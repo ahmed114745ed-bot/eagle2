@@ -964,7 +964,8 @@
     .btn-info,
     .btn-twitter,
     .btn-instagram,
-    .btn-default ,
+    .btn-default,
+    .btn-success,
     .btn-danger {
         color: var(--text-secondary-color) !important;
         border: none !important;
@@ -1006,16 +1007,16 @@
         background: red !important;
     }
 
-    .btn-success {
-        background: var(--success-button) !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 10px 20px !important;
-        font-weight: 500 !important;
-        transition: var(--transition) !important;
-        box-shadow: var(--shadow-sm) !important;
-    }
+    /*.btn-success {*/
+    /*    background: var(--success-button) !important;*/
+    /*    color: #ffffff !important;*/
+    /*    border: none !important;*/
+    /*    border-radius: 8px !important;*/
+    /*    padding: 10px 20px !important;*/
+    /*    font-weight: 500 !important;*/
+    /*    transition: var(--transition) !important;*/
+    /*    box-shadow: var(--shadow-sm) !important;*/
+    /*}*/
 
     .bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
         background-color: var(--primary-color) !important;
@@ -2286,6 +2287,280 @@
     .fields-group .form-control:focus {
         outline: none !important;
         box-shadow: none !important;
+    }
+
+    .modal-dialog {
+        margin: 4% auto !important;
+    }
+
+    .modal-header .close {
+        margin-top: -4% !important;
+    }
+
+
+    /* ==========================================
+   AGENCY HEADER - RESPONSIVE DESIGN
+   ========================================== */
+
+    /* Main Header Container */
+    .agency-header {
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+        padding: 24px;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.5));
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Avatar Section */
+    .agency-avatar {
+        flex-shrink: 0;
+    }
+
+    .agency-avatar .logo-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Info Section */
+    .agency-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .agency-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0;
+    }
+
+    /* Meta Items */
+    .agency-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .meta-label {
+        color: #94a3b8;
+        font-size: 13px;
+        font-weight: 500;
+    }
+
+    .meta-value {
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .flag-image {
+        height: 16px;
+        border-radius: 2px;
+        margin-right: 4px;
+    }
+
+    /* Stats Section */
+    .agency-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+
+    /* ==========================================
+       BUTTONS CARD
+       ========================================== */
+
+    .card.p-3.bg-danger-subtle {
+        background: rgba(30, 41, 59, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 16px !important;
+        margin-top: auto;
+        align-self: flex-start;
+    }
+
+    .card.p-3.bg-danger-subtle .d-flex {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 10px !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    /* All Buttons */
+    /*.card.p-3.bg-danger-subtle .btn {*/
+    /*    border-radius: 10px !important;*/
+    /*    padding: 10px 18px !important;*/
+    /*    font-size: 13px !important;*/
+    /*    font-weight: 500 !important;*/
+    /*    transition: all 0.3s ease !important;*/
+    /*    white-space: nowrap !important;*/
+    /*}*/
+
+    /*!* Back Button *!*/
+    /*.card.p-3.bg-danger-subtle .btn-light {*/
+    /*    background: rgba(255, 255, 255, 0.08) !important;*/
+    /*    color: #e2e8f0 !important;*/
+    /*    border: 1px solid rgba(255, 255, 255, 0.1) !important;*/
+    /*}*/
+
+    /*.card.p-3.bg-danger-subtle .btn-light:hover {*/
+    /*    background: rgba(255, 255, 255, 0.15) !important;*/
+    /*}*/
+
+    /*!* Edit Button *!*/
+    /*.card.p-3.bg-danger-subtle .btn-success {*/
+    /*    background: var(--gradient-primary) !important;*/
+    /*    color: #fff !important;*/
+    /*    border: none !important;*/
+    /*    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;*/
+    /*}*/
+
+    /*.card.p-3.bg-danger-subtle .btn-success:hover {*/
+    /*    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;*/
+    /*    transform: translateY(-2px) !important;*/
+    /*}*/
+
+    /*!* Remove BD Button *!*/
+    /*.card.p-3.bg-danger-subtle .btn-danger {*/
+    /*    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;*/
+    /*    color: #fff !important;*/
+    /*    border: none !important;*/
+    /*    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;*/
+    /*}*/
+
+    /*.card.p-3.bg-danger-subtle .btn-danger:hover {*/
+    /*    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;*/
+    /*    transform: translateY(-2px) !important;*/
+    /*}*/
+
+    /* ==========================================
+       TABLET RESPONSIVE
+       ========================================== */
+
+    @media (max-width: 992px) {
+        .agency-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .agency-info {
+            align-items: center;
+        }
+
+        .agency-meta {
+            justify-content: center;
+        }
+
+        .agency-stats {
+            justify-content: center;
+        }
+
+        .card.p-3.bg-danger-subtle {
+            width: 100%;
+            align-self: stretch;
+        }
+    }
+
+    /* ==========================================
+       MOBILE RESPONSIVE
+       ========================================== */
+
+    @media (max-width: 576px) {
+        .agency-header {
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .agency-avatar .logo-img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .agency-name {
+            font-size: 18px;
+        }
+
+        .meta-label,
+        .meta-value {
+            font-size: 11px;
+        }
+
+        .agency-meta {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .meta-item {
+            justify-content: center;
+        }
+
+        .agency-stats {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* BUTTONS ON MOBILE */
+        .card.p-3.bg-danger-subtle {
+            padding: 12px !important;
+        }
+
+        .card.p-3.bg-danger-subtle .d-flex {
+            flex-direction: column !important;
+            gap: 8px !important;
+        }
+
+        .card.p-3.bg-danger-subtle .btn {
+            width: 100% !important;
+            padding: 12px 16px !important;
+            font-size: 13px !important;
+            text-align: center !important;
+        }
+    }
+
+    /* ==========================================
+       EXTRA SMALL SCREENS
+       ========================================== */
+
+    @media (max-width: 380px) {
+        .agency-header {
+            padding: 12px;
+        }
+
+        .agency-avatar .logo-img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .agency-name {
+            font-size: 16px;
+        }
+
+        .meta-label,
+        .meta-value {
+            font-size: 10px;
+        }
+
+        .card.p-3.bg-danger-subtle .btn {
+            padding: 10px 12px !important;
+            font-size: 12px !important;
+        }
     }
 
     .stats-container .info-box {

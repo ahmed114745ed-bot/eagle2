@@ -15,7 +15,7 @@
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
             --table-background-color: {{ config('themes.tableBackGroundColor')}}
-             --background-image:{{ config('themes.backgroundImage') }};
+              --background-image:{{ config('themes.backgroundImage') }};
             --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
             --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
             --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
@@ -1039,23 +1039,27 @@
             background-color: transparent !important;
             filter: none !important;
         }
+
         .level-form {
             background-color: transparent !important;
             filter: none !important;
             padding: 10px;
         }
+
         .level-label {
             padding: 10px;
         }
+
         /* .rtl .gift-log-form {
             padding-right: 13%;
         } */
         .ltr .gift-log-form {
             padding-left: 13%;
         }
+
         .card {
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             border-top: 1px solid #dee2e6;
         }
 
@@ -1067,6 +1071,7 @@
             color: #333;
             font-weight: 500;
         }
+
         .table tbody tr:nth-child(even) {
             background-color: var(--secondary-color) !important;
             filter: brightness(0.95);
@@ -1074,31 +1079,32 @@
     </style>
 
 </head>
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" /> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
 
 <body>
 
 <div class="agency-profile-container">
-     {{-- Error Messages --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger mx-3 mt-3">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+    {{-- Error Messages --}}
+    @if ($errors->any())
+        <div class="alert alert-danger mx-3 mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-                    @if ($errors->has('msg'))
-                        <div class="alert alert-danger mx-3 mt-3">
-                            {{ $errors->first('msg') }}
-                        </div>
-                    @endif
+    @if ($errors->has('msg'))
+        <div class="alert alert-danger mx-3 mt-3">
+            {{ $errors->first('msg') }}
+        </div>
+    @endif
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
-            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}" alt="Agency Logo" class="logo-img">
+            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}"
+                 alt="Agency Logo" class="logo-img">
         </div>
         <div class="agency-info">
             <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
@@ -1118,10 +1124,10 @@
                     <span class="meta-label">{{__("Phone")}}:</span>
                     <span class="meta-value">{{ @$user->phone ?? 'N/A' }}</span>
                     <span class="meta-label">{{ __("country") }}:</span>
-                 <img src="{{ getImagePath(@$user->country->flag) }}"
-                     class="flag-image"
-                     alt="flag Image"
-                     title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
+                    <img src="{{ getImagePath(@$user->country->flag) }}"
+                         class="flag-image"
+                         alt="flag Image"
+                         title="{{ app()->getLocale() === 'ar' ? @$user->country->name : @$user->country->e_name }}">
                 </div>
 
 
@@ -1131,8 +1137,8 @@
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
 
-                             <span class="meta-value d-block">{{ $availableBalance }}</span>
-                                <!-- <span class="meta-value">{{ $curantBalance }}</span>
+                        <span class="meta-value d-block">{{ $availableBalance }}</span>
+                        <!-- <span class="meta-value">{{ $curantBalance }}</span>
                                 <span class="meta-value">{{ $availableBalance }}</span> -->
 
                     </div>
@@ -1173,20 +1179,20 @@
                 </div>
             </div>
             <div class="agency-meta">
-                 <div class="meta-item">
-                        <span class="meta-label">{{__('type')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                   {!! @$user->userTypeBadge() !!}
-                    </div>
+                <div class="meta-item">
+                    <span class="meta-label">{{__('type')}}:</span>
+                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
+                    {!! @$user->userTypeBadge() !!}
+                </div>
 
             </div>
 
             <div class="agency-meta">
-                 <div class="meta-item">
-                        <span class="meta-label">{{__('badges')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                   {!! @$user->userBadge() !!}
-                    </div>
+                <div class="meta-item">
+                    <span class="meta-label">{{__('badges')}}:</span>
+                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
+                    {!! @$user->userBadge() !!}
+                </div>
 
             </div>
         </div>
@@ -1195,15 +1201,15 @@
                 <a href="{{ url('admin/users/') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
                 </a>
-                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                        <button type="submit" class="btn btn-success edit_user_item_model_btn">
-                            {{ __('edit') }}
-                        </button>
-                 @endif
+                    <button type="submit" class="btn btn-success edit_user_item_model_btn">
+                        {{ __('edit') }}
+                    </button>
+                @endif
 
-                 @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
-                     <button type="button"
+                @if (($user->is_bd == 1) && (\Encore\Admin\Facades\Admin::user()->can('edit-users') || \Encore\Admin\Facades\Admin::user()->can('*')))
+                    <button type="button"
                             class="btn btn-danger remove-bd-btn"
                             data-id="{{ $user->id }}"
                             data-url="{{ route('users.remove', $user->id) }}">
@@ -1216,15 +1222,16 @@
 
 
     @php
-           $activeTab = request('tab', 'salary');
+        $activeTab = request('tab', 'salary');
 
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
 
-          <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
+        <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
 
-        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('vips') }}</a>
+        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+           data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
@@ -1236,13 +1243,17 @@
         <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-           <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-           <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-          <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}" data-target="badges-tab">{{ __('badges') }}</a>
+        <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+           data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
+        <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+           data-target="user-coins-tab">{{ __('User Coins') }}</a>
+        <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
+           data-target="badges-tab">{{ __('badges') }}</a>
 
-          <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}" data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
+        <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
+           data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
     <div id="tab-loading" style="
             display: none;
@@ -1273,15 +1284,16 @@
             <div class="box-body">
                 <div class="nav-scroll-container">
 
-                        <ul class="nav nav-pills">
-                            @foreach($types as $id => $name)
-                                <li class="{{ $type == $id ? 'active' : '' }}">
-                                    <a href="{{ request()->fullUrlWithQuery(['type' => $id, 'pack_page' => 1]) }}" class="charge_action">
-                                        {{ __($name) }}
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
+                    <ul class="nav nav-pills">
+                        @foreach($types as $id => $name)
+                            <li class="{{ $type == $id ? 'active' : '' }}">
+                                <a href="{{ request()->fullUrlWithQuery(['type' => $id, 'pack_page' => 1]) }}"
+                                   class="charge_action">
+                                    {{ __($name) }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
 
@@ -1305,7 +1317,7 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($packs as $index => $pack)
-                               @php
+                                @php
                                     $path = @$pack->ware?->show_img ?? '';
 
                                     $admin = null;
@@ -1332,16 +1344,16 @@
                                     <td>
                                         @if ($admin && @$pack->receive_type == 'wares-dash-dedicate')
                                             <a href="{{ $url ?? '#' }}" target="_blank"
-                                       style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ $image }}" width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $name }} ({{ $uid }})</span>
-                                    </a>
+                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                <img src="{{ $image }}" width="30" height="30"
+                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                <span>{{ $name }} ({{ $uid }})</span>
+                                            </a>
                                         @else
 
                                         @endif
 
-                                </td>
+                                    </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
 
                                     <td>{{ $pack->getType() }}</td>
@@ -1352,48 +1364,50 @@
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :$pack->days  }}</td>
                                     {{-- <td>{{ $pack->receive_type }}</td> --}}
-                                        <td>
-                                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                                {{-- Always show type --}}
-                                                <span style="font-weight: 600; color: #444;">
+                                    <td>
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            {{-- Always show type --}}
+                                            <span style="font-weight: 600; color: #444;">
                                                     {{ @$pack->receive_type ?? '' }}
                                                 </span>
 
-                                                {{-- If receive_type contains "send", show sender below --}}
-                                                @if(@$pack->sender && Str::contains(@$pack->receive_type, 'send'))
-                                                    @php
-                                                        $name = @$pack->sender->name ?? 'Unknown User';
-                                                        $showUrl = url("admin/users/" . @$pack->sender->id);
-                                                    @endphp
+                                            {{-- If receive_type contains "send", show sender below --}}
+                                            @if(@$pack->sender && Str::contains(@$pack->receive_type, 'send'))
+                                                @php
+                                                    $name = @$pack->sender->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/users/" . @$pack->sender->id);
+                                                @endphp
 
-                                                    <a href="{{ $showUrl }}"
-                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                <a href="{{ $showUrl }}"
+                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
                                                         <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                             sender:
                                                         </span>
-                                                        <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                             {{ $name }}
                                                         </span>
-                                                    </a>
-                                                     @elseif($pack->receive_type == 'wares-dash-dedicate' && $pack->admin)
+                                                </a>
+                                            @elseif($pack->receive_type == 'wares-dash-dedicate' && $pack->admin)
                                                 @php
                                                     $name = @$pack->admin->name ?? 'Unknown User';
                                                     $showUrl = url("admin/auth/users/" . @$pack->admin->id);
                                                 @endphp
 
                                                 <a href="{{ $showUrl }}"
-                                                style="text-decoration: none; color: #28a745; display: inline-block;">
+                                                   style="text-decoration: none; color: #28a745; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         admin:
                                                     </span>
-                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                         {{ $name }}
                                                     </span>
                                                 </a>
 
-                                                @endif
-                                            </div>
-                                        </td>
+                                            @endif
+                                        </div>
+                                    </td>
 
 
                                     <td>
@@ -1468,7 +1482,7 @@
                                     </td>
                                     <td>{{ @$userVip->qty ?? 0 }}</td>
                                     <td>{{ @$userVip->total ?? 0 }}</td>
-                                  <td>
+                                    <td>
                                         <div style="display: flex; flex-direction: column; gap: 4px;">
                                             {{-- Always show type --}}
                                             <span style="font-weight: 600; color: #444;">
@@ -1483,11 +1497,12 @@
                                                 @endphp
 
                                                 <a href="{{ $showUrl }}"
-                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         sender:
                                                     </span>
-                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                         {{ $name }}
                                                     </span>
                                                 </a>
@@ -1499,11 +1514,12 @@
                                                 @endphp
 
                                                 <a href="{{ $showUrl }}"
-                                                style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
                                                     <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                         sender:
                                                     </span>
-                                                    <span style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                         {{ $name }}
                                                     </span>
                                                 </a>
@@ -1550,7 +1566,8 @@
             <div class="box-body p-3">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
+                              class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="salary">
                             <div class="row">
                                 <div class="col-md-6">
@@ -1564,7 +1581,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                        <input type="text" class="form-control year" placeholder="السنة"
+                                                               name="year"
                                                                value="{{ request('year') }}" style="text-align: right;">
                                                     </div>
                                                 </div>
@@ -1577,7 +1595,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                        <input type="text" class="form-control month"
+                                                               placeholder="الشهر"
                                                                name="month" value="{{ request('month') }}"
                                                                style="text-align: right;">
                                                     </div>
@@ -1675,7 +1694,8 @@
                                                     <div style="display: flex; flex-direction: column;">
                                                     <span
                                                         style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                        <span
+                                                            style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
                                                     </div>
                                                 </div>
                                             </a>
@@ -1745,13 +1765,15 @@
                                 <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Sender Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
+                                    <input type="number" min="0" value="{{ $user->total_sender_level }}"
+                                           class="form-control "
                                            id="total_sender_level" name="total_sender_level" required>
                                 </div>
 
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Received Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
+                                    <input type="number" min="0" value="{{ $user->total_received_level }}"
+                                           class="form-control "
                                            id="total_received_level" name="total_received_level" required>
                                 </div>
                             </div>
@@ -1768,19 +1790,20 @@
     </div>
 
     <div class="tab-content {{ $activeTab == 'wallet_logs' ? 'active show' : 'd-none' }}" id="wallet-logs-tab">
-       <div class="box-body">
-        <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">
-                {{ __('wallet-transactions') }}
-            </h4>
-        </div>
+        <div class="box-body">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">
+                    {{ __('wallet-transactions') }}
+                </h4>
+            </div>
 
 
-    <div class="card">
+            <div class="card">
 
-      <div class="card mb-4">
+                <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
+                              class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="wallet_logs">
                             <div class="row">
                                 <div class="col-md-6">
@@ -1794,7 +1817,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                        <input type="text" class="form-control year" placeholder="السنة"
+                                                               name="year"
                                                                value="{{ request('year') }}" style="text-align: right;">
                                                     </div>
                                                 </div>
@@ -1807,7 +1831,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                        <input type="text" class="form-control month"
+                                                               placeholder="الشهر"
                                                                name="month" value="{{ request('month') }}"
                                                                style="text-align: right;">
                                                     </div>
@@ -1842,56 +1867,56 @@
                         </form>
                     </div>
                 </div>
-<div class="box-body">
+                <div class="box-body">
 
 
-                <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
-                    <thead class="table-light">
-                    <tr>
-                        <th>#</th>
-                        <th>{{ __('Type') }}</th>
-                        <!-- <th>{{ __('Type') }}</th> -->
-                        <th>{{ __('Amount') }}</th>
-                        <th>{{ __('amount before') }}</th>
-                        <th>{{ __('amount after') }}</th>
-                        <th>{{ __('Created at') }}</th>
-                    </tr>
-                    </thead>
+                    <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Type') }}</th>
+                            <!-- <th>{{ __('Type') }}</th> -->
+                            <th>{{ __('Amount') }}</th>
+                            <th>{{ __('amount before') }}</th>
+                            <th>{{ __('amount after') }}</th>
+                            <th>{{ __('Created at') }}</th>
+                        </tr>
+                        </thead>
 
-                    @if($walletLogs && $walletLogs->count())
-                        <tbody style="color: rgb(208, 115, 43);">
-                        @foreach($walletLogs as $index => $log)
-                            <tr>
-                                <td>{{ $walletLogs->firstItem() + $index }}</td>
-                                <td>{{ __("wallet." . $log->operation) }}</td>
+                        @if($walletLogs && $walletLogs->count())
+                            <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($walletLogs as $index => $log)
+                                <tr>
+                                    <td>{{ $walletLogs->firstItem() + $index }}</td>
+                                    <td>{{ __("wallet." . $log->operation) }}</td>
 
-                                <!-- <td>{{ $log->type }}</td> -->
-                                <td>{{ number_format($log->amount, 2) }}</td>
-                                <td>{{ number_format($log->before_amount, 2) }}</td>
-                                <td>{{ number_format($log->after_amount, 2) }}</td>
-                                <td>{{ $log->created_at }}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    @endif
+                                    <!-- <td>{{ $log->type }}</td> -->
+                                    <td>{{ number_format($log->amount, 2) }}</td>
+                                    <td>{{ number_format($log->before_amount, 2) }}</td>
+                                    <td>{{ number_format($log->after_amount, 2) }}</td>
+                                    <td>{{ $log->created_at }}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        @endif
 
-                </table>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <div class="pagination-wrapper">
-            {{ $walletLogs?->appends([
-                'tab'         => 'wallet_logs',
-                'wallet_logs_page' => $walletLogs?->currentPage(),
-            ])->links('vendor.pagination.default') }}
+            <div class="pagination-wrapper">
+                {{ $walletLogs?->appends([
+                    'tab'         => 'wallet_logs',
+                    'wallet_logs_page' => $walletLogs?->currentPage(),
+                ])->links('vendor.pagination.default') }}
+            </div>
+
         </div>
 
     </div>
 
-</div>
 
-
-     <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
+    <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('badges') }}</h4>
@@ -1916,48 +1941,49 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($badges as $index => $badge)
-                               @php
-                                        $admin = $badge->admin;
+                                @php
+                                    $admin = $badge->admin;
 
-                                    $image = $admin->avatar ?? '';
-                                    $defaultImage = asset("images/businessman-icon.jpg");
-                                    $imagePath = getImagePath($image);
-                                    $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
+                                $image = $admin->avatar ?? '';
+                                $defaultImage = asset("images/businessman-icon.jpg");
+                                $imagePath = getImagePath($image);
+                                $image = isImageExists($imagePath) ? $imagePath : $defaultImage;
 
-                                    $nameRaw = optional($admin)->name ?? @$admin->username;
-                                    $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
+                                $nameRaw = optional($admin)->name ?? @$admin->username;
+                                $name = is_array($nameRaw) ? reset($nameRaw) : (string) $nameRaw;
 
-                                    $uid = optional($admin)->id ?? 0;
-                                    $url = $admin ? url("admin/auth/users/" . $uid) : '#';
+                                $uid = optional($admin)->id ?? 0;
+                                $url = $admin ? url("admin/auth/users/" . $uid) : '#';
                                 @endphp
                                 <tr>
                                     <td>{{ $badges->firstItem() + $index }}</td>
                                     <td>
                                         @if ($admin )
                                             <a href="{{ $url ?? '#' }}" target="_blank"
-                                       style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ $image }}" width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $name }} ({{ $uid }})</span>
-                                    </a>
+                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                <img src="{{ $image }}" width="30" height="30"
+                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                <span>{{ $name }} ({{ $uid }})</span>
+                                            </a>
                                         @else
 
                                         @endif
 
-                                </td>
+                                    </td>
                                     <td>{{ (!empty($badge->expire) && $badge->expire !== '0') ? \Carbon\Carbon::parse($badge->expire)->format('Y-m-d H:i:s') :$badge->days  }}</td>
 
 
-                                 <td>{{ $badge->receive_type }}</td>
-                                   <td>{{ $badge->created_at }}</td>
+                                    <td>{{ $badge->receive_type }}</td>
+                                    <td>{{ $badge->created_at }}</td>
                                     <td>
-                                         @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp) )
-                                        <div class="d-flex">
-                                            <button class="btn btn-danger delete-badge-btn" data-id="{{ @$badge->id }}">
-                                                {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div>
-                                         @endif
+                                        @if (($badge->expire == 0) || ($badge->expire >= now()->timestamp) )
+                                            <div class="d-flex">
+                                                <button class="btn btn-danger delete-badge-btn"
+                                                        data-id="{{ @$badge->id }}">
+                                                    {{ __('dashboard.delete') }}
+                                                </button>
+                                            </div>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -1980,58 +2006,63 @@
 
     </div>
 
-<div class="tab-content" id="user-agency-tab" style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
-        </div>
-        <div class="box-body p-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
-                        <input type="hidden" name="tab" value="user-agency">
+    <div class="tab-content" id="user-agency-tab"
+         style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
+            </div>
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
+                              method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="user-agency">
 
-                        <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
+                            <input type="hidden" name="user_agency_page"
+                                   value="{{ request()->get('user_agency_page', 1) }}">
 
-                        <div class="row mb-3" style="align-items: flex-end;">
-                            <!-- From Date -->
-                            <div class="col-md-4">
-                                <div class="date-flex-row">
-                                    <i class="fa fa-calendar"></i>
-                                    <span>{{ __('Join date') }}</span>
-                                    <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('Join date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="join_date"
+                                               value="{{ request('join_date') }}">
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('admin/users/' . $user->id. '?tab=user-agency') }}"
+                                       class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
                                 </div>
                             </div>
-
-                            <!-- Buttons -->
-                            <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
-                                <button type="submit" class="btn btn-info btn-sm me-2">
-                                    <i class="fa fa-search"></i> {{__('Search')}}
-                                </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{__('Reset')}}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('agency') }}</th>
-                            <th>{{ __('status') }}</th>
-                            <th>{{ __('kicked By') }}</th>
-                            <th>{{ __('kicked By status') }}</th>
-                            <th>{{ __('Join date') }}</th>
-                            <th>{{ __('Leave date') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('agency') }}</th>
+                                <th>{{ __('status') }}</th>
+                                <th>{{ __('kicked By') }}</th>
+                                <th>{{ __('kicked By status') }}</th>
+                                <th>{{ __('Join date') }}</th>
+                                <th>{{ __('Leave date') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             @if($userJoinAgencies && $userJoinAgencies->count())
                                 @foreach($userJoinAgencies as $index => $userJoinAgency)
                                     @php
@@ -2057,37 +2088,37 @@
                                     @endphp
 
                                     @php
-                                       if ($userJoinAgency->status == 'kick off'){
-                                           if ($userJoinAgency->kicked_by_app){
-                                            $status = 'app';
-                                            $kickedBy = $userJoinAgency['kickedByApp'];
-                                            $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->uuid ?? '';
-                                            $kickedByPath = @$kickedBy->profile?->avatar;
-                                            $defaultImage = asset("images/businessman-icon.jpg");
-                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
-                                            if (!isImageExists($url)) {
-                                                $url = $defaultImage;
-                                            }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
-                                        }
+                                        if ($userJoinAgency->status == 'kick off'){
+                                            if ($userJoinAgency->kicked_by_app){
+                                             $status = 'app';
+                                             $kickedBy = $userJoinAgency['kickedByApp'];
+                                             $kickedByName = $kickedBy->name ?? '';
+                                             $kickedByUuid = $kickedBy->uuid ?? '';
+                                             $kickedByPath = @$kickedBy->profile?->avatar;
+                                             $defaultImage = asset("images/businessman-icon.jpg");
+                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                             if (!isImageExists($url)) {
+                                                 $url = $defaultImage;
+                                             }
+                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByUrl = url("admin/users/" . ($kickedBy->id) ?? 0);
+                                         }
 
-                                        if ($userJoinAgency->kicked_by_admin){
-                                            $status = 'admin';
-                                            $kickedBy = $userJoinAgency['kickedByAdmin'];
-                                            $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->id ?? '';
-                                            $kickedByPath = @$kickedBy?->avatar;
-                                            $defaultImage = asset("images/businessman-icon.jpg");
-                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
-                                            if (!isImageExists($url)) {
-                                                $url = $defaultImage;
-                                            }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
-                                        }
-                                    }
+                                         if ($userJoinAgency->kicked_by_admin){
+                                             $status = 'admin';
+                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
+                                             $kickedByName = $kickedBy->name ?? '';
+                                             $kickedByUuid = $kickedBy->id ?? '';
+                                             $kickedByPath = @$kickedBy?->avatar;
+                                             $defaultImage = asset("images/businessman-icon.jpg");
+                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                             if (!isImageExists($url)) {
+                                                 $url = $defaultImage;
+                                             }
+                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByUrl = url("admin/auth/users/".($kickedBy->id ?? 0));
+                                         }
+                                     }
                                     @endphp
 
                                     <tr>
@@ -2097,8 +2128,10 @@
                                                 <div style="display: flex; align-items: center; gap: 10px;">
                                                     {!! $image !!}
                                                     <div style="display: flex; flex-direction: column;">
-                                                    <span style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                        <span
+                                                            style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span
+                                                            style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
                                                     </div>
                                                 </div>
                                             </a>
@@ -2123,104 +2156,111 @@
                                     <td colspan="5" class="text-center">{{ __('No agency join logs found') }}</td>
                                 </tr>
                             @endif
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
 
-                    @if($userJoinAgencies && $userJoinAgencies->count())
-                        <div class="pagination-container">
-                            {{ $userJoinAgencies->appends([
-                                'tab' => 'user-agency',
-                                'user_agency_page' => $userJoinAgencies?->currentPage(),
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+                        @if($userJoinAgencies && $userJoinAgencies->count())
+                            <div class="pagination-container">
+                                {{ $userJoinAgencies->appends([
+                                    'tab' => 'user-agency',
+                                    'user_agency_page' => $userJoinAgencies?->currentPage(),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
 
 @if($activeTab == 'user-coins')
 
-<div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
-    <div class="card">
-    <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
-        </div>
-        <div class="box-body p-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
-                        <input type="hidden" name="tab" value="user-coins">
-                        <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
-
-                        <div class="row mb-3" style="align-items: flex-end;">
-                            <!-- From Date -->
-                            <div class="col-md-3">
-                                <label>{{ __('From Date') }}</label>
-                                <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
-                            </div>
-
-                            <!-- To Date -->
-                            <div class="col-md-3">
-                                <label>{{ __('To Date') }}</label>
-                                <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
-                            </div>
-
-                            <!-- Sub Type -->
-                            <div class="col-md-3">
-                                <label>{{ __('Sub Type') }}</label>
-                                <select name="sub_type" class="form-control">
-                                    <option value="">{{ __('All') }}</option>
-                                    @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
-                                        <option value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Search/Reset Buttons -->
-                            <div class="col-md-3 d-flex align-items-end justify-content-end" style="gap: 8px;top: 23px;">
-                                <button type="submit" class="btn btn-info btn-sm me-2">
-                                    <i class="fa fa-search"></i> {{ __('Search') }}
-                                </button>
-                                <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{ __('Reset') }}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="tab-content" id="user-coins-tab"
+         style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
             </div>
-        <div class="table-responsive">
-            <div class="box-body ">
-                <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('type') }}</th>
-                            <th>{{ __('sub type') }}</th>
-                            <th>{{ __('Item Name') }}</th>
-                            <th>{{ __('balance before') }}</th>
-                            <th>{{ __('amount') }}</th>
-                            <th>{{ __('balance yet') }}</th>
-                            <th>{{ __('from date') }}</th>
-                            <th>{{ __('to date') }}</th>
-                            <!-- <th>{{ __('action') }}</th> -->
-                        </tr>
-                    </thead>
-                    @if($usersCoins && $usersCoins->count())
-                        <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($usersCoins as $index => $coin)
-                                <tr>
-                                    <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
-                                    <td>{{ $coin->type }}</td>
-                                    <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                    <td>{{ @$coin->item_name ?? '' }}</td>
-                                    <td>{{ @$coin->amount_before ?? 0 }}</td>
-                                    <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
-                                        {{ $coin->amount ?? 0 }}
-                                        @if($coin->sub_type == 'coin_game_users')
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal user-agency-form"
+                              method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="user-coins">
+                            <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
+
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-3">
+                                    <label>{{ __('From Date') }}</label>
+                                    <input type="date" class="form-control" name="from_date"
+                                           value="{{ request('from_date') }}">
+                                </div>
+
+                                <!-- To Date -->
+                                <div class="col-md-3">
+                                    <label>{{ __('To Date') }}</label>
+                                    <input type="date" class="form-control" name="to_date"
+                                           value="{{ request('to_date') }}">
+                                </div>
+
+                                <!-- Sub Type -->
+                                <div class="col-md-3">
+                                    <label>{{ __('Sub Type') }}</label>
+                                    <select name="sub_type" class="form-control">
+                                        <option value="">{{ __('All') }}</option>
+                                        @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
+                                            <option
+                                                value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Search/Reset Buttons -->
+                                <div class="col-md-3 d-flex align-items-end justify-content-end"
+                                     style="gap: 8px;top: 23px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{ __('Search') }}
+                                    </button>
+                                    <a href="{{ url('admin/users/' . $user->id. '?tab=user-coins') }}"
+                                       class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{ __('Reset') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('type') }}</th>
+                                <th>{{ __('sub type') }}</th>
+                                <th>{{ __('Item Name') }}</th>
+                                <th>{{ __('balance before') }}</th>
+                                <th>{{ __('amount') }}</th>
+                                <th>{{ __('balance yet') }}</th>
+                                <th>{{ __('from date') }}</th>
+                                <th>{{ __('to date') }}</th>
+                                <!-- <th>{{ __('action') }}</th> -->
+                            </tr>
+                            </thead>
+                            @if($usersCoins && $usersCoins->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($usersCoins as $index => $coin)
+                                    <tr>
+                                        <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
+                                        <td>{{ $coin->type }}</td>
+                                        <td>{{ @$coin->sub_type ?? 0 }}</td>
+                                        <td>{{ @$coin->item_name ?? '' }}</td>
+                                        <td>{{ @$coin->amount_before ?? 0 }}</td>
+                                        <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ $coin->amount ?? 0 }}
+                                            @if($coin->sub_type == 'coin_game_users')
                                                 <br>
                                                 <small class="d-block text-muted text-success">
                                                     {{  $coin->helper_amount }} {{  __('profit') }}
@@ -2229,45 +2269,45 @@
                                                 <small class="d-block text-muted text-danger">
                                                     {{ $coin->amount  - $coin->helper_amount }}  {{  __('loss')}}
                                                 </small>
-                                        @endif
-                                    </td>
-                                    <td>
+                                            @endif
+                                        </td>
+                                        <td>
 
-                                     {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
+                                            {{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0)}}
 
 
-                                     </td>
-                                     <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
-                                     <td>{{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button> -->
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    @endif
-                </table>
+                                                </button> -->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
 
-                @if($usersCoins)
-                    <div class="pagination-container">
-                        {{ $usersCoins->appends([
-                            'tab' => 'user-coins',
-                            'pack_page' => $packs?->currentPage(),
-                            'salary_page' => $salaries?->currentPage(),
-                            'gift_page' => $giftSLogs?->currentPage(),
-                            'coins_page' => $usersCoins?->currentPage(),
-                        ])->links('vendor.pagination.bootstrap-4') }}
+                        @if($usersCoins)
+                            <div class="pagination-container">
+                                {{ $usersCoins->appends([
+                                    'tab' => 'user-coins',
+                                    'pack_page' => $packs?->currentPage(),
+                                    'salary_page' => $salaries?->currentPage(),
+                                    'gift_page' => $giftSLogs?->currentPage(),
+                                    'coins_page' => $usersCoins?->currentPage(),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
         </div>
-      </div>
     </div>
-</div>
 @endif
 
 @if($activeTab == 'charge')
@@ -2399,7 +2439,8 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                        <form action="{{ url('admin/users/' . $user->id) }}" class="form-horizontal gift-log-form"
+                              method="GET" pjax-container>
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
@@ -2410,7 +2451,8 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('From Date') }}</span>
-                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                        <input type="date" class="form-control" id="from_date" name="start_at"
+                                               value="{{ request('start_at') }}">
                                     </div>
                                 </div>
                                 <!-- To Date -->
@@ -2418,7 +2460,8 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('To Date') }}</span>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                        <input type="date" class="form-control" id="to_date" name="end_at"
+                                               value="{{ request('end_at') }}">
                                     </div>
                                 </div>
                                 @if ($giftType == 'receiver')
@@ -2440,7 +2483,8 @@
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
                                     </button>
-                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                    <a href="{{ url('admin/users/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}"
+                                       class="btn btn-default btn-sm">
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
@@ -2528,17 +2572,17 @@
                                 <td>
                                     @if ($giftType === 'receiver' &&@$giftSLog->giftId ==0)
 
-                                            <h5>{{__('remaining diamond')}}</h5>
-                                        @else
-                                    <a href="{{ url('admin/users/' . $id) }}" target="_blank"
-                                       class="d-flex align-items-center text-decoration-none">
-                                        <img src="{{ $image }}" width="40" height="40"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <div>
-                                            <strong style="font-size: 14px;">{{ $name }}</strong><br>
-                                            <small class="text-muted">UUID: {{ $uid }}</small>
-                                        </div>
-                                    </a>
+                                        <h5>{{__('remaining diamond')}}</h5>
+                                    @else
+                                        <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                           class="d-flex align-items-center text-decoration-none">
+                                            <img src="{{ $image }}" width="40" height="40"
+                                                 style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                            <div>
+                                                <strong style="font-size: 14px;">{{ $name }}</strong><br>
+                                                <small class="text-muted">UUID: {{ $uid }}</small>
+                                            </div>
+                                        </a>
                                     @endif
                                 </td>
                                 <td>
@@ -2550,7 +2594,8 @@
                                                  style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                             <div>
                                                 <span>{{ $roomName }}</span><br>
-                                                <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                                <small
+                                                    class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
                                             </div>
                                         </a>
                                     @endif
@@ -2596,7 +2641,8 @@
                                         <div>
                                             <span>{{ $giftName }}</span><br>
                                             <small class="text-muted">
-                                                {{ __('Type') }}: {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
+                                                {{ __('Type') }}
+                                                : {{ __(ucfirst(TYPE_GIFT[@$giftSLog->gift->type ?? 1])) }}<br>
                                                 @if(@$giftSLog->gift->pk)
                                                     <br>{{ __('PK') }}
                                                 @endif
@@ -2648,7 +2694,6 @@
 @endif
 
 
-
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
         <div class="modal-content border-0">
@@ -2688,7 +2733,8 @@
                         </div>
                     </div>
                     <div class="modal-footer mt-3">
-                        <button class="btn btn-secondary close-modal-btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }} </button>
+                        <button class="btn btn-secondary close-modal-btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }} </button>
                         <button class="btn btn-primary add_country" type="submit">{{ __('save') }} </button>
                     </div>
                 </form>
@@ -2698,96 +2744,103 @@
 </div>
 
 
+<div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg mt-6" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-content position-relative">
+                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
+                <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST"
+                      enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-0">
 
-    <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg mt-6" role="document">
-            <div class="modal-content border-0">
-                <div class="modal-content position-relative">
-                    <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
-                        <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                                data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                        <div class="p-4">
+                            <div class="row flex-evenly">
+                                <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
 
-                    <form action="{{ url('/admin/update-user') }}" id="country_update_form" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body p-0">
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('Name') }}</label>
+                                    <input type="text" name="name" class="form-control"
+                                           value="{{ old('name', $user->name ?? '') }}">
+                                </div>
 
-                            <div class="p-4">
-                                <div class="row flex-evenly">
-                                    <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('uuid') }}</label>
+                                    <input type="text" name="uuid" class="form-control"
+                                           value="{{ old('uuid', $user->uuid ?? '') }}">
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('Name') }}</label>
-                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" >
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('email') }}</label>
+                                    <input type="email" name="email" class="form-control"
+                                           value="{{ old('email', $user->email ?? '') }}">
+                                </div>
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('phone') }}</label>
+                                    <input type="text" name="phone" class="form-control"
+                                           value="{{ old('phone', $user->phone ?? '') }}">
+                                </div>
+
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('Gender') }}</label>
+                                    <select class="form-select col-lg-6" name="gender">
+                                        <option value="">{{ __('Choose gender') }}</option>
+                                        <option
+                                            value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
+                                        <option
+                                            value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-6 form-group mb-3">
+                                    <label class="form-label">{{ __('image') }}</label>
+                                    <input class="form-control" name="image" accept="image/*" type="file"/>
+                                    <div class="mt-2">
+                                        <img
+                                            src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
+                                            class="rounded"
+                                            style="width: 100px; height: 100px"
+                                            id="img_edit"
+                                            alt="{{ $user->name ?? '' }}">
                                     </div>
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('uuid') }}</label>
-                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" >
-                                    </div>
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('Country') }}</label>
+                                    <select class="form-select col-lg-6" name="country_id" id="country_id">
+                                        @foreach($countries as $id => $name)
+                                            <option
+                                                value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('email') }}</label>
-                                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}">
-                                    </div>
-
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('phone') }}</label>
-                                        <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone ?? '') }}" >
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('Gender') }}</label>
-                                        <select class="form-select col-lg-6" name="gender">
-                                            <option value="">{{ __('Choose gender') }}</option>
-                                            <option value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
-                                            <option value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-lg-6 form-group mb-3">
-                                        <label class="form-label">{{ __('image') }}</label>
-                                        <input class="form-control" name="image" accept="image/*" type="file" />
-                                        <div class="mt-2">
-                                            <img src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
-                                                class="rounded"
-                                                style="width: 100px; height: 100px"
-                                                id="img_edit"
-                                                alt="{{ $user->name ?? '' }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('Country') }}</label>
-                                        <select class="form-select col-lg-6" name="country_id" id="country_id">
-                                            @foreach($countries as $id => $name)
-                                                <option value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
-                                                    {{ $name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('bio') }}</label>
-                                        <textarea class="form-control"  cols="10" name="bio" rows="2">{{ old('bio', $user->bio ?? '') }}</textarea>
-                                    </div>
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('bio') }}</label>
+                                    <textarea class="form-control" cols="10" name="bio"
+                                              rows="2">{{ old('bio', $user->bio ?? '') }}</textarea>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                            <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-
+</div>
 
 
 <!-- jQuery أولاً -->
@@ -2800,48 +2853,47 @@
 <script>
 
 
-
     $(document).ready(function () {
 
-     $(document).on('click', '.edit_user_item_model_btn', function() {
-                $('#item_modal_update').modal('show');
-       });
+        $(document).on('click', '.edit_user_item_model_btn', function () {
+            $('#item_modal_update').modal('show');
+        });
 
-       $(document).on('click', '.cancel_user_item_model_btn', function() {
+        $(document).on('click', '.cancel_user_item_model_btn', function () {
             $('#item_modal_update').modal('hide');
         });
-    $('#add_form').on('submit', function (e) {
-        e.preventDefault(); // prevent default form submit
+        $('#add_form').on('submit', function (e) {
+            e.preventDefault(); // prevent default form submit
 
-        let form = $(this);
-        let formData = form.serialize();
+            let form = $(this);
+            let formData = form.serialize();
 
-        $.ajax({
-            url: form.attr('action'),
-            method: 'POST',
-            data: formData,
-            success: function (response) {
-                // ✅ close modal
-                $('#Add_model').modal('hide');
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+                    // ✅ close modal
+                    $('#Add_model').modal('hide');
 
-                $('#Add_model').modal('hide');
+                    $('#Add_model').modal('hide');
 
-            // ✅ Reload the page
-            location.reload();
+                    // ✅ Reload the page
+                    location.reload();
 
-            },
-            error: function (xhr) {
-                // show error message
-                let errors = xhr.responseJSON.errors;
-                let msg = '';
-                for (let key in errors) {
-                    msg += errors[key][0] + '\n';
+                },
+                error: function (xhr) {
+                    // show error message
+                    let errors = xhr.responseJSON.errors;
+                    let msg = '';
+                    for (let key in errors) {
+                        msg += errors[key][0] + '\n';
+                    }
+                    alert(msg || 'Something went wrong!');
                 }
-                alert(msg || 'Something went wrong!');
-            }
+            });
         });
     });
-});
 
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -2866,26 +2918,26 @@
             }
 
             tab.addEventListener('click', function (e) {
-                    e.preventDefault();
+                e.preventDefault();
 
-                    const currentUrl = new URL(window.location.href);
-                    const href = tab.getAttribute('href');
-                    const targetUrl = new URL(href, currentUrl.origin);
+                const currentUrl = new URL(window.location.href);
+                const href = tab.getAttribute('href');
+                const targetUrl = new URL(href, currentUrl.origin);
 
-                    // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
-                    if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
-                        document.getElementById('tab-loading').style.display = 'block';
-                        allTabs.forEach(t => t.style.pointerEvents = 'none');
+                // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+                if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+                    document.getElementById('tab-loading').style.display = 'block';
+                    allTabs.forEach(t => t.style.pointerEvents = 'none');
 
-                        setTimeout(() => {
-                            window.location.href = href;
-                        }, 300);
-                    } else {
-                        // لا تعرض اللودر إذا الرابط خارج التابات
+                    setTimeout(() => {
                         window.location.href = href;
-                    }
-                });
+                    }, 300);
+                } else {
+                    // لا تعرض اللودر إذا الرابط خارج التابات
+                    window.location.href = href;
+                }
             });
+        });
 
 
         if (targetElement) {
@@ -2912,65 +2964,65 @@
 
     $(document).ready(function () {
 
-    $(document).on('click', '.remove-bd-btn', function (e) {
-                e.preventDefault();
-                let btn = $(this);
-                let url = btn.data('url');
+        $(document).on('click', '.remove-bd-btn', function (e) {
+            e.preventDefault();
+            let btn = $(this);
+            let url = btn.data('url');
 
-                Swal.fire({
-                    title: 'هل أنت متأكد؟',
-                    text: "لن تستطيع التراجع بعد الحذف!",
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'نعم، احذف',
-                    cancelButtonText: 'إلغاء'
-                }).then((result) => {
-                    if (result.value) {
-                        let form = $('<form>', {
-                            'method': 'POST',
-                            'action': url
-                        }).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_token',
-                            'value': LA.token
-                        })).append($('<input>', {
-                            'type': 'hidden',
-                            'name': '_method',
-                            'value': 'POST'
-                        }));
-                        form.appendTo('body').submit();
-                    }
-                });
+            Swal.fire({
+                title: 'هل أنت متأكد؟',
+                text: "لن تستطيع التراجع بعد الحذف!",
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'نعم، احذف',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.value) {
+                    let form = $('<form>', {
+                        'method': 'POST',
+                        'action': url
+                    }).append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_token',
+                        'value': LA.token
+                    })).append($('<input>', {
+                        'type': 'hidden',
+                        'name': '_method',
+                        'value': 'POST'
+                    }));
+                    form.appendTo('body').submit();
+                }
             });
+        });
 
-         $('#agency_id').select2({
-        placeholder: 'Select agency',
-        allowClear: true,
-        ajax: {
-            url: '/api/search/host-agency', // ✅ make sure this matches your route
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term, // search term
-                    page: params.page || 1
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.data.map(item => ({
-                        id: item.id,
-                        text: item.name
-                    })),
-                    pagination: {
-                        more: data.next_page_url !== null
-                    }
-                };
-            },
-            cache: true
-        }
-    });
+        $('#agency_id').select2({
+            placeholder: 'Select agency',
+            allowClear: true,
+            ajax: {
+                url: '/api/search/host-agency', // ✅ make sure this matches your route
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        })),
+                        pagination: {
+                            more: data.next_page_url !== null
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
 
         console.log("Document ready");
 
@@ -3072,9 +3124,9 @@
             // Open the modal
             $('#Add_model').modal('show');
         });
-            $(document).on('click', '.close-modal-btn', function () {
-                $('#Add_model').modal('hide');
-            });
+        $(document).on('click', '.close-modal-btn', function () {
+            $('#Add_model').modal('hide');
+        });
 
         $(document).on('click', '.delete-btn', function () {
             let itemId = $(this).data('id');
@@ -3115,7 +3167,7 @@
             let itemId = $(this).data('id');
 
             Swal.fire({
-                 title: "{{ __('Are you sure?') }}",
+                title: "{{ __('Are you sure?') }}",
                 text: "{{ __('This action cannot be undone!') }}",
                 showCancelButton: true,
                 confirmButtonText: "{{ __('Yes, delete it!') }}",
