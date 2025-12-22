@@ -35,8 +35,8 @@ class UserCoinLogResource extends JsonResource
  
         case 'payment':
             return [
-                __('wallet.payment_title'),
-                __('wallet.payment_description', [
+                __('payment_title'),
+                __('payment_description', [
                     'amount' => abs($this->amount),
                 ]),
             ];
@@ -44,8 +44,8 @@ class UserCoinLogResource extends JsonResource
         case 'admin_charge':
         case 'bd_charge':
             return [
-                __('wallet.admin_adjustment_title'),
-                __('wallet.admin_adjustment_description', [
+                __('admin_adjustment_title'),
+                __('admin_adjustment_description', [
                     'amount' => abs($this->amount),
                 ]),
             ];
@@ -53,8 +53,8 @@ class UserCoinLogResource extends JsonResource
 
         case 'cp':
             return [
-                __('wallet.cp_title'),
-                __('wallet.cp_description', [
+                __('cp_title'),
+                __('cp_description', [
                     'amount' => abs($this->amount),
                 ]),
             ];
@@ -64,35 +64,35 @@ class UserCoinLogResource extends JsonResource
         case 'gift_logs':
         case 'gift':
             return [
-                __('wallet.gift_title'),
-                __('wallet.gift_description'),
+                __('gift_title'),
+                __('gift_description'),
             ];
 
         case 'daily_gift':
             return [
-                __('wallet.daily_gift_title'),
-                __('wallet.daily_gift_description'),
+                __('daily_gift_title'),
+                __('daily_gift_description'),
             ];
 
         case 'lucky_gift':
             return [
-                __('wallet.lucky_gift_title'),
-                __('wallet.lucky_gift_description'),
+                __('lucky_gift_title'),
+                __('lucky_gift_description'),
             ];
 
         case 'lucky_box':
         case 'box_gift':
             return [
-                __('wallet.lucky_box_title'),
-                __('wallet.lucky_box_description'),
+                __('lucky_box_title'),
+                __('lucky_box_description'),
             ];
 
 
         case 'exchange':
         case 'exchanges_diamonds':
             return [
-                __('wallet.exchange_title'),
-                __('wallet.exchange_description', [
+                __('exchange_title'),
+                __('exchange_description', [
                     'diamonds' => abs($this->amount),
                     'coins'    => abs($this->coin),
                 ]),
@@ -100,8 +100,8 @@ class UserCoinLogResource extends JsonResource
 
         case 'cashback':
             return [
-                __('wallet.cashback_title'),
-                __('wallet.cashback_description', [
+                __('cashback_title'),
+                __('cashback_description', [
                     'amount' => abs($this->amount),
                 ]),
             ];
@@ -109,8 +109,8 @@ class UserCoinLogResource extends JsonResource
 
         case 'packs':
             return [
-                __('packs.purchase_title'),
-                __('packs.purchase_description', [
+                __('purchase_title'),
+                __('purchase_description', [
                     'amount' => abs($this->amount),
                     'item'   => $this->item_name ?? __('packs.default_item'),
                 ]),
@@ -138,44 +138,44 @@ class UserCoinLogResource extends JsonResource
         case 'room_boom':
         case 'host_level':
             return [
-                __('wallet.achievement_title'),
-                __('wallet.achievement_description'),
+                __('achievement_title'),
+                __('achievement_description'),
             ];
 
    
         case 'comment':
             return [
-                __('wallet.comment_title'),
-                __('wallet.comment_description'),
+                __('comment_title'),
+                __('comment_description'),
             ];
 
         case 'family':
             return [
-                __('wallet.family_title'),
-                __('wallet.family_description'),
+                __('family_title'),
+                __('family_description'),
             ];
 
 
         case 'background':
         case 'background_images':
             return [
-                __('wallet.background_title'),
-                __('wallet.background_description'),
+                __('background_title'),
+                __('background_description'),
             ];
 
 
         case 'invitation_charge_earnings':
             return [
-                __('wallet.invitation_title'),
-                __('wallet.invitation_description', [
+                __('invitation_title'),
+                __('invitation_description', [
                     'amount' => abs($this->amount),
                 ]),
             ];
 
         default:
             return [
-                __('wallet.general_title'),
-                __('wallet.general_description'),
+                __('general_title'),
+                __('general_description'),
             ];
     }
 }
