@@ -93,6 +93,16 @@ class UserCoinLogResource extends JsonResource
                     __('coin_game.win_description', ['amount' => $amount]),
                 ];
 
+                case 'packs':
+                return [
+                    __('packs.purchase_title'),
+                    __('packs.purchase_description', [
+                        'amount' => abs($this->amount),
+                        'item'   => $this->item_name ?? __('packs.default_item'),
+                    ]),
+                ];
+
+
             default:
                 return [
                     __('wallet.general_title'),

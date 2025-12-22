@@ -4777,7 +4777,10 @@
 
   "wallet.unknown_user": "مستخدم غير معروف",
   "wallet.general_title": "عملية في المحفظة",
-  "wallet.general_description": "تم تنفيذ عملية على محفظتك."
+  "wallet.general_description": "تم تنفيذ عملية على محفظتك.",
+    "packs.purchase_title": "شراء من المتجر",
+  "packs.purchase_description": "تم خصم :amount عملة مقابل شراء :item من المتجر.",
+  "packs.default_item": "عنصر"
 
 
 

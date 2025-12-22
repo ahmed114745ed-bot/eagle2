@@ -1565,7 +1565,10 @@
 
   "wallet.unknown_user": "Unknown user",
   "wallet.general_title": "Wallet Transaction",
-  "wallet.general_description": "A wallet transaction has been completed."
+  "wallet.general_description": "A wallet transaction has been completed.",
+    "packs.purchase_title": "Mağaza Satın Alımı",
+  "packs.purchase_description": "Mağazadan :item satın almak için :amount coin düşüldü.",
+  "packs.default_item": "ürün"
 
 
 

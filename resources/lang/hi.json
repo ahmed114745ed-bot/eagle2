@@ -3856,7 +3856,10 @@
 
   "wallet.unknown_user": "अज्ञात उपयोगकर्ता",
   "wallet.general_title": "वॉलेट लेनदेन",
-  "wallet.general_description": "आपके वॉलेट पर एक लेनदेन किया गया।"
+  "wallet.general_description": "आपके वॉलेट पर एक लेनदेन किया गया।",
+    "packs.purchase_title": "स्टोर से खरीदारी",
+  "packs.purchase_description": "स्टोर से :item खरीदने के लिए :amount कॉइन काटे गए।",
+  "packs.default_item": "आइटम"
 
 
 
