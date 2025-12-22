@@ -35,7 +35,7 @@ class WeeklyRankingCommand extends Command
 
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
-            //dd( $rankingList);
+          //  dd( $rankingList->toArray());
 
             if (!$rankingList || $rankingList->isEmpty()) {
                 continue;
