@@ -207,7 +207,7 @@ class MyDataResource extends JsonResource
                 'sender_img'   => $this->senderLevel?->img ?? '',
                 'sender_level' => intval($this->senderLevel?->level),
                 'next_sender_level' => intval(  $this->next_sender_level_info['next_level'] ?? 0),
-                'remaining_to_next_level' => floatval($this->next_sender_level_info['remaining_exp_ratio'] ?? 0),
+                'remaining_to_next_level' => floatval($this->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
 
             ],
             'charge_level' =>  [
