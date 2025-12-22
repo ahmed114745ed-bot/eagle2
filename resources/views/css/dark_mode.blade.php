@@ -28,6 +28,7 @@
     .dark-mode .form-col,
     .dark-mode .settings-menu button,
     .dark-mode .swal2-popup,
+    .dark-mode .mobile-select-menu,
     .dark-mode .form-horizontal {
         background-color: var(--dark-secondry-color) !important;
         color: var(--text-primary-color) !important;
@@ -40,7 +41,8 @@
     .dark-mode .pagination > .disabled > span,
     .dark-mode .pagination > .disabled > span:focus,
     .dark-mode .pagination>li>a,
-    .dark-mode .pagination > .disabled > span:hover {
+    .dark-mode .pagination > .disabled > span:hover,
+    .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
 
@@ -69,14 +71,20 @@
         color: unset !important;
     }
 
+    .dark-mode .box-header.with-border {
+        border-bottom: 1px solid var(--white) !important;
+    }
+
+    .dark-mode .btn:hover,
+    .dark-mode .btn-success:hover,
+    .dark-mode .button:hover {
+        color: black !important;
+    }
+
     .dark-mode .table > thead > tr > th {
         background-color: var(--dark-secondry-color) !important;
         color: var(--text-primary-color) !important;
         border-bottom-color: rgba(255, 255, 255, 0.08) !important;
-    }
-
-    .dark-mode .select2-dropdown {
-        background-color: var(--dark-secondry-color) !important;
     }
 
     .dark-mode,

@@ -106,7 +106,6 @@
             padding: 12px 16px !important;
             margin: -16px -16px 16px -16px !important;
             display: block !important;
-            text-align: left !important;
         }
 
         .box-header.with-border {
@@ -137,8 +136,11 @@
     }
 
     .box-header form {
-        padding-top: 8px;
         border-radius: 36px;
+    }
+
+    .input-group-sm>.form-control, .input-group-sm>.input-group-addon, .input-group-sm>.input-group-btn>.btn {
+        height: 35px !important;
     }
 
     .box-header form .box-footer {
@@ -947,10 +949,6 @@
         border-color: var(--secondary-color);
     }
 
-    .btn-info:hover {
-        color: var(--secondary-color) !important;
-    }
-
     .btn-primary {
         background: var(--secondary-color) !important;
         color: var(--text-secondary-color) !important;
@@ -968,7 +966,6 @@
     .btn-instagram,
     .btn-default ,
     .btn-danger {
-        background: var(--primary-color) !important;
         color: var(--text-secondary-color) !important;
         border: none !important;
         border-radius: 8px !important;
@@ -978,10 +975,35 @@
         box-shadow: var(--shadow-sm) !important;
     }
 
-    .btn-primary:hover {
+    .btn-action {
+        background: var(--primary-color) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-secondary-color) !important;
+        border-radius: 6px;
+        padding: 6px 12px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover,
+    .btn-success:hover,
+    .button:hover {
         transform: translateY(-1px) !important;
         box-shadow: var(--shadow-md) !important;
-        color: #ffffff !important;
+        color: var(--text-secondary-color) !important;
+        border-color: var(--secondary-color);
+    }
+
+    .btn-dropbox,
+    .btn-info,
+    .btn-twitter,
+    .btn-instagram,
+    .btn-default ,
+    .btn-danger {
+        background: var(--primary-color) !important;
+    }
+
+    .btn-danger {
+        background: red !important;
     }
 
     .btn-success {
@@ -993,12 +1015,6 @@
         font-weight: 500 !important;
         transition: var(--transition) !important;
         box-shadow: var(--shadow-sm) !important;
-    }
-
-    .btn-success:hover {
-        transform: translateY(-1px) !important;
-        box-shadow: var(--shadow-md) !important;
-        color: #ffffff !important;
     }
 
     .bootstrap-switch.bootstrap-switch-on .bootstrap-switch-handle-on {
@@ -1031,15 +1047,6 @@
     .btn-success {
         background-color: var(--primary-color) !important;
         color: var(--inverse-color) !important;
-    }
-
-    .btn-dropbox:hover,
-    .btn-instagram:hover,
-    .btn-twitter:hover,
-    .btn-success:hover {
-        background: var(--primary-color);
-        filter: brightness(0.85);
-        color: var(--secondary-color) !important;
     }
 
     .content-header > .breadcrumb > li > a {
@@ -1285,12 +1292,6 @@
 
     .btn-default {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--text-secondary-color) !important;
-        border: 1px solid var(--primary-hover-alpha) !important;
-    }
-
-    .btn-default:hover {
-        background-color: var(--second-color) !important;
         color: var(--text-secondary-color) !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
@@ -1808,16 +1809,6 @@
         font-weight: bold;
     }
 
-    button:hover {
-        background: var(--primary-color);
-        filter: brightness(0.85);
-        color: var(--secondary-color);
-    }
-
-    .tab-button:hover {
-        opacity: 0.8;
-    }
-
     .settings-menu button.active {
         background: var(--gradient-primary) !important;
         color: var(--text-secondary-color) !important;
@@ -1833,12 +1824,6 @@
         font-weight: 500 !important;
         transition: var(--transition) !important;
         box-shadow: var(--shadow-sm) !important;
-    }
-
-    .btn-warning:hover {
-        background-color: var(--primary-color);
-        color: var(--secondary-color) !important;
-        filter: brightness(0.85);
     }
 
     /*    tr[data-key="18"] {
@@ -2221,8 +2206,6 @@
         }
     }
 
-    /* end form inputs */
-
     .iti--separate-dial-code .iti__selected-flag {
         background-color: rgba(0, 0, 0, 0.02) !important;
     }
@@ -2232,6 +2215,77 @@
     .table td .dropdown,
     .table td .dropup {
         position: absolute;
+    }
+
+
+    /* ==========================================
+   MODERN FILTER DESIGN - LARAVEL ADMIN
+   ========================================== */
+
+    .col-md-12 .box-body .fields-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .fields-group > .form-group {
+        display: flex;
+        align-items: center;
+        gap: 35px;
+        margin-bottom: 0;
+    }
+
+    .fields-group .col-sm-2.control-label {
+        color: #e2e8f0;
+        font-weight: 500;
+        font-size: 14px;
+        text-align: right;
+        margin-bottom: 0;
+    }
+
+    .fields-group .col-sm-8 {
+        flex: 1;
+    }
+
+    .fields-group .input-group.input-group-sm {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .fields-group .input-group.input-group-sm:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .fields-group .input-group.input-group-sm:focus-within {
+        border-color: rgba(99, 102, 241, 0.5);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .fields-group .input-group-addon {
+        display: none !important;
+    }
+
+    .fields-group .input-group.input-group-sm .form-control {
+        border: none !important;
+        border-radius: 12px !important;
+        color: #f1f5f9;
+        padding: 12px 16px;
+        font-size: 14px;
+        height: auto;
+        box-shadow: none !important;
+    }
+
+    .fields-group .form-control::placeholder {
+        color: #64748b;
+        opacity: 1;
+    }
+
+    .fields-group .form-control:focus {
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .stats-container .info-box {
