@@ -69,6 +69,8 @@ class LeaderCCgameController extends Controller
             ], 200);
         }
 
+         \Log::info('new game' );
+
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
 
