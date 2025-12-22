@@ -275,8 +275,8 @@ class WeeklyRankingCommand extends Command
         $timezone = getTimezone();
 
         // Previous or current week depending on your logic
-        $startOfWeek = Carbon::now($timezone)->startOfWeek(Carbon::SATURDAY);
-        $endOfWeek   = Carbon::now($timezone)->endOfWeek(Carbon::FRIDAY);
+        $startOfWeek = Carbon::now($timezone)->startOfWeek();
+        $endOfWeek   = Carbon::now($timezone)->endOfWeek();
         // dd($record, $range, $type, $userId);
         if (!$userId) return;
 
