@@ -1,4 +1,4 @@
-<div id="appSettings" class="settings-section">
+<div id="appSettings" class="app-settings settings-section">
     <h3>{{ __('App Settings') }}</h3>
     <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
         @csrf

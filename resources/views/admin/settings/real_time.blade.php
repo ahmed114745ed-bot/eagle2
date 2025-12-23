@@ -11,7 +11,7 @@
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 440px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                                 <div class="ribbon-banner-card">
@@ -54,7 +54,7 @@
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 440px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                             </div>
@@ -86,9 +86,14 @@
                                     </div>
                                 </div>
 
-                                <input type="hidden" name="zego_filter_enabled" value="0">
-                                <input type="checkbox" name="zego_filter_enabled" value="1" data-bootstrap-switch
-                                    {{ $zego_filter_enabled ? 'checked' : '' }}>
+                                <div class="col-md-6">
+                                    <div class="form-group d-flex align-items-center gap-2">
+                                        <label style="visibility: hidden;">.</label>
+                                        <input type="hidden" name="zego_filter_enabled" value="0">
+                                        <input type="checkbox" name="zego_filter_enabled" value="1" data-bootstrap-switch
+                                            {{ $zego_filter_enabled ? 'checked' : '' }}>
+                                    </div>
+                                </div>
 
                                 <script>
                                     function initZegoSwitch() {
@@ -110,7 +115,7 @@
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 440px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                             </div>

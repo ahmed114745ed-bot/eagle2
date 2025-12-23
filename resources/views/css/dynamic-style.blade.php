@@ -581,11 +581,21 @@
     }
 
     .skin-black-light .sidebar a {
-        color: #374151 !important;
+        color: var(--text-secondary-color) !important;
         text-decoration: none !important;
         display: flex !important;
         align-items: center !important;
         transition: var(--transition) !important;
+    }
+
+    .settings-menu {
+        border-bottom: 3px solid transparent;
+        padding-bottom: 10px;
+        background: transparent;
+    }
+
+    .dark-mode .settings-menu {
+        border-bottom: 3px solid var(--white);
     }
 
     .skin-black-light .sidebar a:hover {
