@@ -101,10 +101,13 @@ class RankingTypeController extends MainController
             return "<button class='btn btn-sm btn-primary show-rewards-modal' data-id='{$this->id}'>$text</button>";
         });
 
+        $modalTitle = __('Rewards'); // PHP variable with translation
 
         Admin::script("
     $(document).on('click', '.show-rewards-modal', function() {
         var id = $(this).data('id');
+        var modalTitle = '" . e($modalTitle) . "'; // escape for JS
+
         // Show modal
         if (!$('#rewardsModal').length) {
             $('body').append(`
@@ -112,7 +115,7 @@ class RankingTypeController extends MainController
                     <div class='modal-dialog modal-lg'>
                         <div class='modal-content'>
                             <div class='modal-header'>
-                                <h5 class='modal-title'>Rewards</h5>
+                                <h5 class='modal-title'>${modalTitle}</h5>
                                 <button type='button' class='close' data-dismiss='modal'>&times;</button>
                             </div>
                             <div class='modal-body'>Loading...</div>
@@ -120,6 +123,8 @@ class RankingTypeController extends MainController
                     </div>
                 </div>
             `);
+        } else {
+            $('#rewardsModal .modal-title').text(modalTitle);
         }
 
         $('#rewardsModal .modal-body').html('Loading...');
@@ -133,6 +138,8 @@ class RankingTypeController extends MainController
         });
     });
 ");
+
+
 
 
         $grid->column('created_at', __('Created At'))->display(function ($value) {
