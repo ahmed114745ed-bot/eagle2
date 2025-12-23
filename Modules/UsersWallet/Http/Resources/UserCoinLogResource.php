@@ -102,6 +102,54 @@ class UserCoinLogResource extends JsonResource
                     ]),
                 ];
 
+            case 'room_cup':
+                return [
+                    __('room_cup_title'),
+                    __('room_cup_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'weekly_star':
+                return [
+                    __('weekly_star_title'),
+                    __('weekly_star_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'cashback':
+                return [
+                    __('cashback_title'),
+                    __('cashback_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'lucky_gift':
+                return [
+                    __('lucky_gift_title'),
+                    __('lucky_gift_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'vip':
+                return [
+                    __('vip_title'),
+                    __('vip_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'room_boom':
+                return [
+                    __('room_boom_title'),
+                    __('room_boom_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'cp':
+                return [
+                    __('cp_title'),
+                    __('cp_description', ['amount' => abs($this->amount)]),
+                ];
+
+            case 'create_room':
+                return [
+                    __('create_room_title'),
+                    __('create_room_description', ['amount' => abs($this->amount)]),
+                ];
+
 
             default:
                 return [
