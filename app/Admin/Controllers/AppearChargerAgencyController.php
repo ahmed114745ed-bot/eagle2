@@ -330,7 +330,7 @@ class AppearChargerAgencyController extends MainController
             })
             ->switch(Common::getSwitchStates())->sortable();;
 
-        $grid->column('owner.appear_charger_agency', __("Appear charger agency"))
+        $grid->column('appear_charger_agency', __("Appear charger agency"))
             ->display(function () {
                 return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })

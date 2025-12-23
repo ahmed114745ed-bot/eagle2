@@ -13,7 +13,7 @@ class GiftCategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $giftCategories = GiftCategory::get();
+        $giftCategories = GiftCategory::orderBy('sort', 'asc')->get();
         return Common::apiResponse(1, '', GiftCategoryResource::collection($giftCategories));
     }
 }

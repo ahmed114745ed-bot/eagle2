@@ -329,17 +329,29 @@ class MicService
 
         $rowSize = 4;
 
-        $rowStart = intdiv($index, $rowSize) * $rowSize;
+        // $rowStart = intdiv($index, $rowSize) * $rowSize;
+        // $rowEnd = $rowStart + $rowSize - 1;
+
+        // $neighbors = [];
+
+        // for ($i = $rowStart; $i <= $rowEnd; $i++) {
+        //     if ($i !== $index) {
+        //         $neighbors[] = $i;
+        //     }
+        // }
+        $rowStart = intdiv($index - 1, $rowSize) * $rowSize + 1;
         $rowEnd = $rowStart + $rowSize - 1;
-
-        $neighbors = [];
-
-        for ($i = $rowStart; $i <= $rowEnd; $i++) {
-            if ($i !== $index) {
-                $neighbors[] = $i;
-            }
+        if ($rowSize <= 1) {
+            return [];
         }
 
+
+        if ($index - 1 >= $rowStart) {
+            $neighbors[] = $index - 1;
+        }
+        if ($index + 1 <= $rowEnd) {
+            $neighbors[] = $index + 1;
+        }
 
 
         return $neighbors;

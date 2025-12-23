@@ -241,6 +241,17 @@ class OvipGiftTapController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
+        Admin::style("
+            .box-body{
+                overflow: auto !important;
+                scrollbar-width: none;      
+            }
+
+            .box-body::-webkit-scrollbar{
+                display: none;              
+            }
+        ");
         return $grid;
     }
     public function destroy($id)

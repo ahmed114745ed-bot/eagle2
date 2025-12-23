@@ -839,4 +839,66 @@ class CustomNotification
         Common::sendOfficialMessage($user->id, content: $translatedBody[$currentLang], title: $translatedTitle['en'], titleAr: $translatedTitle['ar']);
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
+
+
+
+    public static function withdrawalApproved(User $user, $amount)
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user?->lan ?? 'en';
+
+        $body = __('Your withdrawal request of :amount has been approved.', [
+            'amount' => $amount
+        ], $lang);
+
+        $icon = null;
+        $data = [
+            'type'   => 'withdrawal-approved',
+            'amount' => $amount,
+        ];
+
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                self::appName($user->lan),
+                $body,
+                icon: $icon,
+                data: $data,
+                messageType: 'withdrawal-approved'
+            );
+        }
+
+        Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
+
+    public static function withdrawalRejected(User $user, $amount)
+    {
+        $tokens_notification = $user?->notification_id;
+        $lang = $user?->lan ?? 'en';
+
+        $body = __('Your withdrawal request of :amount has been rejected.', [
+            'amount' => $amount
+        ], $lang);
+
+        $icon = null;
+        $data = [
+            'type'   => 'withdrawal-rejected',
+            'amount' => $amount,
+        ];
+
+        if (!$user->is_logout) {
+            Common::send_firebase_notification(
+                $tokens_notification,
+                self::appName($user->lan),
+                $body,
+                icon: $icon,
+                data: $data,
+                messageType: 'withdrawal-rejected'
+            );
+        }
+
+        Common::sendOfficialMessage($user->id, $body, '', titleAr: $body);
+        (new UserCounterServices)->eventUser($user, 'official-messages');
+    }
 }
