@@ -198,8 +198,8 @@ class WeeklyRankingCommand extends Command
         return match ($type) {
             'wealth' => 'sender_id',
             'charm'  => 'receiver_id',
-            'charge',
-            'game'   => 'id',
+            'charge' => 'id',
+            'game'   => 'user_id',
             default  => 'id',
         };
     }
