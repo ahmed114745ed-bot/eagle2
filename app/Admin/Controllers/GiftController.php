@@ -23,6 +23,7 @@ use App\Admin\Actions\Grid\MoveGroupsGifts;
 use App\Models\Setting;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
+
 class GiftController extends MainController
 {
     use HasResourceActions;
@@ -104,7 +105,7 @@ class GiftController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Gift);
-        $grid->sortable();
+       
         $filterType = request('filter', 'all');
         $category  = [];
         if (request('filter') != 'all') {
@@ -115,11 +116,12 @@ class GiftController extends MainController
             ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
-            ->orderBy('sort', 'asc');
-        // ->orderBy('use_count', 'desc')
-        // ->orderBy('type')
-        // ->orderByRaw('ISNULL(`sort`), `sort`')
-        // ->orderBy('price');
+            // ->orderByDesc('enable')   // 1️⃣ enabled first
+            // ->orderBy('sort', 'asc');
+        ->orderBy('use_count', 'desc')
+        ->orderBy('type')
+        ->orderByRaw('ISNULL(`sort`), `sort`')
+        ->orderBy('price');
 
         $grid->paginate(20);
         $grid->header(function () use ($filterType) {
@@ -402,6 +404,7 @@ class GiftController extends MainController
         )->required();
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
+        
 
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
@@ -461,7 +464,7 @@ class GiftController extends MainController
         return $form;
     }
 
-     public function luckyGiftSettings(Content $content)
+    public function luckyGiftSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'lucky-gift-setting');

@@ -70,7 +70,8 @@ class EmojiCategoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new EmojiCategory());
-
+        $grid->sortable();
+        $grid->model()->orderBy('sort', 'asc');
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
@@ -79,6 +80,7 @@ class EmojiCategoryController extends MainController
             return $value[$locale] ?? ($value['en'] ?? '');
         });
         $grid->column('type', __('Type'));
+
 
         return $grid;
     }
@@ -115,6 +117,9 @@ class EmojiCategoryController extends MainController
         ]));
 
         $form->text('type', __('Type'));
+        $form->number('sort', __('sort'))
+            ->rules('required|integer|min:1')      // minimum value 1
+            ->required();
 
         $form->saving(function (Form $form) {
             $titles = request()->input('title', []);

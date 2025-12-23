@@ -284,7 +284,7 @@ class LuckyGiftService
         $total_cashback_percentage = 0;
 
 
-        $gift = Gift::query()->select(['id', 'name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
+        $gift = Gift::query()->select(['id', 'name', 'e_name','type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
@@ -483,6 +483,7 @@ class LuckyGiftService
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;
+        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ??$gift->name;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;

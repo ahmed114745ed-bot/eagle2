@@ -23,7 +23,8 @@ class AudioGiftsListResource extends JsonResource
         return [
             'name' => $this->sender->name ?? '',
             'avatar' => $this->sender->profile->avatar ?? '',
-            'description' => __('source:') . $roomName .' '. __('gift:') . $giftName,
+            'sender_id' => $this->sender->id ?? 0,
+            'description' => __('source:') . $roomName . ' ' . __('gift:') . $giftName,
             'created_at' => $formattedDate,
             'diamond' => $this->total ?? 0,
         ];
