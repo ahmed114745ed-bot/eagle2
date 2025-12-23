@@ -99,6 +99,21 @@ class WinnerRankingController extends  MainController
             return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
 
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
+                return @$this->ware->name ?? '';
+            } elseif ($this->type == "vip") {
+                return @$this->vip->name ?? '';
+            } elseif ($this->type == "badge") {
+                return @$this->badge->name ?? '';
+            } elseif ($this->type == "coins") {
+                return @$this->target;
+            } elseif ($this->type == "achievement") {
+                $value = getDriverUrl() . '/' . @$this->target;
+                return "<img src='$value' width='80' height='80'>";
+            }
+        });
+
         $grid->column('image', __('image'))->display(function ($path) {
             if (@$this->reward->target_type == 'ware') {
                 $ware = Ware::find($this->reward->target);
