@@ -58,9 +58,10 @@ class DedicateSuperPackageRewardAction extends Action
     {
         $this->hidden('uid', __('id'))->attribute('id', 'uid');
         $this->multipleSelect('super_admin_id', __('Select Super Admins'))
-            ->options(function () {
-                return SuperAdmin::pluck('name', 'id');
-            });
+        ->ajax('/admin/search/super-admin', 'id', 'name');
+            // ->options(function () {
+            //     return SuperAdmin::pluck('name', 'id');
+            // });
     }
 
     public function html()

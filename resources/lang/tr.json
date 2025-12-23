@@ -53,7 +53,8 @@
 "done successfully": "Başarıyla tamamlandı",
 "Are you sure you want to accept this request?": "Bu isteği kabul etmek istediğinizden emin misiniz?",
 "Are you sure you want to reject this request?": "Bu isteği reddetmek istediğinizden emin misiniz?",
-
+"you are host you can not exchange diamonds": "Sunucu olduğunuz için elmasları takas edemezsiniz",
+"calculus not true": "Hesaplama doğru değil",
    "Choose whether the entered amount is in USD or Coins": "Girilen tutarın USD mi yoksa Coins mi olduğunu seçin",
    "Enter the amount based on the selected type": "Seçilen türe göre tutarı girin",
 "Saved successfully ✅": "Başarıyla kaydedildi ✅",
@@ -4183,7 +4184,7 @@
     "confirm_text": "Onayladığınızda, bu hedefe ait tüm mevcut maaşlar kapatılacak, kullanıcıların kazandığı elmaslar hesaplanacak ve kalan elmaslarla yeni bir maaş dönemi başlayacaktır. Bu işlem geri alınamaz.",
     "confirm_button": "Onayla",
     "cancel_button": "İptal",
-  "User Withdrawals": "Kullanıcı Çekimleri",
+    "User Withdrawals": "Kullanıcı Çekimleri",
     "achieve_target": "Hedefi Başarmak",
     "add_user_profit": ":target için kazanç",
     "add_agency_profit": ":target için ajans kazancı",
@@ -4194,11 +4195,36 @@
     "User Withdrawal": "Kullanıcı Çekimi",
     "source:": "Kaynak:",
     "wallet.add": "Hedef Başarısı",
-"wallet.subtract": "Çekim",
-"wallet.transfer": "Transfer"
-,
+    "wallet.subtract": "Çekim",
+    "wallet.transfer": "Transfer"
+    ,
     "gift:": "Hediye:","diamonds_message": "Elmas: :diamonds, Rol: :role, Kar %: :profit, Yayın Süresi: :time"
+    ,"lose_title": "Kayıp",
+    "lose_description": ":amount coin kaybettin",
 
+    "room_cup_title": "Oda Kupası",
+    "room_cup_description": "Oda Kupası'ndan :amount coin kazandın",
+
+    "weekly_star_title": "Haftalık Etkinlik",
+    "weekly_star_description": "Haftalık etkinlikten :amount coin kazandın",
+
+    "cashback_title": "Nakit İade",
+    "cashback_description": "Şanslı hediyelerden :amount coin iade aldın",
+
+    "lucky_gift_title": "Şanslı Hediyeler",
+    "lucky_gift_description": "Şanslı hediyelerden :amount coin kazandın",
+
+    "vip_title": "VIP",
+    "vip_description": "VIP için :amount coin harcadın",
+
+    "room_boom_title": "Oda Bombası",
+    "room_boom_description": "Oda bombasından :amount coin kazandın",
+
+    "cp_title": "CP İlişkisi",
+    "cp_description": "CP ilişkisinden :amount coin kazandın",
+
+    "create_room_title": "Oda Oluştur",
+    "create_room_description": "Oda oluşturmak için :amount coin harcadın"
 
 
 
