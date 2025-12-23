@@ -155,23 +155,23 @@ class UserCoinLogResource extends JsonResource
                 switch ($this->sub_type) {
                     case 'add':
                         return [
-                            __('wallet.add_title'),
-                            __('wallet.add_description', ['amount' => abs($this->amount)]),
+                            __('add_title'),
+                            __('add_description', ['amount' => abs($this->amount)]),
                         ];
                     case 'transfer':
                         return [
-                            __('wallet.transfer_title'),
-                            __('wallet.transfer_description', ['amount' => abs($this->amount)]),
+                            __('transfer_title'),
+                            __('transfer_description', ['amount' => abs($this->amount)]),
                         ];
                     case 'subtract':
                         return [
-                            __('wallet.subtract_title'),
-                            __('wallet.subtract_description', ['amount' => abs($this->amount)]),
+                            __('subtract_title'),
+                            __('subtract_description', ['amount' => abs($this->amount)]),
                         ];
                     default:
                         return [
-                            __('wallet.general_title'),
-                            __('wallet.general_description'),
+                            __('general_title'),
+                            __('general_description'),
                         ];
                 }
 
