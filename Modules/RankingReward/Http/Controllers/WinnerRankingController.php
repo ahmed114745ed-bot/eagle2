@@ -107,9 +107,9 @@ class WinnerRankingController extends  MainController
             } elseif ($this->reward->target_type == "badge") {
                 return @$this->reward->badge->name ?? '';
             } elseif ($this->reward->target_type == "coins") {
-                return @$this->target;
+                return @$this->reward->target;
             } elseif ($this->reward->target_type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+                $value = getDriverUrl() . '/' . @$this->reward->target;
                 return "<img src='$value' width='80' height='80'>";
             }
         });
