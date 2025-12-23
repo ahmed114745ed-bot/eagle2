@@ -161,7 +161,7 @@ class GiftLogRepository extends AbstractRepository
             ->whereHas('room', function ($q) {
                 $q->where('type', 'live');
             })
-            ->selectRaw('sender_id, room_id,created_at,giftId,SUM(giftNum * giftPrice) AS total')
+            ->selectRaw('sender_id, room_id,created_at,giftId,SUM( giftPrice) AS total')
             ->groupBy('sender_id', 'room_id', 'giftId','created_at')
             ->orderByDesc('created_at') 
             ->with(['room', 'sender', 'gift'])
