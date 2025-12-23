@@ -75,7 +75,12 @@ class RankingTypeController extends MainController
 
         $grid->model()->whereHas('rankingType', function ($query) use ($type, $schedule) {
             $query->where('type', $type)->where('schedule', $schedule);
-        });
+        })->with([
+            'rewards',
+            'rewards.ware',
+            'rewards.vip',
+            'rewards.badge',
+        ]);
 
         $grid->column('id', 'ID')->sortable();
         $grid->column('min', __('Min Rank'));
@@ -88,7 +93,7 @@ class RankingTypeController extends MainController
             return "<span class='label label-info'>{$this->min} - {$this->max}</span>";
         });
 
-         $grid->column('members', __('rewards'))->expand(function ($model) {
+        $grid->column('members', __('rewards'))->expand(function ($model) {
 
             $members = $model->rewards->map(function ($reward) {
 
@@ -125,11 +130,11 @@ class RankingTypeController extends MainController
 
                 $defaultImage = asset('images/reward.jpg');
 
-                    $url =  getImagePath($path) ?? $defaultImage;
+                $url =  getImagePath($path) ?? $defaultImage;
 
-                    if (! isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+                if (! isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
                 $image = handleShowImageWithTypes(
                     $reward->id,
@@ -144,7 +149,7 @@ class RankingTypeController extends MainController
                     'gift'     => $gift,
                     'image'    => $image,
                     'quantity' => $reward->expire_days,
-                    
+
                 ];
             });
 
@@ -537,11 +542,11 @@ class RankingTypeController extends MainController
                             break;
 
                         case 'vip':
-                            $path = 
-                            // $reward->vip->image2
-                            //     ? getImagePath($reward->vip->image2)
-                            //     :
-                                 asset('images/ware-image.jpg');
+                            $path =
+                                // $reward->vip->image2
+                                //     ? getImagePath($reward->vip->image2)
+                                //     :
+                                asset('images/ware-image.jpg');
                             break;
 
                         case 'badge':
@@ -552,8 +557,8 @@ class RankingTypeController extends MainController
 
                         case 'coins':
                             $path =
-                           // getImagePath('coin.png');
-                            asset('images/coin.jpg');
+                                // getImagePath('coin.png');
+                                asset('images/coin.jpg');
                             break;
 
                         case 'achievement':
