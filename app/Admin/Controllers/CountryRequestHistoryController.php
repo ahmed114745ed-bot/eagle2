@@ -42,6 +42,7 @@ class CountryRequestHistoryController extends MainController
                 'user.country',
                 'user.receiverLevel',
                 'user.senderLevel',
+                'oldCountry',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])->where('status', '!=', 'pending')->orderByDesc('created_at');
 
