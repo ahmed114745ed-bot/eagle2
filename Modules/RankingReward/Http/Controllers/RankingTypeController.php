@@ -10,7 +10,7 @@ use Encore\Admin\Show;
 use App\Selectables\Badges;
 use Encore\Admin\Widgets\Box;
 use Modules\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
@@ -87,6 +87,73 @@ class RankingTypeController extends MainController
             }
             return "<span class='label label-info'>{$this->min} - {$this->max}</span>";
         });
+
+         $grid->column('members', __('rewards'))->expand(function ($model) {
+
+            $members = $model->rewards->map(function ($reward) {
+
+                $gift = '';
+                $path = '';
+
+                switch ($reward->target_type) {
+                    case 'ware':
+                        $gift = optional($reward->ware)->name;
+                        $path = optional($reward->ware)->img2
+                            ?? optional($reward->ware)->img2;
+                        break;
+
+                    case 'vip':
+                        $gift = optional($reward->vip)->name;
+                        $path = optional($reward->vip)->img;
+                        break;
+
+                    case 'badge':
+                        $gift = optional($reward->badge)->name;
+                        $path = optional($reward->badge)->image;
+                        break;
+
+                    case 'coin':
+                        $gift = $reward->target;
+                        $path = 'coin.png';
+                        break;
+
+                    case 'achievement':
+                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
+                        $path = $reward->target;
+                        break;
+                }
+
+                $defaultImage = asset('images/reward.jpg');
+
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (! isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                $image = handleShowImageWithTypes(
+                    $reward->id,
+                    $url,
+                    50,
+                    50
+                );
+
+                return [
+                    'id'       => $reward->id,
+                    'type'     => $reward->target_type,
+                    'gift'     => $gift,
+                    'image'    => $image,
+                    'quantity' => $reward->expire_days,
+                    
+                ];
+            });
+
+            return new Table(
+                ['ID', __('type'), __('gift'), __('image'),  __('expire')],
+                $members->toArray()
+            );
+        });
+
 
         $grid->column('created_at', __('Created At'))->display(function ($value) {
             return Carbon::parse($value)->format('Y-m-d');
