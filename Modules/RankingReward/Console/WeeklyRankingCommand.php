@@ -28,24 +28,47 @@ class WeeklyRankingCommand extends Command
 
     public function handle()
     {
+        Log::info('Weekly ranking job started');
+
         $rankingTypes = RankingType::where('schedule', 'weekly')->get();
 
+        Log::info('Weekly ranking types count', [
+            'count' => $rankingTypes->count(),
+        ]);
 
         foreach ($rankingTypes as $rankingType) {
 
+            Log::info('Processing ranking type', [
+                'ranking_type_id' => $rankingType->id,
+                'name' => $rankingType->name ?? null,
+            ]);
+
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
-          //  dd( $rankingList->toArray());
 
             if (!$rankingList || $rankingList->isEmpty()) {
+                Log::warning('Ranking list is empty', [
+                    'ranking_type_id' => $rankingType->id,
+                ]);
                 continue;
             }
 
+            Log::info('Ranking list fetched', [
+                'ranking_type_id' => $rankingType->id,
+                'count' => $rankingList->count(),
+            ]);
 
             // 2) Apply ranges to give rewards
             $this->applyRanges($rankingList, $rankingType);
+
+            Log::info('Rewards applied successfully', [
+                'ranking_type_id' => $rankingType->id,
+            ]);
         }
+
+        Log::info('Weekly ranking job finished');
     }
+
 
     public function getRankingList(RankingType $rankingType)
     {
@@ -59,11 +82,11 @@ class WeeklyRankingCommand extends Command
             case 'charge':
                 return $this->charge();
 
-                case 'game':
-                    return $this->gameRanking();
+            case 'game':
+                return $this->gameRanking();
 
-                default:
-                    return collect();
+            default:
+                return collect();
         }
     }
 
@@ -141,9 +164,9 @@ class WeeklyRankingCommand extends Command
             ])
             ->havingRaw('total_sum > 0') // only users with charge or coins
             ->orderByDesc('total_sum');
-            
-         $results = $query->get()->values();
-       
+
+        $results = $query->get()->values();
+
         // Log the results count
         // Log::info("Charge results count", [
         //     'count' => $results->count()
@@ -205,7 +228,7 @@ class WeeklyRankingCommand extends Command
     }
 
 
-   protected function dispatchNotification($userIds, $range)
+    protected function dispatchNotification($userIds, $range)
     {
         // Convert to array if it's a Collection
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
