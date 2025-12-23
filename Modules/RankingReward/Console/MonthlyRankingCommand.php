@@ -160,9 +160,9 @@ class MonthlyRankingCommand extends Command
         return match ($type) {
             'wealth' => 'sender_id',
             'charm'  => 'receiver_id',
-            'charge',
+            'charge' => 'id',
             'game'   => 'user_id',
-            default  => 'user_id',
+            default  => 'id',
         };
     }
 

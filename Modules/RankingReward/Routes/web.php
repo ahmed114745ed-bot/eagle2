@@ -29,6 +29,7 @@ Route::group(
     function () {
         Route::resource('ranking-types', RankingTypeController::class);
         Route::resource('winner-rankings', WinnerRankingController::class);
+       Route::get('rewards/{id}', [RankingTypeController::class, 'getRewards']);
 
         Route::prefix('ranking-rewards/{ranking_range_id}')->group(function () {
 //            Route::get('/', [RankingRewardController::class, 'index'])->name('ranking_rewards.index');

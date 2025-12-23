@@ -10,6 +10,7 @@ use Encore\Admin\Show;
 use App\Selectables\Badges;
 use Encore\Admin\Widgets\Box;
 use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
@@ -93,71 +94,45 @@ class RankingTypeController extends MainController
             return "<span class='label label-info'>{$this->min} - {$this->max}</span>";
         });
 
-        $grid->column('members', __('rewards'))->expand(function ($model) {
 
-            $members = $model->rewards->map(function ($reward) {
 
-                $gift = '';
-                $path = '';
-
-                switch ($reward->target_type) {
-                    case 'ware':
-                        $gift = optional($reward->ware)->name;
-                        $path = optional($reward->ware)->img2
-                            ?? optional($reward->ware)->img2;
-                        break;
-
-                    case 'vip':
-                        $gift = optional($reward->vip)->name;
-                        $path = optional($reward->vip)->img;
-                        break;
-
-                    case 'badge':
-                        $gift = optional($reward->badge)->name;
-                        $path = optional($reward->badge)->image;
-                        break;
-
-                    case 'coin':
-                        $gift = $reward->target;
-                        $path = 'coin.png';
-                        break;
-
-                    case 'achievement':
-                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
-                        $path = $reward->target;
-                        break;
-                }
-
-                $defaultImage = asset('images/reward.jpg');
-
-                $url =  getImagePath($path) ?? $defaultImage;
-
-                if (! isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-
-                $image = handleShowImageWithTypes(
-                    $reward->id,
-                    $url,
-                    50,
-                    50
-                );
-
-                return [
-                    'id'       => $reward->id,
-                    'type'     => $reward->target_type,
-                    'gift'     => $gift,
-                    'image'    => $image,
-                    'quantity' => $reward->expire_days,
-
-                ];
-            });
-
-            return new Table(
-                ['ID', __('type'), __('gift'), __('image'),  __('expire')],
-                $members->toArray()
-            );
+        $grid->column('members', __('Rewards'))->display(function () {
+            $text = __('View Rewards'); // Translation key
+            return "<button class='btn btn-sm btn-primary show-rewards-modal' data-id='{$this->id}'>$text</button>";
         });
+
+
+        Admin::script("
+    $(document).on('click', '.show-rewards-modal', function() {
+        var id = $(this).data('id');
+        // Show modal
+        if (!$('#rewardsModal').length) {
+            $('body').append(`
+                <div class='modal fade' id='rewardsModal' tabindex='-1'>
+                    <div class='modal-dialog modal-lg'>
+                        <div class='modal-content'>
+                            <div class='modal-header'>
+                                <h5 class='modal-title'>Rewards</h5>
+                                <button type='button' class='close' data-dismiss='modal'>&times;</button>
+                            </div>
+                            <div class='modal-body'>Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        $('#rewardsModal .modal-body').html('Loading...');
+        $('#rewardsModal').modal('show');
+
+        // Load rewards via AJAX
+        $.get('/admin/rewards/' + id, function(html) {
+            $('#rewardsModal .modal-body').html(html);
+        }).fail(function() {
+            $('#rewardsModal .modal-body').html('<p class=\"text-danger\">Failed to load rewards.</p>');
+        });
+    });
+");
 
 
         $grid->column('created_at', __('Created At'))->display(function ($value) {
@@ -190,6 +165,72 @@ class RankingTypeController extends MainController
 
         return $grid;
     }
+
+
+
+
+    public function getRewards($id)
+    {
+        // Load the RankingRange and its rewards
+        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge'])->findOrFail($id);
+        $members = $model->rewards->map(function ($reward) {
+
+            $gift = '';
+            $path = '';
+
+            switch ($reward->target_type) {
+                case 'ware':
+                    $gift = optional($reward->ware)->name;
+                    $path = optional($reward->ware)->img2;
+                    break;
+
+                case 'vip':
+                    $gift = optional($reward->vip)->name;
+                    $path = optional($reward->vip)->img;
+                    break;
+
+                case 'badge':
+                    $gift = optional($reward->badge)->name;
+                    $path = optional($reward->badge)->image;
+                    break;
+
+                case 'coin':
+                    $gift = $reward->target;
+                    $path = 'coin.png';
+                    break;
+
+                case 'achievement':
+                    $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
+                    $path = $reward->target;
+                    break;
+            }
+
+            $defaultImage = asset('images/reward.jpg');
+            $url = getImagePath($path) ?? $defaultImage;
+            if (!isImageExists($url)) $url = $defaultImage;
+
+            $image = handleShowImageWithTypes($reward->id, $url, 50, 50);
+
+            // Build HTML columns
+            $giftColumn = $reward->target_type === 'achievement' ? $gift : e($gift);
+
+            return [
+                'ID'     => $reward->id,
+                'Type'   => $reward->target_type,
+                'Gift'   => $giftColumn,
+                'Image'  => $image,
+                'Expire' => $reward->expire_days,
+            ];
+        });
+
+        // Return a Laravel-Admin Table (HTML)
+        $table = new Table(['ID', 'Type', 'Gift', 'Image', 'Expire'], $members->toArray());
+
+        // Render HTML for modal
+        return $table->render();
+    }
+
+
 
     protected function detail($id)
     {

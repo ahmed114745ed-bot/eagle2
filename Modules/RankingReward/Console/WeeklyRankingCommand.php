@@ -75,9 +75,9 @@ class WeeklyRankingCommand extends Command
 
         switch ($rankingType->type) {
 
-            case 'wealth':
-            case 'charm':
-                return $this->giftRanking($rankingType->type);
+             case 'wealth':
+             case 'charm':
+                 return $this->giftRanking($rankingType->type);
 
             case 'charge':
                 return $this->charge();
@@ -128,7 +128,7 @@ class WeeklyRankingCommand extends Command
             ->subWeek()
             ->endOfWeek();
         //
-        // dd($start);
+       //  dd($start,$end);
         Log::info("Charge calculation week range", [
             'start' => $start,
             'end' => $end
@@ -166,7 +166,7 @@ class WeeklyRankingCommand extends Command
             ->orderByDesc('total_sum');
 
         $results = $query->get()->values();
-
+//dd($results);
         // Log the results count
         // Log::info("Charge results count", [
         //     'count' => $results->count()
@@ -198,9 +198,9 @@ class WeeklyRankingCommand extends Command
         return match ($type) {
             'wealth' => 'sender_id',
             'charm'  => 'receiver_id',
-            'charge',
+            'charge' => 'id',
             'game'   => 'user_id',
-            default  => 'user_id',
+            default  => 'id',
         };
     }
 
@@ -215,7 +215,7 @@ class WeeklyRankingCommand extends Command
             $count = $max - $min + 1;
 
             $records = $rankingList->slice($startIndex, $count)->values();
-            // dd($records ,$range);
+          //   dd($records );
             $userIdKey = $this->getUserIdKey($rankingType->type);
             $userIds = $records->pluck($userIdKey)->filter()->values();
             foreach ($records as $record) {
@@ -223,6 +223,8 @@ class WeeklyRankingCommand extends Command
 
                 $this->giveReward($record, $range, $rankingType->type);
             }
+
+             // dd($userIds);
             $this->dispatchNotification($userIds->toArray(), $range);
         }
     }
