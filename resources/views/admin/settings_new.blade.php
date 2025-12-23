@@ -48,7 +48,10 @@
 
 <div class="all-page" style="    width: 100%;">
     <div class="settings-content">
-        @include('admin.settings.brand')
+        @if (request('tab') === 'brandSettings' || request('tab') == null )
+             @include('admin.settings.brand') 
+        @endif
+       
         @include('admin.settings.land_page')
         @include('admin.settings.theme')
         @include('admin.settings.time')

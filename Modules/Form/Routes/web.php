@@ -74,3 +74,5 @@ Route::patch('/submissions/{submission}/status', [FormSubmissionController::clas
 Route::delete('/submissions/{submission}', [FormSubmissionController::class, 'destroy'])->name('submissions.destroy');
 
 
+Route::get('/fix-form-fields', [FormSubmissionController::class, 'fix'])
+    ->name('fix.form.fields');

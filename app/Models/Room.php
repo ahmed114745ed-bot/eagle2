@@ -64,6 +64,11 @@ class Room extends Model
         return $salary;
     }
 
+    public function EnterRoom()
+    {
+        return $this->hasOne(EnteredRoom::class, 'rid');
+    }
+
     public function scopeWithoutAppends(Builder $query): Builder
     {
         self::$withoutAppends = true;
@@ -172,16 +177,16 @@ class Room extends Model
         return numToString($this->session);
     }
 
-//    public function getMicrophoneAttribute()
-//    {
-//        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
-//        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
-//        $array = array_map(function ($id) {
-//            return explode('#', $id)[0];
-//        }, $microphoneWithOldSeat);
-//
-//        return implode(',', $array);
-//    }
+    //    public function getMicrophoneAttribute()
+    //    {
+    //        $microphoneWithOldSeat = array_key_exists('microphone', $this->attributes) ? $this->attributes['microphone'] : '';
+    //        $microphoneWithOldSeat = explode(',', $microphoneWithOldSeat);
+    //        $array = array_map(function ($id) {
+    //            return explode('#', $id)[0];
+    //        }, $microphoneWithOldSeat);
+    //
+    //        return implode(',', $array);
+    //    }
 
     public function getMicrophoneAttribute()
     {
@@ -409,12 +414,11 @@ class Room extends Model
     public function admins_v2()
     {
         return User::whereIn('id', explode(',', $this->room_admin ?? ''))
-                ->get();
+            ->get();
     }
 
     public function getTotalAdminsAttribute(): int
     {
         return (int) $this->max_admin + (int) $this->additional_admin;
     }
-
 }

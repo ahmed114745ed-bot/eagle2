@@ -14,8 +14,14 @@
     "Operation log": "Operation Log",
     "App": "Application",
     "Email": "Email",
+    "Browse change country request":"Browse country request",
+    "All status switch change country request": "Toggle All Change Country Requests",
+"History switch change country request": "Change Country Requests History",
+"Status switch change country request": "Change Country Request Actions Button",
     "action": "Action",
     "Move switch gift": "Move",
+    "Charge switch superadmin": "Freeze wallet",
+    "Charge switch area manager": "Frozen Wallet Button area manager",
 
     "Pay switch dashboard":"charge games",
     "Status switch country": "Status Switch",
@@ -1171,6 +1177,8 @@
 "disable_transfer_salary_success": "Transfer salary has been disabled successfully",
 "confirm_enable_transfer_salary": "Are you sure you want to enable transfer salary?",
 "confirm_disable_transfer_salary": "Are you sure you want to disable transfer salary?",
+
+
 "You have received :coin coin.": "You have received :coin coin.",
 "You have received a gift: :ware": "You have received a gift: :ware",
     "You have received the gift: :giftName": "You have received the gift: :giftName",
@@ -1508,14 +1516,91 @@
 "Show live rooms": "Show live broadcasts",
     "CP Settings": "CP Settings",
     "Enable all CP gifts": "Enable all CP gifts",
-    "Enabled": "Enabled",
     "Disabled": "Disabled",
     "Updated successfully!": "Updated successfully!",
     "Something went wrong!": "Something went wrong!",
-    "cp-settings":"cp settings"
+    "cp-settings":"cp settings",
+"User Withdrawals": "User Withdrawals",
+"User Withdrawal": "User Withdrawal",
+"role_user": "User",
+"role_bd": "BD",
+"role_agency_manager": "Agency Manager",
+"role_app": "App",
+"diamonds_message": "Diamonds: :diamonds, Role: :role, Profit %: :profit, Broadcast Time: :time"
+,"achieve_target": "Achieve Target",
+"add_user_profit": "Profit for target :target",
+"add_agency_profit": "Profit for agency :target",
+"add_bd_profit": "Profit for BD :admin",
+"transfer_to": "Transferred to :target",
+"transfer_from": "Transferred from :target",
+"withdraw": "Withdrawn by :admin",
+"wallet.add": "Target Achievement",
+"wallet.subtract": "Withdraw",
+"wallet.transfer": "Transfer",
+"update_start":"Data processing has started, and the modification will be applied once completed",
+"confirm_title": "Are you sure?",
+"confirm_text": "By confirming, all current salaries for this target will be closed, achieved diamonds will be calculated for users, and a new salary cycle for the current month will begin with the remaining diamonds after deduction. This action cannot be undone.",
+"confirm_button": "Confirm",
+"cancel_button": "Cancel",
+  "coin_game.win_title": "Game Reward",
+  "coin_game.win_description": ":amount coins have been added to your wallet from game winnings.",
 
+  "coin_game.lose_title": "Game Deduction",
+  "coin_game.lose_description": ":amount coins have been deducted from your wallet due to a game loss.",
 
+  "wallet.payment_title": "Wallet Top-Up",
+  "wallet.payment_description": "Your wallet has been credited with :amount coins successfully.",
 
+  "wallet.gift_title": "Gift Sent",
+  "wallet.gift_description": "You have successfully sent a gift.",
+
+  "wallet.exchange_title": "Currency Exchange",
+  "wallet.exchange_description": ":diamonds diamonds were converted into :coins coins.",
+
+  "wallet.gift_room_title": "Room Gift",
+  "wallet.gift_room_description": "A gift was sent to user :user.",
+
+  "wallet.moment_title": "Moments",
+  "wallet.moment_description": "An action related to moments activity.",
+
+  "wallet.unknown_user": "Unknown user",
+  "wallet.general_title": "Wallet Transaction",
+  "wallet.general_description": "A wallet transaction has been completed.",
+    "packs.purchase_title": "Mağaza Satın Alımı",
+  "packs.purchase_description": "Mağazadan :item satın almak için :amount coin düşüldü.",
+  "packs.default_item": "ürün",
+  "lose_title": "Loss",
+  "lose_description": "You lost :amount coins",
+
+  "room_cup_title": "Room Cup",
+  "room_cup_description": "You earned :amount coins from Room Cup",
+
+  "weekly_star_title": "Weekly Event",
+  "weekly_star_description": "You earned :amount coins from the weekly event",
+
+  "cashback_title": "Cashback",
+  "cashback_description": "You received :amount coins cashback from lucky gifts",
+
+  "lucky_gift_title": "Lucky Gifts",
+  "lucky_gift_description": "You earned :amount coins from lucky gifts",
+
+  "vip_title": "VIP",
+  "vip_description": "You spent :amount coins on VIP",
+
+  "room_boom_title": "Room Boom",
+  "room_boom_description": "You earned :amount coins from room boom",
+
+  "cp_title": "CP Relationship",
+  "cp_description": "You earned :amount coins from CP relationship",
+
+  "create_room_title": "Create Room",
+  "create_room_description": "You spent :amount coins to create a room",
+      "add_title": "Add to Wallet",
+    "add_description": "Added :amount coins to your wallet",
+    "transfer_title": "Transfer",
+    "transfer_description": "Transferred :amount coins",
+    "subtract_title": "Withdraw",
+    "subtract_description": "Withdrawn :amount coins from your wallet"
 
 
 

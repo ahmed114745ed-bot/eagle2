@@ -10,6 +10,8 @@ return [
     'login.language.switch' => 'Switch to',
     'login.language.lang' => 'English',
     'login.titleAreaManager' => 'تسجيل الدخول إلى لوحة تحكم مدير المنطقة',
+    'confirm_enable_frozen_wallet'  => 'هل أنت متأكد أنك تريد تفعيل المحفظة المجمدة؟',
+    'confirm_disable_frozen_wallet' => 'هل أنت متأكد أنك تريد تعطيل المحفظة المجمدة؟',
 
     'online'                => 'متصل',
     'login'                 => 'تسجيل الدخول',

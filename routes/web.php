@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\TestsController;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Ban;
@@ -10,6 +9,7 @@ use App\Helpers\Common;
 use App\Models\CoinLog;
 use App\Models\Country;
 use App\Models\BDSallary;
+use App\Helpers\LogHelper;
 use  App\helper\TimeHelper;
 use App\Models\PaymentCoin;
 use App\Models\RoomVisitor;
@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
+use Symfony\Component\Process\Process;
 use App\Admin\Controllers\BdController;
 use App\Jobs\UpdateUserFollowCountsJob;
 use Illuminate\Support\Facades\Artisan;
@@ -33,6 +34,8 @@ use App\Admin\Controllers\AuthController;
 use App\Admin\Controllers\UserController;
 use App\Enums\SuperAdminNotificationType;
 use App\Exports\AgencyChargeTransactions;
+use App\Http\Controllers\TestsController;
+use App\Admin\Controllers\EmojiController;
 use App\Http\Controllers\PayPalController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\WelcomeController;
@@ -50,9 +53,6 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
 use App\Admin\Controllers\AppearChargerAgencyController;
-use App\Helpers\LogHelper;
-use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
-use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -535,6 +535,7 @@ Route::get('/migrate-bd-salaries', [BdSalaryMigrationController::class, 'migrate
 Route::get('/clean-gift-logs', [GiftLogController::class, 'cleanGiftLogsForAllUsers']);
 Route::get('/remaining-diamonds', [GiftLogController::class, 'increaseMonthlyDiamond']);
 Route::get('/users/sync-bd', [\App\Http\Controllers\Api\V1\UserController::class, 'syncBD']);
+Route::get('/emoji-image-type', [EmojiController::class, 'gitImage']);
 
 
 
@@ -1075,7 +1076,8 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-use Symfony\Component\Process\Process;
+use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
+use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {

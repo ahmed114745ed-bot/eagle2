@@ -1,8 +1,8 @@
 <?php
 
 namespace Modules\SuperAdmin\Http\Controllers\Admin;
+use Illuminate\Http\Request;
 
-use App\Admin\Controllers\MainController;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
@@ -10,6 +10,7 @@ use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use IntlDateFormatter;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\Permission;
@@ -25,12 +26,15 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use App\Admin\Controllers\MainController;
 use Modules\Milestones\Entities\Milestone;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Admin\Actions\DeleteSuperAdminAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
-use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
-use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
+use App\Admin\Actions\FrozenWalletSuperAdminAction;
+use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
 
 class SuperAdminController extends MainController
 {
@@ -111,16 +115,171 @@ class SuperAdminController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SuperAdmin());
+
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $areaManagerPreview = session('preview_area_manager');
-        $grid->model()->when($countryID && $areaManagerPreview, fn($q) => $q->whereIn('country_id', $countryID))->with(['appUser.packs', 'creator', 'createdBy'])
-            ->orderByDesc('id');
+
+        $grid->model()->orderByDesc('id');
+
+        if ($countryID && $areaManagerPreview) {
+            $grid->model()->whereIn('country_id', $countryID);
+        }
+
+        $grid->model()->with([
+            'appUser.packs',
+            'country',
+            'appUser',
+            'appUser.profile',
+            'createdBy.agency',
+            'createdBy'
+        ]);
+
+        $milestoneCacheKey = 'milestone_super_admin';
+        $milestoneId = Cache::remember($milestoneCacheKey, 3600, function () {
+            return Milestone::where('slug', 'super-admin')->first();
+        });
 
         $grid->filter(function ($filter) {
             $filter->like('appUser.uuid', __('App User UUID'));
             $filter->like('appUser.name', __('User Name'));
         });
+
         $grid->column('id', __('Id'));
+        $this->superAdminData($grid);
+
+        $grid->column('default', __('default_superadmin_status'))->display(function () {
+            if (request()->filled('_export_')) {
+                return $this->default;
+            }
+
+            if ($this->default == 1) {
+                return <<<HTML
+                    <span style="display: flex; align-items: center;">
+                        <span style="
+                            font-size: smaller;
+                            background: red;
+                            display: inline-block;
+                            border-radius: 50%;
+                            width: 10px;
+                            height: 10px;
+                            margin-left: 5px;
+                        " title=""></span>
+                    </span>
+                HTML;
+            } else {
+                return '<span style="color: #999;"></span>';
+            }
+        });
+
+        $this->appUserData($grid);
+
+        $this->countryData($grid);
+
+        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
+            $creator = $this->createdBy;
+
+            if (!$creator) {
+                return __('Unknown');
+            }
+
+            $url = url("admin/admin-users/{$creator->id}");
+            $avatar = getImagePath($creator->avatar) ?? asset("images/businessman-icon.jpg");
+
+            if (!isImageExists($avatar)) {
+                $avatar = asset("images/businessman-icon.jpg");
+            }
+
+            $image = handleShowImageWithTypes($creator->id, $avatar, 30, 30);
+            $name = $creator->username ?? __('Unknown');
+
+            return "
+                <div style='display:flex; align-items:center; gap:8px;'>
+                    {$image}
+                    <a href='{$url}' style='text-decoration:none;'>
+                        <span style='text-decoration:underline; cursor:pointer;'>{$name}</span>
+                    </a>
+                </div>
+            ";
+        });
+
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            static $formatter = null;
+
+            if ($formatter === null) {
+                $formatter = new IntlDateFormatter(
+                    App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
+                    IntlDateFormatter::LONG,
+                    IntlDateFormatter::SHORT
+                );
+            }
+
+            return $formatter->format(strtotime($date));
+        });
+
+        $permission = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $actions->disableDelete();
+            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new DeleteSuperAdminsAction());
+            }
+
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new FrozenWalletSuperAdminAction());
+            }
+        });
+
+        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) use ($milestoneId) {
+                $url = url('admin/milestone-rewards/' . @$milestoneId->id);
+                $milestone = __('Acquisitions');
+
+                $customButtonHTML = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                        {$milestone}
+                    </a>
+                </div>
+            HTML;
+                $tools->append($customButtonHTML);
+
+                $logoutUrl = route('admin.super.logout');
+                $loginText = __('login');
+                $areaManagerUrl = url('/superadmin/login');
+
+                $customButtonHTML2 = <<<HTML
+                <div style="display: contents; align-items: center;">
+                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
+                        <i class="fa fa-sign-in"></i> {$loginText}
+                    </a>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
+                        <i class="fa fa-copy"></i>
+                    </button>
+                </div>
+                    <script>
+                    function copyAreaManagerUrl() {
+                        const url = '{$areaManagerUrl}';
+                        navigator.clipboard.writeText(url).then(() => {
+                            toastr.success('تم نسخ الرابط بنجاح');
+                        }).catch(() => {
+                            alert('تعذر نسخ الرابط');
+                        });
+                    }
+                </script>
+                HTML;
+
+                $tools->append($customButtonHTML2);
+            });
+        }
+
+        $grid->disableRowSelector();
+        $this->extendGrid($grid);
+
+        return $grid;
+    }
+
+
+    private function superAdminData($grid)
+    {
         $grid->column('username', __('Super Admin'))->display(function ($name) {
             if (request()->filled('_export_')) {
                 return $name;
@@ -151,30 +310,11 @@ class SuperAdminController extends MainController
                 </div>
             ";
         });
-        $grid->column('default', __('default_superadmin_status'))->display(function () {
-            if (request()->filled('_export_')) {
-                return $this->default;
-            }
+    }
 
-            if ($this->default == 1) {
-                return <<<HTML
-                    <span style="display: flex; align-items: center;">
-                        <span style="
-                            font-size: smaller;
-                            background: red;
-                            display: inline-block;
-                            border-radius: 50%;
-                            width: 10px;
-                            height: 10px;
-                            margin-left: 5px;
-                        " title=""></span>
-                    </span>
-                HTML;
-            } else {
-                return '<span style="color: #999;"></span>';
-            }
-        });
 
+    private function appUserData($grid)
+    {
         $grid->column('appUser.name', __('user'))->display(function ($name) {
             $user = $this->appUser;
             if (request()->filled('_export_')) {
@@ -206,41 +346,9 @@ class SuperAdminController extends MainController
                 </div>
             ";
         });
-
-        $grid->column('createdBy.name', __('created by'))->display(function () {
-            $user = $this->createdBy;
-            $name = $user->name ?? '';
-
-            if (request()->filled('_export_')) {
-                return $name;
-            }
-            if (!$user) return "<span style='color: red;'>غير مرتبط</span>";
-
-            $id = $user->id ?? 'غير معروف';
-            $path = $user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
-
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$user->id}");
-
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    $image
-                    <div>
-                       <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                        </a>
-                        <span style='font-size: smaller;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
-
+    }
+    private function countryData($grid)
+    {
         $grid->column('country.name', __('country'))->display(function () {
 
             $country = $this->country;
@@ -265,130 +373,7 @@ class SuperAdminController extends MainController
                     </div>
                 HTML;
         });
-
-        //        $grid->column('agencies_count', __('Agencies Count'))->display(function () {
-        //            return $this->agencies_count;
-        //        });
-        //
-        //
-        //        $grid->column('total_salary', __('total proft'))->display(function () {
-        //            return truncateAndTrim($this->total_salary, 2);
-        //        });
-        //
-        //        $grid->column('current_balance', __('current_balance'))->display(function () {
-        //            $total = floatval($this->total_salary);
-        //            $cut   = floatval($this->total_cut);
-        //            return truncateAndTrim($total - $cut, 2);
-        //        });
-        //
-        //        $grid->column('total_cut', __('Cut amount'))->display(function () {
-        //            return truncateAndTrim($this->total_cut, 2);
-        //        });
-
-        //        if (Admin::user()->can('stop-salary-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-        //            $col = $grid->column('transfer_salary', __("transfer_salary"))
-        //                ->display(function () {
-        //                    return $this->transfer_salary ? 1 : 0;
-        //                });
-        //
-        //            if (! request()->filled('_export_')) {
-        //                $col->switch(Common::getSwitchStates());
-        //            }
-        //        }
-
-        $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
-        });
-
-        $grid->column('created_at', __('Created at'))->display(function ($date) {
-            $carbonDate = Carbon::parse($date);
-            $locale = App::getLocale();
-            $carbonDate->locale($locale);
-            return $carbonDate->translatedFormat('d F Y H:i'); // مثال: 22 مايو 2025 14:30
-        });
-
-        $permission = $this->permission_name;
-        $grid->actions(function ($actions) use ($permission) {
-            $actions->disableDelete();
-            if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
-                $actions->add(new DeleteSuperAdminsAction());
-            }
-        });
-
-        //        if (Admin::user()->can('browse-milestone') || Admin::user()->can('*')) {
-        //            $grid->tools(function (Grid\Tools $tools) {
-        //                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-        //                $url = url('admin/milestone-rewards/' . $milestoneId->id); // Generates absolute URL for /admin/milestones
-        //                $milestone = __('milestone');   // Translates 'milestone' via your language files
-        //
-        //                $customButtonHTML = <<<HTML
-        //                <div style="display: contents; align-items: center;">
-        //                    <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-        //                         {$milestone}
-        //                    </a>
-        //                </div>
-        //            HTML;
-        //
-        //                // Append the custom HTML button to the grid's toolbar
-        //                $tools->append($customButtonHTML);
-        //            });
-        //        }
-
-        if (Admin::user()->can('choose-switch-' . $permission) || Admin::user()->can('*')) {
-
-            $grid->tools(function (Grid\Tools $tools) {
-                $milestoneId = Milestone::where('slug', 'super-admin')->first();
-                $url = url('admin/milestone-rewards/' . @$milestoneId->id); // Generates absolute URL for /admin/milestones
-                $milestone = __('Acquisitions');
-
-                $customButtonHTML = <<<HTML
-                 <div style="display: contents; align-items: center;">
-                     <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                          {$milestone}
-                     </a>
-                 </div>
-             HTML;
-
-                $tools->append($customButtonHTML);
-            });
-
-            $grid->tools(function ($tools) {
-                $logoutUrl = route('admin.super.logout');
-                $loginText = __('login');
-                $areaManagerUrl = url('/superadmin/login');
-
-                $customButtonHTML = <<<HTML
-                <div style="display: contents; align-items: center;">
-                    <a href="{$logoutUrl}" class="btn btn-sm btn-danger" style="margin-right: 10px;">
-                        <i class="fa fa-sign-in"></i> {$loginText}
-                    </a>
-                    <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
-                        <i class="fa fa-copy"></i>
-                    </button>
-
-                </div>
-                     <script>
-                    function copyAreaManagerUrl() {
-                        const url = '{$areaManagerUrl}';
-                        navigator.clipboard.writeText(url).then(() => {
-                            toastr.success('تم نسخ الرابط بنجاح');
-                        }).catch(() => {
-                            alert('تعذر نسخ الرابط');
-                        });
-                    }
-                </script>
-                HTML;
-
-                $tools->append($customButtonHTML);
-            });
-        }
-
-        $grid->disableRowSelector();
-
-        $this->extendGrid($grid);
-        return $grid;
     }
-
     /**
      * Make a form builder.
      *
@@ -816,4 +801,16 @@ class SuperAdminController extends MainController
     //        ]);
     //    }
 
+
+    public function searchBySuperAdmin(Request $request)
+    {   $key = $request->q;
+         $page = $request->get('page', 1);
+         $perPage = 10;
+        return SuperAdmin::selectRaw('concat(username, " - ", id) as name, id')
+            ->where(function ($query) use ($key) {
+                $query->where('username', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+    }
 }

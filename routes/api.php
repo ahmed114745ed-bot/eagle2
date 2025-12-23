@@ -1,13 +1,12 @@
 <?php
 
-use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Events\PublicTestEvent;
 use App\Services\PayPalService;
 use App\Services\CodapayService;
-use App\Events\PublicTestEvent;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Http\Controllers\PaySkyController;
@@ -28,6 +27,7 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
+use App\Http\Controllers\TestDiamondController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -43,7 +43,6 @@ use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
-use App\Http\Controllers\Api\V1\ExchangeController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
@@ -67,7 +66,9 @@ use App\Http\Controllers\Api\V1\Room\MicrophoneController;
 use Modules\Achievement\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
+use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 
@@ -305,6 +306,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('users')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->where('id', '[0-9]+');
+                Route::get('/details', [UserController::class, 'showUsersDetails'])->where('id', '[0-9]+');
                 Route::get('v2/{id}', [UserController::class, 'vTwoshow'])->where('id', '[0-9]+');
                 Route::get('/charger_agency', [UserController::class, 'chargerAgency']);
                 Route::get('/play', [UserController::class, 'allUsersPlayGame']);
@@ -604,9 +606,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
-            Route::prefix('wallet')->group(function () {
-                Route::get('diamonds-statistic', [WalletController::class, 'diamondsStatistic']);
-            });
+          
 
 
             Route::prefix('banners')->group(function () {

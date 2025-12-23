@@ -25,6 +25,8 @@ class Target extends Model
         'img',
         'app_profit_percentage',
         'db_percentage',
+        'under_edit',
+        'edit_id'
     ];
 
     protected static function boot()
@@ -39,12 +41,32 @@ class Target extends Model
         });
     }
 
-    //     public function setReelAttribute($values)
-    // {
-    //     $this->attributes['reel'] = implode(',', $values);
-    // }
-    // public function setMomentAttribute($values)
-    // {
-    //     $this->attributes['moment'] = implode(',', $values);
-    // }
+    public function edit()
+    {
+        return $this->hasOne(TargetEdit::class, 'id', 'edit_id');
+    }
+
+    public  function displayOldNewValue($old, $new, $prefix = '', $isPercentage = false)
+    {
+        if ($old == $new) {
+            $formatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+            return "<span style='font-weight:bold;'>{$formatted}</span>";
+        }
+    
+        $oldFormatted = $isPercentage ? "% {$old}" : "{$prefix}{$old}";
+        $newFormatted = $isPercentage ? "% {$new}" : "{$prefix}{$new}";
+    
+        $color = $new > $old ? '#28a745' : '#dc3545';
+        $arrow = $new > $old ? '↑' : '↓';
+        $arrowIcon =  '🔁';
+
+        return "
+            <div style='align-items:center;gap:5px;'>
+                <span style='color:#dc3545;text-decoration:line-through;'>{$oldFormatted}</span>
+                <span style='display: block;font-size:1.2em;'>$arrowIcon</span>
+                <strong style='color:{$color};'>{$newFormatted} {$arrow}</strong>
+            </div>
+        ";
+    }
+    
 }
