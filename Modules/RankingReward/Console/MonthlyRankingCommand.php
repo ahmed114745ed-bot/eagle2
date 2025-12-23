@@ -161,8 +161,8 @@ class MonthlyRankingCommand extends Command
             'wealth' => 'sender_id',
             'charm'  => 'receiver_id',
             'charge',
-            'game'   => 'user_id',
-            default  => 'user_id',
+            'game'   => 'id',
+            default  => 'id',
         };
     }
 
