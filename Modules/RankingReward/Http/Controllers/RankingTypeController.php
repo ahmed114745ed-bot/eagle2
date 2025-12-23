@@ -231,7 +231,7 @@ class RankingTypeController extends MainController
         });
 
         // Return a Laravel-Admin Table (HTML)
-        $table = new Table(['ID', 'Type', 'Gift', 'Image', 'Expire'], $members->toArray());
+        $table = new Table([__('ID'), __('type'), __('gift'), __('image'), __('expire')], $members->toArray());
 
         // Render HTML for modal
         return $table->render();
