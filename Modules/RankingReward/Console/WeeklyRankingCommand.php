@@ -71,13 +71,9 @@ class WeeklyRankingCommand extends Command
     {
         $timezone = getTimezone();
 
-        $start = Carbon::now($timezone)
-            ->subWeek()
-            ->startOfWeek(Carbon::SATURDAY);
+        $start = Carbon::now($timezone)->subWeek()->startOfWeek();
 
-        $end = Carbon::now($timezone)
-            ->subWeek()
-            ->endOfWeek(Carbon::FRIDAY);
+        $end = Carbon::now($timezone)->subWeek()->endOfWeek();
 
         $map = [
             'wealth' => 'sender_id',
@@ -161,13 +157,9 @@ class WeeklyRankingCommand extends Command
     public function gameRanking()
     {
         $timezone = getTimezone();
-        $start = Carbon::now($timezone)
-            ->subWeek()
-            ->startOfWeek(Carbon::SATURDAY);
+        $start = Carbon::now($timezone)->subWeek()->startOfWeek();
 
-        $end = Carbon::now($timezone)
-            ->subWeek()
-            ->endOfWeek(Carbon::FRIDAY);
+        $end = Carbon::now($timezone)->subWeek()->endOfWeek();
 
         return CoinGameUser::query()
             ->select('user_id', DB::raw("SUM(CASE WHEN type = 1 THEN coins ELSE 0 END) AS exp"))
