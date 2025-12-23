@@ -538,7 +538,7 @@ class UserRepository extends Repository
             //                ->where('is_used', 1)
             //                ->with(['ware']),
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
-            'receiverLevel:id,img,level',
+            'receiverLevel:id,img,level,exp',
             'senderLevel:id,img,level',
             'chargeLevel:id,img,level',
             'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),

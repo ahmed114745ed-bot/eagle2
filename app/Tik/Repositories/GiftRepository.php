@@ -53,22 +53,21 @@ class GiftRepository extends AbstractRepository
             $query->where('gift_category_id', $categoryId);
         }
 
-        return $query->orderBy('sort', 'asc')
-        // orderBy('use_count', 'desc')
-        //             ->orderByRaw('ISNULL(`sort`), `sort`')
-        //             ->orderBy('price')
-                    ->get();
+        return $query
+            ->orderBy('use_count', 'desc')
+            ->orderByRaw('ISNULL(`sort`), `sort`')
+            ->orderBy('price')
+            ->get();
     }
 
-    
+
 
     public function get_images()
     {
 
-            return $this->model->query()
-                ->where('enable', 1)
-                ->pluck('img');
-
+        return $this->model->query()
+            ->where('enable', 1)
+            ->pluck('img');
     }
 
     public function allGifts($page, $perPage)

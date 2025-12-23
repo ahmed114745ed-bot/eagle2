@@ -71,13 +71,13 @@ class CountryService
         $stop_invite_code = settings()->get('change_country');
 
         $existRequest =   ChangeCountryRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
-        if ($existRequest) return  throw new \Exception('you sent request before');
+        if ($existRequest) return  throw new \Exception(__('you sent request before'));
         //  dd($stop_invite_code);
         if ($stop_invite_code  === '1') {
             ChangeCountryRequest::updateOrCreate([
                 'user_id' => auth()->id(),
                 'status' => 'accepted'
-            ], $data + ['user_id' => auth()->id()]);
+            ], $data + ['user_id' => auth()->id(), 'old_country' => $user->country_id]);
 
 
             $user->country_id = $data['country_id'];
@@ -90,7 +90,7 @@ class CountryService
             ChangeCountryRequest::updateOrCreate([
                 'user_id' => auth()->id(),
                 'status' => 'pending'
-            ], $data + ['user_id' => auth()->id()]);
+            ], $data + ['user_id' => auth()->id(), 'old_country' => $user->country_id]);
         }
 
 

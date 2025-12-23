@@ -90,9 +90,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'area-manager',
                         'except' => [],
-                        'additional' => [],
+                        'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
+                            PermissionType::ADMIN->value => ['charge-switch','create', 'edit', 'delete', 'show','browse'],
 
                         ],
                     ],

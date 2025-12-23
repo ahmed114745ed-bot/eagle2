@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\User;
 
+use App\Models\GameWallet;
 use Illuminate\Http\Request;
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\GameWallet;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -27,12 +29,12 @@ class LeaderCCgameController extends Controller
                 'errorMsg' => 'Missing parameters'
             ], 200);
         }
-       $errorExists = $this->checkWallet($request);
-       if ($errorExists ) return response()->json($errorExists);
+        $errorExists = $this->checkWallet($request);
+        if ($errorExists) return response()->json($errorExists);
 
         $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
-                ->select('id', 'name', 'di')
-                ->find($request->uid);
+            ->select('id', 'name', 'di')
+            ->find($request->uid);
         if (!$user) {
             return response()->json([
                 'errorCode' => 4005,
@@ -56,14 +58,18 @@ class LeaderCCgameController extends Controller
     public function updateGameCoin(Request $request)
     {
         // Fast custom validation
-        if (!$request->orderId || !$request->gameId || !$request->roundId ||
+        if (
+            !$request->orderId || !$request->gameId || !$request->roundId ||
             !$request->uid || !isset($request->coin) || !$request->type ||
-            !isset($request->rewardType) || !$request->token || !$request->sign) {
+            !isset($request->rewardType) || !$request->token || !$request->sign
+        ) {
             return response()->json([
                 'errorCode' => 4005,
                 'message'   => 'Invalid params'
             ], 200);
         }
+
+         \Log::info('new game' );
 
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
@@ -112,9 +118,18 @@ class LeaderCCgameController extends Controller
                     'message'   => 'Insufficient game coins'
                 ], 200);
             }
-
+            $amount = abs($coin);
+            $sign   = $type == 1 ? -1 : 1;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                $sign * $amount,
+                $user->di,
+                UserCoinLogType::COIN_GAME,
+                null,
+            );
             // Update user balance
             if ($type == 1) {
+
                 $user->di -= $coin;
             } else {
                 $user->di += $coin;
@@ -138,7 +153,7 @@ class LeaderCCgameController extends Controller
             // Cache the order to prevent duplicates
             Cache::put("order_{$orderId}", true, now()->addMinutes(30));
 
-            dispatch(new \App\Jobs\GameWalletJop($request->coin * (($type == 1) ? -1 : 1) ));
+            dispatch(new \App\Jobs\GameWalletJop($request->coin * (($type == 1) ? -1 : 1)));
 
 
             DB::commit();
@@ -149,7 +164,6 @@ class LeaderCCgameController extends Controller
                     'coins' => $user->di
                 ]
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('updateGameCoin error: ' . $e->getMessage());
@@ -229,7 +243,7 @@ class LeaderCCgameController extends Controller
         ]);
     }
 
-   public function validationOrderId($orderId)
+    public function validationOrderId($orderId)
     {
         if (Cache::has("order_$orderId")) {
             return response()->json([
@@ -290,7 +304,7 @@ class LeaderCCgameController extends Controller
         return null;
     }
 
-    public function checkLoseWallet(float $coins) : bool
+    public function checkLoseWallet(float $coins): bool
     {
         $gameWallet = GameWallet::filterByMonth()->first();
         $gameUsed = $gameWallet?->used ?? 0;

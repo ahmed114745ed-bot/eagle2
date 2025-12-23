@@ -16,10 +16,18 @@
     "Emoji Categories": "इमोजी श्रेणियाँ",
     "Enable host level Feature": "होस्ट स्तर की सुविधा सक्षम करें",
     "Charge by": "चार्ज करें द्वारा",
+    "profile updated successfully": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
     "Browse change country request" : "देश अनुरोध ब्राउज़ करें",
     "badge_gift_message_hi": "आपको एक नया बैज उपहार में मिला है।",
     "Charge reports": "चार्ज रिपोर्ट",
+    "you sent request before": "आपने पहले ही अनुरोध भेजा है",
     "Charge Reports": "चार्ज रिपोर्ट",
+    "you are host you can not exchange diamonds": "आप होस्ट हैं, आप हीरे का विनिमय नहीं कर सकते",
+"calculus not true": "गणना सही नहीं है",
+    "done successfully": "सफलतापूर्वक पूरा हुआ",
+    "Charge switch area manager": "फ्रोजन वॉलेट बटन एरिया मैनेजर",
+    "Are you sure you want to accept this request?": "क्या आप वाकई इस अनुरोध को स्वीकार करना चाहते हैं?",
+"Are you sure you want to reject this request?": "क्या आप वाकई इस अनुरोध को अस्वीकार करना चाहते हैं?",
     "country user": "उपयोगकर्ता का देश","All status switch change country request": "सभी स्थिति स्विच देश परिवर्तन अनुरोध",
 "History switch change country request": "इतिहास स्थिति स्विच देश परिवर्तन अनुरोध",
 "Status switch change country request": "स्थिति स्विच देश परिवर्तन अनुरोध",
@@ -3819,14 +3827,88 @@
     "withdraw": ":admin द्वारा निकाला गया",
     "source:": "स्रोत:",
     "gift:": "उपहार:",
-"wallet.add": "लक्ष्य प्राप्ति",
-"wallet.subtract": "निकासी",
-"wallet.transfer": "स्थानांतरण"
+    "wallet.add": "लक्ष्य प्राप्ति",
+    "wallet.subtract": "निकासी",
+    "wallet.transfer": "स्थानांतरण"
 
-,
+    ,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
+    , "payment_title": "Bakiye Yükleme",
+    "payment_description": "Bakiyenize :amount coin eklendi",
 
+    "admin_adjustment_title": "Yönetici Ayarı",
+    "admin_adjustment_description": "Bakiyeniz :amount coin ile güncellendi",
 
+    "cp_title": "İlişki Geliri",
+    "cp_description": ":amount coin ilişki aktivitenizden kazanıldı",
+
+    "gift_title": "Hediye",
+    "gift_description": "Bir hediye işlemi gerçekleşti",
+
+    "daily_gift_title": "Günlük Hediye",
+    "daily_gift_description": "Günlük hediyenizi aldınız",
+
+    "lucky_gift_title": "Şans Hediyesi",
+    "lucky_gift_description": "Şans sisteminden hediye kazandınız",
+
+    "lucky_box_title": "Şans Kutusu",
+    "lucky_box_description": "Şans kutusundan ödül aldınız",
+
+    "exchange_title": "Para Birimi Değişimi",
+    "exchange_description": ":diamonds elmas :coins coine dönüştürüldü",
+
+    "cashback_title": "Geri Ödeme",
+    "cashback_description": ":amount coin bakiyenize geri ödendi",
+
+    "achievement_title": "Başarı",
+    "achievement_description": "Bir başarı ödülü kazandınız",
+
+    "comment_title": "Etkileşim Ödülü",
+    "comment_description": "Etkileşim veya yorum için ödül",
+
+    "family_title": "Aile Ödülü",
+    "family_description": "Aile aktivitesi ile ilişkili ödül",
+
+    "background_title": "Özelleştirme Ögesi",
+    "background_description": "Özelleştirme ögesi satın alındı veya kullanıldı",
+
+    "invitation_title": "Davet Ödülü",
+    "invitation_description": "Bir kullanıcı davet ettiğiniz için :amount coin kazandınız",
+
+    "general_title": "Cüzdan Aktivitesi",
+    "general_description": "Cüzdan işlemi gerçekleşti",
+    "lose_title": "हानि",
+    "lose_description": "आपने :amount कॉइन खो दिए",
+
+    "room_cup_title": "रूम कप",
+    "room_cup_description": "रूम कप से आपने :amount कॉइन कमाए",
+
+    "weekly_star_title": "साप्ताहिक इवेंट",
+    "weekly_star_description": "साप्ताहिक इवेंट से आपने :amount कॉइन कमाए",
+
+    "cashback_title": "कैशबैक",
+    "cashback_description": "लकी गिफ्ट्स से आपको :amount कॉइन कैशबैक मिला",
+
+    "lucky_gift_title": "लकी गिफ्ट्स",
+    "lucky_gift_description": "लकी गिफ्ट्स से आपने :amount कॉइन कमाए",
+
+    "vip_title": "VIP",
+    "vip_description": "आपने VIP पर :amount कॉइन खर्च किए",
+
+    "room_boom_title": "रूम बूम",
+    "room_boom_description": "रूम बूम से आपने :amount कॉइन कमाए",
+
+    "cp_title": "CP संबंध",
+    "cp_description": "CP संबंध से आपने :amount कॉइन कमाए",
+
+    "create_room_title": "रूम बनाएं",
+    "create_room_description": "रूम बनाने के लिए :amount कॉइन खर्च किए",
+        "add_title": "वॉलेट में जोड़ें",
+    "add_description": ":amount सिक्के आपके वॉलेट में जोड़े गए",
+    "transfer_title": "स्थानांतरण",
+    "transfer_description": ":amount सिक्के स्थानांतरित किए गए",
+    "subtract_title": "निकासी",
+    "subtract_description": ":amount सिक्के आपके वॉलेट से निकाले गए"
 
 
 

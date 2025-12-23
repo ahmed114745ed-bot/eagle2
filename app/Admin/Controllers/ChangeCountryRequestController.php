@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Models\ChangeCountryRequest;
 use App\Admin\Controllers\MainController;
+use Illuminate\Support\Facades\App;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Admin\Actions\Grid\ActionCountryRequest;
 use Illuminate\Http\Request;
@@ -55,20 +56,27 @@ class ChangeCountryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user.packs'])->where('status', 'pending')->orderByDesc('created_at');
+        $grid->model()->with(['country', 'user', 'user.packs'])->where('status', 'pending')->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
             $filter->equal('status', __('Status'))->select([
                 // 'pending' => 'Pending',
-                'accepted' => 'Accepted',
-                'rejected' => 'Rejected'
+                'accepted' => __('Accepted'),
+                'rejected' => __('Rejected')
             ]);
 
             $filter->equal('country_id', __('Country'))->select(
-                Country::pluck('e_name', 'id')
+                Country::all()->pluck(
+                    App::getLocale() === 'ar' ? 'name' : 'e_name',
+                    'id'
+                )
             );
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user.uuid', __('uuid'));
+            });
         });
 
         $grid->id(__('ID'));
@@ -84,7 +92,7 @@ class ChangeCountryRequestController extends MainController
                 return app(UserService::class)->adminUserAvatar($user, withoutLevels: true, showUrl: $showUrl);
             });
 
-        $grid->column('country.name', __('country user'))->display(function () {
+        $grid->column('user_country', __('country user'))->display(function () {
 
             $country = $this->user->country;
 
@@ -147,22 +155,44 @@ class ChangeCountryRequestController extends MainController
         });
 
         if (Admin::user()->can('status-switch-' . $this->permission_name) || Admin::user()->can('*')) {
-            $grid->column('action', trans('Action'))->display(function () {
+            // $grid->column('action', trans('Action'))->display(function () {
+            //     if ($this->status === 'pending') {
+            //         $acceptUrl = admin_url("country-requests/{$this->id}/accept");
+            //         $rejectUrl = admin_url("country-requests/{$this->id}/reject");
+
+            //         $acceptText = __('Accept');
+            //         $rejectText = __('Reject');
+
+            //         return <<<HTML
+            //             <a href="{$acceptUrl}" class="btn btn-success btn-xs">
+            //                 <i class="fa fa-check"></i> {$acceptText}
+            //             </a>
+            //             <a href="{$rejectUrl}" class="btn btn-danger btn-xs">
+            //                 <i class="fa fa-times"></i> {$rejectText}
+            //             </a>
+            //         HTML;
+            //     }
+            //     return '-';
+            // });
+
+            $grid->column('action', __('Action'))->display(function () {
                 if ($this->status === 'pending') {
                     $acceptUrl = admin_url("country-requests/{$this->id}/accept");
                     $rejectUrl = admin_url("country-requests/{$this->id}/reject");
 
                     $acceptText = __('Accept');
                     $rejectText = __('Reject');
+                    $acceptConfirm = __('Are you sure you want to accept this request?');
+                    $rejectConfirm = __('Are you sure you want to reject this request?');
 
                     return <<<HTML
-                        <a href="{$acceptUrl}" class="btn btn-success btn-xs">
-                            <i class="fa fa-check"></i> {$acceptText}
-                        </a>
-                        <a href="{$rejectUrl}" class="btn btn-danger btn-xs">
-                            <i class="fa fa-times"></i> {$rejectText}
-                        </a>
-                    HTML;
+            <a href="javascript:void(0);" onclick="if(confirm('{$acceptConfirm}')) { window.location='{$acceptUrl}'; }" class="btn btn-success btn-xs">
+                <i class="fa fa-check"></i> {$acceptText}
+            </a>
+            <a href="javascript:void(0);" onclick="if(confirm('{$rejectConfirm}')) { window.location='{$rejectUrl}'; }" class="btn btn-danger btn-xs">
+                <i class="fa fa-times"></i> {$rejectText}
+            </a>
+HTML;
                 }
                 return '-';
             });
@@ -234,6 +264,7 @@ class ChangeCountryRequestController extends MainController
         $user = User::find($request->user_id);
         $user->country_id = $request->country_id;
         $user->save();
+        App::setLocale($user->lan ?? 'en');
 
         $title = __('Change Country Request');
         $body = __('Your country change request has been accepted');
@@ -257,9 +288,9 @@ class ChangeCountryRequestController extends MainController
         $request->save();
 
         $user = User::find($request->user_id);
-
+        App::setLocale($user->lan ?? 'en');
         $title = __('Change Country Request');
-        $body = __('Your country crhange request has been rejected');
+        $body = __('Your country change request has been rejected');
         Common::sendOfficialMessage($user->id, $title, $body);
         Common::send_firebase_notification($user->notification_id, $title, $body);
 
