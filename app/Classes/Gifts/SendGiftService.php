@@ -2,6 +2,7 @@
 
 namespace App\Classes\Gifts;
 
+use App\Enums\UserDiamondLogType;
 use App\Models\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
@@ -52,6 +53,21 @@ class SendGiftService
         $roomBoomUuid = (string) Str::uuid();
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
+            if ($type !== 'bag') {
+                $featureType = $room->type === 'audio'
+                    ? UserDiamondLogType::GIFT_ROOM_AUDIO
+                    : UserDiamondLogType::GIFT_ROOM_LIVE;
+
+                UserDiamondLogHelper::logByType(
+                    $receivedUser->id,
+                    $totalPrice,
+                    $receivedUser->monthly_diamond_received,
+                    $featureType,
+                    $senderUser->id,
+
+
+                );
+            }
             $cpId = @$cpIds[$receivedUser->id] ?? null;
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
             $info['room_boom_uuid'] = $roomBoomUuid;
