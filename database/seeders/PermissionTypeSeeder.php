@@ -23,7 +23,7 @@ class PermissionTypeSeeder extends Seeder
 
         // Define your base categories
         $categories = [
-             [
+            [
                 'name' => 'Dashboard',
                 'sort' => 1,
                 'types' => [
@@ -37,14 +37,14 @@ class PermissionTypeSeeder extends Seeder
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => ['pay-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse','pay-switch'],
+                            PermissionType::ADMIN->value => ['browse', 'pay-switch'],
                             PermissionType::SUPER_ADMIN->value => ['browse'],
                             PermissionType::AREA_MANAGER->value => ['browse'],
                         ],
                     ],
                 ],
             ],
-             [
+            [
                 'name' => 'host level',
                 'sort' => 2,
                 'types' => [
@@ -90,9 +90,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'area-manager',
                         'except' => [],
-                        'additional' => [],
+                        'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
+                            PermissionType::ADMIN->value => ['charge-switch','create', 'edit', 'delete', 'show','browse'],
 
                         ],
                     ],
@@ -107,7 +107,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-           
+
             [
                 'name' => 'SuperAdmin',
                 'sort' => 4,
@@ -119,10 +119,10 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'superadmin',
                         'except' => [],
-                        'additional' => [],
+                        'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete','show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create','show'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch', 'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
 
                         ],
                     ],
@@ -150,7 +150,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['add-switch', 'history-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-                           // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
+                            // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
 
                         ],
                     ],
@@ -173,6 +173,15 @@ class PermissionTypeSeeder extends Seeder
                         ],
                     ],
                     [
+                        'key' => 'super-package-reward',
+                        'except' => ['show'],
+                        'additional' => ['dedicate-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'edit', 'create', 'delete'],
+
+                        ],
+                    ],
+                    [
                         'key' => 'super-admin-reward-history',
                         'except' => ['create', 'edit', 'delete', 'show'],
                         'additional' => [],
@@ -182,11 +191,32 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
+
             [
-                'name' => 'Games',
+                'name' => 'Gifts packages',
                 'sort' => 5,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 5],
+                ],
+                'permissions' => [
+
+                    [
+                        'key' => 'super-package-reward',
+                        'except' => ['edit', 'delete', 'show'],
+                        'additional' => ['dedicate-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'create'],
+
+                        ],
+                    ],
+
+                ],
+            ],
+            [
+                'name' => 'Games',
+                'sort' => 6,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 6],
                 ],
                 'permissions' => [
                     [
@@ -217,9 +247,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'badge',
-                'sort' => 6,
+                'sort' => 7,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 6],
+                    PermissionType::ADMIN->value => ['sort' => 7],
                 ],
                 'permissions' => [
                     ['key' => 'badges', 'except' => [], 'additional' => [], 'types' => [
@@ -233,9 +263,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Fast orders',
-                'sort' => 7,
+                'sort' => 8,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 7],
+                    PermissionType::ADMIN->value => ['sort' => 8],
                 ],
                 'permissions' => [
                     [
@@ -306,9 +336,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Wallet',
-                'sort' => 8,
+                'sort' => 9,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 8],
+                    PermissionType::ADMIN->value => ['sort' => 9],
                 ],
                 'permissions' =>  [
                     [
@@ -331,9 +361,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'charge system',
-                'sort' => 9,
+                'sort' => 10,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 9],
+                    PermissionType::ADMIN->value => ['sort' => 10],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 3],
                     PermissionType::AREA_MANAGER->value => ['sort' => 3],
                 ],
@@ -385,9 +415,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'users',
-                'sort' => 10,
+                'sort' => 11,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 10],
+                    PermissionType::ADMIN->value => ['sort' => 11],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 2],
                     PermissionType::AREA_MANAGER->value => ['sort' => 5],
                 ],
@@ -403,6 +433,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'complaints', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'change-country-request', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['status-switch','history-switch','all-status-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'status-switch', 'history-switch','all-status-switch'],
+                    ],],
                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
@@ -414,9 +447,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Advertisements',
-                'sort' => 11,
+                'sort' => 12,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 11],
+                    PermissionType::ADMIN->value => ['sort' => 12],
                     PermissionType::SUPER_ADMIN->value => ['sort' => 7],
                     PermissionType::AREA_MANAGER->value => ['sort' => 8],
                 ],
@@ -443,9 +476,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Store',
-                'sort' => 12,
+                'sort' => 13,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 12],
+                    PermissionType::ADMIN->value => ['sort' => 13],
                 ],
                 'permissions' => [
                     ['key' => 'store', 'except' => [], 'additional' => [], 'types' => [
@@ -455,9 +488,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Distinguished identifier',
-                'sort' => 13,
+                'sort' => 14,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 13],
+                    PermissionType::ADMIN->value => ['sort' => 14],
                 ],
                 'permissions' => [
                     ['key' => 'featured-ids', 'except' => [], 'additional' => [], 'types' => [
@@ -473,9 +506,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Vip',
-                'sort' => 14,
+                'sort' => 15,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 14],
+                    PermissionType::ADMIN->value => ['sort' => 15],
                 ],
                 'permissions' => [
                     ['key' => 'VIPs', 'except' => [], 'additional' => [], 'types' => [
@@ -491,9 +524,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'families',
-                'sort' => 15,
+                'sort' => 16,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 15],
+                    PermissionType::ADMIN->value => ['sort' => 16],
                 ],
                 'permissions' => [
                     ['key' => 'families', 'except' => [], 'additional' => [], 'types' => [
@@ -506,9 +539,9 @@ class PermissionTypeSeeder extends Seeder
             ],
             [
                 'name' => 'Agency System',
-                'sort' => 16,
+                'sort' => 17,
                 'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 1],
+                    PermissionType::ADMIN->value => ['sort' => 17],
                 ],
                 'permissions' => [
                     ['key' => 'agency-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
@@ -592,7 +625,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'hosts-target', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
-                     ['key' => 'remaining-diamonds-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                    ['key' => 'remaining-diamonds-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
                     ['key' => 'hosts', 'except' => ['create'], 'additional' => ['charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch',], 'types' => [
@@ -692,7 +725,10 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-background', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'emoji', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
@@ -708,7 +744,10 @@ class PermissionTypeSeeder extends Seeder
                 ],
                 'permissions' => [
 
-                    ['key' => 'gift', 'except' => [], 'additional' => [], 'types' => [
+                    ['key' => 'gift', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'gift-categories', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                     ['key' => 'gift-logs', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
@@ -735,6 +774,9 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
+                    ],],
+                    ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
                     ],],
                 ],
             ],
@@ -907,8 +949,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => ['show','create'], 'additional' => ['status-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['status-switch','edit','browse'],
+                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['status-switch', 'edit', 'browse'],
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,

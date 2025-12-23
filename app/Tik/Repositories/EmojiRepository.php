@@ -26,6 +26,15 @@ class EmojiRepository extends AbstractRepository
         return $query->select('id', 'pid', 'name', 'emoji', 't_length', 'sort', 'name_en')->orderBy('sort')->get();
     }
 
+    public function index($request)
+    {
+        $query = $this->model->query()->where('enable', 1);
+        if ($request->emoji_category_id) {
+            $query->where('emoji_category_id', $request->emoji_category_id);
+        }
+        return $query->select('id', 'pid', 'name', 'emoji', 'image_type','t_length', 'sort', 'name_en')->orderBy('sort')->get();
+    }
+
     public function findById($id)
     {
         return $this->model->query()->select('id', 'pid', 'name', 'emoji', 't_length', 'sort')->find($id);

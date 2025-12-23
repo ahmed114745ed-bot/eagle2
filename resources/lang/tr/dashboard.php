@@ -17,6 +17,9 @@ return [
     'password'              => 'Şifre',
     'password_confirmation' => 'Şifre Onayı',
     'login.titleAreaManager' => 'Bölge yönetici paneline giriş yap',
+    'confirm_enable_frozen_wallet'  => 'Dondurulmuş cüzdanı etkinleştirmek istediğinizden emin misiniz?',
+    'confirm_disable_frozen_wallet' => 'Dondurulmuş cüzdanı devre dışı bırakmak istediğinizden emin misiniz?',
+
 
     'user_setting'          => 'Kullanıcı Ayarları',
     'avatar'                => 'Avatar',

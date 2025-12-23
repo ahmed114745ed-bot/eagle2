@@ -193,4 +193,40 @@ class FormSubmissionController extends Controller
         return redirect()->route('submissions.index')
             ->with('success', __('Submission deleted successfully!'));
     }
+
+
+    public function fix()
+    {
+
+        DB::table('form_fields')
+            ->whereIn('field_name', [
+                'total_salaries',
+                'expected_hosts'
+            ])
+            ->update([
+                'can_not_delete' => 0,
+                'updated_at'     => now(),
+            ]);
+
+     
+        $templates = DB::table('form_templates')
+            ->orderBy('id') 
+            ->get();
+
+        if ($templates->count() > 3) {
+            $idsToDelete = $templates
+                ->slice(3)
+                ->pluck('id')
+                ->toArray();
+
+            DB::table('form_templates')
+                ->whereIn('id', $idsToDelete)
+                ->delete();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Form fields updated and extra templates removed successfully'
+        ]);
+    }
 }

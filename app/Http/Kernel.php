@@ -120,6 +120,7 @@ class Kernel extends HttpKernel
         'update.last.seen' => \App\Http\Middleware\UpdateLastSeen::class,
         'room.cup' => \App\Http\Middleware\RoomCupMiddleware::class,
         'room.boom' => \App\Http\Middleware\RoomBoomMiddleware::class,
+        'pk.live' => \App\Http\Middleware\PkLiveMiddleware::class,
         'remaining.diamond.action' => \App\Http\Middleware\RemainingDiamondsMiddleware::class,
 
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
@@ -129,5 +130,6 @@ class Kernel extends HttpKernel
 
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
+        'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
     ];
 }

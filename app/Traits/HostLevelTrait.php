@@ -19,8 +19,8 @@ trait HostLevelTrait
             $query->whereDate('created_at', Carbon::now($timezone)->toDateString());
         })
             ->when($eventType == 'weekly', function ($query) use ($timezone) {
-                $startOfWeek = Carbon::now($timezone)->startOfWeek(Carbon::SATURDAY);
-                $endOfWeek   = Carbon::now($timezone)->endOfWeek(Carbon::FRIDAY);
+                $startOfWeek = Carbon::now($timezone)->startOfWeek();
+                $endOfWeek   = Carbon::now($timezone)->endOfWeek();
 
                 $query->whereBetween('created_at', [$startOfWeek, $endOfWeek]);
             })

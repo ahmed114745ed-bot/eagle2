@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
+use App\Models\ChangeCountryRequest;
 use Modules\AreaManager\Entities\Region;
 use App\Tik\Repositories\CountryRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -62,5 +63,37 @@ class CountryService
             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function changeRequest($data): true
+    {
+        $user = request()->user();
+        $stop_invite_code = settings()->get('change_country');
+
+        $existRequest =   ChangeCountryRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
+        if ($existRequest) return  throw new \Exception(__('you sent request before'));
+        //  dd($stop_invite_code);
+        if ($stop_invite_code  === '1') {
+            ChangeCountryRequest::updateOrCreate([
+                'user_id' => auth()->id(),
+                'status' => 'accepted'
+            ], $data + ['user_id' => auth()->id(), 'old_country' => $user->country_id]);
+
+
+            $user->country_id = $data['country_id'];
+            $user->save();
+            $title = __('Change Country Request');
+            $body = __('Your country change request has been accepted');
+            Common::sendOfficialMessage($user->id, $title, $body);
+            Common::send_firebase_notification($user->notification_id, $title, $body);
+        } else {
+            ChangeCountryRequest::updateOrCreate([
+                'user_id' => auth()->id(),
+                'status' => 'pending'
+            ], $data + ['user_id' => auth()->id(), 'old_country' => $user->country_id]);
+        }
+
+
+        return true;
     }
 }

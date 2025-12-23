@@ -330,11 +330,11 @@ class WalletController extends MainController
         $amount = $data['amount'] ?? null;
         $toId = $data['target_id'] ?? null;
 
-        if (settings()->get("stop_charge", 0)) {
+        // if (settings()->get("stop_charge", 0)) {
 
-            throw new \Exception(__('api_responses.freez_charge'));
-        }
-
+        //     throw new \Exception(__('api_responses.freez_charge'));
+        // }
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
 
         if ($from->transfer_salary == 1) {
             throw new \Exception(__('api_responses.freeze_transfer_charger'));
@@ -346,7 +346,7 @@ class WalletController extends MainController
 
         $to = ShippingAgency::find($toId);
 
-        if (!$to ) {
+        if (!$to) {
             throw new \Exception(__('This agency not found'));
         }
 
@@ -355,7 +355,6 @@ class WalletController extends MainController
         }
         if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
             throw new \Exception(__('not_verified_agency'));
-
         }
 
         $rate = Common::getCoinsValue('shipping_coins');
@@ -363,7 +362,7 @@ class WalletController extends MainController
             throw new \Exception(__('api_responses.please set usd_value_in_coins in configs'));
         }
 
-//        $coins = $amount * $rate;
+        //        $coins = $amount * $rate;
 
         $chargeType = $data['charge_type'];
 
@@ -389,13 +388,13 @@ class WalletController extends MainController
     {
         $fromUser->decrement('di', $coins);
         $toAgency->increment('coins', $coins);
-        $adminType = null ;
+        $adminType = null;
         if (auth('admin')->user()->type === 'sub_super_admin') {
-            $adminType = UserTypeEnum::SUB_ADMIN ;
+            $adminType = UserTypeEnum::SUB_ADMIN;
         }
 
         if (auth('admin')->user()->type === 'superadmin') {
-            $adminType = UserTypeEnum::SUPER_ADMIN ;
+            $adminType = UserTypeEnum::SUPER_ADMIN;
         }
 
         WalletService::storeTransaction(
@@ -441,6 +440,8 @@ class WalletController extends MainController
             throw new \Exception(__('Invalid request data.'));
         }
 
+        if ($user->is_frozen_wallet) throw new \Exception(__('your wallet frozen.'));
+
         $subAdmin = SubAdmin::where('parent_id', $user->id)->find($toId);
 
         if (!$subAdmin) {
@@ -451,7 +452,7 @@ class WalletController extends MainController
             return Setting::where('key', 'super_admin_coins')->value('value') ?? 1;
         });
 
-//        $coins = $amount * $userCoins;
+        //        $coins = $amount * $userCoins;
 
         $chargeType = $data['charge_type'];
 
@@ -483,7 +484,7 @@ class WalletController extends MainController
 
 
 
-    private function createChargeRecord( $request, SubAdmin $subAdmin, $coins = 0, $usdAmount )
+    private function createChargeRecord($request, SubAdmin $subAdmin, $coins = 0, $usdAmount)
     {
 
         $charge = new Charge();
@@ -493,7 +494,7 @@ class WalletController extends MainController
         $charge->agency_id =   null;
         $charge->user_type = UserTypeEnum::SUB_ADMIN;
         $charge->amount = $coins;
-        $charge->usd = $usdAmount ;
+        $charge->usd = $usdAmount;
         $charge->balance_before =  $subAdmin->di  - $coins;
         $charge->save();
 
@@ -502,6 +503,4 @@ class WalletController extends MainController
 
         return  true;
     }
-
-
 }

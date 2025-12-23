@@ -21,7 +21,8 @@ class GiftResource extends JsonResource
         return [
             'id' => $this->id,
             'name' =>  $this->name,
-            'type' => $this->type = 1 ? 'normal' : 'hot',
+            // 'type' => $this->type = 1 ? 'normal' : 'hot',
+            'type' => $this->category?->type ?? 'normal',
             'price' => $this->price ?: 0,
             'img' => $this->img ?: '',
             'show_img' => $this->show_img ?: '',

@@ -61,7 +61,7 @@ class UserController extends MainController
 
     public function indexProfessionals(Content $content)
     {
-        if (!session('preview_superadmin') && !session('filter_country_id') && !session('preview_area_manager')){
+        if (!session('preview_superadmin') && !session('filter_country_id') && !session('preview_area_manager')) {
             abort(404, __('not found'));
         }
 
@@ -111,14 +111,14 @@ class UserController extends MainController
     protected function gridProfessional()
     {
         $grid = new Grid(new User());
-         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $haveCoins = (request()->have_coins == 1);
         $grid->model()
             ->ofAgency()
             ->with(['profile', 'packs', 'agency.country', 'country'])
             ->where('is_host', 1)
             ->withCount('sameDeviceUsers')
-            ->where(function ($query) use ($countryID){
+            ->where(function ($query) use ($countryID) {
                 $currentCountry = $countryID;
                 $query->where(function ($q) use ($currentCountry) {
                     $q->whereIn('country_id', $currentCountry)
@@ -465,21 +465,20 @@ class UserController extends MainController
      */
     protected function grid()
     {
-       $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
-
+        // $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = null;
+        if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
-            ->select(['id', 'name', 'uuid', 'special_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play','is_host','transfer_salary', 'is_bd', 'device_token', 'di'])
+            ->select(['id', 'name', 'uuid', 'special_id','country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
-                'ownerRoom:id,uid',
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
                 'userSetting',
-                'senderLevel:id,level',
-                'receiverLevel:id,level',
-                'monthlyDiamondReceive',
+                'senderLevel:id,level,img',
+                'receiverLevel:id,level,img',
                 'country',
                 'packs' => fn($q) => $q->where('is_used', true)
                     ->whereIn('type', [25])
@@ -546,7 +545,7 @@ class UserController extends MainController
             }
         ");
 
-      $grid->column('custom_button2', __('عدد الحسابات'))->display(function () {
+        $grid->column('custom_button2', __('accounts number'))->display(function () {
             $count = $this->same_device_users_count;
 
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
@@ -564,47 +563,6 @@ class UserController extends MainController
                     });
         ");
 
-        // if (!request()->filled('_export_')) {
-        //     $col->modal(__('Other accounts on same device'), function () {
-        //         $users = User::with('profile:id,user_id,avatar')
-        //             ->select(['id', 'name', 'uuid', 'phone', 'device_token'])
-        //             ->where('device_token', $this->device_token)
-        //             ->whereNotNull('device_token')
-        //             ->get();
-
-        //         $rows = $users->map(function ($user) {
-        //             $path = $user->profile?->avatar;
-        //             $defaultImage = asset("images/businessman-icon.jpg");
-        //             $url = getImagePath($path) ?? $defaultImage;
-
-        //             if (!isImageExists($url)) {
-        //                 $url = $defaultImage;
-        //             }
-
-        //             $image = handleShowImageWithTypes($user->id, $url, 40, 40);
-        //             $showUrl = url("admin/users/{$user->id}");
-
-        //             $nameColumn = "
-        //             <div style='display: flex; align-items: center; gap: 10px;'>
-        //                 $image
-        //                 <div>
-        //                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-        //                         <span style='text-decoration: underline; cursor: pointer;'>$user->name</span>
-        //                     </a>
-        //                     <span style='color: #aaa; font-size: smaller;'>UUID: $user->uuid</span>
-        //                 </div>
-        //             </div>
-        //         ";
-
-        //             return [
-        //                 'name' => $nameColumn,
-        //                 'phone' => $user->phone,
-        //             ];
-        //         });
-
-        //         return new Table([__('Name'), __('phone')], $rows->toArray());
-        //     });
-        // }
 
         $permission = $this->permission_name;
 

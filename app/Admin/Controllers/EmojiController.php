@@ -2,21 +2,29 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\Common;
 use App\Models\Emoji;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Helpers\Common;
+use App\Models\EmojiCategory;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\App;
+use App\Admin\Actions\Grid\MoveGroupEmoji;
+use App\Admin\Actions\MoveEmojiCategoryAction;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class EmojiController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'emoji';
+    protected $filterId;
+
+    public function __construct()
+    {
+        $this->filterId = request('filter');
+    }
     public function index(Content $content)
     {
         return parent::index($content
@@ -75,26 +83,103 @@ class EmojiController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Emoji);
+      //  $grid->sortable();
 
+        // Get the current filter from request or default to first category
+        $filterType = request()->get('filter', 'all');
+        $category  = [];
+
+        if (request('filter') != 'all') {
+            $category = EmojiCategory::find(request('filter'));
+        }
+
+
+
+        // Header tabs
+        $grid->header(function () use ($filterType) {
+            $locale = App::getLocale();
+
+            $tabs = ['all' => __('All')];
+            $categories = EmojiCategory::orderBy('id')->get();
+            foreach ($categories as $category) {
+                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+                $tabs[$category->id] = $title;
+            }
+
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = $filterType == $key ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
+
+            return $html;
+        });
+
+        // Apply filter to the grid
+        $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
+            $q->where('emoji_category_id', $filterType);
+        });
+
+        // Columns
         $grid->id(__('ID'));
         $grid->name(__('name'));
         $grid->column('name_en', __('name_en'));
         $grid->column('emoji', trans('emoji'))->display(function ($path) {
-            /** @var Emoji $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
-        $this->extendGrid($grid);
-        $grid->disableExport();
 
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
+        $this->extendGrid($grid);
+
+        $grid->disableExport();
+        $grid->disableCreateButton();
+
+        if ($category && $filterType != 'all') {
+            $grid->tools(function (Grid\Tools $tools) use ($filterType) {
+                $url =  url('/admin/emojis/create/' . $filterType); // Use Laravel route helper
+                $add = __('add');
+
+                $customButtonHTML = <<<HTML
+                <a href="{$url}" class="btn btn-sm btn-success" style="margi    n-right: 10px;">
+                    <i class="fa fa-plus"></i> {$add}
+                </a>
+            HTML;
+
+                $tools->append($customButtonHTML);
+            });
+        }
+
+        Admin::style("
+            .rtl .column-emoji .rtlSvga{
+                direction: ltr;
             }
         ");
+        // Optional: remove table-responsive for large screens
+        Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+        $permission    = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new MoveEmojiCategoryAction());
+            }
+        });
+
+        $grid->batchActions(function ($batch) {
+            $batch->disableDelete();
+            $batch->add(new MoveGroupEmoji());
+        });
+
         return $grid;
     }
+
 
     /**
      * Make a show builder.
@@ -126,9 +211,12 @@ class EmojiController extends MainController
     {
         $form = new Form(new Emoji);
         $this->disableFormTools($form);
-
+       
 
         $form->display(__('ID'));
+        if (!$form->isEditing()) {
+            $form->hidden('emoji_category_id', __('type'))->default(request('filter'));
+        }
         $form->select('pid', __('pid'))->options(function () {
             $ops = [0 => 'root'];
             $ps = Emoji::query()->where('enable', 1)->where('pid', 0)->where('id', '!=', $this->id)->get();
@@ -140,10 +228,38 @@ class EmojiController extends MainController
         $form->text('name', __('name'));
         $form->text('name_en', __('name_en'));
         $form->file('emoji', __('emoji'));
+        $form->select('image_type', __('image_type'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+                 'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
+            ]
+        )->required();
         $form->number('t_length', __('t_length'));
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-        $form->number('sort', __('sort'));
+       $form->number('sort', __('sort'));
+
+        $form->saved(function (Form $form) {
+            $model = $form->model();
+            $type = $form->model()->emoji_category_id;
+            $url = url('admin/emojis') . '?filter=' . $type;
+            return redirect()->to($url);
+        });
 
         return $form;
+    }
+
+
+    public function gitImage()
+    {
+        $gifts = Emoji::whereNotNull('emoji')->get();
+        foreach ($gifts as $gift) {
+            $ImageType =     pathinfo($gift->emoji, PATHINFO_EXTENSION);
+            $gift->image_type = $ImageType == 'alpha' ? 'mp4' : $ImageType;
+            $gift->save();
+        }
+        return $gifts;
     }
 }

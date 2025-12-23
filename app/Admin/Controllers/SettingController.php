@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Models\Language;
 use Cache;
 
 class SettingController extends MainController
@@ -50,7 +51,8 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
-         $chargeTabType = request()->get('type', 'Experience');
+        $languages = Language::select(['id', 'name', 'code'])->get();
+        $chargeTabType = request()->get('type', 'Experience');
 
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
@@ -64,6 +66,7 @@ class SettingController extends MainController
                 'pusher_app_id',
                 'pusher_app_cluster',
                 'settings',
+                'languages',
                 'timezones',
                 'agora_app_id',
                 'zego_server_secret',
@@ -124,7 +127,6 @@ class SettingController extends MainController
                     'key' => 'room_cup',
                     'value' => $request->value
                 ]);
-
             }
             Cache::put('room_cup', $request->value);
             return Common::apiResponse(true, 'created successfully');
@@ -170,6 +172,21 @@ class SettingController extends MainController
                 'value' => $request->value
             ]);
             Cache::put('host_level_action', $request->value);
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+
+    public function updatePkLive(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(['key' => 'pk_live_action'], [
+                'key' => 'pk_live_action',
+                'value' => $request->value
+            ]);
+            Cache::put('pk_live_action', $request->value);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

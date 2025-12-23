@@ -54,6 +54,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -149,10 +150,10 @@ class UserService
         return $this->userRepository->user_bd2($key, $page, $perPage);
     }
 
-    public function userBdByCountries($areaManagerId,$key, $page)
+    public function userBdByCountries($areaManagerId, $key, $page)
     {
         $perPage = 10;
-        return $this->userRepository->userBdByCountries($areaManagerId,$key, $page, $perPage);
+        return $this->userRepository->userBdByCountries($areaManagerId, $key, $page, $perPage);
     }
 
     public function superAdminUsers($key, $page)
@@ -194,7 +195,7 @@ class UserService
         return $this->userRepository->usersByCountry($superAdminId, $key, $page, $perPage);
     }
 
-     public function usersByCountries($areaManager, $key, $page)
+    public function usersByCountries($areaManager, $key, $page)
     {
         $perPage = 10;
 
@@ -275,10 +276,12 @@ class UserService
     {
         $countryId = $user->country_id;
 
-        if ($iso) {
-            $country = Country::where('iso', strtoupper($iso))->first();
-            if ($country) {
-                $countryId = $country->id;
+        if (!$countryId) {
+            if ($iso) {
+                $country = Country::where('iso', strtoupper($iso))->first();
+                if ($country) {
+                    $countryId = $country->id;
+                }
             }
         }
 
@@ -297,7 +300,9 @@ class UserService
         }
         // end update location
 
-        $this->userRepository->updateCountry($user, $countryId);
+        if ($countryId) {
+            $this->userRepository->updateCountry($user, $countryId);
+        }
         //        $this->updateCountryAgencyAndBD($user->id, $countryId);
 
         return $this->userRepository->getUserWithMedals($user->id);
@@ -652,6 +657,12 @@ class UserService
     public function showUser($userId)
     {
         return  $this->userRepository->getUserWithMedals($userId);
+        //        $this->packRepository->deleteAllExpiredPacks();
+    }
+
+    public function showUsers($usersIds)
+    {
+        return  $this->userRepository->getUsersWithMedals($usersIds);
         //        $this->packRepository->deleteAllExpiredPacks();
     }
 
@@ -1301,7 +1312,12 @@ class UserService
 
     public function dataUser($userId)
     {
-        return $this->userRepository->findOrFail($userId, ['family', 'medals.achievementLevel.achievement']);
+        return $this->userRepository->findOrFail($userId, [
+            'family',
+            'receiverLevel:id,img,level,exp',
+            'senderLevel:id,img,level',
+            'medals.achievementLevel.achievement'
+        ]);
     }
 
     public function syncBDUsers()
