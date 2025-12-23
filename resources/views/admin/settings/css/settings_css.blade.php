@@ -181,16 +181,6 @@
         margin: 10px 0 5px;
     }
 
-    input,
-    select {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        background: #333;
-        border: 1px solid #444;
-        color: white;
-    }
-
     button {
         padding: 10px;
         border: none;
@@ -1072,6 +1062,14 @@
         margin-bottom: 16px;
     }
 
+    .preset-card {
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 5px;
+    }
     @media (max-width: 992px) {
     }
 
