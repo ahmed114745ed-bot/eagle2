@@ -157,12 +157,23 @@
 <script>
     (function () {
         try {
-            const darkModeSetting = '{{ \App\Models\Setting::where("key", "dark_mode")->value("value") ?? "0" }}';
+            // Check if user has set a preference in localStorage
+            const userDarkModePreference = localStorage.getItem('admin_dark_mode');
 
-            if (darkModeSetting === '1' || darkModeSetting === 1) {
-                document.documentElement.classList.add('dark-mode');
+            console.log(userDarkModePreference)
+            if (userDarkModePreference !== null) {
+                // User has set a preference, use it
+                const isDarkMode = userDarkModePreference === '1';
+                document.documentElement.classList.toggle('dark-mode', isDarkMode);
             } else {
-                document.documentElement.classList.remove('dark-mode');
+                // No user preference, fall back to global setting
+                const darkModeSetting = '{{ \App\Models\Setting::where("key", "dark_mode")->value("value") ?? "0" }}';
+
+                if (darkModeSetting === '1' || darkModeSetting === 1) {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                }
             }
         } catch (e) {
             console.error('Dark mode initialization error:', e);

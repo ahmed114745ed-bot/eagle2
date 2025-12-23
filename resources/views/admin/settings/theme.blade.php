@@ -327,19 +327,32 @@
         const $switch = $('input[name="dark_mode"][data-bootstrap-switch]');
         const $input = document.getElementById('dark_mode_input');
 
+        // Check localStorage first for user preference
+        const userPreference = localStorage.getItem('admin_dark_mode');
+        let initialState = false;
+
+        if (userPreference !== null) {
+            // User has set a preference, use it
+            initialState = userPreference === '1';
+        } else {
+            // No user preference, use the switch state (which comes from database)
+            initialState = $switch.is(':checked');
+        }
+
         $switch.each(function () {
-            $(this).bootstrapSwitch('state', $(this).prop('checked'), true);
+            $(this).bootstrapSwitch('state', initialState, true);
         });
 
         $switch.on('switchChange.bootstrapSwitch', function (event, state) {
             const value = state ? '1' : '0';
             if ($input) $input.value = value;
             document.documentElement.classList.toggle('dark-mode', state);
+            // Update localStorage when user changes via settings
+            localStorage.setItem('admin_dark_mode', value);
         });
 
-        if ($switch.is(':checked')) {
-            document.documentElement.classList.add('dark-mode');
-        }
+        // Apply the initial state
+        document.documentElement.classList.toggle('dark-mode', initialState);
     }
 
     $(document).ready(function() {

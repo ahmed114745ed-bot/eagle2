@@ -395,7 +395,7 @@
             justify-content: center;
             align-items: center;
             border-radius: 8px;
-            right: 180%;
+            right: 10%;
             position: relative;
         }
 
@@ -406,7 +406,7 @@
             justify-content: center;
             align-items: center;
             border-radius: 8px;
-            left: 200%;
+            left: 10%;
             position: relative;
         }
 

@@ -576,9 +576,15 @@
                     @endif
 
                 </ul>
-                {!! Admin::getNavbar()->render() !!}
+        {!! Admin::getNavbar()->render() !!}
 
-                <li class="dropdown user user-menu">
+                <li class="dropdown">
+                    <a href="javascript:void(0);" id="dark-mode-toggle" class="dropdown-toggle" title="{{ __('Toggle Dark Mode') }}" style="cursor: pointer;">
+                        <i class="fa fa-moon-o" style="font-size: 18px;"></i>
+                    </a>
+                </li>
+
+        <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <img src="{{ Admin::user()->image }}" class="user-image" alt="User Image">
                         <span class="hidden-xs">{{ Admin::user()->name ?? Admin::user()->username }}</span>
@@ -656,6 +662,30 @@
         location.reload();
         toastr.success('{{ __('admin.refresh_succeeded') }}', '', {positionClass: "toast-top-center"});
     });
+
+    // Dark mode toggle functionality
+    $('#dark-mode-toggle').on('click', function() {
+        const isDarkMode = document.documentElement.classList.toggle('dark-mode');
+        localStorage.setItem('admin_dark_mode', isDarkMode ? '1' : '0');
+
+        // Update button icon
+        const icon = $(this).find('i');
+        if (isDarkMode) {
+            icon.removeClass('fa-moon-o').addClass('fa-sun-o');
+        } else {
+            icon.removeClass('fa-sun-o').addClass('fa-moon-o');
+        }
+    });
+
+    // Initialize dark mode button state
+    const currentDarkMode = document.documentElement.classList.contains('dark-mode');
+    const darkModeIcon = $('#dark-mode-toggle').find('i');
+    if (currentDarkMode) {
+        darkModeIcon.removeClass('fa-moon-o').addClass('fa-sun-o');
+    } else {
+        darkModeIcon.removeClass('fa-sun-o').addClass('fa-moon-o');
+    }
+
     $('#area-Manager-select-mobile').on('change', function () {
         const val = $(this).val();
         $('#area-Manager-select').val(val).trigger('change');

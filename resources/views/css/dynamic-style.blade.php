@@ -2582,6 +2582,10 @@
         color: #000000 !important;
     }
 
+    .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a {
+        color: var(--text-secondary-color) !important;
+    }
+
     ::placeholder {
         color: #3f3f3f !important;
     }
