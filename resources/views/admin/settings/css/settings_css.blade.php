@@ -143,7 +143,6 @@
         margin: 0;
         padding: 0;
         background-color: var(--secondary-color);
-        color: white;
         display: flex;
     }
 
@@ -175,15 +174,6 @@
 
     .settings-section.active {
         display: block;
-    }
-
-    form {
-        background: var(--box-background-color);
-        padding: 20px;
-        border-radius: 5px;
-        width: 100%;
-        position: relative;
-        margin: auto;
     }
 
     label {
@@ -502,6 +492,7 @@
 
     .tab-btn {
         background-color: var(--secondary-color);
+        color: var(--text-secondary-color);
         border: none;
         padding: 10px 15px;
         border-radius: 10px;
@@ -575,7 +566,7 @@
     .inner-settings-menu .tab-btn {
         padding: 12px 24px;
         border: none;
-        color: #888;
+        color: var(--text-secondary-color);
         border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -586,11 +577,11 @@
     }
 
     .inner-settings-menu .tab-btn:hover {
-        color: #fff;
+        color: var(--text-secondary-color);
     }
 
     .inner-settings-menu .tab-btn.active {
-        color: #fff;
+        color: var(--text-secondary-color);
     }
 
     /* Section Header */
@@ -642,7 +633,6 @@
         margin: 0;
         font-size: 16px;
         font-weight: 600;
-        color: #fff;
     }
 
     /* Card Icons */
@@ -699,20 +689,19 @@
         margin-bottom: 0;
     }
 
-    .exp-card-body label {
-        display: block;
-        margin-bottom: 6px;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text-secondary-color);
+    .dark-mode .exp-card-body label {
+        color: var(--white);
     }
 
     .exp-card-body .form-control {
         border: 1px solid rgba(255,255,255,0.1);
         border-radius: 8px;
         padding: 10px 14px;
-        color: #fff;
         width: 100%;
+    }
+
+    .dark-mode .exp-card-body .form-control {
+        color: #fff;
     }
 
     .exp-card-body .form-control:focus {
@@ -815,9 +804,11 @@
         align-items: center;
         gap: 12px;
         background: var(--white);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 12px;
-        padding: 12px;
+        border: 1px solid #eaeaea;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
     }
 
     .dark-mode .link-card {
@@ -869,12 +860,6 @@
         margin: 0;
         font-size: 14px;
         font-weight: 600;
-        color: #fff;
-    }
-
-    .link-card-info small {
-        color: #888;
-        font-size: 11px;
     }
 
     /* Card Input */
@@ -1028,6 +1013,63 @@
         .row {
             gap: 12px;
         }
+    }
+
+    /* Modern White Form Card */
+    form {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eaeaea;
+    }
+
+    form .section-title {
+        color: #1a1a2e;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    form .form-control {
+        background: #f8f9fb;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 10px 14px;
+        color: #333;
+        transition: all 0.2s ease;
+    }
+
+    form .form-control:focus {
+        background: #fff;
+        border-color: var(--primary-color, #711e1e);
+        box-shadow: 0 0 0 3px rgba(113, 30, 30, 0.08);
+        outline: none;
+    }
+
+    form .form-control::placeholder {
+        color: #aaa;
+    }
+
+    form .btn-primary {
+        background: #1a1a2e;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: 500;
+        color: #fff;
+        transition: all 0.2s ease;
+    }
+
+    form .btn-primary:hover {
+        background: #2d2d44;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    form .form-group {
+        margin-bottom: 16px;
     }
 
     @media (max-width: 992px) {

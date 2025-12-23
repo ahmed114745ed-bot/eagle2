@@ -6,12 +6,11 @@
         <input type="hidden" name="current_tab" value="">
 
         <div class="dark-mode-card mb-4">
-            <div class="d-flex justify-content-between align-items-center p-3"
-                 style="background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="d-flex justify-content-between align-items-center p-3" style="background: rgba(255,255,255,0.05);border-radius: 16px;border: 1px solid #eaeaea;box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
                 <div class="d-flex align-items-center gap-3">
                     <div class="dark-mode-icon" style="font-size: 24px;">🌙</div>
                     <div>
-                        <h5 class="m-0">{{ __('Dark Mode') }}</h5>
+                        <h5 class="m-0" style="color: black">{{ __('Dark Mode') }}</h5>
                         <small style="color: #888;">{{ __('Toggle dark/light theme') }}</small>
                     </div>
                 </div>

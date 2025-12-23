@@ -70,10 +70,16 @@
         font-size: 14px !important;
     }
 
+    .dark-mode .main-header .select2-container--default .select2-selection--single .select2-selection__rendered,
+    .dark-mode.navbar .select2-container--default .select2-selection--single .select2-selection__rendered,
+    .dark-mode.navbar-nav .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--white) !important;
+    }
+
     .main-header .select2-container--default .select2-selection--single .select2-selection__placeholder,
     .navbar .select2-container--default .select2-selection--single .select2-selection__placeholder,
     .navbar-nav .select2-container--default .select2-selection--single .select2-selection__placeholder {
-        color: var(--text-secondary-color, #9ca3af) !important;
+        color: black !important;
     }
 
     .main-header .select2-container--default .select2-selection--single .select2-selection__arrow,
