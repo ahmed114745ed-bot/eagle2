@@ -2301,7 +2301,7 @@
     }
 
     .modal-dialog {
-        margin: 4% auto !important;
+        margin: 5% auto !important;
     }
 
     .modal-header .close {
@@ -2588,6 +2588,10 @@
 
     ::placeholder {
         color: #3f3f3f !important;
+    }
+
+    .close:focus, .close:hover {
+        color: var(--text-secondary-color);
     }
 
     .stats-container .info-box {

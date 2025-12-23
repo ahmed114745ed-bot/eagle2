@@ -53,7 +53,6 @@ class CoreWalletsController extends MainController
             'vip' => 'fa-solid fa-crown',
             'ads' => 'fa-solid fa-rectangle-ad',
             'invitation_code_wallet' => 'fa-solid fa-user-plus',
-
         ];
 
         $canTransfer = Admin::user()->can('*') || Admin::user()->can('transfer-switch-app-wallet');
@@ -111,8 +110,8 @@ class CoreWalletsController extends MainController
         }
 
         $toWallet->save();
-        
-       
+
+
 
         CoreWalletTransaction::create([
             'from_wallet' => $request->from_wallet_id,

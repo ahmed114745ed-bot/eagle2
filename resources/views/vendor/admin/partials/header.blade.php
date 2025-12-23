@@ -128,7 +128,6 @@
     .modal-header h5 {
         margin: 0;
         font-weight: 600;
-        color: #343a40;
     }
 
     .close-btn {
