@@ -4224,7 +4224,13 @@
     "cp_description": "CP ilişkisinden :amount coin kazandın",
 
     "create_room_title": "Oda Oluştur",
-    "create_room_description": "Oda oluşturmak için :amount coin harcadın"
+    "create_room_description": "Oda oluşturmak için :amount coin harcadın",
+      "add_title": "Cüzdana Ekle",
+    "add_description": "Cüzdanınıza :amount coin eklendi",
+    "transfer_title": "Transfer",
+    "transfer_description": ":amount coin transfer edildi",
+    "subtract_title": "Çekme",
+    "subtract_description": "Cüzdanınızdan :amount coin çekildi"
 
 
 

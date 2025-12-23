@@ -1594,7 +1594,13 @@
   "cp_description": "You earned :amount coins from CP relationship",
 
   "create_room_title": "Create Room",
-  "create_room_description": "You spent :amount coins to create a room"
+  "create_room_description": "You spent :amount coins to create a room",
+      "add_title": "Add to Wallet",
+    "add_description": "Added :amount coins to your wallet",
+    "transfer_title": "Transfer",
+    "transfer_description": "Transferred :amount coins",
+    "subtract_title": "Withdraw",
+    "subtract_description": "Withdrawn :amount coins from your wallet"
 
 
 

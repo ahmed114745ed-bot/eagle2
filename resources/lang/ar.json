@@ -4806,7 +4806,13 @@
   "cp_description": "ربحت :amount كوين من علاقة CP",
 
   "create_room_title": "إنشاء غرفة",
-  "create_room_description": "تم خصم :amount كوين مقابل إنشاء غرفة"
+  "create_room_description": "تم خصم :amount كوين مقابل إنشاء غرفة",
+    "add_title": "إضافة للمحفظة",
+  "add_description": "تمت إضافة :amount كوين إلى محفظتك",
+  "transfer_title": "تحويل",
+  "transfer_description": "تم تحويل :amount كوين",
+  "subtract_title": "سحب من المحفظة",
+  "subtract_description": "تم سحب :amount كوين من محفظتك"
 
 
 
