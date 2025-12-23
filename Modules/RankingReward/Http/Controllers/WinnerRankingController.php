@@ -100,15 +100,15 @@ class WinnerRankingController extends  MainController
         });
 
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
-                return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            if ($this->reward->target_type == "ware") {
+                return @$this->reward->ware->name ?? '';
+            } elseif ($this->reward->target_type == "vip") {
+                return @$this->reward->vip->name ?? '';
+            } elseif ($this->reward->target_type == "badge") {
+                return @$this->reward->badge->name ?? '';
+            } elseif ($this->reward->target_type == "coins") {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
+            } elseif ($this->reward->target_type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
                 return "<img src='$value' width='80' height='80'>";
             }
