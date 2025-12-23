@@ -34,7 +34,6 @@ class WalletController extends Controller
         $user = $request->user();
         $data = $this->walletService->history($user->id, $request->type, $request->start_date, $request->end_date, $request->page, $request->per_page);
 
-      \Log::info('Wallet History Data: ', ['data' => $data]);
         return Common::apiResponse(true, '', UserCoinLogResource::collection($data), 200);
     }
 
