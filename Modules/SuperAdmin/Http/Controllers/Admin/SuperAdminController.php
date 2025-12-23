@@ -202,19 +202,19 @@ class SuperAdminController extends MainController
             ";
         });
 
-        // $grid->column('created_at', __('Created at'))->display(function ($date) {
-        //     static $formatter = null;
+        $grid->column('created_at', __('Created at'))->display(function ($date) {
+            static $formatter = null;
 
-        //     if ($formatter === null) {
-        //         $formatter = new IntlDateFormatter(
-        //             App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
-        //             IntlDateFormatter::LONG,
-        //             IntlDateFormatter::SHORT
-        //         );
-        //     }
+            if ($formatter === null) {
+                $formatter = new IntlDateFormatter(
+                    App::getLocale() === 'ar' ? 'ar_SA' : 'en_US',
+                    IntlDateFormatter::LONG,
+                    IntlDateFormatter::SHORT
+                );
+            }
 
-        //     return $formatter->format(strtotime($date));
-        // });
+            return $formatter->format(strtotime($date));
+        });
 
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {

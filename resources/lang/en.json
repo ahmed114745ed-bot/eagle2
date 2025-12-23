@@ -1568,7 +1568,33 @@
   "wallet.general_description": "A wallet transaction has been completed.",
     "packs.purchase_title": "Mağaza Satın Alımı",
   "packs.purchase_description": "Mağazadan :item satın almak için :amount coin düşüldü.",
-  "packs.default_item": "ürün"
+  "packs.default_item": "ürün",
+  "lose_title": "Loss",
+  "lose_description": "You lost :amount coins",
+
+  "room_cup_title": "Room Cup",
+  "room_cup_description": "You earned :amount coins from Room Cup",
+
+  "weekly_star_title": "Weekly Event",
+  "weekly_star_description": "You earned :amount coins from the weekly event",
+
+  "cashback_title": "Cashback",
+  "cashback_description": "You received :amount coins cashback from lucky gifts",
+
+  "lucky_gift_title": "Lucky Gifts",
+  "lucky_gift_description": "You earned :amount coins from lucky gifts",
+
+  "vip_title": "VIP",
+  "vip_description": "You spent :amount coins on VIP",
+
+  "room_boom_title": "Room Boom",
+  "room_boom_description": "You earned :amount coins from room boom",
+
+  "cp_title": "CP Relationship",
+  "cp_description": "You earned :amount coins from CP relationship",
+
+  "create_room_title": "Create Room",
+  "create_room_description": "You spent :amount coins to create a room"
 
 
 
