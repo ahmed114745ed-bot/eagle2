@@ -176,7 +176,7 @@ class Kernel extends ConsoleKernel
             ->timezone(getTimezone())
             ->appendOutputTo(storage_path('logs/daily-ranking.log'))
             ->runInBackground();
-        $weekEnd = Common::getSettingValue('week_end') ?? 'sunday';
+        $weekEnd = Common::getSettingValue('week_start') ?? 'monday';
 
         // Convert string to Carbon constant
         $carbonDay = constant('Carbon\\Carbon::' . strtoupper($weekEnd));
