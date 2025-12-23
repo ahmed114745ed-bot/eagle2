@@ -1,11 +1,10 @@
 <?php
 
-use App\Admin\Controllers\ChangeCountryRequestController;
 use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
-
 use App\Admin\Controllers\BdController;
+
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\CoinController;
@@ -108,7 +107,10 @@ use App\Admin\Controllers\AgencyMangerTaregetController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\AgencyMangerAgencyesController;
+use App\Admin\Controllers\ChangeCountryRequestController;
+use App\Admin\Controllers\CountryRequestActionController;
 use App\Admin\Controllers\CoreWalletTransactionController;
+use App\Admin\Controllers\CountryRequestHistoryController;
 use App\Admin\Controllers\AdminAreaManagerChargeController;
 use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
@@ -119,6 +121,7 @@ use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 
 Route::group(
     [
@@ -206,6 +209,7 @@ Route::group(
         Route::post('exchange-coins', [UpgradeLevelController::class, 'exchange'])->name('exchange-coins');
         Route::post('group-chat-config', [UpgradeLevelController::class, 'group_chat_config'])->name('group-chat-config');
 
+        Route::get('search/super-admin', [SuperAdminController::class, 'searchBySuperAdmin'])->name('super-admin');
 
         Route::get('search/host-agency', [UserV1Controller::class, 'hostAgencies'])->name('hostAgency');
         Route::post('/locale', MultiLanguageController::class . '@locale');
@@ -231,6 +235,7 @@ Route::group(
         Route::resource('payment-with-method', PaymentMethodController::class);
         Route::post('save-payment-with-method', [PaymentMethodController::class, "customStore"]);
         Route::resource('users-settings', UserSettingController::class);
+
 
         Route::resource('auth/users', 'AdminUserController')->names([
             'index' => 'auth.users.index',
@@ -332,8 +337,10 @@ Route::group(
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
+        Route::get('country-request-history', [CountryRequestHistoryController::class, 'index']);
         Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
         Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
+        Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
         Route::resource('backgrounds', 'BackgroundController');
         Route::resource('official_msgs', 'OfficialMessageController');

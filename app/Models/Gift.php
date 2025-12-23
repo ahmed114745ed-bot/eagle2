@@ -12,6 +12,11 @@ class Gift extends Model
 {
     use AchievementGift, TimestampsWithTimezone;
 
+
+    public $sortable = [
+        'order_column_name' => 'sort', // Set this to your column name
+        'sort_when_creating' => true,
+    ];
     // protected $fillable=['use_count'];
     protected $guarded = [];
 

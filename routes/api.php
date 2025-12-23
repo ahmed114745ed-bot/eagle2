@@ -68,6 +68,7 @@ use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
 

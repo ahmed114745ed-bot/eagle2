@@ -90,9 +90,9 @@ class PermissionTypeSeeder extends Seeder
                     [
                         'key' => 'area-manager',
                         'except' => [],
-                        'additional' => [],
+                        'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
+                            PermissionType::ADMIN->value => ['charge-switch','create', 'edit', 'delete', 'show','browse'],
 
                         ],
                     ],
@@ -121,7 +121,7 @@ class PermissionTypeSeeder extends Seeder
                         'except' => [],
                         'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch','show'],
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch', 'show'],
                             PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
 
                         ],
@@ -177,7 +177,7 @@ class PermissionTypeSeeder extends Seeder
                         'except' => ['show'],
                         'additional' => ['dedicate-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch','edit', 'create', 'delete'],
+                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'edit', 'create', 'delete'],
 
                         ],
                     ],
@@ -199,7 +199,7 @@ class PermissionTypeSeeder extends Seeder
                     PermissionType::ADMIN->value => ['sort' => 5],
                 ],
                 'permissions' => [
-                    
+
                     [
                         'key' => 'super-package-reward',
                         'except' => ['edit', 'delete', 'show'],
@@ -209,7 +209,7 @@ class PermissionTypeSeeder extends Seeder
 
                         ],
                     ],
-                    
+
                 ],
             ],
             [
@@ -432,6 +432,9 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'complaints', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'change-country-request', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['status-switch','history-switch','all-status-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'status-switch', 'history-switch','all-status-switch'],
                     ],],
                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],

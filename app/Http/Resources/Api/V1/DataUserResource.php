@@ -84,6 +84,11 @@ class DataUserResource extends JsonResource
             'colored_name' => $this->color_image,
             'image_color'          => @$this->color_image,
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
+            'level' => [
+                'receiver_img' => $this->receiverLevel?->img ?? '',
+                'exp_receiver' => $this->receiverLevel?->exp ?? 0,
+                'sender_img'   => $this->senderLevel?->img ?? '',
+            ],
         ];
     }
 }
