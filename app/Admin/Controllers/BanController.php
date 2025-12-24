@@ -109,7 +109,7 @@ class BanController extends MainController
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->avatar;
+            $avatarPath = $user->profile->avatar ?? '';
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
             if (!isImageExists($avatar)) {
