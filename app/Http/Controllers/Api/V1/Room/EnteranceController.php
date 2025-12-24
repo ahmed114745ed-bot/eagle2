@@ -28,6 +28,7 @@ use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
 use App\Tik\Services\EnteranceRoomServices;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
@@ -250,8 +251,10 @@ class EnteranceController extends Controller
      */
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
-            throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
-        
+        Log::info('🚀 log out enter room');
+        throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
+        Log::info('🚀 log in enter room');
+
         $user = $request->user();
         $zego_feature = \Cache::rememberForever('zego_feature', function () {
             return \DB::table('settings')->where('key', 'zego_feature')->value('value');
