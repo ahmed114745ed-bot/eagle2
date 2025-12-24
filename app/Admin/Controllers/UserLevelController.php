@@ -64,7 +64,7 @@ class UserLevelController extends MainController
                 'profile',
                 'totalSenderLevel',
                 'totalSenderLevel',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
         $grid->quickSearch();
