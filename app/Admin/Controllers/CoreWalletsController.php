@@ -38,21 +38,21 @@ class CoreWalletsController extends MainController
     public function index(Content $content)
     {
         $icons = [
-            'app_wallet' => 'fa-solid fa-coins',
-            'owner_wallet' => 'fa-solid fa-user-tie',
-            'game_wallet' => 'fa-solid fa-dice',
-            'lucky_box' => 'fa-solid fa-box-open',
-            'host_agency' => 'fa-solid fa-building',
-            'agency' => 'fa-solid fa-briefcase',
-            'lucky_gifts' => 'fa-solid fa-gift',
-            'chinese_games' => 'fa-solid fa-dragon',
-            'games' => 'fa-solid fa-gamepad',
-            'shipping_agents' => 'fa-solid fa-truck',
-            'payment_gateways' => 'fa-solid fa-credit-card',
-            'mall' => 'fa-solid fa-store',
-            'vip' => 'fa-solid fa-crown',
-            'ads' => 'fa-solid fa-rectangle-ad',
-            'invitation_code_wallet' => 'fa-solid fa-user-plus',
+            'app_wallet'             => '🪙',
+            'owner_wallet'           => '👔',
+            'game_wallet'            => '🎲',
+            'lucky_box'              => '📦',
+            'host_agency'            => '🏢',
+            'agency'                 => '💼',
+            'lucky_gifts'            => '🎁',
+            'chinese_games'          => '🐉',
+            'games'                  => '🎮',
+            'shipping_agents'        => '🚚',
+            'payment_gateways'       => '💳',
+            'mall'                   => '🏪',
+            'vip'                    => '👑',
+            'ads'                    => '📢',
+            'invitation_code_wallet' => '👥',
         ];
 
         $canTransfer = Admin::user()->can('*') || Admin::user()->can('transfer-switch-app-wallet');

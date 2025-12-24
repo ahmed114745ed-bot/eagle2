@@ -402,7 +402,8 @@
                             <div class="wallet-badge">المحفظة الرئيسية</div>
                         @endif
                         <div class="wallet-icon">
-                            <i class="{{ $icon }}"></i>
+                            {{ $icon }}
+                            {{--                            <i class="{{ $icon }}"></i>--}}
                         </div>
                         <div class="wallet-name">
                             {{ __(ucfirst(str_replace('_', ' ', $wallet->name))) }}
