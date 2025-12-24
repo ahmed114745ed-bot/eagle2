@@ -3,6 +3,7 @@
 namespace App\Classes\Gifts;
 
 use App\Enums\UserDiamondLogType;
+use App\Helpers\UserDiamondLogHelper;
 use App\Models\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
