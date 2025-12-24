@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Log;
 use Carbon\Carbon;
 use App\Helpers\Common;
@@ -919,7 +920,7 @@ class User extends Authenticatable
         //     ->sum(DB::raw('salary - cut_amount'));
 
         // $total = $userSalary + $roomSalary;
-        $total =wallet_available_by_user($this->id); 
+        $total =wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
 
@@ -1000,6 +1001,10 @@ class User extends Authenticatable
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
     }
 
+    public function newRoom(): BelongsTo
+    {
+        return $this->belongsTo(Room::class, 'now_room_uid', 'id');
+    }
 
     public function nowRoom()
     {
@@ -1930,7 +1935,7 @@ class User extends Authenticatable
     //         }
 
     //         $originalProfile = $model->profile;
-    //         $newAvatar = request()->input('photo'); 
+    //         $newAvatar = request()->input('photo');
     //         if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
     //             $newCount = $model->profile_count + 1;
@@ -2320,7 +2325,7 @@ class User extends Authenticatable
         return $this->hasOne(HostLevelWinner::class, 'user_id', 'id');
     }
 
-    
+
     public function hostLevelWinnerByLevelAndEvent($hostLevelId)
     {
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
@@ -2331,7 +2336,7 @@ class User extends Authenticatable
 
     public function lastHostLevelWinner()
     {
-        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at'); 
+        return $this->hasOne(HostLevelWinner::class, 'user_id', 'id')->latest('created_at');
     }
 
     /**
@@ -2341,7 +2346,7 @@ class User extends Authenticatable
     {
         return $this->lastHostLevelWinner()->filterByEventType($eventType);
     }
-    
+
     public function userWallet()
     {
         return $this->hasOne(UserWallet::class);
