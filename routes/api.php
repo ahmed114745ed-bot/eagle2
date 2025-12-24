@@ -33,6 +33,7 @@ use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
 use App\Http\Controllers\Api\V1\EmojiController;
 use App\Http\Controllers\Api\V1\MusicController;
+use App\Http\Controllers\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
@@ -295,7 +296,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             Route::post('change_room_mode', [RoomController::class, 'changeMode']);
             Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
-
+            Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid']);
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
                 Route::post('/buyCoins', [CoinController::class, 'buyCoins']);
@@ -606,7 +607,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end coin report
             Route::post('un_hide', [\App\Http\Controllers\Api\V1\HomeController::class, 'un_hide']);
 
-          
+
 
 
             Route::prefix('banners')->group(function () {
