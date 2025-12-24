@@ -568,6 +568,37 @@ if (!function_exists('getFileExtension')) {
         return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
     }
 }
+
+if (!function_exists('handleShowImageSvga')) {
+    function handleShowImageSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, int $borderRadius = 50, string $objectFit = 'cover'): string
+    {
+        $imageType = getFileExtension($url);
+
+        // SVGA / ZZ animation
+        if ($imageType === 'svga' || $imageType === 'zz') {
+            $id = 'svga_' . uniqid();
+            return "<div class='svga-player' data-url='{$url}' id='{$id}' style='width: {$width}px; height: {$height}px;'></div>";
+        }
+
+        // MP4 Video
+        if ($imageType === 'mp4') {
+            return "
+                <video width='{$width}' height='{$height}' controls autoplay muted loop>
+                    <source src='{$url}' type='video/mp4'>
+                    <source src='{$url}' type='video/webm'>
+                    Your browser does not support the video tag.
+                </video>
+            ";
+        }
+
+        // Normal Image
+        if ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+        }
+
+        return "<img src='{$url}' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+    }
+}
 if (!function_exists('handleShowImageWithTypes')) {
     function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
