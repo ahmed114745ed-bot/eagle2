@@ -251,10 +251,6 @@ class EnteranceController extends Controller
      */
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
-        Log::info('🚀 log out enter room');
-        throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
-        Log::info('🚀 log in enter room');
-
         $user = $request->user();
         $zego_feature = \Cache::rememberForever('zego_feature', function () {
             return \DB::table('settings')->where('key', 'zego_feature')->value('value');
