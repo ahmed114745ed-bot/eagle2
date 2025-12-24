@@ -2595,6 +2595,10 @@
     }
 
     .skin-black-light .sidebar a {
+        margin-left: 18%;
+    }
+
+    .rtl .skin-black-light .sidebar a {
         margin-right: 18%;
     }
 
