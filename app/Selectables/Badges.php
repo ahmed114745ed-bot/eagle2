@@ -19,7 +19,7 @@ class Badges extends Selectable
         $this->column('image', __('image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithSvga($this->id, $url, 50, 50);
+            return handleShowImageWithSvga($this->id, $url, 80, 80);
         });
 
         $this->column('show_image', __('show image'))->display(function ($path) {

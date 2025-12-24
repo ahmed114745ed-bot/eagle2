@@ -832,8 +832,38 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 $(document).on('shown.bs.modal pjax:complete', function () {
-    if (typeof initSvgaPlayers === 'function') initSvgaPlayers();
+    if (typeof initSvgaPlayers === 'function') {
+        initSvgaPlayers();
+        // Run again shortly after to handle cases where modal content is inserted after shown
+        setTimeout(() => initSvgaPlayers(), 150);
+    }
 });
+
+// Also watch for dynamically added `.svga-player` elements (covers Selectable/AJAX insertions)
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+            if (!m.addedNodes || m.addedNodes.length === 0) continue;
+            m.addedNodes.forEach(node => {
+                try {
+                    if (node.nodeType !== 1) return; // element
+                    if (node.classList && node.classList.contains('svga-player')) {
+                        if (typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                    // also check descendants
+                    if (node.querySelectorAll) {
+                        const found = node.querySelectorAll('.svga-player');
+                        if (found.length && typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                } catch (e) {
+                    console.error('SVGA MutationObserver handler error:', e);
+                }
+            });
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 JS
     );
 }
