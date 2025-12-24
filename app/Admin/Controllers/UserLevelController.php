@@ -62,8 +62,8 @@ class UserLevelController extends MainController
         $grid->model()
             ->with([
                 'profile',
-                'totalSenderLevel',
-                'totalSenderLevel',
+                'totalSenderLevels',
+                'totalSenderLevels',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
@@ -109,7 +109,7 @@ class UserLevelController extends MainController
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip = $this->totalSenderLevel;
+                $vip = $this->totalSenderLevels;
                 $avatar = $vip && @$vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
@@ -123,7 +123,7 @@ class UserLevelController extends MainController
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip = $this->totalReceiverLevel;
+                $vip = $this->totalReceiverLevels;
                 $avatar = $vip && $vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
