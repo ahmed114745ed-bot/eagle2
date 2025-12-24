@@ -41,7 +41,7 @@ class ProfileController extends Controller
         try{
         $out = $this->profileService->updateProfile($request);
 
-        return Common::apiResponse(true, 'profile updated successfully', $out, 200);
+        return Common::apiResponse(true, __('profile updated successfully'), $out, 200);
         }catch(Exception $e)
         {
 

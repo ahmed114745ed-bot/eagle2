@@ -59,6 +59,7 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego2(Request $request)
     {
+         \Log::info('🚀 log out room update zego');
         return $this->enteranceRoomService->updateRoomCountFromZego2($request);
     }
 
@@ -250,8 +251,11 @@ class EnteranceController extends Controller
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
         $user = $request->user();
-        $app_feature = \Cache::get('zego_feature');
-        if ($app_feature &&$app_feature == 1) {
+        $zego_feature = \Cache::rememberForever('zego_feature', function () {
+            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
+        });
+
+        if ($zego_feature && $zego_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();

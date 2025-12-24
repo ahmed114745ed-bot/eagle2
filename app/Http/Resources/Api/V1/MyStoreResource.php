@@ -27,10 +27,9 @@ class MyStoreResource extends JsonResource
     public function toArray($request)
     {
           
-        /** @var User $this*/
         $agency_owner = $this->agency;
         $salary       =round( $this->salary,2);
-        $sallary      = $salary; //
+        $sallary      = $salary; 
         $userSalary   = $sallary;
 
         if (($this->type_user == 2 || $this->type_user == 4)) {
@@ -62,7 +61,7 @@ class MyStoreResource extends JsonResource
                 'pending_dollar' => (string) $pendingDollar ?? '',
                 'room_salary' => (string) $roomSalary ?? '',
                 'paid' =>  $paid ?? 0,
-                'wallet_balance' =>  $this->wallet?->current_balance ?? 0,
+                'wallet_balance' =>  $this->salary_v2 ?? 0,
             ], 
 
         ];

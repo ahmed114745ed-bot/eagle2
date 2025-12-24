@@ -28,6 +28,7 @@ use Modules\AreaManager\Entities\AreaManager;
 use App\Admin\Actions\DeleteAreaManagerAction;
 use Modules\AreaManager\Entities\RegionCountry;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use App\Admin\Actions\FrozenWalletSuperAdminAction;
 
 class AreaManagerController extends MainController
 {
@@ -228,6 +229,10 @@ class AreaManagerController extends MainController
             $actions->disableDelete();
             if (Admin::user()->can('delete-' . $permission) || Admin::user()->can('*')) {
                 $actions->add(new DeleteAreaManagerAction());
+            }
+
+            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+                $actions->add(new FrozenWalletSuperAdminAction());
             }
         });
 

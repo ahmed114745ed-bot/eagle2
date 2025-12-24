@@ -52,7 +52,7 @@ class WalletService
                     'type' => 'transfer',
                     'before_amount' => $fromWallet->balance - $fromWallet->cut_amount - $fromWallet->pending_amount ,
                     'after_amount' => wallet_available_by_user($fromUserId),
-                    'related_id'  =>  $toWallet
+                    'related_id'  =>  $toUserId
 
                 ]);
 

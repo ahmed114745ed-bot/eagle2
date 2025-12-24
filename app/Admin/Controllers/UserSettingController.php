@@ -55,11 +55,12 @@ class UserSettingController extends MainController
         $stop_charge = settings()->get('stop_charge');
         $make_rooms_top = settings()->get('make_rooms_top');
         $make_gift_top = settings()->get('close_open_gifts');
+         $change_country = settings()->get('change_country');
 
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
+            content: view('admin.grid.users.userChargeViewNew', compact(['stop_charge','change_country', 'make_rooms_top', 'stop_invite_code', 'transfer_salary', 'make_gift_top'])),
         ));
     }
     /**

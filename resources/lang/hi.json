@@ -14,10 +14,34 @@
     "Roles": "भूमिकाएँ",
     "User Info": "उपयोगकर्ता जानकारी",
     "Emoji Categories": "इमोजी श्रेणियाँ",
+    "Enable host level Feature": "होस्ट स्तर की सुविधा सक्षम करें",
     "Charge by": "चार्ज करें द्वारा",
+    "profile updated successfully": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
+    "Browse change country request" : "देश अनुरोध ब्राउज़ करें",
     "badge_gift_message_hi": "आपको एक नया बैज उपहार में मिला है।",
     "Charge reports": "चार्ज रिपोर्ट",
+    "you sent request before": "आपने पहले ही अनुरोध भेजा है",
     "Charge Reports": "चार्ज रिपोर्ट",
+    "You are already using this country.": "आप पहले से ही इस देश का उपयोग कर रहे हैं।",
+    "you are host you can not exchange diamonds": "आप होस्ट हैं, आप हीरे का विनिमय नहीं कर सकते",
+"calculus not true": "गणना सही नहीं है",
+"show image": "छवि दिखाएँ",
+"share room": "कमरा साझा करें",
+"Enable share room Feature": "कमरा साझा करने की सुविधा सक्षम करें",
+    "done successfully": "सफलतापूर्वक पूरा हुआ",
+    "Charge switch area manager": "फ्रोजन वॉलेट बटन एरिया मैनेजर",
+    "Are you sure you want to accept this request?": "क्या आप वाकई इस अनुरोध को स्वीकार करना चाहते हैं?",
+"Are you sure you want to reject this request?": "क्या आप वाकई इस अनुरोध को अस्वीकार करना चाहते हैं?",
+    "country user": "उपयोगकर्ता का देश","All status switch change country request": "सभी स्थिति स्विच देश परिवर्तन अनुरोध",
+"History switch change country request": "इतिहास स्थिति स्विच देश परिवर्तन अनुरोध",
+"Status switch change country request": "स्थिति स्विच देश परिवर्तन अनुरोध",
+    "this is your country": "यह आपका देश है",
+    "accept change country": "देश परिवर्तन स्वीकार करें",
+    "Winner Ranking": "विजेता रैंकिंग",
+"reward type": "इनाम का प्रकार",
+"charm": "आकर्षण",
+"View Rewards": "इनाम देखें",
+"Ranking Rewards": "रैंकिंग पुरस्कार",
     "Status switch country": "स्थिति स्विच देश",
     "Disable frozen wallet": "फ्रोजन वॉलेट अक्षम करें",
 "Enable frozen wallet": "फ्रोजन वॉलेट सक्षम करें",
@@ -3796,6 +3820,55 @@
     "Updated successfully!": "सफलतापूर्वक अपडेट किया गया!",
     "Something went wrong!": "कुछ गलत हो गया!",
 
+    "Ranking Types": "रैंकिंग प्रकार",
+    "Ranking Range": "रैंकिंग रेंज",
+    "Edit Ranking Range": "रैंकिंग रेंज संपादित करें",
+    "Create Ranking Range": "रैंकिंग रेंज बनाएं",
+    "Min Rank": "न्यूनतम रैंक",
+    "Max Rank": "अधिकतम रैंक",
+    "Range": "रेंज",
+    "Leave empty for single rank": "एकल रैंक के लिए खाली छोड़ें",
+    "Existing ranges:": "मौजूदा रेंज:",
+    "Min rank must be less than or equal to max rank": "न्यूनतम रैंक अधिकतम रैंक से कम या बराबर होनी चाहिए",
+    "Range overlaps with existing:": "रेंज मौजूदा के साथ ओवरलैप होती है:",
+    "Rank": "रैंक",
+    "daily": "दैनिक",
+    "weekly": "साप्ताहिक",
+    "Ranking Reward": "रैंकिंग पुरस्कार",
+    "Added Rewards": "जोड़े गए पुरस्कार",
+    "Add & Continue": "जोड़ें और जारी रखें",
+    "Done": "हो गया",
+    "Deleted!": "हटा दिया गया!",
+    "Reward added!": "पुरस्कार जोड़ा गया!",
+    "Ware": "वस्तु",
+    "wallet fields": "वॉलेट फ़ील्ड्स",
+    "Browse wallet fields": "वॉलेट फ़ील्ड्स देखें",
+    "Create wallet fields": "वॉलेट फ़ील्ड्स बनाएं",
+    "Delete wallet fields": "वॉलेट फ़ील्ड्स हटाएं",
+    "Edit wallet fields": "वॉलेट फ़ील्ड्स संपादित करें",
+    "Show wallet fields": "वॉलेट फ़ील्ड्स दिखाएं",
+    "wallet template": "वॉलेट टेम्पलेट",
+    "Browse wallet template": "वॉलेट टेम्पलेट देखें",
+    "Create wallet template": "वॉलेट टेम्पलेट बनाएं",
+    "Delete wallet template": "वॉलेट टेम्पलेट हटाएं",
+    "Edit wallet template": "वॉलेट टेम्पलेट संपादित करें",
+    "Show wallet template": "वॉलेट टेम्पलेट दिखाएं",
+    "ranking rewards": "रैंकिंग पुरस्कार",
+    "Browse ranking rewards": "रैंकिंग पुरस्कार देखें",
+    "Create ranking rewards": "रैंकिंग पुरस्कार बनाएं",
+    "Delete ranking rewards": "रैंकिंग पुरस्कार हटाएं",
+    "Edit ranking rewards": "रैंकिंग पुरस्कार संपादित करें",
+    "Show ranking rewards": "रैंकिंग पुरस्कार दिखाएं",
+    "ranking types": "रैंकिंग प्रकार",
+    "Browse ranking types": "रैंकिंग प्रकार देखें",
+    "Create ranking types": "रैंकिंग प्रकार बनाएं",
+    "Delete ranking types": "रैंकिंग प्रकार हटाएं",
+    "Edit ranking types": "रैंकिंग प्रकार संपादित करें",
+    "Show ranking types": "रैंकिंग प्रकार दिखाएं",
+    "Select all": "सभी चुनें",
+
+    "upload_card_back": "📷 कार्ड के पीछे की तस्वीर अपलोड करने के लिए क्लिक करें",
+
     "update_start":"डेटा प्रोसेसिंग शुरू हो गई है, और संशोधन पूरा होने के बाद लागू किया जाएगा",
     "confirm_title": "क्या आप सुनिश्चित हैं?",
     "confirm_text": "पुष्टि करने पर, इस लक्ष्य के सभी मौजूदा वेतन बंद हो जाएंगे, उपयोगकर्ताओं के लिए अर्जित हीरे की गणना की जाएगी, और कटौती के बाद शेष हीरों के साथ इस महीने का नया वेतन चक्र शुरू होगा। इस क्रिया को पूर्ववत नहीं किया जा सकता।",
@@ -3812,14 +3885,88 @@
     "withdraw": ":admin द्वारा निकाला गया",
     "source:": "स्रोत:",
     "gift:": "उपहार:",
-"wallet.add": "लक्ष्य प्राप्ति",
-"wallet.subtract": "निकासी",
-"wallet.transfer": "स्थानांतरण"
+    "wallet.add": "लक्ष्य प्राप्ति",
+    "wallet.subtract": "निकासी",
+    "wallet.transfer": "स्थानांतरण"
 
-,
+    ,
     "diamonds_message": "हीरे: :diamonds, भूमिका: :role, लाभ %: :profit, प्रसारण समय: :time"
+    , "payment_title": "Bakiye Yükleme",
+    "payment_description": "Bakiyenize :amount coin eklendi",
 
+    "admin_adjustment_title": "Yönetici Ayarı",
+    "admin_adjustment_description": "Bakiyeniz :amount coin ile güncellendi",
 
+    "cp_title": "İlişki Geliri",
+    "cp_description": ":amount coin ilişki aktivitenizden kazanıldı",
+
+    "gift_title": "Hediye",
+    "gift_description": "Bir hediye işlemi gerçekleşti",
+
+    "daily_gift_title": "Günlük Hediye",
+    "daily_gift_description": "Günlük hediyenizi aldınız",
+
+    "lucky_gift_title": "Şans Hediyesi",
+    "lucky_gift_description": "Şans sisteminden hediye kazandınız",
+
+    "lucky_box_title": "Şans Kutusu",
+    "lucky_box_description": "Şans kutusundan ödül aldınız",
+
+    "exchange_title": "Para Birimi Değişimi",
+    "exchange_description": ":diamonds elmas :coins coine dönüştürüldü",
+
+    "cashback_title": "Geri Ödeme",
+    "cashback_description": ":amount coin bakiyenize geri ödendi",
+
+    "achievement_title": "Başarı",
+    "achievement_description": "Bir başarı ödülü kazandınız",
+
+    "comment_title": "Etkileşim Ödülü",
+    "comment_description": "Etkileşim veya yorum için ödül",
+
+    "family_title": "Aile Ödülü",
+    "family_description": "Aile aktivitesi ile ilişkili ödül",
+
+    "background_title": "Özelleştirme Ögesi",
+    "background_description": "Özelleştirme ögesi satın alındı veya kullanıldı",
+
+    "invitation_title": "Davet Ödülü",
+    "invitation_description": "Bir kullanıcı davet ettiğiniz için :amount coin kazandınız",
+
+    "general_title": "Cüzdan Aktivitesi",
+    "general_description": "Cüzdan işlemi gerçekleşti",
+    "lose_title": "हानि",
+    "lose_description": "आपने :amount कॉइन खो दिए",
+
+    "room_cup_title": "रूम कप",
+    "room_cup_description": "रूम कप से आपने :amount कॉइन कमाए",
+
+    "weekly_star_title": "साप्ताहिक इवेंट",
+    "weekly_star_description": "साप्ताहिक इवेंट से आपने :amount कॉइन कमाए",
+
+    "cashback_title": "कैशबैक",
+    "cashback_description": "लकी गिफ्ट्स से आपको :amount कॉइन कैशबैक मिला",
+
+    "lucky_gift_title": "लकी गिफ्ट्स",
+    "lucky_gift_description": "लकी गिफ्ट्स से आपने :amount कॉइन कमाए",
+
+    "vip_title": "VIP",
+    "vip_description": "आपने VIP पर :amount कॉइन खर्च किए",
+
+    "room_boom_title": "रूम बूम",
+    "room_boom_description": "रूम बूम से आपने :amount कॉइन कमाए",
+
+    "cp_title": "CP संबंध",
+    "cp_description": "CP संबंध से आपने :amount कॉइन कमाए",
+
+    "create_room_title": "रूम बनाएं",
+    "create_room_description": "रूम बनाने के लिए :amount कॉइन खर्च किए",
+        "add_title": "वॉलेट में जोड़ें",
+    "add_description": ":amount सिक्के आपके वॉलेट में जोड़े गए",
+    "transfer_title": "स्थानांतरण",
+    "transfer_description": ":amount सिक्के स्थानांतरित किए गए",
+    "subtract_title": "निकासी",
+    "subtract_description": ":amount सिक्के आपके वॉलेट से निकाले गए"
 
 
 

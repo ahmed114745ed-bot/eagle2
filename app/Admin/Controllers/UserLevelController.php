@@ -58,8 +58,14 @@ class UserLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->model()
+            ->with([
+                'profile',
+                'totalSenderLevels:id,level,img,type',
+                'totalReceiverLevels:id,level,img,type',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
@@ -71,7 +77,7 @@ class UserLevelController extends MainController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))->display(function ($name) {
-            $path = @$this->profile?->avatar;
+            $path = $this->profile?->avatar ?? '';
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -85,27 +91,26 @@ class UserLevelController extends MainController
 
 
             return "
-    <div style='display: flex; align-items: center; gap: 10px;'>
-        $image
-        <div>
-           <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-             <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-            </a>
-            <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
-        </div>
-    </div>
-";
+                <div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                    <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                        <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UID: $uuid</span>
+                    </div>
+                </div>
+            ";
         });
 
-        //$grid->column('uuid', __('uuid'));
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 
         $grid->column('total_sender_level', __('Sender Level'))
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip = Vip::where('level', $value)->where('type', 2)->first();
-                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+                $vip = $this->totalSenderLevels;
+                $avatar = $vip && @$vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
@@ -118,8 +123,8 @@ class UserLevelController extends MainController
             ->display(function ($value) use ($arrowIcon) {
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
-                $vip = Vip::where('level', $value)->where('type', 1)->first();
-                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+                $vip = $this->totalReceiverLevels;
+                $avatar = $vip && $vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
@@ -142,18 +147,7 @@ class UserLevelController extends MainController
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        //        $show = new Show(User::findOrFail($id));
 
-        return null;
-    }
 
     /**
      * Make a form builder.

@@ -56,7 +56,7 @@ class EmojiController extends Controller
 
     public function categories(Request $request)
     {
-        $categories = EmojiCategory::get();
+        $categories = EmojiCategory::orderBy('sort', 'asc')->get();
         return Common::apiResponse(1, '', GiftCategoryResource::collection($categories));
     }
 }

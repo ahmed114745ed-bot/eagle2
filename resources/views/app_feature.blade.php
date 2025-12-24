@@ -276,6 +276,16 @@
                     style="text-align: right;">
                 {{ __('Moment Status') }}
             </button>
+
+            <button onclick="showSection('hostLevel')"
+                    style="text-align: right;">
+                {{ __('host level') }}
+            </button>
+
+            <button onclick="showSection('shareRoom')"
+                    style="text-align: right;">
+                {{ __('share room') }}
+            </button>
         </div>
     </div>
 
@@ -474,6 +484,39 @@
                 </div>
             </form>
          </div>
+
+                    <div id="shareRoom" class="settings-section">
+                        <h2>{{ __('share room') }}</h2>
+                        <form id="shareRoomForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @php
+                                $errorMessage = $errors ? $errors->first('msg') : null;
+                            @endphp
+                            @if ($errorMessage)
+                                <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                            @endif
+
+                            <div class="form">
+                                <div class="feature-toggle-container">
+                                    <span class="toggle-label">{{ __('Enable share room Feature') }}</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="share_room_toggle" {{ $shareRoom ? 'checked' : '' }}
+                                        onchange="document.getElementById('share_room_value').value = this.checked ? '1' : '0';
+                                            document.getElementById('shareRoomForm').submit();">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <input type="hidden" name="share_room_with_friends" id="share_room_value" value="{{ $shareRoom ? '1' : '0' }}">
+                                </div>
+
+                                <div class="feature-description-container">
+                                    <h4>{{ __('Feature Description') }}</h4>
+                                    <div id="feature-description-content" class="external-content">
+                                        <div class="loading">{{ __('Loading feature description...') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
     </div>
 </div>
 

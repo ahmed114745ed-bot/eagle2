@@ -9,7 +9,7 @@
                 @csrf
 
                 <!-- Toggle Switch Group -->
-                <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
+                {{-- <div class="mb-4 d-flex justify-content-between align-items-center flex-row-reverse inp-div">
                     <span id="switch-text" class="fw-bold me-3">{{ $settings['enabled'] ? __('ON') : __('OFF') }}</span>
                     <div class="d-flex align-items-center">
                         <label class="fw-bold mb-0 me-3" for="enabled">{{ __('Enable host level') }}</label>
@@ -18,7 +18,7 @@
                             <span class="slider round"></span>
                         </label>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Type of Schedule -->
                 <div class="mb-4 inp-div">

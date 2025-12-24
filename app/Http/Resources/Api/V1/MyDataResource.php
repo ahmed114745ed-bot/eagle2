@@ -202,8 +202,13 @@ class MyDataResource extends JsonResource
             'number_of_friends'    => $this->number_of_friends,
             'profile' => $this->profile ? new ProfileResource($this->profile) : null,
             'level' => [
-                'receiver_img' => $this->receiverLevel?->img,
-                'sender_img'   => $this->senderLevel?->img,
+                'receiver_img' => $this->receiverLevel?->img ?? '',
+                'exp_receiver' => $this->receiverLevel?->exp ?? 0,
+                'sender_img'   => $this->senderLevel?->img ?? '',
+                'sender_level' => intval($this->senderLevel?->level),
+                'next_sender_level' => intval(  $this->next_sender_level_info['next_level'] ?? 0),
+                'remaining_to_next_level' => floatval($this->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
+
             ],
             'charge_level' =>  [
                 'current_level'  => $this->chargeLevel->level ?? 0,

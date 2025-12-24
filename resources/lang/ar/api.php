@@ -10,6 +10,7 @@ return [
         'send_ware'   => 'لقد قمت ببعت :wareName ل :toUserName',
         'got_gift'    => 'لقد وصلك :giftName كهدية',
     ],
+    "rankingRewardLevel' => "تهانينا! لقد حصلت على مكافأة المستوى :level",
     "banRoom" => "تم حظرك لمدة :duration ساعة، الساعات المتبقية: :remaining",
     'notCharge' => 'وكالتك غير مفعّلة، يرجى التواصل مع المسؤول.',
     'yorSelf' => 'لا يمكنك الشحن إلى وكالتك الخاصة.',

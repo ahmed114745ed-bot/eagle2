@@ -73,7 +73,8 @@ class GiftCategoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GiftCategory());
-
+        $grid->sortable();
+        $grid->model()->orderBy('sort', 'asc');
         $grid->column('id', __('Id'));
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
@@ -128,6 +129,9 @@ class GiftCategoryController extends MainController
             'cp'         => __('CP'),
             'vip'        => __('VIP'),
         ])->required();
+        $form->number('sort', __('sort'))
+            ->rules('required|integer|min:1')      // minimum value 1
+            ->required();
 
         // Save titles back as array
         $form->saving(function (Form $form) {
