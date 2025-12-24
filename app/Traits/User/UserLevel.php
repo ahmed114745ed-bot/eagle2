@@ -21,6 +21,18 @@ trait UserLevel
             ->where('type', 1);
     }
 
+    public function totalSenderLevel()
+    {
+        return $this->belongsTo(Vip::class, 'total_sender_level', 'level')
+            ->where('type', 2);
+    }
+
+    public function totalReceiverLevel()
+    {
+        return $this->belongsTo(Vip::class, 'total_received_level', 'level')
+            ->where('type', 1);
+    }
+
     public function chargeLevel()
     {
         return $this->belongsTo(Vip::class, 'charge_level', 'level')
