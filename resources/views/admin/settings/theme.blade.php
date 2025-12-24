@@ -242,14 +242,21 @@
 
 <style>
     .preset-card:hover {
-        border-color: #3b82f6 !important;
+        border-color: black !important;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
         transform: translateY(-2px);
     }
 
+    .dark-mode .preset-card:hover {
+        border-color: var(--dark-secondry-color) !important;
+    }
+
     .preset-card.active {
-        border-color: #3b82f6 !important;
-        background: #eff6ff !important;
+        border-color: black !important;
+    }
+
+    .dark-mode .preset-card.active {
+        border-color: var(--dark-secondry-color) !important;
     }
 </style>
 
