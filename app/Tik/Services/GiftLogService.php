@@ -110,7 +110,7 @@ class GiftLogService
                     $amountBefore,
                     UserCoinLogType::GIFT,
                     $gift?->name,
-                    featureType: $featureType
+                     $featureType
                 );
 
                 $updateUserWhenSendGift->send($sendPrice, $user);
