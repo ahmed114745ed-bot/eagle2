@@ -1445,6 +1445,16 @@
         width: auto !important;
     }
 
+    .slimScrollDiv {
+        height: auto !important;
+    }
+
+    .navbar-nav>.notifications-menu>.dropdown-menu>li .menu,
+    .navbar-nav>.messages-menu>.dropdown-menu>li .menu,
+    .navbar-nav>.tasks-menu>.dropdown-menu>li .menu {
+        height: auto !important;
+    }
+
     .rtl .column-reward .rtlSvga {
         direction: ltr !important;
     }
