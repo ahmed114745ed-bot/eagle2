@@ -3,9 +3,6 @@
 namespace App\Models;
 
 use DB;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Log;
-use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
 use Modules\CP\Entities\Cp;
@@ -14,7 +11,6 @@ use App\Traits\User\UserLevel;
 use Modules\Vip\Entities\OVip;
 use App\Helpers\UserPackHelper;
 use Modules\Reals\Entities\Real;
-use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Badge\Entities\Badge;
 use Modules\Vip\Entities\UserVip;
@@ -137,7 +133,6 @@ class User extends Authenticatable
          'frame',
 
      ];*/
-
 
     public function images()
     {
@@ -908,29 +903,22 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        // $userSalary = UserSallary::query()
 
-            ->where('user_id', $this->id)
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+        //     ->where('user_id', $this->id)
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+        //     $q->where('uid', $this->id);
+        // })
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('salary - cut_amount'));
 
-        $total = $userSalary + $roomSalary;
-        // $total =wallet_available_by_user($this->id);
+        // $total = $userSalary + $roomSalary;
+        $total =wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
-
-    public function getSalaryV2Attribute()
-    {
-        $total = wallet_available_by_user($this->id);
-        return floor($total * 100) / 100;
-    }
-
 
     public function getSalaryByAgencyAttribute()
     {
@@ -1007,11 +995,6 @@ class User extends Authenticatable
     public function room()
     {
         return $this->hasOne(Room::class, 'uid', 'now_room_uid');
-    }
-
-    public function newRoom(): BelongsTo
-    {
-        return $this->belongsTo(Room::class, 'now_room_uid', 'id');
     }
 
     public function nowRoom()
@@ -2323,11 +2306,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(RoomVisitor::class, 'user_id');
     }
-
-    public function roomVisitor()
-    {
-        return $this->hasOne(RoomVisitor::class, 'user_id');
-    }
     public function liveTimes()
     {
         return $this->hasMany(LiveTime::class, 'uid');
@@ -2344,7 +2322,7 @@ class User extends Authenticatable
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
         return $this->hostLevelWinner()
             ->where('host_level_id', $hostLevelId)
-            ->filterByEventType($eventType)->exists();
+            ->filterByEventType($eventType) ->exists();
     }
 
     public function lastHostLevelWinner()
