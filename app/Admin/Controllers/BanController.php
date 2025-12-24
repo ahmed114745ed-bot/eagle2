@@ -90,7 +90,7 @@ class BanController extends MainController
         $grid->model()->whereHas('user')
             ->with([
                 'banType:id,name_ar,name_en',
-                'staff:id,name,email,avatar',
+                'staff:id,name,avatar',
                 'user:id,name,uuid,phone,country_id',
                 'user.agency',
                 'user.profile:user_id,avatar',
