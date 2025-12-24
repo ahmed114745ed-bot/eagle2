@@ -270,9 +270,10 @@
 }
 
 /* submenu item style */
-.crs-submenu .crs-link{
+.crs-submenu .crs-link {
     padding: 10px 14px;
-    margin: 4px 6px;
+    margin: 4px 0px;
+    margin-left: 18%;
     border-radius: 8px;
     font-size: 14px;
     color: #fff;
@@ -281,6 +282,10 @@
         transform 0.25s ease,
         background 0.25s ease,
         box-shadow 0.25s ease;
+}
+
+.rtl .crs-submenu .crs-link {
+    margin-right: 18%;
 }
 
 .crs-submenu .crs-link:hover{

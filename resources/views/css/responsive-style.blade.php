@@ -44,6 +44,10 @@
             width: 100% !important;
         }
 
+        .main-sidebar, .left-side {
+            padding-top: 10% !important;
+        }
+
         .rtl .box-body .fields-group [class*="col-md-12"] {
             float: none;
         !important;

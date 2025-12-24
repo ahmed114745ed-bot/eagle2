@@ -2594,14 +2594,6 @@
         color: var(--text-secondary-color);
     }
 
-    .skin-black-light .sidebar a {
-        margin-left: 18%;
-    }
-
-    .rtl .skin-black-light .sidebar a {
-        margin-right: 18%;
-    }
-
     .stats-container .info-box {
         background: linear-gradient(135deg,
         #667eea 0%,
