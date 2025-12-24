@@ -814,47 +814,15 @@ if (typeof initSvgaPlayers === 'undefined') {
             if (el.dataset.loaded) return;
             el.dataset.loaded = true;
 
-            console.debug && console.debug('initSvgaPlayers: found', el, el.dataset.url);
+            const player = new SVGA.Player(el);
+            const parser = new SVGA.Parser(el);
 
-            try {
-                const player = new SVGA.Player(el);
-                const parser = new SVGA.Parser(el);
-
-                // Quick fetch to detect CORS / 404 issues early and provide a visible fallback
-                fetch(el.dataset.url, { method: 'GET', mode: 'cors' })
-                    .then(res => {
-                        if (!res.ok) {
-                            console.error('initSvgaPlayers: fetch failed', el.dataset.url, res.status);
-                            // fallback to PNG version
-                            el.innerHTML = `<img src="\${el.dataset.url.replace(/\.(svga|zz)$/i, '.png')}" style="width:100%;height:100%;object-fit:cover" alt="" />`;
-                            return;
-                        }
-
-                        // Load via SVGA parser
-                        parser.load(el.dataset.url, videoItem => {
-                            try {
-                                player.setVideoItem(videoItem);
-                                player.loops = 100;
-                                player.clearsAfterStop = false;
-                                player.startAnimation();
-                                console.debug && console.debug('initSvgaPlayers: started', el.dataset.url);
-                            } catch (playErr) {
-                                console.error('initSvgaPlayers: player error', playErr);
-                            }
-                        });
-                    })
-                    .catch(err => {
-                        console.error('initSvgaPlayers: fetch error', err);
-                        el.innerHTML = `<img src="\${el.dataset.url.replace(/\.(svga|zz)$/i, '.png')}" style="width:100%;height:100%;object-fit:cover" alt="" />`;
-                    });
-
-            } catch (err) {
-                console.error('initSvgaPlayers: exception', err);
-                // As a last resort, show a fallback image
-                if (el.dataset && el.dataset.url) {
-                    el.innerHTML = `<img src="\${el.dataset.url.replace(/\.(svga|zz)$/i, '.png')}" style="width:100%;height:100%;object-fit:cover" alt="" />`;
-                }
-            }
+            parser.load(el.dataset.url, videoItem => {
+                player.setVideoItem(videoItem);
+                player.loops = 100;
+                player.clearsAfterStop = false;
+                player.startAnimation();
+            });
         });
     }
 }
