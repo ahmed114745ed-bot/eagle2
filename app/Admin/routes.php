@@ -450,8 +450,7 @@ Route::group(
         Route::resource('server-country', ServerCountryController::class);
         Route::resource('room-gift-targets', RoomGiftTargetController::class);
 
-        //--------------------
-        // Route::get('/', 'HomeController@infoBox')->name('home');
+        
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         Route::resource('manger-types', 'MangerTypeController');
@@ -463,10 +462,6 @@ Route::group(
         Route::resource('special-id-requests', 'SpecialIdRequestController');
         Route::resource('family_levels', 'FamilyLevelController');
         Route::resource('silver', 'SilverController');
-
-        // Route::resource('coins/{paymentGatwayId}', 'CoinController')->only(['create', 'store', 'destroy']);
-        // Route::get('coins/{paymentGatwayId}/{id}/edit', 'CoinController@edit');
-        // Route::put('coins/{paymentGatwayId}/{id}', 'CoinController@update');
 
         Route::prefix('coins/{paymentGatwayId}')->group(function () {
             Route::get('/', [CoinController::class, 'index'])->name('coins.index');
