@@ -255,7 +255,7 @@ class EnteranceController extends Controller
             return \DB::table('settings')->where('key', 'zego_feature')->value('value');
         });
 
-        if ($zego_feature ) {
+        if ($zego_feature && $zego_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();
