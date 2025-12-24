@@ -35,29 +35,10 @@ class Badges extends Selectable
             $filter->like('name', __('name'));
             $filter->equal('priority', __('Priority'));
         });
-
-        Admin::script(<<<JS
-function initSvgaPlayers(context = document) {
-    context.querySelectorAll('.svga-player').forEach(el => {
-        if (el.dataset.loaded) return;
-        el.dataset.loaded = true;
-
-        const player = new SVGA.Player(el);
-        const parser = new SVGA.Parser(el);
-
-        parser.load(el.dataset.url, videoItem => {
-            player.setVideoItem(videoItem);
-            player.loops = 100;
-            player.clearsAfterStop = false;
-            player.startAnimation();
-        });
-    });
-}
-
-// Initialize when selectable modal opens
-$(document).on('shown.bs.modal', function () {
-    initSvgaPlayers();
-});
-JS);
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
     }
 }
