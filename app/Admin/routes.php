@@ -31,6 +31,7 @@ use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\BanRoomsController;
 use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\LanguageController;
 use App\Admin\Controllers\LinkViewController;
@@ -580,7 +581,7 @@ Route::group(
         Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
-        Route::resource('/bans-rooms', 'BanRoomsController');
+        Route::get('/bans-rooms', [BanRoomsController::class, 'index']);
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
