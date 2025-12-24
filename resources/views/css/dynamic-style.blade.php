@@ -1243,7 +1243,6 @@
 
     .modal-content {
         position: relative;
-        background-color: var(--box-background-color) !important;
         -webkit-background-clip: padding-box;
         background-clip: padding-box;
         border: 1px solid var(--primary-hover-alpha) !important;
@@ -1390,7 +1389,7 @@
     }
 
     .dropdown-menu {
-        position: absolute;
+        position: fixed;
         top: 100%;
         z-index: 1000;
         display: none;
@@ -1408,6 +1407,10 @@
         -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
         box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
         color: var(--inverse-box-color) !important;
+    }
+
+    .rtl .dropdown-menu {
+        left: 50px;
     }
 
     .flag-image {
@@ -1431,9 +1434,15 @@
     /* LTR override */
     html.ltr .dropdown-menu {
         text-align: left;
-        left: 0;
-        right: auto;
+        left: auto;
+        right: 38px;
         float: left;
+    }
+
+    .navbar-nav>.notifications-menu>.dropdown-menu,
+    .navbar-nav>.messages-menu>.dropdown-menu,
+    .navbar-nav>.tasks-menu>.dropdown-menu {
+        width: auto !important;
     }
 
     .rtl .column-reward .rtlSvga {
@@ -2582,7 +2591,7 @@
         color: #000000 !important;
     }
 
-    .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a {
+    .navbar-nav > .messages-menu > .dropdown-menu > li .menu > li > a {
         color: var(--text-secondary-color) !important;
     }
 

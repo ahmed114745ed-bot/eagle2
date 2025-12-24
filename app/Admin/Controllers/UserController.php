@@ -197,8 +197,7 @@ class UserController extends MainController
         if (request()->messages == 'month') {
             $grid->model()->whereHas(
                 'chatMessages',
-                fn($q) =>
-                $q->whereMonth('created_at', now()->month)
+                fn($q) => $q->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
             );
         }
@@ -266,7 +265,7 @@ class UserController extends MainController
             ->display(function ($name) {
 
                 $user = $this;
-                if (! $user) {
+                if (!$user) {
                     return __('No User');
                 }
                 return app(UserService::class)->adminUserAvatar($user);
@@ -276,11 +275,10 @@ class UserController extends MainController
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 
 
-
         $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 $agency = $this->agency;
-                if (! $agency) {
+                if (!$agency) {
                     return '';
                 }
 
@@ -310,8 +308,8 @@ class UserController extends MainController
 
         $grid->column('versions', __('versions'))->modal(__('versions'), function () {
             $data = [
-                ['iOS',     $this->ios_version],
-                ['Huawei',  $this->huawei_version],
+                ['iOS', $this->ios_version],
+                ['Huawei', $this->huawei_version],
                 ['Android', $this->android_version],
             ];
 
@@ -368,19 +366,33 @@ class UserController extends MainController
         // JS);
 
 
-
         Admin::script("
-                    $(document).on('click', '.show-same-device-modal', function() {
-                        console.log('here');
-                        var userId = $(this).data('user-id');
-                        $('#sameDeviceUsersModal .modal-body').html('Loading...');
-                        $('#sameDeviceUsersModal').modal('show');
-                        $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
-                            $('#sameDeviceUsersModal .modal-body').html(html);
-                        });
-                    });
-        ");
+            // Initial modal open
+            $(document).on('click', '.show-same-device-modal', function() {
+                var userId = $(this).data('user-id');
+                loadSameDeviceUsers(userId, 1);
+            });
 
+            // Pagination click
+            $(document).on('click', '.ajax-pagination', function(e) {
+                e.preventDefault();
+                var userId = $(this).data('user-id');
+                var page = $(this).data('page');
+
+                if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+                    loadSameDeviceUsers(userId, page);
+                }
+            });
+
+            function loadSameDeviceUsers(userId, page) {
+                $('#sameDeviceUsersModal .modal-body').html('<div class=\"text-center\"><i class=\"fa fa-spinner fa-spin fa-2x\"></i></div>');
+                $('#sameDeviceUsersModal').modal('show');
+
+                $.get('/admin/users/' + userId + '/same-device-users-table', { page: page }, function(html) {
+                    $('#sameDeviceUsersModal .modal-body').html(html);
+                });
+            }
+        ");
 
 
         $grid->actions(function ($actions) use ($permission) {
@@ -412,15 +424,15 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
 
-            if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
 
 
-            if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
-            if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
@@ -455,7 +467,6 @@ class UserController extends MainController
             settings()->set("transfer_salary", "0");
         }
     }
-
 
 
     public function showAdditionalInfo($id, Content $content)
@@ -560,7 +571,7 @@ class UserController extends MainController
 
         $typeMap = PACK_USER;
 
-        $types =  collect($typeMap);
+        $types = collect($typeMap);
         $userPackTypes = Pack::where('user_id', $id)->pluck('type')->unique()->toArray();
         // $userPackTypes = $this->typesByLevel($id);
         $currentType = request()->get('type', $types->keys()->first());
@@ -592,7 +603,7 @@ class UserController extends MainController
             $q->where('sender_id', $id);
         })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
             $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
-            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+            $endUtc = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
 
             $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
@@ -605,7 +616,7 @@ class UserController extends MainController
             $q->where('sender_id', $id);
         })->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
             $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
-            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+            $endUtc = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
 
             $query->whereBetween('created_at', [$startUtc, $endUtc]);
         })->when(isset($agencyId), function ($query) use ($agencyId) {
@@ -651,20 +662,20 @@ class UserController extends MainController
             ->orderByDesc('id')
             ->paginate(20, ['*'], 'wallet_logs_page')
             ->appends([
-                'tab'   => 'wallet_logs',
-                'year'  => request('year'),
+                'tab' => 'wallet_logs',
+                'year' => request('year'),
                 'month' => request('month'),
             ]);
 
 
-        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries' ,'availableBalance','curantBalance','walletLogs');
-        return  parent::show($id, $content->title(__('user profile'))
+        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries', 'availableBalance', 'curantBalance', 'walletLogs');
+        return parent::show($id, $content->title(__('user profile'))
             ->view('user_profile', $data));
     }
 
     public function countries()
     {
-        $ops       = [null => __('no country')];
+        $ops = [null => __('no country')];
         $countries = Country::all();
         foreach ($countries as $country) {
             $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
@@ -697,7 +708,6 @@ class UserController extends MainController
     }
 
 
-
     /**
      * Make a form builder.
      *
@@ -709,12 +719,12 @@ class UserController extends MainController
         $this->disableFormTools($form);
 
         if ($form->isEditing()) {
-            $userId           = request()->route('user');
-            $user             = User::findOrFail($userId);
-            $oldDiValue       = $user->getOriginal('di');
+            $userId = request()->route('user');
+            $user = User::findOrFail($userId);
+            $oldDiValue = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
         } else {
-            $oldDiValue       = null;
+            $oldDiValue = null;
             $oldDiamoundValue = null;
         }
 
@@ -821,10 +831,10 @@ class UserController extends MainController
 
 
         $form->select('country_id', trans('country'))->options(function () {
-            $ops       = [null => __('no country')];
+            $ops = [null => __('no country')];
             $countries = Country::all();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
+                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
             }
             return $ops;
         });
@@ -845,8 +855,8 @@ class UserController extends MainController
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
-            $model     = $form->model();
-            $user_id   = $model->id;
+            $model = $form->model();
+            $user_id = $model->id;
             $form->model()->uuid = $form->original_uuid;
             // $user = User::find($user_id);
             // $originalProfile = $user->profile;
@@ -905,7 +915,6 @@ class UserController extends MainController
 
         return $form;
     }
-
 
 
     public function request_invite_code(Request $request)
@@ -1002,7 +1011,6 @@ class UserController extends MainController
     }
 
 
-
     public function updateUsers(Request $request)
     {
         $user = User::find($request->id);
@@ -1033,7 +1041,7 @@ class UserController extends MainController
 
         ];
         if ($request->hasFile('image')) {
-            $dataUserProfile['avatar']  = Common::upload('images', $request->file('image'));
+            $dataUserProfile['avatar'] = Common::upload('images', $request->file('image'));
         }
         if ($profileUser) {
 
@@ -1047,10 +1055,16 @@ class UserController extends MainController
 
     // app/Admin/Controllers/UsersAppController.php
 
-    public function ajaxSameDeviceUsersTable($id)
+    public function ajaxSameDeviceUsersTable($id, Request $request)
     {
-        $user = User::with(['sameDeviceUsers.profile'])->findOrFail($id);
-        $users = $user->sameDeviceUsers;
+        $user = User::findOrFail($id);
+        $perPage = 10;
+        $page = $request->get('page', 1);
+
+        $users = User::with('profile')
+            ->where('device_token', $user->device_token)
+            ->where('id', '!=', $user->id)
+            ->paginate($perPage, ['*'], 'page', $page);
 
         $rows = $users->map(function ($user) {
             $path = $user->profile?->avatar;
@@ -1083,10 +1097,50 @@ class UserController extends MainController
         });
 
         $table = new Table([__('Name'), __('phone'), __('created_at')], $rows->toArray());
+        $pagination = $this->buildAjaxPagination($users, $id);
         // Return just table's HTML (your AJAX will inject this)
-        return $table->render();
+        return $table->render() . $pagination;
     }
 
+    private function buildAjaxPagination($paginator, $userId)
+    {
+        if ($paginator->lastPage() <= 1) {
+            return '';
+        }
+
+        $currentPage = $paginator->currentPage();
+        $lastPage = $paginator->lastPage();
+
+        $html = '<nav aria-label="Page navigation" style="margin-top: 15px;">';
+        $html .= '<ul class="pagination justify-content-center">';
+
+        // Previous button
+        $prevDisabled = $currentPage == 1 ? 'disabled' : '';
+        $prevPage = $currentPage - 1;
+        $html .= "<li class='page-item {$prevDisabled}'>";
+        $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$prevPage}'>&laquo;</a>";
+        $html .= "</li>";
+
+        // Page numbers
+        for ($i = 1; $i <= $lastPage; $i++) {
+            $active = $i == $currentPage ? 'active' : '';
+            $html .= "<li class='page-item {$active}'>";
+            $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$i}'>{$i}</a>";
+            $html .= "</li>";
+        }
+
+        // Next button
+        $nextDisabled = $currentPage == $lastPage ? 'disabled' : '';
+        $nextPage = $currentPage + 1;
+        $html .= "<li class='page-item {$nextDisabled}'>";
+        $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$nextPage}'>&raquo;</a>";
+        $html .= "</li>";
+
+        $html .= '</ul>';
+        $html .= '</nav>';
+
+        return $html;
+    }
 
     public function removeBD($id)
     {

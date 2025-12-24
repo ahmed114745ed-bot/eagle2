@@ -553,13 +553,6 @@
 
             <ul class="nav navbar-nav">
 
-                <li class="dropdown">
-                    <a href="javascript:void(0);" id="dark-mode-toggle" class="dropdown-toggle"
-                       title="{{ __('Toggle Dark Mode') }}" style="cursor: pointer;">
-                        <i class="fa fa-moon-o" style="font-size: 18px;"></i>
-                    </a>
-                </li>
-
                 <ul class="nav navbar-nav hidden-sm visible-lg-block" style="    padding: 0px !important;">
                     @if (!Admin::user()->type || Admin::user()->type == '')
 
@@ -580,8 +573,16 @@
                         @include('SuperAdmin::notifications.super')
 
                     @endif
+
                 </ul>
                 {!! Admin::getNavbar()->render() !!}
+
+                <li class="dropdown">
+                    <a href="javascript:void(0);" id="dark-mode-toggle" class="dropdown-toggle"
+                       title="{{ __('Toggle Dark Mode') }}" style="cursor: pointer;">
+                        <i class="fa fa-moon-o" style="font-size: 18px;"></i>
+                    </a>
+                </li>
 
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
