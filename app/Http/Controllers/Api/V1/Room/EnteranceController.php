@@ -252,7 +252,7 @@ class EnteranceController extends Controller
     {
         $user = $request->user();
         $zego_feature = \Cache::rememberForever('zego_feature', function () {
-            return \DB::table('settings')->where('name', 'zego_feature')->value('value');
+            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
         });
 
         if (!$zego_feature ) {
