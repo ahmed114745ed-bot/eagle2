@@ -3,18 +3,13 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Ban;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\BanType;
 use Illuminate\Http\Request;
 use App\Admin\Actions\BanUser;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\DeleteBans;
 use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\RemoveBanUser;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
 
@@ -34,10 +29,6 @@ class BanController extends MainController
         return  parent::index($content
             ->title(trans('bans'))
             ->body($this->grid()));
-        // ->row(function ($row) {
-        //     $row->column(10, $this->grid());
-        //     $row->column(2, view('admin.grid.users.ban'));
-        // });
     }
 
     /**
@@ -91,19 +82,24 @@ class BanController extends MainController
     {
         $now = now();
         $grid = new Grid(new Ban);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->disableRowSelector();
 
         $reason = app()->getLocale() == 'ar' ? 'description_ar' : 'description_en';
 
         $grid->model()->whereHas('user')
+            ->with([
+                'banType',
+                'staff',
+                'user',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > '$now'")
-            ->select($reason,'user_id', 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
-            ->groupBy([$reason, 'user_id','uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id','img'])->orderByDesc('created_at');
-        //    $grid->id(__ ('ID'));
-        // $grid->uid(__('uuid'));
-        //        $grid->user_type(__('user_type'));
+            ->select($reason, 'user_id', 'uid', 'duration', 'type', 'img', 'device_number', 'staff_id',   DB::raw('(SELECT created_at FROM bans AS b WHERE b.uid = bans.uid AND b.type = bans.type ORDER BY b.id DESC LIMIT 1) AS created_at'), 'ban_type_id')
+            ->groupBy([$reason, 'user_id', 'uid', 'type', 'duration', 'device_number',  'staff_id',  'ban_type_id', 'img'])->orderByDesc('created_at');
+
         $grid->column('user_id', __('User'))->display(function () {
             $user = $this->user;
             if (!$user) return '-';
@@ -142,7 +138,6 @@ class BanController extends MainController
             return $types[$type] ?? '-';
         });
 
-        // $grid->column('description_ar', __('reason'));
         $grid->column($reason, __('reason'))->display(function ($description) {
             $limitedDescription = mb_substr($description, 0, 40) . (mb_strlen($description) > 40 ? '...' : '');
             return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
@@ -172,19 +167,18 @@ class BanController extends MainController
         ");
 
         $grid->column('ban_type_id', __('ban_type'))->display(function ($row) {
-            $banType = BanType::find($this->ban_type_id);
-            $name_ar = $banType->name_ar ?? '';
-            $name_en = $banType->name_en ?? '';
+            $banType = $this->banType;
+            if (!$banType) return '-';
+            $name_ar = $banType->name_ar ?? $banType->name_en;
+            $name_en = $banType->name_en ?? $banType->name_ar;
 
-            $locale = app()->getLocale(); // get current language
-
-            return $locale === 'ar' ? $name_ar : $name_en;
+            return app()->getLocale() === 'ar' ? $name_ar : $name_en;
         });
 
         $grid->column('img', trans('image'))->image('', 30);
 
         $grid->device_number(__('device_number'));
-        // $grid->staff_id(__('staff_id'));
+        
         $grid->column('staff_id', __('staff'))->display(function () {
             if (!$this->staff) return '-';
 
@@ -283,9 +277,6 @@ class BanController extends MainController
 JS);
 
 
-
-
-
         $grid->disableExport();
         $grid->disableRowSelector();
         $grid->disableActions();
@@ -318,51 +309,6 @@ JS);
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        //        $show = new Show(Ban::findOrFail($id));
-        //
-        //        $show->id('ID');
-        //        $show->uid('uid');
-        //        $show->user_type('user_type');
-        //        $show->duration('duration');
-        //        $show->type('type');
-        //        $show->ip('ip');
-        //        $show->device_number('device_number');
-        //        $show->staff_id('staff_id');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
-        //
-        //        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        //        $form = new Form(new Ban);
-        //
-        //        $form->display('ID');
-        //        $form->text('uid', __('uid'));
-        ////        $form->text('user_type', __('user_type'));
-        //        $form->number('duration', __('duration(hours)'));
-        ////        $form->text('type', __('type'));
-        //        $form->switch('ban_ip', 'ip_ban')->states ([0=>'off',1=>'on']);
-        //        $form->switch('device_ban', __('device_ban'))->states ([0=>'off',1=>'on']);
-        //        $form->display(trans('admin.created_at'));
-        //
-        //
-        //        return $form;
-    }
 
     public function deleteBan(Request $request)
     {

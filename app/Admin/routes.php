@@ -577,7 +577,7 @@ Route::group(
         Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
-        Route::resource('/bans', 'BanController');
+        Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
         Route::resource('/bans-rooms', 'BanRoomsController');

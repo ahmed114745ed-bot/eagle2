@@ -38,6 +38,7 @@ class CountryRequestHistoryController extends MainController
         $grid->model()
             ->with([
                 'country',
+                'user.profile',
                 'user',
                 'user.country',
                 'user.receiverLevel',
