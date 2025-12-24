@@ -351,7 +351,7 @@
     .btn-twitter,
     .btn-success {
         background-color: var(--primary-color) !important;
-        color: var(--inverse-color) !important;
+        color: var(--text-secondary-color) !important;
     }
 
     .btn-dropbox:hover,
