@@ -92,7 +92,8 @@ class BanController extends MainController
                 'banType',
                 'staff',
                 'user',
-                'user.profile',
+                'user.agency',
+                'user.profile:user_id,avatar',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
@@ -178,7 +179,7 @@ class BanController extends MainController
         $grid->column('img', trans('image'))->image('', 30);
 
         $grid->device_number(__('device_number'));
-        
+
         $grid->column('staff_id', __('staff'))->display(function () {
             if (!$this->staff) return '-';
 
