@@ -607,14 +607,17 @@ if (!function_exists('handleShowImageWithTypes')) {
     {
         $imageType = getFileExtension($url);
         if ($imageType == 'svga' || $imageType == 'zz') {
-            // Return standardized svga-player markup so the global initializer can pick it up.
-            $id = 'svga_' . $uniqueId;
-            $safeUrl = e($url);
-            $style = "width: {$width}px; height: {$height}px;";
+            $model = showSvgaImage($url, $uniqueId);
             if ($objectFit !== 'cover') {
-                $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+                return "<div class='rtlSvga' id='$model'
+            style='width: {$width}px;
+                   height: {$height}px;
+                   object-fit: {$objectFit};
+                   border-radius: {$borderRadius}px;
+                   margin-right: 4px;'>
+             </div>";
             }
-            return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+            return "<div class ='rtlSvga' id='$model' style='width: {$width}px !important; height: {$height}px !important;'> </div>";
         } elseif ($imageType == 'mp4') {
             return "
                 <video width='$width' height='$height' controls autoplay muted loop>
@@ -831,8 +834,36 @@ document.addEventListener('DOMContentLoaded', function () {
 $(document).on('shown.bs.modal pjax:complete', function () {
     if (typeof initSvgaPlayers === 'function') {
         initSvgaPlayers();
+        // Run again shortly after to handle cases where modal content is inserted after shown
+        setTimeout(() => initSvgaPlayers(), 150);
     }
 });
+
+// Also watch for dynamically added `.svga-player` elements (covers Selectable/AJAX insertions)
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+            if (!m.addedNodes || m.addedNodes.length === 0) continue;
+            m.addedNodes.forEach(node => {
+                try {
+                    if (node.nodeType !== 1) return; // element
+                    if (node.classList && node.classList.contains('svga-player')) {
+                        if (typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                    // also check descendants
+                    if (node.querySelectorAll) {
+                        const found = node.querySelectorAll('.svga-player');
+                        if (found.length && typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                } catch (e) {
+                    console.error('SVGA MutationObserver handler error:', e);
+                }
+            });
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
 JS
     );
 }
