@@ -89,9 +89,9 @@ class BanController extends MainController
 
         $grid->model()->whereHas('user')
             ->with([
-                'banType',
-                'staff',
-                'user',
+                'banType:id,name_ar,name_en',
+                'staff:id,name,email,avatar',
+                'user:id,name,uuid,phone,country_id',
                 'user.agency',
                 'user.profile:user_id,avatar',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
