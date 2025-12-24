@@ -161,7 +161,7 @@
 
     .settings-content {
         flex-grow: 1;
-        padding: 20px;
+        padding: 20px !important;
     }
 
     .settings-section {

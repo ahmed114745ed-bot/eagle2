@@ -158,8 +158,7 @@
         /*.sidebar-open .content-wrapper {*/
         /*    margin-right: 250px;*/
         /*}*/
-        .col-md-3,
-        .col-sm-6 {
+        .col-md-3, .col-sm-6 {
             flex: 0 0 100%;
             width: 50%;
         }
