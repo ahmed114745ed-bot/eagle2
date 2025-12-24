@@ -150,7 +150,7 @@ class BanUser extends Action
 
             $route = $ban->banType?->route;
 
-            if ($route == 'rooms/enter_room' && $user->room) {
+            if ($route == 'rooms/enter_room' && $user->newRoom) {
                 // dd( $user->room());
                 $ms = [
                     'messageContent' => [
@@ -162,8 +162,8 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
-                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
-            } else if ($route == 'rooms/up_microphone' && $user->room) {
+                Common::sendToZego('SendCustomCommand', @$user->newRoom->id, $user->newRoom->uid, $json);
+            } else if ($route == 'rooms/up_microphone' && $user->newRoom) {
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
@@ -174,20 +174,21 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
-                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
-            } else if ($route == 'rooms/up-microphone' && $user->room) {
-                $ms = [
-                    'messageContent' => [
-                        "message" => "unableToUPMicrophone",
-                        'user_id' => $user->id,
-                        'reason_ar' => $request->description_ar ?? '',
-                        'reason_en' => $request->description_en ?? '',
-                        'duration' => $request->duration ?? 0,
-                    ]
-                ];
-                $json = json_encode($ms);
-                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
+                Common::sendToZego('SendCustomCommand', @$user->newRoom->id, $user->newRoom->uid, $json);
             }
+//            else if ($route == 'rooms/up-microphone' && $user->room) {
+//                $ms = [
+//                    'messageContent' => [
+//                        "message" => "unableToUPMicrophone",
+//                        'user_id' => $user->id,
+//                        'reason_ar' => $request->description_ar ?? '',
+//                        'reason_en' => $request->description_en ?? '',
+//                        'duration' => $request->duration ?? 0,
+//                    ]
+//                ];
+//                $json = json_encode($ms);
+//                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
+//            }
         }
 
 

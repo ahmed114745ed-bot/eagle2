@@ -58,6 +58,10 @@ Trait ZegoTrait
     }
     public static function sendToZego($Action,$RoomId,$FromUserId,$MessageContent,$IsTest = 'false'){
 
+        info($Action);
+        info($RoomId);
+        info($FromUserId);
+        info($MessageContent);
         $url = 'https://rtc-api.zego.im';
         $AppId = self::getConf ('zego_app_id');
         $SignatureNonce = self::getSignatureNonce ();
@@ -81,9 +85,9 @@ Trait ZegoTrait
 
         ];
         try {
-        
+
            return  Http::withHeaders ($headers)->acceptJson ()->timeout (20)->get ($url,$params)->json ();
-    
+
         }catch (\Exception $exception){
             Log::info('Exception Charisma sendToZego ', [
                 'getMessage' => $exception->getMessage() ,
@@ -119,7 +123,7 @@ Trait ZegoTrait
 
         ];
         try {
-         
+
             Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
@@ -150,7 +154,7 @@ Trait ZegoTrait
 
         ];
         try {
-   
+
             $res = Http::withHeaders ($headers)->acceptJson ()->timeout (10)->get ($url,$params)->json ();
         }catch (\Exception $exception){
 
