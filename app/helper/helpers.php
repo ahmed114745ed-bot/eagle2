@@ -599,6 +599,9 @@ if (!function_exists('handleShowImageSvga')) {
         return "<img src='{$url}' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
 }
+
+
+
 if (!function_exists('handleShowImageWithTypes')) {
     function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
@@ -631,6 +634,37 @@ if (!function_exists('handleShowImageWithTypes')) {
 
 
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+    }
+    if (!function_exists('handleShowImageWithSvga')) {
+        function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
+        {
+            $imageType = getFileExtension($url);
+            if ($imageType == 'svga' || $imageType == 'zz') {
+                // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
+                $id = 'svga_' . $uniqueId;
+                $safeUrl = e($url);
+                $style = "width: {$width}px; height: {$height}px;";
+                if ($objectFit !== 'cover') {
+                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+                }
+                return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+            } elseif ($imageType == 'mp4') {
+                return "
+                <video width='$width' height='$height' controls autoplay muted loop>
+                    <source src='$url' type='video/mp4'>
+                    <source src='$url' type='video/webm'>
+
+                    Your browser does not support the video tag.
+                 </video>
+                ";
+            } elseif ($objectFit !== 'cover') {
+                return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+
+
+
+            return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+        }
     }
 }
 
@@ -681,12 +715,7 @@ if (!function_exists('convertNumbersToWestern')) {
         return str_replace($numbers, $newNumbers, $string);
     }
 }
-
 if (!function_exists('showSvgaImage')) {
-    /**
-     * @param string|null $url
-     * @return string
-     */
     function showSvgaImage(?string $url, ?string $uniqueKey): string
     {
         $model = 'this' . $uniqueKey;
@@ -729,7 +758,85 @@ if (!function_exists('showSvgaImage')) {
         return $model;
     }
 }
+if (!function_exists('showSvgaImage2')) {
+    /**
+     * @param string|null $url
+     * @return string
+     */
+    function showSvgaImage2(?string $url, ?string $uniqueKey): string
+    {
+        $model = 'this' . $uniqueKey;
+        $model2 = 'this2' . $uniqueKey;
 
+
+        Admin::script("
+                    var $model = new SVGA.Player('#$model');
+                    $model.loops = 100;
+                    $model.clearsAfterStop = false;
+
+                    var $model2 = new SVGA.Parser('#$model');
+
+                    function pauseAnimation() {
+                        $model.pauseAnimation();
+                    }
+
+                    function stopAnimation() {
+                        $model.stopAnimation();
+                    }
+                ");
+
+        // Load SVGA animation and handle potential errors
+        Admin::script("
+                    try {
+                        $model2.load('$url', function(videoItem) {
+                            $model.setVideoItem(videoItem);
+                            $model.startAnimation();
+
+                            $model.onFinished(function() {
+                                // Code for when the animation finishes
+                            });
+                        });
+                    } catch (error) {
+                        console.error('An error occurred:', error.message);
+                    } finally {
+                        console.log('Try...catch has finished executing.');
+                    }
+                ");
+        return $model;
+    }
+
+    // Global initializer for SVGA `.svga-player` elements
+    Admin::script(
+        <<<JS
+if (typeof initSvgaPlayers === 'undefined') {
+    function initSvgaPlayers(context = document) {
+        context.querySelectorAll('.svga-player').forEach(el => {
+            if (el.dataset.loaded) return;
+            el.dataset.loaded = true;
+
+            const player = new SVGA.Player(el);
+            const parser = new SVGA.Parser(el);
+
+            parser.load(el.dataset.url, videoItem => {
+                player.setVideoItem(videoItem);
+                player.loops = 100;
+                player.clearsAfterStop = false;
+                player.startAnimation();
+            });
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof initSvgaPlayers === 'function') initSvgaPlayers();
+});
+
+$(document).on('shown.bs.modal pjax:complete', function () {
+    if (typeof initSvgaPlayers === 'function') initSvgaPlayers();
+});
+JS
+    );
+}
 if (! function_exists('checkAgencyFeature')) {
     function checkAgencyFeature()
     {
