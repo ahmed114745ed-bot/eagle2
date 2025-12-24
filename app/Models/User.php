@@ -137,6 +137,13 @@ class User extends Authenticatable
 
      ];*/
 
+    public function ownerAgency()
+    {
+        return $this->hasOne(Agency::class, 'owner_id')
+            ->where('type', 1);
+    }
+
+
     public function images()
     {
         return $this->hasMany(ProfileGallary::class);
@@ -925,7 +932,7 @@ class User extends Authenticatable
 
     public function getSalaryV2Attribute()
     {
-        $total = wallet_available_by_user($this->id); 
+        $total = wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
 
