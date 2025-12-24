@@ -150,8 +150,6 @@ class BanUser extends Action
 
             $route = $ban->banType?->route;
 
-
-            info($user->room);
             if ($route == 'rooms/enter_room' && $user->room) {
                 // dd( $user->room());
                 $ms = [
