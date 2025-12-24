@@ -24,6 +24,9 @@ class FirebaseAuthController extends Controller
 
     public function loginWithUid(Request $request)
     {
+        $user = Auth::user();
+        if (!$user->firebase_uuid)  return Common::apiResponse(0, 'User not authenticated or missing Firebase UID', null, 401);
+
         $customToken = $this->firebase->createCustomToken(Auth::user()->firebase_uuid);
         $data = ['firebase_token' => $customToken,];
         Log::info('Firebase token generated successfully', [
