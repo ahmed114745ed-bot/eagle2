@@ -62,8 +62,8 @@ class UserLevelController extends MainController
         $grid->model()
             ->with([
                 'profile',
-                'totalSenderLevels',
-                'totalSenderLevels',
+                'totalSenderLevels:id,level,img,type',
+                'totalReceiverLevels:id,level,img,type',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID));
