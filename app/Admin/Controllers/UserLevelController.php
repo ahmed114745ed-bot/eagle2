@@ -110,7 +110,7 @@ class UserLevelController extends MainController
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
                 $vip = $this->totalSenderLevel;
-                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+                $avatar = $vip && @$vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
@@ -124,7 +124,7 @@ class UserLevelController extends MainController
 
                 $defaultImage = asset("images/level0.png"); // الصورة الافتراضية
                 $vip = $this->totalReceiverLevel;
-                $avatar = $vip && $vip->img ? getImagePath($vip->img) : $defaultImage;
+                $avatar = $vip && $vip?->img ? getImagePath($vip?->img) : $defaultImage;
 
                 return "<div style='display: flex; align-items: center; gap: 5px;'>
                         <img src='$avatar' alt='User Avatar' style='width: 64px; height: 16px;'>
