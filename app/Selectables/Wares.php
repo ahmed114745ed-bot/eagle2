@@ -21,7 +21,7 @@ class Wares extends Selectable
         $this->column('img2', __('show_img'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithSvga($this->id, $url, 80, 80);
+            return handleShowImageWithSvga($this->id, $url, 60, 60);
         });
         $this->column('type', __('type'))->select(
             [
@@ -46,10 +46,5 @@ class Wares extends Selectable
             });
         });
 
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
-            }
-        ");
     }
 }

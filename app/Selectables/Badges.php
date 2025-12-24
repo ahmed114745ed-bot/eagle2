@@ -35,10 +35,6 @@ class Badges extends Selectable
             $filter->like('name', __('name'));
             $filter->equal('priority', __('Priority'));
         });
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
-            }
-        ");
+        
     }
 }
