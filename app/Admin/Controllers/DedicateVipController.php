@@ -61,7 +61,10 @@ class DedicateVipController extends MainController
     protected function grid()
     {
         $grid = new Grid(new OVip);
-        $grid->model()->orderByDesc('created_at');
+        $grid->model()
+            ->with([
+                'waresOvip:id,level,name,show_img,img2'
+            ])->orderByDesc('created_at');
         $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'));
@@ -89,7 +92,7 @@ class DedicateVipController extends MainController
     ");
         $grid->column('ware', __('wares'))->expand(function () {
 
-            $wares = Ware::query()->where('get_type', 1)->where('enable', 1)->where('level', $this->level)->where('is_active_for_vip', 1)->get()->map(function ($ware) {
+            $wares = $this->waresOvip->map(function ($ware) {
                 $showaImage = $ware->show_img
                     ? '<img src="' . getImagePath($ware->show_img) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
                     : 'No Image';
@@ -128,13 +131,6 @@ class DedicateVipController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableRowSelector();
-
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-            $actions->disableEdit();
-            $actions->disableView();
-            // $actions->add(new DedicateAction());
-        });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');

@@ -568,6 +568,40 @@ if (!function_exists('getFileExtension')) {
         return pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
     }
 }
+
+if (!function_exists('handleShowImageSvga')) {
+    function handleShowImageSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, int $borderRadius = 50, string $objectFit = 'cover'): string
+    {
+        $imageType = getFileExtension($url);
+
+        // SVGA / ZZ animation
+        if ($imageType === 'svga' || $imageType === 'zz') {
+            $id = 'svga_' . uniqid();
+            return "<div class='svga-player' data-url='{$url}' id='{$id}' style='width: {$width}px; height: {$height}px;'></div>";
+        }
+
+        // MP4 Video
+        if ($imageType === 'mp4') {
+            return "
+                <video width='{$width}' height='{$height}' controls autoplay muted loop>
+                    <source src='{$url}' type='video/mp4'>
+                    <source src='{$url}' type='video/webm'>
+                    Your browser does not support the video tag.
+                </video>
+            ";
+        }
+
+        // Normal Image
+        if ($objectFit !== 'cover') {
+            return '<img src="' . e($url) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+        }
+
+        return "<img src='{$url}' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+    }
+}
+
+
+
 if (!function_exists('handleShowImageWithTypes')) {
     function handleShowImageWithTypes(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
     {
@@ -600,6 +634,37 @@ if (!function_exists('handleShowImageWithTypes')) {
 
 
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+    }
+    if (!function_exists('handleShowImageWithSvga')) {
+        function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
+        {
+            $imageType = getFileExtension($url);
+            if ($imageType == 'svga' || $imageType == 'zz') {
+                // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
+                $id = 'svga_' . $uniqueId;
+                $safeUrl = e($url);
+                $style = "width: {$width}px; height: {$height}px;";
+                if ($objectFit !== 'cover') {
+                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+                }
+                return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+            } elseif ($imageType == 'mp4') {
+                return "
+                <video width='$width' height='$height' controls autoplay muted loop>
+                    <source src='$url' type='video/mp4'>
+                    <source src='$url' type='video/webm'>
+
+                    Your browser does not support the video tag.
+                 </video>
+                ";
+            } elseif ($objectFit !== 'cover') {
+                return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+
+
+
+            return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+        }
     }
 }
 
@@ -650,12 +715,7 @@ if (!function_exists('convertNumbersToWestern')) {
         return str_replace($numbers, $newNumbers, $string);
     }
 }
-
 if (!function_exists('showSvgaImage')) {
-    /**
-     * @param string|null $url
-     * @return string
-     */
     function showSvgaImage(?string $url, ?string $uniqueKey): string
     {
         $model = 'this' . $uniqueKey;
@@ -697,49 +757,158 @@ if (!function_exists('showSvgaImage')) {
                 ");
         return $model;
     }
+}
+if (!function_exists('showSvgaImage2')) {
+    /**
+     * @param string|null $url
+     * @return string
+     */
+    function showSvgaImage2(?string $url, ?string $uniqueKey): string
+    {
+        $model = 'this' . $uniqueKey;
+        $model2 = 'this2' . $uniqueKey;
 
-    if (! function_exists('checkAgencyFeature')) {
-        function checkAgencyFeature()
-        {
-            $app_feature = \Cache::get('host_agency');
-            if (!($app_feature == '1' || $app_feature == 1)) {
-                abort(403, __('This feature has not been activated for you'));
-                //                return redirect()->back()->send();
-            }
-        }
-    }
 
-    if (!function_exists('truncateAndTrim')) {
-        function truncateAndTrim($number, $decimals = 2)
-        {
-            $factor = pow(10, $decimals);
-            $truncated = floor($number * $factor) / $factor;
-            return rtrim(rtrim(number_format($truncated, $decimals, '.', ''), '0'), '.');
-        }
-    }
+        Admin::script("
+                    var $model = new SVGA.Player('#$model');
+                    $model.loops = 100;
+                    $model.clearsAfterStop = false;
 
-    if (! function_exists('clearAgencyCache')) {
-        function clearAgencyCache($agencyId)
-        {
-            $tabs = ['members', 'charges', 'salaries', 'requests', 'targets', 'rate', 'stars', 'heroes', 'giftlog'];
+                    var $model2 = new SVGA.Parser('#$model');
 
-            foreach ($tabs as $tab) {
-                for ($i = 1; $i <= 10; $i++) {
-                    Cache::forget("agency_{$agencyId}_{$tab}_page_{$i}");
-                }
-
-                if (in_array($tab, ['rate', 'stars', 'heroes'])) {
-                    for ($month = 1; $month <= 12; $month++) {
-                        $year = date('Y');
-                        Cache::forget("agency_{$agencyId}_{$tab}_{$month}_{$year}");
+                    function pauseAnimation() {
+                        $model.pauseAnimation();
                     }
-                }
-            }
 
-            Cache::forget("agency_{$agencyId}_giftlog");
+                    function stopAnimation() {
+                        $model.stopAnimation();
+                    }
+                ");
+
+        // Load SVGA animation and handle potential errors
+        Admin::script("
+                    try {
+                        $model2.load('$url', function(videoItem) {
+                            $model.setVideoItem(videoItem);
+                            $model.startAnimation();
+
+                            $model.onFinished(function() {
+                                // Code for when the animation finishes
+                            });
+                        });
+                    } catch (error) {
+                        console.error('An error occurred:', error.message);
+                    } finally {
+                        console.log('Try...catch has finished executing.');
+                    }
+                ");
+        return $model;
+    }
+
+    // Global initializer for SVGA `.svga-player` elements
+    Admin::script(
+        <<<JS
+if (typeof initSvgaPlayers === 'undefined') {
+    function initSvgaPlayers(context = document) {
+        context.querySelectorAll('.svga-player').forEach(el => {
+            if (el.dataset.loaded) return;
+            el.dataset.loaded = true;
+
+            const player = new SVGA.Player(el);
+            const parser = new SVGA.Parser(el);
+
+            parser.load(el.dataset.url, videoItem => {
+                player.setVideoItem(videoItem);
+                player.loops = 100;
+                player.clearsAfterStop = false;
+                player.startAnimation();
+            });
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof initSvgaPlayers === 'function') initSvgaPlayers();
+});
+
+$(document).on('shown.bs.modal pjax:complete', function () {
+    if (typeof initSvgaPlayers === 'function') {
+        initSvgaPlayers();
+        // Run again shortly after to handle cases where modal content is inserted after shown
+        setTimeout(() => initSvgaPlayers(), 150);
+    }
+});
+
+// Also watch for dynamically added `.svga-player` elements (covers Selectable/AJAX insertions)
+if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+            if (!m.addedNodes || m.addedNodes.length === 0) continue;
+            m.addedNodes.forEach(node => {
+                try {
+                    if (node.nodeType !== 1) return; // element
+                    if (node.classList && node.classList.contains('svga-player')) {
+                        if (typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                    // also check descendants
+                    if (node.querySelectorAll) {
+                        const found = node.querySelectorAll('.svga-player');
+                        if (found.length && typeof initSvgaPlayers === 'function') initSvgaPlayers(node);
+                    }
+                } catch (e) {
+                    console.error('SVGA MutationObserver handler error:', e);
+                }
+            });
+        }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+JS
+    );
+}
+if (! function_exists('checkAgencyFeature')) {
+    function checkAgencyFeature()
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            abort(403, __('This feature has not been activated for you'));
+            //                return redirect()->back()->send();
         }
     }
 }
+
+if (!function_exists('truncateAndTrim')) {
+    function truncateAndTrim($number, $decimals = 2)
+    {
+        $factor = pow(10, $decimals);
+        $truncated = floor($number * $factor) / $factor;
+        return rtrim(rtrim(number_format($truncated, $decimals, '.', ''), '0'), '.');
+    }
+}
+
+if (! function_exists('clearAgencyCache')) {
+    function clearAgencyCache($agencyId)
+    {
+        $tabs = ['members', 'charges', 'salaries', 'requests', 'targets', 'rate', 'stars', 'heroes', 'giftlog'];
+
+        foreach ($tabs as $tab) {
+            for ($i = 1; $i <= 10; $i++) {
+                Cache::forget("agency_{$agencyId}_{$tab}_page_{$i}");
+            }
+
+            if (in_array($tab, ['rate', 'stars', 'heroes'])) {
+                for ($month = 1; $month <= 12; $month++) {
+                    $year = date('Y');
+                    Cache::forget("agency_{$agencyId}_{$tab}_{$month}_{$year}");
+                }
+            }
+        }
+
+        Cache::forget("agency_{$agencyId}_giftlog");
+    }
+}
+
 
 
 
@@ -1098,7 +1267,6 @@ if (!function_exists('wallet_available_by_wallet')) {
         $currentBalance   = $wallet->balance ?? 0;
         $currentCutAmount = $wallet->cut_amount ?? 0;
         $currentPending   = $wallet->pending_amount ?? 0;
-        return $currentBalance -  $currentCutAmount - $currentPending ;
+        return $currentBalance -  $currentCutAmount - $currentPending;
     }
 }
-

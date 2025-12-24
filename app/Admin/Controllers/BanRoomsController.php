@@ -2,9 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Models\BanRoom;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
@@ -35,33 +33,6 @@ class BanRoomsController extends MainController
         // });
     }
 
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
-    public function show($id, Content $content)
-    {
-        return parent::show($id, $content
-            ->title(trans('bans'))
-            ->body($this->detail($id)));
-    }
-
-    /**
-     * Edit interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
-    public function edit($id, Content $content)
-    {
-        return parent::edit($id, $content
-            ->title(trans('bans'))
-            ->body($this->form()->edit($id)));
-    }
 
     /**
      * Create interface.
@@ -85,9 +56,16 @@ class BanRoomsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new BanRoom());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->disableRowSelector();
-        $grid->model()->whereHas('room')
+        $grid->model()
+            ->with([
+                'room',
+                'room.owner',
+                'room.owner.profile:user_id,avatar',
+                'staff'
+            ])
+            ->whereHas('room')
             ->when($countryID, fn($q) => $q->whereHas('room', fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
             // ->select('id','room_id', 'duration', 'staff_id',
@@ -133,7 +111,7 @@ class BanRoomsController extends MainController
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->avatar;
+            $avatarPath = $user->profile->avatar ?? '';
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
             if (!isImageExists($avatar)) {
@@ -234,52 +212,5 @@ class BanRoomsController extends MainController
         });
 
         return $grid;
-    }
-
-
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
-    protected function detail($id)
-    {
-        //        $show = new Show(Ban::findOrFail($id));
-        //
-        //        $show->id('ID');
-        //        $show->uid('uid');
-        //        $show->user_type('user_type');
-        //        $show->duration('duration');
-        //        $show->type('type');
-        //        $show->ip('ip');
-        //        $show->device_number('device_number');
-        //        $show->staff_id('staff_id');
-        //        $show->created_at(trans('admin.created_at'));
-        //        $show->updated_at(trans('admin.updated_at'));
-        //
-        //        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
-    protected function form()
-    {
-        //        $form = new Form(new Ban);
-        //
-        //        $form->display('ID');
-        //        $form->text('uid', __('uid'));
-        ////        $form->text('user_type', __('user_type'));
-        //        $form->number('duration', __('duration(hours)'));
-        ////        $form->text('type', __('type'));
-        //        $form->switch('ban_ip', 'ip_ban')->states ([0=>'off',1=>'on']);
-        //        $form->switch('device_ban', __('device_ban'))->states ([0=>'off',1=>'on']);
-        //        $form->display(trans('admin.created_at'));
-        //
-        //
-        //        return $form;
     }
 }

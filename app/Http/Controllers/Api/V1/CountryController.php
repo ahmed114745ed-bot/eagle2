@@ -92,7 +92,7 @@ class CountryController extends Controller
             'country_id' => ['required', 'integer', Rule::exists('countries', 'id')],
         ]);
 
-        if ($request->user()->country_id == $request->country_id) return Common::apiResponse(0, __('this is your country'), 400);
+        if ($request->user()->country_id == $request->country_id) return Common::apiResponse(0, __('You are already using this country.'), 400);
         try {
             $this->countryService->changeRequest($data);
         } catch (Exception $exception) {

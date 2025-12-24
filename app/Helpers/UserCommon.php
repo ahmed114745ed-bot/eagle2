@@ -383,10 +383,12 @@ class UserCommon
         return str_replace($arabicNumbers, $newNumbers, $string);
     }
 
-    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
+    // public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType, $isUsed = null)
+    public static function addVipToUser(User $user, OVip $vip, $expire, $sender = null, $receiveType = '', $isUsed = null, $sendNotification = 1)
+
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed);
+        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -416,15 +418,15 @@ class UserCommon
     }
 
 
-    public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null, $receiveType = null)
+    public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null, $receiveType = null, $sendNotification = 1)
     {
         $receiveType = $receiveType ?? 'not-sending';
 
 
         $pack = Pack::query()->where('user_id', $user->id)->where('target_id', $ware->id)->first();
 
-        $title = __('congratulations')  ;
-        $body = $user->name .':' .__('You have received a gift: :ware', ['ware' => $ware->name]);
+        $title = __('congratulations');
+        $body = $user->name . ':' . __('You have received a gift: :ware', ['ware' => $ware->name]);
 
         // if ($pack) {
         //     if ($pack->expire == 0) return '';
@@ -466,12 +468,13 @@ class UserCommon
             $pack->senderable()->associate($sender);
             $pack->save();
             DB::commit();
+            if ($sendNotification) {
+                Common::sendOfficialMessage($user->id, $title, $body);
+                (new UserCounterServices)->eventUser($user, 'official-messages');
 
-            Common::sendOfficialMessage($user->id, $title, $body);
-            (new UserCounterServices)->eventUser($user, 'official-messages');
-
-            $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
-            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
+            }
         } catch (\Exception $exception) {
             DB::rollBack();
         }
@@ -481,7 +484,7 @@ class UserCommon
     public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
     {
         $title = __('congratulations');
-        $body = $user->name .':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
+        $body = $user->name . ':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
 
         DB::beginTransaction();
         try {
