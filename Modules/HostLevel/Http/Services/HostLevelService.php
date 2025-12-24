@@ -46,7 +46,7 @@ class HostLevelService
         $diamonds = $this->computeDiamonds($user->id) ?? 0;
         $level = HostLevel::where('diamonds', '<=', $diamonds)->orderByDesc('level')->value('level');
         $lastLevelEvent = HostLevel::orderByDesc('level')->first();
-        if ($diamonds  > $lastLevelEvent->diamonds) {
+        if ($lastLevelEvent && $diamonds  > $lastLevelEvent->diamonds) {
             $nextLevel = $lastLevelEvent;
         }
 
