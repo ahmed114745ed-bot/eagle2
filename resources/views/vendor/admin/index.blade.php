@@ -41,7 +41,7 @@
 
     <div class="content-wrapper" id="pjax-container">
         {!! Admin::style() !!}
-        <div id="app" style="margin-top: 7%;">
+        <div id="app" class="app-class" style="margin-top: 7%;">
         @yield('content')
         </div>
         {!! Admin::script() !!}

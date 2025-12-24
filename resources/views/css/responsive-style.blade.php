@@ -25,6 +25,12 @@
     }
 
     @media (max-width: 992px) {
+        .app-class {
+            margin-top: 10% !important;
+        }
+        .content {
+            width: 100% !important;
+        }
         .wrapper {
             /* min-width: max-content; */
         }
