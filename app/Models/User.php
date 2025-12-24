@@ -137,12 +137,6 @@ class User extends Authenticatable
 
      ];*/
 
-    public function ownerAgency()
-    {
-        return $this->hasOne(Agency::class, 'owner_id')
-            ->where('type', 1);
-    }
-
 
     public function images()
     {

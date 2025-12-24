@@ -92,7 +92,7 @@ class BanController extends MainController
                 'banType:id,name_ar,name_en',
                 'staff:id,name,avatar',
                 'user:id,name,uuid,phone,country_id',
-                'user.ownerAgency:id,owner_id,type',
+                'staff.agency',
                 'user.profile:user_id,avatar',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
