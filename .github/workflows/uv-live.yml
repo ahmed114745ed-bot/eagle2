@@ -42,17 +42,17 @@ jobs:
           cd /var/www/uv-live
           pwd
           #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t uv-live:${{ github.sha }} .
-          docker service update --image uv-live:${{ github.sha }} uv-live-app
+          docker build -t uv-live:${{ github.sha }} -f Dockerfile-octan .
+          docker service update --image uv-live:${{ github.sha }} uv-live-octa
 
           # Get container ID of task 5live-app.1
-          CONTAINER_ID=$(docker ps --filter "name=uv-live-app.1" --format "{{.ID}}" | head -n 1)
+          CONTAINER_ID=$(docker ps --filter "name=uv-live-octa.1" --format "{{.ID}}" | head -n 1)
 
           # Run artisan command inside that container
           if [ -n "$CONTAINER_ID" ]; then
             docker exec  $CONTAINER_ID php artisan whatsapp:change-token
           else
-            echo "No running container found for uv-live-app.1 service task"
+            echo "No running container found for uv-live-octa.1 service task"
             exit 1
           fi
 
