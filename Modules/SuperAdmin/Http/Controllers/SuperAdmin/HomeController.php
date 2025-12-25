@@ -2,6 +2,7 @@
 
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
+use App\Helpers\Common;
 use App\Models\Bd;
 use App\Models\Charge;
 use App\Models\CoinLog;
