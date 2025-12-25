@@ -498,10 +498,9 @@ Route::group(
             Route::get('/finance/tables', [AllStatisticController::class, 'financeTables']);
             Route::get('/finance/chart', [AllStatisticController::class, 'financeChartIndex']);
             Route::get('wallet-logs/ajax', [AllStatisticController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
-
         });
 
-        
+
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
         Route::resource('usersBd', BdController::class);
