@@ -1513,6 +1513,9 @@ class Common
     {
         Log::info(111111);
         $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
+        Log::info('secret key', [
+                'zego_token' => $zegoClientId,
+            ]);
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
