@@ -176,6 +176,12 @@ Route::group(
             Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         });
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/finance/cards', [HomeController::class, 'financeCards']);
+            Route::get('/finance/tables', [HomeController::class, 'financeTables']);
+            Route::get('/finance/chart', [HomeController::class, 'financeChartIndex']);
+            Route::get('wallet-logs/ajax', [HomeController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
+        });
     }
 );
 

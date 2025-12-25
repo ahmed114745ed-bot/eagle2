@@ -129,6 +129,7 @@
     .dark-mode input,
     .dark-mode textarea,
     .dark-mode .table > tbody > tr:hover,
+    .dark-mode .data-table tr:hover ,
     .dark-mode .agency-header,
     .dark-mode .card-header,
     .dark-mode .table tbody tr:nth-child(even),

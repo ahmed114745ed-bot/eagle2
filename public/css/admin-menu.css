@@ -592,3 +592,101 @@
         font-size: 13px;
     }
 }
+
+/* ✅ Force hide submenus when sidebar is collapsed */
+.sidebar-collapse .crs-submenu,
+body.sidebar-collapse .crs-submenu,
+.sidebar-mini.sidebar-collapse .crs-submenu {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    overflow: hidden !important;
+    display: none !important;
+}
+
+.sidebar-collapse .crs-tree.crs-open > .crs-submenu,
+body.sidebar-collapse .crs-tree.crs-open > .crs-submenu {
+    display: none !important;
+}
+
+/* ✅ Hide title text when sidebar is collapsed - ONLY in sidebar, NOT in popovers */
+body.sidebar-collapse .main-sidebar .crs-title,
+body.sidebar-collapse .sidebar .crs-title,
+.sidebar-mini.sidebar-collapse .main-sidebar .crs-title {
+    display: none !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ✅ Hide arrow when sidebar is collapsed - ONLY in sidebar */
+body.sidebar-collapse .main-sidebar .crs-arrow,
+body.sidebar-collapse .sidebar .crs-arrow,
+.sidebar-mini.sidebar-collapse .main-sidebar .crs-arrow {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+/* ✅ Center the icon when collapsed - ONLY in sidebar */
+body.sidebar-collapse .main-sidebar .crs-link,
+body.sidebar-collapse .sidebar .crs-link,
+.sidebar-mini.sidebar-collapse .main-sidebar .crs-link {
+    justify-content: center !important;
+    padding: 12px 8px !important;
+}
+
+/* ✅ Make icon bigger when collapsed - ONLY in sidebar */
+body.sidebar-collapse .main-sidebar .crs-icon,
+body.sidebar-collapse .sidebar .crs-icon,
+.sidebar-mini.sidebar-collapse .main-sidebar .crs-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    font-size: 20px !important;
+}
+
+/* ========================================= */
+/* ✅ POPOVER STYLES - ALWAYS SHOW TEXT     */
+/* ========================================= */
+
+.crs-popover .crs-title {
+    display: block !important;
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+    flex: 1 !important;
+}
+
+.crs-popover .crs-arrow {
+    display: inline-block !important;
+    opacity: 0.95 !important;
+}
+
+.crs-popover .crs-link {
+    justify-content: flex-start !important;
+    padding: 10px 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.crs-popover .crs-icon {
+    width: 24px !important;
+    min-width: 24px !important;
+    font-size: 16px !important;
+}
+
+/* ✅ TOOLTIP STYLES */
+.crs-tooltip {
+    display: block !important;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.crs-tooltip.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.crs-menu {
+    padding: 0;
+}

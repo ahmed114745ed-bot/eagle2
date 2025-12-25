@@ -1620,8 +1620,12 @@
     }
 
     .sidebar-mini.sidebar-collapse .main-header .logo {
-        width: 5.5% !important;
+        width: 5.3% !important;
         height: 75% !important;
+    }
+
+    .rtl .sidebar-mini.sidebar-collapse .main-header .logo {
+        width: 5.4% !important;
     }
 
     .sidebar-mini.sidebar-collapse .main-sidebar {
@@ -2764,6 +2768,10 @@
 
     .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
         border-top-color: var(--secondary-color) !important;
+    }
+
+    .data-table tr:hover {
+        background: var(--off-white);
     }
 
     .stats-container .info-box {

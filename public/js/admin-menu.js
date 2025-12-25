@@ -514,14 +514,103 @@ console.log('✅ sidebar js loaded');
         }
     }
 
+
+    let previouslyOpenMenus = []; // Store which menus were open before collapse
+
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const isCollapsed = document.body.classList.contains('sidebar-collapse');
+
+                if (isCollapsed) {
+                    // ✅ COLLAPSING: Save open menus, then close them
+                    previouslyOpenMenus = [];
+
+                    document.querySelectorAll('.crs-tree.crs-open').forEach(function(tree) {
+                        // Save the tree ID so we can reopen later
+                        const treeId = tree.dataset.crsTreeId || tree.dataset.crsId;
+                        if (treeId) {
+                            previouslyOpenMenus.push(treeId);
+                        }
+
+                        const submenu = tree.querySelector('.crs-submenu');
+                        const toggle = tree.querySelector('.crs-toggle');
+
+                        tree.classList.remove('crs-open');
+
+                        if (submenu) {
+                            submenu.style.maxHeight = '0px';
+                            submenu.style.opacity = '0';
+                            submenu.style.transform = 'translateY(-10px) scaleY(0.95)';
+                        }
+
+                        if (toggle) {
+                            toggle.setAttribute('aria-expanded', 'false');
+                        }
+                    });
+
+                    closeAllPopovers();
+
+                } else {
+                    // ✅ EXPANDING: Re-open the menus that were open before
+                    // OR open the menu containing the active item
+
+                    setTimeout(() => {
+                        // First, try to open menus that were previously open
+                        if (previouslyOpenMenus.length > 0) {
+                            previouslyOpenMenus.forEach(function(treeId) {
+                                const tree = document.querySelector(`.crs-tree[data-crs-tree-id="${treeId}"]`) ||
+                                    document.querySelector(`.crs-tree[data-crs-id="${treeId}"]`);
+
+                                if (tree) {
+                                    openSubmenu(tree);
+                                }
+                            });
+                        } else {
+                            // If no previously open menus, open the one with active item
+                            const activeLink = document.querySelector('.crs-link.active, .crs-item.active .crs-link');
+                            if (activeLink) {
+                                openParentMenus(activeLink);
+                            }
+                        }
+                    }, 100);
+                }
+
                 saveSidebarState();
             }
         });
     });
 
+// ✅ Add this helper function to open a submenu
+    function openSubmenu(tree) {
+        if (!tree || tree.classList.contains('crs-open')) return;
+
+        const submenu = tree.querySelector(':scope > .crs-submenu');
+        const toggle = tree.querySelector(':scope > .crs-toggle');
+
+        if (!submenu) return;
+
+        tree.classList.add('crs-open');
+
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', 'true');
+        }
+
+        // Reset and animate
+        submenu.style.opacity = '1';
+        submenu.style.transform = 'translateY(0) scaleY(1)';
+        submenu.style.maxHeight = submenu.scrollHeight + 'px';
+
+        // Animate items
+        animateSubmenuItems(submenu);
+
+        // After animation, set to none for nested content
+        setTimeout(() => {
+            if (tree.classList.contains('crs-open')) {
+                submenu.style.maxHeight = 'none';
+            }
+        }, 400);
+    }
 
     function highlightActiveMenuItem() {
         const currentPath = window.location.pathname;

@@ -453,10 +453,6 @@
             border-bottom: none;
         }
 
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
         .user-cell {
             display: flex;
             align-items: center;
