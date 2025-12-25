@@ -1510,11 +1510,21 @@ class Common
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
-        if ((!$zego_token && !$zegoClientId) || ($sounZego != '3') || ($vedioZego != '3')) {
+
+        $zego_server_secret = Common::getConfig('zego_server_secret');
+        $zego_app_id = Common::getConfig('zego_app_id');
+        $app_sign = Common::getConfig('app_sign');
+        if ((!$zego_token && !$zegoClientId) && ($sounZego != '3' && $vedioZego != '3')) {
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
                 'zego_app_sign'      =>  '',
+            ];
+        } elseif ($sounZego == '1' || $vedioZego == '1') {
+            $zegoData = [
+                'zego_app_id'        =>  $zego_app_id ?? '',
+                'zego_server_secret' => $zego_server_secret ?? '',
+                'zego_app_sign'      =>  $app_sign ?? '',
             ];
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
