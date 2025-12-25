@@ -16,10 +16,11 @@ use App\Models\CoinLog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
+use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin as AuthAdmin;
 
 
@@ -193,6 +194,8 @@ class BanUser extends Action
 
 
         if ($room && $newBan) {
+
+            Log::info('ban user send to zego', ['room_id' => $room->id, 'user_id' => $user->id]);
             $d = [
                 "messageContent" => [
                     "message" => "banDevice",
