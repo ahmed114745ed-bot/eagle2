@@ -1504,7 +1504,37 @@ class Common
         $level = Vip::collectionBuilder()->where('level', $amount)->orderByDesc('exp')->first();
         return $level;
     }
+    public static function zegoData($key = null)
+    {
+        $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
+        $zego_token = Common::getConf('zego_token');
+        $sounZego = Common::getConf('sound_library');
+        $vedioZego = Common::getConf('video_library');
+        if ((!$zego_token && !$zegoClientId) || ($sounZego != '3') || ($vedioZego != '3')) {
+            $zegoData = [
+                'zego_app_id'        =>  '',
+                'zego_server_secret' =>  '',
+                'zego_app_sign'      =>  '',
+            ];
+        } else {
+            $data = decryptToArray($zego_token, $zegoClientId);
 
+            $zegoData = [
+                'zego_app_id'        => $data['app_id'] ?? '',
+                'zego_server_secret' => $data['server_secret'] ?? '',
+                'zego_app_sign'      => $data['app_sign'] ?? '',
+            ];
+        }
+
+
+        // If a key is provided, return that specific value
+        if ($key) {
+            return $zegoData[$key] ?? null;
+        }
+
+        // Otherwise return all values
+        return $zegoData;
+    }
     public static  function createUserAdmin($appOwnerId)
     {
         if (!$appOwnerId) return;
@@ -2409,7 +2439,4 @@ class Common
         }
         return $user->id;
     }
-
-
-    
 }
