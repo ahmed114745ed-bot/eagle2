@@ -9,13 +9,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/users-online-stats";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/users-online-stats";
     } else {
-        $prefix = '';
+        $fetchUrl = "statistics/users-online-stats";
     }
-    $fetchUrl = $prefix . "/statistics/users-online-stats";
     $onlineUsersLabel = __('online_users');
     $offlineUsersLabel = __('offline_users');
 @endphp
