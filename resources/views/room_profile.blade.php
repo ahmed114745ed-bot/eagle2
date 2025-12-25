@@ -99,15 +99,18 @@
                 </div>
             </div>
         </div>
-        <div style="display: flex; justify-content: flex-start; gap: 8px; margin-bottom: 8px;">
-            <button class="btn-back edit-btn" onclick="openEditModal()">
-                <i class="fas fa-edit"></i> {{__("Edit Room")}}
-            </button>
-            @if(Admin::user()->can('edit-rooms') || Admin::user()->can('*'))
-                <button class="btn-back" onclick="window.location.href='{{ url('admin/rooms') }}'">
-                    <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
-                </button>
-            @endif
+        <div class="card p-3 bg-danger-subtle">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url('admin/rooms') }}" class="btn btn-light">
+                    <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
+                </a>
+
+                @if(Admin::user()->can('edit-rooms') || Admin::user()->can('*'))
+                    <button type="button" class="btn btn-info" onclick="openEditModal()">
+                        <i class="fas fa-edit"></i> {{ __('Edit Room') }}
+                    </button>
+                @endif
+            </div>
         </div>
     </div>
 

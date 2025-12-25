@@ -1085,7 +1085,12 @@
     .skin-black-light .main-header > .navbar .nav .open > a:focus,
     .skin-black-light .main-header > .navbar .nav > .active > a {
         background-color: var(--second-color) !important;
-        border-left: 1px solid var(--second-alpha) !important;
+        /*border-left: 1px solid var(--second-alpha) !important;*/
+    }
+
+    .skin-black-light .main-header>.navbar .navbar-custom-menu .navbar-nav>li>a,
+    .skin-black-light .main-header>.navbar .navbar-right>li>a {
+        border-left: unset !important;
     }
 
     .skin-black-light .main-header > .logo {
