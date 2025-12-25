@@ -16,7 +16,7 @@ return [
     'name' => env('APP_NAME', 'Laravel').'_Admin',
     'company_name' => env('COMPANY_NAME', 'UTD Company'),
     'isUsed_vip' => env('IS_USED_VIP', 'false'),
-    'locale' => env('LANG', 'en'),
+    'locale' => app()->getLocale(),
 
     /*
     |--------------------------------------------------------------------------
@@ -492,7 +492,7 @@ return [
             //     'hi' => 'Hindi',
             // ],
             // default locale
-            'default' => 'ar',
+            'default' => env('LANG', 'en'),
             // if or not show multi-language login page, optional, default is true
             'show-login-page' => true,
             // if or not show multi-language navbar, optional, default is true
