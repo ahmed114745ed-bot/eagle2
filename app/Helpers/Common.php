@@ -1511,6 +1511,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
+        Log::info(111111);
         $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
@@ -1521,6 +1522,7 @@ class Common
         $app_sign = Common::getConfig('app_sign');
 
         if ((!$zego_token && !$zegoClientId) || ($sounZego == '3' || $vedioZego == '3')) {
+             Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
@@ -1536,7 +1538,7 @@ class Common
             // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
-
+               Log::info(66666666666);
             $zegoData = [
                 'zego_app_id'        => $data['app_id'] ?? '',
                 'zego_server_secret' => $data['server_secret'] ?? '',
