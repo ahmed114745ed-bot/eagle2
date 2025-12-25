@@ -42,8 +42,8 @@ jobs:
           cd /var/www/pop-live
           pwd
           #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t pop-live:${{ github.sha }} .
-          docker service update --image pop-live:${{ github.sha }} pop-live-app
+          docker build -t pop-live:${{ github.sha }} -f Dockerfile-octan .
+          docker service update --image pop-live:${{ github.sha }} pop-live-octa
 
           # Get container ID of task 5live-app.1
           CONTAINER_ID=$(docker ps --filter "name=pop-live-app.1" --format "{{.ID}}" | head -n 1)
