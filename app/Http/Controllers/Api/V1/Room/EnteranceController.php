@@ -97,11 +97,11 @@ class EnteranceController extends Controller
 
      public function libraryAgoraZego()
     {
-     
+      Common::zegoData();
         $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::zegoData('zego_server_secret');
         $zego_app_id = Common::zegoData('zego_app_id');
-        $app_sign = Common::zegoData('app_sign');
+        $app_sign = Common::zegoData('zego_app_sign');
         $library = Common::getConfig('video_library');
         $liveLibrary = (int) Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
