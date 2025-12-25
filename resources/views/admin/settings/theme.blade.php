@@ -35,10 +35,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Blue Ocean
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #3b82f6; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #0ea5e9; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #64748b; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #3b82f6; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #0ea5e9; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #e0f2fe; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -50,10 +50,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Purple Dream
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #8b5cf6; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #a855f7; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #6b7280; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #8b5cf6; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #a855f7; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f3e8ff; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -65,10 +65,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Sunset
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f97316; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f59e0b; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #78716c; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f97316; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f59e0b; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #ffedd5; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -80,10 +80,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Forest
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #10b981; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #059669; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #4b5563; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #10b981; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #059669; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #d1fae5; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -95,10 +95,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Royal
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #6366f1; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #8b5cf6; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #71717a; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: white;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #6366f1; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #8b5cf6; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #e0e7ff; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -110,10 +110,10 @@
                         <div style="font-weight: 600; margin-bottom: 10px; color: #333; font-size: 14px;">
                             Dark Elegance
                         </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #1f2937; border: 2px solid #e5e7eb;" title="Primary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #374151; border: 2px solid #e5e7eb;" title="Secondary"></div>
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #9ca3af; border: 2px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #1f2937;" title="Text">Aa</div>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #1f2937; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #374151; border: 2px solid #e5e7eb;"></div>
+                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #f3f4f6; border: 2px solid #e5e7eb;"></div>
                         </div>
                     </div>
                 </div>
@@ -265,35 +265,34 @@
         'blue-ocean': {
             secondary_color: '#3b82f6',
             primary_color: '#0ea5e9',
-            text_secondary_color: '#64748b'  // Slate gray - good for text
+            text_secondary_color: '#e0f2fe'  // Light blue tint
         },
         'purple-dream': {
             secondary_color: '#8b5cf6',
             primary_color: '#a855f7',
-            text_secondary_color: '#6b7280'  // Gray - good for text
+            text_secondary_color: '#f3e8ff'  // Light purple tint
         },
         'sunset': {
             secondary_color: '#f97316',
             primary_color: '#f59e0b',
-            text_secondary_color: '#78716c'  // Stone gray - good for text
+            text_secondary_color: '#ffedd5'  // Light orange tint
         },
         'forest': {
             secondary_color: '#10b981',
             primary_color: '#059669',
-            text_secondary_color: '#4b5563'  // Gray - good for text
+            text_secondary_color: '#d1fae5'  // Light green tint
         },
         'royal': {
             secondary_color: '#6366f1',
             primary_color: '#8b5cf6',
-            text_secondary_color: '#71717a'  // Zinc gray - good for text
+            text_secondary_color: '#e0e7ff'  // Light indigo tint
         },
         'dark-elegance': {
             secondary_color: '#1f2937',
             primary_color: '#374151',
-            text_secondary_color: '#9ca3af'  // Light gray - good for text on dark
+            text_secondary_color: '#f3f4f6'  // Light gray
         }
     };
-
     function applyPreset(presetName) {
         const preset = themePresets[presetName];
         if (!preset) return;
@@ -334,12 +333,15 @@
         const $switch = $('input[name="dark_mode"][data-bootstrap-switch]');
         const $input = document.getElementById('dark_mode_input');
 
+        // Check localStorage first for user preference
         const userPreference = localStorage.getItem('admin_dark_mode');
         let initialState = false;
 
         if (userPreference !== null) {
+            // User has set a preference, use it
             initialState = userPreference === '1';
         } else {
+            // No user preference, use the switch state (which comes from database)
             initialState = $switch.is(':checked');
         }
 
@@ -351,9 +353,11 @@
             const value = state ? '1' : '0';
             if ($input) $input.value = value;
             document.documentElement.classList.toggle('dark-mode', state);
+            // Update localStorage when user changes via settings
             localStorage.setItem('admin_dark_mode', value);
         });
 
+        // Apply the initial state
         document.documentElement.classList.toggle('dark-mode', initialState);
     }
 
