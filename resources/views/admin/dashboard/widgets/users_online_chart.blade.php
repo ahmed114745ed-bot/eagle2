@@ -13,7 +13,7 @@
     } elseif (request()->is('areaManager*')) {
         $prefix = 'areaManager';
     } else {
-        $prefix = 'admin';
+        $prefix = '';
     }
     $fetchUrl = $prefix . "/statistics/users-online-stats";
     $onlineUsersLabel = __('online_users');
