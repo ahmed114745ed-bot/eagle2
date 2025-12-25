@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Resources\AppSettingResource;
 use Auth;
 use Exception;
 use App\Models\Ban;
@@ -16,6 +15,7 @@ use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
@@ -29,6 +29,7 @@ use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Services\FilterChargeService;
 use Illuminate\Support\Facades\Cache;
@@ -37,6 +38,7 @@ use App\Http\Resources\CpUserResource;
 use App\helper\InvitationEarningHelper;
 use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\AppSettingResource;
 use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\UserPackUtdResource;
@@ -57,7 +59,6 @@ use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
-use Illuminate\Support\Arr;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
@@ -872,6 +873,16 @@ class UserController extends Controller
             substr($ZegoEncreyptkey, 0, 16)
         );
 
+        $decryptedPayload = openssl_decrypt(
+            $encryptedData,
+            'AES-256-CBC',
+            $ZegoEncreyptkey,
+            0,
+            substr($ZegoEncreyptkey, 0, 16)
+        );
+        Log::info('ZEGO | decrypted payload', [
+            'decrypted' =>  $decryptedPayload,
+        ]);
         return Common::apiResponse(1, '', $encryptedData);
     }
 
