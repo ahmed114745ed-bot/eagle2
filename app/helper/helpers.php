@@ -144,6 +144,15 @@ if (!function_exists('calculateUserUsd')) {
     }
 }
 
+if (!function_exists('decryptToArray')) {
+    function decryptToArray(string $encrypted, $key): array
+    {
+        $iv = substr($key, 0, 16);
+        $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
+        return json_decode($decrypted, true);
+    }
+}
+
 if (!function_exists('checkStoredProcedureExists')) {
     function checkStoredProcedureExists($procedureName)
     {
