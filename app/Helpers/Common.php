@@ -1530,14 +1530,16 @@ class Common
                 'vedioZego' => $vedioZego,
             ]);
         
-        if ((!$zego_token && !$zegoClientId) || ($sounZego === '3' || $vedioZego === '3')) {
+        if ((!$zego_token && !$zegoClientId) && ($sounZego === '3' && $vedioZego === '3')) {
              Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
                 'zego_app_sign'      =>  '',
             ];
-        } elseif ($sounZego == '1' || $vedioZego == '1') {
+        }
+        
+        if ($sounZego == '1' || $vedioZego == '1') {
 
             $zegoData = [
                 'zego_app_id'        =>  $zego_app_id ?? '',
