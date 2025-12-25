@@ -435,7 +435,7 @@ async function loadFinanceTables() {
                 <tr>
                     <td>#${w.id}</td>
                     <td>
-                        <a href="/${routePrefix}/users/${w.user_id}" target="_blank">
+                        <a href="/${routePrefix}/users/${w.user_id}" target="_blank"
                         style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
                             <img src="${w.img || '/images/default-avatar.png'}" alt="${w.user_name}"
                                 style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
