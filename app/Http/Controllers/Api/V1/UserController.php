@@ -57,7 +57,7 @@ use App\Http\Resources\Api\V1\UserTargetResource;
 use App\Http\Resources\Api\V1\DeviceTokenResource;
 use Modules\WhatsappAuth\Services\WhatsappWebhook;
 use Modules\FixedTarget\Services\FixedTargetService;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
+use Illuminate\Support\Arr;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
@@ -818,15 +818,37 @@ class UserController extends Controller
         return Common::apiResponse(1, 'account deleted successfully');
     }
 
+    // public function zegoCredential()
+    // {
+    //     $ZegoEncreyptkey = config('app.zego_credential');
+    //     $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
+    //     $data = $keys->mapWithKeys(function ($item) {
+    //         return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
+    //     });
+
+    //     $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
+
+    //     return Common::apiResponse(1, '', $encryptedData);
+    // }
+
     public function zegoCredential()
     {
         $ZegoEncreyptkey = config('app.zego_credential');
-        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
+        $keys = Common::getConfFromKey(['youtube_key']);
+
         $data = $keys->mapWithKeys(function ($item) {
             return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
         });
 
-        $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
+        $zegoKeys = Common::zegoData();
+        $zegoData = Arr::only($zegoKeys, ['zego_app_id', 'zego_app_sign']);
+        if (isset($zegoData['zego_app_id'])) {
+            $zegoData['zego_app_id'] = (int) $zegoData['zego_app_id'];
+        }
+
+        $data = array_merge($data->toArray(), $zegoData);
+        // dd($data);
+        $encryptedData = openssl_encrypt(json_encode($data), 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
 
         return Common::apiResponse(1, '', $encryptedData);
     }

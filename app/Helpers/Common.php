@@ -1524,6 +1524,7 @@ class Common
                 'zego_app_sign'      =>  '',
             ];
         } elseif ($sounZego == '1' || $vedioZego == '1') {
+          
             $zegoData = [
                 'zego_app_id'        =>  $zego_app_id ?? '',
                 'zego_server_secret' => $zego_server_secret ?? '',
