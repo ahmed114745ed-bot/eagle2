@@ -27,7 +27,7 @@ jobs:
             echo "Disk space is within acceptable limits $current% "
           fi
   run_pop-live_app:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest 
     needs: run_pop-live_hub
     steps:
     - name: print out pop-live
