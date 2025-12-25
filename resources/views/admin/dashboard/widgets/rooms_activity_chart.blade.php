@@ -14,13 +14,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/rooms-activity";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/rooms-activity";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/rooms-activity";
     }
-    $fetchUrl = $prefix . "/statistics/rooms-activity";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

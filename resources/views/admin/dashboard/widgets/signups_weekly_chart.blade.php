@@ -10,13 +10,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/comparison-user-signup";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/comparison-user-signup";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/comparison-user-signup";
     }
-    $fetchUrl = $prefix . "/statistics/comparison-user-signup";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

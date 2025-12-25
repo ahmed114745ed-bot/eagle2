@@ -7,13 +7,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/top-users-visits";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/top-users-visits";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/top-users-visits";
     }
-    $fetchUrl = $prefix . "/statistics/top-users-visits";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -25,7 +24,7 @@
             url: "{{ $fetchUrl }}",
             method: 'GET',
             dataType: 'json',
-            success: function(data) {
+            success: function (data) {
                 const ctx = document.getElementById('topUsersChart').getContext('2d');
 
                 if (topUsersChart) {
