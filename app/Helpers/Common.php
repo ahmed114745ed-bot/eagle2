@@ -1192,7 +1192,7 @@ class Common
         $AppId = self::zegoData('zego_app_id');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-     //   $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        //   $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
         $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
 
         $signature = md5($str);
@@ -1434,10 +1434,12 @@ class Common
 
             $client           = new Client();
             $url              = 'https://rtc-api.zego.im';
-            $AppId            = self::getConf('zego_app_id');
+            //   $AppId            = self::getConf('zego_app_id');
+            $AppId            = self::zegoData('zego_app_id');
             $SignatureNonce   = self::getSignatureNonce();
             $Timestamp        = time();
-            $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+            //  $str              = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+            $str              = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
             $signature        = md5($str);
             $SignatureVersion = '2.0';
             $params           = [
@@ -1524,7 +1526,7 @@ class Common
                 'zego_app_sign'      =>  '',
             ];
         } elseif ($sounZego == '1' || $vedioZego == '1') {
-          
+
             $zegoData = [
                 'zego_app_id'        =>  $zego_app_id ?? '',
                 'zego_server_secret' => $zego_server_secret ?? '',
