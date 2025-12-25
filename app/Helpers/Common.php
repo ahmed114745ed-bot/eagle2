@@ -1188,10 +1188,13 @@ class Common
         $client = new Client();
 
         $url = 'https://rtc-api.zego.im';
-        $AppId = self::getConf('zego_app_id');
+        // $AppId = self::getConf('zego_app_id');
+        $AppId = self::zegoData('zego_app_id');
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
-        $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+     //   $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
+        $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
