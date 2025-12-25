@@ -67,8 +67,8 @@
                         ['uri' => '/', 'icon' => '🏠', 'title' => __('Home')],
                         ['uri' => '/charges', 'icon' => '💸', 'title' => __('charges')],
                         ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('agencies')],
-                        ['uri' => '/salaries', 'icon' => 'fa-building', 'title' => __('salaries')],
-                        ['uri' => '/request-agencies', 'icon' => 'fa-building', 'title' => __('request-agencies')],
+                        ['uri' => '/salaries', 'icon' => '💰', 'title' => __('salaries')],
+                        ['uri' => '/request-agencies', 'icon' => '📝', 'title' => __('request-agencies')],
                     ];
                 @endphp
 
@@ -223,31 +223,31 @@
             @if (in_array(Admin::user()->type, ['area-manager', 'sub_area_manager']) )
                 @php
                     $areaManagerLinks = [
-                        ['uri' => '/', 'icon' => '', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-users',
+                            'icon' => '🌍',
                             'title' => __('Super Admin'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
+                                ['uri' => '/superadmin-users', 'icon' => '👤', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                             ],
                         ],
                         ['uri' => '/charges', 'icon' => '💸', 'title' => __('charges'), 'permission' => 'coin-recharge'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-briefcase',
+                            'icon' => '💼',
                             'title' => __('BD'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
-                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ['uri' => '/user-Bds', 'icon' => '👥', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => '✈️', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
                             ],
                         ],
                         ['uri' => '/users', 'icon' => '👥', 'title' => __('Users'), 'permission' => 'users'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'permission' => null,
                             'children' => [
@@ -259,7 +259,7 @@
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏠',
                             'title' => __('rooms'),
                             'permission' => null,
                             'children' => [
@@ -278,12 +278,12 @@
                         ],
                         [
                             'uri' => '#',
-                            'icon' => '',
+                            'icon' => '👔',
                             'title' => __('Employees and Permissions'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/roles', 'icon' => '', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth-users', 'icon' => '', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ['uri' => '/roles', 'icon' => '🔐', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth-users', 'icon' => '👥', 'title' => __('users'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
@@ -362,12 +362,12 @@
                 @php
                     $superadminPreviewLinks = [
                         ['uri' => '/superadmin/statistics','icon' => '🏠','title' => __('Dashboard')],
-                        ['uri' => '/superadmin/profile','icon' => '','title' => __('Super Admin Profile')],
+                        ['uri' => '/superadmin/profile','icon' => '👤','title' => __('Super Admin Profile')],
                         ['uri' => '/users','icon' => '👥','title' => __('Users')],
                         ['uri' => '/usersBd','icon' => '💼','title' => __('BD')],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'children' => [
                                 ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('Host Agencies')],
@@ -425,31 +425,31 @@
             @elseif(session('preview_area_manager'))
                 @php
                     $areaManagerPreviewLinks = [
-                        ['uri' => '/', 'icon' => '', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-users',
+                            'icon' => '🌍',
                             'title' => __('Super Admin'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
+                                ['uri' => '/superadmin-users', 'icon' => '👤', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                             ],
                         ],
-                        ['uri' => '/area-manager-charges-reports', 'icon' => 'fa-building', 'title' => __('charges')],
+                        ['uri' => '/area-manager-charges-reports', 'icon' => '📃', 'title' => __('charges')],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-briefcase',
+                            'icon' => '💼',
                             'title' => __('BD'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
-                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ['uri' => '/user-Bds', 'icon' => '👥', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => '✈️', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
                             ],
                         ],
                         ['uri' => '/users', 'icon' => '👥', 'title' => __('Users'), 'permission' => 'users'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'permission' => null,
                             'children' => [
@@ -461,7 +461,7 @@
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏠',
                             'title' => __('rooms'),
                             'permission' => null,
                             'children' => [
@@ -475,17 +475,17 @@
                             'title' => __('Advertisements'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/official_msgs', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                ['uri' => '/official_msgs', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => '',
+                            'icon' => '👔',
                             'title' => __('Employees and Permissions'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/auth/roles', 'icon' => '', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth/users', 'icon' => '', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ['uri' => '/auth/roles', 'icon' => '🔐', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth/users', 'icon' => '👥', 'title' => __('users'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
