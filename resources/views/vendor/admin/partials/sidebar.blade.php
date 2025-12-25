@@ -3,7 +3,7 @@
 <script src="{{ asset('js/admin-menu.js') }}"></script></section>
     <section class="sidebar">
 
-    
+
 
         @if(config('admin.enable_menu_search'))
             <!-- search form (Optional) -->
@@ -478,7 +478,7 @@
             @endif
         </ul>
 
-    
+
     </section>
 
     <style>

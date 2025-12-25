@@ -3,7 +3,7 @@
     :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
         --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
-        --green-color: green;
+        --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
         --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
         --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};

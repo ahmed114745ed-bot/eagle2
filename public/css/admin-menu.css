@@ -568,9 +568,9 @@
     right: -2px;
     width: 8px;
     height: 8px;
-    background: var(--green-color);
+    background: var(--green-color) !important;
     border-radius: 50%;
-    box-shadow: 0 0 6px var(--green-color);
+    box-shadow: 0 0 6px var(--green-color) !important;
 }
 /* small screens tweak */
 @media (max-width: 640px){

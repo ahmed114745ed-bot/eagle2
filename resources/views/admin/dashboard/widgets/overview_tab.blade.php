@@ -251,11 +251,24 @@
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-<script>
+@php
+    if (request()->is('superadmin*')) {
+        $prefix = 'superadmin';
+    } elseif (request()->is('areaManager*')) {
+        $prefix = 'areaManager';
+    } else {
+        $prefix = 'admin';
+    }
+@endphp
 
+<script>
+    const routePrefix = "{{ $prefix }}";
+</script>
+
+<script>
 function loadWalletLogs() {
     $.ajax({
-        url: "{{ route('admin.wallet-logs.ajax') }}",
+        url: `/${routePrefix}/wallet-logs/ajax`,
         type: "GET",
         dataType: "json",
         success: function(response) {
@@ -284,7 +297,7 @@ function loadWalletLogs() {
                             <td>${log.id}</td>
 
                             <td>
-                                <a href="/admin/users/${log.user_id}"
+                                <a href="/${routePrefix}/users/${log.user_id}"
                                 style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
                                     <img src="${log.img}" alt="${log.user_name}"
                                         style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -374,7 +387,7 @@ function renderStatusBadge(status) {
 async function loadFinanceCards() {
     try {
         const { from, to } = getFilters();
-        const res = await fetch(`/admin/dashboard/finance/cards?from=${from}&to=${to}`);
+        const res = await fetch(`/${routePrefix}/dashboard/finance/cards?from=${from}&to=${to}`);
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         Object.keys(data).forEach(key => {
@@ -395,7 +408,7 @@ async function loadFinanceTables() {
     const topUsersContainer = document.getElementById('topUsersContainer');
 
     try {
-        const res = await fetch('/admin/dashboard/finance/tables');
+        const res = await fetch(`/${routePrefix}/dashboard/finance/tables`);
         console.log('Finance tables API status:', res.status);
        const defaultAvatar = "{{ asset('images/businessman-icon.jpg') }}";
 
@@ -423,7 +436,7 @@ async function loadFinanceTables() {
                 <tr>
                     <td>#${w.id}</td>
                     <td>
-                        <a href="/admin/users/${w.user_id}" target="_blank"
+                        <a href="/${routePrefix}/users/${w.user_id}" target="_blank">
                         style="display:flex; align-items:center; gap:10px; text-decoration:none; color:inherit;">
                             <img src="${w.img || '/images/default-avatar.png'}" alt="${w.user_name}"
                                 style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
@@ -458,7 +471,7 @@ async function loadFinanceTables() {
         topUsersContainer.innerHTML = `
             <div class="top-row" style="display: flex; justify-content: center; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
                 ${topRow.map(u => `
-                    <a href="/admin/users/${u.id}" style="text-decoration: none; color: inherit; flex: 0 0 calc(${100 / topRow.length}% - 10px);">
+                    <a href="/${routePrefix}/users/${u.id}">
                         <div class="user-card">
                             <img src="${u.avatar}" alt="${u.name}" onerror="this.src='/images/default-avatar.png'">
                             <div class="user-name">${u.name}</div>
@@ -530,7 +543,7 @@ function renderShipmentsChart(canvasId, labels=[], values=[]) {
 async function loadFinanceChart() {
     try {
         const { from, to, days } = getFilters();
-        const res = await fetch(`/admin/dashboard/finance/chart?from=${from}&to=${to}&days=${days}`);
+        const res = await fetch(`/${routePrefix}/dashboard/finance/chart?from=${from}&to=${to}&days=${days}`);
         if(!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         const labels = Array.from(data.labels ?? []);
