@@ -1620,7 +1620,7 @@
     }
 
     .sidebar-mini.sidebar-collapse .main-header .logo {
-        width: 5.5% !important;
+        width: 5.4% !important;
         height: 75% !important;
     }
 
