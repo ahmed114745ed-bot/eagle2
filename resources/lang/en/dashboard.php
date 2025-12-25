@@ -10,6 +10,23 @@ return [
     'login.language.switch' => 'الانتقال إلى',
     'login.language.lang'   => 'اللغة العربية',
     'login.titleAreaManager' => 'Login area manger dashboard',
+    'login' => [
+        'title' => 'Welcome back!',
+        'subtitle' => 'Sign in to access your dashboard',
+        'features' => [
+            'secure' => 'Secure, encrypted login',
+            'fast' => 'Fast access to all features',
+            'global' => 'Manage everything from anywhere',
+        ],
+        'form_title' => 'Sign in',
+        'form_subtitle' => 'Enter your details to continue',
+        'username_placeholder' => 'Enter your username',
+        'remember' => 'Remember me',
+        'forgot' => 'Forgot password?',
+        'reset' => 'Reset your password',
+        'or' => 'OR',
+        'loading' => 'Signing in...'
+    ],
 
     'online'                => 'Online',
     'login'                 => 'Login',
