@@ -1620,8 +1620,12 @@
     }
 
     .sidebar-mini.sidebar-collapse .main-header .logo {
-        width: 5.4% !important;
+        width: 5.3% !important;
         height: 75% !important;
+    }
+
+    .rtl .sidebar-mini.sidebar-collapse .main-header .logo {
+        width: 5.4% !important;
     }
 
     .sidebar-mini.sidebar-collapse .main-sidebar {
