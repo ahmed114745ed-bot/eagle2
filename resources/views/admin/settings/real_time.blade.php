@@ -51,21 +51,21 @@
                     </div>
                 </form>
 
-                  <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
+                           <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
                                 @csrf
                                 <!-- Zego Fields -->
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0">{{ __('zego token') }}</h4>
+                                            <h4 class="m-0">{{ __('utd zego token') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('zego token') }}:</label>
+                                                        for="zego_server_secret">{{ __('utd zego token') }}:</label>
                                                     <input type="text" id="zego_server_secret"
                                                         name="zego_token" placeholder="server_secret"
                                                         value="{{ $zego_token }}" class="form-control"
@@ -175,7 +175,7 @@
         <div class="form">
             <label class="d-block">{{ __('Sound System Setting:') }}</label>
             <div class="row mt-4">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                         <div class="d-flex align-items-center">
@@ -187,7 +187,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                         <div class="d-flex align-items-center">
@@ -199,7 +199,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                
+
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                         <div class="d-flex align-items-center">
@@ -207,6 +209,18 @@
                                    name="sound_library"
                                    value="2" {{ $soundLibrary == '2' ? 'checked' : '' }}>
                             <label for="tencentSoundRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdZegoSoundRadio" class="custom-radio libraryRealTime"
+                                   name="sound_library"
+                                   value="3" {{ $soundLibrary == '3' ? 'checked' : '' }}>
+                            <label for="utdZegoSoundRadio" class="switch"></label>
                         </div>
                     </div>
                 </div>
@@ -219,7 +233,7 @@
         <div class="form">
             <label class="d-block">{{ __('Video System Setting:') }}</label>
             <div class="row mt-4">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                         <div class="d-flex align-items-center">
@@ -231,7 +245,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                         <div class="d-flex align-items-center">
@@ -243,7 +257,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                         <div class="d-flex align-items-center">
@@ -251,6 +265,18 @@
                                    name="video_library"
                                    value="2" {{ $videoLibrary == '2' ? 'checked' : '' }}>
                             <label for="tencentVideoRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdZegoVideoRadio" class="custom-radio libraryRealTime"
+                                   name="video_library"
+                                   value="3" {{ $videoLibrary == '3' ? 'checked' : '' }}>
+                            <label for="utdZegoVideoRadio" class="switch"></label>
                         </div>
                     </div>
                 </div>
