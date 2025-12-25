@@ -43,16 +43,16 @@ jobs:
         script: |
           cd /var/www/5live
           pwd
-          docker build -t 5live:${{ github.sha }} .
-          docker service update --image 5live:${{ github.sha }} 5live-app
+          docker build -t 5live:${{ github.sha }} -f Dockerfile-octan .
+          docker service update --image 5live:${{ github.sha }} 5live-octa
           
           # Get first container ID of the service
-          CONTAINER_ID=$(docker ps --filter "name=5live-app.1" --format "{{.ID}}" | head -n 1)
+          CONTAINER_ID=$(docker ps --filter "name=5live-octa.1" --format "{{.ID}}" | head -n 1)
           # Run artisan command inside that container
           if [ -n "$CONTAINER_ID" ]; then
             docker exec  $CONTAINER_ID php artisan whatsapp:change-token
           else
-            echo "No running container found for 5live-app service"
+            echo "No running container found for 5live-octa service"
             exit 1
           fi
 
