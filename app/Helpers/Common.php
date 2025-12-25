@@ -1523,7 +1523,13 @@ class Common
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
-
+       
+         Log::info('ZEGO | zego config values', [
+                'zego_token' => $zego_token,
+                'sounZego' => $sounZego,
+                'vedioZego' => $vedioZego,
+            ]);
+        
         if ((!$zego_token && !$zegoClientId) || ($sounZego == '3' || $vedioZego == '3')) {
              Log::info(33333);
             $zegoData = [
