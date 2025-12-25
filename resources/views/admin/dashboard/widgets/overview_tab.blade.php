@@ -268,7 +268,7 @@
 <script>
 function loadWalletLogs() {
     $.ajax({
-        url: `/${routePrefix}/wallet-logs/ajax`,
+        url: `/${routePrefix}/dashboard/wallet-logs/ajax`,
         type: "GET",
         dataType: "json",
         success: function(response) {
