@@ -10,6 +10,23 @@ return [
     'login.language.switch' => 'Switch to',
     'login.language.lang' => 'English',
     'login.titleAreaManager' => 'تسجيل الدخول إلى لوحة تحكم مدير المنطقة',
+    'login' => [
+        'title' => 'مرحباً بك!',
+        'subtitle' => 'سجل دخولك للوصول إلى لوحة التحكم الخاصة بك',
+        'features' => [
+            'secure' => 'تسجيل دخول آمن ومشفّر',
+            'fast' => 'وصول سريع لجميع الميزات',
+            'global' => 'إدارة شاملة من أي مكان',
+        ],
+        'form_title' => 'تسجيل الدخول',
+        'form_subtitle' => 'أدخل بياناتك للوصول إلى حسابك',
+        'username_placeholder' => 'أدخل اسم المستخدم',
+        'remember' => 'حفظ بيانات الدخول',
+        'forgot' => 'نسيت كلمة المرور؟',
+        'reset' => 'إعادة تعيين كلمة المرور',
+        'or' => 'أو',
+        'loading' => 'جاري تسجيل الدخول...'
+    ],
 
     'online'                => 'متصل',
     'login'                 => 'تسجيل الدخول',
