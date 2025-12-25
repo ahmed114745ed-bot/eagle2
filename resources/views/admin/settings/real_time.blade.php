@@ -51,6 +51,34 @@
                     </div>
                 </form>
 
+                  <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
+                                method="POST">
+                                @csrf
+                                <!-- Zego Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('zego token') }}</h4>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('zego token') }}:</label>
+                                                    <input type="text" id="zego_server_secret"
+                                                        name="zego_token" placeholder="server_secret"
+                                                        value="{{ $zego_token }}" class="form-control"
+                                                        required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                    </div>
+                                </div>
+                            </form>
+
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
                     <div class="col-md-6 mb-3 ms-0 me-auto">
