@@ -1519,8 +1519,8 @@ class Common
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
-       
-        if ((!$zego_token && !$zegoClientId)|| ($sounZego == '3' || $vedioZego == '3')) {
+
+        if ((!$zego_token && !$zegoClientId) || ($sounZego == '3' || $vedioZego == '3')) {
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
@@ -1533,7 +1533,7 @@ class Common
                 'zego_server_secret' => $zego_server_secret ?? '',
                 'zego_app_sign'      =>  $app_sign ?? '',
             ];
-           // dd($zegoData);
+            // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
 
@@ -1542,6 +1542,12 @@ class Common
                 'zego_server_secret' => $data['server_secret'] ?? '',
                 'zego_app_sign'      => $data['app_sign'] ?? '',
             ];
+            Log::info('ZEGO | mapped zego data', [
+                'zegoData' => $zegoData,
+            ]);
+            Log::info('secret key', [
+                'zego_token' => $zegoClientId,
+            ]);
         }
 
 
