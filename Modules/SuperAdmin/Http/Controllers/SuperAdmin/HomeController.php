@@ -3,6 +3,8 @@
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
 use App\Models\Bd;
+use App\Models\Charge;
+use App\Models\CoinLog;
 use App\Models\GameChargeHistory;
 use App\Models\GameWallet;
 use Carbon\Carbon;
@@ -13,6 +15,7 @@ use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
+use Carbon\CarbonPeriod;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,6 +25,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Chat\Entities\ChatMessage;
 use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
+use Modules\UsersWallet\Entities\WalletLog;
 
 class HomeController extends  MainController
 {
@@ -741,4 +745,219 @@ class HomeController extends  MainController
             ], 500);
         }
     }
+
+    public function financeCards(Request $request)
+    {
+        $countryID = $this->countryId();
+
+        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->startOfDay();
+        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
+
+        $result = UserSallary::whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->selectRaw('
+            SUM(pending_dollar) as total_dollars,
+            SUM(agency_sallary) as total_agency_dollars,
+            SUM(sallary) as total_user_dollars
+        ')
+            ->first();
+
+        $totalDollars = $result->total_dollars ?? 0;
+        $totalAgencyDollars = $result->total_agency_dollars ?? 0;
+        $totalUserDollars = $result->total_user_dollars ?? 0;
+
+        $totalTargets = $totalDollars + $totalAgencyDollars + $totalUserDollars;
+
+        $totalCharges = Charge::whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum('usd');
+
+        $totalPayments = CoinLog::whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum('obtained_coins');
+
+        $totalGiftsValue = GiftLog::whereHas('sender', fn($q) => $q->where('country_id', $countryID))
+            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum(\DB::raw('giftPrice * giftNum'));
+
+        $rate = Common::getCoinsValue('user_coins');
+        $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
+
+        return response()->json([
+            'total_balance' => $totalTargets,
+            'pending_balance' => $totalCharges,
+            'available_balance' => $totalPayments,
+            'today_balance' => $totalGiftsUsd
+        ]);
+    }
+
+    public function financeTables(Request $request)
+    {
+        $countryID = $this->countryId();
+
+        $payments = CoinLog::with('coin.paymentGateway')
+            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->whereIn('status', [1, 2])
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'gateway' => $p->coin->paymentGateway->title ?? '',
+                'amount' => $p->obtained_coins,
+                'status' => $p->status,
+                'date' => Carbon::parse($p->created_at)->format('Y-m-d')
+            ]);
+
+        $withdrawals = WalletLog::with('user.profile')
+            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->where('operation', 'subtract')
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(function ($w) {
+                $defaultImage = asset('images/businessman-icon.jpg');
+                $path = $w->user->profile?->avatar ?? null;
+                $url = $path ? getImagePath($path) : $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return [
+                    'id' => $w->id,
+                    'user_name' => $w->user->name ?? '',
+                    'uuid' => $w->user->uuid ?? '',
+                    'user_id' => $w->user_id,
+                    'img' => $url,
+                    'amount' => $w->amount,
+                    'type' => $w->type,
+                    'date' => $w->created_at->format('Y-m-d')
+                ];
+            });
+
+        $topUsers = DB::table('charges')
+            ->join('users', 'charges.user_id', '=', 'users.id')
+            ->where('users.country_id', $countryID)
+            ->where('charges.user_type', 'user')
+            ->select('charges.user_id', DB::raw('SUM(charges.usd) as total_usd'), DB::raw('MAX(charges.created_at) as last_charge'))
+            ->groupBy('charges.user_id')
+            ->orderByDesc('total_usd')
+            ->limit(5)
+            ->get();
+
+        $users = $topUsers->map(function ($u) {
+            $user = User::find($u->user_id);
+
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $path = $user->profile?->avatar ?? null;
+            $url = $path ? getImagePath($path) : $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return [
+                'id' => $u->user_id,
+                'name' => $user->name ?? 'غير معروف',
+                'uuid' => $user->uuid ?? 'غير معروف',
+                'avatar' => $url,
+                'total_usd' => $u->total_usd,
+                'last_charge' => $u->last_charge,
+            ];
+        });
+
+        return response()->json([
+            'payments' => $payments,
+            'withdrawals' => $withdrawals,
+            'topUsers' => $users
+        ]);
+    }
+
+    public function financeChartIndex(Request $request)
+    {
+        $countryID = $this->countryId();
+
+        $days = (int)$request->query('days', 7);
+
+        $to = $request->filled('to')
+            ? Carbon::parse($request->query('to'))->endOfDay()
+            : now()->endOfDay();
+
+        $from = $request->filled('from')
+            ? Carbon::parse($request->query('from'))->startOfDay()
+            : $to->copy()->subDays($days - 1)->startOfDay();
+
+        $period = CarbonPeriod::create($from, $to);
+
+        $values = array_fill_keys(
+            array_map(fn($d) => $d->format('Y-m-d'), iterator_to_array($period)),
+            0
+        );
+
+        $charges = Charge::whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->selectRaw('DATE(created_at) as date, SUM(usd) as total')
+            ->whereBetween('created_at', [$from, $to])
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date')
+            ->pluck('total', 'date')
+            ->toArray();
+
+        foreach ($charges as $date => $total) {
+            $values[$date] = (float)$total;
+        }
+
+        $labels = array_map(
+            fn($d) => Carbon::parse($d)->format($days === 7 ? 'D' : 'd M'),
+            array_keys($values)
+        );
+
+        return response()->json([
+            'labels' => $labels,
+            'values' => array_values($values),
+        ]);
+    }
+
+    public function ajaxWalletLogs(Request $request)
+    {
+        $countryID = $this->countryId();
+
+        $logs = WalletLog::with('user.profile')
+            ->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            ->whereIn('operation', ['add', 'cut'])
+            ->orderBy('created_at', 'desc')
+            ->take(8)
+            ->get();
+
+        return response()->json([
+            'data' => $logs->map(function ($log) {
+                $defaultImage = asset('images/businessman-icon.jpg');
+                $path = $log->user->profile?->avatar ?? null;
+                $url = $path ? getImagePath($path) : $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return [
+                    'id' => $log->id,
+                    'user_name' => $log->user ? $log->user->name : '-',
+                    'user_id' => $log->user ? $log->user->id : '-',
+                    'user_uuid' => $log->user ? $log->user->uuid : '-',
+                    'img' => $url,
+                    'amount' => $log->amount,
+                    'operation' => $log->operation,
+                    'type' => $log->type,
+                    'before_amount' => $log->before_amount,
+                    'after_amount' => $log->after_amount,
+                    'created_at' => $log->created_at->format('Y-m-d H:i'),
+                ];
+            }),
+        ]);
+    }
+
 }
