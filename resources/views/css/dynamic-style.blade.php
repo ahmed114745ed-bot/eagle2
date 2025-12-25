@@ -2770,6 +2770,10 @@
         border-top-color: var(--secondary-color) !important;
     }
 
+    .data-table tr:hover {
+        background: var(--off-white);
+    }
+
     .stats-container .info-box {
         background: linear-gradient(135deg,
         #667eea 0%,
