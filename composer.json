@@ -37,7 +37,7 @@
         "laravel-admin-ext/media-player": "^1.1",
         "laravel-admin-extensions/multi-language": "^0.0.6",
         "laravel/framework": "^10.0",
-        "laravel/sanctum": "^3.2",
+        "laravel/sanctum": "^3.3.3",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
         "mockery/mockery": "^1.6",
