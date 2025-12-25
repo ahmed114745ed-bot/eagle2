@@ -325,7 +325,6 @@ function loadWalletLogs() {
         error: function(xhr, status, error) {
             console.error("AJAX Error:", status, error);
             console.log("Response:", xhr.responseText);
-            alert("حدث خطأ أثناء جلب البيانات. تحقق من الكونسول.");
         }
     });
 }
