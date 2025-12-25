@@ -63,52 +63,20 @@ class EnteranceController extends Controller
         return $this->enteranceRoomService->updateRoomCountFromZego2($request);
     }
 
-    public function libraryAgoraZego()
-    {
-        $agora_app_id = Common::getConfig('app_id');
-        $zego_server_secret = Common::getConfig('zego_server_secret');
-        $zego_app_id = Common::getConfig('zego_app_id');
-        $app_sign = Common::getConfig('app_sign');
-        $library = Common::getConfig('video_library');
-        $liveLibrary = (int) Common::getConfig('live_library');
-        $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
-        $is_auto_preview = (int) Common::getConfig('is_auto_preview');
-
-
-        $libraries = ['agora', 'zego', 'tencent'];
-        $liveTypes = ['RTC', 'CDN', 'L3' ];
-
-        $data = [
-            'agora_app_id' => $agora_app_id,
-            'zego' => [
-                'server_secret' => $zego_server_secret,
-                'app_id' => $zego_app_id,
-                'app_sign' => $app_sign,
-                'filter' => $zego_filter_enabled == 1 ? true : false,
-                'live_type' => $liveTypes[@$liveLibrary ?? 0]
-            ],
-            'library' => $libraries[$library],
-            'is_auto_preview' => $is_auto_preview == 1 ? true : false,
-
-
-        ];
-        return Common::apiResponse(1, '', $data);
-    }
-
     // public function libraryAgoraZego()
     // {
     //     $agora_app_id = Common::getConfig('app_id');
-    //     $zego_server_secret = Common::zegoData('zego_server_secret');
-    //     $zego_app_id = Common::zegoData('zego_app_id');
-    //     $app_sign = Common::zegoData('zego_app_sign');
+    //     $zego_server_secret = Common::getConfig('zego_server_secret');
+    //     $zego_app_id = Common::getConfig('zego_app_id');
+    //     $app_sign = Common::getConfig('app_sign');
     //     $library = Common::getConfig('video_library');
     //     $liveLibrary = (int) Common::getConfig('live_library');
     //     $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
     //     $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
 
-    //     $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
-    //     $liveTypes = ['RTC', 'CDN', 'L3'];
+    //     $libraries = ['agora', 'zego', 'tencent'];
+    //     $liveTypes = ['RTC', 'CDN', 'L3' ];
 
     //     $data = [
     //         'agora_app_id' => $agora_app_id,
@@ -126,6 +94,38 @@ class EnteranceController extends Controller
     //     ];
     //     return Common::apiResponse(1, '', $data);
     // }
+
+    public function libraryAgoraZego()
+    {
+        $agora_app_id = Common::getConfig('app_id');
+        $zego_server_secret = Common::zegoData('zego_server_secret');
+        $zego_app_id = Common::zegoData('zego_app_id');
+        $app_sign = Common::zegoData('zego_app_sign');
+        $library = Common::getConfig('video_library');
+        $liveLibrary = (int) Common::getConfig('live_library');
+        $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+        $is_auto_preview = (int) Common::getConfig('is_auto_preview');
+
+
+        $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
+        $liveTypes = ['RTC', 'CDN', 'L3'];
+
+        $data = [
+            'agora_app_id' => $agora_app_id,
+            'zego' => [
+                'server_secret' => $zego_server_secret,
+                'app_id' => $zego_app_id,
+                'app_sign' => $app_sign,
+                'filter' => $zego_filter_enabled == 1 ? true : false,
+                'live_type' => $liveTypes[@$liveLibrary ?? 0]
+            ],
+            'library' => $libraries[$library],
+            'is_auto_preview' => $is_auto_preview == 1 ? true : false,
+
+
+        ];
+        return Common::apiResponse(1, '', $data);
+    }
 
 
     public function checkSignature($secert, $signature, $timestamp, $nonce)
