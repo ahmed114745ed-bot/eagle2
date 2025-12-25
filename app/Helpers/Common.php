@@ -1512,10 +1512,10 @@ class Common
     public static function zegoData($key = null)
     {
         Log::info(111111);
-        $zegoClientId = config('app.zego_client_id') ?? env('ZEGO_CLIENT_ID');
+        $zegoClientId = env('ZEGO_CLIENT_ID') ?? config('app.zego_client_id');
         Log::info('secret key', [
-                'env client zego id' => $zegoClientId,
-            ]);
+            'env client zego id' => $zegoClientId,
+        ]);
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
@@ -1523,22 +1523,22 @@ class Common
         $zego_server_secret = Common::getConfig('zego_server_secret');
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
-       
-         Log::info('ZEGO | zego config values', [
-                'zego_token' => $zego_token,
-                'sounZego' => $sounZego,
-                'vedioZego' => $vedioZego,
-            ]);
-        
+
+        Log::info('ZEGO | zego config values', [
+            'zego_token' => $zego_token,
+            'sounZego' => $sounZego,
+            'vedioZego' => $vedioZego,
+        ]);
+
         if ((!$zego_token && !$zegoClientId) && ($sounZego === '3' && $vedioZego === '3')) {
-             Log::info(33333);
+            Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
                 'zego_app_sign'      =>  '',
             ];
         }
-        
+
         if ($sounZego == '1' || $vedioZego == '1') {
 
             $zegoData = [
@@ -1549,7 +1549,7 @@ class Common
             // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
-               Log::info(66666666666);
+            Log::info(66666666666);
             $zegoData = [
                 'zego_app_id'        => $data['app_id'] ?? '',
                 'zego_server_secret' => $data['server_secret'] ?? '',
