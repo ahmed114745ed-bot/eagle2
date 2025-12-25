@@ -97,6 +97,7 @@ class EnteranceController extends Controller
 
      public function libraryAgoraZego()
     {
+     
         $agora_app_id = Common::getConfig('app_id');
         $zego_server_secret = Common::zegoData('zego_server_secret');
         $zego_app_id = Common::zegoData('zego_app_id');
@@ -107,7 +108,7 @@ class EnteranceController extends Controller
         $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
 
-        $libraries = ['agora', 'zego', 'tencent'];
+        $libraries = ['agora', 'zego', 'tencent','utd zego'];
         $liveTypes = ['RTC', 'CDN', 'L3' ];
 
         $data = [
