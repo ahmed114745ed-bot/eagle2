@@ -240,7 +240,9 @@ body.login-body {
 }
 
 @media (max-width: 640px) {
-    body.login-body { padding: 16px; }
+    body.login-body { 
+        /* padding: 16px; */
+     }
     .login-container { min-height: 520px; border-radius: 18px; }
     .form-side { padding: 30px 20px; }
     .branding-side { padding: 30px 20px; }
