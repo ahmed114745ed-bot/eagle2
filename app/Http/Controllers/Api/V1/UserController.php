@@ -818,62 +818,62 @@ class UserController extends Controller
         return Common::apiResponse(1, 'account deleted successfully');
     }
 
-    // public function zegoCredential()
-    // {
-    //     $ZegoEncreyptkey = config('app.zego_credential');
-    //     $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
-    //     $data = $keys->mapWithKeys(function ($item) {
-    //         return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
-    //     });
-    //     // dd($data);
-    //     $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
-
-    //     return Common::apiResponse(1, '', $encryptedData);
-    // }
-
-
-
     public function zegoCredential()
     {
         $ZegoEncreyptkey = config('app.zego_credential');
-
-        // youtube key
-        $keys = Common::getConfFromKey(['youtube_key']);
-
+        $keys = Common::getConfFromKey(['app_sign', 'zego_app_id', 'youtube_key']);
         $data = $keys->mapWithKeys(function ($item) {
-            return [$item['name'] => $item['value']];
+            return [$item['name'] => $item['name'] == 'zego_app_id' ? (int)$item['value'] : $item['value']];
         });
-
-        // zego data
-        $zegoKeys = Common::zegoData();
-
-        $zegoData = [
-            'zego_app_id' => isset($zegoKeys['zego_app_id'])
-                ? (int) $zegoKeys['zego_app_id']
-                : null,
-
-            'app_sign' => $zegoKeys['zego_app_sign'] ?? null,
-        ];
-
-        // merge AS COLLECTION (this is the key line 🔥)
-        $data = collect($zegoData)
-            ->filter(fn($v) => !is_null($v))
-            ->merge($data);
-
-        // ✅ SAME AS OLD
-        // dd($data); // Illuminate\Support\Collection
-
-        // encryption STILL needs string
-        $encryptedData = openssl_encrypt(
-            $data,   // ← REQUIRED
-            'AES-256-CBC',
-            $ZegoEncreyptkey,
-            0,
-            substr($ZegoEncreyptkey, 0, 16)
-        );
+        // dd($data);
+        $encryptedData = openssl_encrypt($data, 'AES-256-CBC', $ZegoEncreyptkey, 0, substr($ZegoEncreyptkey, 0, 16));
 
         return Common::apiResponse(1, '', $encryptedData);
     }
+
+
+
+    // public function zegoCredential()
+    // {
+    //     $ZegoEncreyptkey = config('app.zego_credential');
+
+    //     // youtube key
+    //     $keys = Common::getConfFromKey(['youtube_key']);
+
+    //     $data = $keys->mapWithKeys(function ($item) {
+    //         return [$item['name'] => $item['value']];
+    //     });
+
+    //     // zego data
+    //     $zegoKeys = Common::zegoData();
+
+    //     $zegoData = [
+    //         'zego_app_id' => isset($zegoKeys['zego_app_id'])
+    //             ? (int) $zegoKeys['zego_app_id']
+    //             : null,
+
+    //         'app_sign' => $zegoKeys['zego_app_sign'] ?? null,
+    //     ];
+
+    //     // merge AS COLLECTION (this is the key line 🔥)
+    //     $data = collect($zegoData)
+    //         ->filter(fn($v) => !is_null($v))
+    //         ->merge($data);
+
+    //     // ✅ SAME AS OLD
+    //     // dd($data); // Illuminate\Support\Collection
+
+    //     // encryption STILL needs string
+    //     $encryptedData = openssl_encrypt(
+    //         $data,   // ← REQUIRED
+    //         'AES-256-CBC',
+    //         $ZegoEncreyptkey,
+    //         0,
+    //         substr($ZegoEncreyptkey, 0, 16)
+    //     );
+
+    //     return Common::apiResponse(1, '', $encryptedData);
+    // }
 
 
 
