@@ -1530,7 +1530,7 @@ class Common
                 'vedioZego' => $vedioZego,
             ]);
         
-        if ((!$zego_token && !$zegoClientId) || ($sounZego == '3' || $vedioZego == '3')) {
+        if ((!$zego_token && !$zegoClientId) || ($sounZego === '3' || $vedioZego === '3')) {
              Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
