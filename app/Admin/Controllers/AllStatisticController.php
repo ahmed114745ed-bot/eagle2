@@ -783,19 +783,16 @@ class AllStatisticController extends MainController
 
     public function financeCards(Request $request)
     {
-        $countries = $this->countries();
-
         $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->startOfDay();
-        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->endOfDay();
+        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->startOfDay();
 
-        $result = UserSallary::whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
-            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+        $result = UserSallary::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->selectRaw('
-            SUM(pending_dollar) as total_dollars,
-            SUM(agency_sallary) as total_agency_dollars,
-            SUM(sallary) as total_user_dollars
-        ')
+                         SUM(pending_dollar) as total_dollars,
+                         SUM(agency_sallary) as total_agency_dollars,
+                         SUM(sallary) as total_user_dollars
+                     ')
             ->first();
 
         $totalDollars = $result->total_dollars ?? 0;
@@ -804,23 +801,20 @@ class AllStatisticController extends MainController
 
         $totalTargets = $totalDollars + $totalAgencyDollars + $totalUserDollars;
 
-        $totalCharges = Charge::whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
-            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+        $totalCharges = Charge::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->sum('usd');
 
-        $totalPayments = CoinLog::whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
-            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+        $totalPayments = CoinLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->sum('obtained_coins');
 
-        $totalGiftsValue = GiftLog::whereHas('sender', fn($q) => $q->whereIn('country_id', $countries))
-            ->when($from, fn($q) => $q->where('created_at', '>=', $from))
+        $totalGiftsValue = GiftLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
             ->when($to, fn($q) => $q->where('created_at', '<=', $to))
             ->sum(\DB::raw('giftPrice * giftNum'));
 
         $rate = Common::getCoinsValue('user_coins');
-        $totalGiftsUsd = $rate > 0 ? $totalGiftsValue / $rate : 0;
+        $totalGiftsUsd = $totalGiftsValue / $rate;
 
         return response()->json([
             'total_balance' => $totalTargets,
@@ -832,10 +826,7 @@ class AllStatisticController extends MainController
 
     public function financeTables(Request $request)
     {
-        $countries = $this->countries();
-
         $payments = CoinLog::with('coin.paymentGateway')
-            ->whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
             ->whereIn('status', [1, 2])
             ->latest()
             ->take(6)
@@ -845,12 +836,10 @@ class AllStatisticController extends MainController
                 'gateway' => $p->coin->paymentGateway->title ?? '',
                 'amount' => $p->obtained_coins,
                 'status' => $p->status,
-                'date' => Carbon::parse($p->created_at)->format('Y-m-d')
+                'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
             ]);
 
-        $withdrawals = WalletLog::with('user.profile')
-            ->whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
-            ->where('operation', 'subtract')
+        $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
             ->latest()
             ->take(8)
             ->get()
@@ -874,28 +863,28 @@ class AllStatisticController extends MainController
                     'date' => $w->created_at->format('Y-m-d')
                 ];
             });
+        \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
 
-        $topUsers = DB::table('charges')
-            ->join('users', 'charges.user_id', '=', 'users.id')
-            ->whereIn('users.country_id', $countries)
-            ->where('charges.user_type', 'user')
-            ->select('charges.user_id', DB::raw('SUM(charges.usd) as total_usd'), DB::raw('MAX(charges.created_at) as last_charge'))
-            ->groupBy('charges.user_id')
+
+        $topUsers = \DB::table('charges')
+            ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
+            ->where('user_type', 'user')
+            ->groupBy('user_id')
             ->orderByDesc('total_usd')
             ->limit(5)
             ->get();
 
         $users = $topUsers->map(function ($u) {
-            $user = User::find($u->user_id);
+            $user = \App\Models\User::find($u->user_id);
 
             $defaultImage = asset('images/businessman-icon.jpg');
-            $path = $user->profile?->avatar ?? null;
-            $url = $path ? getImagePath($path) : $defaultImage;
+            $path = $user->profile?->avatar;
+
+            $url = getImagePath($path) ?? $defaultImage;
 
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
-
             return [
                 'id' => $u->user_id,
                 'name' => $user->name ?? 'غير معروف',
@@ -905,7 +894,6 @@ class AllStatisticController extends MainController
                 'last_charge' => $u->last_charge,
             ];
         });
-
         return response()->json([
             'payments' => $payments,
             'withdrawals' => $withdrawals,
@@ -915,8 +903,6 @@ class AllStatisticController extends MainController
 
     public function financeChartIndex(Request $request)
     {
-        $countries = $this->countries();
-
         $days = (int)$request->query('days', 7);
 
         $to = $request->filled('to')
@@ -934,8 +920,7 @@ class AllStatisticController extends MainController
             0
         );
 
-        $charges = Charge::whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
-            ->selectRaw('DATE(created_at) as date, SUM(usd) as total')
+        $charges = Charge::selectRaw('DATE(created_at) as date, SUM(usd) as total')
             ->whereBetween('created_at', [$from, $to])
             ->groupByRaw('DATE(created_at)')
             ->orderBy('date')
@@ -959,10 +944,8 @@ class AllStatisticController extends MainController
 
     public function ajaxWalletLogs(Request $request)
     {
-        $countries = $this->countries();
 
         $logs = WalletLog::with('user.profile')
-            ->whereHas('user', fn($q) => $q->whereIn('country_id', $countries))
             ->whereIn('operation', ['add', 'cut'])
             ->orderBy('created_at', 'desc')
             ->take(8)
@@ -994,5 +977,4 @@ class AllStatisticController extends MainController
             }),
         ]);
     }
-
 }
