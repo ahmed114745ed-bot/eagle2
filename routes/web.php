@@ -1116,18 +1116,3 @@ Route::get('/run-lucky-gift-unit-test', function () {
 
 
 
-Route::get('/test-multi-language', function () {
-    $cookie_name = KevinSoft\MultiLanguage\MultiLanguage::config('cookie-name', 'locale');
-    $cookie_value = request()->cookie($cookie_name);
-    $default_locale = KevinSoft\MultiLanguage\MultiLanguage::config('default');
-    $languages = KevinSoft\MultiLanguage\MultiLanguage::config('languages');
-
-    return [
-        'current_locale' => app()->getLocale(),
-        'cookie_exists' => request()->hasCookie($cookie_name),
-        'cookie_value' => $cookie_value,
-        'default_locale' => $default_locale,
-        'languages_available' => $languages,
-        'request_path' => request()->path()
-    ];
-})->middleware('multiLanguage');
