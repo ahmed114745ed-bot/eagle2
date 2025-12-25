@@ -42,6 +42,9 @@
     .dark-mode .pagination > .disabled > span:focus,
     .dark-mode .pagination>li>a,
     .dark-mode .pagination > .disabled > span:hover,
+    .dark-mode .stat-card,
+    .dark-mode .table-section,
+    .dark-mode .empty-table,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -54,6 +57,8 @@
     .dark-mode .tab-content,
     .dark-mode .settings-sidebar,
     .dark-mode #landPageSettings,
+    .dark-mode .performers-card,
+    .dark-mode .section-box,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
     }
@@ -71,7 +76,8 @@
         color: unset !important;
     }
 
-    .dark-mode .box-header.with-border {
+    .dark-mode .box-header.with-border,
+    .dark-mode .section-header {
         border-bottom: 1px solid var(--white) !important;
     }
 
