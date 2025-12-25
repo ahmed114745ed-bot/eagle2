@@ -17,16 +17,20 @@
 
 body.login-body {
     font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     /* display: flex; */
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 45%, var(--accent-color) 100%);
     position: relative;
     /* overflow: hidden; */
-    padding: 15px;
+    /* padding: 15px; */
     color: var(--text-main);
+        box-sizing: border-box;
+
 }
+
+
 
 .bg-animation {
     position: absolute;
@@ -70,7 +74,7 @@ body.login-body {
     overflow: hidden;
     /* width: min(1040px, 95vw);
      */
-     width: 84%;
+     width: 70%;
      margin: auto;
     min-height: 620px;
     animation: slideUp 0.8s ease;
