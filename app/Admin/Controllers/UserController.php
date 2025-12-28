@@ -453,7 +453,6 @@ class UserController extends MainController
         $type = request('type') ?? 4;
         $agencyId = request('agency_id');
         $user = User::with([
-            'profile',
             'country',
             'senderLevel',
             'receiverLevel',
