@@ -292,7 +292,8 @@ trait CalcsTrait
 
         $star_level      = $user->total_received_level;
 
-        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+        $firstVip_type1          = $user->receiverLevel;
+       // self::vipByLevelAndType($star_level, 1);
 
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
@@ -307,7 +308,8 @@ trait CalcsTrait
         $gold_level             = $user->total_sender_level;
 
 
-        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+        $firstVip_type2          = $user->senderLevel;
+      //  self::vipByLevelAndType($gold_level, 2);
         $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
 
         $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
