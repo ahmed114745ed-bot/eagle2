@@ -149,19 +149,6 @@ class FormRequestController extends MainController
             $rejectText  = __('Reject');
             $viewText    = __('Preview');
 
-            // return <<<HTML
-            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //        <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
-            //             <i class="fa fa-eye"></i> {$viewText}
-            //         </a>}
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
-            //         }
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
-            //         }
-            // HTML;
-
             $html = '';
 
             if (Admin::user()->can('show-' . $this->permission_name) || Admin::user()->can('*')) {
