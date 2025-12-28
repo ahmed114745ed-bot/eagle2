@@ -128,13 +128,19 @@
     display: inline-block;
     *display: inline;
     vertical-align: middle;
-    margin: 0;
+    margin-right: 5px !important;
+    margin-top: 5px;
     padding: 0;
     width: 18px;
     height: 18px;
     background: url(blue.png) no-repeat;
     border: none;
     cursor: pointer;
+}
+
+.rtl .icheckbox_minimal-blue,
+.iradio_minimal-blue {
+    margin-left: 5px !important;
 }
 
 .icheckbox_minimal-blue {

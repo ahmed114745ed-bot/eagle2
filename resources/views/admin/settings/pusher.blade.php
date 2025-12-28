@@ -1,11 +1,7 @@
 <div id="pusherSettings" class="settings-section">
     <h3>{{ __('Real Time Setting') }}</h3>
 
-    <div class="row"
-         style="
-                background-color:var(--box-background-color)!important;
-
-                ">
+    <div class="row">
         <div class="col-md-6 mb-3 ms-0 me-auto">
             <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
                 @csrf

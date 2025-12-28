@@ -11,7 +11,6 @@
     /* القائمة الجانبية */
     .settings-sidebar {
         width: 250px;
-        background: var(--secondary-color);
         min-height: 400px;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
@@ -27,7 +26,6 @@
         width: 100%;
         text-align: right;
         padding: 15px;
-        background: #333;
         color: white;
         border: none;
         margin-bottom: 5px;
@@ -271,7 +269,7 @@
                     style="text-align: right;">
                 {{ __('room cup setting') }}
             </button>
-            
+
              <button onclick="showSection('MomentStatus')"
                     style="text-align: right;">
                 {{ __('Moment Status') }}

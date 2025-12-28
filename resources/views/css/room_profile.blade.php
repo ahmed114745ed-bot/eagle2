@@ -10,7 +10,6 @@
              --background-image:{{ config('themes.backgroundImage') }};
         --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
         --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-        --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
         --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
         --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
@@ -268,20 +267,6 @@
         color: #333;
         /* background: var(--secondary-color); */
         /* filter: brightness(0.85); */
-
-    }
-
-    .agency-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 25px;
-        margin-bottom: 30px;
-        position: relative;
-        padding: 20px;
-        background: var(--secondary-color);
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        /* filter: brightness(0.5); */
 
     }
 
@@ -635,15 +620,6 @@
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         margin-bottom: 30px;
-    }
-
-    .card-header {
-        padding: 15px 20px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--secondary-color);
     }
 
     .card-header h3 {
@@ -1060,10 +1036,6 @@
     .card-title {
         color: #333;
         font-weight: 500;
-    }
-    .table tbody tr:nth-child(even) {
-        background-color: var(--secondary-color) !important;
-        filter: brightness(0.95);
     }
 
     .pk-title {

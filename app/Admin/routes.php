@@ -495,6 +495,14 @@ Route::group(
             Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
         });
+        Route::get('/dashboard/finance', [AllStatisticController::class, 'financeIndex']);
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/finance/cards', [AllStatisticController::class, 'financeCards']);
+            Route::get('/finance/tables', [AllStatisticController::class, 'financeTables']);
+            Route::get('/finance/chart', [AllStatisticController::class, 'financeChartIndex']);
+            Route::get('wallet-logs/ajax', [AllStatisticController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
+        });
+
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
