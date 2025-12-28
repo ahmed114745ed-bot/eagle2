@@ -606,112 +606,112 @@ class UserController extends MainController
         $giftType   = request('gift_type', 'receiver');
 
         /* =========================
-     | User (ONE QUERY)
+     | USER (ONE QUERY ONLY)
      ========================= */
         $user = User::with([
-            'profile',
-            'country',
-            'senderLevel',
-            'receiverLevel',
+            // 'profile:id,user_id,avatar',
+            'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
+            // 'senderLevel:id,level,type',
+            // 'receiverLevel:id,level,type',
+
             'packs' => function ($q) {
                 $q->where('type', 25)
                     ->where('is_used', true)
+                    ->where(function ($q) {
+                        $q->where('expire', 0)
+                            ->orWhere('expire', '>=', now()->timestamp);
+                    })
                     ->with('ware:id,value');
             },
         ])->findOrFail($id);
 
         /* =========================
-     | User Image
+     | USER IMAGE
      ========================= */
         $defaultImage = asset('images/businessman-icon.jpg');
         $imageUrl = getImagePath(optional($user->profile)->avatar);
         $user->display_image = isImageExists($imageUrl) ? $imageUrl : $defaultImage;
 
         /* =========================
-     | User Joined Agencies (ONE QUERY)
+     | USER JOINED AGENCIES
      ========================= */
-        $userJoinAgenciesQuery = UsersJoinedAgency::with([
-            'agency',
-            'kickedByApp',
-            'kickedByAdmin',
+        $userJoinAgencies = UsersJoinedAgency::with([
+            'agency:id,name,type',
+            'kickedByApp:id,name',
+            'kickedByAdmin:id,name',
         ])
             ->where('user_id', $id)
             ->when($joinDate, fn($q) => $q->whereDate('join_date', $joinDate))
-            ->orderByDesc('id');
-
-        $userJoinAgencies = $userJoinAgenciesQuery
+            ->orderByDesc('id')
             ->paginate(10, ['*'], 'user_agency_page');
 
         /* =========================
-     | Packs
+     | PACKS (ONE BASE QUERY)
      ========================= */
-        $packs = Pack::with(['admin', 'userVip', 'ware:id,show_img'])
+        $packBase = Pack::with(['admin:id,name', 'userVip', 'ware:id,show_img'])
             ->where('user_id', $id)
-            ->where('type', $type)
             ->whereHas('ware')
+            ->whereNull('deleted_at');
+
+        $packs = (clone $packBase)
+            ->where('type', $type)
             ->orderByDesc('is_used')
             ->latest()
             ->paginate(10, ['*'], 'pack_page');
 
+        $userPackTypes = (clone $packBase)
+            ->pluck('type')
+            ->unique()
+            ->toArray();
+
         /* =========================
-     | User VIPs (NO DUPLICATION)
+     | USER VIPS
      ========================= */
         $userVipsQuery = UserVip::where('user_id', $id);
 
         $userVips = $userVipsQuery
             ->paginate(10, ['*'], 'vip_page');
 
-        $hasVip = (clone $userVipsQuery)
-            ->where('is_used', 1)
-            ->exists();
+        $hasVip = $userVips->contains('is_used', 1);
 
         /* =========================
-     | Salaries
+     | SALARIES
      ========================= */
-        $salaries = UserSallary::where('user_id', $id)
-            ->with('agency')
+        $salaries = UserSallary::with('agency:id,name')
+            ->where('user_id', $id)
             ->when($year, fn($q) => $q->where('year', $year))
             ->when($month, fn($q) => $q->where('month', $month))
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'salary_page');
 
         /* =========================
-     | Pack Types
+     | PACK TYPES FILTER
      ========================= */
-        $typeMap = PACK_USER;
-        $types = collect($typeMap);
-
-        $userPackTypes = Pack::where('user_id', $id)
-            ->pluck('type')
-            ->unique()
-            ->toArray();
-
-        $currentType = request('type', $types->keys()->first());
+        $types = collect(PACK_USER);
 
         if ($userPackTypes) {
             $types = $types->filter(fn($_, $key) => in_array($key, $userPackTypes));
         }
 
+        $currentType = request('type', $types->keys()->first());
+
         /* =========================
-     | Charges
+     | CHARGES
      ========================= */
-        $charges = Charge::query()
+        $charges = Charge::with(Common::chargerRelationsQuery())
             ->when(
                 $chargeTabType === 'receiver',
-                fn($q) =>
-                $q->where('user_id', $id)->where('user_type', 'user')
+                fn($q) => $q->where('user_id', $id)->where('user_type', 'user')
             )
             ->when(
                 $chargeTabType === 'charger',
-                fn($q) =>
-                $q->where('charger_id', $id)->where('charger_type', 'user')
+                fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user')
             )
-            ->with(Common::chargerRelationsQuery())
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'charges_page');
 
         /* =========================
-     | Gift Logs + Diamonds (BASE QUERY)
+     | GIFT LOGS (BASE QUERY)
      ========================= */
         $giftBaseQuery = GiftLog::query()
             ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
@@ -725,14 +725,20 @@ class UserController extends MainController
             ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
         $giftSLogs = (clone $giftBaseQuery)
-            ->with('receiver', 'sender', 'gift', 'room', 'agency')
+            ->with([
+                'receiver.profile:id,user_id,avatar',
+                'sender.profile:id,user_id,avatar',
+                'gift:id,name,price',
+                'room:id,room_name',
+                'agency:id,name',
+            ])
             ->orderByDesc('id')
             ->paginate(10, ['*'], 'gift_page');
 
         $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
 
         /* =========================
-     | Coins
+     | USER COINS
      ========================= */
         $usersCoins = UserCoinLog::where('user_id', $id)
             ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
@@ -742,10 +748,10 @@ class UserController extends MainController
             ->paginate(10, ['*'], 'coins_page');
 
         /* =========================
-     | Badges
+     | BADGES
      ========================= */
-        $badges = UserBadge::where('user_id', $id)
-            ->with('admin')
+        $badges = UserBadge::with('admin:id,name')
+            ->where('user_id', $id)
             ->orderByRaw("
             CASE
                 WHEN expire = 0 THEN 0
@@ -756,10 +762,17 @@ class UserController extends MainController
             ->orderByDesc('expire')
             ->paginate(10, ['*'], 'badges_page');
 
-        $countries = $this->countries();
+        /* =========================
+     | COUNTRIES (CACHED)
+     ========================= */
+        $countries = cache()->rememberForever(
+            'countries',
+            fn() =>
+            Country::select('id', 'name', 'e_name', 'flag')->get()
+        );
 
         /* =========================
-     | Wallet
+     | WALLET
      ========================= */
         $availableBalance = wallet_available_by_user($id);
         $curantBalance = $availableBalance;
@@ -776,7 +789,7 @@ class UserController extends MainController
             ]);
 
         /* =========================
-     | View
+     | VIEW
      ========================= */
         $data = compact(
             'user',
@@ -808,6 +821,7 @@ class UserController extends MainController
             $content->title(__('user profile'))->view('user_profile', $data)
         );
     }
+
 
 
     public function countries()
