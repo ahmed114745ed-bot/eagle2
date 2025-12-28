@@ -5,8 +5,6 @@ namespace App\Listeners;
 use App\Models\Language;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Cookie;
 use Laravel\Octane\Events\RequestReceived;
 
 class SetupMultiLanguageListener
@@ -32,17 +30,7 @@ class SetupMultiLanguageListener
                 ->toArray();
         });
 
-        // ضبط الـ config
         Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
-
-        // ضبط الـ current locale
-        $cookieName = Config::get('admin.extensions.multi-language.cookie-name', 'locale');
-        $default = Config::get('admin.extensions.multi-language.default', 'en');
-        $current = Cookie::get($cookieName, $default);
-
-        // Share مع كل الـ views
-        View::share('languages', $enabledLanguages);
-        View::share('current', $current);
     }
 
     /**
