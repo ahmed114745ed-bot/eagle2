@@ -1260,7 +1260,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('Admin') }}</th>
+                            <th>{{ __('created by') }}</th>
                             <th>{{ __('get type') }}</th>
                             <th>{{ __('type') }}</th>
                             <th>{{ __('img') }}</th>
@@ -1886,7 +1886,7 @@
                         <thead class="table-light">
                         <tr>
                             <th>#</th>
-                            <th>{{ __('Admin') }}</th>
+                            <th>{{ __('created by') }}</th>
                             <th>{{ __('expire') }}</th>
                             <th>{{ __('receive_type') }}</th>
                             <th>{{ __('created_at') }}</th>
