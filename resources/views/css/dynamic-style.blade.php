@@ -1260,4 +1260,8 @@ html.ltr .dropdown-menu {
     body {
         overflow-x: auto !important;
     }
+
+    .logo-icon img {
+        width: 30% !important;
+    }
 </style>
