@@ -8,6 +8,6 @@ return [
     'messagingSenderId' => env('FIREBASE_MESSAGING_SENDER_ID'),
     'appId' => env('FIREBASE_APP_ID'),
     'vapid_key' => env('FIREBASE_VAPID_KEY'),
-    'credentials' => storage_path('app/firebase/service-account.json'),
-    //'credentials' => storage_path(env('FILE_NAME')),
+    // 'credentials' => storage_path('app/firebase/service-account.json'),
+    'credentials' => storage_path(env('FILE_NAME')),
 ];

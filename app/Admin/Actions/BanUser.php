@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Facades\Admin as AuthAdmin;
 
-
 class BanUser extends Action
 {
     public $name;
@@ -152,6 +151,7 @@ class BanUser extends Action
             $route = $ban->banType?->route;
 
             if ($route == 'rooms/enter_room' && $user->room) {
+                Log::info('ban user send unableToEnterRoom to zego for user id ' . $user->id);
                 // dd( $user->room());
                 $ms = [
                     'messageContent' => [
@@ -165,6 +165,7 @@ class BanUser extends Action
                 $json = json_encode($ms);
                 Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
             } else if ($route == 'rooms/up_microphone' && $user->room) {
+                Log::info('ban user send unableToUPMicrophone to zego for user id ' . $user->id);
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
@@ -177,6 +178,7 @@ class BanUser extends Action
                 $json = json_encode($ms);
                 Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
             } else if ($route == 'rooms/up-microphone' && $user->room) {
+                Log::info('ban user send unableToUPMicrophone to zego for user id ' . $user->id);
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
@@ -194,8 +196,7 @@ class BanUser extends Action
 
 
         if ($room && $newBan) {
-
-            Log::info('ban user send to zego', ['room_id' => $room->id, 'user_id' => $user->id]);
+            Log::info('ban user send banDevice to zego for user id ' . $user->id);
             $d = [
                 "messageContent" => [
                     "message" => "banDevice",
@@ -206,7 +207,11 @@ class BanUser extends Action
                 ]
             ];
             $json = json_encode($d);
-
+            Log::info('ZEGO0000000 | sendToZego params ban', [
+                'json' => $json,
+                'room_id' => $room->id,
+                'user_id' => $user->id,
+            ]);
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
         }
         if ($newBan) {

@@ -316,52 +316,6 @@ class UserController extends MainController
         });
         $permission = $this->permission_name;
 
-
-        // $grid->column('bd_action', __('BD Action'))->display(function () {
-        //     if ($this->is_bd == 1) {
-        //         $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
-        //         $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
-        //         $btn .= __('Remove BD') . '</button>';
-        //         return $btn;
-        //     }
-        //     return '';
-        // });
-
-        // Admin::script(<<<'JS'
-        //     $(document).on('click', '.remove-bd-btn', function (e) {
-        //         e.preventDefault();
-        //         let btn = $(this);
-        //         let url = btn.data('url');
-
-        //         Swal.fire({
-        //             title: 'هل أنت متأكد؟',
-        //             text: "لن تستطيع التراجع بعد الحذف!",
-        //             showCancelButton: true,
-        //             confirmButtonColor: '#d33',
-        //             cancelButtonColor: '#3085d6',
-        //             confirmButtonText: 'نعم، احذف',
-        //             cancelButtonText: 'إلغاء'
-        //         }).then((result) => {
-        //             if (result.value) {
-        //                 let form = $('<form>', {
-        //                     'method': 'POST',
-        //                     'action': url
-        //                 }).append($('<input>', {
-        //                     'type': 'hidden',
-        //                     'name': '_token',
-        //                     'value': LA.token
-        //                 })).append($('<input>', {
-        //                     'type': 'hidden',
-        //                     'name': '_method',
-        //                     'value': 'POST'
-        //                 }));
-        //                 form.appendTo('body').submit();
-        //             }
-        //         });
-        //     });
-        // JS);
-
-
         Admin::script("
             // Initial modal open
             $(document).on('click', '.show-same-device-modal', function() {
@@ -465,54 +419,6 @@ class UserController extends MainController
     }
 
 
-    public function showAdditionalInfo($id, Content $content)
-    {
-        return $content
-            ->row(function (Row $row) {
-                $row->column(12, $this->showColSearch());
-            })
-            ->row(
-                function ($row) use ($id) {
-                    $user = User::find($id);
-                    if ($user) {
-                        $user->flowers = 0;
-                        $user->save();
-                    }
-                    $type = $user->type_user;
-                    switch ($type) {
-                        case 0:
-                            $userType = __("User");
-                            break;
-                        case 1:
-                            $userType = __("Host");
-                            break;
-                        case 2:
-                            $userType = __("Host Agent");
-                            break;
-                        case 3:
-                            $userType = __("Shipping Agent");
-                            break;
-                        case 4:
-                            $userType = __("Resort & Shipping Agent");
-                            break;
-                        case 5:
-                            $userType = __("Admin");
-                            break;
-                        default:
-                            $userType = $type; // Keep the original value if no match is found
-                            break;
-                    }
-
-                    $row->column(2, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
-                    $row->column(2, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
-                    $row->column(2, new InfoBox(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
-                    $row->column(2, new InfoBox(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
-                }
-            );
-    }
-
     protected function showColSearch()
     {
         $form = new Box();
@@ -542,7 +448,17 @@ class UserController extends MainController
         $joinDate = request('join_date');
         $type = request('type') ?? 4;
         $agencyId = request('agency_id');
-        $user = User::with('profile')->find($id);
+        $user = User::with([
+            'profile',
+            'country',
+            'senderLevel',
+            'receiverLevel',
+            'packs' => function ($q) {
+                $q->where('type', 25)
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
+        ])->find($id);
         $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($user->profile->avatar);
         if (!isImageExists($imageUrl)) {

@@ -9,14 +9,11 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
-use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormRequest;
 use Modules\Form\Services\FormRenderService;
 
@@ -63,7 +60,15 @@ class FormRequestController extends MainController
         $grid = new Grid(new FormRequest());
 
         $grid->model()
-            ->with(['user', 'template', 'bd'])
+            ->with([
+                'user',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'template',
+                'bd'
+            ])
             ->where('form_template_type', $type)->orderByDesc('id');
 
         $grid->column('user', __('user'))
@@ -143,19 +148,6 @@ class FormRequestController extends MainController
             $approveText = __('Approved');
             $rejectText  = __('Reject');
             $viewText    = __('Preview');
-
-            // return <<<HTML
-            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //        <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
-            //             <i class="fa fa-eye"></i> {$viewText}
-            //         </a>}
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
-            //         }
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
-            //         }
-            // HTML;
 
             $html = '';
 
