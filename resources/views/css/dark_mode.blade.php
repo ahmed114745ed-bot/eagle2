@@ -156,6 +156,10 @@
         border-color: rgba(255, 255, 255, 0.15) !important;
     }
 
+    .dark-mode .btn-default {
+        color: var(--text-secondary-color) !important;
+    }
+
     /* Apply dark mode on page load if saved */
     document {
     }
