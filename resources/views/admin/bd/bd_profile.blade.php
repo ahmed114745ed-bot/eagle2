@@ -756,7 +756,7 @@
 <!-- Header Section -->
 <div class="agency-header">
     <div class="agency-avatar">
-        <img src="{{ getImagePath($bd->avatar) }}" alt="Agency Logo" class="logo-img">
+        <img src="{{ $bd->display_image }}" alt="Agency Logo" class="logo-img">
     </div>
     <div class="agency-info">
         <h1 class="agency-name">{{ $bd->username ??'' }}</h1>

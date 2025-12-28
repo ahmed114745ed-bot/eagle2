@@ -1060,7 +1060,7 @@
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
-            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}"
+            <img src="{{ $user->display_image }}"
                  alt="Agency Logo" class="logo-img">
         </div>
         <div class="agency-info">

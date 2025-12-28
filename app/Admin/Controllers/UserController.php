@@ -544,9 +544,16 @@ class UserController extends MainController
         $end = request('end_at');
         $tab = request('tab') ?? 'salary';
         $joinDate = request('join_date');
-        $user = User::with('profile')->find($id);
         $type = request('type') ?? 4;
         $agencyId = request('agency_id');
+        $user = User::with('profile')->find($id);
+        $defaultImage = asset("images/businessman-icon.jpg");
+        $imageUrl = getImagePath($user->profile->avatar);
+        if (!isImageExists($imageUrl)) {
+            $imageUrl = $defaultImage;
+        }
+        $user->display_image = $imageUrl;
+
 
         $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
             $query->whereDate('join_date', $joinDate);
