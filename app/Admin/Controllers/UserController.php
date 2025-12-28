@@ -609,28 +609,24 @@ class UserController extends MainController
      | USER (ONE QUERY ONLY)
      ========================= */
         $user = User::with([
-             'profile:id,user_id,avatar',
+            'profile:id,user_id,avatar',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
             'senderLevel:id,level,type',
             'receiverLevel:id,level,type',
-
             'packs' => function ($q) {
                 $q->where('type', 25)
                     ->where('is_used', true)
-                    ->where(function ($q) {
-                        $q->where('expire', 0)
-                            ->orWhere('expire', '>=', now()->timestamp);
-                    })
+                    ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                     ->with('ware:id,value');
             },
         ])->findOrFail($id);
 
         /* =========================
-     | USER IMAGE
-     ========================= */
+| USER IMAGE
+========================= */
         $defaultImage = asset('images/businessman-icon.jpg');
-        $imageUrl = getImagePath(optional($user->profile)->avatar);
-        $user->display_image = isImageExists($imageUrl) ? $imageUrl : $defaultImage;
+        $avatar = optional($user->profile)->avatar;
+        $user->display_image = isImageExists(getImagePath($avatar)) ? getImagePath($avatar) : $defaultImage;
 
         /* =========================
      | USER JOINED AGENCIES
@@ -648,7 +644,7 @@ class UserController extends MainController
         /* =========================
      | PACKS (ONE BASE QUERY)
      ========================= */
-        $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar','userVip', 'sender','ware:id,show_img'])
+        $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar', 'userVip', 'sender', 'ware:id,show_img'])
             ->where('user_id', $id)
             ->whereHas('ware')
             ->whereNull('deleted_at');
