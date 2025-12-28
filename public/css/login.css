@@ -137,11 +137,12 @@ body.login-body {
 .form-label { display: block; color: #334155; font-weight: 600; margin-bottom: 10px; font-size: 14px; }
 
 .input-wrapper { position: relative; transition: transform 0.2s ease; }
-.input-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px; transition: all 0.3s ease; pointer-events: none; }
+.input-icon { right: 18px; }
+.input-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px; transition: all 0.3s ease; pointer-events: none; }
 
 .form-input {
     width: 100%;
-    padding: 16px 50px 16px 20px;
+    padding: 16px 20px 16px 50px;
     border: 2px solid var(--border);
     border-radius: 12px;
     font-size: 15px;
@@ -149,6 +150,10 @@ body.login-body {
     transition: all 0.3s ease;
     background: #f8fafc;
     outline: none;
+}
+
+[dir="rtl"] .form-input {
+    padding: 16px 50px 16px 20px !important;
 }
 
 .form-input:focus {
@@ -159,7 +164,8 @@ body.login-body {
 
 .form-input:focus + .input-icon { color: var(--primary-color); }
 
-.password-toggle { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #94a3b8; cursor: pointer; font-size: 20px; transition: all 0.3s ease; }
+[dir="rtl"] .password-toggle { left: 18px !important; right: auto !important;}
+.password-toggle { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #94a3b8; cursor: pointer; font-size: 20px; transition: all 0.3s ease; }
 .password-toggle:hover { color: var(--primary-color); }
 
 .error-text { margin-top: 8px; color: #b91c1c; font-size: 13px; }
@@ -231,7 +237,7 @@ body.login-body {
 }
 
 @media (max-width: 640px) {
-    body.login-body { 
+    body.login-body {
         padding-top: 16px;
      }
     .login-container { min-height: 520px; border-radius: 18px; }
@@ -247,5 +253,8 @@ body.login-body {
     .brand-subtitle { font-size: 14px; }
     .form-title { font-size: 24px; }
     .form-input { padding: 14px 46px 14px 16px; font-size: 14px; }
+    [dir="rtl"] .form-input {
+        padding: 16px 50px 16px 20px !important;
+    }
     .login-btn { padding: 14px; font-size: 15px; }
 }

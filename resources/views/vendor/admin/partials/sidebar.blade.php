@@ -549,10 +549,6 @@
             font-weight: bold;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
-
-        .main-sidebar, .left-side {
-            padding-top: 5% !important;
-        }
     </style>
 
     <div id="tab-loading">

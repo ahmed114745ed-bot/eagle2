@@ -28,9 +28,11 @@
         .app-class {
             margin-top: 10% !important;
         }
+
         .content {
             width: 100% !important;
         }
+
         .wrapper {
             /* min-width: max-content; */
         }
@@ -46,6 +48,10 @@
     }
 
     @media (max-width: 768px) {
+        .main-sidebar, .left-side {
+            padding-top: 20% !important;
+        }
+
         .content {
             width: 100% !important;
         }
@@ -234,6 +240,10 @@
     }
 
     @media (max-width: 576px) {
+        .main-sidebar, .left-side {
+            padding-top: 20% !important;
+        }
+
         .box-footer {
             flex-direction: column;
             align-items: center;
