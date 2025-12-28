@@ -89,7 +89,9 @@ trait ZegoTrait
         ];
         $headers = [];
         try {
-
+              Log::info('ZEGO | sendToZego params', [
+                  'params' => $params,
+              ]);
             return  Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
         } catch (\Exception $exception) {
             Log::info('Exception Charisma sendToZego ', [
