@@ -88,13 +88,17 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
         $this->defineCarbonMacros();
+        
+        // Setup languages early so MultiLanguageServiceProvider can use them
+        $this->app->booting(function () {
+            $this->setupLanguages();
+        });
     }
 
     public function boot(): void
     {
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
-        $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
 
@@ -109,6 +113,11 @@ class AppServiceProvider extends ServiceProvider
                 return htmlspecialchars_decode($value, ENT_QUOTES);
             });
         }
+        
+        // Re-add language menu after all providers are loaded (fix for Octane)
+        $this->app->booted(function () {
+            $this->refreshLanguageMenu();
+        });
     }
 
     public function dashboardAdminConfig(): void
@@ -267,6 +276,23 @@ class AppServiceProvider extends ServiceProvider
 
         Config::set('admin.extensions.multi-language.languages', $enabledLanguages);
         Config::set('admin.logo', Cache::get('app_title', 'Default Title'));
+    }
+
+    /**
+     * Refresh the language menu in Admin navbar (fix for Octane)
+     */
+    protected function refreshLanguageMenu(): void
+    {
+        try {
+            $languages = Config::get('admin.extensions.multi-language.languages', []);
+            
+            // Only add if languages exist and navbar is available
+            if (!empty($languages) && class_exists(\Encore\Admin\Facades\Admin::class)) {
+                \Encore\Admin\Facades\Admin::navbar()->add(new \KevinSoft\MultiLanguage\Widgets\LanguageMenu());
+            }
+        } catch (\Exception $e) {
+            // Silently fail if Admin is not available
+        }
     }
 
     protected function registerModelObservers(): void
