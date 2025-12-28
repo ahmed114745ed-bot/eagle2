@@ -10,13 +10,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/comparison-user-signup";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/comparison-user-signup";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/comparison-user-signup";
     }
-    $fetchUrl = $prefix . "/statistics/comparison-user-signup";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -24,50 +23,57 @@
     let weeklySignupsChart;
 
     function loadWeeklySignups() {
-        fetch("{{ $fetchUrl }}", {
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const ctx = document.getElementById('weeklySignupsChart').getContext('2d');
+        $.ajax({
+            url: "{{ $fetchUrl }}",
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                const ctx = document.getElementById('weeklySignupsChart').getContext('2d');
 
-            if (weeklySignupsChart) {
-                weeklySignupsChart.destroy();
-            }
+                if (weeklySignupsChart) {
+                    weeklySignupsChart.destroy();
+                }
 
-            weeklySignupsChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: data.currentMonth,
-                            data: data.dataCurrent,
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)'
-                        },
-                        {
-                            label: data.previousMonth,
-                            data: data.dataPrevious,
-                            backgroundColor: 'rgba(255, 99, 132, 0.7)'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'top' }
+                weeklySignupsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: data.currentMonth,
+                                data: data.dataCurrent,
+                                backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                            },
+                            {
+                                label: data.previousMonth,
+                                data: data.dataPrevious,
+                                backgroundColor: 'rgba(255, 99, 132, 0.7)'
+                            }
+                        ]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { stepSize: 1 }
+                            }
                         }
                     }
-                }
-            });
-        })
-        .catch(err => console.error("Fetch Error:", err));
+                });
+            },
+            error: function(err) {
+                console.error("AJAX Error:", err);
+            }
+        });
     }
 
-    document.addEventListener("DOMContentLoaded", loadWeeklySignups);
+    // Execute immediately - this is the key!
+    if (!window.weeklySignupsLoaded) {
+        window.weeklySignupsLoaded = true;
+        loadWeeklySignups();
+    }
 </script>

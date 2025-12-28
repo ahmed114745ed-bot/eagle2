@@ -202,7 +202,7 @@ class AreaManagerController extends MainController
                         <i class="fa fa-sign-in"></i> {$loginText}
                     </a>
                     <button type="button" class="btn btn-sm btn-primary" onclick="copyAreaManagerUrl()">
-                        <i class="fa fa-copy"></i>   
+                        <i class="fa fa-copy"></i>
                     </button>
 
                 </div>
@@ -452,11 +452,14 @@ class AreaManagerController extends MainController
         }
         $selectedCountriesJson = json_encode($selectedCountries);
 
-        $form->html(view('admin.partials.country_map', [
+        $mapHtml = view('admin.partials.country_map', [
             'countriesJson' => $countriesJson,
             'selectedCountriesJson' => $selectedCountriesJson,
             'currentAreaManagerId' => $currentAreaManagerId,
-        ])->render());
+        ])->render();
+
+        $marker = '<div class="full-column-width">'.$mapHtml.'</div>';
+        $form->html($marker, '')->setWidth(12, 0);
     }
 
 

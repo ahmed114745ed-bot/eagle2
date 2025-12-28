@@ -1,0 +1,6 @@
+- Replace 'fa-home' with '🏠' in sidebar.blade.php
+- Replace 'fa-users' with '👥' in sidebar.blade.php
+- Replace 'fa-building' with '🏢' in sidebar.blade.php
+- Replace 'fa-briefcase' with '💼' in sidebar.blade.php
+- Replace 'fa-plane' with '✈️' in sidebar.blade.php
+- Replace 'fa-list' with '📋' in sidebar.blade.php

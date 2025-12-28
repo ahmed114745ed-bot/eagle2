@@ -50,20 +50,29 @@
 @endphp
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+function loadTopReceiversChart() {
+    const canvas = document.getElementById("topReceiversRadar");
+    if (!canvas) return;
 
-    fetch('{{ url($prefix . "/statistics/top-receiver") }}')
-        .then(response => response.json())
-        .then(({ labels, data }) => {
-            const ctx = document.getElementById("topReceiversRadar").getContext("2d");
+    // Check if chart already exists
+    if (window.topReceiversChartInstance) {
+        window.topReceiversChartInstance.destroy();
+    }
 
-            new Chart(ctx, {
+    $.ajax({
+        url: '{{ url($prefix . "/statistics/top-receiver") }}',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            const ctx = canvas.getContext("2d");
+
+            window.topReceiversChartInstance = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels,
+                    labels: response.labels,
                     datasets: [{
                         label: '{{ __("Total Received") }}',
-                        data,
+                        data: response.data,
                         backgroundColor: 'rgba(34,197,94,0.2)',
                         borderColor: '#22c55e',
                         pointBackgroundColor: '#22c55e'
@@ -71,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         title: {
@@ -88,8 +98,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 }
             });
-        })
-        .catch(error => console.error('Error loading chart data:', error));
-});
+        },
+        error: function() {
+            console.error('Error loading top receivers chart data');
+        }
+    });
+}
+
+// Load immediately - no DOM waiting, no multiple event listeners
+loadTopReceiversChart();
 </script>
 

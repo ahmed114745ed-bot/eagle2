@@ -155,20 +155,6 @@
 
 }
 
-.agency-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 25px;
-    margin-bottom: 30px;
-    position: relative;
-    padding: 20px;
-    background: var(--secondary-color);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    /* filter: brightness(0.5); */
-
-}
-
 .agency-avatar {
     width: 120px;
     height: 120px;
@@ -267,22 +253,6 @@
     gap: 5px;
 }
 
-.rtl .btn-back {
-    position: absolute;
-    top: 5px;
-    left: 20px;
-    background: #ecf0f1;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    color: #7f8c8d;
-    cursor: pointer;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
 .btn-back:hover {
     background: #d6e0e3;
     color: #34495e;
@@ -321,15 +291,6 @@
     .top-performers-section {
         grid-template-columns: 1fr;
     }
-}
-
-.performers-card {
-    background: var(--secondary-color);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    /* filter: brightness(0.5); */
-
 }
 
 .section-header {
@@ -462,7 +423,7 @@
     border: none;
     border-bottom: 3px solid transparent;
     font-weight: 600;
-   
+
     cursor: pointer;
     transition: all 0.3s;
     white-space: nowrap;
@@ -492,28 +453,10 @@
     margin-bottom: 30px;
 }
 
-.card-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--secondary-color);
-}
-
 .card-header h3 {
     margin: 0;
     font-size: 18px;
     color: #2c3e50;
-}
-
-.count-badge {
-    background: #ecf0f1;
-    color: #7f8c8d;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
 }
 
 .data-table {
@@ -533,7 +476,7 @@
     /* text-align: left; */
     padding: 12px 15px;
     background: var(--secondary-color);
-   
+
     font-weight: 600;
     text-transform: none;
     font-size: 12px;
@@ -729,7 +672,7 @@
         width: 108%;
 
     }
-    
+
     .avatar-grid {
         grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     }
@@ -741,7 +684,7 @@
             margin-bottom: 35px;
         }
 
-    
+
     .stat-icon {
             width: 50px;
             height: 50px;
@@ -756,7 +699,7 @@
 
     }
 
-    
+
     .target-card-stat {
          width: 92%;
 
@@ -772,7 +715,7 @@
         margin-bottom: 31px;
 
     }
-    .card-target-filter-phone  .col-md-7{  
+    .card-target-filter-phone  .col-md-7{
        float: none;
     }
 
@@ -832,7 +775,7 @@
         <i class="fas fa-arrow-left"></i> {{ __("Go Back") }}
     </a>
 </div>
- 
+
 <div class="top-performers-section">
 
             <div class="performers-card">
@@ -843,15 +786,15 @@
                     </h2>
                 </div>
                     <div class="avatar-grid">
-                        
-                            
+
+
                             <a href="#" >
                                {{  truncateAndTrim( $bd->total_salary)  }}
                             </a>
                     </div>
-              
+
             </div>
-    
+
             <div class="performers-card">
                 <div class="section-header">
                     <h2 class="section-title">
@@ -859,22 +802,22 @@
                         {{ __('Agency Count') }}
                     </h2>
                 </div>
-                
-                
+
+
                     <div class="avatar-grid">
-                        
-                            
+
+
                             <a href="#" >
                                {{ $bd->agencies_count  }}
                             </a>
                     </div>
-               
+
             </div>
         </div>
-               
-                 
 
-                  
+
+
+
 <!-- Tabs Navigation -->
 @php $activeTab = request('tab', 'agencies'); @endphp
 
@@ -1186,7 +1129,7 @@
 
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
 
 
     <script>
@@ -1239,7 +1182,7 @@
                 // Remove active class from all buttons and content
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                
+
                 // Add active class to clicked button and corresponding content
                 btn.classList.add('active');
                 const target = btn.getAttribute('data-target');

@@ -2,6 +2,10 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\Common;
+use App\Models\Charge;
+use App\Models\CoinLog;
+use App\Models\MonthlyDiamondReceive;
 use App\Models\User;
 use App\Models\GameWallet;
 use App\Models\UserSallary;
@@ -24,7 +28,8 @@ use Illuminate\Http\Request;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
-
+use Carbon\CarbonPeriod;
+use Modules\UsersWallet\Entities\WalletLog;
 
 class AllStatisticController extends MainController
 {
@@ -39,30 +44,30 @@ class AllStatisticController extends MainController
     {
         $filterCountryId = session('filter_country_id');
         if (!empty($filterCountryId)) {
-            return [(int) $filterCountryId];
+            return [(int)$filterCountryId];
         }
-    
+
         $adminId = session('area_manager_id') ?? auth()->id();
-    
+
         if (!$adminId) {
             return [];
         }
-    
+
         $authAdmin = AreaManager::find($adminId);
-    
+
         if (!$authAdmin) {
             return [];
         }
-    
+
         $sessionCountryId = session('area_manager_country_id');
         if (!empty($sessionCountryId)) {
-            return (array) $sessionCountryId;
+            return (array)$sessionCountryId;
         }
-    
+
         if (method_exists($authAdmin, 'countriesQuery')) {
             return $authAdmin->countriesQuery()->pluck('id')->toArray();
         }
-    
+
         return [];
     }
 
@@ -124,21 +129,22 @@ class AllStatisticController extends MainController
         return response()->json([
             'success' => true,
             'labels' => $rows->pluck('label'),
-            'data'   => $rows->pluck('total'),
+            'data' => $rows->pluck('total'),
         ]);
     }
 
     public function onlineStats()
     {
-        $online  = User::where('online', 1)->count();
+        $online = User::where('online', 1)->count();
         $offline = User::where('online', 0)->count();
 
 
         return response()->json(data: [
-            'online'  => $online,
+            'online' => $online,
             'offline' => $offline,
         ]);
     }
+
     public function roomsActivity(Request $request)
     {
         $period = $request->get('period', 'day');
@@ -253,7 +259,7 @@ class AllStatisticController extends MainController
 
         return response()->json([
             'labels' => $labels,
-            'data'   => $data
+            'data' => $data
         ]);
     }
 
@@ -270,7 +276,7 @@ class AllStatisticController extends MainController
             ->get();
         return response()->json([
             'labels' => $topUsers->pluck('name'),
-            'data'   => $topUsers->pluck('total_hours')
+            'data' => $topUsers->pluck('total_hours')
         ]);
     }
 
@@ -303,7 +309,7 @@ class AllStatisticController extends MainController
         $dataPrevious = [];
 
         foreach (range(1, 4) as $week) {
-            $dataCurrent[]  = $signups->where('month', $currMonth)->where('week_of_month', $week)->sum('total');
+            $dataCurrent[] = $signups->where('month', $currMonth)->where('week_of_month', $week)->sum('total');
             $dataPrevious[] = $signups->where('month', $prevMonth)->where('week_of_month', $week)->sum('total');
         }
 
@@ -311,10 +317,10 @@ class AllStatisticController extends MainController
         $prevMonthName = Carbon::create()->month($prevMonth)->translatedFormat('F');
 
         return response()->json([
-            'labels'       => $labels,
-            'dataCurrent'  => $dataCurrent,
+            'labels' => $labels,
+            'dataCurrent' => $dataCurrent,
             'dataPrevious' => $dataPrevious,
-            'currentMonth'  => $currMonthName,
+            'currentMonth' => $currMonthName,
             'previousMonth' => $prevMonthName,
         ]);
     }
@@ -353,15 +359,15 @@ class AllStatisticController extends MainController
             ->count();
 
         $roomStats = [
-            __('Rooms with PK')  => $roomsWithPk,
-            __('Audio Rooms')    => $audioRooms,
-            __('Live Rooms')     => $liveRooms,
+            __('Rooms with PK') => $roomsWithPk,
+            __('Audio Rooms') => $audioRooms,
+            __('Live Rooms') => $liveRooms,
             __('Inactive Rooms') => $inactiveRooms,
         ];
 
         return response()->json([
             'labels' => array_keys($roomStats),
-            'data'   => array_values($roomStats),
+            'data' => array_values($roomStats),
         ]);
     }
 
@@ -379,10 +385,10 @@ class AllStatisticController extends MainController
             ->filter(fn($room) => $room->gifts_sum_gift_price > 0);
 
         $labels = $topGiftedRooms->map(fn($room) => $room->owner->name ?? 'Unknown');
-        $data   = $topGiftedRooms->pluck('gifts_sum_gift_price');
+        $data = $topGiftedRooms->pluck('gifts_sum_gift_price');
         return response()->json([
             'labels' => $labels,
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -407,10 +413,10 @@ class AllStatisticController extends MainController
             ->get();
 
         $labels = $avgSessionRooms->pluck('room_name');
-        $data   = $avgSessionRooms->pluck('avg_duration');
+        $data = $avgSessionRooms->pluck('avg_duration');
         return response()->json([
             'labels' => $labels,
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -429,10 +435,10 @@ class AllStatisticController extends MainController
             ->get();
 
         $labels = $topAgenciesByTargets->map(fn($t) => $t->agency->name ?? 'Unknown');
-        $data   = $topAgenciesByTargets->pluck('total_achieved');
+        $data = $topAgenciesByTargets->pluck('total_achieved');
         return response()->json([
             'labels' => $labels,
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -441,8 +447,7 @@ class AllStatisticController extends MainController
         $countryID = $this->countryId();
         $topSenders = GiftLog::whereHas(
             'sender',
-            fn($q) =>
-            $q->when($countryID, function ($query, $countryID) {
+            fn($q) => $q->when($countryID, function ($query, $countryID) {
                 return $query->where('country_id', $countryID);
             })
                 ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
@@ -458,10 +463,10 @@ class AllStatisticController extends MainController
             ->filter(fn($s) => $s->total_sent > 0);
 
         $labels = $topSenders->map(fn($s) => $s->sender->name ?? 'Unknown');
-        $data   = $topSenders->pluck('total_sent');
+        $data = $topSenders->pluck('total_sent');
         return response()->json([
             'labels' => $labels,
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -470,8 +475,7 @@ class AllStatisticController extends MainController
         $countryID = $this->countryId();
         $topReceivers = GiftLog::whereHas(
             'receiver',
-            fn($q) =>
-            $q->when($countryID, function ($query, $countryID) {
+            fn($q) => $q->when($countryID, function ($query, $countryID) {
                 return $query->where('country_id', $countryID);
             })
                 ->whereHas('agency', fn($a) => $a->when($countryID, function ($query, $countryID) {
@@ -487,10 +491,10 @@ class AllStatisticController extends MainController
             ->filter(fn($s) => $s->total_received > 0);
 
         $labels = $topReceivers->map(fn($r) => $r->receiver->name ?? 'Unknown');
-        $data   = $topReceivers->pluck('total_received');
+        $data = $topReceivers->pluck('total_received');
         return response()->json([
             'labels' => $labels,
-            'data'   => $data,
+            'data' => $data,
         ]);
     }
 
@@ -506,12 +510,12 @@ class AllStatisticController extends MainController
             ->count();
 
         $notAchievedAgencies = Agency::when($countryID, function ($query, $countryID) {
-            return $query->where('country_id', $countryID);
-        })
-            ->count() - $achievedAgencies;
+                return $query->where('country_id', $countryID);
+            })
+                ->count() - $achievedAgencies;
 
         return response()->json([
-            'achieved'    => $achievedAgencies,
+            'achieved' => $achievedAgencies,
             'notAchieved' => $notAchievedAgencies,
         ]);
     }
@@ -539,10 +543,10 @@ class AllStatisticController extends MainController
         $liveRoomsTrue = $liveRooms[1] ?? 0;
         $liveRoomsFalse = $liveRooms[0] ?? 0;
         return response()->json([
-            'audio'         => $roomCounts['audio'] ?? 0,
-            'live'          => $roomCounts['live'] ?? 0,
-            'active'        => $liveRoomsTrue,
-            'inactive'      =>  $liveRoomsFalse,
+            'audio' => $roomCounts['audio'] ?? 0,
+            'live' => $roomCounts['live'] ?? 0,
+            'active' => $liveRoomsTrue,
+            'inactive' => $liveRoomsFalse,
         ]);
     }
 
@@ -560,8 +564,7 @@ class AllStatisticController extends MainController
 
         $agency_salaries = AgencySallary::whereHas(
             'agency',
-            fn($q) =>
-            $q->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            fn($q) => $q->when($countryID, fn($q) => $q->where('country_id', $countryID))
         )->sum(DB::raw('sallary - cut_amount'));
 
         $activeAgencies = Agency::when($countryID, fn($q) => $q->where('country_id', $countryID))
@@ -776,5 +779,202 @@ class AllStatisticController extends MainController
                 'message' => 'Error fetching statistics data'
             ], 500);
         }
+    }
+
+    public function financeCards(Request $request)
+    {
+        $from = $request->query('from') ? Carbon::parse($request->query('from'))->startOfDay() : now()->startOfDay();
+        $to = $request->query('to') ? Carbon::parse($request->query('to'))->endOfDay() : now()->startOfDay();
+
+        $result = UserSallary::when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->selectRaw('
+                         SUM(pending_dollar) as total_dollars,
+                         SUM(agency_sallary) as total_agency_dollars,
+                         SUM(sallary) as total_user_dollars
+                     ')
+            ->first();
+
+        $totalDollars = $result->total_dollars ?? 0;
+        $totalAgencyDollars = $result->total_agency_dollars ?? 0;
+        $totalUserDollars = $result->total_user_dollars ?? 0;
+
+        $totalTargets = $totalDollars + $totalAgencyDollars + $totalUserDollars;
+
+        $totalCharges = Charge::when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum('usd');
+
+        $totalPayments = CoinLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum('obtained_coins');
+
+        $totalGiftsValue = GiftLog::when($from, fn($q) => $q->where('created_at', '>=', $from))
+            ->when($to, fn($q) => $q->where('created_at', '<=', $to))
+            ->sum(\DB::raw('giftPrice * giftNum'));
+
+        $rate = Common::getCoinsValue('user_coins');
+        $totalGiftsUsd = $totalGiftsValue / $rate;
+
+        return response()->json([
+            'total_balance' => $totalTargets,
+            'pending_balance' => $totalCharges,
+            'available_balance' => $totalPayments,
+            'today_balance' => $totalGiftsUsd
+        ]);
+    }
+
+    public function financeTables(Request $request)
+    {
+        $payments = CoinLog::with('coin.paymentGateway')
+            ->whereIn('status', [1, 2])
+            ->latest()
+            ->take(6)
+            ->get()
+            ->map(fn($p) => [
+                'id' => $p->id,
+                'gateway' => $p->coin->paymentGateway->title ?? '',
+                'amount' => $p->obtained_coins,
+                'status' => $p->status,
+                'date' => \Carbon\Carbon::parse($p->created_at)->format('Y-m-d')
+            ]);
+
+        $withdrawals = WalletLog::with('user.profile')->where('operation', 'subtract')
+            ->latest()
+            ->take(8)
+            ->get()
+            ->map(function ($w) {
+                $defaultImage = asset('images/businessman-icon.jpg');
+                $path = $w->user->profile?->avatar ?? null;
+                $url = $path ? getImagePath($path) : $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return [
+                    'id' => $w->id,
+                    'user_name' => $w->user->name ?? '',
+                    'uuid' => $w->user->uuid ?? '',
+                    'user_id' => $w->user_id,
+                    'img' => $url,
+                    'amount' => $w->amount,
+                    'type' => $w->type,
+                    'date' => $w->created_at->format('Y-m-d')
+                ];
+            });
+        \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
+
+
+        $topUsers = \DB::table('charges')
+            ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
+            ->where('user_type', 'user')
+            ->groupBy('user_id')
+            ->orderByDesc('total_usd')
+            ->limit(5)
+            ->get();
+
+        $users = $topUsers->map(function ($u) {
+            $user = \App\Models\User::find($u->user_id);
+
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $path = $user->profile?->avatar;
+
+            $url = getImagePath($path) ?? $defaultImage;
+
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            return [
+                'id' => $u->user_id,
+                'name' => $user->name ?? 'غير معروف',
+                'uuid' => $user->uuid ?? 'غير معروف',
+                'avatar' => $url,
+                'total_usd' => $u->total_usd,
+                'last_charge' => $u->last_charge,
+            ];
+        });
+        return response()->json([
+            'payments' => $payments,
+            'withdrawals' => $withdrawals,
+            'topUsers' => $users
+        ]);
+    }
+
+    public function financeChartIndex(Request $request)
+    {
+        $days = (int)$request->query('days', 7);
+
+        $to = $request->filled('to')
+            ? Carbon::parse($request->query('to'))->endOfDay()
+            : now()->endOfDay();
+
+        $from = $request->filled('from')
+            ? Carbon::parse($request->query('from'))->startOfDay()
+            : $to->copy()->subDays($days - 1)->startOfDay();
+
+        $period = CarbonPeriod::create($from, $to);
+
+        $values = array_fill_keys(
+            array_map(fn($d) => $d->format('Y-m-d'), iterator_to_array($period)),
+            0
+        );
+
+        $charges = Charge::selectRaw('DATE(created_at) as date, SUM(usd) as total')
+            ->whereBetween('created_at', [$from, $to])
+            ->groupByRaw('DATE(created_at)')
+            ->orderBy('date')
+            ->pluck('total', 'date')
+            ->toArray();
+
+        foreach ($charges as $date => $total) {
+            $values[$date] = (float)$total;
+        }
+
+        $labels = array_map(
+            fn($d) => Carbon::parse($d)->format($days === 7 ? 'D' : 'd M'),
+            array_keys($values)
+        );
+
+        return response()->json([
+            'labels' => $labels,
+            'values' => array_values($values),
+        ]);
+    }
+
+    public function ajaxWalletLogs(Request $request)
+    {
+
+        $logs = WalletLog::with('user.profile')
+            ->whereIn('operation', ['add', 'cut'])
+            ->orderBy('created_at', 'desc')
+            ->take(8)
+            ->get();
+
+        return response()->json([
+            'data' => $logs->map(function ($log) {
+                $defaultImage = asset('images/businessman-icon.jpg');
+                $path = $log->user->profile?->avatar ?? null;
+                $url = $path ? getImagePath($path) : $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                return [
+                    'id' => $log->id,
+                    'user_name' => $log->user ? $log->user->name : '-',
+                    'user_id' => $log->user ? $log->user->id : '-',
+                    'user_uuid' => $log->user ? $log->user->uuid : '-',
+                    'img' => $url,
+                    'amount' => $log->amount,
+                    'operation' => $log->operation,
+                    'type' => $log->type,
+                    'before_amount' => $log->before_amount,
+                    'after_amount' => $log->after_amount,
+                    'created_at' => $log->created_at->format('Y-m-d H:i'),
+                ];
+            }),
+        ]);
     }
 }

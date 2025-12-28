@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Dashboard\StatisticsController;
+use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -760,3 +762,6 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
+Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
+Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
+Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);
