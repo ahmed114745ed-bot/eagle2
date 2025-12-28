@@ -131,8 +131,8 @@ return [
 
     'swoole' => [
         'options' => [
-            'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
-            'task_worker_num' => env('OCTANE_TASK_WORKERS', swoole_cpu_num()),
+            // 'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
+            // 'task_worker_num' => env('OCTANE_TASK_WORKERS', swoole_cpu_num()),
             'max_request' => env('OCTANE_MAX_REQUESTS', 500),
             'package_max_length' => 10 * 1024 * 1024,
             'http_parse_post' => true,
