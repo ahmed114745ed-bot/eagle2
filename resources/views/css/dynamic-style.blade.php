@@ -2789,6 +2789,10 @@
         ) !important;
         background-attachment: fixed !important;
     }
+
+    .logo-icon img {
+        width: 30% !important;
+    }
 </style>
 
 @include('css.dark_mode')
