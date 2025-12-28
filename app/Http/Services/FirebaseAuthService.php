@@ -25,4 +25,20 @@ class FirebaseAuthService
     {
         return $this->auth->createCustomToken($uid)->toString();
     }
+
+    public function createGuest(): array
+    {
+        $user = $this->auth->createUser([
+            'disabled' => false,
+        ]);
+
+        $uid = $user->uid;
+
+        $customToken = $this->auth->createCustomToken($uid)->toString();
+
+        return [
+            'uid'   => $uid,
+            'token' => $customToken,
+        ];
+    }
 }
