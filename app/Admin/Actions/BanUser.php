@@ -198,7 +198,10 @@ class BanUser extends Action
             }
         }
 
-
+  Log::info('ZEGO0000000 | sendToZego params unableToEnterRoom', [
+                    'room_id' => @$user->room->id,
+                    'user_id' => $user->id,
+                ]);
 
         if ($room && $newBan) {
             Log::info('ban user send banDevice to zego for user id ' . $user->id);
