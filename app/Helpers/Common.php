@@ -1512,7 +1512,7 @@ class Common
     public static function zegoData($key = null)
     {
         Log::info(111111);
-        $zegoClientId = env('ZEGO_CLIENT_ID') ?? config('app.zego_client_id');
+        $zegoClientId =  config('app.zego_client_id');
         Log::info('secret key', [
             'env client zego id' => $zegoClientId,
         ]);
