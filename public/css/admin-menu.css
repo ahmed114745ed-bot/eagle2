@@ -300,7 +300,7 @@
 
 /* accessibility focus */
 .crs-link:focus {
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 0 0 1px var(--secondary-color);
 }
 
 /* Pulse animation for active menu item */

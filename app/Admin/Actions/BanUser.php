@@ -163,6 +163,11 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
+                Log::info('ZEGO0000000 | sendToZego params unableToEnterRoom', [
+                    'json' => $json,
+                    'room_id' => @$user->room->id,
+                    'user_id' => $user->id,
+                ]);
                 Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
             } else if ($route == 'rooms/up_microphone' && $user->room) {
                 Log::info('ban user send unableToUPMicrophone to zego for user id ' . $user->id);
@@ -193,7 +198,10 @@ class BanUser extends Action
             }
         }
 
-
+  Log::info('ZEGO0000000 | sendToZego params unableToEnterRoom', [
+                    'room_id' => @$user->room->id,
+                    'user_id' => $user->id,
+                ]);
 
         if ($room && $newBan) {
             Log::info('ban user send banDevice to zego for user id ' . $user->id);
