@@ -48,39 +48,39 @@ return [
     */
 
     'listeners' => [
-        // WorkerStarting::class => [
-        //     EnsureUploadedFilesAreValid::class,
-        //     EnsureUploadedFilesCanBeMoved::class,
-        // ],
+        WorkerStarting::class => [
+            EnsureUploadedFilesAreValid::class,
+            EnsureUploadedFilesCanBeMoved::class,
+        ],
 
-        // RequestReceived::class => [
-        //     ...Octane::prepareApplicationForNextOperation(),
-        //     ...Octane::prepareApplicationForNextRequest(),
-        //     FlushAuthenticationState::class,  // ⭐ مهم جداً لحل مشكلة "غير مصدق"
-        //     FlushSessionState::class,
-        //     FlushLocaleState::class,
-        //     FlushQueuedCookies::class,
-        // ],
+        RequestReceived::class => [
+            ...Octane::prepareApplicationForNextOperation(),
+            ...Octane::prepareApplicationForNextRequest(),
+            FlushAuthenticationState::class,  // ⭐ مهم جداً لحل مشكلة "غير مصدق"
+            FlushSessionState::class,
+            FlushLocaleState::class,
+            FlushQueuedCookies::class,
+        ],
 
-        // RequestTerminated::class => [
-        //     FlushTemporaryContainerInstances::class,
-        //     // DisconnectFromDatabases::class,
-        //     CollectGarbage::class,
-        //     ReportException::class,
-        //     StopWorkerIfNecessary::class,
-        // ],
+        RequestTerminated::class => [
+            FlushTemporaryContainerInstances::class,
+            // DisconnectFromDatabases::class,
+            CollectGarbage::class,
+            ReportException::class,
+            StopWorkerIfNecessary::class,
+        ],
 
-        // TaskReceived::class => [
-        //     ...Octane::prepareApplicationForNextOperation(),
-        // ],
+        TaskReceived::class => [
+            ...Octane::prepareApplicationForNextOperation(),
+        ],
 
-        // TickReceived::class => [
-        //     ...Octane::prepareApplicationForNextOperation(),
-        // ],
+        TickReceived::class => [
+            ...Octane::prepareApplicationForNextOperation(),
+        ],
 
-        // WorkerStopping::class => [
-        //     //
-        // ],
+        WorkerStopping::class => [
+            //
+        ],
     ],
 
     /*
@@ -131,8 +131,8 @@ return [
 
     'swoole' => [
         'options' => [
-            // 'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
-            // 'task_worker_num' => env('OCTANE_TASK_WORKERS', swoole_cpu_num()),
+            'worker_num' => env('OCTANE_WORKERS', swoole_cpu_num()),
+            'task_worker_num' => env('OCTANE_TASK_WORKERS', swoole_cpu_num()),
             'max_request' => env('OCTANE_MAX_REQUESTS', 500),
             'package_max_length' => 10 * 1024 * 1024,
             'http_parse_post' => true,
