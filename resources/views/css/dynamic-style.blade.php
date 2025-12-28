@@ -603,7 +603,7 @@
     }
 
     .skin-black-light .sidebar a i {
-        color: var(--primary-color) !important;
+        color: var(--text-secondary-color) !important;
         margin-right: 12px !important;
         width: 20px !important;
         text-align: center !important;
@@ -672,7 +672,6 @@
     }
 
     .table .table {
-        background: var(--table-background-color) !important;
         color: var(--table-background-color) !important;
     }
 
@@ -1205,6 +1204,22 @@
         transform: scale(1.05) !important;
     }
 
+    body.sidebar-open .main-header .sidebar-toggle:not(#mobileSelectBtn) {
+        background-color: var(--primary-color) !important;
+        color: #ffffff !important;
+    }
+
+    #mobileSelectBtn.active {
+        background-color: var(--primary-color) !important;
+        color: #ffffff !important;
+    }
+
+    #mobileSelectBtn::before,
+    #mobileSelectBtn::after,
+    #mobileSelectBtn span {
+        display: none !important;
+    }
+
     .select2-dropdown {
         background-color: #ffffff !important;
         border: 1px solid #d1d5db !important;
@@ -1305,7 +1320,7 @@
 
     .btn-default {
         background-color: var(--primary-hover-alpha) !important;
-        color: var(--text-secondary-color) !important;
+        color: black !important;
         border: 1px solid var(--primary-hover-alpha) !important;
     }
 
@@ -1626,7 +1641,7 @@
 
     .sidebar-mini.sidebar-collapse .main-header .logo {
         width: 5.3% !important;
-        height: 75% !important;
+        height: 100% !important;
     }
 
     .rtl .sidebar-mini.sidebar-collapse .main-header .logo {
@@ -2312,7 +2327,6 @@
 
     .fields-group .input-group.input-group-sm .form-control {
         border-radius: 12px !important;
-        color: #f1f5f9;
         padding: 12px 16px;
         font-size: 14px;
         height: auto;
@@ -2332,11 +2346,6 @@
     .modal-dialog {
         margin: 5% auto !important;
     }
-
-    .modal-header .close {
-        margin-top: -4% !important;
-    }
-
 
     /* ==========================================
    AGENCY HEADER - RESPONSIVE DESIGN

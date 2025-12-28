@@ -181,7 +181,6 @@
     }
 
     .modal-footer {
-        display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 16px 20px;
@@ -251,11 +250,6 @@
     @media (max-width: 576px) {
         .modal-no {
             width: 95%;
-        }
-
-        .modal-footer {
-            flex-direction: column;
-            gap: 12px;
         }
 
         .btn-footer {
@@ -450,9 +444,10 @@
             </div>
 
             <div class="mobile-select-toggle d-lg-none">
-                <button id="mobileSelectBtn" class="btn btn-primary">
+                <a href="javascript:void(0);"
+                   id="mobileSelectBtn" class="sidebar-toggle mobile-select-toggle-btn" role="button">
                     <i class="fa fa-sliders"></i>
-                </button>
+                </a>
 
                 <div id="mobileSelectMenu" class="mobile-select-menu">
                     <select id="area-Manager-select-mobile" class="form-control" style="margin: 6% 0%;">
@@ -1116,12 +1111,14 @@
             mobileBtn.addEventListener("click", function (e) {
                 e.stopPropagation();
                 mobileMenu.classList.toggle("show");
+                mobileBtn.classList.toggle("active");
             });
         }
 
         document.addEventListener("click", function (e) {
             if (!mobileMenu.contains(e.target) && !mobileBtn.contains(e.target)) {
                 mobileMenu.classList.remove("show");
+                mobileBtn.classList.remove("active");
             }
         });
     });

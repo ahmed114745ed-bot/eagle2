@@ -459,11 +459,7 @@
         }
 
         .modal-dialog {
-            margin: 15% auto !important;
-        }
-
-        .modal-header .close {
-            margin-top: -7% !important;
+            margin: 25% auto !important;
         }
 
         .dashboard-container .tab-pane .col-md-12 .stats-container .row {

@@ -291,10 +291,6 @@ class UserController extends MainController
                 max-width: 90%;
             }
 
-            .modal {
-                top: 5%;
-            }
-
             .modal-body {
                 max-height: 70vh !important;
                 overflow-y: auto !important;
@@ -1068,9 +1064,14 @@ class UserController extends MainController
         $perPage = 10;
         $page = $request->get('page', 1);
 
+        if (empty($user->device_token)) {
+            return '<div class="alert alert-warning text-center">
+            This user has no device identifier.
+        </div>';
+        }
+
         $users = User::with('profile')
             ->where('device_token', $user->device_token)
-            ->where('id', '!=', $user->id)
             ->paginate($perPage, ['*'], 'page', $page);
 
         $rows = $users->map(function ($user) {
