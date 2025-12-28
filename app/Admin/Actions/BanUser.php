@@ -22,7 +22,6 @@ use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Facades\Admin as AuthAdmin;
-use Illuminate\Support\Facades\Log;
 
 class BanUser extends Action
 {
@@ -197,12 +196,7 @@ class BanUser extends Action
 
 
         if ($room && $newBan) {
-<<<<<<< Updated upstream
-
-            Log::info('ban user send to zego', ['room_id' => $room->id, 'user_id' => $user->id]);
-=======
             Log::info('ban user send banDevice to zego for user id ' . $user->id);
->>>>>>> Stashed changes
             $d = [
                 "messageContent" => [
                     "message" => "banDevice",
