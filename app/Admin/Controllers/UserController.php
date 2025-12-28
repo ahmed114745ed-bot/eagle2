@@ -648,7 +648,7 @@ class UserController extends MainController
         /* =========================
      | PACKS (ONE BASE QUERY)
      ========================= */
-        $packBase = Pack::with(['admin:id,name', 'userVip', 'ware:id,show_img'])
+        $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar','userVip', 'sender','ware:id,show_img'])
             ->where('user_id', $id)
             ->whereHas('ware')
             ->whereNull('deleted_at');
