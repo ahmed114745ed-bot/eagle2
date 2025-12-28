@@ -207,7 +207,11 @@ class BanUser extends Action
                 ]
             ];
             $json = json_encode($d);
-
+            Log::info('ZEGO0000000 | sendToZego params ban', [
+                'json' => $json,
+                'room_id' => $room->id,
+                'user_id' => $user->id,
+            ]);
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
         }
         if ($newBan) {
