@@ -69,10 +69,12 @@ trait ZegoTrait
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
+        Log::info('ZegoTrait sendToZego AppId ', ['AppId' => $AppId]);
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         // $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
         $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
+        Log::info('ZegoTrait sendToZego str ', ['str' => self::zegoData('zego_server_secret') ]);
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
@@ -140,12 +142,10 @@ trait ZegoTrait
 
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
-        Log::info('ZegoTrait sendToZego_3', ['AppId' => $AppId]);
         $SignatureNonce = self::getSignatureNonce();
         $Timestamp = time();
         //  $str = $AppId . $SignatureNonce . self::getConf('zego_server_secret') . $Timestamp;
         $str = $AppId . $SignatureNonce . self::zegoData('zego_server_secret') . $Timestamp;
-        Log::info('ZegoTrait sendToZego_3', ['zego_server_secret' => self::zegoData('zego_server_secret')]);
         $signature = md5($str);
         $SignatureVersion = '2.0';
         $params = [
