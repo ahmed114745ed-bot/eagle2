@@ -609,10 +609,10 @@ class UserController extends MainController
      | USER (ONE QUERY ONLY)
      ========================= */
         $user = User::with([
-            // 'profile:id,user_id,avatar',
+             'profile:id,user_id,avatar',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
-            // 'senderLevel:id,level,type',
-            // 'receiverLevel:id,level,type',
+            'senderLevel:id,level,type',
+            'receiverLevel:id,level,type',
 
             'packs' => function ($q) {
                 $q->where('type', 25)
