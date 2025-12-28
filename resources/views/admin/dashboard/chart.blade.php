@@ -435,12 +435,12 @@
     }
 
     .nav-tabs .nav-link:hover {
-        background-color: #f8f9fa;
+        background-color: var(--primary-color);
         color: #495057;
     }
 
     .nav-tabs .nav-link.active {
-        background-color: #007bff;
+        background-color: var(--primary-color);
         color: white;
         box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
     }

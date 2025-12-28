@@ -343,9 +343,8 @@
     }
 </style>
 <header class="main-header">
-    <a href="{{ admin_url('/') }}" class=" menu-link  logo d-flex align-items-center gap-2 " style=" ">
-
-        <div class="logo-icon ms-2" style="width: 100%;">
+    <a href="{{ admin_url('/') }}" class="menu-link logo d-flex align-items-center gap-2">
+        <div class="logo-icon ms-2" style="display: flex; align-items: center; justify-content: center; padding: 8px;">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();
@@ -357,16 +356,14 @@
             @if(!empty($logo))
                 <img src="{{ $logo }}"
                      alt="{{ $appName }}"
-                     class="h-12 w-12 object-contain rounded-circle"
-                     style="height: 95%;  width: 89%; border-radius:50%;">
+                     style="max-height: 40px; width: auto; object-fit: contain;">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
-                      style="height:32px;width:32px;font-weight:bold;">
-                    {{ strtoupper(substr($appName, 0, 1)) }}
-                </span>
+                      style="height:32px; width:32px; font-weight:bold;">
+                {{ strtoupper(substr($appName, 0, 1)) }}
+            </span>
             @endif
         </div>
-
     </a>
 
     <nav class="navbar navbar-static-top" role="navigation">
