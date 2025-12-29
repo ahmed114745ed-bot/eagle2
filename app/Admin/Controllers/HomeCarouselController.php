@@ -161,7 +161,7 @@ class HomeCarouselController extends MainController
                                 </label>
                                 <br>
                                 <small class='duration-text' style='display:block; margin-top:5px;'>
-                                {$duration} {$icon} 
+                                {$duration} {$icon}
                                 </small>
                             </div>
                             ";
@@ -229,28 +229,6 @@ class HomeCarouselController extends MainController
 
         // Make table header sticky when scrolling
         Admin::style('
-            .table-responsive {
-                max-height: calc(100vh - 250px);
-                overflow-y: auto;
-            }
-            .grid-table thead th {
-                position: sticky;
-                top: 0;
-                background-color: #f5f5f5;
-                z-index: 10;
-                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-            }
-            .grid-table thead th::after {
-                content: "";
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                border-bottom: 1px solid #ddd;
-            }
-
-
-
             .switch {
       position: relative;
       display: inline-block;
@@ -258,7 +236,7 @@ class HomeCarouselController extends MainController
       height: 24px;
     }
 
-    .switch input { 
+    .switch input {
       opacity: 0;
       width: 0;
       height: 0;
@@ -322,11 +300,11 @@ class HomeCarouselController extends MainController
 //            }
 //        ');
 
-//        Admin::script("
-//        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-//            $('.table-responsive').removeClass('table-responsive');
-//            }
-//        ");
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -352,14 +330,14 @@ class HomeCarouselController extends MainController
             optional($display)->delete();
         }
 
-        
+
             return response()->json([
                 'success'    => true,
                 'message'    => __('Submission status updated successfully!'),
                 'display_id' => $display->id ?? 0,
             ]);
-        
-      
+
+
         return back()->with('success', __('Submission status updated successfully!'));
     }
 
