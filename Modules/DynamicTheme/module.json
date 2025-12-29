@@ -1,0 +1,13 @@
+{
+    "name": "DynamicTheme",
+    "alias": "dynamictheme",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\DynamicTheme\\Providers\\DynamicThemeServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

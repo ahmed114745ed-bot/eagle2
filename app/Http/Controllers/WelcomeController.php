@@ -21,7 +21,7 @@ class WelcomeController extends Controller
     
     public function index()
     {
-        $appName = $this->appName();
+        $appName = $this->appName() ?? 'Default';
         $logo = getAppLogo();
         $settings = Setting::pluck('value', 'key')->toArray();
         $firstChar = mb_substr($appName, 0, 1);

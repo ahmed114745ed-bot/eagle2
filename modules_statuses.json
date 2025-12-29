@@ -36,5 +36,6 @@
     "TaskStream": true,
     "HostLevel": true,
     "UsersWallet": true,
-    "RankingReward": true
+    "RankingReward": true,
+    "DynamicTheme": true
 }

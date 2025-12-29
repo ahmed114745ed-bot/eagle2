@@ -1,0 +1,235 @@
+    <!-- Primary Settings -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                    Primary Settings
+                </h3>
+                <div class="space-y-3">
+                    <div v-for="(value, key) in localSettings.primary_settings" :key="key" class="flex flex-col">
+                        <label class="text-xs text-gray-600 mb-1">{{ formatLabel(key) }}</label>
+
+                        <!-- Boolean -->
+                        <div v-if="typeof value === 'boolean'" class="flex items-center">
+                            <input
+                                type="checkbox"
+                                :checked="value"
+                                @change="updatePrimarySetting(key, $event.target.checked)"
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            />
+                            <span class="ml-2 text-sm text-gray-700">{{ value ? 'Enabled' : 'Disabled' }}</span>
+                        </div>
+
+                        <!-- Number -->
+                        <input
+                            v-else-if="typeof value === 'number' || key.includes('percentage') || key.includes('rank') || key.includes('columns')"
+                            type="number"
+                            :value="value"
+                            @input="updatePrimarySetting(key, Number($event.target.value))"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+
+                        <!-- Select for layout -->
+                        <select
+                            v-else-if="key === 'layout'"
+                            :value="value"
+                            @change="updatePrimarySetting(key, $event.target.value)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="grid">Grid</option>
+                            <option value="list">List</option>
+                        </select>
+
+                        <!-- Text -->
+                        <input
+                            v-else
+                            type="text"
+                            :value="value"
+                            @input="updatePrimarySetting(key, $event.target.value)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+                </div>
+            </div>
+       
+
+            <!-- Secondary Settings -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                    <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                    Secondary Settings (Appearance)
+                </h3>
+                <div class="space-y-3">
+                    <div v-for="(value, key) in filteredSecondarySettings" :key="key" class="flex flex-col">
+                        <label class="text-xs text-gray-600 mb-1">{{ formatLabel(key) }}</label>
+
+                        <!-- Boolean -->
+                        <div v-if="typeof value === 'boolean'" class="flex items-center">
+                            <input
+                                type="checkbox"
+                                :checked="value"
+                                @change="updateSecondarySetting(key, $event.target.checked)"
+                                class="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                            />
+                            <span class="ml-2 text-sm text-gray-700">{{ value ? 'Enabled' : 'Disabled' }}</span>
+                        </div>
+
+                        <!-- Number -->
+                        <input
+                            v-else-if="typeof value === 'number'"
+                            type="number"
+                            :value="value"
+                            @input="updateSecondarySetting(key, Number($event.target.value))"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        />
+
+                        <!-- Select for indicator_style -->
+                        <select
+                            v-else-if="key === 'indicator_style'"
+                            :value="value"
+                            @change="updateSecondarySetting(key, $event.target.value)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        >
+                            <option value="dots">Dots</option>
+                            <option value="lines">Lines</option>
+                            <option value="numbers">Numbers</option>
+                        </select>
+
+                        <!-- Select for scroll_direction -->
+                        <select
+                            v-else-if="key === 'scroll_direction'"
+                            :value="value"
+                            @change="updateSecondarySetting(key, $event.target.value)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        >
+                            <option value="horizontal">Horizontal</option>
+                            <option value="vertical">Vertical</option>
+                        </select>
+
+                        <!-- Text -->
+                        <input
+                            v-else
+                            type="text"
+                            :value="value"
+                            @input="updateSecondarySetting(key, $event.target.value)"
+                            class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Position Settings (for positioned widgets) -->
+            <div v-if="widget.is_positioned">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                    <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
+                    Position Settings
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-600 mb-1">Anchor</label>
+                        <select
+                            v-model="localSettings.position.anchor"
+                            @change="updateSettings"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                        >
+                            <option value="top_left">Top Left</option>
+                            <option value="top_right">Top Right</option>
+                            <option value="bottom_left">Bottom Left</option>
+                            <option value="bottom_right">Bottom Right</option>
+                            <option value="center">Center</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs text-gray-600 mb-1">Top %</label>
+                            <input
+                                type="number"
+                                v-model.number="localSettings.position.top_percentage"
+                                @input="updateSettings"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 mb-1">Bottom %</label>
+                            <input
+                                type="number"
+                                v-model.number="localSettings.position.bottom_percentage"
+                                @input="updateSettings"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 mb-1">Left %</label>
+                            <input
+                                type="number"
+                                v-model.number="localSettings.position.left_percentage"
+                                @input="updateSettings"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-600 mb-1">Right %</label>
+                            <input
+                                type="number"
+                                v-model.number="localSettings.position.right_percentage"
+                                @input="updateSettings"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Settings (for widgets with actions) -->
+            <div v-if="widget.action || widget.is_positioned">
+                <h3 class="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    Action
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-xs text-gray-600 mb-1">Action Type</label>
+                        <select
+                            v-model="localSettings.action.type"
+                            @change="updateSettings"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        >
+                            <option value="screen">Navigate to Screen</option>
+                            <option value="webview">Open WebView</option>
+                            <option value="filter">Filter</option>
+                            <option value="internal">Internal Action</option>
+                        </select>
+                    </div>
+
+                    <div v-if="localSettings.action.type === 'screen'">
+                        <label class="text-xs text-gray-600 mb-1">Screen Key</label>
+                        <input
+                            type="text"
+                            v-model="localSettings.action.screen_key"
+                            @input="updateSettings"
+                            placeholder="e.g., games_screen"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        />
+                    </div>
+
+                    <div v-if="localSettings.action.type === 'webview'">
+                        <label class="text-xs text-gray-600 mb-1">URL</label>
+                        <input
+                            type="url"
+                            v-model="localSettings.action.url"
+                            @input="updateSettings"
+                            placeholder="https://..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        />
+                        <label class="text-xs text-gray-600 mb-1 mt-2">Title</label>
+                        <input
+                            type="text"
+                            v-model="localSettings.action.title"
+                            @input="updateSettings"
+                            placeholder="Page Title"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                        />
+                    </div>
+                </div>
+            </div>
+
+           

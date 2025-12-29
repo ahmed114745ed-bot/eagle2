@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{  $appName }} - Meet New People & Go Live</title>
+    <title>{{  @$appName }} - Meet New People & Go Live</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-pap7tB9iKkZrV8+WZgQ4a8PSULs2uR3bBjrEk1DThwSbWbQ4zX+9XbQ1tXEbJ0fJG2hnvGH+FvAb5N1yZ2lPGA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Enhanced color scheme */
-            --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};     
-            --secondary-color:{{ data_get($settings, 'app_primary_color', '#ffffff') }};
+            --primary-color: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};     
+            --secondary-color:{{ data_get(@$settings, 'app_primary_color', '#ffffff') }};
             --accent-color: #06b6d4;
             --dark-bg: #0f0f23;
             --text-color: #1a1a2e;
-            --text-light: {{ data_get($settings, 'text_header_color', '#fff') }};
+            --text-light: {{ data_get(@$settings, 'text_header_color', '#fff') }};
             
-            --background:{{ data_get($settings, 'background_color', '#fff') }};
-            --background-alt:{{ data_get($settings, 'background_color', '#fff') }};
+            --background:{{ data_get(@$settings, 'background_color', '#fff') }};
+            --background-alt:{{ data_get(@$settings, 'background_color', '#fff') }};
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
@@ -359,7 +359,7 @@
         .logo-icon {
             width: 45px;
             height: 45px;
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 12px;
             display: flex;
@@ -387,7 +387,7 @@
             font-size: 28px;
             font-weight: 700;
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -427,7 +427,7 @@
         }
 
         .download-btn {
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             color: white !important;
             padding: 12px 30px;
@@ -493,7 +493,7 @@
             margin-top: 80px;
             min-height: 100vh;
             /* background: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%); */
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }} ;
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }} ;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -849,7 +849,7 @@
             transform: translateX(-50%);
             width: 60px;
             height: 4px;
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
 
             /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 2px;
@@ -891,7 +891,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
             /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             transform: scaleX(0);
             transition: transform 0.4s;
@@ -921,7 +921,7 @@
         .feature-icon {
             width: 90px;
             height: 90px;
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
 
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             border-radius: 50%;
@@ -959,7 +959,7 @@
 
         /* Stats Section */
         .stats {
-            background: {{ data_get($settings, 'app_primary_color', '#ffffff') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#ffffff') }};
             /* background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); */
             padding: 80px 8%;
             color: white;
@@ -1032,7 +1032,7 @@
         /* Gallery Section */
         .gallery {
             padding: 100px 8%;
-            background: {{ data_get($settings, 'background_color', '#fff') }};
+            background: {{ data_get(@$settings, 'background_color', '#fff') }};
         }
 
         .gallery-grid {
@@ -1093,7 +1093,7 @@
         .cta {
             padding: 100px 8%;
             text-align: center;
-            background: {{ data_get($settings, 'background_color', '#fff') }};
+            background: {{ data_get(@$settings, 'background_color', '#fff') }};
             /* background: linear-gradient(135deg, #fafafe 0%, #f3f4f6 100%); */
             position: relative;
             overflow: hidden;
@@ -1366,7 +1366,7 @@
             left: 0;
             width: 0%;
             height: 3px;
-            background: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
+            background: {{ data_get(@$settings, 'app_primary_color', '#32e5ac') }};
             /* background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); */
             z-index: 1001;
             transition: width 0.1s;
@@ -1473,12 +1473,12 @@
 
             <div class="logo-icon">
                 @if(!empty($logo))
-                    <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
+                    <img src="{{@$logo }}" alt="{{@$appName }}" class="h-12 w-12 object-contain rounded-full">
                 @else
-                        {{ strtoupper(substr($appName, 0, 1)) }}
+                        {{ strtoupper(substr(@$appName, 0, 1)) }}
                 @endif
             </div>
-            <div class="logo-text">{{  $appName }}</div>
+            <div class="logo-text">{{ @$appName }}</div>
         </div>
         <nav id="nav">
             <a href="#features" data-translate="nav.features">Features</a>
@@ -1614,7 +1614,7 @@
 
     <!-- Gallery Section -->
     <section class="gallery" id="gallery">
-        <h2 class="section-title" data-translate="gallery.title">Experience {{ $appName }}</h2>
+        <h2 class="section-title" data-translate="gallery.title">Experience {{@$appName }}</h2>
         <p class="section-subtitle" data-translate="gallery.subtitle">See how millions connect and share every day</p>
         <div class="gallery-grid">
             <div class="gallery-item">
@@ -1684,7 +1684,7 @@
 
     <!-- CTA Section -->
     <section class="cta" id="download">
-        <h2 data-translate="cta.title">Ready to Join {{ $appName }}?</h2>
+        <h2 data-translate="cta.title">Ready to Join {{@$appName }}?</h2>
         <p data-translate="cta.subtitle">Download now and start connecting with millions of people worldwide</p>
         <div class="app-stores">
             <a href="{{ @$settings['ios_link'] }}" class="store-badge">
@@ -1718,13 +1718,13 @@
                 <div class="logo-container">
                     <div class="logo-icon">
                         @if(!empty($logo))
-                            <img src="{{ $logo }}" alt="{{ $appName }}" class="h-12 w-12 object-contain rounded-full">
+                            <img src="{{@$logo }}" alt="{{@$appName }}" class="h-12 w-12 object-contain rounded-full">
                         @else
-                                {{ strtoupper(substr($appName, 0, 1)) }}
+                                {{ strtoupper(substr(@$appName, 0, 1)) }}
                         @endif
                     </div>
                 
-                <div class="logo-text">{{ $appName }}</div>
+                <div class="logo-text">{{@$appName }}</div>
                 </div>
                 <p style="margin-top: 20px; color: #94a3b8;" data-translate="footer.desc">Connect with millions worldwide through live streaming and social discovery.</p>
                 
@@ -1789,7 +1789,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p data-translate="footer.copyright">&copy; 2024 {{ $appName }}. All rights reserved. Built for connecting people worldwide.</p>
+            <p data-translate="footer.copyright">&copy; 2024 {{@$appName }}. All rights reserved. Built for connecting people worldwide.</p>
         </div>
     </footer>
 
@@ -1870,7 +1870,7 @@
                     desc: "Post photos and short videos to share your daily life. Build your followers and increase your popularity."
                 },
                 gallery: {
-                    title: "Experience {{ $appName }}",
+                    title: "Experience {{@$appName }}",
                     subtitle: "See how millions connect and share every day"
                 },
                 gallery1: { title: "Live Streaming", desc: "Broadcast to the world" },
@@ -1883,7 +1883,7 @@
                 stats3: { desc: "Daily Streams" },
                 stats4: { desc: "Support" },
                 cta: {
-                    title: "Ready to Join {{ $appName }}?",
+                    title: "Ready to Join {{@$appName }}?",
                     subtitle: "Download now and start connecting with millions of people worldwide"
                 },
                 store: {
@@ -1914,7 +1914,7 @@
                     privacy: "Privacy Policy",
                     guidelines: "Guidelines",
                     report: "Report Issue",
-                    copyright: "© 2024 {{ $appName }}. All rights reserved. Built for connecting people worldwide."
+                    copyright: "© 2024 {{@$appName }}. All rights reserved. Built for connecting people worldwide."
                 }
             },
             ar: {
@@ -1991,7 +1991,7 @@
                     desc: "انشر الصور ومقاطع الفيديو القصيرة لمشاركة حياتك اليومية. ابن متابعيك وزد من شعبيتك."
                 },
                 gallery: {
-                    title: "تجربة {{ $appName }}",
+                    title: "تجربة {{@$appName }}",
                     subtitle: "شاهد كيف يتواصل ويشارك الملايين كل يوم"
                 },
                 gallery1: { title: "البث المباشر", desc: "البث للعالم" },
@@ -2004,7 +2004,7 @@
                 stats3: { desc: "بث يومي" },
                 stats4: { desc: "دعم" },
                 cta: {
-                    title: "جاهز للانضمام إلى {{ $appName }}؟",
+                    title: "جاهز للانضمام إلى {{@$appName }}؟",
                     subtitle: "حمل الآن وابدأ التواصل مع ملايين الأشخاص حول العالم"
                 },
                 store: {
@@ -2035,7 +2035,7 @@
                     privacy: "سياسة الخصوصية",
                     guidelines: "الإرشادات",
                     report: "الإبلاغ عن مشكلة",
-                    copyright: "© 2024 {{ $appName }}. جميع الحقوق محفوظة. صُمم لربط الناس حول العالم."
+                    copyright: "© 2024 {{@$appName }}. جميع الحقوق محفوظة. صُمم لربط الناس حول العالم."
                 }
             }
             // Add more languages here following the same structure
