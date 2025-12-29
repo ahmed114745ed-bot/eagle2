@@ -536,11 +536,8 @@ class EnteranceController extends Controller
 
             if ($request->hasFile('room_cover')) {
 
-                $room->room_cover = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'rooms',
-                        'room_cover'
-                    );
+             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+
             }
 
             if ($request->free_mic) {
