@@ -96,7 +96,7 @@
     .dark-mode,
     .dark-mode .content-header > .breadcrumb > li > a,
     .dark-mode .content-header > h1,
-    .dark-mode * {
+    .dark-mode *:not([class*="phpdebugbar"]):not(.phpdebugbar *) {
         color: #ffffff !important;
     }
 
