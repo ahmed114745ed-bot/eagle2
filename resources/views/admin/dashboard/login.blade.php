@@ -556,9 +556,9 @@
             <div class="form-group">
                 <label class="input-label">اسم المستخدم</label>
                 <div class="input-container">
-                    <input 
-                        type="text" 
-                        class="form-input" 
+                    <input
+                        type="text"
+                        class="form-input"
                         placeholder="أدخل اسم المستخدم"
                         value="mktest23"
                         required
@@ -571,9 +571,9 @@
             <div class="form-group">
                 <label class="input-label">كلمة المرور</label>
                 <div class="input-container">
-                    <input 
-                        type="password" 
-                        class="form-input" 
+                    <input
+                        type="password"
+                        class="form-input"
                         id="passwordInput"
                         placeholder="أدخل كلمة المرور"
                         value="password123"
@@ -670,7 +670,7 @@
             const btn = document.getElementById('loginBtn');
             btn.classList.add('loading');
             btn.innerHTML = '<span class="button-content"><span class="spinner"></span><span>جاري التحقق...</span></span>';
-            
+
             setTimeout(() => {
                 btn.classList.remove('loading');
                 btn.innerHTML = '<span class="button-content"><span>✓ تم بنجاح</span></span>';
@@ -686,7 +686,7 @@
             input.addEventListener('focus', function() {
                 this.parentElement.style.transform = 'scale(1.02)';
             });
-            
+
             input.addEventListener('blur', function() {
                 this.parentElement.style.transform = 'scale(1)';
             });

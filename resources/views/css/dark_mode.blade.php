@@ -156,7 +156,10 @@
         border-color: rgba(255, 255, 255, 0.15) !important;
     }
 
-    .dark-mode .btn-default {
+    .dark-mode .btn-default,
+    .dark-mode .btn:hover,
+    .dark-mode .btn-success:hover,
+    .dark-mode .button:hover {
         color: var(--text-secondary-color) !important;
     }
 

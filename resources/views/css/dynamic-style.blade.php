@@ -999,8 +999,12 @@
     .button:hover {
         transform: translateY(-1px) !important;
         box-shadow: var(--shadow-md) !important;
-        color: var(--text-secondary-color) !important;
+        color: black !important;
         border-color: var(--secondary-color);
+    }
+
+    .btn-default:hover {
+        color: black !important;
     }
 
     .btn-dropbox,
@@ -1113,7 +1117,7 @@
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-primary, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-primary {
-        background: var(--primary-color) !important;
+        background: green !important;
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-success, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-success {
@@ -1329,7 +1333,7 @@
     }
 
     .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
-        background: black !important;
+        background: red !important;
         color: var(--text-secondary-color) !important;
     }
 
@@ -2438,7 +2442,6 @@
         border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 12px !important;
         padding: 20px !important;
-        margin-top: auto;
         align-self: flex-start;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         display: flex;
@@ -2824,6 +2827,10 @@
     .rtl .main-header .logo .logo-icon {
         margin-right: 0;
         margin-left: 8px;
+    }
+
+    .main-sidebar, .left-side {
+        padding-top: 5% !important;
     }
 
     .stats-container .info-box {
