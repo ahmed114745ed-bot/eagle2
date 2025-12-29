@@ -282,6 +282,7 @@ Route::group(
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         Route::resource('free-users', 'FreeUserController');
+        Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
         Route::resource('family-users', 'UserFamilyController');
         Route::post('send-request-invite-code', 'UserController@request_invite_code');
@@ -450,7 +451,7 @@ Route::group(
         Route::resource('server-country', ServerCountryController::class);
         Route::resource('room-gift-targets', RoomGiftTargetController::class);
 
-        
+
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         Route::resource('manger-types', 'MangerTypeController');
