@@ -42,7 +42,7 @@ jobs:
           cd /var/www/lumio
           pwd
           #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t lumio-octa:${{ github.sha }} .
+          docker build -t lumio-octa:${{ github.sha }} . -f Dockerfile-octan
           docker service update --image lumio-octa:${{ github.sha }} lumio-octa
 
           # Get container ID of task 5live-app.1
