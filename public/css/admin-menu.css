@@ -690,3 +690,51 @@ body.sidebar-collapse .sidebar .crs-icon,
 .crs-menu {
     padding: 0;
 }
+
+/* Menu Badge */
+.crs-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border-radius: 10px;
+    margin-left: auto;
+    margin-right: 8px;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+    animation: badge-pulse 2s infinite;
+}
+
+[dir="rtl"] .crs-badge,
+.rtl .crs-badge {
+    margin-left: 8px;
+    margin-right: auto;
+}
+
+/* Pulse Animation */
+@keyframes badge-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Collapsed sidebar */
+.sidebar-collapse .crs-badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 9px;
+    padding: 0 3px;
+    margin: 0;
+}
+
+.rtl .sidebar-collapse .crs-badge {
+    right: auto;
+    left: 5px;
+}

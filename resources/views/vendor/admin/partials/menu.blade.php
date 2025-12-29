@@ -99,6 +99,13 @@ $isVisible =
     Admin::user()->visible($roles) &&
     Admin::user()->can($permission) &&
     (!is_null($itemId) && !in_array($itemId, $renderedMenu));
+
+$badgeCount = 0;
+$badgeUris = ['form-requests'];
+
+if (Str::contains($uri, $badgeUris)) {
+    $badgeCount = \Modules\Form\Entities\FormRequest::where('status', 'pending')->count();
+}
 @endphp
 
 @if($isVisible)
@@ -116,11 +123,15 @@ $isVisible =
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
                 <span class="crs-title">
-                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle)))) 
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
                         ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
                         : $normalizedTitle
                     }}
                 </span>
+
+                    @if($badgeCount > 0)
+                        <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
+                    @endif
             </a>
         </li>
     @else
@@ -133,7 +144,7 @@ $isVisible =
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
                 <span class="crs-title">
-                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle)))) 
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
                         ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
                         : $normalizedTitle
                     }}
