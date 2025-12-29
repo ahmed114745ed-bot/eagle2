@@ -105,7 +105,7 @@ class VersionController extends Controller
             'app_url' => @$appUrl,
             'is_new_theme_enabled' => (bool) ($settings['is_new_theme_enabled'] ?? false),
             'moment_status'  => (bool) ($settings['moment_status'] ?? true),
-            'is_show_host_level' =>
+            'is_show_host_levels' =>
             intval($settings['host_level_action'] ?? 0) === 1
                 && intval($settings['host_level_enabled'] ?? 0) === 1,
 
