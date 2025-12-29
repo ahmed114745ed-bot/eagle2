@@ -2137,11 +2137,21 @@ class Common
             'admin',
             'bd',
             'senderUser',
+            'senderUser.packs' => function ($q) {
+            $q->whereIn('type', [25])
+              ->where('is_used', true)
+              ->with('ware:id,value');
+        },
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
             'receiverUser',
             'receiverUser.profile',
+            'receiverUser.packs' => function ($q) {
+            $q->whereIn('type', [25])
+              ->where('is_used', true)
+              ->with('ware:id,value');
+        },
             'receiveragency',
         ];
     }
