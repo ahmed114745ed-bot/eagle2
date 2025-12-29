@@ -46,23 +46,65 @@
 </style>
 
 
-@php
-    $uri = \Illuminate\Support\Arr::get($item, 'uri', '');
-    $shouldHideBd = Str::startsWith($uri, 'bd/') && !Admin::user()->inRoles(['bd']);
 
-    $renderedMenu = $renderedMenu ?? [];
-    $itemId = $item['id'] ?? null;
+
+
+@php
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
+/* -------------------------------
+ | URI / BD Visibility
+ |-------------------------------*/
+$uri = Arr::get($item, 'uri', '');
+$shouldHideBd = Str::startsWith($uri, 'bd/') && !Admin::user()->inRoles(['bd']);
+
+/* -------------------------------
+ | Prevent duplicate rendering
+ |-------------------------------*/
+$renderedMenu = $renderedMenu ?? [];
+$itemId = $item['id'] ?? null;
+
+/* -------------------------------
+ | Normalize title
+ |-------------------------------*/
+$rawTitle = Arr::get($item, 'title', '');
+
+if (is_array($rawTitle)) {
+    // Pick current locale or first available
+    $rawTitle = $rawTitle[app()->getLocale()] ?? reset($rawTitle);
+}
+
+$normalizedTitle = is_string($rawTitle) ? $rawTitle : '';
+
+/* -------------------------------
+ | Normalize roles
+ |-------------------------------*/
+$roles = Arr::get($item, 'roles', []);
+if (!is_array($roles)) {
+    $roles = [];
+}
+
+/* -------------------------------
+ | Normalize permission
+ |-------------------------------*/
+$permission = Arr::get($item, 'permission');
+if (is_array($permission)) {
+    // pick first permission if it's an array
+    $permission = reset($permission);
+}
+
+$isVisible =
+    !$shouldHideBd &&
+    Admin::user()->visible($roles) &&
+    Admin::user()->can($permission) &&
+    (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 @endphp
 
-@if(!$shouldHideBd
-    && Admin::user()->visible(\Illuminate\Support\Arr::get($item, 'roles', []))
-    && Admin::user()->can(\Illuminate\Support\Arr::get($item, 'permission'))
-    && (!is_null($itemId) && !in_array($itemId, $renderedMenu)))
-
+@if($isVisible)
     @php
         $renderedMenu[] = $itemId;
-        $href = url()->isValidUrl($item['uri']) ? $item['uri'] : admin_url($item['uri']);
-        $titleTranslation = 'admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($item['title'])));
+        $href = url()->isValidUrl($uri) ? $uri : admin_url($uri);
     @endphp
 
     @if(!isset($item['children']))
@@ -73,8 +115,12 @@
                 @else
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
-                <span
-                    class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                <span class="crs-title">
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle)))) 
+                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        : $normalizedTitle
+                    }}
+                </span>
             </a>
         </li>
     @else
@@ -86,8 +132,12 @@
                 @else
                     <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
                 @endif
-                <span
-                    class="crs-title">{{ Lang::has($titleTranslation) ? __($titleTranslation) : admin_trans($item['title']) }}</span>
+                <span class="crs-title">
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle)))) 
+                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        : $normalizedTitle
+                    }}
+                </span>
                 @php $isRtl = app()->getLocale() === 'ar'; @endphp
                 <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow" aria-hidden="true"></i>
             </a>
@@ -103,8 +153,3 @@
         </li>
     @endif
 @endif
-
-
-
-
-
