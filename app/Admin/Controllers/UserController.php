@@ -603,7 +603,9 @@ class UserController extends MainController
         $agencyId   = request('agency_id');
         $chargeTabType = request('type', 'receiver');
         $giftType   = request('gift_type', 'receiver');
-        $packs = $types = $currentType = null;
+        $packs = null;
+         $types = collect();
+        $currentType = null;
         $userVips = $hasVip = null;
         $salaries = null;
         $charges = null;
@@ -627,7 +629,7 @@ class UserController extends MainController
                     ->with('ware:id,value');
             },
         ])->findOrFail($id);
-     $curantBalance = wallet_available_by_user($id);
+        $curantBalance = wallet_available_by_user($id);
         $availableBalance = wallet_available_by_user($id);
         /* =========================
         | USER IMAGE
@@ -748,7 +750,7 @@ class UserController extends MainController
                     ->appends(['tab' => 'wallet_logs', 'year' => $year, 'month' => $month]);
                 break;
         }
-         $countries = $this->countries();
+        $countries = $this->countries();
 
         /* =========================
      | VIEW

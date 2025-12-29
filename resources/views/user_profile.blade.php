@@ -1185,7 +1185,11 @@
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
 
-        <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
+        <a href="?tab=packs"
+            class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
+            data-target="packs-tab">
+            {{ __('packs') }}
+            </a>
 
         <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
            data-target="vips-tab">{{ __('vips') }}</a>
@@ -1232,8 +1236,8 @@
 
 
     <!-- packs Section -->
- @if($activeTab == 'packs')
-    <div class="tab-content active" id="packs-tab">
+ 
+    <div class="tab-content {{ $activeTab === 'packs' ? '' : 'd-none' }}" id="packs-tab">
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title" style="text-align: left;">{{ __('pack') }}</h4>
@@ -1400,7 +1404,7 @@
         </div>
 
     </div>
-    @endif
+    
 
 
     <!-- vips Section -->
