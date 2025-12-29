@@ -87,6 +87,7 @@ use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\CoinGameUserAllController;
+use App\Admin\Controllers\CountryCategoryController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
@@ -338,6 +339,7 @@ Route::group(
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
+        Route::resource('country-categories', CountryCategoryController::class);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
         Route::get('country-request-history', [CountryRequestHistoryController::class, 'index']);
         Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
