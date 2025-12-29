@@ -161,7 +161,7 @@
     }
 
     input:checked + .slider {
-        background: var(--primary-button) !important;
+        background: var(--primary-color) !important;
     }
 
     .content-header > .breadcrumb > li > a {
@@ -1172,7 +1172,7 @@
 
     .table > tbody > tr > td {
         border-top: 1px solid #f3f4f6 !important;
-        padding: 12px 16px !important;
+        /*padding: 12px 16px !important;*/
         color: #374151 !important;
     }
 
