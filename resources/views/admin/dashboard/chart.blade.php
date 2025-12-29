@@ -21,6 +21,14 @@
         padding: 20px;
     }
 
+    .dashboard-container {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
     .section-header {
         font-size: 2.5rem;
         font-weight: 800;
@@ -599,11 +607,11 @@
 
             <div class="tab-pane fade" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
                 <div class="col-md-12 mb-4">@include('admin.dashboard.widgets.room_tab')</div>
-                <div class="stats-grid">
-                    <div class="widget-card">@include('admin.dashboard.widgets.rooms_distribution_chart')</div>
-                    <div class="widget-card">@include('admin.dashboard.widgets.rooms_activity_chart')</div>
-                    <div class="widget-card">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div>
-                    <div class="widget-card">@include('admin.dashboard.widgets.avg_session_duration_chart')</div>
+                <div class="row">
+                    <div class="col-lg-6 col-12 mb-3"><div class="widget-card">@include('admin.dashboard.widgets.rooms_distribution_chart')</div></div>
+                    <div class="col-lg-6 col-12 mb-3"><div class="widget-card">@include('admin.dashboard.widgets.rooms_activity_chart')</div></div>
+                    <div class="col-lg-6 col-12 mb-3"><div class="widget-card">@include('admin.dashboard.widgets.top_gifted_rooms_chart')</div></div>
+                    <div class="col-lg-6 col-12 mb-3"><div class="widget-card">@include('admin.dashboard.widgets.avg_session_duration_chart')</div></div>
                 </div>
             </div>
 

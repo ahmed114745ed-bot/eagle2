@@ -1040,13 +1040,6 @@
         color: var(--text-secondary-color);
     }
 
-    .box-header > .fa,
-    .box-header > .glyphicon,
-    .box-header > .ion,
-    .box-header .box-title {
-        color: var(--text-secondary-color) !important;
-    }
-
     .rtl .box-header > .fa,
     .rtl .box-header > .glyphicon,
     .rtl .box-header > .ion,
