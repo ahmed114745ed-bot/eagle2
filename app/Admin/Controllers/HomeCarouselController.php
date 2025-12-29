@@ -134,7 +134,7 @@ class HomeCarouselController extends MainController
 
                     $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture() ? 1 : 0;
 
-                    $duration = 0;
+                    $duration = "∞";
                     if ($display && $display->end_at) {
                         $duration = Carbon::parse($display->end_at)->isFuture()
                             ? Carbon::parse($display->end_at)->diffForHumans(
@@ -278,27 +278,27 @@ class HomeCarouselController extends MainController
             transform: translateX(26px);
             }
         ');
-//        Admin::style('
-//            .table-responsive {
-//                max-height: calc(100vh - 250px);
-//                overflow-y: auto;
-//            }
-//            .grid-table thead th {
-//                position: sticky;
-//                top: 0;
-//                background-color: #f5f5f5;
-//                z-index: 10;
-//                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-//            }
-//            .grid-table thead th::after {
-//                content: "";
-//                position: absolute;
-//                left: 0;
-//                bottom: 0;
-//                width: 100%;
-//                border-bottom: 1px solid #ddd;
-//            }
-//        ');
+        //        Admin::style('
+        //            .table-responsive {
+        //                max-height: calc(100vh - 250px);
+        //                overflow-y: auto;
+        //            }
+        //            .grid-table thead th {
+        //                position: sticky;
+        //                top: 0;
+        //                background-color: #f5f5f5;
+        //                z-index: 10;
+        //                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+        //            }
+        //            .grid-table thead th::after {
+        //                content: "";
+        //                position: absolute;
+        //                left: 0;
+        //                bottom: 0;
+        //                width: 100%;
+        //                border-bottom: 1px solid #ddd;
+        //            }
+        //        ');
 
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -331,11 +331,11 @@ class HomeCarouselController extends MainController
         }
 
 
-            return response()->json([
-                'success'    => true,
-                'message'    => __('Submission status updated successfully!'),
-                'display_id' => $display->id ?? 0,
-            ]);
+        return response()->json([
+            'success'    => true,
+            'message'    => __('Submission status updated successfully!'),
+            'display_id' => $display->id ?? 0,
+        ]);
 
 
         return back()->with('success', __('Submission status updated successfully!'));
