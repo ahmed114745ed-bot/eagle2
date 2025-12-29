@@ -949,8 +949,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['status-switch', 'edit', 'browse'],
+                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch','move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['status-switch', 'move-switch','edit', 'browse'],
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
