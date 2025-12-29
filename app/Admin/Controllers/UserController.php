@@ -598,13 +598,20 @@ class UserController extends MainController
         $year       = request('year');
         $start      = request('start_at');
         $end        = request('end_at');
-        $tab        = request('tab', 'salary');
         $joinDate   = request('join_date');
         $type       = request('type', 4);
         $agencyId   = request('agency_id');
         $chargeTabType = request('type', 'receiver');
         $giftType   = request('gift_type', 'receiver');
-
+        $packs = $types = $currentType = null;
+        $userVips = $hasVip = null;
+        $salaries = null;
+        $charges = null;
+        $giftSLogs = $diamonds = null;
+        $userJoinAgencies = null;
+        $usersCoins = null;
+        $badges = null;
+        $walletLogs = null;
         /* =========================
      | USER (ONE QUERY ONLY)
      ========================= */
@@ -620,202 +627,157 @@ class UserController extends MainController
                     ->with('ware:id,value');
             },
         ])->findOrFail($id);
-
+     $curantBalance = wallet_available_by_user($id);
+        $availableBalance = wallet_available_by_user($id);
         /* =========================
-| USER IMAGE
-========================= */
+        | USER IMAGE
+        ========================= */
         $defaultImage = asset('images/businessman-icon.jpg');
         $avatar = optional($user->profile)->avatar;
         $user->display_image = isImageExists(getImagePath($avatar)) ? getImagePath($avatar) : $defaultImage;
+        $activeTab = request('tab', 'packs');
+        switch ($activeTab) {
 
-        /* =========================
-     | USER JOINED AGENCIES
-     ========================= */
-        $userJoinAgencies = UsersJoinedAgency::with([
-            'agency:id,name,type',
-            'kickedByApp:id,name',
-            'kickedByAdmin:id,name',
-        ])
-            ->where('user_id', $id)
-            ->when($joinDate, fn($q) => $q->whereDate('join_date', $joinDate))
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'user_agency_page');
+            case 'packs':
+                $types = collect(PACK_USER);
+                $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar', 'userVip', 'sender', 'ware:id,show_img'])
+                    ->where('user_id', $id)
+                    ->whereHas('ware')
+                    ->whereNull('deleted_at');
 
-        /* =========================
-     | PACKS (ONE BASE QUERY)
-     ========================= */
-        $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar', 'userVip', 'sender', 'ware:id,show_img'])
-            ->where('user_id', $id)
-            ->whereHas('ware')
-            ->whereNull('deleted_at');
+                $packs = (clone $packBase)
+                    ->where('type', request('type', 4))
+                    ->orderByDesc('is_used')
+                    ->latest()
+                    ->paginate(10, ['*'], 'pack_page');
 
-        $packs = (clone $packBase)
-            ->where('type', $type)
-            ->orderByDesc('is_used')
-            ->latest()
-            ->paginate(10, ['*'], 'pack_page');
+                $userPackTypes = (clone $packBase)->pluck('type')->unique()->toArray();
+                $types = $types->filter(fn($_, $key) => in_array($key, $userPackTypes));
+                $currentType = request('type', $types->keys()->first());
+                break;
 
-        $userPackTypes = (clone $packBase)
-            ->pluck('type')
-            ->unique()
-            ->toArray();
+            case 'vips':
+                $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
+                $hasVip = $userVips->contains('is_used', 1);
+                break;
 
-        /* =========================
-     | USER VIPS
-     ========================= */
-        $userVipsQuery = UserVip::where('user_id', $id);
+            case 'salary':
+                $year = request('year');
+                $month = request('month');
+                $salaries = UserSallary::with('agency:id,name')
+                    ->where('user_id', $id)
+                    ->when($year, fn($q) => $q->where('year', $year))
+                    ->when($month, fn($q) => $q->where('month', $month))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'salary_page');
+                break;
 
-        $userVips = $userVipsQuery
-            ->paginate(10, ['*'], 'vip_page');
+            case 'charge':
+                $chargeTabType = request('type', 'receiver');
+                $charges = Charge::with(Common::chargerRelationsQuery())
+                    ->when($chargeTabType === 'receiver', fn($q) => $q->where('user_id', $id)->where('user_type', 'user'))
+                    ->when($chargeTabType === 'charger', fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user'))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'charges_page');
+                break;
 
-        $hasVip = $userVips->contains('is_used', 1);
+            case 'gift-log':
+                $giftType = request('gift_type', 'receiver');
+                $start = request('start_at');
+                $end = request('end_at');
+                $agencyId = request('agency_id');
+                $timezone = Common::timeZone();
 
-        /* =========================
-     | SALARIES
-     ========================= */
-        $salaries = UserSallary::with('agency:id,name')
-            ->where('user_id', $id)
-            ->when($year, fn($q) => $q->where('year', $year))
-            ->when($month, fn($q) => $q->where('month', $month))
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'salary_page');
+                $giftBaseQuery = GiftLog::query()
+                    ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
+                    ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
+                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
+                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
+                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
+                    ]))
+                    ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
-        /* =========================
-     | PACK TYPES FILTER
-     ========================= */
-        $types = collect(PACK_USER);
+                $giftSLogs = (clone $giftBaseQuery)
+                    ->with([
+                        'receiver.profile:id,user_id,avatar',
+                        'sender.profile:id,user_id,avatar',
+                        'gift:id,name,price',
+                        'room:id,room_name',
+                        'agency:id,name',
+                    ])
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'gift_page');
 
-        if ($userPackTypes) {
-            $types = $types->filter(fn($_, $key) => in_array($key, $userPackTypes));
+                $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+                break;
+
+            case 'user-agency':
+                $joinDate = request('join_date');
+                $userJoinAgencies = UsersJoinedAgency::with(['agency:id,name,type', 'kickedByApp:id,name', 'kickedByAdmin:id,name'])
+                    ->where('user_id', $id)
+                    ->when($joinDate, fn($q) => $q->whereDate('join_date', $joinDate))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'user_agency_page');
+                break;
+
+            case 'user-coins':
+                $usersCoins = UserCoinLog::where('user_id', $id)
+                    ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
+                    ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
+                    ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'coins_page');
+                break;
+
+            case 'badges':
+                $badges = UserBadge::with('admin:id,name')
+                    ->where('user_id', $id)
+                    ->orderByRaw("CASE WHEN expire = 0 THEN 0 WHEN expire >= ? THEN 0 ELSE 1 END", [now()->timestamp])
+                    ->orderByDesc('expire')
+                    ->paginate(10, ['*'], 'badges_page');
+                break;
+
+            case 'wallet_logs':
+                $year = request('year');
+                $month = request('month');
+                $walletLogs = WalletLog::where('user_id', $id)
+                    ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                    ->when($month, fn($q) => $q->whereMonth('created_at', $month))
+                    ->orderByDesc('id')
+                    ->paginate(20, ['*'], 'wallet_logs_page')
+                    ->appends(['tab' => 'wallet_logs', 'year' => $year, 'month' => $month]);
+                break;
         }
-
-        $currentType = request('type', $types->keys()->first());
-
-        /* =========================
-     | CHARGES
-     ========================= */
-        $charges = Charge::with(Common::chargerRelationsQuery())
-            ->when(
-                $chargeTabType === 'receiver',
-                fn($q) => $q->where('user_id', $id)->where('user_type', 'user')
-            )
-            ->when(
-                $chargeTabType === 'charger',
-                fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user')
-            )
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'charges_page');
-
-        /* =========================
-     | GIFT LOGS (BASE QUERY)
-     ========================= */
-        $giftBaseQuery = GiftLog::query()
-            ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
-            ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
-            ->when($start && $end, function ($q) use ($start, $end, $timezone) {
-                $q->whereBetween('created_at', [
-                    Carbon::parse($start, $timezone)->startOfDay()->utc(),
-                    Carbon::parse($end, $timezone)->endOfDay()->utc(),
-                ]);
-            })
-            ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
-
-        $giftSLogs = (clone $giftBaseQuery)
-            ->with([
-                'receiver.profile:id,user_id,avatar',
-                'sender.profile:id,user_id,avatar',
-                'gift:id,name,price',
-                'room:id,room_name',
-                'agency:id,name',
-            ])
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'gift_page');
-
-        $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
-
-        /* =========================
-     | USER COINS
-     ========================= */
-        $usersCoins = UserCoinLog::where('user_id', $id)
-            ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
-            ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
-            ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'coins_page');
-
-        /* =========================
-     | BADGES
-     ========================= */
-        $badges = UserBadge::with('admin:id,name')
-            ->where('user_id', $id)
-            ->orderByRaw("
-            CASE
-                WHEN expire = 0 THEN 0
-                WHEN expire >= ? THEN 0
-                ELSE 1
-            END
-        ", [now()->timestamp])
-            ->orderByDesc('expire')
-            ->paginate(10, ['*'], 'badges_page');
-
-        /* =========================
-     | COUNTRIES (CACHED)
-     ========================= */
-        $countries = cache()->rememberForever(
-            'countries',
-            fn() =>
-            Country::select('id', 'name', 'e_name', 'flag')->get()
-        );
-
-        /* =========================
-     | WALLET
-     ========================= */
-        $availableBalance = wallet_available_by_user($id);
-        $curantBalance = $availableBalance;
-
-        $walletLogs = WalletLog::where('user_id', $id)
-            ->when($year, fn($q) => $q->whereYear('created_at', $year))
-            ->when($month, fn($q) => $q->whereMonth('created_at', $month))
-            ->orderByDesc('id')
-            ->paginate(20, ['*'], 'wallet_logs_page')
-            ->appends([
-                'tab' => 'wallet_logs',
-                'year' => $year,
-                'month' => $month,
-            ]);
+         $countries = $this->countries();
 
         /* =========================
      | VIEW
      ========================= */
         $data = compact(
             'user',
+            'countries',
             'packs',
-            'type',
-            'userVips',
-            'salaries',
-            'userJoinAgencies',
             'types',
-            'currentType',
-            'timezone',
-            'charges',
-            'tab',
-            'chargeTabType',
-            'giftSLogs',
             'giftType',
-            'diamonds',
+            'currentType',
+            'userVips',
+            'chargeTabType',
             'hasVip',
+            'salaries',
+            'charges',
+            'giftSLogs',
+            'diamonds',
+            'userJoinAgencies',
             'usersCoins',
             'badges',
-            'countries',
+            'type',
+            'walletLogs',
+            'activeTab',
             'availableBalance',
-            'curantBalance',
-            'walletLogs'
+            'curantBalance'
         );
 
-        return parent::show(
-            $id,
-            $content->title(__('user profile'))->view('user_profile', $data)
-        );
+        return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
 
 

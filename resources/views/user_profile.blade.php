@@ -1232,7 +1232,7 @@
 
 
     <!-- packs Section -->
-
+ @if($activeTab == 'packs')
     <div class="tab-content active" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1400,119 +1400,122 @@
         </div>
 
     </div>
+    @endif
 
 
     <!-- vips Section -->
-    <div class="tab-content" id="vips-tab" style="{{ $activeTab == 'vips' ? '' : 'display: none;' }}">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
-            </div>
-
-            <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('level') }}</th>
-                            <th>{{ __('expire') }}</th>
-                            <th>{{ __('qty') }}</th>
-                            <th>{{ __('total Price') }}</th>
-                            <th>{{ __('receive_type') }}</th>
-                            <th>{{ __('action') }}</th>
-
-                        </tr>
-                        </thead>
-                        @if($userVips && $userVips->count())
-                            <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($userVips as $index => $userVip)
-                                <tr>
-                                    <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
-                                    <td>{{ $userVip->level }}</td>
-                                    <td>
-                                        {{
-                                            (!empty($userVip->expire) && $userVip->expire != '0')
-                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
-                                                : $userVip->days
-                                        }}
-                                    </td>
-                                    <td>{{ @$userVip->qty ?? 0 }}</td>
-                                    <td>{{ @$userVip->total ?? 0 }}</td>
-                                    <td>
-                                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                                            {{-- Always show type --}}
-                                            <span style="font-weight: 600; color: #444;">
-                                                {{ @$userVip->receive_type ?? '' }}
-                                            </span>
-
-                                            {{-- If send-vip, show sender below --}}
-                                            @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
-                                                @php
-                                                    $name = @$userVip->sender->name ?? 'Unknown User';
-                                                    $showUrl = url("admin/users/" . @$userVip->sender->id);
-                                                @endphp
-
-                                                <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
-                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                        sender:
-                                                    </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                        {{ $name }}
-                                                    </span>
-                                                </a>
-                                            @endif
-                                            @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
-                                                @php
-                                                    $name = @$userVip->admin->name ?? 'Unknown Admin';
-                                                    $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
-                                                @endphp
-
-                                                <a href="{{ $showUrl }}"
-                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
-                                                    <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
-                                                        sender:
-                                                    </span>
-                                                    <span
-                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
-                                                        {{ $name }}
-                                                    </span>
-                                                </a>
-                                            @endif
-                                        </div>
-                                    </td>
-
-                                    <td>
-                                        <div class="d-flex">
-
-                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
-                                                {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div>
-                                    </td>
-
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        @endif
-                    </table>
-
-                    @if($userVips)
-                        <div class="pagination-container">
-                            {{ $userVips->appends([
-                                'tab' => 'vips',
-                                 'vip_page' => $userVips->currentPage(),
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+    
+        <div class="tab-content {{ $activeTab == 'vips' ? '' : 'd-none' }}" id="vips-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
                 </div>
+
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('level') }}</th>
+                                <th>{{ __('expire') }}</th>
+                                <th>{{ __('qty') }}</th>
+                                <th>{{ __('total Price') }}</th>
+                                <th>{{ __('receive_type') }}</th>
+                                <th>{{ __('action') }}</th>
+
+                            </tr>
+                            </thead>
+                            @if($userVips && $userVips->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($userVips as $index => $userVip)
+                                    <tr>
+                                        <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
+                                        <td>{{ $userVip->level }}</td>
+                                        <td>
+                                            {{
+                                                (!empty($userVip->expire) && $userVip->expire != '0')
+                                                    ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
+                                                    : $userVip->days
+                                            }}
+                                        </td>
+                                        <td>{{ @$userVip->qty ?? 0 }}</td>
+                                        <td>{{ @$userVip->total ?? 0 }}</td>
+                                        <td>
+                                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                {{-- Always show type --}}
+                                                <span style="font-weight: 600; color: #444;">
+                                                    {{ @$userVip->receive_type ?? '' }}
+                                                </span>
+
+                                                {{-- If send-vip, show sender below --}}
+                                                @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
+                                                    @php
+                                                        $name = @$userVip->sender->name ?? 'Unknown User';
+                                                        $showUrl = url("admin/users/" . @$userVip->sender->id);
+                                                    @endphp
+
+                                                    <a href="{{ $showUrl }}"
+                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                            sender:
+                                                        </span>
+                                                        <span
+                                                            style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                            {{ $name }}
+                                                        </span>
+                                                    </a>
+                                                @endif
+                                                @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
+                                                    @php
+                                                        $name = @$userVip->admin->name ?? 'Unknown Admin';
+                                                        $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
+                                                    @endphp
+
+                                                    <a href="{{ $showUrl }}"
+                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                        <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
+                                                            sender:
+                                                        </span>
+                                                        <span
+                                                            style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                            {{ $name }}
+                                                        </span>
+                                                    </a>
+                                                @endif
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="d-flex">
+
+                                                <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
+                                                    {{ __('dashboard.delete') }}
+                                                </button>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
+
+                        @if($userVips)
+                            <div class="pagination-container">
+                                {{ $userVips->appends([
+                                    'tab' => 'vips',
+                                    'vip_page' => $userVips->currentPage(),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+
             </div>
-
-
         </div>
-    </div>
+    
 
     <div class="tab-content" id="salary-tab">
         <div class="card">
@@ -2852,57 +2855,93 @@
         });
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const selectedTab = urlParams.get('tab') || 'packs';
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const selectedTab = urlParams.get('tab') || 'packs';
 
-        const allTabs = document.querySelectorAll('.tab-btn');
-        const allTabContents = document.querySelectorAll('[id$="-tab"]');
+    //     const allTabs = document.querySelectorAll('.tab-btn');
+    //     const allTabContents = document.querySelectorAll('[id$="-tab"]');
 
-        let targetElement = null;
+    //     let targetElement = null;
 
-        allTabs.forEach(tab => {
-            const target = tab.getAttribute('data-target');
-            const content = document.getElementById(target);
+    //     allTabs.forEach(tab => {
+    //         const target = tab.getAttribute('data-target');
+    //         const content = document.getElementById(target);
 
-            if (target.startsWith(selectedTab)) {
-                tab.classList.add('active');
-                content.style.display = 'block';
-                targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
-            } else {
-                tab.classList.remove('active');
-                content.style.display = 'none';
-            }
+    //         if (target.startsWith(selectedTab)) {
+    //             tab.classList.add('active');
+    //             content.style.display = 'block';
+    //             targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
+    //         } else {
+    //             tab.classList.remove('active');
+    //             content.style.display = 'none';
+    //         }
 
-            tab.addEventListener('click', function (e) {
-                e.preventDefault();
+    //         tab.addEventListener('click', function (e) {
+    //             e.preventDefault();
 
-                const currentUrl = new URL(window.location.href);
-                const href = tab.getAttribute('href');
-                const targetUrl = new URL(href, currentUrl.origin);
+    //             const currentUrl = new URL(window.location.href);
+    //             const href = tab.getAttribute('href');
+    //             const targetUrl = new URL(href, currentUrl.origin);
 
-                // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
-                if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
-                    document.getElementById('tab-loading').style.display = 'block';
-                    allTabs.forEach(t => t.style.pointerEvents = 'none');
+    //             // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+    //             if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+    //                 document.getElementById('tab-loading').style.display = 'block';
+    //                 allTabs.forEach(t => t.style.pointerEvents = 'none');
 
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 300);
-                } else {
-                    // لا تعرض اللودر إذا الرابط خارج التابات
-                    window.location.href = href;
-                }
-            });
-        });
+    //                 setTimeout(() => {
+    //                     window.location.href = href;
+    //                 }, 300);
+    //             } else {
+    //                 // لا تعرض اللودر إذا الرابط خارج التابات
+    //                 window.location.href = href;
+    //             }
+    //         });
+    //     });
 
 
-        if (targetElement) {
-            setTimeout(() => {
-                targetElement.scrollIntoView({behavior: 'smooth'});
-            }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
+    //     if (targetElement) {
+    //         setTimeout(() => {
+    //             targetElement.scrollIntoView({behavior: 'smooth'});
+    //         }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
+    //     }
+    // });
+document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedTab = urlParams.get('tab') || 'packs';
+
+    const allTabs = document.querySelectorAll('.tab-btn');
+    let targetElement = null;
+
+    allTabs.forEach(tab => {
+        const target = tab.getAttribute('data-target');
+        const content = document.getElementById(target);
+
+        if (!content) return; // ✅ prevent null error
+
+        if (target === selectedTab + '-tab') {
+            tab.classList.add('active');
+            content.classList.remove('d-none');
+            content.style.display = 'block';
+            targetElement = content;
+        } else {
+            tab.classList.remove('active');
+            content.classList.add('d-none');
+            content.style.display = 'none';
         }
+
+        tab.addEventListener('click', function (e) {
+            e.preventDefault();
+            window.location.href = tab.getAttribute('href');
+        });
     });
+
+    if (targetElement) {
+        setTimeout(() => {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+    }
+});
 
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
