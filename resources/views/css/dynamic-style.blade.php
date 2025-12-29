@@ -2833,6 +2833,14 @@
         padding-top: 5% !important;
     }
 
+    .dark-mode .phpdebugbar-settings {
+        background: white !important;
+    }
+
+    .phpdebugbar[data-theme="dark"] .phpdebugbar-settings {
+        background: none !important;
+    }
+
     .stats-container .info-box {
         background: linear-gradient(135deg,
         #667eea 0%,
