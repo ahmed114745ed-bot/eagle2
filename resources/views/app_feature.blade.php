@@ -4,7 +4,6 @@
         margin: 0;
         padding: 0;
         background-color: #121212;
-        color: white;
         display: flex;
     }
 
@@ -27,10 +26,19 @@
         text-align: right;
         padding: 15px;
         color: white;
+        background: black;
         border: none;
         margin-bottom: 5px;
         cursor: pointer;
         font-size: 16px;
+    }
+
+    .new-form {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eaeaea;
     }
 
     .settings-menu button:hover {
@@ -186,10 +194,6 @@
         transition: .4s;
     }
 
-    input:checked + .slider {
-        background-color: #2196F3;
-    }
-
     input:focus + .slider {
         box-shadow: 0 0 1px #2196F3;
     }
@@ -224,21 +228,27 @@
 
     @media (max-width: 576px) {
     }
+
     @media (max-width: 768px) {
         .all-page {
             display: block;
         }
+
         .settings-content {
             width: 100%;
         }
+
         .form {
             width: auto;
         }
     }
+
     @media (max-width: 992px) {
     }
+
     @media (max-width: 1200px) {
     }
+
     @media (max-width: 1400px) {
     }
 </style>
@@ -256,21 +266,21 @@
                     style="text-align: right;">
                 {{ __('Reel Settings') }}
             </button>
-             <button onclick="showSection('YouTubeSettings')"
+            <button onclick="showSection('YouTubeSettings')"
                     style="text-align: right;">
                 {{ __('YouTube Settings') }}
             </button>
-                         <button onclick="showSection('LiveSettings')"
+            <button onclick="showSection('LiveSettings')"
                     style="text-align: right;">
                 {{ __('Live Settings') }}
             </button>
-             </button>
-                         <button onclick="showSection('RoomCupSetting')"
+            </button>
+            <button onclick="showSection('RoomCupSetting')"
                     style="text-align: right;">
                 {{ __('room cup setting') }}
             </button>
 
-             <button onclick="showSection('MomentStatus')"
+            <button onclick="showSection('MomentStatus')"
                     style="text-align: right;">
                 {{ __('Moment Status') }}
             </button>
@@ -290,7 +300,9 @@
     <div class="settings-content">
         <div id="AppFeature" class="settings-section active">
             <h2>{{ __('Agency Feature') }}</h2>
-            <form id="agencyFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="agencyFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -308,7 +320,8 @@
                                 document.getElementById('agencyFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="host_agency" id="host_agency_value" value="{{ $hostAgencyStatus ? '1' : '0' }}">
+                        <input type="hidden" name="host_agency" id="host_agency_value"
+                               value="{{ $hostAgencyStatus ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -323,7 +336,8 @@
 
         <div id="ReelSettings" class="settings-section">
             <h2>{{ __('Reel Settings') }}</h2>
-            <form id="reelFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="reelFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -341,7 +355,8 @@
                                 document.getElementById('reelFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="reel_status" id="host_reel_value" value="{{ $reelSettings ? '1' : '0' }}">
+                        <input type="hidden" name="reel_status" id="host_reel_value"
+                               value="{{ $reelSettings ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -353,9 +368,12 @@
                 </div>
             </form>
         </div>
+
         <div id="YouTubeSettings" class="settings-section">
             <h2>{{ __('YouTube Settings') }}</h2>
-            <form id="YouTubeFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="YouTubeFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
+                  method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -373,7 +391,8 @@
                                 document.getElementById('YouTubeFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="youtube_status" id="host_youtube_value" value="{{ $youtubeSettings ? '1' : '0' }}">
+                        <input type="hidden" name="youtube_status" id="host_youtube_value"
+                               value="{{ $youtubeSettings ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -385,9 +404,11 @@
                 </div>
             </form>
         </div>
+
         <div id="LiveSettings" class="settings-section">
             <h2>{{ __('Live Settings') }}</h2>
-            <form id="liveFeatureForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="liveFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -405,7 +426,8 @@
                                 document.getElementById('liveFeatureForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="live_status" id="host_live_value" value="{{ $liveSettings ? '1' : '0' }}">
+                        <input type="hidden" name="live_status" id="host_live_value"
+                               value="{{ $liveSettings ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -418,9 +440,10 @@
             </form>
         </div>
 
-         <div id="RoomCupSetting" class="settings-section">
+        <div id="RoomCupSetting" class="settings-section">
             <h2>{{ __('room cup setting') }}</h2>
-            <form id="roomCupForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="roomCupForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -438,7 +461,8 @@
                                 document.getElementById('roomCupForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="room_cup_setting" id="room_cup_value" value="{{ $roomCupSetting ? '1' : '0' }}">
+                        <input type="hidden" name="room_cup_setting" id="room_cup_value"
+                               value="{{ $roomCupSetting ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -450,9 +474,11 @@
                 </div>
             </form>
         </div>
-         <div id="MomentStatus" class="settings-section">
+
+        <div id="MomentStatus" class="settings-section">
             <h2>{{ __('Moment Status') }}</h2>
-            <form id="momentStatusForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+            <form id="momentStatusForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
                 @csrf
                 @php
                     $errorMessage = $errors ? $errors->first('msg') : null;
@@ -470,7 +496,8 @@
                                 document.getElementById('momentStatusForm').submit();">
                             <span class="slider round"></span>
                         </label>
-                        <input type="hidden" name="moment_status" id="moment_status_value" value="{{ $momentStatus ? '1' : '0' }}">
+                        <input type="hidden" name="moment_status" id="moment_status_value"
+                               value="{{ $momentStatus ? '1' : '0' }}">
                     </div>
 
                     <div class="feature-description-container">
@@ -481,40 +508,77 @@
                     </div>
                 </div>
             </form>
-         </div>
+        </div>
 
-                    <div id="shareRoom" class="settings-section">
-                        <h2>{{ __('share room') }}</h2>
-                        <form id="shareRoomForm" action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            @php
-                                $errorMessage = $errors ? $errors->first('msg') : null;
-                            @endphp
-                            @if ($errorMessage)
-                                <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                            @endif
+        <div id="hostLevel" class="settings-section">
+            <h2>{{ __('host level') }}</h2>
+            <form id="hostLevelForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
 
-                            <div class="form">
-                                <div class="feature-toggle-container">
-                                    <span class="toggle-label">{{ __('Enable share room Feature') }}</span>
-                                    <label class="switch">
-                                        <input type="checkbox" id="share_room_toggle" {{ $shareRoom ? 'checked' : '' }}
-                                        onchange="document.getElementById('share_room_value').value = this.checked ? '1' : '0';
-                                            document.getElementById('shareRoomForm').submit();">
-                                        <span class="slider round"></span>
-                                    </label>
-                                    <input type="hidden" name="share_room_with_friends" id="share_room_value" value="{{ $shareRoom ? '1' : '0' }}">
-                                </div>
-
-                                <div class="feature-description-container">
-                                    <h4>{{ __('Feature Description') }}</h4>
-                                    <div id="feature-description-content" class="external-content">
-                                        <div class="loading">{{ __('Loading feature description...') }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable host level Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="host_level_toggle" {{ $hostLevel ? 'checked' : '' }}
+                            onchange="document.getElementById('host_level_value').value = this.checked ? '1' : '0';
+                                document.getElementById('hostLevelForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="host_level_enabled" id="host_level_value"
+                               value="{{ $hostLevel ? '1' : '0' }}">
                     </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="shareRoom" class="settings-section">
+            <h2>{{ __('share room') }}</h2>
+            <form id="shareRoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                  enctype="multipart/form-data">
+                @csrf
+                @php
+                    $errorMessage = $errors ? $errors->first('msg') : null;
+                @endphp
+                @if ($errorMessage)
+                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                @endif
+
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable share room Feature') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="share_room_toggle" {{ $shareRoom ? 'checked' : '' }}
+                            onchange="document.getElementById('share_room_value').value = this.checked ? '1' : '0';
+                                            document.getElementById('shareRoomForm').submit();">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="share_room_with_friends" id="share_room_value"
+                               value="{{ $shareRoom ? '1' : '0' }}">
+                    </div>
+
+                    <div class="feature-description-container">
+                        <h4>{{ __('Feature Description') }}</h4>
+                        <div id="feature-description-content" class="external-content">
+                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -524,7 +588,7 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         function getQueryParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
@@ -548,8 +612,8 @@
 
         const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
         if (activeButton) {
-            activeButton.style.backgroundColor = 'var(--primary-color)';
-            activeButton.style.color = 'var(--text-secondary-color)';
+            activeButton.style.backgroundColor = 'var(--primary-color) !important';
+            activeButton.style.color = 'var(--text-secondary-color) !important';
         }
 
         const url = new URL(window.location);
@@ -568,7 +632,7 @@
         document.getElementById("imageModal").style.display = "none";
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         var agencyHiddenValue = document.getElementById('host_agency_value').value;
         document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
 

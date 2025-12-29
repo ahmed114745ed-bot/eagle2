@@ -114,28 +114,33 @@ class HomeCarouselController extends MainController
         $grid->column('sort', __('sort'))->editable();
 
         // Make table header sticky when scrolling
-        Admin::style('
-            .table-responsive {
-                max-height: calc(100vh - 250px);
-                overflow-y: auto;
-            }
-            .grid-table thead th {
-                position: sticky;
-                top: 0;
-                background-color: #f5f5f5;
-                z-index: 10;
-                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
-            }
-            .grid-table thead th::after {
-                content: "";
-                position: absolute;
-                left: 0;
-                bottom: 0;
-                width: 100%;
-                border-bottom: 1px solid #ddd;
-            }
-        ');
+//        Admin::style('
+//            .table-responsive {
+//                max-height: calc(100vh - 250px);
+//                overflow-y: auto;
+//            }
+//            .grid-table thead th {
+//                position: sticky;
+//                top: 0;
+//                background-color: #f5f5f5;
+//                z-index: 10;
+//                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+//            }
+//            .grid-table thead th::after {
+//                content: "";
+//                position: absolute;
+//                left: 0;
+//                bottom: 0;
+//                width: 100%;
+//                border-bottom: 1px solid #ddd;
+//            }
+//        ');
 
+//        Admin::script("
+//        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+//            $('.table-responsive').removeClass('table-responsive');
+//            }
+//        ");
         return $grid;
     }
 
@@ -293,7 +298,7 @@ class HomeCarouselController extends MainController
     protected function syncDisplaysBeforeSave(Form $form)
     {
         $form->ignore(['duration']);
-       
+
 
             $form->saving(function (Form $form) {
 
@@ -301,9 +306,9 @@ class HomeCarouselController extends MainController
 
                 $path = WebPHelper::uploadWebp(
                     request()->file('img'),
-                    'images',       
-                    'splash',        
-                                
+                    'images',
+                    'splash',
+
                 );
 
                 $form->image_url = $path;

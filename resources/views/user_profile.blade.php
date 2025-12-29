@@ -1,12 +1,5 @@
 @php use App\Helpers\Common;use Carbon\Carbon; @endphp
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
-
-    <style>
+<style>
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
@@ -14,8 +7,8 @@
             --text-primary-color: {{ config('themes.textPrimaryColor') }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
-            --table-background-color: {{ config('themes.tableBackGroundColor')}}
-              --background-image:{{ config('themes.backgroundImage') }};
+            --table-background-color: {{ config('themes.tableBackGroundColor')}};
+            --background-image: {{ config('themes.backgroundImage') }};
             --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
             --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
             --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
@@ -607,7 +600,7 @@
         }
 
         .tab-btn:hover:not(.active) {
-            color: #34495e;
+            border-bottom-color: var(--secondary-color) !important;
         }
 
         .tab-content {
@@ -1033,14 +1026,18 @@
             color: #333;
             font-weight: 500;
         }
-    </style>
 
+        .nav>li>a:hover, .nav>li>a:active, .nav>li>a:focus {
+            background: var(--secondary-color) !important;
+        }
+    </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
+<script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 </head>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous" />
 
 <body>
 
-<div class="agency-profile-container">
+<div class="agency-profile-container" id="pjax-container">
     {{-- Error Messages --}}
     @if ($errors->any())
         <div class="alert alert-danger mx-3 mt-3">
@@ -1186,34 +1183,35 @@
     <div class="agency-tabs">
 
         <a href="?tab=packs"
-            class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
-            data-target="packs-tab">
+           data-pjax
+           class="tab-btn {{ $activeTab === 'packs' ? 'active' : '' }}"
+           data-target="packs-tab">
             {{ __('packs') }}
-            </a>
+        </a>
 
-        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+        <a href="?tab=vips" data-pjax class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
            data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
-        <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
+        <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-        <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-        <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+        <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-        <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+        <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
            data-target="user-coins-tab">{{ __('User Coins') }}</a>
-        <a href="?tab=badges" class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
+        <a href="?tab=badges" data-pjax class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
            data-target="badges-tab">{{ __('badges') }}</a>
 
-        <a href="?tab=wallet_logs" class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
+        <a href="?tab=wallet_logs" data-pjax class="tab-btn {{ $activeTab == 'wallet_logs' ? 'active' : '' }}"
            data-target="wallet-logs-tab">  {{ __('wallet-transactions') }} </a>
     </div>
     <div id="tab-loading" style="
@@ -1234,9 +1232,8 @@
         {{ __('Loading...') }}
     </div>
 
-
     <!-- packs Section -->
- 
+
     <div class="tab-content {{ $activeTab === 'packs' ? '' : 'd-none' }}" id="packs-tab">
         <div class="card">
             <div class="card-header">
@@ -1373,7 +1370,7 @@
 
                                     <td>
                                         <div class="d-flex">
-                                            <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
+                                            <button class="btn btn-info w-100 me-3 edit_item_model_btn"
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
                                             </button>
@@ -1404,122 +1401,119 @@
         </div>
 
     </div>
-    
-
 
     <!-- vips Section -->
-    
-        <div class="tab-content {{ $activeTab == 'vips' ? '' : 'd-none' }}" id="vips-tab">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
-                </div>
 
-                <div class="table-responsive">
-                    <div class="box-body ">
-                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                            <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>{{ __('level') }}</th>
-                                <th>{{ __('expire') }}</th>
-                                <th>{{ __('qty') }}</th>
-                                <th>{{ __('total Price') }}</th>
-                                <th>{{ __('receive_type') }}</th>
-                                <th>{{ __('action') }}</th>
+    <div class="tab-content {{ $activeTab == 'vips' ? '' : 'd-none' }}" id="vips-tab">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('vips') }}</h4>
+            </div>
 
-                            </tr>
-                            </thead>
-                            @if($userVips && $userVips->count())
-                                <tbody style="color: rgb(208, 115, 43);">
-                                @foreach($userVips as $index => $userVip)
-                                    <tr>
-                                        <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
-                                        <td>{{ $userVip->level }}</td>
-                                        <td>
-                                            {{
-                                                (!empty($userVip->expire) && $userVip->expire != '0')
-                                                    ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
-                                                    : $userVip->days
-                                            }}
-                                        </td>
-                                        <td>{{ @$userVip->qty ?? 0 }}</td>
-                                        <td>{{ @$userVip->total ?? 0 }}</td>
-                                        <td>
-                                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                                {{-- Always show type --}}
-                                                <span style="font-weight: 600; color: #444;">
+            <div class="table-responsive">
+                <div class="box-body ">
+                    <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                        <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('level') }}</th>
+                            <th>{{ __('expire') }}</th>
+                            <th>{{ __('qty') }}</th>
+                            <th>{{ __('total Price') }}</th>
+                            <th>{{ __('receive_type') }}</th>
+                            <th>{{ __('action') }}</th>
+
+                        </tr>
+                        </thead>
+                        @if($userVips && $userVips->count())
+                            <tbody style="color: rgb(208, 115, 43);">
+                            @foreach($userVips as $index => $userVip)
+                                <tr>
+                                    <td>{{ $index + 1 + (($userVips->currentPage() - 1) * $userVips->perPage()) }}</td>
+                                    <td>{{ $userVip->level }}</td>
+                                    <td>
+                                        {{
+                                            (!empty($userVip->expire) && $userVip->expire != '0')
+                                                ? \Carbon\Carbon::parse($userVip->expire)->format('Y-m-d H:i:s')
+                                                : $userVip->days
+                                        }}
+                                    </td>
+                                    <td>{{ @$userVip->qty ?? 0 }}</td>
+                                    <td>{{ @$userVip->total ?? 0 }}</td>
+                                    <td>
+                                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                                            {{-- Always show type --}}
+                                            <span style="font-weight: 600; color: #444;">
                                                     {{ @$userVip->receive_type ?? '' }}
                                                 </span>
 
-                                                {{-- If send-vip, show sender below --}}
-                                                @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
-                                                    @php
-                                                        $name = @$userVip->sender->name ?? 'Unknown User';
-                                                        $showUrl = url("admin/users/" . @$userVip->sender->id);
-                                                    @endphp
+                                            {{-- If send-vip, show sender below --}}
+                                            @if(@$userVip->receive_type === 'send-vip' && @$userVip->sender)
+                                                @php
+                                                    $name = @$userVip->sender->name ?? 'Unknown User';
+                                                    $showUrl = url("admin/users/" . @$userVip->sender->id);
+                                                @endphp
 
-                                                    <a href="{{ $showUrl }}"
-                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                <a href="{{ $showUrl }}"
+                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
                                                         <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                             sender:
                                                         </span>
-                                                        <span
-                                                            style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                             {{ $name }}
                                                         </span>
-                                                    </a>
-                                                @endif
-                                                @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
-                                                    @php
-                                                        $name = @$userVip->admin->name ?? 'Unknown Admin';
-                                                        $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
-                                                    @endphp
+                                                </a>
+                                            @endif
+                                            @if(@$userVip->receive_type === 'admin-dedicate' && @$userVip->admin)
+                                                @php
+                                                    $name = @$userVip->admin->name ?? 'Unknown Admin';
+                                                    $showUrl = url("admin/auth/users/" . @$userVip->admin->id);
+                                                @endphp
 
-                                                    <a href="{{ $showUrl }}"
-                                                    style="text-decoration: none; color: #007bff; display: inline-block;">
+                                                <a href="{{ $showUrl }}"
+                                                   style="text-decoration: none; color: #007bff; display: inline-block;">
                                                         <span style="font-weight: 600; color: #555; font-size: 0.9rem;">
                                                             sender:
                                                         </span>
-                                                        <span
-                                                            style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
+                                                    <span
+                                                        style="text-decoration: underline; cursor: pointer; font-size: 1.1rem; font-weight: bold;">
                                                             {{ $name }}
                                                         </span>
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </td>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
 
-                                        <td>
-                                            <div class="d-flex">
+                                    <td>
+                                        <div class="d-flex">
 
-                                                <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
-                                                    {{ __('dashboard.delete') }}
-                                                </button>
-                                            </div>
-                                        </td>
+                                            <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
+                                                {{ __('dashboard.delete') }}
+                                            </button>
+                                        </div>
+                                    </td>
 
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            @endif
-                        </table>
-
-                        @if($userVips)
-                            <div class="pagination-container">
-                                {{ $userVips->appends([
-                                    'tab' => 'vips',
-                                    'vip_page' => $userVips->currentPage(),
-                                ])->links('vendor.pagination.bootstrap-4') }}
-                            </div>
+                                </tr>
+                            @endforeach
+                            </tbody>
                         @endif
-                    </div>
+                    </table>
+
+                    @if($userVips)
+                        <div class="pagination-container">
+                            {{ $userVips->appends([
+                                'tab' => 'vips',
+                                'vip_page' => $userVips->currentPage(),
+                            ])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
+                    @endif
                 </div>
-
-
             </div>
+
+
         </div>
-    
+    </div>
 
     <div class="tab-content" id="salary-tab">
         <div class="card">
@@ -1878,7 +1872,6 @@
         </div>
 
     </div>
-
 
     <div class="tab-content {{ $activeTab == 'badges' ? 'active show' : 'd-none' }}" id="badges-tab">
         <div class="card">
@@ -2372,8 +2365,6 @@
     </div>
 @endif
 
-
-
 @if($activeTab == 'gift-log')
     <div class="tab-content active" id="gift-log-tab">
         <div class="card">
@@ -2657,7 +2648,6 @@
     </div>
 @endif
 
-
 <div class="modal fade" id="Add_model" tabindex="-1" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
         <div class="modal-content border-0">
@@ -2706,7 +2696,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg mt-6" role="document">
@@ -2806,13 +2795,10 @@
     </div>
 </div>
 
-
 <!-- jQuery أولاً -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-
 <!-- SweetAlert2 -->
 <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script> -->
-
 
 <script>
 
@@ -2859,93 +2845,123 @@
         });
     });
 
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     const selectedTab = urlParams.get('tab') || 'packs';
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTab = urlParams.get('tab') || 'packs';
 
-    //     const allTabs = document.querySelectorAll('.tab-btn');
-    //     const allTabContents = document.querySelectorAll('[id$="-tab"]');
+        const allTabs = document.querySelectorAll('.tab-btn');
+        let targetElement = null;
 
-    //     let targetElement = null;
+        allTabs.forEach(tab => {
+            const target = tab.getAttribute('data-target');
+            const content = document.getElementById(target);
 
-    //     allTabs.forEach(tab => {
-    //         const target = tab.getAttribute('data-target');
-    //         const content = document.getElementById(target);
+            if (!content) return; // ✅ prevent null error
 
-    //         if (target.startsWith(selectedTab)) {
-    //             tab.classList.add('active');
-    //             content.style.display = 'block';
-    //             targetElement = content; // خزن العنصر لعمل scroll إليه لاحقًا
-    //         } else {
-    //             tab.classList.remove('active');
-    //             content.style.display = 'none';
-    //         }
+            if (target === selectedTab + '-tab') {
+                tab.classList.add('active');
+                content.classList.remove('d-none');
+                content.style.display = 'block';
+                targetElement = content;
+            } else {
+                tab.classList.remove('active');
+                content.classList.add('d-none');
+                content.style.display = 'none';
+            }
 
-    //         tab.addEventListener('click', function (e) {
-    //             e.preventDefault();
-
-    //             const currentUrl = new URL(window.location.href);
-    //             const href = tab.getAttribute('href');
-    //             const targetUrl = new URL(href, currentUrl.origin);
-
-    //             // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
-    //             if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
-    //                 document.getElementById('tab-loading').style.display = 'block';
-    //                 allTabs.forEach(t => t.style.pointerEvents = 'none');
-
-    //                 setTimeout(() => {
-    //                     window.location.href = href;
-    //                 }, 300);
-    //             } else {
-    //                 // لا تعرض اللودر إذا الرابط خارج التابات
-    //                 window.location.href = href;
-    //             }
-    //         });
-    //     });
-
-
-    //     if (targetElement) {
-    //         setTimeout(() => {
-    //             targetElement.scrollIntoView({behavior: 'smooth'});
-    //         }, 500); // تأخير بسيط للتأكد أن العنصر ظاهر
-    //     }
-    // });
-document.addEventListener("DOMContentLoaded", function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const selectedTab = urlParams.get('tab') || 'packs';
-
-    const allTabs = document.querySelectorAll('.tab-btn');
-    let targetElement = null;
-
-    allTabs.forEach(tab => {
-        const target = tab.getAttribute('data-target');
-        const content = document.getElementById(target);
-
-        if (!content) return; // ✅ prevent null error
-
-        if (target === selectedTab + '-tab') {
-            tab.classList.add('active');
-            content.classList.remove('d-none');
-            content.style.display = 'block';
-            targetElement = content;
-        } else {
-            tab.classList.remove('active');
-            content.classList.add('d-none');
-            content.style.display = 'none';
-        }
-
-        tab.addEventListener('click', function (e) {
-            e.preventDefault();
-            window.location.href = tab.getAttribute('href');
+            // Remove the click handler that prevents default and reloads
         });
+
+        if (targetElement) {
+            setTimeout(() => {
+                targetElement.scrollIntoView({behavior: 'smooth'});
+            }, 300);
+        }
     });
 
-    if (targetElement) {
-        setTimeout(() => {
-            targetElement.scrollIntoView({ behavior: 'smooth' });
-        }, 300);
+    // Function to handle tab switching
+    function handleTabSwitching() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTab = urlParams.get('tab') || 'packs';
+
+        const allTabs = document.querySelectorAll('.tab-btn');
+        let targetElement = null;
+
+        allTabs.forEach(tab => {
+            const target = tab.getAttribute('data-target');
+            const content = document.getElementById(target);
+
+            if (!content) return; // ✅ prevent null error
+
+            if (target === selectedTab + '-tab') {
+                tab.classList.add('active');
+                content.classList.remove('d-none');
+                content.style.display = 'block';
+                targetElement = content;
+            } else {
+                tab.classList.remove('active');
+                content.classList.add('d-none');
+                content.style.display = 'none';
+            }
+        });
+
+        if (targetElement) {
+            setTimeout(() => {
+                targetElement.scrollIntoView({behavior: 'smooth'});
+            }, 300);
+        }
     }
-});
+
+    // Initialize PJAX
+    $(document).pjax('a[data-pjax]', '#pjax-container');
+
+    // PJAX event listeners for loading indicator
+    $(document).on('pjax:start', function() {
+        $('#tab-loading').show();
+    });
+
+    $(document).on('pjax:end', function() {
+        $('#tab-loading').hide();
+        handleTabSwitching(); // Update tabs after PJAX load
+    });
+
+    // Handle tab switching on initial load
+    document.addEventListener("DOMContentLoaded", function () {
+        handleTabSwitching();
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedTab = urlParams.get('tab') || 'packs';
+
+        const allTabs = document.querySelectorAll('.tab-btn');
+        let targetElement = null;
+
+        allTabs.forEach(tab => {
+            const target = tab.getAttribute('data-target');
+            const content = document.getElementById(target);
+
+            if (!content) return; // ✅ prevent null error
+
+            if (target === selectedTab + '-tab') {
+                tab.classList.add('active');
+                content.classList.remove('d-none');
+                content.style.display = 'block';
+                targetElement = content;
+            } else {
+                tab.classList.remove('active');
+                content.classList.add('d-none');
+                content.style.display = 'none';
+            }
+
+            // Remove the click handler that prevents default and reloads
+        });
+
+        if (targetElement) {
+            setTimeout(() => {
+                targetElement.scrollIntoView({behavior: 'smooth'});
+            }, 300);
+        }
+    });
 
 
     document.querySelectorAll('.tab-btn').forEach(btn => {

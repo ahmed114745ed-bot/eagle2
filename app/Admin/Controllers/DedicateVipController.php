@@ -77,19 +77,7 @@ class DedicateVipController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-        Admin::style("
-        .table {
-            background-color: var(--table-background-color) !important;
-        }
 
-        .table th, .table td {
-            background-color: var(--table-background-color) !important;
-        }
-
-        .table tbody tr:hover {
-            background-color: var(--primary-hover-alpha) !important;
-        }
-    ");
         $grid->column('ware', __('wares'))->expand(function () {
 
             $wares = $this->waresOvip->map(function ($ware) {
@@ -124,7 +112,6 @@ class DedicateVipController extends MainController
         $grid->column('expire', __('expire'));
         if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
-
                 return (new \App\Admin\Actions\VipDedicateAction($this->id))->render();
             });
         }
