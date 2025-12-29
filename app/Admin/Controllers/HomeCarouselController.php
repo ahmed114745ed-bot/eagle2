@@ -2,23 +2,21 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\WebPHelper;
 use Carbon\Carbon;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
-use App\Models\Country;
 use App\Models\Setting;
+use App\Helpers\WebPHelper;
 use App\Models\HomeCarousel;
+use Illuminate\Http\Request;
 use App\Selectables\Countries;
 use Encore\Admin\Facades\Admin;
-use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use App\Models\HomeCarouselDisplay;
-use App\Tik\Services\Files\ImageConverter;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class HomeCarouselController extends MainController
@@ -88,25 +86,141 @@ class HomeCarouselController extends MainController
                     </div>";
         });
 
+        // $types = [
+        //     'displayDiscover' => 'Discover',
+        //     'displayHomeTop'  => 'Home Top',
+        //     'displayHomeMiddle' => 'Home Middle',
+        //     'displayLive'     => 'Live',
+        //     'displayCountry'  => 'Country',
+        //     'displayRoom'  => 'Room',
+        // ];
+
+        // foreach ($types as $attr => $label) {
+        //     $grid->column($attr, __($label))
+        //         ->display(function () use ($attr) {
+        //             return $this->{$attr} ? 1 : 0;
+        //         })
+        //         ->switch([
+        //             'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
+        //             'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
+        //         ]);
+        // }
+
+
         $types = [
-            'displayDiscover' => 'Discover',
-            'displayHomeTop'  => 'Home Top',
-            'displayHomeMiddle' => 'Home Middle',
-            'displayLive'     => 'Live',
-            'displayCountry'  => 'Country',
-            'displayRoom'  => 'Room',
+            'displayDiscover'    => 'Discover',
+            'displayHomeTop'     => 'Home Top',
+            'displayHomeMiddle'  => 'Home Middle',
+            'displayLive'        => 'Live',
+            'displayCountry'     => 'Country',
+            'displayRoom'        => 'Room',
+        ];
+
+        $typeMapping = [
+            'displayDiscover'   => 'discover',
+            'displayHomeTop'    => 'home_top',
+            'displayHomeMiddle' => 'home_middle',
+            'displayLive'       => 'live',
+            'displayCountry'    => 'country',
+            'displayRoom'       => 'room',
         ];
 
         foreach ($types as $attr => $label) {
             $grid->column($attr, __($label))
-                ->display(function () use ($attr) {
-                    return $this->{$attr} ? 1 : 0;
+                ->display(function () use ($attr, $typeMapping) {
+
+                    $type = $typeMapping[$attr];
+                    $display = $this->displays->firstWhere('display_type', $type);
+
+                    $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture() ? 1 : 0;
+
+                    $duration = 0;
+                    if ($display && $display->end_at) {
+                        $duration = Carbon::parse($display->end_at)->isFuture()
+                            ? Carbon::parse($display->end_at)->diffForHumans(
+                                now(),
+                                ['parts' => 2, 'short' => true, 'syntax' => Carbon::DIFF_ABSOLUTE]
+                            )
+                            : 0;
+                    }
+
+                    $displayId = $display ? $display->id : 0;
+                    $icon =  "<i class='fa fa-clock-o text-success'></i>";
+
+                    return "
+                            <div style='text-align:center; margin-bottom:20px;'> <!-- add spacing -->
+                                <label class='switch'>
+                                    <input
+                                        type='checkbox'
+                                        class='display-switch'
+                                        data-home-carousel-id='{$this->id}'
+                                        data-display-type='{$type}'
+                                        data-id='{$displayId}'
+                                        " . ($status ? 'checked' : '') . ">
+                                    <span class='slider round'></span>
+                                </label>
+                                <br>
+                                <small class='duration-text' style='display:block; margin-top:5px;'>
+                                {$duration} {$icon} 
+                                </small>
+                            </div>
+                            ";
                 })
-                ->switch([
-                    'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
-                    'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
-                ]);
+                ->style('text-align:center;');
         }
+
+
+
+        Admin::script("
+    if (typeof axios === 'undefined') {
+        var script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js';
+        document.head.appendChild(script);
+    }
+
+    function bindDisplaySwitch() {
+        document.querySelectorAll('.display-switch').forEach(function(el) {
+
+            // prevent double binding
+            el.onchange = null;
+
+            el.addEventListener('change', function() {
+                let checkbox = this;
+
+                let payload = {
+                    home_carousel_id: checkbox.dataset.homeCarouselId,
+                    display_type: checkbox.dataset.displayType,
+                    status: checkbox.checked ? 1 : 0
+                };
+
+                axios.post('/admin/home-carousel-display-toggle', payload)
+                    .then(res => {
+                        if (!res.data.success) {
+                            checkbox.checked = !payload.status;
+                            return;
+                        }
+
+                        // ✅ update new id after create
+                        checkbox.dataset.id = res.data.display_id ?? 0;
+
+                        // ✅ update duration
+                        let durationEl = checkbox.closest('div').querySelector('.duration-text');
+                        durationEl.textContent = res.data.duration || '';
+                    })
+                    .catch(() => {
+                        checkbox.checked = !payload.status;
+                    });
+            });
+        });
+    }
+
+    bindDisplaySwitch();
+    $(document).on('pjax:complete', bindDisplaySwitch);
+");
+
+
+
+
 
 
 
@@ -134,10 +248,95 @@ class HomeCarouselController extends MainController
                 width: 100%;
                 border-bottom: 1px solid #ddd;
             }
+
+
+
+            .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+            background-color: #4caf50;
+            }
+
+            input:focus + .slider {
+            box-shadow: 0 0 1px #4caf50;
+            }
+
+            input:checked + .slider:before {
+            transform: translateX(26px);
+            }
         ');
 
         return $grid;
     }
+
+    public function toggleStatus(Request $request)
+    {
+        // dd($request->all());
+        $request->validate([
+            'home_carousel_id' => 'required|exists:home_carousels,id',
+            'display_type'     => 'required|string',
+            'status'           => 'required|boolean',
+        ]);
+
+        $display = HomeCarouselDisplay::where('home_carousel_id', $request->home_carousel_id)
+            ->where('display_type', $request->display_type)
+            ->first();
+        if ($request->status) {
+            HomeCarouselDisplay::create([
+                'home_carousel_id' => $request->home_carousel_id,
+                'display_type'     => $request->display_type,
+                'end_at'          => now(),
+            ]);
+        } else {
+            optional($display)->delete();
+        }
+
+        
+            return response()->json([
+                'success'    => true,
+                'message'    => __('Submission status updated successfully!'),
+                'display_id' => $display->id ?? 0,
+            ]);
+        
+      
+        return back()->with('success', __('Submission status updated successfully!'));
+    }
+
 
 
     /**
@@ -293,17 +492,17 @@ class HomeCarouselController extends MainController
     protected function syncDisplaysBeforeSave(Form $form)
     {
         $form->ignore(['duration']);
-       
 
-            $form->saving(function (Form $form) {
 
-        if (request()->hasFile('img')) {
+        $form->saving(function (Form $form) {
+
+            if (request()->hasFile('img')) {
 
                 $path = WebPHelper::uploadWebp(
                     request()->file('img'),
-                    'images',       
-                    'splash',        
-                                
+                    'images',
+                    'splash',
+
                 );
 
                 $form->image_url = $path;
