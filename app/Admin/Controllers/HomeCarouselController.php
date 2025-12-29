@@ -248,7 +248,79 @@ class HomeCarouselController extends MainController
                 width: 100%;
                 border-bottom: 1px solid #ddd;
             }
+
+
+
+            .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+
+            input:checked + .slider {
+            background-color: #4caf50;
+            }
+
+            input:focus + .slider {
+            box-shadow: 0 0 1px #4caf50;
+            }
+
+            input:checked + .slider:before {
+            transform: translateX(26px);
+            }
         ');
+//        Admin::style('
+//            .table-responsive {
+//                max-height: calc(100vh - 250px);
+//                overflow-y: auto;
+//            }
+//            .grid-table thead th {
+//                position: sticky;
+//                top: 0;
+//                background-color: #f5f5f5;
+//                z-index: 10;
+//                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+//            }
+//            .grid-table thead th::after {
+//                content: "";
+//                position: absolute;
+//                left: 0;
+//                bottom: 0;
+//                width: 100%;
+//                border-bottom: 1px solid #ddd;
+//            }
+//        ');
 
 //        Admin::script("
 //        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
@@ -446,6 +518,10 @@ class HomeCarouselController extends MainController
     protected function syncDisplaysBeforeSave(Form $form)
     {
         $form->ignore(['duration']);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2ad3c6c810da5036e320127cb76b342da229fecc
 
 
         $form->saving(function (Form $form) {
