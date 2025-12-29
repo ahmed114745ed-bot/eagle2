@@ -132,20 +132,18 @@ class CountryController extends MainController
         }
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->actions(function ($actions) {
+         $permission    = $this->permission_name;
+        $grid->actions(function ($actions)  use ($permission) {
             $actions->disableView();
             $actions->disableDelete();
-        });
-        $grid->disableCreateButton();
-
-        $permission    = $this->permission_name;
-        $grid->actions(function ($actions) use ($permission) {
-            $model = $actions->row;
-
             if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new MoveCountryCategoryAction());
             }
         });
+        $grid->disableCreateButton();
+
+       
+       
 
 
         $grid->batchActions(function ($batch) use ($permission) {
