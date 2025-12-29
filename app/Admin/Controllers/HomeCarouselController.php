@@ -518,10 +518,7 @@ class HomeCarouselController extends MainController
     protected function syncDisplaysBeforeSave(Form $form)
     {
         $form->ignore(['duration']);
-<<<<<<< HEAD
-=======
 
->>>>>>> 2ad3c6c810da5036e320127cb76b342da229fecc
 
 
         $form->saving(function (Form $form) {
