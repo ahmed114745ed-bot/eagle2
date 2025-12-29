@@ -46,66 +46,93 @@
 </style>
 
 
-
-
-
 @php
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+    use Illuminate\Support\Arr;
+    use Illuminate\Support\Str;
 
-/* -------------------------------
- | URI / BD Visibility
- |-------------------------------*/
-$uri = Arr::get($item, 'uri', '');
-$shouldHideBd = Str::startsWith($uri, 'bd/') && !Admin::user()->inRoles(['bd']);
+    /* -------------------------------
+     | URI / BD Visibility
+     |-------------------------------*/
+    $uri = Arr::get($item, 'uri', '');
+    $shouldHideBd = Str::startsWith($uri, 'bd/') && !Admin::user()->inRoles(['bd']);
 
-/* -------------------------------
- | Prevent duplicate rendering
- |-------------------------------*/
-$renderedMenu = $renderedMenu ?? [];
-$itemId = $item['id'] ?? null;
+    /* -------------------------------
+     | Prevent duplicate rendering
+     |-------------------------------*/
+    $renderedMenu = $renderedMenu ?? [];
+    $itemId = $item['id'] ?? null;
 
-/* -------------------------------
- | Normalize title
- |-------------------------------*/
-$rawTitle = Arr::get($item, 'title', '');
+    /* -------------------------------
+     | Normalize title
+     |-------------------------------*/
+    $rawTitle = Arr::get($item, 'title', '');
 
-if (is_array($rawTitle)) {
-    // Pick current locale or first available
-    $rawTitle = $rawTitle[app()->getLocale()] ?? reset($rawTitle);
-}
+    if (is_array($rawTitle)) {
+        // Pick current locale or first available
+        $rawTitle = $rawTitle[app()->getLocale()] ?? reset($rawTitle);
+    }
 
-$normalizedTitle = is_string($rawTitle) ? $rawTitle : '';
+    $normalizedTitle = is_string($rawTitle) ? $rawTitle : '';
 
-/* -------------------------------
- | Normalize roles
- |-------------------------------*/
-$roles = Arr::get($item, 'roles', []);
-if (!is_array($roles)) {
-    $roles = [];
-}
+    /* -------------------------------
+     | Normalize roles
+     |-------------------------------*/
+    $roles = Arr::get($item, 'roles', []);
+    if (!is_array($roles)) {
+        $roles = [];
+    }
 
-/* -------------------------------
- | Normalize permission
- |-------------------------------*/
-$permission = Arr::get($item, 'permission');
-if (is_array($permission)) {
-    // pick first permission if it's an array
-    $permission = reset($permission);
-}
+    /* -------------------------------
+     | Normalize permission
+     |-------------------------------*/
+    $permission = Arr::get($item, 'permission');
+    if (is_array($permission)) {
+        // pick first permission if it's an array
+        $permission = reset($permission);
+    }
 
-$isVisible =
-    !$shouldHideBd &&
-    Admin::user()->visible($roles) &&
-    Admin::user()->can($permission) &&
-    (!is_null($itemId) && !in_array($itemId, $renderedMenu));
+    $isVisible =
+        !$shouldHideBd &&
+        Admin::user()->visible($roles) &&
+        Admin::user()->can($permission) &&
+        (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 
-$badgeCount = 0;
-$badgeUris = ['form-requests'];
+    $badgeCount = 0;
 
-if (Str::contains($uri, $badgeUris)) {
-    $badgeCount = \Modules\Form\Entities\FormRequest::where('status', 'pending')->count();
-}
+    $badgeConfig = [
+        'form-requests' => fn() => \Modules\Form\Entities\FormRequest::where('status', 'pending')->count(),
+        'superadmin-banner-requests' => fn() => \Modules\SuperAdmin\Entities\SuperadminBannerRequest::where('status', 'pending')->count(),
+        'country-requests' => fn() => \App\Models\ChangeCountryRequest::where('status', 'pending')->count(),
+    ];
+
+    $getBadgeCount = function($uri) use ($badgeConfig) {
+        foreach ($badgeConfig as $badgeUri => $countCallback) {
+            if (Str::contains($uri, $badgeUri)) {
+                return $countCallback();
+            }
+        }
+        return 0;
+    };
+
+    $getChildrenBadgeCount = function($children) use ($getBadgeCount, &$getChildrenBadgeCount) {
+        $total = 0;
+        foreach ($children as $child) {
+            $childUri = Arr::get($child, 'uri', '');
+            $total += $getBadgeCount($childUri);
+
+            if (isset($child['children']) && is_array($child['children'])) {
+                $total += $getChildrenBadgeCount($child['children']);
+            }
+        }
+        return $total;
+    };
+
+    if (isset($item['children']) && is_array($item['children'])) {
+        $badgeCount = $getChildrenBadgeCount($item['children']);
+    } else {
+        $badgeCount = $getBadgeCount($uri);
+    }
+
 @endphp
 
 @if($isVisible)
@@ -129,9 +156,9 @@ if (Str::contains($uri, $badgeUris)) {
                     }}
                 </span>
 
-                    @if($badgeCount > 0)
-                        <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
-                    @endif
+                @if($badgeCount > 0)
+                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
+                @endif
             </a>
         </li>
     @else
@@ -150,6 +177,9 @@ if (Str::contains($uri, $badgeUris)) {
                     }}
                 </span>
                 @php $isRtl = app()->getLocale() === 'ar'; @endphp
+                @if($badgeCount > 0)
+                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
+                @endif
                 <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow" aria-hidden="true"></i>
             </a>
 
