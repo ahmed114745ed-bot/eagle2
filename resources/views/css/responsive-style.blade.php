@@ -477,7 +477,7 @@
         }
 
         .rtl .col-md-3 .card {
-            margin-left: auto !important;
+            margin-left: 4% !important;
             margin-right: 4% !important;
         }
 
