@@ -142,6 +142,26 @@ Route::get('/page/{name}', function ($name) {
     return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));
 })->middleware('localization');
 
+Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Request $request) {
+    // Get headers using Laravel's request object (works with all servers)
+    $headersOld = array_change_key_case(getallheaders(), CASE_UPPER);
+    $headers = array_change_key_case($request->headers->all(), CASE_UPPER);
+    
+    // Flatten the headers array (Laravel returns arrays for each header)
+    $headers = array_map(function ($value) {
+        return is_array($value) ? $value[0] : $value;
+    }, $headers);
+
+    return response()->json([
+        'headersOld' => $headersOld,
+        'headers' => $headers,
+        'request_body' => $request->all(),
+        'raw_content' => $request->getContent(),
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
+
 Route::get('/clear', function () {
 
     Artisan::call('cache:clear');
