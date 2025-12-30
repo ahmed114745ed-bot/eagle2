@@ -84,7 +84,6 @@ class CountryController extends MainController
     {
         $grid = new Grid(new Country);
         $filterType = request()->get('filter', 'all');
-        $category  = [];
         $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
             $q->where('country_category_id', $filterType);
         })->orderByDesc('status');
@@ -94,11 +93,6 @@ class CountryController extends MainController
 
             $filter->equal('e_name', __('name'));
         });
-
-
-        if (request('filter') != 'all') {
-            $category = CountryCategory::find(request('filter'));
-        }
 
         $grid->header(function () use ($filterType) {
             $locale = App::getLocale();
@@ -132,20 +126,18 @@ class CountryController extends MainController
         }
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->actions(function ($actions) {
+         $permission    = $this->permission_name;
+        $grid->actions(function ($actions)  use ($permission) {
             $actions->disableView();
             $actions->disableDelete();
-        });
-        $grid->disableCreateButton();
-
-        $permission    = $this->permission_name;
-        $grid->actions(function ($actions) use ($permission) {
-            $model = $actions->row;
-
             if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new MoveCountryCategoryAction());
             }
         });
+        $grid->disableCreateButton();
+
+       
+       
 
 
         $grid->batchActions(function ($batch) use ($permission) {

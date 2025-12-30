@@ -60,6 +60,7 @@ class FormRequestController extends MainController
         $grid = new Grid(new FormRequest());
 
         $grid->model()
+            ->select(['id', 'name', 'bd_id', 'whatsapp_number', 'submitted_by', 'form_template_type', 'status'])
             ->with([
                 'user',
                 'user.country',
@@ -289,6 +290,9 @@ class FormRequestController extends MainController
 
         $grid->disableActions();
         $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableColumnSelector();
+        $grid->disableRowSelector();
 
         return $grid;
     }
