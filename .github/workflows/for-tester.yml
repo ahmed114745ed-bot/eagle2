@@ -1,12 +1,12 @@
 name: SSh-for-tester-pipline
 on:
   push:
-    branches: ["new-design"]
+    branches: ["dynamicTheme"]
 jobs:
   run_new-design_job:
     runs-on: ubuntu-latest
     steps:
-    - name: print out new-design Eagle
+    - name: print out dynamicTheme Eagle
       uses: appleboy/ssh-action@v1.2.1
       with:
         host: "34.18.18.32"
