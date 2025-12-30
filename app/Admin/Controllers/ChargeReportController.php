@@ -650,8 +650,17 @@ class ChargeReportController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
-        $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when(!request('from_date'), function ($query,) {
+
+            $start = now()->startOfMonth();
+            $end   = $end   = now()->endOfMonth();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -659,7 +668,36 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     if ($from = request('from_date')) {
+                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                //         $query->whereDate('created_at', '>=', $start);
+                //     }
+                // }, __('From Date'), 'from_date')->date();
 
+                $filter->where(function ($query) {
+
+                    $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+                    $query->where(
+                        'created_at',
+                        '>=',
+                        $from->startOfMonth()
+                    );
+                }, __('From Date'), 'from_date')
+                    ->date()
+                    ->default(now()->startOfMonth()->toDateString());
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
             $filter->disableIdFilter();
             $filter->where(function ($query) {
                 if ($this->input != null) {
