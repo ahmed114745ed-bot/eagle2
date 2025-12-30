@@ -132,16 +132,20 @@ class HomeCarouselController extends MainController
                     $type = $typeMapping[$attr];
                     $display = $this->displays->firstWhere('display_type', $type);
 
-                    $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture()  && ($display->status) == 1 ? 1 : 0;
+                     $status = $display && ($display->status) == 1 ? 1 : 0;
 
                     $duration = 0;
-                    if ($display && $display->end_at) {
+                    if ($display && $display->end_at && $display->duration != 0) {
                         $duration = Carbon::parse($display->end_at)->isFuture()
                             ? Carbon::parse($display->end_at)->diffForHumans(
                                 now(),
                                 ['parts' => 2, 'short' => true, 'syntax' => Carbon::DIFF_ABSOLUTE]
                             )
                             : 0;
+                        $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture()  && ($display->status) == 1 ? 1 : 0;
+                    } elseif ($display && $display->duration == 0) {
+                        $duration = '∞';
+                        $status = $display && ($display->status) == 1 ? 1 : 0;
                     }
 
                     $displayId = $display ? $display->id : 0;
@@ -398,6 +402,7 @@ class HomeCarouselController extends MainController
         $durationUnit = match ($homeCarousel->form) {
             2       => 'days',
             3       => 'months',
+            4       => 'lifetime',
             default => 'hours',
         };
 
@@ -406,6 +411,7 @@ class HomeCarouselController extends MainController
         $endAt = match ($durationUnit) {
             'days'   => now()->addDays($duration),
             'months' => now()->addMonths($duration),
+            'lifetime' => now(),
             default  => now()->addHours($duration),
         };
 
@@ -493,8 +499,8 @@ class HomeCarouselController extends MainController
         $form->display(__('admin.ID'));
         $form->number('sort', __('sort'));
         $form->imagePath('img', trans('img'))
-            /**->setResolution(80)*/
-            ->required();
+        /**->setResolution(80)*/
+         ->required();
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates())->default(true);
     }
 
@@ -505,7 +511,8 @@ class HomeCarouselController extends MainController
             0 => __(''),
             1 => __('hours'),
             2 => __('days'),
-            3 => __('months')
+            3 => __('months'),
+            4 => __('lifetime')
         ])->when('1', function (Form $form) {
 
             $form->text('input', trans('input'))
@@ -516,6 +523,8 @@ class HomeCarouselController extends MainController
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
                 ->rules('required|regex:/^\d+$/');
+        })->when('4', function (Form $form) {
+            $form->hidden('input', trans('input'))->default(0);
         });
     }
 
@@ -686,6 +695,9 @@ class HomeCarouselController extends MainController
                         case 3:
                             $duration_unit = 'months';
                             break;
+                        case 4:
+                            $duration_unit = 'lifetime';
+                            break;
                         default:
                             $duration_unit = 'hours';
                     }
@@ -719,6 +731,7 @@ class HomeCarouselController extends MainController
                                         1 => 'hours',
                                         2 => 'days',
                                         3 => 'months',
+                                        4 => 'lifetime',
                                         default => 'hours',
                                     }
                                 ]);
@@ -730,6 +743,7 @@ class HomeCarouselController extends MainController
                                         1 => 'hours',
                                         2 => 'days',
                                         3 => 'months',
+                                        4 => 'lifetime',
                                         default => 'hours',
                                     }
                                 ]);
