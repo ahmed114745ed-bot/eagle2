@@ -662,7 +662,7 @@
         border: 1px solid #e5e7eb !important;
         border-radius: var(--border-radius) !important;
         box-shadow: var(--shadow-md) !important;
-        overflow: hidden !important;
+        overflow: visible !important;
         transition: var(--transition) !important;
     }
 
