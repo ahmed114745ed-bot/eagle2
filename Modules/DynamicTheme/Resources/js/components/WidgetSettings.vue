@@ -378,7 +378,8 @@
                 
                 <div class="mt-2">
                   <template v-if="editAssetForm.file">
-                    <img v-if="editAssetForm.asset_type === 'image'" :src="URL.createObjectURL(editAssetForm.file)" class="w-full h-32 object-cover rounded" />
+                    <img v-if="editAss
+                    etForm.asset_type === 'image'" :src="URL.createObjectURL(editAssetForm.file)" class="w-full h-32 object-cover rounded" />
                     <div v-else class="w-full h-32 bg-gray-100 flex items-center justify-center rounded text-sm text-gray-700">
                       {{ editAssetForm.file.name }}
                     </div>
@@ -1034,13 +1035,19 @@ const buildStorageLink = (path) => {
     : `${normalizedBase}/storage/${normalizedPath}`;
 };
 
+const resolveAssetUrl = (path) => {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return buildStorageLink(path);
+};
+
 const fileLink = (asset) => {
   if (!asset) return null;
-  if (asset.file_url) return asset.file_url;
-  const fromPath = buildStorageLink(asset.file_path);
+  const fromFileUrl = resolveAssetUrl(asset.file_url);
+  if (fromFileUrl) return fromFileUrl;
+  const fromPath = resolveAssetUrl(asset.file_path);
   if (fromPath) return fromPath;
-  if (asset.default_url) return asset.default_url;
-  return null;
+  return resolveAssetUrl(asset.default_url);
 };
 
 const deleteChild = async (child) => {
