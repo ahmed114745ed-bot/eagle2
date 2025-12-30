@@ -336,7 +336,7 @@ class OvipGiftTapController extends MainController
             }
         }
         
-            $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm','alpha','vap'];
             if ($form->show_img instanceof UploadedFile) {
                 // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
                 $ext = strtolower($form->show_img->guessExtension());
