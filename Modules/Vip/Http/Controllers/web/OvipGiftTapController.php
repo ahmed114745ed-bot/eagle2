@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Modules\Reals\Http\Services\FfmpegService;
 use Encore\Admin\Controllers\HasResourceActions;
+use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Vip\Services\WareSaveService;
 
@@ -353,43 +354,44 @@ class OvipGiftTapController extends MainController
                 if ($ext === 'zz' && $originalExt === 'svga') $ext = 'svga';
                 if ($ext === 'gif' && $originalExt === 'gif') $ext = 'png';
 
-                // if ($ext === 'mp4') {
-                //     $videoPath = getDriverUrl() . '/' . upload($form->img2);
-                //     $wareId = $form->model()->id;
-
-                //     (new FfmpegService())->extractByDuration($videoPath, $wareId);
-
-                //     $imagePath = (config('app.env') !== 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
-                //     $response = Http::attach('image', Storage::disk('gcs')->get($imagePath), "{$wareId}.jpg")
-                //         ->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                //     if ($response->successful()) {
-                //         $type = $response->json()['data']['video_type'] ?? null;
-                //         if ($type) $ext = strtolower($type);
-                //     }
-                // }
-
                 if ($ext === 'mp4') {
-                    $videoPath = upload($form->img2); // your upload helper
+                    $videoPath = getDriverUrl() . '/' . upload($form->img2);
                     $wareId = $form->model()->id;
 
-                    // Call API or FFMpeg to detect if 'vap' or 'alpha'
-                    $response = Http::attach('video', Storage::disk('gcs')->get($videoPath), "{$wareId}.mp4")
+                    (new FfmpegService())->extractByDuration($videoPath, $wareId);
+
+                    $imagePath = (config('app.env') !== 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
+                    $response = Http::attach('image', Storage::disk('gcs')->get($imagePath), "{$wareId}.jpg")
                         ->post('https://utd-test.utdsoftware.com/api/analyze-media');
 
                     if ($response->successful()) {
-                        $videoType = $response->json()['data']['video_type'] ?? null;
-                        
-                        if ($videoType === 'vap') {
-                           
-                            $ext = 'vap';
-                        } elseif ($videoType === 'alpha') {
-                            $ext = 'alpha';
-                        }
+                        $type = $response->json()['data']['video_type'] ?? null;
+                        if ($type) $ext = strtolower($type);
                     }
                 }
 
+                // if ($ext === 'mp4') {
+                //     $videoPath = upload($form->img2); // your upload helper
+                //     $wareId = $form->model()->id;
+
+                //     // Call API or FFMpeg to detect if 'vap' or 'alpha'
+                //     $response = Http::attach('video', Storage::disk('gcs')->get($videoPath), "{$wareId}.mp4")
+                //         ->post('https://utd-test.utdsoftware.com/api/analyze-media');
+
+                //     if ($response->successful()) {
+                //         $videoType = $response->json()['data']['video_type'] ?? null;
+                        
+                //         if ($videoType === 'vap') {
+                           
+                //             $ext = 'vap';
+                //         } elseif ($videoType === 'alpha') {
+                //             $ext = 'alpha';
+                //         }
+                //     }
+                // }
+
                 if (!in_array($ext, $allowed)) {
+                    Log::info('Invalid file type uploaded for img2', ['extension' => $ext, 'allowed' => $allowed]);
                     throw ValidationException::withMessages(['img2' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
                 }
 
