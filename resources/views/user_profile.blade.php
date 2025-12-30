@@ -1099,14 +1099,14 @@
                     <div class="meta-item">
                         <span class="meta-label">{{__('level')}}:</span>
                         <span class="meta-value">
-                                    <img src="{{ getImagePath(Common::level_center($user)['sender_img']) }}"
+                                    <img src="{{ getImagePath($user->senderLevel->img) }}"
                                          style="height: 24px;">
                                 </span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__('Receiver Level')}}:</span>
                         <span class="meta-value">
-                                <img src="{{ getImagePath(Common::level_center($user)['receiver_img']) }}"
+                                <img src="{{ getImagePath($user->receiverLevel->img) }}"
                                      style="height: 24px;">
                             </span>
                     </div>
