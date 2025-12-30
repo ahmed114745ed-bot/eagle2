@@ -1438,6 +1438,7 @@
     html.rtl .dropdown-menu {
         text-align: right;
         right: auto !important;
+        left: auto;
         float: right;
     }
 
