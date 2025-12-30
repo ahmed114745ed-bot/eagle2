@@ -2,6 +2,7 @@
 
 namespace Modules\DynamicTheme\Http\Controllers\Api\Admin;
 
+use App\Helpers\Common;
 use Modules\DynamicTheme\Http\Controllers\Controller;
 use Modules\DynamicTheme\Entities\ThemeAsset;
 use Illuminate\Http\Request;
@@ -21,18 +22,13 @@ class AssetUploadController extends Controller
 
         $file = $request->file('file');
         $assetType = $request->input('asset_type');
+        $disk = config('filesystems.default');
 
         // Determine folder based on asset type
         $folder = 'assets/' . $assetType . 's';
-
-        // Generate unique filename
-        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-        // Store file in public disk
-        $path = $file->storeAs($folder, $filename, 'public');
-
-        // Generate public URL
-        $url = asset('storage/' . $path);
+        $path = Common::upload($folder, $file, $disk);
+        $filename = basename($path);
+        $url = Storage::disk($disk)->url($path);
 
         return response()->json([
             'message' => 'File uploaded successfully',
@@ -55,23 +51,18 @@ class AssetUploadController extends Controller
         ]);
 
         $file = $request->file('file');
+        $disk = config('filesystems.default');
 
         // Determine folder based on asset type
         $folder = 'assets/' . $asset->asset_type . 's';
 
-        // Generate unique filename
-        $filename = time() . '_' . $asset->asset_key . '.' . $file->getClientOriginalExtension();
-
         // Delete old file if exists
-        if ($asset->default_url && Storage::disk('public')->exists($asset->default_url)) {
-            Storage::disk('public')->delete($asset->default_url);
+        if ($asset->file_path && Storage::disk($disk)->exists($asset->file_path)) {
+            Storage::disk($disk)->delete($asset->file_path);
         }
 
-        // Store file in public disk
-        $path = $file->storeAs($folder, $filename, 'public');
-
-        // Generate public URL
-        $url = asset('storage/' . $path);
+        $path = Common::upload($folder, $file, $disk);
+        $url = Storage::disk($disk)->url($path);
 
         // Update asset with new URL
         $asset->update([
@@ -91,8 +82,10 @@ class AssetUploadController extends Controller
      */
     public function delete(ThemeAsset $asset)
     {
-        if ($asset->file_path && Storage::disk('public')->exists($asset->file_path)) {
-            Storage::disk('public')->delete($asset->file_path);
+        $disk = config('filesystems.default');
+
+        if ($asset->file_path && Storage::disk($disk)->exists($asset->file_path)) {
+            Storage::disk($disk)->delete($asset->file_path);
         }
 
         $asset->update([

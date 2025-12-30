@@ -3,6 +3,15 @@
         <!-- Header -->
         <header class="bg-white shadow">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-end mb-4">
+                    <a
+                        href="/admin"
+                        class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                    >
+                        ⬅️ العودة إلى لوحة التحكم
+                    </a>
+                </div>
+
                 <!-- Configuration Selector Row -->
                 <div class="flex justify-between items-center mb-4 pb-4 border-b border-gray-200">
                     <div class="flex items-center space-x-4">
@@ -54,23 +63,23 @@
                     <h1 class="text-2xl font-bold text-gray-900">
                         🎨 Dynamic Theme Dashboard
                     </h1>
-                    <div class="flex space-x-4">
+                </div>
+
+                <div class="mt-4 flex justify-end space-x-4">
+                    <button
+                        @click="saveConfiguration"
+                        :disabled="!hasChanges || !selectedConfigId"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        💾 Save Configuration
+                    </button>
                     
-                        <button
-                            @click="saveConfiguration"
-                            :disabled="!hasChanges || !selectedConfigId"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            💾 Save Configuration
-                        </button>
-                        
-                        <button
-                            @click="previewScreen"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                        >
-                            👁️ Preview
-                        </button>
-                    </div>
+                    <button
+                        @click="previewScreen"
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                        👁️ Preview
+                    </button>
                 </div>
             </div>
         </header>

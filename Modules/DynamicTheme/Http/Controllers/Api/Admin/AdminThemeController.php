@@ -2,6 +2,7 @@
 
 namespace Modules\DynamicTheme\Http\Controllers\Api\Admin;
 
+use App\Helpers\Common;
 use Modules\DynamicTheme\Http\Controllers\Controller;
 use Modules\DynamicTheme\Entities\Asset;
 use Modules\DynamicTheme\Entities\Screen;
@@ -12,6 +13,7 @@ use Modules\DynamicTheme\Entities\ThemeAsset;
 use Modules\DynamicTheme\Entities\LibraryAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -157,6 +159,7 @@ class AdminThemeController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $maxMb = $request->input('max_size') ? (int)$request->input('max_size') : 5;
+            $disk = config('filesystems.default');
 
             // additional validation based on asset_type
             if ($validated['asset_type'] === 'image') {
@@ -165,11 +168,11 @@ class AdminThemeController extends Controller
                 $request->validate(['file' => 'file|max:' . ($maxMb * 1024)]);
             }
 
-            $filename = \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs("theme-assets/{$validated['asset_type']}", $filename, 'public');
+            $folder = "theme-assets/{$validated['asset_type']}";
+            $path = Common::upload($folder, $file, $disk);
 
             $validated['file_path'] = $path;
-            $validated['default_url'] = asset('storage/' . $path);
+            $validated['default_url'] = Storage::disk($disk)->url($path);
             $validated['original_filename'] = $file->getClientOriginalName();
         }
         
@@ -204,20 +207,21 @@ class AdminThemeController extends Controller
         ]);
 
         $file = $request->file('file');
+        $disk = config('filesystems.default');
 
         // choose folder by asset_type
         $type = $asset->asset_type ?? 'file';
-        $filename = \Illuminate\Support\Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs("theme-assets/{$type}", $filename, 'public');
+        $folder = "theme-assets/{$type}";
+        $path = Common::upload($folder, $file, $disk);
 
         // delete previous file if exists
-        if ($asset->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($asset->file_path)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($asset->file_path);
+        if ($asset->file_path && Storage::disk($disk)->exists($asset->file_path)) {
+            Storage::disk($disk)->delete($asset->file_path);
         }
 
         $asset->update([
             'file_path' => $path,
-            'default_url' => asset('storage/' . $path),
+            'default_url' => Storage::disk($disk)->url($path),
             'original_filename' => $file->getClientOriginalName(),
         ]);
 
@@ -231,8 +235,10 @@ class AdminThemeController extends Controller
     {
         $asset = ThemeAsset::findOrFail($assetId);
 
-        if ($asset->file_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($asset->file_path)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($asset->file_path);
+        $disk = config('filesystems.default');
+
+        if ($asset->file_path && Storage::disk($disk)->exists($asset->file_path)) {
+            Storage::disk($disk)->delete($asset->file_path);
         }
 
         $asset->update([
@@ -312,14 +318,11 @@ public function updateAssetDashboard(Request $request, WidgetTheme $theme, Theme
                     ]);
                 }
 
-                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-                $path = $file->storeAs(
-                    "theme-assets/{$validated['asset_type']}",
-                    $filename,
-                    'public'
-                );
+                $disk = config('filesystems.default');
+                $path = Common::upload("theme-assets/{$validated['asset_type']}", $file, $disk);
 
                 $validated['file_path'] = $path;
+                $validated['default_url'] = Storage::disk($disk)->url($path);
                 $validated['original_filename'] = $file->getClientOriginalName();
             }
 

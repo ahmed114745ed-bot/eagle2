@@ -2,13 +2,13 @@
 
 namespace Modules\DynamicTheme\Http\Controllers\Api\V1;
 
+use App\Helpers\Common;
 use Modules\DynamicTheme\Http\Controllers\Controller;
 use Modules\DynamicTheme\Entities\Asset;
 use Modules\DynamicTheme\Entities\ThemeAsset;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AssetController extends Controller
 {
@@ -53,19 +53,16 @@ class AssetController extends Controller
 
         $file = $request->file('file');
         $assetType = $request->asset_type;
-
-        // Generate unique filename
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-
-        // Store file
-        $path = $file->storeAs("assets/{$assetType}", $filename, 'public');
+        $disk = config('filesystems.default');
+        $path = Common::upload("assets/{$assetType}", $file, $disk);
+        $fileUrl = Storage::disk($disk)->url($path);
 
         // Create asset record
         $asset = Asset::create([
             'name' => $request->name ?? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
             'original_name' => $file->getClientOriginalName(),
             'file_path' => $path,
-            'file_url' => asset('storage/' . $path),
+            'file_url' => $fileUrl,
             'asset_type' => $assetType,
             'mime_type' => $file->getMimeType(),
             'file_size' => $file->getSize(),
@@ -133,8 +130,10 @@ class AssetController extends Controller
         }
 
         // Delete file from storage
-        if (Storage::disk('public')->exists($asset->file_path)) {
-            Storage::disk('public')->delete($asset->file_path);
+        $disk = config('filesystems.default');
+
+        if (Storage::disk($disk)->exists($asset->file_path)) {
+            Storage::disk($disk)->delete($asset->file_path);
         }
 
         $asset->delete();

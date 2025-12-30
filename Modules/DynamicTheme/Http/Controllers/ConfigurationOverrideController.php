@@ -2,6 +2,7 @@
 
 namespace Modules\DynamicTheme\Http\Controllers;
 
+use App\Helpers\Common;
 use Modules\DynamicTheme\Entities\ClientConfiguration;
 use Modules\DynamicTheme\Entities\ConfigScreenOverride;
 use Modules\DynamicTheme\Entities\ConfigWidgetOverride;
@@ -380,6 +381,8 @@ class ConfigurationOverrideController extends Controller
                 ->where('theme_asset_id', $validated['theme_asset_id'])
                 ->first();
 
+            $disk = config('filesystems.default');
+
             if (!$asset) {
                 $asset = new ConfigAssetOverride([
                     'configuration_id' => $configId,
@@ -392,12 +395,11 @@ class ConfigurationOverrideController extends Controller
             // Handle file upload
             if ($request->hasFile('value_file')) {
                 // Delete old file if exists
-                if ($asset->value_file && Storage::exists($asset->value_file)) {
-                    Storage::delete($asset->value_file);
+                if ($asset->value_file && Storage::disk($disk)->exists($asset->value_file)) {
+                    Storage::disk($disk)->delete($asset->value_file);
                 }
 
-                $path = $request->file('value_file')->store("configs/{$configId}/assets");
-                $asset->value_file = $path;
+                $asset->value_file = Common::upload("configs/{$configId}/assets", $request->file('value_file'), $disk);
             }
 
             // Set text value
@@ -437,8 +439,10 @@ class ConfigurationOverrideController extends Controller
 
             if ($override) {
                 // Delete file if exists
-                if ($override->value_file && Storage::exists($override->value_file)) {
-                    Storage::delete($override->value_file);
+                $disk = config('filesystems.default');
+
+                if ($override->value_file && Storage::disk($disk)->exists($override->value_file)) {
+                    Storage::disk($disk)->delete($override->value_file);
                 }
 
                 $override->delete();
@@ -508,6 +512,8 @@ class ConfigurationOverrideController extends Controller
                 ->where('theme_asset_id', $validated['theme_asset_id'])
                 ->first();
 
+            $disk = config('filesystems.default');
+
             if (!$asset) {
                 $asset = new ConfigChildAssetOverride([
                     'configuration_id' => $configId,
@@ -520,12 +526,11 @@ class ConfigurationOverrideController extends Controller
 
             // Handle file upload
             if ($request->hasFile('value_file')) {
-                if ($asset->value_file && Storage::exists($asset->value_file)) {
-                    Storage::delete($asset->value_file);
+                if ($asset->value_file && Storage::disk($disk)->exists($asset->value_file)) {
+                    Storage::disk($disk)->delete($asset->value_file);
                 }
 
-                $path = $request->file('value_file')->store("configs/{$configId}/child-assets");
-                $asset->value_file = $path;
+                $asset->value_file = Common::upload("configs/{$configId}/child-assets", $request->file('value_file'), $disk);
             }
 
             // Set text value
@@ -563,8 +568,10 @@ class ConfigurationOverrideController extends Controller
                 ->find($childAssetOverrideId);
 
             if ($override) {
-                if ($override->value_file && Storage::exists($override->value_file)) {
-                    Storage::delete($override->value_file);
+                $disk = config('filesystems.default');
+
+                if ($override->value_file && Storage::disk($disk)->exists($override->value_file)) {
+                    Storage::disk($disk)->delete($override->value_file);
                 }
 
                 $override->delete();

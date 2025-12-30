@@ -187,16 +187,25 @@
                                         >
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center gap-4">
-                                                    <div class="w-10 h-10 flex items-center justify-center">
-                                                        <template v-if="asset.type === 'file' && asset.default_url">
-                                                            <img
-                                                                v-if="asset.asset_type === 'image'"
-                                                                :src="asset.default_url"
-                                                                alt="Asset thumbnail"
-                                                                class="w-10 h-10 object-cover rounded border border-gray-600"
-                                                            />
-                                                            <span v-else class="text-sm text-gray-200 px-2 py-1 bg-gray-600 rounded">ملف</span>
-                                                        </template>
+                                                    <div class="relative group">
+                                                        <div class="w-16 h-16 rounded-lg overflow-hidden border border-gray-700 bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center">
+                                                            <template v-if="asset.type === 'file' && asset.default_url">
+                                                                <img
+                                                                    v-if="asset.asset_type === 'image'"
+                                                                    :src="asset.default_url"
+                                                                    alt="Asset thumbnail"
+                                                                    class="w-full h-full object-contain transition duration-150 transform group-hover:scale-105"
+                                                                />
+                                                                <span v-else class="text-xs text-gray-200 px-2 py-1 bg-gray-600 rounded">ملف</span>
+                                                            </template>
+                                                            <span v-else class="text-xs text-gray-400">No file</span>
+                                                        </div>
+                                                        <a
+                                                            v-if="asset.default_url"
+                                                            :href="asset.default_url"
+                                                            target="_blank"
+                                                            class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-blue-300 opacity-0 group-hover:opacity-100 bg-gray-900 px-2 py-0.5 rounded border border-gray-700 shadow"
+                                                        >فتح</a>
                                                     </div>
                                                     <div>
                                                         <p class="text-white font-medium text-sm">{{ asset.asset_label || asset.asset_key }}</p>
@@ -209,12 +218,16 @@
 
                                             <!-- Preview: show image (without link) or text value -->
                                             <div class="border-t border-gray-600 pt-3">
-                                                <img
+                                                <div
                                                     v-if="asset.input_type === 'file' && asset.asset_type === 'image' && asset.default_url"
-                                                    :src="asset.default_url"
-                                                    alt="Asset preview"
-                                                    class="w-24 h-24 object-cover rounded border border-gray-600"
-                                                />
+                                                    class="w-full max-h-64 rounded-lg border border-gray-700 bg-gray-900/60 p-3 flex items-center justify-center"
+                                                >
+                                                    <img
+                                                        :src="asset.default_url"
+                                                        alt="Asset preview"
+                                                        class="max-h-56 w-auto object-contain"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

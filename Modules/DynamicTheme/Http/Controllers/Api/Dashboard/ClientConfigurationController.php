@@ -2,6 +2,7 @@
 
 namespace Modules\DynamicTheme\Http\Controllers\Api\Dashboard;
 
+use App\Helpers\Common;
 use Modules\DynamicTheme\Http\Controllers\Controller;
 use Modules\DynamicTheme\Entities\ClientConfiguration;
 use Modules\DynamicTheme\Entities\ConfigChildAssetOverride;
@@ -448,9 +449,10 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
         $file = $request->file('file');
         $asset = ThemeAsset::findOrFail($request->theme_asset_id);
         $assetType = $asset->asset_type;
+        $disk = config('filesystems.default');
 
         // Store file
-        $path = $file->store("config_{$configuration->id}/{$assetType}s", 'public');
+        $path = Common::upload("config_{$configuration->id}/{$assetType}s", $file, $disk);
 
         // Delete old file if exists
         $existingOverride = ConfigAssetOverride::where('configuration_id', $configuration->id)
@@ -458,7 +460,7 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
             ->first();
 
         if ($existingOverride && $existingOverride->file_path) {
-            Storage::disk('public')->delete($existingOverride->file_path);
+            Storage::disk($disk)->delete($existingOverride->file_path);
         }
 
         // Create or update override
@@ -477,7 +479,7 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
             'message' => 'Asset override uploaded successfully',
             'data' => [
                 'file_path' => $path,
-                'file_url' => Storage::url($path),
+                'file_url' => Storage::disk($disk)->url($path),
                 'original_filename' => $file->getClientOriginalName(),
             ]
         ]);
