@@ -1007,15 +1007,22 @@ const cancelDeleteChild = () => {
   deletingChild.value = null;
   showDeleteChildConfirm.value = false;
 };
+const storageBase = window?.storageUrl || window?.STORAGE_URL || window?.assetBaseUrl || '';
+const buildStorageLink = (path) => {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = storageBase || window.location.origin;
+  const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
+  const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+  return `${normalizedBase}/storage/${normalizedPath}`;
+};
+
 const fileLink = (asset) => {
-  if (asset.file_path) {
-    return `/storage/${asset.file_path}`;
-  }
-
-  if (asset.default_url) {
-    return asset.default_url;
-  }
-
+  if (!asset) return null;
+  if (asset.file_url) return asset.file_url;
+  const fromPath = buildStorageLink(asset.file_path);
+  if (fromPath) return fromPath;
+  if (asset.default_url) return asset.default_url;
   return null;
 };
 
