@@ -46,7 +46,7 @@ class EmojiCategorySeeder extends Seeder
             ]);
         }
 
-        Country::whereNull('emoji_category_id')
-            ->update(['emoji_category_id' => $emojiCategory->id]);
+        Country::whereNull('country_category_id')
+            ->update(['country_category_id' => $emojiCategory->id]);
     }
 }
