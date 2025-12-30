@@ -574,8 +574,8 @@ class UserController extends MainController
                         //         ->where('is_used', true)
                         //         ->with('ware:id,value');
                         // },
-                        'receiver.profile',
-                        'sender.profile',
+                        // 'receiver.profile',
+                        // 'sender.profile',
                         'gift:id,name,price',
                         'room:id,room_name',
                         'agency:id,name',
