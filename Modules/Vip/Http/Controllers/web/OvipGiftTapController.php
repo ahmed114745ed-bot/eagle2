@@ -379,9 +379,9 @@ class OvipGiftTapController extends MainController
 
                     if ($response->successful()) {
                         $videoType = $response->json()['data']['video_type'] ?? null;
-                         dd($videoType);
+                        
                         if ($videoType === 'vap') {
-                            dd($videoType);
+                           
                             $ext = 'vap';
                         } elseif ($videoType === 'alpha') {
                             $ext = 'alpha';
