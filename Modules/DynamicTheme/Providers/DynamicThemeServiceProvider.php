@@ -30,7 +30,7 @@ class DynamicThemeServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
 
         $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
-        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'dynamic-theme');
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'dynamictheme');
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
     }
 

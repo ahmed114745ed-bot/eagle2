@@ -10,3 +10,4 @@ if (appElement) {
     const app = createApp(DashboardApp);
     app.mount('#app');
 }
+ 

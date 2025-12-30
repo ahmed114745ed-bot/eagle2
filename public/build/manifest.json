@@ -1,0 +1,42 @@
+{
+  "Modules/DynamicTheme/Resources/css/app.css": {
+    "file": "assets/app-CfNoULaU.css",
+    "src": "Modules/DynamicTheme/Resources/css/app.css",
+    "isEntry": true
+  },
+  "Modules/DynamicTheme/Resources/js/admin.js": {
+    "file": "assets/admin-D9fTtvZE.js",
+    "name": "admin",
+    "src": "Modules/DynamicTheme/Resources/js/admin.js",
+    "isEntry": true,
+    "imports": [
+      "_NotificationToast-CMMZahZZ.js"
+    ],
+    "css": [
+      "assets/app-CfNoULaU.css"
+    ]
+  },
+  "Modules/DynamicTheme/Resources/js/app.js": {
+    "file": "assets/app-D0lDRCPv.js",
+    "name": "app",
+    "src": "Modules/DynamicTheme/Resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_NotificationToast-CMMZahZZ.js"
+    ],
+    "css": [
+      "assets/app-DbyvIEGH.css"
+    ]
+  },
+  "_NotificationToast-!~{004}~.js": {
+    "file": "assets/NotificationToast-EFwtlYcG.css",
+    "src": "_NotificationToast-!~{004}~.js"
+  },
+  "_NotificationToast-CMMZahZZ.js": {
+    "file": "assets/NotificationToast-CMMZahZZ.js",
+    "name": "NotificationToast",
+    "css": [
+      "assets/NotificationToast-EFwtlYcG.css"
+    ]
+  }
+}

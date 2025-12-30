@@ -32,3 +32,4 @@ gcp.json
 /config/laravel-ffmpeg.php
 /config/filesystem.php
 /bootstrap/cache/
+/Modules/DynamicTheme/node_modules/
