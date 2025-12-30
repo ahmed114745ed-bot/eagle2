@@ -270,11 +270,19 @@
                                         v-else-if="asset.type === 'file' && asset.asset_type === 'image' && fileLink(asset)"
                                         class="border border-gray-100 rounded-lg bg-gray-50 p-3 flex items-center justify-center"
                                       >
-                                        <img
-                                          :src="fileLink(asset)"
-                                          alt="Asset preview"
-                                          class="max-h-48 w-auto object-contain rounded"
-                                        />
+                                        <a
+                                          :href="fileLink(asset)"
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          class="block group"
+                                        >
+                                          <img
+                                            :src="fileLink(asset)"
+                                            alt="Asset preview"
+                                            class="w-full h-32 object-cover rounded transition-transform duration-150 group-hover:scale-[1.02]"
+                                          />
+                                          <p class="mt-2 text-[11px] text-blue-600 text-center">فتح في نافذة جديدة</p>
+                                        </a>
                                       </div>
 
                                       <div v-else class="text-sm text-gray-500">لا يوجد عرض متاح.</div>
@@ -1011,10 +1019,17 @@ const storageBase = window?.storageUrl || window?.STORAGE_URL || window?.assetBa
 const buildStorageLink = (path) => {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
+
   const base = storageBase || window.location.origin;
   const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
-  const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
-  return `${normalizedBase}/storage/${normalizedPath}`;
+
+  // avoid duplicating /storage when the base already points to the storage root
+  const baseHasStorage = /\/storage\/?$/.test(normalizedBase);
+  const normalizedPath = path.startsWith('/') ? path.slice(1) : path.replace(/^storage\//i, '');
+
+  return baseHasStorage
+    ? `${normalizedBase}/${normalizedPath}`
+    : `${normalizedBase}/storage/${normalizedPath}`;
 };
 
 const fileLink = (asset) => {
