@@ -562,8 +562,8 @@ class UserController extends MainController
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
-                        'receiver',
-                        'sender',
+                        // 'receiver',
+                        // 'sender',
                         // 'sender.packs' => function ($q) {
                         //     $q->whereIn('type', [25])
                         //         ->where('is_used', true)
