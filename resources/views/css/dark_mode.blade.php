@@ -69,7 +69,8 @@
     .dark-mode .datepicker table tr td span.active:hover,
     .dark-mode .datepicker table tr td span.active.disabled,
     .dark-mode .datepicker table tr td span.active.disabled:hover,
-    .dark-mode .datepicker table tr td span:hover ,
+    .dark-mode .datepicker table tr td span:hover,
+    .dark-mode .select2-container--default .select2-selection--multiple,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
     }
