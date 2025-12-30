@@ -142,9 +142,9 @@ class CountryController extends MainController
 
         $grid->batchActions(function ($batch) use ($permission) {
             $batch->disableDelete();
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+           // if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
                 $batch->add(new MoveGroupCountry());
-            }
+           // }
         });
 
         return $grid;
