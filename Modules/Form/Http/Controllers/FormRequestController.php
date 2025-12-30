@@ -73,9 +73,9 @@ class FormRequestController extends MainController
                 animation: pulse 2s infinite;
             }
             @keyframes pulse {
-                0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7); }
-                70% { box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0); }
-                100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0); }
+                0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 70%, transparent); }
+                70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent); }
+                100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent); }
             }
         ');
 
