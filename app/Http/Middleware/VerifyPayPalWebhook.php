@@ -21,6 +21,9 @@ class VerifyPayPalWebhook extends PayPalService
         // Get headers as array (case-insensitive normalization)
         $headers = array_change_key_case(getallheaders(), CASE_UPPER);
 
+        // Log the headers for debugging
+        LogHelper::info('PayPal Webhook Headers', $headers);
+
         // Get the JSON payload as array
         $payload = $request->json()->all();
 
@@ -30,12 +33,18 @@ class VerifyPayPalWebhook extends PayPalService
             'transmission_id'   => $headers['PAYPAL-TRANSMISSION-ID'] ?? null,
             'transmission_sig'  => $headers['PAYPAL-TRANSMISSION-SIG'] ?? null,
             'transmission_time' => $headers['PAYPAL-TRANSMISSION-TIME'] ?? null,
-            'webhook_id'        => config('paypal.webhook_id'), // must match dashboard
-            'webhook_event'     => $payload, // ✅ JSON object, not string
+            'webhook_id'        => config('paypal.webhook_id'),
+            'webhook_event'     => $payload,
         ];
+
+        // Log the verification data for debugging
+        LogHelper::info('PayPal Webhook Verification Data', $verificationData);
 
         $response = Http::withToken(app(PayPalService::class)->getAccessToken())
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
+
+        // Log the response for debugging
+        LogHelper::info('PayPal Webhook Verification Response', $response->json());
 
         if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);
