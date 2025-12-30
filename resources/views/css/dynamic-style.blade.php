@@ -1450,7 +1450,7 @@
     html.ltr .dropdown-menu {
         text-align: left;
         left: auto;
-        right: 38px;
+        /*right: 38px;*/
         float: left;
     }
 
