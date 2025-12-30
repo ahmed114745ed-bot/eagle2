@@ -86,27 +86,6 @@ class HomeCarouselController extends MainController
                     </div>";
         });
 
-        // $types = [
-        //     'displayDiscover' => 'Discover',
-        //     'displayHomeTop'  => 'Home Top',
-        //     'displayHomeMiddle' => 'Home Middle',
-        //     'displayLive'     => 'Live',
-        //     'displayCountry'  => 'Country',
-        //     'displayRoom'  => 'Room',
-        // ];
-
-        // foreach ($types as $attr => $label) {
-        //     $grid->column($attr, __($label))
-        //         ->display(function () use ($attr) {
-        //             return $this->{$attr} ? 1 : 0;
-        //         })
-        //         ->switch([
-        //             'on'  => ['value' => 1, 'text' => 'ON',  'color' => 'success'],
-        //             'off' => ['value' => 0, 'text' => 'OFF', 'color' => 'danger'],
-        //         ]);
-        // }
-
-
         $types = [
             'displayDiscover'    => 'Discover',
             'displayHomeTop'     => 'Home Top',
@@ -206,6 +185,8 @@ class HomeCarouselController extends MainController
 
                         // ✅ update new id after create
                         checkbox.dataset.id = res.data.display_id ?? 0;
+                         $.pjax.reload('#pjax-container');
+                         toastr.success('Done');
 
                         // ✅ update duration
                         let durationEl = checkbox.closest('div').querySelector('.duration-text');
