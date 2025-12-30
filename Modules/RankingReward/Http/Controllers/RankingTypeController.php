@@ -216,7 +216,7 @@ class RankingTypeController extends MainController
             $url = getImagePath($path) ?? $defaultImage;
             if (!isImageExists($url)) $url = $defaultImage;
 
-            $image = handleShowImageWithTypes($reward->id, $url, 50, 50);
+            $image = handleShowImageWithSvga($reward->id, $url, 50, 50);
 
             // Build HTML columns
             $giftColumn = $reward->target_type === 'achievement' ? $gift : e($gift);
