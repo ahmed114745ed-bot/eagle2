@@ -212,36 +212,72 @@
                               <div v-if="selectedChild.assets?.length">
                                 <h4 class="text-sm font-medium text-gray-600 mb-2">Existing Assets</h4>
                                 <ul class="space-y-2">
-                                  <li v-for="asset in selectedChild.assets" :key="asset.id" class="bg-white border border-gray-200 rounded p-3 flex justify-between items-center">
-                                    <div>
-                                      <div class="flex items-center gap-3 flex-wrap">
-                                        <span class="text-gray-900 font-medium">{{ asset.asset_label || asset.asset_key }}</span>
-                                        <span class="text-xs text-gray-500">({{ asset.type }})</span>
+                                  <li
+                                    v-for="asset in selectedChild.assets"
+                                    :key="asset.id"
+                                    class="bg-white border border-gray-200 rounded p-3 flex gap-4"
+                                  >
+                                    <div class="relative group shrink-0">
+                                      <div
+                                        class="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center"
+                                      >
+                                        <template v-if="asset.type === 'file' && asset.asset_type === 'image' && fileLink(asset)">
+                                          <img
+                                            :src="fileLink(asset)"
+                                            alt="Asset preview"
+                                            class="w-full h-full object-contain transition-transform duration-150 group-hover:scale-105"
+                                          />
+                                        </template>
+                                        <span v-else class="text-[11px] text-gray-500">No preview</span>
                                       </div>
-
-                                      <div class="text-sm text-gray-500 mt-1">
-                                        <span v-if="fileLink(asset)">
-                                         
-                                        </span>
-                                        <span v-else>-</span>
-                                      </div>
-
-                                      <div class="mt-2">
-                                        <div v-if="asset.type === 'text'" class="text-sm text-gray-700 break-all">
-                                          {{ asset.text || asset.default_url || '—' }}
-                                        </div>
-                                        <div
-                                          v-else-if="asset.type === 'file' && asset.asset_type === 'image' && fileLink(asset)"
-                                          class="mt-1"
-                                        >
-                                          <img :src="fileLink(asset)" alt="Asset preview" class="w-24 h-24 object-cover rounded border" />
-                                        </div>
-                                      </div>
+                                      <a
+                                        v-if="fileLink(asset)"
+                                        :href="fileLink(asset)"
+                                        target="_blank"
+                                        class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-blue-600 opacity-0 group-hover:opacity-100 bg-white px-2 py-0.5 rounded border border-gray-200 shadow"
+                                      >فتح</a>
                                     </div>
 
-                                    <div class="flex items-center gap-2">
-                                      <button @click="openEditAssetModal(asset)" class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700">Edit</button>
-                                  
+                                    <div class="flex-1 space-y-2 min-w-0">
+                                      <div class="flex items-start justify-between gap-3">
+                                        <div class="space-y-1 min-w-0">
+                                          <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="text-gray-900 font-medium">{{ asset.asset_label || asset.asset_key }}</span>
+                                            <span class="text-xs text-gray-600 px-2 py-0.5 bg-gray-100 rounded">{{ asset.type }}</span>
+                                            <span v-if="asset.asset_type" class="text-xs text-gray-600 px-2 py-0.5 bg-gray-100 rounded">{{ asset.asset_type }}</span>
+                                            <span v-if="asset.is_visible === false" class="text-xs text-red-600 px-2 py-0.5 bg-red-50 rounded">Hidden</span>
+                                            <span v-else class="text-xs text-green-600 px-2 py-0.5 bg-green-50 rounded">Visible</span>
+                                          </div>
+                                          <div v-if="fileLink(asset)" class="text-[11px] text-gray-500 break-all">{{ fileLink(asset) }}</div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2">
+                                          <button
+                                            @click="openEditAssetModal(asset)"
+                                            class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                                          >Edit</button>
+                                        </div>
+                                      </div>
+
+                                      <div
+                                        v-if="asset.type === 'text'"
+                                        class="border border-gray-100 rounded-lg bg-gray-50 p-3 text-sm text-gray-700 break-all"
+                                      >
+                                        {{ asset.text || asset.default_url || '—' }}
+                                      </div>
+
+                                      <div
+                                        v-else-if="asset.type === 'file' && asset.asset_type === 'image' && fileLink(asset)"
+                                        class="border border-gray-100 rounded-lg bg-gray-50 p-3 flex items-center justify-center"
+                                      >
+                                        <img
+                                          :src="fileLink(asset)"
+                                          alt="Asset preview"
+                                          class="max-h-48 w-auto object-contain rounded"
+                                        />
+                                      </div>
+
+                                      <div v-else class="text-sm text-gray-500">لا يوجد عرض متاح.</div>
                                     </div>
                                   </li>
                                 </ul>

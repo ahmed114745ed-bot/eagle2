@@ -64,9 +64,17 @@ class ConfiguredScreenResource extends JsonResource
                                     'asset_key' => $assetOverride->asset?->asset_key,
                                     'asset_type' => $assetOverride->asset?->asset_type,
                                     'child_id' => $assetOverride->child_id,
-                                    'type' => $assetOverride->type ?? $assetOverride->asset?->type,
-                                    'text' => $globalOverride?->value_override ?? $assetOverride->text ?? $assetOverride->asset?->text,
-                                    'file_path' => $resolvedFilePath,
+                                    // 'type' => $assetOverride->type ?? $assetOverride->asset?->type,
+                                    // 'text' => $globalOverride?->value_override ?? $assetOverride->text ?? $assetOverride->asset?->text,
+                                    // 'file_path' => $resolvedFilePath,
+                                        'type'  => $assetOverride->type ?? $assetOverride->asset?->type,
+                                        'value' => (
+                                            ($assetOverride->type ?? $assetOverride->asset?->type) === 'file'
+                                                ? $resolvedFilePath
+                                                : ($globalOverride?->value_override
+                                                    ?? $assetOverride->text
+                                                    ?? $assetOverride->asset?->text)
+                                        ),
                                     'file_url' => $resolvedFileUrl,
                                     'default_url' => $assetOverride->asset?->default_url,
                                     'is_visible' => $assetOverride->is_visible !== false,
