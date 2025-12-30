@@ -8,21 +8,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-    root: path.resolve(__dirname, '../../'),
     build: {
-        outDir: 'public/build',
-        emptyOutDir: false,
+        outDir: path.resolve(__dirname, '../../public/build-dynamic-theme'),
+        emptyOutDir: true,
         manifest: true,
     },
     plugins: [
         vue(),
         laravel({
-            publicDirectory: 'public',
-            buildDirectory: 'build',
-            // Use paths relative to project root
+            publicDirectory: path.resolve(__dirname, '../../public'),
+            buildDirectory: 'build-dynamic-theme',
+            hotFile: path.resolve(__dirname, '../../storage/framework/vite.dynamic-theme.hot'),
             input: [
-                'Modules/DynamicTheme/Resources/css/app.css',
-                'Modules/DynamicTheme/Resources/js/app.js',
+                'Resources/css/app.css',
+                'Resources/js/app.js',
             ],
             refresh: [
                 'Modules/DynamicTheme/Resources/views/**/*',
@@ -35,5 +34,10 @@ export default defineConfig({
         alias: {
             '@': path.resolve(__dirname, 'Resources/js'),
         },
+    },
+    server: {
+        host: true,
+        strictPort: true,
+        port: 5173,
     },
 });
