@@ -567,13 +567,19 @@
     content: '';
     position: absolute;
     top: -2px;
-    right: -2px;
+    left: -2px;
     width: 8px;
     height: 8px;
     background: var(--green-color) !important;
     border-radius: 50%;
     box-shadow: 0 0 6px var(--green-color) !important;
 }
+
+.rtl .crs-item.active > .crs-link .crs-icon::after,
+.rtl .crs-link.active .crs-icon::after {
+    right: -2px;
+}
+
 /* small screens tweak */
 @media (max-width: 640px){
     .crs-link { padding: 10px 12px; }
