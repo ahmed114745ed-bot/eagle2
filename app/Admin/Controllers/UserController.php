@@ -469,7 +469,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id','name','uuid','special_id','country_id','di']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'di']);
 
         $with = [
             'profile:id,user_id,avatar',
@@ -562,8 +562,8 @@ class UserController extends MainController
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
-                        'receiver',
-                        'sender',
+                        'receiver:id,name,uuid,special_id',
+                        'sender:id,name,uuid,special_id',
                         // 'sender.packs' => function ($q) {
                         //     $q->whereIn('type', [25])
                         //         ->where('is_used', true)
@@ -574,8 +574,8 @@ class UserController extends MainController
                         //         ->where('is_used', true)
                         //         ->with('ware:id,value');
                         // },
-                        'receiver.profile',
-                        'sender.profile',
+                        // 'receiver.profile',
+                        // 'sender.profile',
                         'gift:id,name,price',
                         'room:id,room_name',
                         'agency:id,name',

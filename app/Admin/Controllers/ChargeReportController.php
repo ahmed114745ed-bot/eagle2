@@ -13,13 +13,9 @@ use App\Helpers\UserCommon;
 use App\Models\ExchangeLog;
 use App\Models\PaymentCoin;
 use Encore\Admin\Layout\Row;
-use App\Models\ChargeInvoice;
 use Encore\Admin\Widgets\Box;
-use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Layout\Column;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Log;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class ChargeReportController extends MainController
@@ -92,15 +88,15 @@ class ChargeReportController extends MainController
         }
 
         $grid = new Grid(new Charge());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
         $grid->model()
             ->when($countryID, fn($q) =>
-                $q->where(function ($q) use ($countryID) {
-                    $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
-                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
-                }))
+            $q->where(function ($q) use ($countryID) {
+                $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }))
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
@@ -192,7 +188,7 @@ class ChargeReportController extends MainController
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
                         $from = request('from_date');
-                    }, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
+                    }, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
                 });
 
                 $filter->column(1 / 2, function ($filter) {
@@ -217,7 +213,7 @@ class ChargeReportController extends MainController
             $grid->filter(function (Grid\Filter $filter) {
                 $filter->disableIdFilter();
                 $filter->expand();
-                $filter->column(1 /4, function ($filter) {
+                $filter->column(1 / 4, function ($filter) {
                     $filter->where(function () {}, __('Type'), 'filter_type')
                         ->select([
                             'user'     => 'User',
@@ -226,27 +222,27 @@ class ChargeReportController extends MainController
                 });
 
                 $filter->column(3 / 4, function ($filter) {
-                        $filter->where(function ($query) {
-                            $input = $this->input;
-                            $type  = request('filter_type');
-                            if ($type == 'user') {
-                                $query->whereHas('receiverUser', function ($q) use ($input) {
-                                    $q->where('uuid', $input)
-                                        ->orWhere('name', 'like', "%$input%");
-                                });
-                            } else {
-                                $query->whereHas('receiver', function ($q) use ($input) {
-                                    $q->where('id', $input)
-                                        ->orWhere('name', 'like', "%$input%");
-                                });
-                            }
-                        }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
-                    });
+                    $filter->where(function ($query) {
+                        $input = $this->input;
+                        $type  = request('filter_type');
+                        if ($type == 'user') {
+                            $query->whereHas('receiverUser', function ($q) use ($input) {
+                                $q->where('uuid', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        } else {
+                            $query->whereHas('receiver', function ($q) use ($input) {
+                                $q->where('id', $input)
+                                    ->orWhere('name', 'like', "%$input%");
+                            });
+                        }
+                    }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
+                });
 
 
 
                 $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(convertArabicToEnglishNumbers(request('from_date')));
+                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
                 });
 
                 $filter->column(1 / 2, function ($filter) {
@@ -258,6 +254,11 @@ class ChargeReportController extends MainController
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
             $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when(!request('from_date'), function ($query,) {
+
+            $start = now()->startOfMonth();
+            $end   = $end   = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
         });
         $grid->column('id', __('transaction id'));
@@ -434,11 +435,16 @@ class ChargeReportController extends MainController
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
 
-        $grid->model()
+        $grid->model()->when(!request('from_date'), function ($query,) {
+
+            $start = now()->startOfMonth();
+            $end   = $end   = now()->endOfMonth();
+            $query->whereBetween('created_at', [$start, $end]);
+        })
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at');
 
@@ -465,12 +471,27 @@ class ChargeReportController extends MainController
             });
 
             $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     if ($from = request('from_date')) {
+                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                //         $query->whereDate('created_at', '>=', $start);
+                //     }
+                // }, __('From Date'), 'from_date')->date();
+
                 $filter->where(function ($query) {
-                    if ($from = request('from_date')) {
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                        $query->whereDate('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->date();
+
+                    $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+
+                    $query->where(
+                        'created_at',
+                        '>=',
+                        $from->startOfMonth()
+                    );
+                }, __('From Date'), 'from_date')
+                    ->date()
+                    ->default(now()->startOfMonth()->toDateString());
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
@@ -506,6 +527,17 @@ class ChargeReportController extends MainController
                 request('from_date'),
                 fn($q, $from) =>
                 $q->whereDate('created_at', '>=', Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay())
+            );
+
+            $query->when(
+                !request('from_date'),
+
+                fn($q) =>
+                $q->where(
+                    'created_at',
+                    '>=',
+                    now()->startOfMonth()
+                )
             );
 
             $query->when(
@@ -615,11 +647,20 @@ class ChargeReportController extends MainController
     {
 
         $grid = new Grid(new CoinLog());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
-        $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when(!request('from_date'), function ($query,) {
+
+            $start = now()->startOfMonth();
+            $end   = $end   = now()->endOfMonth();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -627,7 +668,36 @@ class ChargeReportController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->equal('user.uuid', __('charger'));
             });
+            $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     if ($from = request('from_date')) {
+                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                //         $query->whereDate('created_at', '>=', $start);
+                //     }
+                // }, __('From Date'), 'from_date')->date();
 
+                $filter->where(function ($query) {
+
+                    $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+                    $query->where(
+                        'created_at',
+                        '>=',
+                        $from->startOfMonth()
+                    );
+                }, __('From Date'), 'from_date')
+                    ->date()
+                    ->default(now()->startOfMonth()->toDateString());
+
+                $filter->where(function ($query) {
+                    if ($to = request('to_date')) {
+
+                        $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
+                        $query->whereDate('created_at', '<=', $end);
+                    }
+                }, __('To Date'), 'to_date')->date();
+            });
             $filter->disableIdFilter();
             $filter->where(function ($query) {
                 if ($this->input != null) {
@@ -718,25 +788,50 @@ class ChargeReportController extends MainController
     protected function exchange()
     {
         $grid = new Grid(new ExchangeLog());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
-        $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+
+        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+
+            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when(!request('from_date'), function ($query,) {
+
+            $start = now()->startOfMonth();
+            $end   = $end   = now()->endOfMonth();
+            $query->whereBetween('created_at', [$start, $end]);
+        })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->where('status', 1);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
             $filter->column(1 / 2, function ($filter) {
+                // $filter->where(function ($query) {
+                //     if ($from = request('from_date')) {
+                //         $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
+                //         $query->whereDate('created_at', '>=', $start);
+                //     }
+                // }, __('From Date'), 'from_date')->date();
+
                 $filter->where(function ($query) {
-                    if ($from = request('from_date')) {
-                        $start = Carbon::parse(convertArabicToEnglishNumbers($from))->startOfDay();
-                        $query->whereDate('created_at', '>=', $start);
-                    }
-                }, __('From Date'), 'from_date')->date();
+
+                    $from = request('from_date')
+                        ? Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))
+                        : now()->startOfMonth();
+                    $query->where(
+                        'created_at',
+                        '>=',
+                        $from->startOfMonth()
+                    );
+                }, __('From Date'), 'from_date')
+                    ->date()
+                    ->default(now()->startOfMonth()->toDateString());
 
                 $filter->where(function ($query) {
                     if ($to = request('to_date')) {
+
                         $end = Carbon::parse(convertArabicToEnglishNumbers($to))->endOfDay();
                         $query->whereDate('created_at', '<=', $end);
                     }
