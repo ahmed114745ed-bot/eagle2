@@ -132,9 +132,9 @@ class HomeCarouselController extends MainController
                     $type = $typeMapping[$attr];
                     $display = $this->displays->firstWhere('display_type', $type);
 
-                    $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture() ? 1 : 0;
+                    $status = $display && $display->end_at && Carbon::parse($display->end_at)->isFuture()  && ($display->status) == 1 ? 1 : 0;
 
-                    $duration = "∞";
+                    $duration = 0;
                     if ($display && $display->end_at) {
                         $duration = Carbon::parse($display->end_at)->isFuture()
                             ? Carbon::parse($display->end_at)->diffForHumans(
@@ -308,38 +308,137 @@ class HomeCarouselController extends MainController
         return $grid;
     }
 
+    // public function toggleStatus(Request $request)
+    // {
+    //     // dd($request->all());
+    //     $request->validate([
+    //         'home_carousel_id' => 'required|exists:home_carousels,id',
+    //         'display_type'     => 'required|string',
+    //         'status'           => 'required|boolean',
+    //     ]);
+
+    //     $display = HomeCarouselDisplay::where('home_carousel_id', $request->home_carousel_id)
+    //         ->where('display_type', $request->display_type)
+    //         ->first();
+
+    //     $homeCarousel = HomeCarousel::find($request->home_carousel_id);
+    //     $formForm = $homeCarousel->form;
+    //     switch ($formForm) {
+    //         case 1:
+    //             $duration_unit = 'hours';
+    //             break;
+    //         case 2:
+    //             $duration_unit = 'days';
+    //             break;
+    //         case 3:
+    //             $duration_unit = 'months';
+    //             break;
+    //         default:
+    //             $duration_unit = 'hours';
+    //     }
+
+    //     $duration = $homeCarousel->input ?? 1;
+
+    //     $endAt = match ($duration_unit) {
+    //         'hours' => now()->addHours($duration),
+    //         'days'  => now()->addDays($duration),
+    //         'months' => now()->addMonths($duration),
+    //         default => now()->addHours($duration),
+    //     };
+
+    //     if ($request->status) {
+    //         if ($display && Carbon::parse($display->end_at)->isFuture()) {
+
+    //             $display->status = 1;
+    //             $display->save();
+    //             // already active
+    //         } elseif ($display && Carbon::parse($display->end_at)->isPast()) {
+
+
+    //             $display->status = 1;
+    //             $display->end_at = $endAt;
+    //             $display->save();
+    //         } elseif (!$display) {
+    //             HomeCarouselDisplay::create([
+    //                 'home_carousel_id' => $request->home_carousel_id,
+    //                 'display_type'     => $request->display_type,
+    //                 'status'           => 1,
+    //                 'end_at'           => $endAt,
+    //                 'duration'        => $duration_unit,
+    //             ]);
+    //         }
+    //     } else {
+    //         $display->status = 0;
+    //         $display->save();
+    //     }
+
+
+    //     return response()->json([
+    //         'success'    => true,
+    //         'message'    => __('Submission status updated successfully!'),
+    //         'display_id' => $display->id ?? 0,
+    //     ]);
+
+
+    //     return back()->with('success', __('Submission status updated successfully!'));
+    // }
+
+
     public function toggleStatus(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
+        $data = $request->validate([
             'home_carousel_id' => 'required|exists:home_carousels,id',
             'display_type'     => 'required|string',
             'status'           => 'required|boolean',
         ]);
 
-        $display = HomeCarouselDisplay::where('home_carousel_id', $request->home_carousel_id)
-            ->where('display_type', $request->display_type)
-            ->first();
-        if ($request->status) {
-            HomeCarouselDisplay::create([
-                'home_carousel_id' => $request->home_carousel_id,
-                'display_type'     => $request->display_type,
-                'end_at'          => now(),
-            ]);
+        $homeCarousel = HomeCarousel::findOrFail($data['home_carousel_id']);
+
+        // Resolve duration unit
+        $durationUnit = match ($homeCarousel->form) {
+            2       => 'days',
+            3       => 'months',
+            default => 'hours',
+        };
+
+        $duration = $homeCarousel->input ?? 1;
+
+        $endAt = match ($durationUnit) {
+            'days'   => now()->addDays($duration),
+            'months' => now()->addMonths($duration),
+            default  => now()->addHours($duration),
+        };
+
+        $display = HomeCarouselDisplay::firstOrNew([
+            'home_carousel_id' => $data['home_carousel_id'],
+            'display_type'     => $data['display_type'],
+        ]);
+
+        if ($data['status']) {
+            $display->status = 1;
+
+            // Refresh end_at if expired or new
+            if (!$display->exists || Carbon::parse($display->end_at)->isPast()) {
+                $display->end_at = $endAt;
+            }
+
+            $display->duration_unit = $durationUnit;
+            $display->duration = $duration;
         } else {
-            optional($display)->delete();
+            if ($display->exists) {
+                $display->status = 0;
+            }
         }
 
+        $display->save();
 
         return response()->json([
             'success'    => true,
             'message'    => __('Submission status updated successfully!'),
-            'display_id' => $display->id ?? 0,
+            'display_id' => $display->id,
         ]);
-
-
-        return back()->with('success', __('Submission status updated successfully!'));
     }
+
 
 
 

@@ -462,30 +462,43 @@ class UserController extends MainController
         $usersCoins = null;
         $badges = null;
         $walletLogs = null;
+
+        // Decide active tab early so we only eager load what we need
+        $activeTab = request('tab', 'packs');
+
         /* =========================
-     | USER (ONE QUERY ONLY)
+     | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $user = User::with([
+        $userQuery = User::query()->select(['id','name','uuid','special_id','country_id','di']);
+
+        $with = [
             'profile:id,user_id,avatar',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
-            'senderLevel:id,level,type',
-            'receiverLevel:id,level,type',
-            'packs' => function ($q) {
+            'senderLevel:id,level,type,img',
+            'receiverLevel:id,level,type,img',
+        ];
+
+        // Only load packs when viewing packs tab
+        if ($activeTab === 'packs') {
+            $with['packs'] = function ($q) {
                 $q->where('type', 25)
                     ->where('is_used', true)
                     ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                     ->with('ware:id,value');
-            },
-        ])->findOrFail($id);
-        $curantBalance = wallet_available_by_user($id);
-        $availableBalance = wallet_available_by_user($id);
+            };
+        }
+
+        $user = $userQuery->with($with)->findOrFail($id);
+
+        // Avoid duplicate wallet calls
+        $availableBalance = $curantBalance = wallet_available_by_user($id);
         /* =========================
         | USER IMAGE
         ========================= */
         $defaultImage = asset('images/businessman-icon.jpg');
         $avatar = optional($user->profile)->avatar;
         $user->display_image = isImageExists(getImagePath($avatar)) ? getImagePath($avatar) : $defaultImage;
-        $activeTab = request('tab', 'packs');
+        // $activeTab already set above
         switch ($activeTab) {
 
             case 'packs':
