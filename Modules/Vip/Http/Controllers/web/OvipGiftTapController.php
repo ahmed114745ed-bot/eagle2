@@ -370,28 +370,7 @@ class OvipGiftTapController extends MainController
                     }
                 }
 
-                // if ($ext === 'mp4') {
-                //     $videoPath = upload($form->img2); // your upload helper
-                //     $wareId = $form->model()->id;
-
-                //     // Call API or FFMpeg to detect if 'vap' or 'alpha'
-                //     $response = Http::attach('video', Storage::disk('gcs')->get($videoPath), "{$wareId}.mp4")
-                //         ->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-                //     if ($response->successful()) {
-                //         $videoType = $response->json()['data']['video_type'] ?? null;
-                        
-                //         if ($videoType === 'vap') {
-                           
-                //             $ext = 'vap';
-                //         } elseif ($videoType === 'alpha') {
-                //             $ext = 'alpha';
-                //         }
-                //     }
-                // }
-
                 if (!in_array($ext, $allowed)) {
-                    Log::info('Invalid file type uploaded for img2', ['extension' => $ext, 'allowed' => $allowed]);
                     throw ValidationException::withMessages(['img2' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
                 }
 
