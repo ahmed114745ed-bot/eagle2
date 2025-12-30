@@ -16,9 +16,10 @@ class WaresByType extends Selectable
         $this->column('id', __('ID'));
         $this->column('name', __('Name'));
         $this->column('show_img', __('Show Image'))->image('', 30);
-        $this->column('img2', __('Alternative Image'))->display(function ($path) {
+         $this->column('img2', __('show_img'))->display(function ($path) {
+            /** @var Ware $this */
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 10, 10);
+            return handleShowImageWithSvga($this->id, $url, 60, 60);
         });
         $this->column('type', __('Type'))->select([
             4 => trans('Avatar Frame'),
