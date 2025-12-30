@@ -1015,7 +1015,9 @@ const cancelDeleteChild = () => {
   deletingChild.value = null;
   showDeleteChildConfirm.value = false;
 };
-const storageBase = window?.storageUrl || window?.STORAGE_URL || window?.assetBaseUrl || '';
+// Prefer explicit CDN/storage base (falls back to GCS bucket if not provided)
+const storageCdnBase = window?.storageCdn || window?.STORAGE_CDN || 'https://storage.googleapis.com/eagle-t';
+const storageBase = window?.storageUrl || window?.STORAGE_URL || window?.assetBaseUrl || storageCdnBase;
 const buildStorageLink = (path) => {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
@@ -1023,8 +1025,8 @@ const buildStorageLink = (path) => {
   const base = storageBase || window.location.origin;
   const normalizedBase = base.endsWith('/') ? base.slice(0, -1) : base;
 
-  // avoid duplicating /storage when the base already points to the storage root
-  const baseHasStorage = /\/storage\/?$/.test(normalizedBase);
+  // avoid duplicating /storage when the base already points to the storage root or a CDN bucket
+  const baseHasStorage = /\/storage\/?$/.test(normalizedBase) || normalizedBase.includes('storage.googleapis.com');
   const normalizedPath = path.startsWith('/') ? path.slice(1) : path.replace(/^storage\//i, '');
 
   return baseHasStorage
