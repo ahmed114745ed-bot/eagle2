@@ -18,10 +18,10 @@
 }
 
 .ltr .bck-bt{
-    width: 8%;
+    width: 15%;
     margin: 20px auto;
     text-align: center;
-    border-radius: 36px;
+    border-radius: 12px;
     border: 2px;
     background-color: var(--primary-color) !important;
     top: -73px;
