@@ -1357,7 +1357,7 @@
 
     .rtl .pull-right > .dropdown-menu {
         right: auto;
-        left: 0;
+        left: auto;
     }
 
     .popover {
@@ -1403,7 +1403,6 @@
     }
 
     .dropdown-menu {
-        position: fixed;
         top: 100%;
         z-index: 1000;
         display: none;
