@@ -59,6 +59,17 @@
     .dark-mode #landPageSettings,
     .dark-mode .performers-card,
     .dark-mode .section-box,
+    .dark-mode .bootstrap-datetimepicker-widget table thead tr:first-child th:hover,
+    .dark-mode .datepicker table tr td.day:hover,
+    .dark-mode .datepicker table tr td.active,
+    .dark-mode .datepicker table tr td.active:hover,
+    .dark-mode .datepicker table tr td.active.disabled,
+    .dark-mode .datepicker table tr td.active.disabled:hover,
+    .dark-mode .datepicker table tr td span.active,
+    .dark-mode .datepicker table tr td span.active:hover,
+    .dark-mode .datepicker table tr td span.active.disabled,
+    .dark-mode .datepicker table tr td span.active.disabled:hover,
+    .dark-mode .datepicker table tr td span:hover ,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
     }
@@ -98,6 +109,11 @@
     .dark-mode .content-header > h1,
     .dark-mode *:not([class*="phpdebugbar"]):not(.phpdebugbar *) {
         color: #ffffff !important;
+    }
+
+    .dark-mode .datepicker table tr td.old,
+    .dark-mode .datepicker table tr td.new {
+        color: #515151 !important;
     }
 
     .dark-mode ::placeholder {

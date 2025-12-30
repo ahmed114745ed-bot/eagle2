@@ -785,5 +785,28 @@ console.log('✅ sidebar js loaded');
 
             window.location.href = leaf.href;
         }, true);
+
+        $(document).ready(function() {
+            moment.defineLocale('ar', {
+                months: 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split('_'),
+                monthsShort: 'يناير_فبراير_مارس_أبريل_مايو_يونيو_يوليو_أغسطس_سبتمبر_أكتوبر_نوفمبر_ديسمبر'.split('_'),
+                weekdays: 'الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت'.split('_'),
+                weekdaysShort: 'أحد_إثنين_ثلاثاء_أربعاء_خميس_جمعة_سبت'.split('_'),
+                weekdaysMin: 'ح_ن_ث_ر_خ_ج_س'.split('_'),
+                longDateFormat: {
+                    LT: 'HH:mm',
+                    LTS: 'HH:mm:ss',
+                    L: 'YYYY-MM-DD',
+                    LL: 'D MMMM YYYY',
+                    LLL: 'D MMMM YYYY HH:mm',
+                    LLLL: 'dddd D MMMM YYYY HH:mm'
+                },
+                week: { dow: 6, doy: 12 },
+                meridiem: function (hour) {
+                    return hour < 12 ? 'ص' : 'م';
+                }
+            });
+            moment.locale('ar');
+        });
     })();
 })();

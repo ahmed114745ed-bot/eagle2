@@ -161,7 +161,7 @@
     }
 
     input:checked + .slider {
-        background: var(--primary-color) !important;
+        background: green !important;
     }
 
     .content-header > .breadcrumb > li > a {
@@ -1333,10 +1333,6 @@
     .dark-mode .h1, .dark-mode .h2, .dark-mode .h3, .dark-mode .h4, .dark-mode .h5, .dark-mode .h6,
     .dark-mode h1, .dark-mode h2, .dark-mode h3, .dark-mode h4, .dark-mode h5, .dark-mode h6 {
         color: var(--text-secondary-color);
-    }
-
-    .dark-mode .bootstrap-switch .bootstrap-switch-handle-off.bootstrap-switch-default, .bootstrap-switch .bootstrap-switch-handle-on.bootstrap-switch-default {
-        background: var(--primary-hover-alpha) !important;
     }
 
     .img-thumbnail {
@@ -2662,7 +2658,6 @@
 
     .table tbody tr:nth-child(even) {
         background-color: var(--off-white) !important;
-        filter: brightness(0.95);
     }
 
     .stat-card {
@@ -2832,6 +2827,24 @@
 
     .phpdebugbar[data-theme="dark"] .phpdebugbar-settings {
         background: none !important;
+    }
+
+    .bootstrap-datetimepicker-widget {
+        display: contents !important;
+    }
+
+    .datepicker table tr td.active, .datepicker table tr td.active:hover, .datepicker table tr td.active.disabled, .datepicker table tr td.active.disabled:hover {
+        background: var(--primary-color) !important;
+    }
+
+    .datepicker table tr td span.active, .datepicker table tr td span.active:hover, .datepicker table tr td span.active.disabled, .datepicker table tr td span.active.disabled:hover {
+        background: var(--primary-color) !important;
+    }
+
+    .dropdown-menu.show,
+    .dropdown-menu[style*="display: block"] {
+        position: fixed !important;
+        z-index: 99999 !important;
     }
 
     .stats-container .info-box {
