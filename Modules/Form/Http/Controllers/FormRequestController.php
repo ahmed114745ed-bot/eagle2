@@ -32,18 +32,69 @@ class FormRequestController extends MainController
     {
         $type = request()->get('type', 'host_agency');
 
+        $pendingCounts = FormRequest::where('status', 'pending')
+            ->selectRaw('form_template_type, COUNT(*) as count')
+            ->groupBy('form_template_type')
+            ->pluck('count', 'form_template_type')
+            ->toArray();
+
         $buttons = [
             'host_agency' => __('Host Agency'),
             'bd_form' => __('BD Form'),
             'shipping_agency' => __('Shaping Agency'),
         ];
 
-        $header = '<div style="margin-bottom:15px;">';
+        Admin::style('
+            .tab-btn {
+                position: relative;
+            }
+            .tab-btn .pending-badge {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background-color: var(--primary-color);
+                filter: brightness(1.5);
+                color: var(--text-secondary-color);
+                border-radius: 50%;
+                padding: 2px 6px;
+                font-size: 10px;
+                min-width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .tab-btn.active-tab {
+                background: var(--primary-color);
+                color: white;
+            }
+            .tab-btn .pending-badge.pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 70%, transparent); }
+                70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent); }
+                100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent); }
+            }
+        ');
+
+        $header = '<div style="margin-bottom:15px; display: flex; gap: 10px;">';
         foreach ($buttons as $key => $label) {
-            $active = $type === $key ? 'background:var(--primary-color);color:white;' : '';
-            $header .= "<a href='?type={$key}' class='btn tab-btn' style='margin-right:5px;{$active}'>{$label}</a>";
+            $activeClass = $type === $key ? 'active-tab' : '';
+            $count = $pendingCounts[$key] ?? 0;
+
+            // Badge HTML - only show if count > 0
+            $badge = '';
+            if ($count > 0) {
+                $pulseClass = $count > 0 ? 'pulse' : '';
+                $badge = "<span class='pending-badge {$pulseClass}'>{$count}</span>";
+            }
+
+            $header .= "<a href='?type={$key}' class='btn tab-btn {$activeClass}' style='position: relative;'>{$label}{$badge}</a>";
         }
         $header .= '</div>';
+
         $content->title(__('requests_title'));
 
         if (Admin::user()->can('type-switch-' . $this->permission_name) || Admin::user()->can('*')) {
