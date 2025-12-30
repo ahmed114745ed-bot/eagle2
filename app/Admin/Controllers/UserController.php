@@ -469,7 +469,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id','name','uuid','special_id','country_id','di']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'di']);
 
         $with = [
             'profile:id,user_id,avatar',
@@ -551,7 +551,25 @@ class UserController extends MainController
                 $agencyId = request('agency_id');
                 $timezone = Common::timeZone();
 
-                $giftBaseQuery = GiftLog::query()
+                $giftBaseQuery = GiftLog::query()->with([
+                    'receiver',
+                    'sender',
+                    // 'sender.packs' => function ($q) {
+                    //     $q->whereIn('type', [25])
+                    //         ->where('is_used', true)
+                    //         ->with('ware:id,value');
+                    // },
+                    // 'receiver.packs' => function ($q) {
+                    //     $q->whereIn('type', [25])
+                    //         ->where('is_used', true)
+                    //         ->with('ware:id,value');
+                    // },
+                    'receiver.profile',
+                    'sender.profile',
+                    'gift:id,name,price',
+                    'room:id,room_name',
+                    'agency:id,name',
+                ])
                     ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
                     ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
                     ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
@@ -561,25 +579,7 @@ class UserController extends MainController
                     ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
                 $giftSLogs = (clone $giftBaseQuery)
-                    ->with([
-                        'receiver',
-                        'sender',
-                        // 'sender.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        // 'receiver.packs' => function ($q) {
-                        //     $q->whereIn('type', [25])
-                        //         ->where('is_used', true)
-                        //         ->with('ware:id,value');
-                        // },
-                        'receiver.profile',
-                        'sender.profile',
-                        'gift:id,name,price',
-                        'room:id,room_name',
-                        'agency:id,name',
-                    ])
+
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'gift_page');
 

@@ -916,7 +916,7 @@ class User extends Authenticatable
         //     ->sum(DB::raw('salary - cut_amount'));
 
         // $total = $userSalary + $roomSalary;
-        $total =wallet_available_by_user($this->id);
+        $total = wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
 
@@ -1495,26 +1495,45 @@ class User extends Authenticatable
     /**
      * Custom accessor for UUID with special pack conditions.
      */
+    // public function getUuidAttribute($value)
+    // {
+    //     if ($this->relationLoaded('packs')) {
+
+    //         $pack = $this->packs
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->where('ware.value', $this->special_id)
+    //             ->first();
+    //     } else {
+
+    //         $pack = $this->packs()
+    //             ->with('ware')
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
+    //             ->first();
+    //     }
+
+    //     return ($this->special_id && $pack && $pack->is_used === 1)
+    //         ? $this->special_id
+    //         : $this->original_uuid;
+    // }
+
+
     public function getUuidAttribute($value)
     {
-        if ($this->relationLoaded('packs')) {
-
-            $pack = $this->packs
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->where('ware.value', $this->special_id)
-                ->first();
-        } else {
-
-            $pack = $this->packs()
-                ->with('ware')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
-                ->first();
+        if (!$this->relationLoaded('packs')) {
+            return $this->original_uuid;
         }
 
-        return ($this->special_id && $pack && $pack->is_used === 1)
+        $pack = $this->packs->first(
+            fn($pack) =>
+            $pack->type === 25 &&
+                $pack->is_used &&
+                optional($pack->ware)->value == $this->special_id
+        );
+
+        return ($this->special_id && $pack)
             ? $this->special_id
             : $this->original_uuid;
     }
@@ -2322,7 +2341,7 @@ class User extends Authenticatable
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
         return $this->hostLevelWinner()
             ->where('host_level_id', $hostLevelId)
-            ->filterByEventType($eventType) ->exists();
+            ->filterByEventType($eventType)->exists();
     }
 
     public function lastHostLevelWinner()
