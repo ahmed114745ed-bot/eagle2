@@ -138,11 +138,15 @@ class RoleController extends MainController
 
         $grid->disableExport();
         // $this->extendGrid($grid);
-        Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-            $('.table-responsive').removeClass('table-responsive');
+        Admin::style('
+            .grid-table td .dropdown, .grid-table td .dropup, .table td .dropdown, .table td .dropup {
+                position: relative !important;
             }
-        ");
+
+            .box {
+                overflow: auto !important;
+            }
+        ');
         return $grid;
     }
 
