@@ -150,7 +150,16 @@ class ChargeReportController extends MainController
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
 
-            $grid->model()->where('charger_type', 'host_agency');
+            $grid->model()->where('charger_type', 'host_agency')->with([
+                'senderAgency',
+                'senderAgency.owner',
+                'senderAgency.owner.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'senderAgency.owner.specialId.ware'
+            ]);
         } else {
             $grid->model()->where(function ($query) {
                 $query->where('charger_type', 'agency')
