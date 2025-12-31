@@ -81,23 +81,6 @@
         border-radius: 6px;
     }
 
-    .transferModal{
-        width: 600px;
-        height: 1000px;
-        background-color:var(--box-background-color);
-        display: none;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, -20%);
-        background: white;
-        border-radius: 36px;
-        z-index: 9999;
-        width: 520px;
-        overflow: hidden;
-        height: 394px;
-
-    }
     .transferForm{
         height: 100%;
         padding: 25px 9px 14px 16px;
@@ -271,7 +254,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     <div class="card-content">
         <span class="icon_trans"><i class="fas fa-exchange-alt"></i></span>
         @if (\Encore\Admin\Facades\Admin::user()->can('add-switch-coin-recharge') || \Encore\Admin\Facades\Admin::user()->can('*'))
-        <button onclick="openChargeModal()" class="btn btn-light btn-sm">
+        <button onclick="openChargeModal()" class="btn btn-info btn-sm">
             {{ __('Charge') }}
         </button>
         @endif
@@ -423,7 +406,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
             } else {
                 const dollars = amount / currentRate;
                 output.textContent = `≈ $${dollars.toFixed(2)}`;
-                console.log(`Amount: ${amount} coins → Dollars: $${dollars.toFixed(2)}`); 
+                console.log(`Amount: ${amount} coins → Dollars: $${dollars.toFixed(2)}`);
             }
         } else {
             output.style.display = 'none';

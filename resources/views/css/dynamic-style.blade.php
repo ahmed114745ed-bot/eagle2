@@ -1272,7 +1272,7 @@
     }
 
     .modal-header {
-        min-height: 16.43px;
+        min-height: 8%;
         padding: 15px;
         border-bottom: 1px solid var(--primary-hover-alpha) !important;
     }
@@ -1474,9 +1474,13 @@
     }
 
     select > option {
-        background-color: var(--box-background-color) !important;
-        color: var(--inverse-box-color) !important;
+        background-color: var(--white) !important;
+        color: black !important;
+    }
 
+    #target_type:focus option:checked {
+        background: var(--primary-color) !important;
+        color: white !important;
     }
 
     .slider {
@@ -2871,6 +2875,20 @@
 
     .navbar-nav>.notifications-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.tasks-menu>.dropdown-menu>li .menu>li>a:hover {
         background: var(--primary-color);
+    }
+
+    .transferModal{
+        display: none;
+        position: fixed;
+        top: 25%;
+        left: 50%;
+        transform: translate(-50%, -20%);
+        background: white;
+        border-radius: 36px;
+        z-index: 9999;
+        width: 520px;
+        overflow: hidden;
+        height: 60%;
     }
 
     .stats-container .info-box {
