@@ -64,22 +64,24 @@
     @media (max-width: 768px) {
         .reels-main-container {
             height: 100vh;
+            flex-direction: column-reverse;
         }
         
         .reels-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: 90%;
-            max-width: 400px;
-            z-index: 1000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            overflow-y: auto;
-            margin-top: 50px;
-
+            display: none;
         }
+        
+        .reels-video-container {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        /* Hide desktop sidebar on mobile */
+        .reels-sidebar:not(.mobile-sidebar-overlay) {
+            display: none !important;
+        }
+        
+        /* Mobile Sidebar will be the overlay only */
         
         .reels-sidebar.mobile-open {
             transform: translateX(0);
@@ -87,11 +89,12 @@
         
         .reels-video-container {
             width: 100%;
+            height: 100vh;
         }
         
         /* Mobile Overlay Background */
         .mobile-sidebar-overlay {
-            position: fixed;
+            /* position: fixed; */
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
@@ -944,10 +947,15 @@
     </div>
     
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 left-0 bg-white shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto pt-14"
-         :class="isMobileSidebarOpen ? 'translate-x-0' : 'ltr:translate-x-full rtl:-translate-x-full'"
-         x-ref="mobileSidebar"
-         x-show="true">
+    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] bg-white shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+         :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
+         x-show="isMobileSidebarOpen"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="translate-x-full">
         
         <div class="p-3 sm:p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-between">
             <h2 class="text-lg sm:text-xl font-bold">
