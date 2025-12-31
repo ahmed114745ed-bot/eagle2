@@ -40,11 +40,12 @@ class RoleController extends MainController
 
     public function edit($id, Content $content)
     {
-        return  parent::edit($id, $content
+        return parent::edit($id, $content
             ->title($this->title())
             ->description($this->description['edit'] ?? trans('admin.edit'))
             ->body($this->form($id)->edit($id)));
     }
+
     public function create(Content $content)
     {
         if (!Admin::user()->can('*')) {
@@ -60,6 +61,7 @@ class RoleController extends MainController
     {
         return $this->form()->store();
     }
+
     public function show($id, Content $content)
     {
         if (!Admin::user()->can('*')) {
@@ -69,6 +71,7 @@ class RoleController extends MainController
             ->title(trans(__('Roles')))
             ->body($this->detail($id)));
     }
+
     public function update($id)
     {
         return $this->form()->update($id);
@@ -115,13 +118,11 @@ class RoleController extends MainController
         $grid->column('updated_at', trans('admin.updated_at'))->sortable();
 
 
-
-
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             // $protectedSlugs = ['administrator', 'admin', 'developer', 'agency', 'charger'];
 
             // if (in_array($actions->row->slug, $protectedSlugs)) {
-            //     $actions->disableDelete(); 
+            //     $actions->disableDelete();
             // } else {
             $actions->disableDelete();
             $actions->add(new DeleteRole());
@@ -135,10 +136,13 @@ class RoleController extends MainController
         });
 
 
-
-
         $grid->disableExport();
         // $this->extendGrid($grid);
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
         return $grid;
     }
 
@@ -248,7 +252,7 @@ class RoleController extends MainController
 
             foreach ($resourceActions as $resource => $actions) {
                 $hasBrowse = !empty($actions['browse']);
-                $hasCrud   = !empty($actions['create']) || !empty($actions['edit']) || !empty($actions['delete']);
+                $hasCrud = !empty($actions['create']) || !empty($actions['edit']) || !empty($actions['delete']);
 
                 if ($hasBrowse) {
                     if (isset($slugToId["browse-$resource"])) $finalPermissionIds[] = $slugToId["browse-$resource"];
