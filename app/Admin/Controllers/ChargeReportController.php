@@ -103,7 +103,7 @@ class ChargeReportController extends MainController
                 'admin',
                 'admin.agency',
                 'admin.agency.owner',
-                'areaManager',
+                
                 'senderShippingAgency',
                 'senderShippingAgency.owner',
                 'senderAgency.owner',
@@ -121,6 +121,18 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
+
+                'admin.agency.owner.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'senderAgency.owner.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+               // 'areaManager',
                 // 'bd',
                 // 'subAreaManager',
                 // 'senderUser',
