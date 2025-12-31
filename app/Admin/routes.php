@@ -611,7 +611,7 @@ Route::group(
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
         Route::resource('super-package-rewards', SuperPackageController::class);
-       Route::resource('super-admin-rewards-histories', SuperAdminRewardControllerHistory::class);
+       Route::resource('admin-rewards-histories', SuperAdminRewardControllerHistory::class);
         Route::resource('admin-rewards', SuperAdminRewardController::class);
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])

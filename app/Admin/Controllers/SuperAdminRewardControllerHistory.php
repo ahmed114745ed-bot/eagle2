@@ -30,7 +30,7 @@ class SuperAdminRewardControllerHistory extends MainController
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Super Admin Reward History'))
+            ->title(trans('Reward History'))
             //    ->row(function (Row $row) {
             //         $row->column(12, $this->grid2());
             //     })
@@ -107,12 +107,14 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('Created At'))->date();
             });
         });
-        $grid->model()->where('type', $type);
+        $grid->model()->where('type', $type)->with(['superAdmin', 'admin','areaManager', 'ware', 'vip', 'badge']);
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
-            $name = @$this->superAdmin->name ?? '';
-            $uid = @$this->superAdmin->username;
-            $path = @$this?->superAdmin?->avatar;
+
+            $admin = $this->user_type == 'super_admin' ? $this->superAdmin : $this->areaManager;
+            $name = @$admin->name ?? '';
+            $uid = @$admin->username ?? '';
+            $path = @$admin->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -173,8 +175,34 @@ class SuperAdminRewardControllerHistory extends MainController
         $grid->column('expire', __('Expire'));
         $grid->column('no_reward', __('No reward'));
         $grid->column('created_at', __('created_at'));
+        $grid->column('created_by', __('created_by'))->display(function ($name) {
+
+            $admin =  $this->admin;
+            $name = @$admin->name ?? '';
+            $uid = @$admin->username ?? '';
+            $path = @$admin->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this ? url("admin/superadmin-users/{$this->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>";
+        });
         $grid->tools(function (Grid\Tools $tools) {
-            $url = url('admin/super-admin-rewards?type=vip');
+            $url = url('admin/admin-rewards?type=vip');
             $back = __(' back');
 
             $customButtonHTML = <<<HTML
