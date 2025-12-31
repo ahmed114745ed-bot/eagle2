@@ -8,7 +8,6 @@
 :root {
         --primary-color: {{ config('themes.primaryColor') }};
         --secondary-color: {{ config('themes.secondaryColor') }};
-        --green-color: {{ config('themes.greenColor') }};
         --text-primary-color: {{ config('themes.textPrimaryColor') }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -293,15 +292,6 @@
     }
 }
 
-.section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-}
-
 .stats-row {
     display: flex;
     gap: 15px;
@@ -315,15 +305,6 @@
     align-items: center;
     gap: 8px;
     color: #2c3e50;
-}
-
-.section-badge {
-    background: #3498db;
-    color: white;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
 }
 
 .avatar-grid {

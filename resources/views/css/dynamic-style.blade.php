@@ -2279,7 +2279,7 @@
     .grid-table td .dropup,
     .table td .dropdown,
     .table td .dropup {
-        position: absolute;
+        position: relative;
     }
 
 

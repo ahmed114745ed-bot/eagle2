@@ -148,10 +148,6 @@ class RoleControllerNew extends MainController
         // $this->extendGrid($grid);
 
         Admin::style('
-            .grid-table td .dropdown, .grid-table td .dropup, .table td .dropdown, .table td .dropup {
-                position: relative !important;
-            }
-
             .box {
                 overflow: auto !important;
             }

@@ -12,7 +12,6 @@
 :root {
         --primary-color: {{ config('themes.primaryColor') }};
         --secondary-color: {{ config('themes.secondaryColor') }};
-        --green-color: {{ config('themes.greenColor') }};
         --text-primary-color: {{ config('themes.textPrimaryColor') }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -945,14 +944,14 @@
                         <span class="meta-label">{{__("ID")}}:</span>
                         <span class="meta-value">{{ $family->id }}</span>
                     </div>
-                   
+
                     <div class="meta-item">
                         <span class="meta-label">{{__("Owner")}}:</span>
                         <span class="meta-value">{{ @$family?->owner?->name ?? '' }}</span>
                         <span class="meta-uuid">({{ @$family?->owner?->uuid ?? '' }})</span>
                     </div>
                 </div>
-                
+
             </div>
             <button class="btn-back" onclick="window.history.back()">
                 <i class="fas fa-arrow-left"></i> {{__("Go Back")}}
@@ -962,7 +961,7 @@
 
 
        @php
-                     $activeTab = request('tab', 'tab=members'); 
+                     $activeTab = request('tab', 'tab=members');
         @endphp
         <!-- Navigation Tabs -->
         <div class="agency-tabs">
@@ -1091,9 +1090,9 @@
             </div>
 
 
-           
 
-          
+
+
 
 
 
@@ -1230,7 +1229,7 @@ function confirmAction(message, onConfirm) {
 }
 
 
-   
+
 
 
 
