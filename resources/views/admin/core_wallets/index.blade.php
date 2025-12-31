@@ -44,7 +44,7 @@
         backdrop-filter: blur(10px);
         border: 1px solid #eaeaea;
         border-radius: 16px;
-        padding: 25px;
+        padding: 25px 10px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
     }
@@ -226,7 +226,7 @@
     .wallet-badge {
         position: absolute;
         top: 15px;
-        left: 15px;
+        right: 15px;
         background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(10px);
         padding: 6px 14px;
@@ -235,6 +235,11 @@
         font-weight: 600;
         z-index: 2;
         border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .rtl .wallet-badge {
+        left: 15px;
+        right: auto;
     }
 
     .wallet-update-time {
@@ -359,34 +364,34 @@
 
 <div class="container-fluid" style="padding: 0;">
     <!-- Page Header -->
-    <div class="page-header">
-        <div class="container">
-            <div class="breadcrumb-custom">
-                المحافظ الأساسية / <span>الصفحة الرئيسية</span>
-            </div>
-            <h1 class="page-title">
-                💼 {{ __('Application wallet') }}
-            </h1>
-        </div>
-    </div>
+{{--    <div class="page-header">--}}
+{{--        <div class="container">--}}
+{{--            <div class="breadcrumb-custom">--}}
+{{--                {{ __('Core Wallets') }} / <span>{{ __('Home') }}</span>--}}
+{{--            </div>--}}
+{{--            <h1 class="page-title">--}}
+{{--                💼 {{ __('Application wallet') }}--}}
+{{--            </h1>--}}
+{{--        </div>--}}
+{{--    </div>--}}
 
     <div class="container">
         <!-- Stats Overview -->
         <div class="stats-overview">
             <div class="stat-card">
-                <div class="stat-label">إجمالي الرصيد</div>
+                <div class="stat-label">{{ __('Total Balance') }}</div>
                 <div class="stat-value">{{ number_format($coreWallets->sum('coins')) }} USD</div>
-                <div class="stat-change">↑ متوسط جميع المحافظ</div>
+                <div class="stat-change">↑ {{ __('Average of all wallets') }}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">عدد المحافظ النشطة</div>
+                <div class="stat-label">{{ __('Active Wallets Count') }}</div>
                 <div class="stat-value">{{ $coreWallets->count() }}</div>
-                <div class="stat-change">↑ 100% نشطة</div>
+                <div class="stat-change">↑ {{ __('100% Active') }}</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">متوسط الرصيد</div>
+                <div class="stat-label">{{ __('Average Balance') }}</div>
                 <div class="stat-value">{{ number_format($coreWallets->avg('coins')) }} USD</div>
-                <div class="stat-change">لكل محفظة</div>
+                <div class="stat-change">{{ __('Per wallet') }}</div>
             </div>
         </div>
 
@@ -399,11 +404,10 @@
                 <div class="wallet-card">
                     <div class="wallet-header {{ $wallet->is_negative ? 'negative' : '' }}">
                         @if($loop->first)
-                            <div class="wallet-badge">المحفظة الرئيسية</div>
+                            <div class="wallet-badge">{{ __('Main Wallet') }}</div>
                         @endif
                         <div class="wallet-icon">
                             {{ $icon }}
-                            {{--                            <i class="{{ $icon }}"></i>--}}
                         </div>
                         <div class="wallet-name">
                             {{ __(ucfirst(str_replace('_', ' ', $wallet->name))) }}
@@ -419,19 +423,19 @@
                     <div class="wallet-body">
                         <div class="wallet-info">
                             <div class="info-item">
-                                <span class="info-label">آخر تحديث</span>
+                                <span class="info-label">{{ __('Last Update') }}</span>
                                 <span class="info-value">{{ $wallet->update_for_human }}</span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">الحالة</span>
+                                <span class="info-label">{{ __('Status') }}</span>
                                 <span class="info-value"
                                       style="color: {{ $wallet->is_negative ? '#ef4444' : '#22c55e' }} !important;">
-                                    ● {{ $wallet->is_negative ? 'سالب' : 'نشط' }}
+                                    ● {{ $wallet->is_negative ? __('Negative') : __('Active') }}
                                 </span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">النوع</span>
-                                <span class="info-value">أساسي</span>
+                                <span class="info-label">{{ __('Type') }}</span>
+                                <span class="info-value">{{ __('Core') }}</span>
                             </div>
                         </div>
                         @if($canTransfer)
@@ -440,7 +444,7 @@
                                         class="btn-wallet"
                                         data-toggle="modal"
                                         data-target="#transferModal"
-                                        onclick="prepareTransferModal({{ $wallet->id }}, '{{ __(ucfirst(str_replace('_', ' ', $wallet->name))) }}')"
+                                        onclick="prepareTransferModal({{ $wallet->id }}, '{{ __(ucfirst(str_replace('_', ' ', $wallet->name))) }}')">
                                     <i class="fas fa-arrow-right-arrow-left"></i> {{ __('Transfer') }}
                                 </button>
                             </div>
@@ -452,7 +456,7 @@
     </div>
 </div>
 
-<!-- Transfer Modal (ONLY ONE) -->
+<!-- Transfer Modal -->
 <div class="modal fade" id="transferModal" tabindex="-1" role="dialog" aria-labelledby="transferModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <form id="walletTransferForm" method="POST" action="{{ route('admin.wallet.transfer.submit') }}">
@@ -461,7 +465,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="transferModalLabel">
-                        {{ __('transfer from') }} <span id="walletName"></span>
+                        {{ __('Transfer from') }} <span id="walletName"></span>
                     </h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -470,7 +474,7 @@
 
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="to_wallet_id" class="form-label font-weight-bold">{{ __('to wallet') }}</label>
+                        <label for="to_wallet_id" class="form-label font-weight-bold">{{ __('To Wallet') }}</label>
                         <select class="form-control" name="to_wallet_id" id="to_wallet_id" required>
                             @foreach ($coreWallets as $wallet)
                                 <option value="{{ $wallet->id }}">
@@ -481,17 +485,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="amount" class="form-label font-weight-bold">{{ __('amount') }}</label>
+                        <label for="amount" class="form-label font-weight-bold">{{ __('Amount') }}</label>
                         <input type="number" name="amount" class="form-control" min="1" required>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> {{ __('execute transfer') }}
+                        <i class="fas fa-check"></i> {{ __('Execute Transfer') }}
                     </button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">
-                        <i class="fas fa-times"></i> {{ __('cancel') }}
+                        <i class="fas fa-times"></i> {{ __('Cancel') }}
                     </button>
                 </div>
             </div>
@@ -499,11 +503,18 @@
     </div>
 </div>
 
-<!-- Toast Container (ONLY ONE) -->
+<!-- Toast Container -->
 <div id="toast-container"></div>
 
-<!-- JavaScript (ONLY ONE BLOCK) -->
+<!-- JavaScript -->
 <script>
+    // Translation strings for JavaScript
+    const translations = {
+        transferSuccess: @json(__('Transfer completed successfully')),
+        transferFailed: @json(__('Transfer failed')),
+        serverError: @json(__('Server connection error'))
+    };
+
     // Toast notification function
     function showToast(message, type = 'success') {
         const toastId = 'toast-' + Date.now();
@@ -556,21 +567,21 @@
             const data = await response.json();
 
             if (response.ok && data.status === 1) {
-                showToast(data.message || 'تم التحويل بنجاح ✅', 'success');
+                showToast(data.message || translations.transferSuccess + ' ✅', 'success');
                 $('#transferModal').modal('hide');
                 form.reset();
                 setTimeout(() => {
                     location.reload();
                 }, 1000);
             } else {
-                showToast(data.message || 'فشل في التحويل ❌', 'danger');
+                showToast(data.message || translations.transferFailed + ' ❌', 'danger');
             }
         } catch (error) {
             console.error(error);
-            showToast('حدث خطأ في الاتصال بالخادم ❌', 'danger');
+            showToast(translations.serverError + ' ❌', 'danger');
         }
     }
 
-    // Event listener (ONLY ONE)
+    // Event listener
     document.getElementById('walletTransferForm').addEventListener('submit', submitWalletTransfer);
 </script>

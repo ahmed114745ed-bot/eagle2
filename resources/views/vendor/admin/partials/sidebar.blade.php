@@ -568,6 +568,7 @@
         const MAX_WIDTH = 40;
         const DEFAULT_WIDTH = 18;
         const STORAGE_KEY = 'sidebar-width-percent';
+        const MOBILE_BREAKPOINT = 768; // pixels
 
         let isResizing = false;
         let startX = 0;
@@ -582,6 +583,10 @@
 
         function isSidebarCollapsed() {
             return document.body.classList.contains('sidebar-collapse');
+        }
+
+        function isMobile() {
+            return window.innerWidth <= MOBILE_BREAKPOINT;
         }
 
         function pxToPercent(px) {
@@ -604,8 +609,8 @@
         }
 
         function updateLayout(sidebarWidthPercent) {
-            // Don't apply if sidebar is collapsed
-            if (isSidebarCollapsed()) {
+            // Don't apply if mobile or sidebar is collapsed
+            if (isMobile() || isSidebarCollapsed()) {
                 clearInlineStyles();
                 return;
             }
@@ -649,8 +654,14 @@
 
             if (!resizer || !sidebar) return;
 
-            // Only apply saved width if sidebar is NOT collapsed
-            if (!isSidebarCollapsed()) {
+            // Don't initialize on mobile
+            if (isMobile()) {
+                clearInlineStyles();
+                return;
+            }
+
+            // Only apply saved width if sidebar is NOT collapsed and NOT mobile
+            if (!isSidebarCollapsed() && !isMobile()) {
                 const savedWidth = localStorage.getItem(STORAGE_KEY);
                 if (savedWidth) {
                     updateLayout(parseFloat(savedWidth));
@@ -661,11 +672,15 @@
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.attributeName === 'class') {
+                        // Skip on mobile
+                        if (isMobile()) {
+                            clearInlineStyles();
+                            return;
+                        }
+
                         if (isSidebarCollapsed()) {
-                            // Sidebar just collapsed - clear inline styles
                             clearInlineStyles();
                         } else {
-                            // Sidebar just expanded - restore saved width
                             const savedWidth = localStorage.getItem(STORAGE_KEY);
                             if (savedWidth) {
                                 updateLayout(parseFloat(savedWidth));
@@ -680,9 +695,23 @@
                 attributeFilter: ['class']
             });
 
+            // Handle window resize - clear styles if resized to mobile
+            window.addEventListener('resize', function() {
+                if (isMobile()) {
+                    clearInlineStyles();
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                } else if (!isSidebarCollapsed()) {
+                    const savedWidth = localStorage.getItem(STORAGE_KEY);
+                    if (savedWidth) {
+                        updateLayout(parseFloat(savedWidth));
+                    }
+                }
+            });
+
             resizer.addEventListener('mousedown', function(e) {
-                // Don't allow resizing when collapsed
-                if (isSidebarCollapsed()) return;
+                // Don't allow resizing on mobile or when collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
 
                 e.preventDefault();
                 isResizing = true;
@@ -694,10 +723,11 @@
             document.addEventListener('mousemove', function(e) {
                 if (!isResizing) return;
 
-                // Stop if sidebar gets collapsed during resize
-                if (isSidebarCollapsed()) {
+                // Stop if mobile or sidebar gets collapsed during resize
+                if (isMobile() || isSidebarCollapsed()) {
                     isResizing = false;
                     document.body.classList.remove('sidebar-resizing');
+                    clearInlineStyles();
                     return;
                 }
 
@@ -722,18 +752,17 @@
                 isResizing = false;
                 document.body.classList.remove('sidebar-resizing');
 
-                // Only save if sidebar is not collapsed
-                if (!isSidebarCollapsed()) {
+                // Only save if not mobile and sidebar is not collapsed
+                if (!isMobile() && !isSidebarCollapsed()) {
                     const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
                     localStorage.setItem(STORAGE_KEY, finalWidth);
                 }
             });
 
             resizer.addEventListener('dblclick', function() {
-                // Don't do anything if collapsed
-                if (isSidebarCollapsed()) return;
+                // Don't do anything if mobile or collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
 
-                // Reset all to CSS defaults
                 clearInlineStyles();
                 localStorage.removeItem(STORAGE_KEY);
             });
