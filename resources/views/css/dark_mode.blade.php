@@ -95,6 +95,8 @@
 
     .dark-mode .btn:hover,
     .dark-mode .btn-success:hover,
+    .dark-mode .notification-item .title,
+    .dark-mode .notification-item .message,
     .dark-mode .button:hover {
         color: black !important;
     }
