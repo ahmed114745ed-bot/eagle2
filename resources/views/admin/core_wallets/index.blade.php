@@ -47,6 +47,7 @@
         padding: 25px 10px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         transition: all 0.3s ease;
+        gap: 8px;
     }
 
     .dark-mode .stat-card {
@@ -62,13 +63,11 @@
     .stat-label {
         font-size: 14px;
         opacity: 0.8;
-        margin-bottom: 8px;
     }
 
     .stat-value {
         font-size: 28px;
         font-weight: 700;
-        margin-bottom: 5px;
     }
 
     .stat-change {
@@ -77,6 +76,7 @@
         align-items: center;
         gap: 5px;
         color: #4ade80 !important;
+        margin-top: 5px;
     }
 
     /* Wallet Cards */
@@ -377,10 +377,11 @@
 
     <div class="container">
         <!-- Stats Overview -->
+        <!-- Stats Overview -->
         <div class="stats-overview">
             <div class="stat-card">
                 <div class="stat-label">{{ __('Total Balance') }}</div>
-                <div class="stat-value">{{ number_format($coreWallets->sum('coins')) }} USD</div>
+                <div class="stat-value">{{ formatLargeNumber($coreWallets->sum('coins')) }}</div>
                 <div class="stat-change">↑ {{ __('Average of all wallets') }}</div>
             </div>
             <div class="stat-card">
@@ -390,7 +391,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-label">{{ __('Average Balance') }}</div>
-                <div class="stat-value">{{ number_format($coreWallets->avg('coins')) }} USD</div>
+                <div class="stat-value">{{ formatLargeNumber($coreWallets->avg('coins')) }}</div>
                 <div class="stat-change">{{ __('Per wallet') }}</div>
             </div>
         </div>

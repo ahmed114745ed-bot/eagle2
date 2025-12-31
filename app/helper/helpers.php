@@ -1279,3 +1279,17 @@ if (!function_exists('wallet_available_by_wallet')) {
         return $currentBalance -  $currentCutAmount - $currentPending;
     }
 }
+
+function formatLargeNumber($number): string
+{
+    if ($number >= 1000000000000) {
+        return number_format($number / 1000000000000, 2) . 'Trillion'; // Trillion
+    } elseif ($number >= 1000000000) {
+        return number_format($number / 1000000000, 2) . 'Billion'; // Billion
+    } elseif ($number >= 1000000) {
+        return number_format($number / 1000000, 2) . 'Million'; // Million
+    } elseif ($number >= 1000) {
+        return number_format($number / 1000, 2) . 'Thousand'; // Thousand
+    }
+    return number_format($number);
+}
