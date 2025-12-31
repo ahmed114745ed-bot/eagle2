@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SuperAdminReward extends Model
 {
     use HasFactory;
+    protected $table = 'admin_rewards';
     protected $guarded = [];
     protected $appends = ['target1', 'target2', 'target3', 'target4', 'target5'];
 

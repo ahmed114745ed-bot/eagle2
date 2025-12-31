@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SuperAdmin\Http\Controllers\Admin;
+namespace App\Admin\Controllers;
 
 use App\Models\Ware;
 use Encore\Admin\Form;

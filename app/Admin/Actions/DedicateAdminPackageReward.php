@@ -1,32 +1,38 @@
 <?php
 
-namespace Modules\SuperAdmin\Actions\Admin;
+namespace App\Admin\Actions;
+
 
 use Illuminate\Http\Request;
-use Encore\Admin\Actions\Action;
 use Encore\Admin\Facades\Admin;
-use Modules\AreaManager\Entities\AreaManager;
+use Encore\Admin\Actions\Action;
+use App\Models\SuperPackageReward;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 
-class DedicateSuperAdminRewardAction extends Action
+class DedicateAdminPackageReward extends Action
 {
     public $name;
     protected $selector = '.salary_action';
     public $id;
-    public $type;
 
-    public function __construct($id = 0, $type = '')
+    public function __construct($id = 0,)
     {
         $this->name = __('dedicate');
         $this->id = $id;
-        $this->type = $type;
+
         parent::__construct();
     }
 
     public function handle(Request $request)
     {
         try {
+            $superPackage = SuperPackageReward::with('packageRewards')->find($request->uid);
+
+            if (!$superPackage) {
+                return $this->response()->error(__('Super Package not found.'));
+            }
 
             $superAdmins = $request->input('super_admin_id', []);
             $areaAdmins = $request->input('area_admin_id', []);
@@ -35,21 +41,20 @@ class DedicateSuperAdminRewardAction extends Action
                 $superAdmins = $areaAdmins;
             }
 
-            $expire = $request->input('expire');
-            $noReward = $request->input('no_reward');
-
             foreach ($superAdmins as $superAdmin) {
-                SuperAdminReward::create([
-                    'super_admin_id' => $superAdmin,
-                    'type' => $request->type,
-                    'target' => $request->uid,
-                    'expire' => $expire,
-                    'no_reward' => $noReward,
-                    'user_type' => $userType,
-                    'created_by' => Admin::user()->id,
-
-                ]);
+                foreach ($superPackage->packageRewards as $reward) {
+                    SuperAdminReward::create([
+                        'super_admin_id' => $superAdmin,
+                        'type' => $reward->type,
+                        'target' => $reward->target,
+                        'expire' => $reward->expire,
+                        'no_reward' => $reward->quantity,
+                        'user_type' => $userType,
+                        'created_by' => Admin::user()->id,
+                    ]);
+                }
             }
+
 
             return $this->response()->success(__('Dedicated successfully'))->refresh();
         } catch (\Exception $exception) {
@@ -60,7 +65,6 @@ class DedicateSuperAdminRewardAction extends Action
     public function form()
     {
         $this->hidden('uid', __('id'))->attribute('id', 'uid');
-        $this->hidden('type', __('id'))->attribute('id', 'type');
         $this->select('user_type', __('user Type'))->options(['area_manager' => __('Region Manager'), 'super_admin' => __('Country Manager')])->default('area_manager')->required()->attribute(['id' => 'user-type-select']);
 
         $this->multipleSelect('area_admin_id', __('Select Region Manager'))
@@ -68,9 +72,6 @@ class DedicateSuperAdminRewardAction extends Action
 
         $this->multipleSelect('super_admin_id', __('Select Country Manager'))
             ->options(self::getAreaAdmins())->attribute(['id' => 'super-admin-select']);
-
-        $this->integer('expire', __('Days'))->default(1);
-        $this->integer('no_reward', __('No reward'))->default(1);
 
         Admin::script(<<<'SCRIPT'
             function toggleUserTypeFields() {
@@ -95,16 +96,14 @@ class DedicateSuperAdminRewardAction extends Action
 
     public function html()
     {
-        return '<a href="#" onclick="dedicateSet(\'' . $this->id . '\', \'' . $this->type . '\')" class="btn btn-sm btn-success salary_action">'
+        return '<a href="#" onclick="dedicateSet(\'' . $this->id . '\')" class="btn btn-sm btn-success salary_action">'
             . __('dedicate') . '</a>
         <script>
-            function dedicateSet(uid, type) {
+            function dedicateSet(uid) {
                 $("#uid").val(uid);
-                $("#type").val(type);
             }
         </script>';
     }
-
 
 
     protected static function getSuperAdmins()
