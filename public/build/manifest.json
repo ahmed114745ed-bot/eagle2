@@ -1,11 +1,11 @@
 {
   "Modules/DynamicTheme/Resources/css/app.css": {
-    "file": "assets/app-CfNoULaU.css",
+    "file": "assets/app-DNRCuf0M.css",
     "src": "Modules/DynamicTheme/Resources/css/app.css",
     "isEntry": true
   },
   "Modules/DynamicTheme/Resources/js/admin.js": {
-    "file": "assets/admin-D9fTtvZE.js",
+    "file": "assets/admin-CelPnphe.js",
     "name": "admin",
     "src": "Modules/DynamicTheme/Resources/js/admin.js",
     "isEntry": true,
@@ -13,11 +13,11 @@
       "_NotificationToast-CMMZahZZ.js"
     ],
     "css": [
-      "assets/app-CfNoULaU.css"
+      "assets/app-DNRCuf0M.css"
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
-    "file": "assets/app-D0lDRCPv.js",
+    "file": "assets/app-Buxe71cR.js",
     "name": "app",
     "src": "Modules/DynamicTheme/Resources/js/app.js",
     "isEntry": true,
