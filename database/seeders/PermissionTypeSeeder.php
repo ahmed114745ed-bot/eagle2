@@ -1181,6 +1181,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'reward-center', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
 
                         PermissionType::SUPER_ADMIN->value => ['browse', 'dedicate-switch'],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'dedicate-switch'],
                     ],],
 
                 ],
