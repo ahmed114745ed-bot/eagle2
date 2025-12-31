@@ -2036,7 +2036,7 @@ class Common
     }
 
 
-      public static function getChargerInfoII($resource)
+    public static function getChargerInfoII($resource)
     {
         if (request()->is('superadmin/*')) {
             $prefix = 'superadmin';
@@ -2055,7 +2055,7 @@ class Common
                     'id' => $admin->id ?? '',
                     'type' => 'dash',
                     'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
-                    
+
                 ];
 
             case UserTypeEnum::AREA_MANAGER:
@@ -2067,7 +2067,7 @@ class Common
                     'id' => $areaManager->id ?? '',
                     'type' => 'dash',
                     'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
-                    
+
                 ];
 
             case 'agency':
@@ -2080,7 +2080,7 @@ class Common
                     'id' => $agency->id ?? '',
                     'type' => 'agency',
                     'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
-                    
+
                 ];
 
             case 'host_agency':
@@ -2093,7 +2093,7 @@ class Common
                     'id' => $agency->id ?? '',
                     'type' => 'host_agency',
                     'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
-                    
+
                 ];
 
             case 'bd':
@@ -2105,7 +2105,7 @@ class Common
                     'id' => $bd->id ?? '',
                     'type' => 'bd',
                     'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
-                    
+
                 ];
 
             case UserTypeEnum::SUB_AREA_MANAGER:
@@ -2117,7 +2117,7 @@ class Common
                     'id' => $subAreaManager->id ?? '',
                     'type' => 'dash',
                     'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
-                    
+
                 ];
 
             case 'user':
@@ -2146,7 +2146,7 @@ class Common
     }
 
 
-   
+
 
 
     public static function getReceiverInfo($resource)
@@ -2320,20 +2320,20 @@ class Common
             'bd',
             'senderUser',
             'senderUser.packs' => function ($q) {
-            $q->whereIn('type', [25])
-              ->where('is_used', true)
-              ->with('ware:id,value');
-        },
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
             'receiverUser',
             'receiverUser.profile',
             'receiverUser.packs' => function ($q) {
-            $q->whereIn('type', [25])
-              ->where('is_used', true)
-              ->with('ware:id,value');
-        },
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
             'receiveragency',
         ];
     }

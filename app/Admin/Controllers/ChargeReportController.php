@@ -98,15 +98,15 @@ class ChargeReportController extends MainController
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
             ->orderByDesc('created_at')->with([
-                'sender',
-                'sender.profile:id,user_id,avatar',
+                // 'sender',
+                // 'sender.profile:id,user_id,avatar',
                 'receiver',
                 'receiver.profile:id,user_id,avatar',
-                'sender.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
+                // 'sender.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
                 'receiver.packs' => function ($q) {
                     $q->whereIn('type', [25])
                         ->where('is_used', true)
