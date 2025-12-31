@@ -17,7 +17,6 @@
         :root {
             --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
             --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
-            --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
             --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
             --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};
@@ -132,7 +131,7 @@
                 </div>
             @endif
 
-            <form action="{{ admin_url('login') }}" method="post" id="loginForm">
+            <form action="{{ bd_url('login') }}" method="post" id="loginForm">
                 <div class="form-group">
                     <label class="form-label" for="username">{{ trans('admin.username') }}</label>
                     <div class="input-wrapper">
@@ -238,7 +237,7 @@
                     return;
                 }
 
-                fetch("{{ admin_url('/locale') }}", {
+                fetch("{{ bd_url('/locale') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

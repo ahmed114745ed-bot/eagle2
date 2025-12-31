@@ -738,8 +738,6 @@ class UserController extends MainController
                 ]);
         }
 
-        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
-
         // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
@@ -836,6 +834,8 @@ class UserController extends MainController
             });
         </script>');
         }
+
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'))->setElementName('full-column-width');
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;

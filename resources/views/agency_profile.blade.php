@@ -15,9 +15,6 @@
             --secondary-color:
                 {{ config('themes.secondaryColor') }}
             ;
-            --green-color:
-                {{ config('themes.greenColor') }}
-            ;
             --text-primary-color:
                 {{ config('themes.textPrimaryColor') }}
             ;
