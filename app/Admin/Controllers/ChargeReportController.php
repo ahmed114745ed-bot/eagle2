@@ -198,7 +198,7 @@ class ChargeReportController extends MainController
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
-            $sender = Common::getChargerInfo($this);
+            $sender = Common::getChargerInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -242,7 +242,7 @@ class ChargeReportController extends MainController
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
 
 
-            $sender = Common::getReceiverInfo($this);
+            $sender = Common::getReceiverInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
