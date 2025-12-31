@@ -275,7 +275,7 @@
                                 ['uri' => '/official-message', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
-                          ['uri' => '/rewards', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
+                          ['uri' => '/rewards', 'icon' => '🎁', 'title' => __('reward dedicate')],
                         [
                             'uri' => '#',
                             'icon' => '👔',
