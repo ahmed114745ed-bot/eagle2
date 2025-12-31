@@ -547,10 +547,23 @@ class HomeCarouselController extends MainController
             ->rules(['array'])
             ->attribute('id', 'display_at_select');
 
+        Admin::style('
+            .select2-container--default .select2-selection--multiple .select2-selection__choice {
+                background-color: var(--primary-color) !important;
+            }
+        ');
 
+        $form->html('<div class="full-column-width countries-wrapper" id="countries_wrapper">')->setWidth(12, 0);
         $form->belongsToMany('countries', Countries::class, trans('Country'));
+        $form->html('</div>')->setWidth(12, 0);
 
         $form->html('<style>#countries_select { display:none; }</style>');
+
+        Admin::style('
+            .rtl .fields-group .form-group {
+                display: block!important;
+            }
+        ');
 
         Admin::script("
              function toggleCountriesField() {
