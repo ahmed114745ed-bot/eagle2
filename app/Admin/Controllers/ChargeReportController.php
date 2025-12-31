@@ -98,21 +98,22 @@ class ChargeReportController extends MainController
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
             ->orderByDesc('created_at')->with([
-                'sender',
-                'sender.profile:id,user_id,avatar',
+                // 'sender',
+                // 'sender.profile:id,user_id,avatar',
                 'receiver',
                 'receiver.profile:id,user_id,avatar',
-                'sender.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
+                // 'sender.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
                 'receiver.packs' => function ($q) {
                     $q->whereIn('type', [25])
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
                 'admin',
+                'admin.agency',
                 'senderUser',
                 'senderUser.profile:id,user_id,avatar',
                 'senderUser.packs' => function ($q) {
@@ -120,36 +121,8 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
-                // 'senderShippingAgency',
-                // 'senderShippingAgency.owner',
-                // 'senderAgency.owner',
-                // 'senderAgency',
+                'receiveragency',
 
-                // 'admin.agency',
-                // 'admin.agency.owner',
-
-                // 'admin.agency.owner.packs' => function ($q) {
-                //     $q->whereIn('type', [25])
-                //         ->where('is_used', true)
-                //         ->with('ware:id,value');
-                // },
-                // 'senderAgency.owner.packs' => function ($q) {
-                //     $q->whereIn('type', [25])
-                //         ->where('is_used', true)
-                //         ->with('ware:id,value');
-                // },
-                // 'areaManager',
-                // 'bd',
-                // 'subAreaManager',
-                 
-                // 'receiveragency',
-                // 'receiveragency.owner',
-                // 'receiverSubAreaManager.owner',
-                // 'receiverSubAreaManager',
-                // 'receiverSuperAdmin',
-                // 'receiverSuperAdmin.owner',
-                // 'receiverSubSuperAdmin.owner',
-                // 'receiverSubSuperAdmin'
             ]);
 
         if ($charger_type == "dash") {
