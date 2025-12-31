@@ -151,6 +151,10 @@ class RoleControllerNew extends MainController
             .grid-table td .dropdown, .grid-table td .dropup, .table td .dropdown, .table td .dropup {
                 position: relative !important;
             }
+
+            .box {
+                overflow: auto !important;
+            }
         ');
         return $grid;
     }
