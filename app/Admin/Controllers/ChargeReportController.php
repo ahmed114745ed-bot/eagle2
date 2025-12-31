@@ -158,7 +158,8 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
-                'senderAgency.owner.specialId.ware'
+                'senderAgency.owner.specialId.ware',
+                'senderAgency.owner.packs'
             ]);
         } else {
             $grid->model()->where(function ($query) {
