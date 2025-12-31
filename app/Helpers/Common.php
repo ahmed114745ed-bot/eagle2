@@ -2036,6 +2036,116 @@ class Common
     }
 
 
+      public static function getChargerInfoII($resource)
+    {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+        switch ($resource->charger_type) {
+            case 'dash':
+                $admin = $resource->admin;
+                return [
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
+                    'type' => 'dash',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+                    
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
+                    
+                ];
+
+            case 'agency':
+                $agency = $resource->senderShippingAgency;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+                    
+                ];
+
+            case 'host_agency':
+                $agency = $resource->senderAgency;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'host_agency',
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+                    
+                ];
+
+            case 'bd':
+                $bd = $resource->bd;
+                return [
+                    'name' => $bd->username ?? '',
+                    'image' => $bd->avatar ?? '',
+                    'uuid' => $bd->id ?? '',
+                    'id' => $bd->id ?? '',
+                    'type' => 'bd',
+                    'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+                    
+                ];
+
+            case UserTypeEnum::SUB_AREA_MANAGER:
+                $subAreaManager = $resource->subAreaManager;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+                    
+                ];
+
+            case 'user':
+                $user = $resource->senderUser;
+
+                return [
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
+                    'type' => 'user',
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                ];
+
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'type_name' => '',
+                    'url' => '#',
+                ];
+        }
+    }
+
+
    
 
 
@@ -2126,6 +2236,78 @@ class Common
                     'image_color'          => null,
                     'id_image'             => '',
                     'colored_name'         => '',
+                ];
+        }
+    }
+
+    public static function getReceiverInfoII($resource)
+    {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+
+        switch ($resource->user_type) {
+            case 'agency':
+                return [
+                    'name' => $resource->receiveragency->name ?? '',
+                    'image' => $resource->receiveragency->img ?? '',
+                    'uuid' => $resource->receiveragency->id ?? '',
+                    'id' => $resource->receiveragency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+
+                ];
+            case 'sub_area_manager':
+                return [
+                    'name' => $resource->receiverSubAreaManager->username ?? '',
+                    'image' => $resource->receiverSubAreaManager->avatar ?? '',
+                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
+                    'id' => $resource->receiverSubAreaManager->id ?? '',
+                    'type' => 'sub_area_manager',
+                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+
+                ];
+            case 'super_admin':
+                return [
+                    'name' => $resource->receiverSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSuperAdmin->avatar ?? '',
+                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSuperAdmin->id ?? '',
+                    'type' => 'super_admin',
+                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->avatar ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                ];
+            case 'user':
+                return [
+
+                    'id' => $resource->receiver->id ?? '',
+                    'name' => $resource->receiver->name ?? '',
+                    'image' => $resource->receiver->profile->avatar ?? '',
+                    'uuid' => $resource->receiver->uuid ?? '',
+                    'type' => 'user',
+                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
+
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'url' => '#',
                 ];
         }
     }

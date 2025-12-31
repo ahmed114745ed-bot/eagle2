@@ -101,7 +101,6 @@ class ChargeReportController extends MainController
                 'sender',
                 'sender.profile:id,user_id,avatar',
                 'receiver',
-                'receiver.color_image',
                 'receiver.profile:id,user_id,avatar',
                 'sender.packs' => function ($q) {
                     $q->whereIn('type', [25])
@@ -114,6 +113,13 @@ class ChargeReportController extends MainController
                         ->with('ware:id,value');
                 },
                 'admin',
+                'senderUser',
+                'senderUser.profile:id,user_id,avatar',
+                'senderUser.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
                 // 'senderShippingAgency',
                 // 'senderShippingAgency.owner',
                 // 'senderAgency.owner',
@@ -135,7 +141,7 @@ class ChargeReportController extends MainController
                 // 'areaManager',
                 // 'bd',
                 // 'subAreaManager',
-                // 'senderUser',
+                 
                 // 'receiveragency',
                 // 'receiveragency.owner',
                 // 'receiverSubAreaManager.owner',
@@ -158,7 +164,8 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
-                'senderAgency.owner.specialId.ware'
+                'senderAgency.owner.specialId.ware',
+                'senderAgency.owner.packs'
             ]);
         } else {
             $grid->model()->where(function ($query) {
@@ -197,7 +204,7 @@ class ChargeReportController extends MainController
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
-            $sender = Common::getChargerInfo($this);
+            $sender = Common::getChargerInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -241,7 +248,7 @@ class ChargeReportController extends MainController
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
 
 
-            $sender = Common::getReceiverInfo($this);
+            $sender = Common::getReceiverInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
