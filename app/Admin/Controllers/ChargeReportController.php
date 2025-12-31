@@ -105,7 +105,9 @@ class ChargeReportController extends MainController
                 'senderShippingAgency',
                 'senderShippingAgency.owner',
                 'senderAgency.owner',
+                'senderAgency',
                 'receiver',
+                'receiver.color_image',
                 'receiver.profile:id,user_id,avatar',
                 'sender.packs' => function ($q) {
                     $q->whereIn('type', [25])
