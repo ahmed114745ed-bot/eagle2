@@ -113,12 +113,12 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
-                 'admin',
+                'admin',
                 // 'senderShippingAgency',
                 // 'senderShippingAgency.owner',
                 // 'senderAgency.owner',
                 // 'senderAgency',
-                
+
                 // 'admin.agency',
                 // 'admin.agency.owner',
 
@@ -132,7 +132,7 @@ class ChargeReportController extends MainController
                 //         ->where('is_used', true)
                 //         ->with('ware:id,value');
                 // },
-               // 'areaManager',
+                // 'areaManager',
                 // 'bd',
                 // 'subAreaManager',
                 // 'senderUser',
@@ -500,7 +500,15 @@ class ChargeReportController extends MainController
             $start = now()->startOfMonth();
             $end   = $end   = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
-        })
+        })->with([
+            'user',
+            'user.profile',
+            'user.packs' => function ($q) {
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
+        ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at');
 
@@ -848,25 +856,26 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()->with(['user',
-        'user.profile',
-        'user.packs' => function ($q) {
-                            $q->whereIn('type', [25])
-                                ->where('is_used', true)
-                                ->with('ware:id,value');
-                        },
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.packs' => function ($q) {
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
         ])
-        ->when(request('from_date') && request('to_date'), function ($query,) {
+            ->when(request('from_date') && request('to_date'), function ($query,) {
 
-            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
-            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
-            $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query,) {
+                $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+                $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                $query->whereBetween('created_at', [$start, $end]);
+            })->when(!request('from_date'), function ($query,) {
 
-            $start = now()->startOfMonth();
-            $end   = $end   = now()->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
-        })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+                $start = now()->startOfMonth();
+                $end   = $end   = now()->endOfMonth();
+                $query->whereBetween('created_at', [$start, $end]);
+            })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->where('status', 1);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
