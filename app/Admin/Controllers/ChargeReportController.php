@@ -120,6 +120,7 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
+                'receiveragency',
                 // 'senderShippingAgency',
                 // 'senderShippingAgency.owner',
                 // 'senderAgency.owner',
@@ -142,7 +143,7 @@ class ChargeReportController extends MainController
                 // 'bd',
                 // 'subAreaManager',
                  
-                // 'receiveragency',
+                 
                 // 'receiveragency.owner',
                 // 'receiverSubAreaManager.owner',
                 // 'receiverSubAreaManager',
