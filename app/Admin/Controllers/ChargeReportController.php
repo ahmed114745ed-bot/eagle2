@@ -101,6 +101,8 @@ class ChargeReportController extends MainController
                 'sender',
                 'sender.profile:id,user_id,avatar',
                 'admin',
+                'admin.agency',
+                'admin.agency.owner',
                 'areaManager',
                 'senderShippingAgency',
                 'senderShippingAgency.owner',
