@@ -84,7 +84,7 @@ html[lang="ar"] .modal-overlay {
   transition: all 0.2s ease;
 }
 .notification-item.unread {
-  border-left-color: #007bff;
+  border-left-color: var(--primary-color);
   background-color: #eef6ff;
 }
 .notification-item:hover {

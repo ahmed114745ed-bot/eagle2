@@ -45,6 +45,7 @@
     .dark-mode .stat-card,
     .dark-mode .table-section,
     .dark-mode .empty-table,
+    .dark-mode .notification-item.unread,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -71,6 +72,7 @@
     .dark-mode .datepicker table tr td span.active.disabled:hover,
     .dark-mode .datepicker table tr td span:hover,
     .dark-mode .select2-container--default .select2-selection--multiple,
+    .dark-mode .modal-body2,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
     }
@@ -95,8 +97,6 @@
 
     .dark-mode .btn:hover,
     .dark-mode .btn-success:hover,
-    .dark-mode .notification-item .title,
-    .dark-mode .notification-item .message,
     .dark-mode .button:hover {
         color: black !important;
     }
