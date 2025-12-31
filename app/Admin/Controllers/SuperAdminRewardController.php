@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SuperAdmin\Http\Controllers\Admin;
+namespace App\Admin\Controllers;
 
 use App\Models\Ware;
 use Encore\Admin\Grid;
@@ -36,7 +36,7 @@ class SuperAdminRewardController extends MainController
 
         session(['last_ware_type' => request()->get('type', 'vip')]);
         return parent::index($content
-            ->title(trans('Super Admin Reward'))
+            ->title(trans('Reward'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
@@ -99,7 +99,7 @@ class SuperAdminRewardController extends MainController
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
 
-                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
+                    return (new \App\Admin\Actions\DedicateAdminPackageReward($this->id))->render();
                 });
             }
         } else {
@@ -119,7 +119,7 @@ class SuperAdminRewardController extends MainController
 
         if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
             $grid->tools(function (Grid\Tools $tools) {
-                $url = '/admin/super-admin-rewards-histories?type=' . request('type');
+                $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
                 $tools->append($button);
             });

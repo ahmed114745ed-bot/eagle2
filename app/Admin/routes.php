@@ -94,6 +94,7 @@ use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\PusherStatisticsController;
+use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -119,12 +120,14 @@ use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\RemainingDiamondHistoryController;
 use App\Admin\Controllers\RemainingDiamondSettingController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
+
 
 Route::group(
     [
@@ -608,7 +611,8 @@ Route::group(
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
         Route::resource('super-package-rewards', SuperPackageController::class);
-
+       Route::resource('admin-rewards-histories', SuperAdminRewardControllerHistory::class);
+        Route::resource('admin-rewards', SuperAdminRewardController::class);
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
         //             ->icon('fa-file');
