@@ -1,9 +1,17 @@
 
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" as="style">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" media="print" onload="this.media='all'">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
         body {
             font-family: 'Cairo', sans-serif;
         }
@@ -58,13 +66,101 @@
         }
         
         .reels-sidebar {
-            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+        }
+        
+        .reels-sidebar.mobile-open {
+            transform: translateX(0);
         }
         
         .reels-video-container {
             width: 100%;
         }
         
+        /* Mobile Overlay Background */
+        .mobile-sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .mobile-sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* Mobile Toggle Button */
+        .mobile-reels-toggle {
+            position: fixed;
+            bottom: 120px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5), 0 0 0 0 rgba(102, 126, 234, 0.4);
+            z-index: 998;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: pulse-button 2s ease-in-out infinite;
+            border: 3px solid white;
+        }
+        
+        @keyframes pulse-button {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(102, 126, 234, 0.8), 0 0 0 8px rgba(102, 126, 234, 0.2);
+            }
+        }
+        
+        .mobile-reels-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .mobile-reels-toggle i {
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-reels-toggle.active {
+            animation: none;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .mobile-reels-toggle.active i {
+            transform: rotate(180deg);
+        }
+    }
+    
+    /* Hide mobile elements on desktop */
+    @media (min-width: 769px) {
+        .mobile-reels-toggle,
+        .mobile-sidebar-overlay {
+            display: none !important;
+        }
+    }
+    
+    /* User Profile Overlay */
+    @media (max-width: 768px) {
         /* User Profile Overlay */
         .absolute.top-4 {
             top: 0.5rem;
@@ -174,17 +270,87 @@
             animation: float 2s ease-in-out infinite;
         }
     }
+    
+    /* Skeleton Loader Styles */
+    .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: skeleton-loading 1.5s infinite;
+    }
+    
+    @keyframes skeleton-loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    .skeleton-text {
+        height: 12px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .skeleton-circle {
+        border-radius: 50%;
+    }
+    
+    /* Optimize rendering */
+    .video-item-height {
+        content-visibility: auto;
+        contain-intrinsic-height: 100vh;
+    }
+    
+    /* Fade in animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Alpine cloak */
+    [x-cloak] { display: none !important; }
 </style>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="reels-main-container flex bg-gray-100" x-data="reelsManager()">
+<div class="reels-main-container flex bg-gray-100" x-data="reelsManager()" x-cloak>
+    <!-- Mobile Overlay Background -->
+    <div class="mobile-sidebar-overlay" 
+         :class="{ 'active': isMobileSidebarOpen }"
+         @click="closeMobileSidebar()"
+         x-show="isMobileSidebarOpen"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"></div>
+    
+    <!-- Mobile Toggle Button -->
+    <button class="mobile-reels-toggle md:hidden" 
+            :class="{ 'active': isMobileSidebarOpen }"
+            @click="toggleMobileSidebar()">
+        <i class="fas" :class="isMobileSidebarOpen ? 'fa-times' : 'fa-list'"></i>
+        <!-- Badge for reels count -->
+        <span x-show="!isMobileSidebarOpen && filteredReels.length > 0"
+              class="absolute -top-1 -left-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
+              x-text="filteredReels.length"></span>
+    </button>
+    
     <!-- Reels List (Sidebar) -->
-    <div class="reels-sidebar bg-white border-l border-gray-200 shadow-lg flex flex-col">
+    <div class="reels-sidebar bg-white border-l border-gray-200 shadow-lg flex flex-col"
+         :class="{ 'mobile-open': isMobileSidebarOpen }">
         <!-- Search Filter -->
-        <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white border-b">
+        <div class="p-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white border-b relative">
+            <!-- Close Button for Mobile -->
+            <button @click="closeMobileSidebar()" 
+                    class="md:hidden absolute top-3 left-3 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition">
+                <i class="fas fa-times"></i>
+            </button>
+            
             <h2 class="text-lg font-bold mb-3 flex items-center">
                 <i class="fas fa-film ml-2"></i>
                 قائمة الريلز
@@ -216,17 +382,34 @@
              x-ref="sidebarContainer"
              @scroll="handleSidebarScroll()"
              style="height: calc(100% - 130px);">
-            <div class="grid grid-cols-3 gap-2 p-2">
+            <!-- Skeleton Loader for Initial Load -->
+            <template x-if="!reelsLoaded && filteredReels.length === 0">
+                <div class="grid grid-cols-3 gap-2 p-2">
+                    <template x-for="i in 9" :key="i">
+                        <div class="rounded-md overflow-hidden shadow">
+                            <div class="relative bg-gray-200 skeleton" style="padding-bottom: 177.78%;"></div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+            
+            <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
-                    <div @click="selectReel(reel.id)" 
+                    <div @click="selectReel(reel.id); closeMobileSidebar()" 
                          :class="selectedReelId === reel.id ? 'ring-2 ring-blue-500 shadow-lg' : ''"
-                         class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group">
+                         class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in"
+                         x-intersect.once="loadThumbnail($el, reel)">
                         <div class="relative bg-gray-200" style="padding-bottom: 177.78%; /* 16:9 ratio */">
-                            <img :src="reel.thumbnail_url" 
+                            <!-- Skeleton until image loads -->
+                            <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
+                            
+                            <img x-show="reel.thumbnailLoaded"
+                                 :src="reel.thumbnail_url" 
                                  :alt="reel.title" 
                                  class="absolute inset-0 w-full h-full object-cover"
                                  loading="lazy"
-                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E%D8%B1%D9%8A%D9%84%3C/text%3E%3C/svg%3E'">
+                                 @load="reel.thumbnailLoaded = true"
+                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E%D8%B1%D9%8A%D9%84%3C/text%3E%3C/svg%3E'; this.style.display='block'; reel.thumbnailLoaded = true;">
                             
                             <!-- User Info Overlay on Hover -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
@@ -312,32 +495,44 @@
                 <div class="w-full max-w-2xl h-full relative">
                     <!-- Video Container -->
                     <div class="relative h-full bg-black flex items-center justify-center">
-                        <!-- Lazy load video only when needed -->
-                        <template x-if="shouldLoadVideo(index)">
-                            <video :src="reel.video_url" 
-                                   :id="'video-' + reel.id"
-                                   class="w-full h-full object-contain"
-                                   loop
-                                   autoplay
-                                   muted
-                                   preload="metadata"
-                                   playsinline
-                                   x-ref="video"
-                                   @click="togglePlay($event)"
-                                   @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
-                                   @timeupdate="updateProgress($event)"
-                                   @play="updateProgress($event)"
-                                   @pause="updateProgress($event)">
-                            </video>
+                        <!-- Skeleton Loader while video loading -->
+                        <template x-if="!shouldLoadVideo(index)">
+                            <div class="w-full h-full flex items-center justify-center bg-gray-900">
+                                <div class="text-center text-white/50">
+                                    <div class="skeleton skeleton-circle w-20 h-20 mx-auto mb-4 bg-gray-700"></div>
+                                    <div class="skeleton skeleton-text w-32 mx-auto bg-gray-700"></div>
+                                </div>
+                            </div>
                         </template>
                         
-                        <!-- Placeholder when video not loaded -->
-                        <template x-if="!shouldLoadVideo(index)">
-                            <div class="w-full h-full flex items-center justify-center">
-                                <div class="text-center text-white/50">
-                                    <i class="fas fa-play-circle text-6xl mb-3"></i>
-                                    <p>اسحب للمشاهدة</p>
+                        <!-- Lazy load video only when needed -->
+                        <template x-if="shouldLoadVideo(index)">
+                            <div class="w-full h-full relative">
+                                <!-- Loading skeleton while video loads -->
+                                <div x-show="!isVideoReady(reel.id)" class="absolute inset-0 flex items-center justify-center bg-gray-900">
+                                    <div class="text-center text-white/50">
+                                        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto mb-4"></div>
+                                        <p class="text-sm">جاري تحميل الفيديو...</p>
+                                    </div>
                                 </div>
+                                
+                                <video :src="reel.video_url" 
+                                       :id="'video-' + reel.id"
+                                       class="w-full h-full object-contain"
+                                       x-show="isVideoReady(reel.id)"
+                                       loop
+                                       autoplay
+                                       muted
+                                       preload="none"
+                                       playsinline
+                                       x-ref="video"
+                                       @click="togglePlay($event)"
+                                       @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
+                                       @canplay="markVideoReady(reel.id)"
+                                       @timeupdate.throttle.500ms="updateProgress($event)"
+                                       @play="updateProgress($event)"
+                                       @pause="updateProgress($event)">
+                                </video>
                             </div>
                         </template>
                         
@@ -784,10 +979,16 @@
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
                     <div class="relative aspect-[9/16] bg-gray-200">
-                        <img :src="reel.thumbnail_url" 
+                        <!-- Skeleton Loader -->
+                        <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
+                        
+                        <img x-show="reel.thumbnailLoaded"
+                             :src="reel.thumbnail_url" 
                              :alt="reel.title" 
                              class="w-full h-full object-cover"
-                             loading="lazy">
+                             loading="lazy"
+                             @load="reel.thumbnailLoaded = true"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E%D8%B1%D9%8A%D9%84%3C/text%3E%3C/svg%3E'; this.style.display='block'; reel.thumbnailLoaded = true;">
                         
                         <!-- User Info Overlay on Hover for Mobile -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
@@ -829,8 +1030,8 @@
 <script>
 function reelsManager() {
     return {
-        allReels: @json($reels),
-        filteredReels: @json($reels),
+        allReels: [],
+        filteredReels: [],
         searchQuery: '',
         selectedReelId: null,
         selectedReel: null,
@@ -852,22 +1053,74 @@ function reelsManager() {
         videoStates: {},
         videoDurations: {},
         isMobileSidebarOpen: false,
+        reelsLoaded: false,
+        videoReadyStates: {},
         
         init() {
-            // Load first few videos
-            this.loadedVideos.add(0);
-            this.loadedVideos.add(1);
-            this.loadedVideos.add(2);
-            
-            // الافتراضي بصوت
+            // تحميل البيانات بشكل تدريجي لتحسين الأداء
             this.isGlobalMuted = false;
             
-            // Auto-play first video on load
+            // تحميل البيانات بعد رندر الصفحة
+            this.$nextTick(() => {
+                // استخدام requestIdleCallback لتحميل البيانات في وقت الفراغ
+                if (window.requestIdleCallback) {
+                    requestIdleCallback(() => this.loadInitialData());
+                } else {
+                    setTimeout(() => this.loadInitialData(), 100);
+                }
+            });
+        },
+        
+        loadInitialData() {
+            // تحميل البيانات من السيرفر
+            const reelsData = @json($reels);
+            
+            // تحميل أول 6 فقط للبداية السريعة مع تهيئة thumbnailLoaded
+            this.allReels = reelsData.map(reel => {
+                // تحميل الصورة فوراً لأول 6 ريلز
+                const shouldPreload = reelsData.indexOf(reel) < 6;
+                return {
+                    ...reel,
+                    thumbnailLoaded: false
+                };
+            });
+            
+            // تحميل تدريجي - أول 6 للبداية
+            this.filteredReels = this.allReels.slice(0, 6);
+            this.reelsLoaded = true;
+            
+            // Load first video only
+            this.loadedVideos.add(0);
+            
+            // التأكد من أن القائمة مغلقة والريل مفتوح
+            this.isMobileSidebarOpen = false;
+            
             this.$nextTick(() => {
                 this.playFirstVideo();
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
+                
+                // تحميل بقية الريلز بعد 500ms
+                setTimeout(() => {
+                    if (this.filteredReels.length < this.allReels.length) {
+                        const nextBatch = this.allReels.slice(6, 15);
+                        this.filteredReels = [...this.filteredReels, ...nextBatch];
+                    }
+                }, 500);
             });
+        },
+        
+        loadThumbnail(element, reel) {
+            // يتم تحميل الصورة فقط عندما تكون قريبة من الرؤية
+            // x-intersect.once سيتولى هذا تلقائياً
+        },
+        
+        isVideoReady(reelId) {
+            return this.videoReadyStates[reelId] === true;
+        },
+        
+        markVideoReady(reelId) {
+            this.videoReadyStates[reelId] = true;
         },
         
         toggleMobileSidebar() {
@@ -882,6 +1135,7 @@ function reelsManager() {
         
         onVideoLoaded(event, reelId) {
             const video = event.target;
+            this.markVideoReady(reelId);
             
             // تطبيق حالة الصوت العامة
             video.muted = this.isGlobalMuted;
@@ -903,9 +1157,9 @@ function reelsManager() {
         },
         
         shouldLoadVideo(index) {
-            // تحميل الفيديو الحالي + 2 قبله + 3 بعده فقط
+            // تحميل الفيديو الحالي + 1 قبله + 2 بعده فقط لتوفير الذاكرة
             const currentIndex = this.currentVideoIndex;
-            return Math.abs(index - currentIndex) <= 3 || this.loadedVideos.has(index);
+            return Math.abs(index - currentIndex) <= 2 || this.loadedVideos.has(index);
         },
         
         setupSidebarScroll() {
@@ -939,24 +1193,33 @@ function reelsManager() {
             if (!container) return;
             
             let scrollTimeout;
+            let lastScrollTop = 0;
+            
             container.addEventListener('scroll', () => {
                 // Debounce scroll event للأداء
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
+                    const scrollTop = container.scrollTop;
+                    
+                    // تحديث الفيديو الحالي فقط عند التغيير
+                    if (Math.abs(scrollTop - lastScrollTop) > 50) {
+                        this.handleScroll();
+                        lastScrollTop = scrollTop;
+                    }
+                    
                     if (this.loading || !this.hasMore) return;
                     
                     const scrollHeight = container.scrollHeight;
-                    const scrollTop = container.scrollTop;
                     const clientHeight = container.clientHeight;
                     const scrollPercentage = ((scrollTop + clientHeight) / scrollHeight) * 100;
                     
-                    // Load more when user is near bottom (60% scrolled)
-                    if (scrollPercentage >= 60) {
+                    // Load more when user is near bottom (70% scrolled)
+                    if (scrollPercentage >= 70) {
                         console.log('🔽 Main scroll detected:', scrollPercentage.toFixed(0) + '%');
                         this.loadMoreReels();
                     }
-                }, 200); // زيادة الـ debounce للأداء
-            });
+                }, 150); // تحسين الـ debounce للأداء
+            }, { passive: true }); // passive للأداء الأفضل
         },
         
         async loadMoreReels() {
@@ -1038,14 +1301,26 @@ function reelsManager() {
             if (newIndex !== this.currentVideoIndex) {
                 this.currentVideoIndex = newIndex;
                 
-                // تحميل الفيديوهات المجاورة
-                for (let i = newIndex - 2; i <= newIndex + 3; i++) {
+                // تحميل الفيديوهات المجاورة فقط (تحسين الذاكرة)
+                for (let i = newIndex - 1; i <= newIndex + 2; i++) {
                     if (i >= 0 && i < this.filteredReels.length) {
                         this.loadedVideos.add(i);
                     }
                 }
                 
-                console.log('📍 الفيديو الحالي:', newIndex, '| محملة:', this.loadedVideos.size);
+                // إزالة الفيديوهات البعيدة من الذاكرة
+                const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 5);
+                farVideos.forEach(i => {
+                    const video = document.getElementById('video-' + this.filteredReels[i]?.id);
+                    if (video) {
+                        video.src = ''; // تفريغ الفيديو
+                        video.load(); // إعادة تحميل (فارغ)
+                    }
+                    this.loadedVideos.delete(i);
+                    delete this.videoReadyStates[this.filteredReels[i]?.id];
+                });
+                
+                console.log('📍 الفيديو:', newIndex, '| محملة:', this.loadedVideos.size);
             }
             
             // إدارة تشغيل الفيديوهات
@@ -1077,7 +1352,7 @@ function reelsManager() {
                     const isInCenter = rect.top >= -50 && rect.bottom <= screenHeight + 50;
                     if (isInCenter) {
                         activeVideo = video;
-                        if (video.paused) {
+                        if (video.paused && video.src) {
                             // تشغيل الفيديو المرئي فوراً مع تطبيق حالة الصوت
                             video.muted = true; // بدء muted للسماح بالتشغيل
                             setTimeout(() => {
@@ -1088,7 +1363,7 @@ function reelsManager() {
                                     }, 100);
                                 }).catch(e => console.log('خطأ في التشغيل:', e));
                             }, 100);
-                        } else {
+                        } else if (video.src) {
                             // تطبيق حالة الصوت العامة على الفيديو الحالي
                             video.muted = this.isGlobalMuted;
                         }
