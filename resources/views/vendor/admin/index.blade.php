@@ -10,7 +10,6 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="manifest" href="{{ route('manifest.json') }}">
-
 {{--    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">--}}
 {{--    <link rel="shortcut icon" href="{{ asset('images/favicon/android-chrome-512x512.png') }}" type="image/png">--}}
 
@@ -26,6 +25,15 @@
 </head>
 
 <body class="hold-transition {{config('admin.skin')}} {{join(' ', config('admin.layout'))}}">
+
+<script>
+    (function() {
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.body.classList.add('sidebar-collapse');
+        }
+        document.documentElement.classList.remove('sidebar-collapse-init');
+    })();
+</script>
 
 @if($alert = config('admin.top_alert'))
     <div style="text-align: center;padding: 5px;font-size: 12px;background-color: #ffffd5;color: #ff0000;">
