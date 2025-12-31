@@ -855,11 +855,6 @@ class ChargeReportController extends MainController
                                 ->where('is_used', true)
                                 ->with('ware:id,value');
                         },
-                        'receiver.packs' => function ($q) {
-                            $q->whereIn('type', [25])
-                                ->where('is_used', true)
-                                ->with('ware:id,value');
-                        },
         ])
         ->when(request('from_date') && request('to_date'), function ($query,) {
 
