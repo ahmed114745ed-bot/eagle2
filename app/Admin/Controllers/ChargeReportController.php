@@ -101,7 +101,6 @@ class ChargeReportController extends MainController
                 'sender',
                 'sender.profile:id,user_id,avatar',
                 'receiver',
-                'receiver.color_image',
                 'receiver.profile:id,user_id,avatar',
                 'sender.packs' => function ($q) {
                     $q->whereIn('type', [25])
@@ -114,6 +113,13 @@ class ChargeReportController extends MainController
                         ->with('ware:id,value');
                 },
                 'admin',
+                'senderUser',
+                'senderUser.profile:id,user_id,avatar',
+                'senderUser.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
                 // 'senderShippingAgency',
                 // 'senderShippingAgency.owner',
                 // 'senderAgency.owner',
@@ -135,7 +141,7 @@ class ChargeReportController extends MainController
                 // 'areaManager',
                 // 'bd',
                 // 'subAreaManager',
-                // 'senderUser',
+                 
                 // 'receiveragency',
                 // 'receiveragency.owner',
                 // 'receiverSubAreaManager.owner',
