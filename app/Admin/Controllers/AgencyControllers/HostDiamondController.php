@@ -59,11 +59,16 @@ class HostDiamondController extends MainController
             }))
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
             ->with([
-                'receiver:id,uuid,original_uuid,name,country_id',
                 'receiver.profile:id,user_id,avatar',
-                'receiver.country:id,name,e_name,flag',
-                'agency:id,name,img'
-            ])
+                'receiver.country',
+                'receiver',
+                'receiver.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'agency'
+            ]) // assuming these are relationships
             ->where('agency_id', '!=', 0)
             ->groupBy('receiver_id', 'agency_id')
             ->when(! request('from_date'), fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
