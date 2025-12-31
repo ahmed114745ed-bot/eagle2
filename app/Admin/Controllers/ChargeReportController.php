@@ -121,17 +121,17 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
-                'bd',
-                'subAreaManager',
-                'senderUser',
-                'receiveragency',
-                'receiveragency.owner',
-                'receiverSubAreaManager.owner',
-                'receiverSubAreaManager',
-                'receiverSuperAdmin',
-                'receiverSuperAdmin.owner',
-                'receiverSubSuperAdmin.owner',
-                'receiverSubSuperAdmin'
+                // 'bd',
+                // 'subAreaManager',
+                // 'senderUser',
+                // 'receiveragency',
+                // 'receiveragency.owner',
+                // 'receiverSubAreaManager.owner',
+                // 'receiverSubAreaManager',
+                // 'receiverSuperAdmin',
+                // 'receiverSuperAdmin.owner',
+                // 'receiverSubSuperAdmin.owner',
+                // 'receiverSubSuperAdmin'
             ]);
 
         if ($charger_type == "dash") {
