@@ -250,7 +250,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
     <div style="margin-top: 15px;">
     <span class="icon_trans"> <i class="fas fa-exchange-alt"></i></span>
 
-        <button onclick="openChargeModal()" class="btn btn-light btn-sm">
+        <button onclick="openChargeModal()" class="btn btn-info btn-sm">
             {{ __('charge_wallet') }}
         </button>
         <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
@@ -262,7 +262,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
 <div class="card-visa">
     <div class="card-content">
         <span class="icon_trans"><i class="fas fa-exchange-alt"></i></span>
-        <button onclick="openChargeModal()" class="btn btn-light btn-sm">
+        <button onclick="openChargeModal()" class="btn btn-info btn-sm">
             {{ __('Charge') }}
         </button>
         <strong>{{ $translated }}: </strong> {{ $finalSalary }} 💰
@@ -384,7 +384,7 @@ padding: 20px; color: ; font-size: 20px; text-align: center; width: 500px; margi
                     }
 
                     data.forEach(item => {
-                        
+
                         const div = document.createElement('div');
                         div.className = 'list-group-item list-group-item-action list-group-item2';
                         div.textContent = item.name ? `${item.name} (ID: ${item.id})` : `ID: ${item.id}`;

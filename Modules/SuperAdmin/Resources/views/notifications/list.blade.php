@@ -16,16 +16,16 @@
 
         $previewUrl = $data['preview_url'] ?? null;
         if ($previewUrl) {
-            $enum = \App\Enums\SuperAdminNotificationLink::tryFrom($previewUrl);
+            $enum = \Modules\SuperAdmin\Enums\SuperAdminNotificationLink::tryFrom($previewUrl);
             if ($enum) {
                 $previewUrl = $enum->url($data);
             }
         }
     @endphp
 
-    <div class="notification-item {{ $notif->is_read ? 'read' : 'unread' }}" 
-         data-id="{{ $notif->id }}" 
-         style="cursor:pointer;" 
+    <div class="notification-item {{ $notif->is_read ? 'read' : 'unread' }}"
+         data-id="{{ $notif->id }}"
+         style="cursor:pointer;"
          onclick="superAdminhandleNotificationClick({{ $notif->id }}, '{{ $previewUrl }}')">
 
         <div class="title">{{ $title }}</div>
