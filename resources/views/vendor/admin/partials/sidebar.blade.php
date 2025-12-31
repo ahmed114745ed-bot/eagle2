@@ -580,11 +580,36 @@
                 document.documentElement.classList.contains('rtl');
         }
 
+        function isSidebarCollapsed() {
+            return document.body.classList.contains('sidebar-collapse');
+        }
+
         function pxToPercent(px) {
             return (px / window.innerWidth) * 100;
         }
 
+        function clearInlineStyles() {
+            const sidebar = document.querySelector('.main-sidebar');
+            const navbar = document.querySelector('.navbar-static-top');
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const logo = document.querySelector('.main-header .logo');
+
+            if (sidebar) sidebar.style.width = '';
+            if (navbar) navbar.style.width = '';
+            if (logo) logo.style.width = '';
+            if (contentWrapper) {
+                contentWrapper.style.marginLeft = '';
+                contentWrapper.style.marginRight = '';
+            }
+        }
+
         function updateLayout(sidebarWidthPercent) {
+            // Don't apply if sidebar is collapsed
+            if (isSidebarCollapsed()) {
+                clearInlineStyles();
+                return;
+            }
+
             const contentWrapper = document.querySelector('.content-wrapper');
             const navbar = document.querySelector('.navbar-static-top');
             const sidebar = document.querySelector('.main-sidebar');
@@ -592,9 +617,6 @@
 
             const navbarWidth = 100 - sidebarWidthPercent - 0.5;
 
-            // Logo is slightly smaller than sidebar
-            // LTR: sidebar 18% = logo 17.3% (difference of 0.7%)
-            // RTL: sidebar 18% = logo 17.4% (difference of 0.6%)
             const logoOffset = isRTL() ? 0.6 : 0.7;
             const logoWidth = sidebarWidthPercent - logoOffset;
 
@@ -604,7 +626,7 @@
 
             if (logo) {
                 logo.style.setProperty('width', logoWidth + '%', 'important');
-                }
+            }
 
             if (navbar) {
                 navbar.style.width = navbarWidth + '%';
@@ -627,13 +649,40 @@
 
             if (!resizer || !sidebar) return;
 
-            const savedWidth = localStorage.getItem(STORAGE_KEY);
-            if (savedWidth && !document.body.classList.contains('sidebar-collapse')) {
-                updateLayout(parseFloat(savedWidth));
+            // Only apply saved width if sidebar is NOT collapsed
+            if (!isSidebarCollapsed()) {
+                const savedWidth = localStorage.getItem(STORAGE_KEY);
+                if (savedWidth) {
+                    updateLayout(parseFloat(savedWidth));
+                }
             }
 
+            // Watch for sidebar collapse/expand changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        if (isSidebarCollapsed()) {
+                            // Sidebar just collapsed - clear inline styles
+                            clearInlineStyles();
+                        } else {
+                            // Sidebar just expanded - restore saved width
+                            const savedWidth = localStorage.getItem(STORAGE_KEY);
+                            if (savedWidth) {
+                                updateLayout(parseFloat(savedWidth));
+                            }
+                        }
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
             resizer.addEventListener('mousedown', function(e) {
-                if (document.body.classList.contains('sidebar-collapse')) return;
+                // Don't allow resizing when collapsed
+                if (isSidebarCollapsed()) return;
 
                 e.preventDefault();
                 isResizing = true;
@@ -644,6 +693,13 @@
 
             document.addEventListener('mousemove', function(e) {
                 if (!isResizing) return;
+
+                // Stop if sidebar gets collapsed during resize
+                if (isSidebarCollapsed()) {
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                    return;
+                }
 
                 const deltaX = e.clientX - startX;
                 const deltaPercent = (deltaX / window.innerWidth) * 100;
@@ -665,25 +721,20 @@
 
                 isResizing = false;
                 document.body.classList.remove('sidebar-resizing');
-                const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
-                localStorage.setItem(STORAGE_KEY, finalWidth);
+
+                // Only save if sidebar is not collapsed
+                if (!isSidebarCollapsed()) {
+                    const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
+                    localStorage.setItem(STORAGE_KEY, finalWidth);
+                }
             });
 
             resizer.addEventListener('dblclick', function() {
+                // Don't do anything if collapsed
+                if (isSidebarCollapsed()) return;
+
                 // Reset all to CSS defaults
-                sidebar.style.width = '';
-
-                const navbar = document.querySelector('.navbar-static-top');
-                const contentWrapper = document.querySelector('.content-wrapper');
-                const logo = document.querySelector('.main-header .logo');
-
-                if (navbar) navbar.style.width = '';
-                if (logo) logo.style.width = '';
-                if (contentWrapper) {
-                    contentWrapper.style.marginLeft = '';
-                    contentWrapper.style.marginRight = '';
-                }
-
+                clearInlineStyles();
                 localStorage.removeItem(STORAGE_KEY);
             });
         }
