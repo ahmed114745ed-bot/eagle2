@@ -378,8 +378,7 @@
                 
                 <div class="mt-2">
                   <template v-if="editAssetForm.file">
-                    <img v-if="editAss
-                    etForm.asset_type === 'image'" :src="URL.createObjectURL(editAssetForm.file)" class="w-full h-32 object-cover rounded" />
+                    <img v-if="editAssetForm.asset_type === 'image'" :src="URL.createObjectURL(editAssetForm.file)" class="w-full h-32 object-cover rounded" />
                     <div v-else class="w-full h-32 bg-gray-100 flex items-center justify-center rounded text-sm text-gray-700">
                       {{ editAssetForm.file.name }}
                     </div>

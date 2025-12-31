@@ -20,6 +20,12 @@
                         >
                             📤 Export All
                         </button>
+                        <a
+                            href="/admin"
+                            class="inline-flex items-center px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                        >
+                            ⬅️ العودة إلى لوحة التحكم
+                        </a>
                     </div>
                 </div>
             </div>
