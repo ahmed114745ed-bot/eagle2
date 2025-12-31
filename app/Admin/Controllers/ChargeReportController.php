@@ -100,14 +100,6 @@ class ChargeReportController extends MainController
             ->orderByDesc('created_at')->with([
                 'sender',
                 'sender.profile:id,user_id,avatar',
-                'admin',
-                'admin.agency',
-                'admin.agency.owner',
-                
-                'senderShippingAgency',
-                'senderShippingAgency.owner',
-                'senderAgency.owner',
-                'senderAgency',
                 'receiver',
                 'receiver.color_image',
                 'receiver.profile:id,user_id,avatar',
@@ -121,17 +113,24 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
+                // 'senderShippingAgency',
+                // 'senderShippingAgency.owner',
+                // 'senderAgency.owner',
+                // 'senderAgency',
+                // 'admin',
+                // 'admin.agency',
+                // 'admin.agency.owner',
 
-                'admin.agency.owner.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
-                'senderAgency.owner.packs' => function ($q) {
-                    $q->whereIn('type', [25])
-                        ->where('is_used', true)
-                        ->with('ware:id,value');
-                },
+                // 'admin.agency.owner.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
+                // 'senderAgency.owner.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
                // 'areaManager',
                 // 'bd',
                 // 'subAreaManager',
