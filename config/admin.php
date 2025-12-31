@@ -492,7 +492,7 @@ return [
             //     'hi' => 'Hindi',
             // ],
             // default locale
-            'default' => 'ar',
+            'default' => 'en',
             // if or not show multi-language login page, optional, default is true
             'show-login-page' => true,
             // if or not show multi-language navbar, optional, default is true
