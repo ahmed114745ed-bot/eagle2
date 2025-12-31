@@ -113,6 +113,7 @@ class ChargeReportController extends MainController
                         ->with('ware:id,value');
                 },
                 'admin',
+                'admin.agency',
                 'senderUser',
                 'senderUser.profile:id,user_id,avatar',
                 'senderUser.packs' => function ($q) {
@@ -121,36 +122,7 @@ class ChargeReportController extends MainController
                         ->with('ware:id,value');
                 },
                 'receiveragency',
-                // 'senderShippingAgency',
-                // 'senderShippingAgency.owner',
-                // 'senderAgency.owner',
-                // 'senderAgency',
 
-                // 'admin.agency',
-                // 'admin.agency.owner',
-
-                // 'admin.agency.owner.packs' => function ($q) {
-                //     $q->whereIn('type', [25])
-                //         ->where('is_used', true)
-                //         ->with('ware:id,value');
-                // },
-                // 'senderAgency.owner.packs' => function ($q) {
-                //     $q->whereIn('type', [25])
-                //         ->where('is_used', true)
-                //         ->with('ware:id,value');
-                // },
-                // 'areaManager',
-                // 'bd',
-                // 'subAreaManager',
-                 
-                 
-                // 'receiveragency.owner',
-                // 'receiverSubAreaManager.owner',
-                // 'receiverSubAreaManager',
-                // 'receiverSuperAdmin',
-                // 'receiverSuperAdmin.owner',
-                // 'receiverSubSuperAdmin.owner',
-                // 'receiverSubSuperAdmin'
             ]);
 
         if ($charger_type == "dash") {
