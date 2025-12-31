@@ -113,11 +113,12 @@ class ChargeReportController extends MainController
                         ->where('is_used', true)
                         ->with('ware:id,value');
                 },
+                 'admin',
                 // 'senderShippingAgency',
                 // 'senderShippingAgency.owner',
                 // 'senderAgency.owner',
                 // 'senderAgency',
-                // 'admin',
+                
                 // 'admin.agency',
                 // 'admin.agency.owner',
 
@@ -847,7 +848,20 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+        $grid->model()->with(['user',
+        'user.profile',
+        'user.packs' => function ($q) {
+                            $q->whereIn('type', [25])
+                                ->where('is_used', true)
+                                ->with('ware:id,value');
+                        },
+                        'receiver.packs' => function ($q) {
+                            $q->whereIn('type', [25])
+                                ->where('is_used', true)
+                                ->with('ware:id,value');
+                        },
+        ])
+        ->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
             $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
