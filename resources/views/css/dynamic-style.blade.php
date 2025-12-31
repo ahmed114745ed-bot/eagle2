@@ -1629,7 +1629,11 @@
     }
 
     .main-header .logo {
-        width: 17.5% !important;
+        width: 17.3% !important;
+    }
+
+    .rtl .main-header .logo {
+        width: 17.4% !important;
     }
 
     .sidebar-mini.sidebar-collapse .main-header .logo {
@@ -2188,6 +2192,10 @@
     }
 
     .file-input .input-group.file-caption-main .input-group-btn {
+        position: relative !important;
+    }
+
+    .rtl .file-input .input-group.file-caption-main .input-group-btn {
         position: absolute !important;
     }
 
@@ -2195,11 +2203,11 @@
         padding: 5px 15px !important;
         border-radius: 6px !important;
         font-size: 12px !important;
-        margin-top: 65% !important;
-        margin-right: 100% !important;
+        margin-left: -105% !important;
     }
 
     .rtl .file-input .input-group.file-caption-main .btn-file {
+        margin-top: 65% !important;
         margin-left: 100% !important;
     }
 

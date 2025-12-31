@@ -574,11 +574,51 @@
         let startWidthPercent = 0;
 
         function isRTL() {
-            return document.documentElement.dir === 'rtl' || document.body.classList.contains('rtl');
+            return document.documentElement.dir === 'rtl' ||
+                document.body.dir === 'rtl' ||
+                document.body.classList.contains('rtl') ||
+                document.documentElement.classList.contains('rtl');
         }
 
         function pxToPercent(px) {
             return (px / window.innerWidth) * 100;
+        }
+
+        function updateLayout(sidebarWidthPercent) {
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const navbar = document.querySelector('.navbar-static-top');
+            const sidebar = document.querySelector('.main-sidebar');
+            const logo = document.querySelector('.main-header .logo');
+
+            const navbarWidth = 100 - sidebarWidthPercent - 0.5;
+
+            // Logo is slightly smaller than sidebar
+            // LTR: sidebar 18% = logo 17.3% (difference of 0.7%)
+            // RTL: sidebar 18% = logo 17.4% (difference of 0.6%)
+            const logoOffset = isRTL() ? 0.6 : 0.7;
+            const logoWidth = sidebarWidthPercent - logoOffset;
+
+            if (sidebar) {
+                sidebar.style.width = sidebarWidthPercent + '%';
+            }
+
+            if (logo) {
+                logo.style.setProperty('width', logoWidth + '%', 'important');
+                }
+
+            if (navbar) {
+                navbar.style.width = navbarWidth + '%';
+            }
+
+            if (contentWrapper) {
+                if (isRTL()) {
+                    contentWrapper.style.marginRight = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginLeft = '0';
+                } else {
+                    contentWrapper.style.marginLeft = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginRight = '0';
+                }
+            }
         }
 
         function init() {
@@ -587,10 +627,9 @@
 
             if (!resizer || !sidebar) return;
 
-            // Restore saved width
             const savedWidth = localStorage.getItem(STORAGE_KEY);
             if (savedWidth && !document.body.classList.contains('sidebar-collapse')) {
-                sidebar.style.width = savedWidth + '%';
+                updateLayout(parseFloat(savedWidth));
             }
 
             resizer.addEventListener('mousedown', function(e) {
@@ -616,10 +655,9 @@
                     newWidthPercent = startWidthPercent + deltaPercent;
                 }
 
-                // Clamp between min and max
                 newWidthPercent = Math.min(Math.max(newWidthPercent, MIN_WIDTH), MAX_WIDTH);
 
-                sidebar.style.width = newWidthPercent + '%';
+                updateLayout(newWidthPercent);
             });
 
             document.addEventListener('mouseup', function() {
@@ -627,13 +665,26 @@
 
                 isResizing = false;
                 document.body.classList.remove('sidebar-resizing');
-                localStorage.setItem(STORAGE_KEY, pxToPercent(sidebar.offsetWidth).toFixed(2));
+                const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
+                localStorage.setItem(STORAGE_KEY, finalWidth);
             });
 
-            // Double-click to reset
             resizer.addEventListener('dblclick', function() {
-                sidebar.style.width = DEFAULT_WIDTH + '%';
-                localStorage.setItem(STORAGE_KEY, DEFAULT_WIDTH);
+                // Reset all to CSS defaults
+                sidebar.style.width = '';
+
+                const navbar = document.querySelector('.navbar-static-top');
+                const contentWrapper = document.querySelector('.content-wrapper');
+                const logo = document.querySelector('.main-header .logo');
+
+                if (navbar) navbar.style.width = '';
+                if (logo) logo.style.width = '';
+                if (contentWrapper) {
+                    contentWrapper.style.marginLeft = '';
+                    contentWrapper.style.marginRight = '';
+                }
+
+                localStorage.removeItem(STORAGE_KEY);
             });
         }
 
