@@ -1,362 +1,256 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ config('admin.title') }} | {{ trans('admin.login') }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- CSRF meta -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/css/bootstrap.min.css") }}">
-    <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/font-awesome/css/font-awesome.min.css") }}">
-    <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/dist/css/AdminLTE.min.css") }}">
-    <link rel="stylesheet" href="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/flat/green.css") }}">
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-
+    @if(!is_null($favicon = Admin::favicon()))
+        <link rel="shortcut icon" href="{{$favicon}}">
+    @endif
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <style>
-        #forget-password:hover { text-decoration: underline; cursor: pointer; }
+        :root {
+            --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
+            --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
+            --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
+            --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
+            --text-secondary-color: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
+            --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};
+            --table-background-color: {{ config('themes.tableBackGroundColor') ?: '#f9fafb' }};
+            --background-image: {{ config('themes.backgroundImage') ?: 'none' }};
+            --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) ?: '' }});
+            --second-alpha: rgba(31, 41, 55, 0.1);
+            --primary-hover-alpha: rgba(37, 99, 235, 0.1);
+            --scroll-second-color: rgba(255, 255, 255, 0.8);
+            --scroll-first-color: rgba(37, 99, 235, 0.2);
+
+            --inverse-color: #ffffff;
+            --inverse-box-color: #1f2937;
+            --success-button: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --primary-button: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+
+            --white: #ffffff;
+            --off-white: #faf9f6;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-50: #f9fafb;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-900: #111827;
+
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+            --gradient-primary: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            --gradient-vertical-primary: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
     </style>
 </head>
 
-<body class="hold-transition login-page" @if(config('admin.login_background_image')) style="background: url({{config('admin.login_background_image')}}) no-repeat;background-size: cover;" @endif>
+<body class="login-body" data-loading-text="{{ app()->getLocale() === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing in...' }}">
+@php
+    $logo = App\Models\Setting::where('key', 'app_logo')->first();
+    $logo_url = $logo?->value;
+    $logo_src = empty($logo) ? asset('images/app-logo.png') : getImagePath($logo_url);
+    $isAr = app()->getLocale() === 'ar';
+    $t = function (string $key, string $fallback) {
+        $fullKey = 'dashboard.' . $key;
+        $value = __($fullKey);
+        return $value === $fullKey ? $fallback : $value;
+    };
+    $strings = [
+        'welcome_title'   => $t('login.title', $isAr ? 'مرحباً بك!' : 'Welcome back!'),
+        'welcome_sub'     => $t('login.subtitle', $isAr ? 'سجل دخولك للوصول إلى لوحة التحكم الخاصة بك' : 'Sign in to access your dashboard'),
+        'feature_secure'  => $t('login.features.secure', $isAr ? 'تسجيل دخول آمن ومشفّر' : 'Secure, encrypted login'),
+        'feature_fast'    => $t('login.features.fast', $isAr ? 'وصول سريع لجميع الميزات' : 'Fast access to all features'),
+        'feature_global'  => $t('login.features.global', $isAr ? 'إدارة شاملة من أي مكان' : 'Manage everything from anywhere'),
+        'form_title'      => $t('login.form_title', $isAr ? 'تسجيل الدخول' : 'Sign in'),
+        'form_sub'        => $t('login.form_subtitle', $isAr ? 'أدخل بياناتك للوصول إلى حسابك' : 'Enter your details to continue'),
+        'forgot'          => $t('login.forgot', $isAr ? 'نسيت كلمة المرور؟' : 'Forgot password?'),
+        'reset'           => $t('login.reset', $isAr ? 'إعادة تعيين كلمة المرور' : 'Reset your password'),
+        'or'              => $t('login.or', $isAr ? 'أو' : 'OR'),
+        'loading'         => $t('login.loading', $isAr ? 'جاري تسجيل الدخول...' : 'Signing in...'),
+    ];
+@endphp
 
-<div class="login-box">
-    <div class="login-logo">
-        @php
-            $logo = App\Models\Setting::where('key', 'app_logo')->first();
-            $logo_url = $logo?->value;
-        @endphp
-        <div><img src="{{ empty($logo) ? asset('images/app-logo.png') : getImagePath($logo_url) }}" style="width:150px;"></div>
-        <div class="box-title">
-            <a href="{{ areaManager_url('/') }}" style="color: var(--green-color);">{{ __('dashboard.login.titleAreaManager') }}</a>
-        </div>
+    <div class="bg-animation">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
     </div>
 
-    <div class="login-box-body">
-
-        {{-- Existing errors / success --}}
-        @if($errors->any())
-            <div class="alert alert-danger text-center">
-                @foreach($errors->all() as $error)
-                    <div><i class="fa fa-times-circle-o"></i> {{ $error }}</div>
-                @endforeach
-            </div>
-        @endif
-        @if(session('success'))
-            <div class="alert alert-success text-center">
-                <i class="fa fa-check-circle-o"></i> {{ session('success') }}
-            </div>
-        @endif
-
-        <form action="{{ areaManager_url('login') }}" method="post" id="login-form">
-            @csrf
-            <div class="form-group has-feedback">
-                <input type="text" id="username" name="username"
-                       class="form-control input-lg text-center" placeholder="{{ trans('admin.username') }}"
-                       value="{{ old('username') }}" required>
+    <div class="login-container">
+        <div class="branding-side">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <img src="{{ $logo_src }}" alt="{{ config('app.name') }}">
+                </div>
+                <h1 class="brand-title">{{ $strings['welcome_title'] }}</h1>
+                <p class="brand-subtitle">{{ $strings['welcome_sub'] }}</p>
             </div>
 
-                 {{-- <div class="form-group has-feedback">
-                    <select id="type" name="type" class="form-control input-lg text-center" required>
-                        <option value="area-manager"selected>{{ __('Area manager') }}</option>
-                        <option value="sub_area_manager">{{ __('Sub area manager') }}</option>
-                    </select>
-                </div> --}}
+            <div class="features">
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <span>{{ $strings['feature_secure'] }}</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span>{{ $strings['feature_fast'] }}</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌐</span>
+                    <span>{{ $strings['feature_global'] }}</span>
+                </div>
+            </div>
+        </div>
 
-            <div class="form-group has-feedback">
-                <input type="password" name="password"
-                       class="form-control input-lg text-center" placeholder="{{ trans('admin.password') }}" required>
+        <div class="form-side">
+            <div class="form-header">
+                <h2 class="form-title">{{ $strings['form_title'] }}</h2>
+                <p class="form-subtitle">{{ $strings['form_sub'] }}</p>
             </div>
 
-               
-
-            @if(config('admin.auth.remember'))
-                <div class="checkbox icheck text-center" dir="rtl">
-                    <label>
-                        <input type="checkbox" name="remember" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }} >
-                        {{ __('dashboard.login.remember') }}
-                    </label>
+            @if($errors->any())
+                <div class="alert">
+                    <span>⚠️</span>
+                    <div>
+                        @foreach($errors->all() as $message)
+                            <div>{{ $message }}</div>
+                        @endforeach
+                    </div>
                 </div>
             @endif
 
-            <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ trans('admin.login') }}</button>
-        </form>
-
-        <div class="language-switch text-center">
-            <a href="#" id="language-switcher" style="color: var(--green-color);">{{__('dashboard.login.language.switch')}} <span style="font-weight: bold;">{{__('dashboard.login.language.lang2')}}</span></a>
-        </div>
-                <div class="forget-password text-center" style="margin-top: 10px;">
-                    <a href="" id="forget-password"
-                    style="color: var(--green-color); font-weight: bold; text-decoration: underline;">
-                        {{ __('forget password') }}
-                    </a>
+            <form action="{{ admin_url('login') }}" method="post" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">{{ trans('admin.username') }}</label>
+                    <div class="input-wrapper">
+                        <input
+                            id="username"
+                            type="text"
+                            class="form-input"
+                            name="username"
+                            placeholder="{{ trans('admin.username') }}"
+                            value="{{ old('username') }}"
+                            required
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                    @if($errors->has('username'))
+                        @foreach($errors->get('username') as $message)
+                            <div class="error-text">{{ $message }}</div>
+                        @endforeach
+                    @endif
+                    <input type="hidden" name="url" value="{{ @$test }}">
                 </div>
-                <br>
+
+                <div class="form-group">
+                    <label class="form-label" for="passwordInput">{{ trans('admin.password') }}</label>
+                    <div class="input-wrapper">
+                        <input
+                            id="passwordInput"
+                            type="password"
+                            class="form-input"
+                            name="password"
+                            placeholder="{{ trans('admin.password') }}"
+                            required
+                        >
+                        <span class="input-icon">🔒</span>
+                        <button type="button" class="password-toggle" data-toggle="password" aria-label="Toggle password">👁️</button>
+                    </div>
+                    @if($errors->has('password'))
+                        @foreach($errors->get('password') as $message)
+                            <div class="error-text">{{ $message }}</div>
+                        @endforeach
+                    @endif
+                </div>
+
+                <div class="form-options">
+                    @if(config('admin.auth.remember'))
+                        <label class="checkbox-wrapper" for="remember">
+                            <input type="checkbox" id="remember" name="remember" value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
+                            <span>{{ __('dashboard.login.remember') }}</span>
+                        </label>
+                    @endif
+                    <a href="#" class="forgot-link">{{ $strings['forgot'] }}</a>
+                </div>
+
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <button type="submit" class="login-btn">
+                    <span>{{ trans('admin.login') }}</span>
+                    <span>→</span>
+                </button>
 
 
-        <form action="{{ areaManager_url('change-password-view') }}" method="get" id="forget-password-form" style="display:none; margin-top:15px;">
-            @csrf
-            <input type="hidden" name="username" id="forget-username">
-            {{-- <input type="hidden" name="type" id="forget-type"> --}}
-            <label for="whatsapp_code" style="font-weight:bold; display:block; margin-bottom:8px;">
-                    {{ __('dashboard.login.enter_code') }}
-            </label>
-            <input type="text" id="whatsapp_code" name="code" class="form-control input-lg text-center" placeholder="{{ __('dashboard.login.whatsapp_code') }}">
-            <div style="margin-top:10px;">
-                <button type="submit" class="btn btn-success btn-block btn-lg btn-flat rounded submit">{{ __('Validation') }}</button>
-            </div>
-        </form>
+                <div class="language-selector">
+                    <button type="button" class="lang-btn {{ $current === 'ar' ? 'active' : '' }}" data-locale="ar">العربية</button>
+                    <button type="button" class="lang-btn {{ $current === 'en' ? 'active' : '' }}" data-locale="en">English</button>
+                </div>
+
+              
+            </form>
+        </div>
     </div>
-</div>
 
-<div class="rights text-center">{{ __('dashboard.login.rights') . ' ' . config('app.name') }}</div>
-
-<!-- مودال الخطأ -->
-<div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-hidden="true" >
-  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-    <div class="modal-content" >
-      <div class="modal-header  text-white"  style="background-color: #ff0000 !important;">
-        <h5 class="modal-title"><i class="fa fa-exclamation-circle"></i> {{ __('dashboard.login.error') }}</h5>
-        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-      </div>
-      <div class="modal-body text-center">
-        <p id="errorModalText" style="margin:0;"></p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-light" data-dismiss="modal">{{ __('dashboard.login.ok') }}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title"><i class="fa fa-whatsapp"></i> {{ __('dashboard.login.confirm_send') }}</h5>
-        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-      </div>
-      <div class="modal-body text-center">
-        <p id="confirmText" style="margin:0;"></p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('dashboard.login.cancel') }}</button>
-        <button type="button" class="btn btn-success" id="confirmSendBtn">{{ __('dashboard.login.confirm') }}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-hidden="true">
-  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title"><i class="fa fa-check-circle"></i> {{ __('dashboard.login.success') }}</h5>
-        <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
-      </div>
-      <div class="modal-body text-center">
-        <p id="successModalText" style="margin:0;"></p>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-light" data-dismiss="modal">{{ __('dashboard.login.ok') }}</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/jQuery/jQuery-2.1.4.min.js") }}"></script>
-<script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/bootstrap/js/bootstrap.min.js") }}"></script>
-<script src="{{ admin_asset("vendor/laravel-admin/AdminLTE/plugins/iCheck/icheck.min.js") }}"></script>
+    <div class="rights text-center">{{ __('dashboard.login.rights') . config('app.name') }}</div>
 
 <script>
-$(document).ready(function () {
-    // iCheck init (if used)
-    if ($.fn.iCheck) {
-        $('input').iCheck({
-            checkboxClass: 'icheckbox_flat-green',
-            radioClass: 'iradio_flat-green',
-            increaseArea: '20%'
-        });
-    }
+    (function () {
+        const csrfToken = document.querySelector('input[name="_token"]')?.value;
+        const passwordInput = document.getElementById('passwordInput');
+        const toggleBtn = document.querySelector('[data-toggle="password"]');
 
-    // AJAX CSRF setup (from meta)
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        if (toggleBtn && passwordInput) {
+            toggleBtn.addEventListener('click', function () {
+                const isHidden = passwordInput.type === 'password';
+                passwordInput.type = isHidden ? 'text' : 'password';
+                this.textContent = isHidden ? '🙈' : '👁️';
+            });
         }
-    });
 
-    // language switcher (kept as-is)
-    $('#language-switcher').on('click', function (e) {
-        e.preventDefault();
-        let current_locale = '{{$current}}';
-        let locale = (current_locale === 'ar') ? 'en' : 'ar';
-        $.post("{{ admin_url('/locale') }}", { locale: locale }, function () {
-            location.reload();
-        });
-    });
-
-    // prevent double submit for forms
-    $('#login-form, #forget-password-form').on('submit', function () {
-        var $btn = $(this).find('button[type="submit"]');
-
-        if ($(this).attr('id') === 'forget-password-form') {
-            $btn.text("{{ __('dashboard.login.loading.check_code') }}");
-        } else {
-            $btn.text("{{ __('dashboard.login.loading.logging_in') }}");
+        const form = document.getElementById('loginForm');
+        if (form) {
+            const submitBtn = form.querySelector('.login-btn');
+            form.addEventListener('submit', function () {
+                if (!submitBtn) return;
+                submitBtn.disabled = true;
+                const loadingText = document.body.dataset.loadingText || '{{ $strings['loading'] }}';
+                submitBtn.innerHTML = '<span>' + loadingText + '</span><span>⏳</span>';
+            });
         }
-    });
 
-//  console.log("Proceeding with forget password for:", username, type);
-    // نقر على "نسيت كلمة المرور"
-    $('#forget-password').on('click', function (e) {
-        e.preventDefault();
-
-        let username = $('#username').val()?.trim();
-        //  let type = $('#type').val()?.trim();
-
-        // 1) لو ما فيه username -> عرض مودال خطأ
-        if (!username) {
-            $('#errorModalText').text("{{ __('dashboard.login.error.enter_username_first') }}");
-            $('#errorModal').modal('show');
-            return;
-        }
-        // if (!type) {
-        //     $('#errorModalText').text("{{ __('login.error.enter_type') }}");
-        //     $('#errorModal').modal('show');
-        //     return;
-        // }
-
-        $.ajax({
-            url: "{{ areaManager_url('send-whatsapp-code-preview') }}",
-            method: "POST",
-            data: { username: username,
-                // type:type
-             },
-            dataType: "json",
-            beforeSend: function () {
-                // optional: show loading state
-                $('#confirmText').text("{{ __('dashboard.login.loading.prepare') }}");
-                $('#confirmModal').modal('show');
-            },
-            success: function (data) {
-                if (!data || !data.status) {
-                    $('#confirmModal').modal('hide');
-                    $('#errorModalText').text(data?.message || "{{ __('login.error.try_again') }}");
-                    $('#errorModal').modal('show');
+        const langButtons = document.querySelectorAll('.lang-btn');
+        langButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const locale = this.dataset.locale;
+                if (!locale || locale === '{{ $current }}' || !csrfToken) {
                     return;
                 }
 
-                $('#confirmText').text("{{ __('dashboard.login.whatsapp.send_to_number') }} " + (data.masked_number || ''));
-                $('#confirmModal').modal('show');
-
-                $('#confirmSendBtn').off('click').on('click', function () {
-                    var $btn = $(this);
-                    $btn.prop('disabled', true).text("{{ __('dashboard.login.loading.sending') }}");
-
-                    $.ajax({
-                        url: "{{ areaManager_url('send-whatsapp-code') }}",
-                        method: "POST",
-                        data: { username: username,
-                            // type:type
-                         },
-                        dataType: "json",
-                        success: function (res) {
-                            $btn.prop('disabled', false).text("{{ __('dashboard.login.confirm') }}");
-                            $('#confirmModal').modal('hide');
-
-                            if (res && res.success) {
-                                $('#successModalText').text(res.message || "{{ __('dashboard.login.whatsapp.sent') }}");
-                                $('#successModal').modal('show');
-
-                                $('#forget-username').val(username);
-                                // $('#forget-type').val(type);
-
-                                $('#forget-password-form').fadeIn();
-                                document.getElementById('forget-password-form').style.display = 'block';
-
-                            } else {
-                                $('#errorModalText').text(res?.message || "{{ __('dashboard.login.whatsapp.failed') }}");
-                                $('#errorModal').modal('show');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            $btn.prop('disabled', false).text("{{ __('dashboard.login.confirm') }}");
-                            $('#confirmModal').modal('hide');
-                            let res = xhr.responseJSON;
-                            let errMsg = res?.message
-                                ? "{{ __('') }}" + res.message
-                                : xhr.responseText || error || "{{ __('dashboard.login.whatsapp.failed') }}";
-
-                            $('#errorModalText').text(errMsg);
-                            $('#errorModal').modal('show');
-                            console.error('send-whatsapp-code error:', xhr.responseText || error);
-                        }
-                    });
+                fetch("{{ admin_url('/locale') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: new URLSearchParams({ locale: locale })
+                }).then(function () {
+                    window.location.reload();
                 });
-            },
-            error: function (xhr, status, error) {
-                $('#confirmModal').modal('hide');
-                $('#errorModalText').text("{{ __('dashboard.login.error.user_fetch') }}");
-                $('#errorModal').modal('show');
-                console.error('preview error:', xhr.responseText || error);
-            }
+            });
         });
-    });
-});
-
-$('#forget-password-form').on('submit', function (e) {
-    e.preventDefault(); // منع إعادة تحميل الصفحة
-
-    var $form = $(this);
-    var $btn  = $form.find('button[type="submit"]');
-
-    var username = $('#forget-username').val();
-    var code     = $('#whatsapp_code').val();
-    // var type = $('#forget-type').val();
-
-
-    $btn.text("{{ __('dashboard.login.loading.check_code') }}");
-
-    $.ajax({
-        url: "{{ areaManager_url('verify-whatsapp-code') }}", // نفس الـ action بتاع الفورم
-        method: "GET", // زي ما انت كاتب في الفورم
-        data: {
-            username: username,
-            code: code,
-            //  type:type,
-            _token: $('meta[name="csrf-token"]').attr('content')
-        },
-        dataType: "json",
-        success: function (res) {
-            $btn.text("{{ __('Validation') }}").prop('disabled', false);
-
-            if (res.success) {
-                $('#successModalText').text(res.message);
-                $('#successModal').modal('show');
-
-                if (res.redirect) {
-                    setTimeout(function () {
-                        window.location.href = res.redirect;
-                    }, 1500);
-                }
-            } else {
-                $('#errorModalText').text(res.message);
-                $('#errorModal').modal('show');
-            }
-        },
-        error: function (xhr, status, error) {
-            $('#errorModalText').text(xhr.responseJSON?.message || "{{ __('حدث خطأ أثناء التحقق، حاول مرة أخرى') }}");
-            $('#errorModal').modal('show');
-            console.error('verify-code error:', xhr.responseText || error);
-        },
-        complete: function () {
-            // رجع النص الأصلي للزر بعد الانتهاء
-            $btn.text("{{ __('Validation') }}");
-        }
-    });
-});
+    })();
 </script>
 </body>
 </html>
