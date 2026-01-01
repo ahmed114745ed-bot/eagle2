@@ -121,9 +121,7 @@
 
         .box-header .pull-right,
         .box-header .pull-left {
-            float: none !important;
             text-align: center !important;
-            margin: 8px 0 !important;
         }
 
         .box-header .box-title {
@@ -2281,7 +2279,7 @@
     .grid-table td .dropup,
     .table td .dropdown,
     .table td .dropup {
-        position: absolute;
+        position: relative;
     }
 
 
@@ -2889,6 +2887,10 @@
         width: 520px;
         overflow: hidden;
         height: 60%;
+    }
+
+    .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+        background-color: var(--primary-color);
     }
 
     .stats-container .info-box {
