@@ -187,7 +187,7 @@
             $('#stopInviteCode').on('change', function() {
                 var isChecked = $(this).is(':checked');
                 $.ajax({
-                    url: '/send-request-invite-code',
+                    url: 'admin/send-request-invite-code',
                     method: 'POST',
                     data: { stop_invite_code: isChecked },
                     success: function(response) { console.log(response); },
