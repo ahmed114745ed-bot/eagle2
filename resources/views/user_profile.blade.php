@@ -594,8 +594,10 @@
         }
 
         .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
+            color: var(--text-secondary-color);
+            background-color: var(--primary-color);
+            border-bottom-color: transparent;
+            border-radius: 4px;
         }
 
         .tab-btn:hover:not(.active) {
@@ -1035,7 +1037,6 @@
 </head>
 
 <body>
-
 <div class="agency-profile-container" id="pjax-container">
     {{-- Error Messages --}}
     @if ($errors->any())
