@@ -368,6 +368,104 @@
         }
     }
 
+    /* Media query for phones 400-500px width */
+    @media (max-width: 500px) and (min-width: 400px) {
+        .dashboard-container {
+            padding: 8px !important;  /* Changed: symmetric padding */
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;  /* Added: was missing */
+            overflow-x: hidden;
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            margin: 18px 0 12px 0;
+            padding: 0 8px;  /* Changed: symmetric */
+        }
+
+        .stats-grid {
+            gap: 12px;
+            grid-template-columns: 1fr;
+            padding: 0;  /* Changed: removed asymmetric padding */
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .card-header {
+            padding: 11px 14px;
+            font-size: 0.95rem;
+        }
+
+        .tab-content {
+            padding: 12px 8px !important;  /* Changed: symmetric */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .tabs-container {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .widget-card {
+            margin-bottom: 12px;
+            overflow-x: auto;
+            margin-left: 0 !important;  /* Changed */
+            margin-right: 0 !important;  /* Changed */
+        }
+
+        .widget-card-premium {
+            padding: 18px;
+            border-radius: 16px;
+            margin-left: 0 !important;  /* Changed */
+            margin-right: 0 !important;  /* Changed */
+        }
+
+        .balance-card .row > div {
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 0 !important;  /* Changed: was -4px */
+            margin-right: 0 !important;  /* Changed: was -4px */
+        }
+
+        .col-md-6, .col-lg-3, .col-xl-2, .col-md-12, .col-lg-6, .col-12 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            padding-left: 0 !important;  /* Changed */
+            padding-right: 0 !important;  /* Changed */
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 3px 4px !important;  /* Changed: symmetric */
+            margin: 0 !important;  /* Changed */
+            border-radius: 8px;
+        }
+
+        .stats-masonry {
+            padding: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+
     @media (max-width: 480px) {
         .dashboard-container {
             padding: 5px;
@@ -510,6 +608,39 @@
 
         .nav-tabs .nav-link i {
             margin-right: 4px;
+        }
+    }
+
+    /* Optimized for 400-500px phones */
+    @media (max-width: 500px) and (min-width: 400px) {
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 3px 0;
+            margin: 0 4px;
+            border-radius: 8px;
+        }
+
+        .nav-tabs li {
+            margin: 2px 3px;
+            flex-shrink: 0;
+        }
+
+        .nav-tabs .nav-link {
+            font-size: 0.8rem;
+            padding: 7px 10px;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 3px;
+            font-size: 0.75rem;
+        }
+
+        .tab-content {
+            padding-top: 15px;
+            margin: 0;
+            border-radius: 0;
         }
     }
 
