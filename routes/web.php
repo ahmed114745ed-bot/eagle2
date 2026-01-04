@@ -146,7 +146,7 @@ Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Reque
     // Get headers using Laravel's request object (works with all servers)
     $headersOld = array_change_key_case(getallheaders(), CASE_UPPER);
     $headers = array_change_key_case($request->headers->all(), CASE_UPPER);
-    
+
     // Flatten the headers array (Laravel returns arrays for each header)
     $headers = array_map(function ($value) {
         return is_array($value) ? $value[0] : $value;
@@ -1130,4 +1130,9 @@ Route::get('/run-lucky-gift-unit-test', function () {
     $output = $process->getOutput() . $process->getErrorOutput();
 
     return response('<pre>'.e($output).'</pre>');
+});
+
+Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+    Debugbar::info('Viewport:', $request->all());
+    return response()->json(['ok' => true]);
 });
