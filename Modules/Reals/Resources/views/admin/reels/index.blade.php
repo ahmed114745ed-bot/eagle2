@@ -354,8 +354,9 @@
                             </div>
                         </div>
                         
-                        <!-- Interaction Buttons (Left Side for Arabic) -->
-                        <div class="absolute right-4 bottom-24 flex flex-col gap-4 z-20 md:right-auto md:left-4">
+                        <!-- Interaction Buttons (Dynamic Position Based on Language) -->
+                        <div class="absolute bottom-24 flex flex-col gap-4 z-20 
+                                    {{ app()->getLocale() == 'ar' ? 'right-4 md:right-auto md:left-4' : 'left-4 md:left-auto md:right-4' }}">
                             <!-- Likes Button -->
                             <button @click.stop="toggleInteraction('likes', reel.id)"
                                     :class="activeTab === 'likes' && selectedReelId === reel.id ? 'scale-110' : 'hover:bg-white/30'"
