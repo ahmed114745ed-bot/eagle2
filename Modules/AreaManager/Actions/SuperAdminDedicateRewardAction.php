@@ -155,7 +155,7 @@ function pu(val) {
                     $user->id,
                     $reward->target,
                     $amountBefore,
-                    UserCoinLogType::SUPER_ADMIN_REWARD,
+                    UserCoinLogType::REGION_MANAGER_REWARD,
                 );
 
                 $user->di += $reward->target;
@@ -165,14 +165,14 @@ function pu(val) {
                 break;
             case "vip":
                 $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'super_admin_dedicate');
+                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'region_manager_dedicate');
                 break;
             case "ware":
                 $ware = Ware::find($reward->target);
-                UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'super_admin_dedicate');
+                UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'region_manager_dedicate');
                 break;
             case "badge":
-                Common::userBadge($user->id, $reward->target, $reward->expire, 'super_admin_dedicate');
+                Common::userBadge($user->id, $reward->target, $reward->expire, 'region_manager_dedicate');
                 break;
             case "achievement":
                 $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
