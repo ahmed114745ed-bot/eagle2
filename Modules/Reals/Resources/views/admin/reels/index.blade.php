@@ -17,7 +17,7 @@
         @include('reals::admin.reels.partials.styles')
     </style>
 
-<div class="reels-main-container flex bg-gray-100" x-data="reelsManager()" x-cloak>
+<div class="reels-main-container flex " x-data="reelsManager()" x-cloak>
     <!-- Mobile Overlay Background -->
     <div class="mobile-sidebar-overlay" 
          :class="{ 'active': isMobileSidebarOpen }"
@@ -42,7 +42,7 @@
     </button>
     
     <!-- Reels List (Sidebar) -->
-    <div class="reels-sidebar bg-white border-l border-gray-200 shadow-lg flex flex-col"
+    <div class="reels-sidebar bg-white0 border-l border-gray-200 shadow-lg flex flex-col"
          :class="{ 'mobile-open': isMobileSidebarOpen }">
         <!-- Search Filter -->
         <div class="p-4 text-white border-b relative" style="background: var(--primary-gradient);">
@@ -413,7 +413,7 @@
 
 
     <!-- Interactions Panel (Right Side) - Slide In Panel -->
-    <div class=" right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] bg-white shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
+    <div class=" right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] bg-white0 shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
          :class="showInteractionPanel ? 'translate-x-0' : 'ltr:translate-x-full rtl:-translate-x-full'"
          x-show="showInteractionPanel"
          x-transition:enter="transition ease-out duration-200"
@@ -604,7 +604,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+        <div class="bg-white0 rounded-2xl shadow-2xl w-full max-w-md p-6"
              x-show="showDeleteModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -673,7 +673,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6"
+        <div class="bg-white0 rounded-2xl shadow-2xl w-full max-w-lg p-6"
              x-show="showEditModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -764,7 +764,7 @@
     </div>
     
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] bg-white shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] bg-white0 shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
          :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
          x-show="isMobileSidebarOpen"
          x-transition:enter="ease-out duration-300"
