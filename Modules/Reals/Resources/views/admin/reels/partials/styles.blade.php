@@ -96,15 +96,59 @@ body {
         right: 0;
         top: 0;
         bottom: 0;
-        z-index: 50;
+        z-index: 999;
+        width: 100%;
+        max-width: 500px;
         transform: translateX(100%);
-        transition: transform 0.2s ease-in-out;
+        transition: transform 0.3s ease-in-out;
+        box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
     }
     
     .interactions-panel.show {
-        width: 500px;
-        max-width: 90vw;
         transform: translateX(0);
+    }
+}
+
+/* Mobile specific adjustments (< 640px) */
+@media (max-width: 639px) {
+    .interactions-panel {
+        max-width: 100vw;
+        width: 100vw;
+    }
+    
+    /* Smaller padding on mobile */
+    .interactions-panel > div[class*="p-"] {
+        padding: 0.75rem !important;
+    }
+    
+    /* Adjust header padding */
+    .interactions-panel > div:first-child {
+        padding-top: 1rem !important;
+        padding-bottom: 0.75rem !important;
+    }
+    
+    /* Smaller close button */
+    .interactions-panel button[class*="w-12"] {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+    }
+    
+    /* Adjust tabs on mobile */
+    .interactions-panel button[class*="flex-1"] {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.25rem !important;
+    }
+    
+    /* Content area optimization */
+    .interactions-panel [class*="h-[calc(100vh"] {
+        height: calc(100vh - 90px) !important;
+        padding: 0.5rem !important;
+    }
+    
+    /* Card spacing on mobile */
+    .interactions-panel .space-y-3 > * {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
     }
 }
 
