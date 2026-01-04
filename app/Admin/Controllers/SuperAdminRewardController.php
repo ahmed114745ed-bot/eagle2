@@ -26,7 +26,7 @@ class SuperAdminRewardController extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward';
+    public $permission_name = 'admin-reward';
     public function index(Content $content)
     {
 

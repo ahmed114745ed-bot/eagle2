@@ -27,7 +27,7 @@ class SuperAdminRewardControllerHistory extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward-history';
+    public $permission_name = 'admin-reward-history';
     public function index(Content $content)
     {
         return parent::index($content
