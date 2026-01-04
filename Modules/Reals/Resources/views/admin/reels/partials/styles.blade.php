@@ -18,6 +18,12 @@ body {
 .reels-main-container {
     height: calc(100vh - 50px);
     position: relative;
+    display: flex;
+    gap: 0;
+}
+
+.reels-main-container.panel-open {
+    gap: 1rem;
 }
 
 /* Sidebar adjustments */
@@ -32,10 +38,63 @@ body {
 .reels-video-container {
     height: 100%;
     flex: 1;
+    min-width: 0;
+    transition: flex 0.2s ease-in-out;
 }
 
 .video-item-height {
     height: 100%;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Interactions Panel - Part of flex layout when open */
+.interactions-panel {
+    height: 100%;
+    width: 0;
+    min-width: 0;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid #e5e7eb;
+    overflow: hidden;
+    position: relative;
+    transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+}
+
+.interactions-panel.show {
+    width: 30%;
+    min-width: 400px;
+    max-width: 600px;
+    overflow-y: auto;
+}
+
+/* Show panel as overlay on small/medium screens */
+@media (max-width: 1279px) {
+    .interactions-panel {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        transform: translateX(100%);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .interactions-panel.show {
+        width: 500px;
+        max-width: 90vw;
+        transform: translateX(0);
+    }
+}
+
+/* On XL screens and larger, adjust width only */
+@media (min-width: 1280px) {
+    .interactions-panel {
+        width: 30%;
+        min-width: 400px;
+        max-width: 600px;
+    }
 }
 
 /* Tablet (iPad Portrait & Landscape) */
@@ -266,6 +325,28 @@ body {
 .skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+/* User Avatar Styles */
+.interactions-panel img.rounded-full {
+    object-fit: cover;
+    background-color: #f3f4f6;
+}
+
+/* Flag Image Styles */
+.interactions-panel .flag-image,
+.interactions-panel img[title] {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* User Info Card Hover */
+.interactions-panel [style*="background-color: var(--primary-hover-alpha)"]:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
     animation: skeleton-loading 1.5s infinite;
 }
 

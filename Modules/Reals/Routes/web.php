@@ -44,6 +44,7 @@ Route::group(
         Route::prefix('view')->group(function () {
             Route::get('/reels', [AdminReelController::class, 'index'])->name('admin.reels.index');
             Route::get('/reels/load-more', [AdminReelController::class, 'loadMore'])->name('admin.reels.loadMore');
+            Route::post('/reels/batch-counts', [AdminReelController::class, 'batchCounts'])->name('admin.reels.batchCounts');
             Route::get('/reels/{id}', [AdminReelController::class, 'show'])->name('admin.reels.show');
             Route::post('/reels/{id}/update', [AdminReelController::class, 'update'])->name('admin.reels.update');
             Route::delete('/reels/{id}', [AdminReelController::class, 'destroy'])->name('admin.reels.destroy');
