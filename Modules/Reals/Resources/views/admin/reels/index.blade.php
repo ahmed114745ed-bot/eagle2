@@ -594,7 +594,7 @@
                     <div class="space-y-3">
                         <template x-for="gift in gifts" :key="gift.id">
                             <div class="rounded-lg p-4 transition hover:shadow-md"
-                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
                                     <img :src="gift.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + gift.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
@@ -624,7 +624,7 @@
                                         
                                         <!-- معلومات الهدية -->
                                         <div class="mt-2 flex items-center gap-2 p-2 rounded-lg"
-                                             style="background-color: var(--dark-primary-colo); border: 1px solid var(--primary-hover-alpha);">
+                                             style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                             <div class="text-3xl" x-text="getGiftEmoji(gift.gift_type)"></div>
                                             <div class="flex-1">
                                                 <p class="text-sm font-semibold" 
