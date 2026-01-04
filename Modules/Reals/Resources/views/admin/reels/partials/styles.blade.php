@@ -94,7 +94,7 @@ body {
     .interactions-panel {
         position: fixed;
         right: 0;
-        top: 0;
+        top: 1;
         bottom: 0;
         z-index: 999;
         width: 100%;
@@ -114,6 +114,8 @@ body {
     .interactions-panel {
         max-width: 100vw;
         width: 100vw;
+        top: 106px;
+
     }
     
     /* Smaller padding on mobile */
@@ -158,6 +160,8 @@ body {
         width: 30%;
         min-width: 400px;
         max-width: 600px;
+        top: 106px;
+
     }
 }
 
@@ -217,7 +221,7 @@ body {
     /* Mobile Toggle Button */
     .mobile-reels-toggle {
         position: fixed;
-        bottom: 120px;
+        bottom: 234px;
         right: 20px;
         width: 56px;
         height: 56px;
@@ -410,7 +414,7 @@ body {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
-}
+
     animation: skeleton-loading 1.5s infinite;
 }
 
