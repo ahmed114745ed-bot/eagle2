@@ -18,6 +18,8 @@ body {
 .reels-main-container {
     height: calc(100vh - 50px);
     position: relative;
+    display: flex;
+    gap: 0;
 }
 
 /* Sidebar adjustments */
@@ -32,12 +34,50 @@ body {
 .reels-video-container {
     height: 100%;
     flex: 1;
+    min-width: 0;
 }
 
 .video-item-height {
     height: 100%;
-    width: 51%;
-    margin: 1px 16px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Interactions Panel - Always visible on large screens */
+.interactions-panel {
+    height: 100%;
+    width: 30%;
+    min-width: 400px;
+    max-width: 600px;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid #e5e7eb;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Show panel as overlay on small/medium screens */
+@media (max-width: 1279px) {
+    .interactions-panel {
+        position: fixed !important;
+        width: 500px;
+        max-width: 90vw;
+    }
+}
+
+/* On XL screens and larger, always show panel */
+@media (min-width: 1280px) {
+    .interactions-panel {
+        display: block !important;
+        position: relative !important;
+        transform: translateX(0) !important;
+    }
+    
+    /* Hide interaction buttons on large screens since panel is always visible */
+    .interaction-toggle-btn {
+        display: none;
+    }
 }
 
 /* Tablet (iPad Portrait & Landscape) */
@@ -268,6 +308,28 @@ body {
 .skeleton {
     background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
     background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+}
+
+/* User Avatar Styles */
+.interactions-panel img.rounded-full {
+    object-fit: cover;
+    background-color: #f3f4f6;
+}
+
+/* Flag Image Styles */
+.interactions-panel .flag-image,
+.interactions-panel img[title] {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* User Info Card Hover */
+.interactions-panel [style*="background-color: var(--primary-hover-alpha)"]:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
     animation: skeleton-loading 1.5s infinite;
 }
 

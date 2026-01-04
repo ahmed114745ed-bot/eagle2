@@ -42,8 +42,9 @@
     </button>
     
     <!-- Reels List (Sidebar) -->
-    <div class="reels-sidebar bg-white0 border-l border-gray-200 shadow-lg flex flex-col"
-         :class="{ 'mobile-open': isMobileSidebarOpen }">
+    <div class="reels-sidebar border-l border-gray-200 shadow-lg flex flex-col"
+         :class="{ 'mobile-open': isMobileSidebarOpen }"
+         style="background-color: var(--box-background-color);">
         <!-- Search Filter -->
         <div class="p-4 text-white border-b relative" style="background: var(--primary-gradient);">
             <!-- Close Button for Mobile -->
@@ -53,7 +54,7 @@
             </button>
             
             <h2 class="text-lg font-bold mb-3 flex items-center">
-                <i class="fas fa-film ml-2"></i>
+                <i class="fas fa-film ml-2" style="margin: 7px 10px;"></i>
                 قائمة الريلز
             </h2>
             
@@ -80,8 +81,9 @@
         </div>
         
         <!-- Reels Grid with Scroll -->
-        <div class="flex-1 overflow-y-auto bg-gray-50" 
+        <div class="flex-1 overflow-y-auto" 
              x-ref="sidebarContainer"
+             style="background-color: var(--table-background-color);"
              @scroll="handleSidebarScroll()"
              style="height: calc(100% - 130px);">
             <!-- Skeleton Loader for Initial Load -->
@@ -412,10 +414,13 @@
     </div>
 
 
-    <!-- Interactions Panel (Right Side) - Slide In Panel -->
-    <div class=" right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] bg-white0 shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
-         :class="showInteractionPanel ? 'translate-x-0' : 'ltr:translate-x-full rtl:-translate-x-full'"
-         x-show="showInteractionPanel"
+    <!-- Interactions Panel (Right Side) - Always visible on large screens, slide on small -->
+    <div class="interactions-panel xl:block xl:relative xl:translate-x-0
+                fixed right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] 
+                shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
+         style="background-color: var(--box-background-color);"
+         :class="{'translate-x-0': showInteractionPanel || window.innerWidth >= 1280, 'ltr:translate-x-full rtl:-translate-x-full': !showInteractionPanel && window.innerWidth < 1280}"
+         x-show="showInteractionPanel || window.innerWidth >= 1280"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
          x-transition:enter-end="translate-x-0"
@@ -423,7 +428,7 @@
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full">
         
-        <!-- Close Button -->
+        <!-- Close Button (works on all screens) -->
         <button @click="closeInteractionPanel()"
                 class="absolute top-4 right-4 ltr:right-4 rtl:left-4 w-10 h-10 sm:w-12 sm:h-12 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg z-10 transition">
             <i class="fas fa-times text-lg sm:text-xl"></i>
@@ -442,7 +447,7 @@
                         :class="activeTab === 'likes' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
                         :style="activeTab === 'likes' ? 'color: var(--primary-color);' : ''"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
-                    <i class="fas fa-heart ml-1 sm:ml-2"></i>
+                    <i class="fas fa-heart ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">الإعجابات</span>
                     <span class="sm:hidden">إعجاب</span>
                     <span x-show="selectedReel" 
@@ -454,7 +459,7 @@
                         :class="activeTab === 'comments' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
                         :style="activeTab === 'comments' ? 'color: var(--primary-color);' : ''"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
-                    <i class="fas fa-comment ml-1 sm:ml-2"></i>
+                    <i class="fas fa-comment ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">التعليقات</span>
                     <span class="sm:hidden">تعليق</span>
                     <span x-show="selectedReel" 
@@ -466,7 +471,7 @@
                         :class="activeTab === 'gifts' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
                         :style="activeTab === 'gifts' ? 'color: var(--primary-color);' : ''"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
-                    <i class="fas fa-gift ml-1 sm:ml-2"></i>
+                    <i class="fas fa-gift ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">الهدايا</span>
                     <span class="sm:hidden">هدية</span>
                     <span x-show="selectedReel" 
@@ -477,20 +482,38 @@
         </div>
 
         <!-- Content Area -->
-        <div class="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-y-auto p-3 sm:p-4">
+        <div class="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-y-auto p-3 sm:p-4"
+             style="background-color: var(--table-background-color);">
             <!-- Likes Tab -->
             <div x-show="activeTab === 'likes'">
                 <template x-if="likes.length > 0">
                     <div class="space-y-3">
                         <template x-for="like in likes" :key="like.id">
-                            <div class="flex items-center p-3 rounded-lg transition" style="background-color: var(--primary-hover-alpha);">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background: var(--primary-gradient);">
-                                    <span x-text="like.user?.name?.charAt(0)"></span>
-                                </div>
-                                <div class="mr-3 flex-1">
-                                    <p class="font-semibold text-gray-800" x-text="like.user?.name"></p>
-                                    <p class="text-xs text-gray-500">UUID: <span x-text="like.user?.uuid || like.user?.id"></span></p>
-                                    <p class="text-xs text-gray-400" x-text="formatDate(like.created_at)"></p>
+                            <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
+                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                <img :src="like.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + like.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                     class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                                     :alt="like.user?.name">
+                                <div class="ms-3 flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <strong class="text-base font-bold truncate" 
+                                                style="color: var(--text-primary-color);" 
+                                                x-text="like.user?.name"></strong>
+                                        <img x-show="like.user?.country?.flag" 
+                                             :src="like.user?.country?.flag ? '{{ url('') }}' + '/storage/' + like.user.country.flag : ''"
+                                             class="w-5 h-auto"
+                                             :title="like.user?.country?.name"
+                                             style="vertical-align: middle;">
+                                    </div>
+                                    <p class="text-xs text-gray-600 mb-1">
+                                        <span class="font-medium">UID:</span> 
+                                        <span x-text="like.user?.original_uuid || like.user?.id"></span>
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        <span class="font-medium">Special:</span> 
+                                        <span x-text="like.user?.uuid"></span>
+                                    </p>
+                                    <p class="text-xs text-gray-400 mt-2" x-text="formatDate(like.created_at)"></p>
                                 </div>
                                 <i class="fas fa-heart text-red-500 text-xl"></i>
                             </div>
@@ -510,15 +533,34 @@
                 <template x-if="comments.length > 0">
                     <div class="space-y-3">
                         <template x-for="comment in comments" :key="comment.id">
-                            <div class="rounded-lg p-4 transition" style="background-color: var(--primary-hover-alpha);">
-                                <div class="flex items-start">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background: var(--primary-gradient);">
-                                        <span x-text="comment.user?.name?.charAt(0)"></span>
-                                    </div>
-                                    <div class="mr-3 flex-1">
-                                        <p class="font-semibold text-gray-800" x-text="comment.user?.name"></p>
-                                        <p class="text-xs text-gray-500">UUID: <span x-text="comment.user?.uuid || comment.user?.id"></span></p>
-                                        <p class="text-gray-700 mt-1" x-text="comment.comment"></p>
+                            <div class="rounded-lg p-4 transition hover:shadow-md"
+                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                <div class="flex items-start gap-3">
+                                    <img :src="comment.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + comment.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
+                                         :alt="comment.user?.name">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <strong class="text-base font-bold truncate" 
+                                                    style="color: var(--text-primary-color);" 
+                                                    x-text="comment.user?.name"></strong>
+                                            <img x-show="comment.user?.country?.flag" 
+                                                 :src="comment.user?.country?.flag ? '{{ url('') }}' + '/storage/' + comment.user.country.flag : ''"
+                                                 class="w-5 h-auto"
+                                                 :title="comment.user?.country?.name"
+                                                 style="vertical-align: middle;">
+                                        </div>
+                                        <p class="text-xs text-gray-600 mb-1">
+                                            <span class="font-medium">UID:</span> 
+                                            <span x-text="comment.user?.original_uuid || comment.user?.id"></span>
+                                        </p>
+                                        <p class="text-xs text-gray-500 mb-2">
+                                            <span class="font-medium">Special:</span> 
+                                            <span x-text="comment.user?.uuid"></span>
+                                        </p>
+                                        <p class="p-2 rounded text-sm" 
+                                           style="color: var(--text-primary-color); background-color: var(--table-background-color);" 
+                                           x-text="comment.comment"></p>
                                         <p class="text-xs text-gray-400 mt-2" x-text="formatDate(comment.created_at)"></p>
                                     </div>
                                 </div>
@@ -539,23 +581,43 @@
                 <template x-if="gifts.length > 0">
                     <div class="space-y-3">
                         <template x-for="gift in gifts" :key="gift.id">
-                            <div class="rounded-lg p-4 transition" style="background-color: var(--primary-hover-alpha);">
+                            <div class="rounded-lg p-4 transition hover:shadow-md"
+                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
-                                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0" style="background: var(--primary-gradient);">
-                                        <span x-text="gift.user?.name?.charAt(0)"></span>
-                                    </div>
+                                    <img :src="gift.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + gift.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                         class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
+                                         :alt="gift.user?.name">
                                     
                                     <!-- معلومات المستخدم -->
-                                    <div class="flex-1">
-                                        <p class="font-semibold text-gray-800" x-text="gift.user?.name"></p>
-                                        <p class="text-xs text-gray-500">UUID: <span x-text="gift.user?.uuid || gift.user?.id"></span></p>
+                                    <div class="flex-1 min-w-0 min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <strong class="text-base font-bold truncate" 
+                                                    style="color: var(--text-primary-color);" 
+                                                    x-text="gift.user?.name"></strong>
+                                            <img x-show="gift.user?.country?.flag" 
+                                                 :src="gift.user?.country?.flag ? '{{ url('') }}' + '/storage/' + gift.user.country.flag : ''"
+                                                 class="w-5 h-auto"
+                                                 :title="gift.user?.country?.name"
+                                                 style="vertical-align: middle;">
+                                        </div>
+                                        <p class="text-xs text-gray-600 mb-1">
+                                            <span class="font-medium">UID:</span> 
+                                            <span x-text="gift.user?.original_uuid || gift.user?.id"></span>
+                                        </p>
+                                        <p class="text-xs text-gray-500 mb-2">
+                                            <span class="font-medium">Special:</span> 
+                                            <span x-text="gift.user?.uuid"></span>
+                                        </p>
                                         
                                         <!-- معلومات الهدية -->
-                                        <div class="mt-2 flex items-center gap-2 p-2 bg-white/70 rounded-lg">
+                                        <div class="mt-2 flex items-center gap-2 p-2 rounded-lg"
+                                             style="background-color: var(--table-background-color); border: 1px solid var(--primary-hover-alpha);">
                                             <div class="text-3xl" x-text="getGiftEmoji(gift.gift_type)"></div>
                                             <div class="flex-1">
-                                                <p class="text-sm font-semibold text-gray-700" x-text="getGiftName(gift.gift_type)"></p>
+                                                <p class="text-sm font-semibold" 
+                                                   style="color: var(--text-primary-color);" 
+                                                   x-text="getGiftName(gift.gift_type)"></p>
                                                 <p class="text-xs text-gray-500">النوع: <span x-text="gift.gift_type"></span></p>
                                             </div>
                                             <div class="text-right">
@@ -581,9 +643,9 @@
         </div>
     </div>
 
-    <!-- Overlay -->
-    <div class="fixed inset-0 bg-black/50 z-40"
-         x-show="showInteractionPanel"
+    <!-- Overlay (only on small screens) -->
+    <div class="xl:hidden fixed inset-0 bg-black/50 z-40"
+         x-show="showInteractionPanel && window.innerWidth < 1280"
          @click="closeInteractionPanel()"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -764,7 +826,8 @@
     </div>
     
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] bg-white0 shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+         style="background-color: var(--box-background-color);"
          :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
          x-show="isMobileSidebarOpen"
          x-transition:enter="ease-out duration-300"

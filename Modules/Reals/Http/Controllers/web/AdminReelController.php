@@ -16,7 +16,7 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
-        $reels = Real::with('user')
+        $reels = Real::with(['user.profile', 'user.country'])
             ->withCount(['likes', 'comments', 'Views'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
@@ -49,7 +49,7 @@ class AdminReelController extends MainController
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 20);
         
-        $reels = Real::with('user:id,name,email')
+        $reels = Real::with(['user.profile', 'user.country'])
             ->withCount(['likes', 'comments', 'Views'])
             ->orderBy('created_at', 'desc')
             ->skip($offset)
@@ -84,7 +84,7 @@ class AdminReelController extends MainController
 
     public function show($id, Content $content)
     {
-        $reel = Real::with(['user', 'likes.user', 'comments.user'])
+        $reel = Real::with(['user.profile', 'user.country', 'likes.user.profile', 'likes.user.country', 'comments.user.profile', 'comments.user.country'])
             ->withCount(['likes', 'comments', 'Views'])
             ->findOrFail($id);
 
@@ -112,7 +112,7 @@ class AdminReelController extends MainController
     public function getLikes($id)
     {
         $reel = Real::findOrFail($id);
-        $likes = $reel->likes()->with('user')->get();
+        $likes = $reel->likes()->with(['user.profile', 'user.country'])->get();
 
         return response()->json(['likes' => $likes]);
     }
@@ -120,7 +120,7 @@ class AdminReelController extends MainController
     public function getComments($id)
     {
         $reel = Real::findOrFail($id);
-        $comments = $reel->comments()->with('user')->orderBy('created_at', 'desc')->get();
+        $comments = $reel->comments()->with(['user.profile', 'user.country'])->orderBy('created_at', 'desc')->get();
 
         return response()->json(['comments' => $comments]);
     }
