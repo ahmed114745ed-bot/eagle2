@@ -105,6 +105,12 @@ class AdminRewardController extends MainController
             });
         // }
 
+            Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+
         $grid->disableActions();
         $grid->disableRowSelector();
         $grid->disableExport();
