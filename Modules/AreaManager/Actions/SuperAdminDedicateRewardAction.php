@@ -55,7 +55,7 @@ class SuperAdminDedicateRewardAction extends Action
                 SuperAdminReward::create([
                     'super_admin_id' => $user->id,
                     'type' => $reward->type,
-                    'target' => $reward->uid,
+                    'target' => $reward->target,
                     'expire' => $reward->expire,
                     'no_reward' => 1,
                     'user_type' => 'super_admin',
@@ -68,7 +68,7 @@ class SuperAdminDedicateRewardAction extends Action
             $reward->save();
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
-
+          dd($exception->getMessage());
             return $this->response()->error('you dedicate all reward');
         }
     }

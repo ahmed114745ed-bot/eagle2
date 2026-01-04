@@ -168,7 +168,7 @@ class DedicateAdminPackageReward extends Action
         $reward = SuperAdminReward::create([
             'super_admin_id' => $user->id,
             'type' => $request->type,
-            'target' => $request->uid,
+            'target' => $request->target,
             'expire' => $request->expire,
             'no_reward' => 1,
             'user_type' => 'user',
