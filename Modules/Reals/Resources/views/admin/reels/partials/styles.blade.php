@@ -36,6 +36,8 @@ body {
 
 .video-item-height {
     height: 100%;
+    width: 51%;
+    margin: 1px 16px;
 }
 
 /* Tablet (iPad Portrait & Landscape) */
