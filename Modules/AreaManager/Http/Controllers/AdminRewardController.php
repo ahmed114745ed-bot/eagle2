@@ -6,12 +6,13 @@ use App\Models\Ware;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Modules\SuperAdmin\Actions\Admin\SuperAdminDedicateRewardAction;
-use Modules\SuperAdmin\Entities\SuperAdminReward;
+
 use Modules\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Modules\AreaManager\Actions\SuperAdminDedicateRewardAction;
 
 class AdminRewardController extends MainController
 {
@@ -96,6 +97,14 @@ class AdminRewardController extends MainController
             });
         }
 
+        // if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
+            $grid->tools(function (Grid\Tools $tools) {
+                $url = '/areaManager/rewards-history?type=user&reward_type=' . request('type');
+                $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+                $tools->append($button);
+            });
+        // }
+
         $grid->disableActions();
         $grid->disableRowSelector();
         $grid->disableExport();
@@ -111,7 +120,10 @@ class AdminRewardController extends MainController
         // Define your type mapping
         $typeMap = SELECTED_USED_WARE;
 
-        $types =  ['vip', 'ware',  'badge',
+        $types =  [
+            'vip',
+            'ware',
+            'badge',
             /** 'achievement'*/
         ];
         $currentType = request()->get('type', 'vip');

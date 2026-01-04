@@ -5,6 +5,7 @@ namespace Modules\SuperAdmin\Entities;
 use App\Models\Ware;
 use App\Models\Admin;
 use App\Helpers\Common;
+use App\Models\User;
 use Modules\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
 use Modules\Badge\Entities\Badge;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AreaManager\Entities\SubAreaManager;
 
 class SuperAdminReward extends Model
 {
@@ -31,10 +33,28 @@ class SuperAdminReward extends Model
         return $this->belongsTo(AreaManager::class, 'super_admin_id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'super_admin_id');
+    }
+
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'created_by');
     }
+
+
+    public function areaManagerDedicate()
+    {
+        return $this->belongsTo(AreaManager::class, 'created_by');
+    }
+
+    public function subAreaManagerDedicate()
+    {
+        return $this->belongsTo(SubAreaManager::class, 'created_by');
+    }
+
+
     public function ware()
     {
         return $this->hasOne(Ware::class, 'id', 'target');

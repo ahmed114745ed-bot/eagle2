@@ -1,19 +1,22 @@
 <?php
 
-namespace Modules\SuperAdmin\Actions\Admin;
+namespace Modules\AreaManager\Actions;
 
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
+use App\Models\Country;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Enums\UserCoinLogType;
 use Modules\Vip\Entities\OVip;
-use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Encore\Admin\Facades\Admin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 class SuperAdminDedicateRewardAction extends Action
@@ -33,24 +36,36 @@ class SuperAdminDedicateRewardAction extends Action
 
     public function handle(Request $request)
     {
-        $user = User::query()->searchByUuid($request->user_uuid)->first();
-        if (!$user) {
-            return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-        }
 
-        // if ($user->country_id != auth()->user()->country_id) {
-        //     return $this->response()->error(__('Sorry, you can only manage users in your own country.'))->refresh();        }
 
         $reward = SuperAdminReward::find($request->id);
         $rewardNom =  $reward->no_reward -  $reward->gave_reward_no;
         try {
-            if ($rewardNom !== 0) {
-                $this->assignRewards($reward, $user);
-                $reward->gave_reward_no += 1;
-                $reward->save();
-                return $this->response()->success(__('dashboard.successful'));
+            if ($rewardNom == 0) {
+                return $this->response()->error(__('your reward finished'));
             }
-            return $this->response()->error(__('your reward finished'));
+            if ($request->user_type == 'user') {
+                $user = User::query()->searchByUuid($request->user_uuid)->first();
+                if (!$user)   return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+                $this->assignRewards($reward, $user);
+            } else {
+                $user = SuperAdmin::find($request->super_admin_id);
+                if (!$user) return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+                SuperAdminReward::create([
+                    'super_admin_id' => $user->id,
+                    'type' => $reward->type,
+                    'target' => $reward->uid,
+                    'expire' => $reward->expire,
+                    'no_reward' => 1,
+                    'user_type' => 'super_admin',
+                    'created_by' => Admin::user()->id,
+
+                ]);
+            }
+
+            $reward->gave_reward_no += 1;
+            $reward->save();
+            return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
 
             return $this->response()->error('you dedicate all reward');
@@ -60,7 +75,31 @@ class SuperAdminDedicateRewardAction extends Action
     public function form()
     {
         $this->hidden('id', __('id'))->attribute('id', 'vid');
-        $this->text('user_uuid', __('user uuid'));
+        $this->select('user_type', __('user Type'))->options(['super_admin' => __('Country Manager'), 'user' => __('user')])->default('super_admin')->required()->attribute(['id' => 'user-type-select']);
+
+        $this->text('user_uuid', __('user uuid'))->attribute(['id' => 'user-select']);
+        $this->select('super_admin_id', __('Select Country Manager'))
+            ->options(self::getSuperAdmins())->attribute(['id' => 'super-admin-select']);
+
+        Admin::script(<<<'SCRIPT'
+            function toggleUserTypeFields() {
+                var selected = $('#user-type-select').val();
+
+                if (selected === 'user') {
+                    $('#user-select').closest('.form-group').show();
+                    $('#super-admin-select').closest('.form-group').hide();
+                } else if (selected === 'super_admin') {
+                    $('#super-admin-select').closest('.form-group').show();
+                    $('#user-select').closest('.form-group').hide();
+                }
+            }
+
+            // listen to correct select
+            $(document).on('change', '#user-type-select', toggleUserTypeFields);
+
+            // run on page load
+            toggleUserTypeFields();
+            SCRIPT);
     }
 
     public function html()
@@ -73,6 +112,24 @@ function pu(val) {
 }
 </script>
 ';
+    }
+
+
+    protected static function getSuperAdmins()
+    {
+        static $admins = null;
+        $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
+
+        $countries = Country::where('area_manager_id',  $authId)->pluck('id')->toArray();
+        if ($admins === null) {
+            $admins = SuperAdmin::query()
+                ->where('type', 'superadmin')
+                ->whereNull('deleted_at')
+                ->pluck('name', 'id')->whereIn('country_id', $countries)
+                ->toArray();
+        }
+
+        return $admins;
     }
 
 
