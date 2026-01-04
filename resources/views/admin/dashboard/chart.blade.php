@@ -468,46 +468,98 @@
 
     @media (max-width: 480px) {
         .dashboard-container {
-            padding: 5px;
+            padding: 4px !important;  /* Smaller symmetric padding */
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            overflow-x: hidden;
         }
 
         .section-header {
             font-size: 1.2rem;
-            margin: 15px 0 10px 0;
+            margin: 12px 0 8px 0;  /* Smaller margins */
+            padding: 0 4px;  /* Smaller symmetric padding */
         }
 
         .stats-grid {
-            gap: 10px;
+            gap: 8px;  /* Smaller gap */
+            grid-template-columns: 1fr;
+            padding: 0;
+            margin: 0;
         }
 
         .card-body {
-            padding: 10px;
+            padding: 8px;  /* Smaller padding */
         }
 
         .card-header {
-            padding: 10px 12px;
+            padding: 8px 10px;  /* Smaller padding */
             font-size: 0.9rem;
         }
 
         .tab-content {
-            padding: 10px;
-            margin: 0 -5px;
+            padding: 8px 4px !important;  /* Smaller symmetric padding */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .tabs-container {
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .widget-card {
-            margin-bottom: 10px;
+            margin-bottom: 8px;  /* Smaller margin */
+            overflow-x: auto;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
 
         .widget-card-premium {
-            padding: 15px;
+            padding: 12px;  /* Smaller padding */
+            border-radius: 12px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .balance-card .row > div {
+            margin-bottom: 8px;  /* Smaller margin */
         }
 
         .row {
-            display: block !important;
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
 
-        .widget-card {
-            overflow-x: auto;
+        .col-md-6, .col-lg-3, .col-xl-2, .col-md-12, .col-lg-6, .col-12 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        table {
+            font-size: 0.8rem;  /* Smaller font */
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 2px 3px !important;  /* Smaller symmetric padding */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .stats-masonry {
+            padding: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
     }
 
