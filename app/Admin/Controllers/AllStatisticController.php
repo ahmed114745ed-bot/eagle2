@@ -510,9 +510,9 @@ class AllStatisticController extends MainController
             ->count();
 
         $notAchievedAgencies = Agency::when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            })
-                ->count() - $achievedAgencies;
+            return $query->where('country_id', $countryID);
+        })
+            ->count() - $achievedAgencies;
 
         return response()->json([
             'achieved' => $achievedAgencies,
@@ -976,5 +976,21 @@ class AllStatisticController extends MainController
                 ];
             }),
         ]);
+    }
+
+
+    public function index2(Content $content)
+    {
+        return $content
+            ->title(__('Home'))
+            ->description(__('General Statistics'))
+            ->row(function (Row $row) {
+                $row->column(12, function () {
+                    return '
+                <div style="text-align:center; padding:40px; font-size:20px; font-weight:bold;">
+                    🚧 ' . __('Coming Soon') . '
+                </div>';
+                });
+            });
     }
 }
