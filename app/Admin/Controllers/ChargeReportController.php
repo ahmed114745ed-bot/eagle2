@@ -484,6 +484,75 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
+        Admin::style("
+            /* Force date picker inputs to be smaller - very specific selectors */
+            input[type='date'],
+            input[type='date'].form-control,
+            .form-control[type='date'],
+            .filter-container input[type='date'],
+            .filter-item input[type='date'],
+            .col-md-6 input[type='date'],
+            .col-md-2 input[type='date'],
+            .col-md-3 input[type='date'],
+            .col-md-4 input[type='date'],
+            .col-md-5 input[type='date'],
+            .col-md-8 input[type='date'] {
+                max-width: 100px !important;
+                width: 100px !important;
+                font-size: 0.75rem !important;
+                padding: 0.15rem 0.3rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Target date picker containers specifically */
+            .input-group:has(input[type='date']),
+            .input-group:has(.form-control[type='date']) {
+                max-width: 110px !important;
+                width: 110px !important;
+            }
+
+            /* Reduce spacing for filter columns */
+            .filter-item,
+            .filter-item-date,
+            .col-md-6,
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-8 {
+                margin-bottom: 5px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* Make buttons in input groups smaller */
+            .input-group .btn,
+            .input-group-append .btn,
+            .input-group-btn .btn {
+                padding: 0.15rem 0.3rem !important;
+                font-size: 0.75rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Override any existing date picker styles */
+            .daterangepicker,
+            .bootstrap-datepicker,
+            .datepicker {
+                font-size: 0.75rem !important;
+                width: 180px !important;
+                max-width: 180px !important;
+            }
+
+            .daterangepicker .calendar-table,
+            .bootstrap-datepicker .datepicker-days,
+            .datepicker table {
+                font-size: 0.7rem !important;
+            }
+        ");
+
         $grid->model()->when(!request('from_date'), function ($query,) {
 
             $start = now()->startOfMonth();
@@ -703,6 +772,75 @@ class ChargeReportController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
+
+        Admin::style("
+            /* Force date picker inputs to be smaller - very specific selectors */
+            input[type='date'],
+            input[type='date'].form-control,
+            .form-control[type='date'],
+            .filter-container input[type='date'],
+            .filter-item input[type='date'],
+            .col-md-6 input[type='date'],
+            .col-md-2 input[type='date'],
+            .col-md-3 input[type='date'],
+            .col-md-4 input[type='date'],
+            .col-md-5 input[type='date'],
+            .col-md-8 input[type='date'] {
+                max-width: 100px !important;
+                width: 100px !important;
+                font-size: 0.75rem !important;
+                padding: 0.15rem 0.3rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Target date picker containers specifically */
+            .input-group:has(input[type='date']),
+            .input-group:has(.form-control[type='date']) {
+                max-width: 110px !important;
+                width: 110px !important;
+            }
+
+            /* Reduce spacing for filter columns */
+            .filter-item,
+            .filter-item-date,
+            .col-md-6,
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-8 {
+                margin-bottom: 5px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* Make buttons in input groups smaller */
+            .input-group .btn,
+            .input-group-append .btn,
+            .input-group-btn .btn {
+                padding: 0.15rem 0.3rem !important;
+                font-size: 0.75rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Override any existing date picker styles */
+            .daterangepicker,
+            .bootstrap-datepicker,
+            .datepicker {
+                font-size: 0.75rem !important;
+                width: 180px !important;
+                max-width: 180px !important;
+            }
+
+            .daterangepicker .calendar-table,
+            .bootstrap-datepicker .datepicker-days,
+            .datepicker table {
+                font-size: 0.7rem !important;
+            }
+        ");
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();

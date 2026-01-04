@@ -2122,6 +2122,37 @@
         transform: translateY(-100%);
     }
 
+    /* Fix header blocking */
+    header.main-header {
+        pointer-events: none !important;
+    }
+
+    /* But enable clicks on actual navbar content */
+    header.main-header .navbar,
+    header.main-header .nav,
+    header.main-header .nav-pills,
+    header.main-header a,
+    header.main-header button,
+    header.main-header .logo {
+        pointer-events: auto !important;
+    }
+
+    /* If navbar is hidden */
+    .navbar-hidden {
+        pointer-events: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Make sure tabs are clickable */
+    .nav-pills,
+    .nav-pills li,
+    .nav-pills a,
+    .charge_action {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 100;
+    }
+
     /* form inputs */
     .form-horizontal .fields-group > .col-md-12 {
         display: grid !important;
@@ -2897,15 +2928,9 @@
         background-color: var(--primary-color);
     }
 
-    .stats-container .info-box {
-        background: linear-gradient(135deg,
-        #667eea 0%,
-        #8B5CF6 25%,
-        #A855F7 50%,
-        #C084FC 75%,
-        #E879F9 100%
-        ) !important;
-        background-attachment: fixed !important;
+    .nav>li>a:hover, .nav>li>a:active, .nav>li>a:focus {
+        background: var(--secondary-color) !important;
+        color: var(--text-secondary-color);
     }
 </style>
 
