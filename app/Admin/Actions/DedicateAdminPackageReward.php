@@ -19,6 +19,8 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
+use Illuminate\Support\Facades\DB;
+
 
 class DedicateAdminPackageReward extends Action
 {
@@ -60,12 +62,12 @@ class DedicateAdminPackageReward extends Action
 
             foreach ($superAdmins as $superAdmin) {
                 foreach ($superPackage->packageRewards as $reward) {
-                    SuperAdminReward::create([
+                    DB::table('admin_rewards')->insert([
                         'super_admin_id' => $superAdmin,
                         'type' => $reward->type,
                         'target' => $reward->target,
                         'expire' => $reward->expire,
-                        'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement'? 1 : $reward->quantity,
+                        'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement' ? 1 : $reward->quantity,
                         'user_type' => $userType,
                         'created_by' => Admin::user()->id,
                     ]);
