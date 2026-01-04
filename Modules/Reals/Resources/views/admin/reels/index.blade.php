@@ -85,7 +85,7 @@
         <!-- Reels Grid with Scroll -->
         <div class="flex-1 overflow-y-auto" 
              x-ref="sidebarContainer"
-             style="background-color: var(--table-background-color);"
+             style="background-color: var(--box-background-color);"
              @scroll="handleSidebarScroll()"
              style="height: calc(100% - 130px);">
             <!-- Skeleton Loader for Initial Load -->
@@ -477,7 +477,7 @@
 
         <!-- Content Area -->
         <div class="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-y-auto p-3 sm:p-4"
-             style="background-color: var(--table-background-color);">
+             style="background-color: var(--box-background-color);">
             <!-- Likes Tab -->
             <div x-show="activeTab === 'likes'">
                 <template x-if="likes.length > 0">
@@ -485,7 +485,7 @@
                         <template x-for="like in likes" :key="like.id">
                             <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
                                  style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
-                                <img :src="like.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + like.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
+                                <img :src="like.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + like.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
                                      :alt="like.user?.name">
                                 <div class="ms-3 flex-1 min-w-0">
@@ -494,7 +494,7 @@
                                                 style="color: var(--text-primary-color);" 
                                                 x-text="like.user?.name"></strong>
                                         <img x-show="like.user?.country?.flag" 
-                                             :src="like.user?.country?.flag ? '{{ url('') }}' + '/storage/' + like.user.country.flag : ''"
+                                             :src="like.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + like.user.country.flag : ''"
                                              class="w-5 h-auto"
                                              :title="like.user?.country?.name"
                                              style="vertical-align: middle;">
@@ -528,9 +528,9 @@
                     <div class="space-y-3">
                         <template x-for="comment in comments" :key="comment.id">
                             <div class="rounded-lg p-4 transition hover:shadow-md"
-                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
-                                    <img :src="comment.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + comment.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
+                                    <img :src="comment.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + comment.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                                          :alt="comment.user?.name">
                                     <div class="flex-1 min-w-0">
@@ -539,7 +539,7 @@
                                                     style="color: var(--text-primary-color);" 
                                                     x-text="comment.user?.name"></strong>
                                             <img x-show="comment.user?.country?.flag" 
-                                                 :src="comment.user?.country?.flag ? '{{ url('') }}' + '/storage/' + comment.user.country.flag : ''"
+                                                 :src="comment.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + comment.user.country.flag : ''"
                                                  class="w-5 h-auto"
                                                  :title="comment.user?.country?.name"
                                                  style="vertical-align: middle;">
@@ -553,7 +553,7 @@
                                             <span x-text="comment.user?.uuid"></span>
                                         </p>
                                         <p class="p-2 rounded text-sm" 
-                                           style="color: var(--text-primary-color); background-color: var(--table-background-color);" 
+                                           style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);" 
                                            x-text="comment.comment"></p>
                                         <p class="text-xs text-gray-400 mt-2" x-text="formatDate(comment.created_at)"></p>
                                     </div>
@@ -579,7 +579,7 @@
                                  style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
-                                    <img :src="gift.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + gift.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
+                                    <img :src="gift.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + gift.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                                          :alt="gift.user?.name">
                                     
@@ -590,7 +590,7 @@
                                                     style="color: var(--text-primary-color);" 
                                                     x-text="gift.user?.name"></strong>
                                             <img x-show="gift.user?.country?.flag" 
-                                                 :src="gift.user?.country?.flag ? '{{ url('') }}' + '/storage/' + gift.user.country.flag : ''"
+                                                 :src="gift.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + gift.user.country.flag : ''"
                                                  class="w-5 h-auto"
                                                  :title="gift.user?.country?.name"
                                                  style="vertical-align: middle;">
@@ -606,7 +606,7 @@
                                         
                                         <!-- معلومات الهدية -->
                                         <div class="mt-2 flex items-center gap-2 p-2 rounded-lg"
-                                             style="background-color: var(--table-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                             style="background-color: var(--dark-primary-colo); border: 1px solid var(--primary-hover-alpha);">
                                             <div class="text-3xl" x-text="getGiftEmoji(gift.gift_type)"></div>
                                             <div class="flex-1">
                                                 <p class="text-sm font-semibold" 
@@ -638,7 +638,7 @@
     </div>
 
     <!-- Overlay (only on small screens when panel is open) -->
-    <div class=" fixed inset-0  z-40"
+    <div class="  inset-0  z-40"
          x-show="showInteractionPanel"
          @click.stop="showInteractionPanel = false"
          x-transition:enter="transition ease-out duration-300"
