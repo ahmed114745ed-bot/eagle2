@@ -810,3 +810,17 @@ console.log('✅ sidebar js loaded');
         });
     })();
 })();
+
+    window.addEventListener('load', function () {
+    fetch('/__debugbar/screen', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            width: window.innerWidth,
+            height: window.innerHeight
+        })
+    });
+});
