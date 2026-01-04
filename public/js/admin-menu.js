@@ -811,16 +811,20 @@ console.log('✅ sidebar js loaded');
     })();
 })();
 
+if (window.APP_ENV !== 'production') {
     window.addEventListener('load', function () {
-    fetch('/__debugbar/screen', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            width: window.innerWidth,
-            height: window.innerHeight
-        })
+        fetch('/__debugbar/screen', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content')
+            },
+            body: JSON.stringify({
+                width: window.innerWidth,
+                height: window.innerHeight
+            })
+        });
     });
-});
+}
