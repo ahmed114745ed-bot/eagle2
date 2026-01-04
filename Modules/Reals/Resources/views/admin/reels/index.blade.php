@@ -485,7 +485,7 @@
                         <template x-for="like in likes" :key="like.id">
                             <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
                                  style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
-                                <img :src="like.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + like.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                <img :src="like.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + like.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
                                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
                                      :alt="like.user?.name">
                                 <div class="ms-3 flex-1 min-w-0">
@@ -530,7 +530,7 @@
                             <div class="rounded-lg p-4 transition hover:shadow-md"
                                  style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
-                                    <img :src="comment.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + comment.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                    <img :src="comment.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + comment.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                                          :alt="comment.user?.name">
                                     <div class="flex-1 min-w-0">
@@ -579,7 +579,7 @@
                                  style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
-                                    <img :src="gift.user?.profile?.avatar ? '{{ url('') }}' + '/storage/' + gift.user.profile.avatar : '{{ asset('images/businessman-icon.jpg') }}'"
+                                    <img :src="gift.user?.profile?.avatar ? 'https://eagle.utdsoftware.com' + '/storage/' + gift.user.profile.avatar : 'https://eagle.utdsoftware.com/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                                          :alt="gift.user?.name">
                                     
@@ -638,7 +638,7 @@
     </div>
 
     <!-- Overlay (only on small screens when panel is open) -->
-    <div class=" fixed inset-0 bg-black/50 z-40"
+    <div class=" fixed inset-0  z-40"
          x-show="showInteractionPanel"
          @click.stop="showInteractionPanel = false"
          x-transition:enter="transition ease-out duration-300"
