@@ -213,8 +213,8 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
-    Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
+    // Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+    // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
         'status' => 'success',
