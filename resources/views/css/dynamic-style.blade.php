@@ -1355,7 +1355,7 @@
 
     .rtl .pull-right > .dropdown-menu {
         right: auto;
-        left: auto;
+        /*left: auto;*/
     }
 
     .popover {
@@ -1420,8 +1420,12 @@
         color: var(--inverse-box-color) !important;
     }
 
+    .grid-dropdown-menu {
+        position: fixed;
+    }
+
     .rtl .dropdown-menu {
-        left: 50px;
+        left: 7%;
     }
 
     .flag-image {
@@ -1435,7 +1439,7 @@
     html.rtl .dropdown-menu {
         text-align: right;
         right: auto !important;
-        left: auto;
+        /*left: auto;*/
         float: right;
     }
 
