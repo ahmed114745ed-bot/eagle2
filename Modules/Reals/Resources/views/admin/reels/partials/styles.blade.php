@@ -10,8 +10,28 @@
     --primary-gradient: linear-gradient(135deg, {{ config('themes.primaryColor') }} 0%, {{ config('themes.secondaryColor') }} 100%);
 }
 
+/* Dark Mode Support */
+.dark-mode {
+    --box-background-color: #152038;
+    --table-background-color: #0d1b2a;
+    --text-primary-color: #d1d5db;
+    --text-secondary-color: #9ca3af;
+    --dark-primary-color: rgb(15, 23, 42);
+    --dark-secondry-color: rgb(30, 41, 59);
+}
+
 body {
     font-family: 'Cairo', sans-serif;
+}
+
+/* Hide scrollbars but keep functionality */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
 
 /* Main container adjustment for admin navbar */

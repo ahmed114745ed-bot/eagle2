@@ -709,14 +709,14 @@ function reelsManager() {
                         this.selectedReel.description = this.editingReel.description;
                     }
                     
-                    alert('✅ تم تحديث الكابشن بنجاح');
+                    // alert('✅ تم تحديث الكابشن بنجاح');
                     this.showEditModal = false;
                 } else {
-                    alert('❌ حدث خطأ في التحديث: ' + (result.message || 'خطأ غير معروف'));
+                    // alert('❌ حدث خطأ في التحديث: ' + (result.message || 'خطأ غير معروف'));
                 }
             } catch (error) {
                 console.error('❌ Error updating reel:', error);
-                alert('❌ حدث خطأ في الاتصال: ' + error.message);
+                // alert('❌ حدث خطأ في الاتصال: ' + error.message);
             }
         },
         
@@ -758,7 +758,7 @@ function reelsManager() {
                     this.deletingReel = null;
                     
                     // Success notification
-                    alert('✅ تم حذف الريل بنجاح');
+                    // alert('✅ تم حذف الريل بنجاح');
                 } else {
                     this.deletingReel = null;
                     alert('❌ حدث خطأ في الحذف: ' + (result.message || 'خطأ غير معروف'));

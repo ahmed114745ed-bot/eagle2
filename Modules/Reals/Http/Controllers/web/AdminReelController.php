@@ -39,8 +39,6 @@ class AdminReelController extends MainController
             });
 
         return $content
-            ->header('إدارة الريلز')
-            ->description('عرض وإدارة الريلز')
             ->body(view('reals::admin.reels.index', compact('reels')));
     }
     

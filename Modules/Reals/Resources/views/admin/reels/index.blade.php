@@ -15,6 +15,23 @@
     <!-- Reels Styles -->
     <style>
         @include('reals::admin.reels.partials.styles')
+
+    </style>
+    <style>
+                .content-header,
+        .skin-black-light .content-header,
+        body .content-header,
+        .wrapper .content-header {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            max-height: 0 !important;
+            overflow: hidden !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            opacity: 0 !important;
+        }
     </style>
 
 <div class="reels-main-container flex" 
@@ -66,9 +83,9 @@
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="ابحث بالاسم أو المعرف..."
-                       class="w-full px-3 py-2 ps-10 rounded-md text-gray-800 text-sm focus:outline-none border border-white/30"
+                       class="w-full px-3 py-2 ps-10 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none border border-white/30 dark:border-gray-700"
                        style="box-shadow: 0 0 0 2px var(--primary-hover-alpha);">
-                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
             
             <div class="flex items-center justify-between mt-2">
@@ -93,7 +110,7 @@
                 <div class="grid grid-cols-3 gap-2 p-2">
                     <template x-for="i in 9" :key="i">
                         <div class="rounded-md overflow-hidden shadow">
-                            <div class="relative bg-gray-200 skeleton" style="padding-bottom: 177.78%;"></div>
+                            <div class="relative bg-gray-200 dark:bg-gray-700 skeleton" style="padding-bottom: 177.78%;"></div>
                         </div>
                     </template>
                 </div>
@@ -104,7 +121,7 @@
                     <div @click="selectReel(reel.id); closeMobileSidebar()" 
                          :class="selectedReelId === reel.id ? 'ring-2 ring-blue-500 shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
-                        <div class="relative bg-gray-200" style="padding-bottom: 177.78%; /* 16:9 ratio */">
+                        <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
                             <!-- Skeleton until image loads -->
                             <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
                             
@@ -204,10 +221,10 @@
                     <div class="relative h-full bg-black flex items-center justify-center">
                         <!-- Skeleton Loader while video loading -->
                         <template x-if="!shouldLoadVideo(index)">
-                            <div class="w-full h-full flex items-center justify-center bg-gray-900">
+                            <div class="w-full h-full flex items-center justify-center bg-gray-900 dark:bg-gray-950">
                                 <div class="text-center text-white/50">
-                                    <div class="skeleton skeleton-circle w-20 h-20 mx-auto mb-4 bg-gray-700"></div>
-                                    <div class="skeleton skeleton-text w-32 mx-auto bg-gray-700"></div>
+                                    <div class="skeleton skeleton-circle w-20 h-20 mx-auto mb-4 bg-gray-700 dark:bg-gray-800"></div>
+                                    <div class="skeleton skeleton-text w-32 mx-auto bg-gray-700 dark:bg-gray-800"></div>
                                 </div>
                             </div>
                         </template>
@@ -216,9 +233,9 @@
                         <template x-if="shouldLoadVideo(index)">
                             <div class="w-full h-full relative">
                                 <!-- Loading skeleton while video loads -->
-                                <div x-show="!isVideoReady(reel.id)" class="absolute inset-0 flex items-center justify-center bg-gray-900">
+                                <div x-show="!isVideoReady(reel.id)" class="absolute inset-0 flex items-center justify-center bg-gray-900 dark:bg-gray-950">
                                     <div class="text-center text-white/50">
-                                        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 mx-auto mb-4"></div>
+                                        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 dark:border-purple-400 mx-auto mb-4"></div>
                                         <p class="text-sm">جاري تحميل الفيديو...</p>
                                     </div>
                                 </div>
@@ -280,7 +297,7 @@
                                      x-transition:leave-start="opacity-100 scale-100"
                                      x-transition:leave-end="opacity-0 scale-95"
                                      class="absolute mt-2 w-44 rounded-lg shadow-2xl z-50 overflow-hidden border-2"
-                                     style="left: -88px; background: var(--primary-gradient); border-color: var(--primary-color);">
+                                     style="left: -88px; background: var(--primary-color); border-color: var(--primary-color);">
                                     <button @click.stop="editReel(reel); open = false" 
                                             class="w-full px-4 py-3 text-right flex items-center gap-3 transition text-white"
                                             style="background-color: rgba(255, 255, 255, 0.05);"
@@ -337,8 +354,8 @@
                             </div>
                         </div>
                         
-                        <!-- Interaction Buttons (Right Side) -->
-                        <div class="absolute left-4 bottom-24 flex flex-col gap-4 z-20 md:left-auto md:right-4">
+                        <!-- Interaction Buttons (Left Side for Arabic) -->
+                        <div class="absolute right-4 bottom-24 flex flex-col gap-4 z-20 md:right-auto md:left-4">
                             <!-- Likes Button -->
                             <button @click.stop="toggleInteraction('likes', reel.id)"
                                     :class="activeTab === 'likes' && selectedReelId === reel.id ? 'scale-110' : 'hover:bg-white/30'"
@@ -431,10 +448,10 @@
         <!-- Tabs Header -->
         <div class="p-3 sm:p-4 pt-5 sm:pt-6" style="background: var(--primary-gradient);">
             <!-- Refresh Button -->
-            <button @click="refreshReelCounts(selectedReelId)" 
+            <!-- <button @click="refreshReelCounts(selectedReelId)" 
                     class="absolute top-16 left-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition text-white">
                 <i class="fas fa-sync-alt text-sm"></i>
-            </button>
+            </button> -->
             
             <div class="flex space-x-1 sm:space-x-2 space-x-reverse">
                 <button @click="activeTab = 'likes'; loadTabData()" 
@@ -499,15 +516,15 @@
                                              :title="like.user?.country?.name"
                                              style="vertical-align: middle;">
                                     </div>
-                                    <p class="text-xs text-gray-600 mb-1">
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
                                         <span class="font-medium">UID:</span> 
                                         <span x-text="like.user?.original_uuid || like.user?.id"></span>
                                     </p>
-                                    <p class="text-xs text-gray-500">
+                                    <p class="text-xs text-gray-500 dark:text-gray-500">
                                         <span class="font-medium">Special:</span> 
                                         <span x-text="like.user?.uuid"></span>
                                     </p>
-                                    <p class="text-xs text-gray-400 mt-2" x-text="formatDate(like.created_at)"></p>
+                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(like.created_at)"></p>
                                 </div>
                                 <i class="fas fa-heart text-red-500 text-xl"></i>
                             </div>
@@ -515,7 +532,7 @@
                     </div>
                 </template>
                 <template x-if="likes.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 py-12">
+                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
                         <i class="fas fa-heart text-5xl mb-3 opacity-30"></i>
                         <p>لا توجد إعجابات بعد</p>
                     </div>
@@ -563,7 +580,7 @@
                     </div>
                 </template>
                 <template x-if="comments.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 py-12">
+                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
                         <i class="fas fa-comment text-5xl mb-3 opacity-30"></i>
                         <p>لا توجد تعليقات بعد</p>
                     </div>
@@ -616,11 +633,11 @@
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-xl font-bold" style="color: var(--secondary-color);" x-text="gift.gift_value"></span>
-                                                <p class="text-xs text-gray-500">نقطة</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-500">نقطة</p>
                                             </div>
                                         </div>
                                         
-                                        <p class="text-xs text-gray-400 mt-2" x-text="formatDate(gift.created_at)"></p>
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(gift.created_at)"></p>
                                     </div>
                                 </div>
                             </div>
@@ -628,7 +645,7 @@
                     </div>
                 </template>
                 <template x-if="gifts.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 py-12">
+                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
                         <i class="fas fa-gift text-5xl mb-3 opacity-30"></i>
                         <p>لا توجد هدايا بعد</p>
                     </div>
@@ -660,7 +677,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6"
              x-show="showDeleteModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -672,30 +689,30 @@
             
             <div class="flex flex-col items-center text-center">
                 <!-- Icon -->
-                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                    <i class="fas fa-trash-alt text-4xl text-red-600"></i>
+                <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                    <i class="fas fa-trash-alt text-4xl text-red-600 dark:text-red-400"></i>
                 </div>
                 
                 <!-- Title -->
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                     تأكيد الحذف
                 </h3>
                 
                 <!-- Message -->
-                <p class="text-gray-600 mb-6">
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
                     هل أنت متأكد من حذف هذا الريل؟<br>
                     <span class="text-sm text-red-600 font-semibold">لا يمكن التراجع عن هذا الإجراء</span>
                 </p>
                 
                 <!-- Reel Info -->
                 <template x-if="deletingReel">
-                    <div class="w-full bg-gray-50 rounded-lg p-3 mb-6">
+                    <div class="w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-6">
                         <div class="flex items-center gap-3">
                             <img :src="deletingReel.thumbnail_url" 
                                  class="w-16 h-16 rounded-lg object-cover">
                             <div class="flex-1 text-right">
-                                <p class="font-semibold text-gray-800 truncate" x-text="deletingReel.title"></p>
-                                <p class="text-sm text-gray-500" x-text="deletingReel.user?.name"></p>
+                                <p class="font-semibold text-gray-800 dark:text-gray-100 truncate" x-text="deletingReel.title"></p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400" x-text="deletingReel.user?.name"></p>
                             </div>
                         </div>
                     </div>
@@ -704,12 +721,12 @@
                 <!-- Buttons -->
                 <div class="flex gap-3 w-full">
                     <button @click="showDeleteModal = false" 
-                            class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-bold transition">
+                            class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                         <i class="fas fa-times ml-2"></i>
                         إلغاء
                     </button>
                     <button @click="confirmDelete()" 
-                            class="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition shadow-lg">
+                            class="flex-1 py-3 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-bold transition shadow-lg">
                         <i class="fas fa-trash ml-2"></i>
                         حذف نهائياً
                     </button>
@@ -729,7 +746,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6"
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg p-6"
              x-show="showEditModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -740,32 +757,32 @@
              x-transition:leave-end="opacity-0 scale-90">
             
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-edit ml-2" style="color: var(--primary-color);"></i>
                     تعديل الكابشن
                 </h3>
                 <button @click="showEditModal = false" 
-                        class="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition">
-                    <i class="fas fa-times text-gray-600"></i>
+                        class="w-10 h-10 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition">
+                    <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
                 </button>
             </div>
             
             <template x-if="editingReel">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">العنوان</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">العنوان</label>
                         <input type="text" 
                                x-model="editingReel.title"
-                               class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none transition"
+                               class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none transition"
                                style="border-color: var(--primary-color) !important;"
                                placeholder="أدخل عنوان الريل...">
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">الوصف</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">الوصف</label>
                         <textarea x-model="editingReel.description"
                                   rows="4"
-                                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none transition resize-none"
+                                  class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none transition resize-none"
                                   style="border-color: var(--primary-color) !important;"
                                   placeholder="أدخل وصف الريل..."></textarea>
                     </div>
@@ -780,7 +797,7 @@
                             حفظ التعديلات
                         </button>
                         <button @click="showEditModal = false" 
-                                class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-bold transition">
+                                class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                             <i class="fas fa-times ml-2"></i>
                             إلغاء
                         </button>
@@ -849,10 +866,10 @@
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="ابحث بالاسم أو المعرف..."
-                       class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none">
-                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                       class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-purple-500 focus:outline-none">
+                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
-            <p class="text-xs sm:text-sm mt-2 text-gray-600" x-text="filteredReels.length + ' ريل'"></p>
+            <p class="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400" x-text="filteredReels.length + ' ريل'"></p>
         </div>
         
         <!-- Reels Grid -->
@@ -861,7 +878,7 @@
                 <div @click="selectReel(reel.id); closeMobileSidebar()" 
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
-                    <div class="relative aspect-[9/16] bg-gray-200">
+                    <div class="relative aspect-[9/16] bg-gray-200 dark:bg-gray-700">
                         <!-- Skeleton Loader -->
                         <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
                         
