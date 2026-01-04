@@ -94,7 +94,7 @@ body {
     .interactions-panel {
         position: fixed;
         right: 0;
-        top: 1;
+        top: 0;
         bottom: 0;
         z-index: 999;
         width: 100%;
@@ -160,7 +160,7 @@ body {
         width: 30%;
         min-width: 400px;
         max-width: 600px;
-        top: 106px;
+        /* top: 106px; */
 
     }
 }
