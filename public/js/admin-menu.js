@@ -811,7 +811,7 @@ console.log('✅ sidebar js loaded');
     })();
 })();
 
-if (window.APP_ENV !== 'production') {
+// if (window.APP_ENV !== 'production') {
     window.addEventListener('load', function () {
         fetch('/__debugbar/screen', {
             method: 'POST',
@@ -827,4 +827,4 @@ if (window.APP_ENV !== 'production') {
             })
         });
     });
-}
+// }
