@@ -512,6 +512,8 @@ function reelsManager() {
         
         filterReels() {
             const query = this.searchQuery.toLowerCase().trim();
+            const currentReelId = this.selectedReelId || (this.filteredReels[this.currentVideoIndex]?.id);
+            const currentReel = this.filteredReels[this.currentVideoIndex];
             
             if (!query) {
                 this.filteredReels = this.allReels;
@@ -526,8 +528,27 @@ function reelsManager() {
                 });
             }
             
-            this.currentVideoIndex = 0;
-            this.loadedVideos = new Set([0, 1, 2]);
+            // الحفاظ على الريل الحالي حتى لو لم يكن في النتائج
+            if (currentReelId && currentReel) {
+                const currentIndex = this.filteredReels.findIndex(r => r.id === currentReelId);
+                if (currentIndex !== -1) {
+                    // الريل الحالي موجود في النتائج - نبقى عليه
+                    this.currentVideoIndex = currentIndex;
+                    this.loadedVideos = new Set([
+                        Math.max(0, currentIndex - 1),
+                        currentIndex,
+                        Math.min(this.filteredReels.length - 1, currentIndex + 1)
+                    ]);
+                } else {
+                    // الريل الحالي غير موجود في النتائج - نضيفه في البداية
+                    this.filteredReels = [currentReel, ...this.filteredReels];
+                    this.currentVideoIndex = 0;
+                    this.loadedVideos = new Set([0, 1, 2]);
+                }
+            } else {
+                this.currentVideoIndex = 0;
+                this.loadedVideos = new Set([0, 1, 2]);
+            }
         },
         
         formatDate(dateString) {
