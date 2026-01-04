@@ -354,8 +354,9 @@
                             </div>
                         </div>
                         
-                        <!-- Interaction Buttons (Left Side for Arabic) -->
-                        <div class="absolute right-4 bottom-24 flex flex-col gap-4 z-20 md:right-auto md:left-4">
+                        <!-- Interaction Buttons (Dynamic Position Based on Language) -->
+                        <div class="absolute bottom-24 flex flex-col gap-4 z-20 
+                                    {{ app()->getLocale() == 'ar' ? 'right-4 md:right-auto md:left-4' : 'left-4 md:left-auto md:right-4' }}">
                             <!-- Likes Button -->
                             <button @click.stop="toggleInteraction('likes', reel.id)"
                                     :class="activeTab === 'likes' && selectedReelId === reel.id ? 'scale-110' : 'hover:bg-white/30'"
@@ -501,7 +502,7 @@
                     <div class="space-y-3">
                         <template x-for="like in likes" :key="like.id">
                             <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
-                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <img :src="like.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + like.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
                                      :alt="like.user?.name">
@@ -593,7 +594,7 @@
                     <div class="space-y-3">
                         <template x-for="gift in gifts" :key="gift.id">
                             <div class="rounded-lg p-4 transition hover:shadow-md"
-                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
                                     <img :src="gift.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + gift.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
@@ -623,7 +624,7 @@
                                         
                                         <!-- معلومات الهدية -->
                                         <div class="mt-2 flex items-center gap-2 p-2 rounded-lg"
-                                             style="background-color: var(--dark-primary-colo); border: 1px solid var(--primary-hover-alpha);">
+                                             style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                             <div class="text-3xl" x-text="getGiftEmoji(gift.gift_type)"></div>
                                             <div class="flex-1">
                                                 <p class="text-sm font-semibold" 

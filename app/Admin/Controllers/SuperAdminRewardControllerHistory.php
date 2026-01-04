@@ -6,16 +6,17 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Selectables\Badges;
-use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Modules\Vip\Entities\OVip;
 use App\Selectables\SuperAdmins;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
+use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
 
 class SuperAdminRewardControllerHistory extends MainController
 {
@@ -85,6 +86,8 @@ class SuperAdminRewardControllerHistory extends MainController
     {
         $grid = new Grid(new SuperAdminReward());
         $type = request('type') ?? 'vip';
+
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -107,10 +110,29 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('Created At'))->date();
             });
         });
-        $grid->model()->where('type', $type)->with(['superAdmin', 'admin','areaManager', 'ware', 'vip', 'badge']);
+        $grid->model()->where('type', $type)->with([
+            'superAdmin',
+            'admin',
+            'user',
+            'user.senderLevel',
+            'user.receiverLevel',
+            'user.profile',
+            'user.country',
+            'areaManager',
+            'ware',
+            'vip',
+            'badge'
+        ]);
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
+            if ($this->user_type == 'user') {
 
+                $user = $this->user;
+                if (!$user) {
+                    return __('No User');
+                }
+                return app(UserService::class)->adminUserAvatar($user);
+            }
             $admin = $this->user_type == 'super_admin' ? $this->superAdmin : $this->areaManager;
             $name = @$admin->name ?? '';
             $uid = @$admin->username ?? '';
