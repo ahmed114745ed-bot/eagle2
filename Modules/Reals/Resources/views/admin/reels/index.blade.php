@@ -63,9 +63,9 @@
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="ابحث بالاسم أو المعرف..."
-                       class="w-full px-3 py-2 pr-10 rounded-md text-gray-800 text-sm focus:outline-none border border-white/30"
+                       class="w-full px-3 py-2 ps-10 rounded-md text-gray-800 text-sm focus:outline-none border border-white/30"
                        style="box-shadow: 0 0 0 2px var(--primary-hover-alpha);">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
             </div>
             
             <div class="flex items-center justify-between mt-2">
@@ -604,7 +604,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white0 rounded-2xl shadow-2xl w-full max-w-md p-6"
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6"
              x-show="showDeleteModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -673,7 +673,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
         
-        <div class="bg-white0 rounded-2xl shadow-2xl w-full max-w-lg p-6"
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6"
              x-show="showEditModal"
              @click.stop
              x-transition:enter="transition ease-out duration-300"
@@ -792,8 +792,8 @@
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="ابحث بالاسم أو المعرف..."
-                       class="w-full px-3 sm:px-4 py-2 pr-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                       class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none">
+                <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
             </div>
             <p class="text-xs sm:text-sm mt-2 text-gray-600" x-text="filteredReels.length + ' ريل'"></p>
         </div>
