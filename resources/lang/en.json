@@ -19,6 +19,12 @@
 "History switch change country request": "Change Country Requests History",
 "Status switch change country request": "Change Country Request Actions Button",
     "action": "Action",
+    "Edit super package reward": "Edit super package reward",
+  "Admin Reward": "Reward",
+  "Dedicate switch admin reward": "Assign reward",
+  "Browse admin reward": "View rewards",
+  "Admin Reward History": "Reward history",
+  "Browse admin reward history": "View reward history"
     "Move switch gift": "Move",
     "Charge switch superadmin": "Freeze wallet",
     "Charge switch area manager": "Frozen Wallet Button area manager",

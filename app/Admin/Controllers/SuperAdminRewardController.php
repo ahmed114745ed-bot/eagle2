@@ -52,7 +52,7 @@ class SuperAdminRewardController extends MainController
     {
         $content = new Row();
 
-        $types =  ['vip', 'ware', 'badge', 'package'];
+        $types =  ['vip', 'ware', 'badge', 'package',/**'other'*/];
         $currentType = request()->get('type', 'vip');
 
         $box = new Box(content: view('admin.grid.Form.rewardTabs', [
@@ -117,7 +117,7 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
+        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) && request('type') != 'package') {
             $grid->tools(function (Grid\Tools $tools) {
                 $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
