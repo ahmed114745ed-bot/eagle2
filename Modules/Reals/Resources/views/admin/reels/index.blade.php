@@ -638,7 +638,7 @@
     </div>
 
     <!-- Overlay (only on small screens when panel is open) -->
-    <div class=" fixed inset-0  z-40"
+    <div class="  inset-0  z-40"
          x-show="showInteractionPanel"
          @click.stop="showInteractionPanel = false"
          x-transition:enter="transition ease-out duration-300"
