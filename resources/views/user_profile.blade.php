@@ -1027,10 +1027,6 @@
             color: #333;
             font-weight: 500;
         }
-
-        .nav>li>a:hover, .nav>li>a:active, .nav>li>a:focus {
-            background: var(--secondary-color) !important;
-        }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
