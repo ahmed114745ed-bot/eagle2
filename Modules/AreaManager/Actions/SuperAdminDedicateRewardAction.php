@@ -11,11 +11,12 @@ use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Enums\UserCoinLogType;
 use Modules\Vip\Entities\OVip;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
+use Modules\AreaManager\Entities\Region;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Encore\Admin\Facades\Admin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
@@ -120,12 +121,14 @@ function pu(val) {
         static $admins = null;
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
 
-        $countries = Country::where('area_manager_id',  $authId)->pluck('id')->toArray();
+         $region = Region::where('manager_id', $authId)->with('countries')->first();
+        $countries = $region->countries->pluck('id')->toArray();
         if ($admins === null) {
             $admins = SuperAdmin::query()
+                ->whereIn('country_id', $countries)
                 ->where('type', 'superadmin')
                 ->whereNull('deleted_at')
-                ->pluck('name', 'id')->whereIn('country_id', $countries)
+                ->pluck('name', 'id')
                 ->toArray();
         }
 
