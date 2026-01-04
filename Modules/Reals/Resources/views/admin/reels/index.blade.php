@@ -269,23 +269,29 @@
                                 <!-- Dropdown Menu -->
                                 <div x-show="open" 
                                      @click.away="open = false"
-                                     x-transition:enter="transition ease-out duration-200"
-                                     x-transition:enter-start="opacity-0 scale-90"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="opacity-0 scale-95"
                                      x-transition:enter-end="opacity-100 scale-100"
-                                     x-transition:leave="transition ease-in duration-150"
+                                     x-transition:leave="transition ease-in duration-75"
                                      x-transition:leave-start="opacity-100 scale-100"
-                                     x-transition:leave-end="opacity-0 scale-90"
-                                     class="absolute left-82 mt-2 w-40 bg-white rounded-lg shadow-2xl z-50 overflow-hidden border border-gray-200"
-                                     style="display: none; left: -82px; !important;">
+                                     x-transition:leave-end="opacity-0 scale-95"
+                                     class="absolute mt-2 w-44 rounded-lg shadow-2xl z-50 overflow-hidden border-2"
+                                     style="left: -88px; background: var(--primary-gradient); border-color: var(--primary-color);">
                                     <button @click.stop="editReel(reel); open = false" 
-                                            class="w-full px-4 py-3 text-right flex items-center gap-3 hover:bg-gray-50 transition text-gray-700">
-                                        <i class="fas fa-edit" style="color: var(--primary-color);"></i>
+                                            class="w-full px-4 py-3 text-right flex items-center gap-3 transition text-white"
+                                            style="background-color: rgba(255, 255, 255, 0.05);"
+                                            onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'"
+                                            onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'">
+                                        <i class="fas fa-edit text-white"></i>
                                         <span class="font-semibold">تعديل</span>
                                     </button>
-                                    <div class="border-t border-gray-200"></div>
+                                    <div class="border-t" style="border-color: rgba(255, 255, 255, 0.2);"></div>
                                     <button @click.stop="deleteReel(reel.id); open = false" 
-                                            class="w-full px-4 py-3 text-right flex items-center gap-3 hover:bg-red-50 transition text-red-600">
-                                        <i class="fas fa-trash"></i>
+                                            class="w-full px-4 py-3 text-right flex items-center gap-3 transition text-white"
+                                            style="background-color: rgba(239, 68, 68, 0.1);"
+                                            onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.25)'"
+                                            onmouseout="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'">
+                                        <i class="fas fa-trash text-red-300"></i>
                                         <span class="font-semibold">حذف</span>
                                     </button>
                                 </div>
@@ -407,13 +413,13 @@
 
 
     <!-- Interactions Panel (Right Side) - Slide In Panel -->
-    <div class=" right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 max-md:top-[30px]"
+    <div class=" right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] bg-white shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
          :class="showInteractionPanel ? 'translate-x-0' : 'ltr:translate-x-full rtl:-translate-x-full'"
          x-show="showInteractionPanel"
-         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
          x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in duration-300"
+         x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full">
         
@@ -425,6 +431,12 @@
 
         <!-- Tabs Header -->
         <div class="p-3 sm:p-4 pt-5 sm:pt-6" style="background: var(--primary-gradient);">
+            <!-- Refresh Button -->
+            <button @click="refreshReelCounts(selectedReelId)" 
+                    class="absolute top-16 left-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition text-white">
+                <i class="fas fa-sync-alt text-sm"></i>
+            </button>
+            
             <div class="flex space-x-1 sm:space-x-2 space-x-reverse">
                 <button @click="activeTab = 'likes'; loadTabData()" 
                         :class="activeTab === 'likes' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
@@ -735,7 +747,7 @@
                 <span class="text-white text-xs font-bold px-1.5" x-text="filteredReels.length"></span>
             </div>
             <!-- Pulse Animation -->
-            <div class="absolute inset-0 rounded-2xl animate-ping opacity-20" style="background-color: var(--primary-color);"></div>
+            <!-- <div class="absolute inset-0 rounded-2xl animate-ping opacity-20" style="background-color: var(--primary-color);"></div> -->
         </div>
     </button>
     

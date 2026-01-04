@@ -69,13 +69,23 @@ function reelsManager() {
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
                 
+                // تحديث الأرقام للريلز الأولية
+                this.refreshVisibleReelsCounts();
+                
                 // تحميل بقية الريلز بعد 500ms
                 setTimeout(() => {
                     if (this.filteredReels.length < this.allReels.length) {
                         const nextBatch = this.allReels.slice(6, 15);
                         this.filteredReels = [...this.filteredReels, ...nextBatch];
+                        // تحديث أرقام الدفعة الجديدة
+                        this.refreshVisibleReelsCounts();
                     }
                 }, 500);
+                
+                // تحديث الأرقام كل 30 ثانية للريلز المرئية
+                setInterval(() => {
+                    this.refreshVisibleReelsCounts();
+                }, 30000);
             });
         },
         
@@ -337,11 +347,104 @@ function reelsManager() {
             this.selectedReel = this.filteredReels.find(r => r.id === reelId);
             this.showInteractionPanel = true;
             
+            // Load data in background without waiting and refresh counts
             await this.loadTabData();
         },
         
         closeInteractionPanel() {
             this.showInteractionPanel = false;
+            // Refresh counts when closing to catch any updates
+            if (this.selectedReelId) {
+                this.refreshReelCounts(this.selectedReelId);
+            }
+        },
+        
+        async refreshReelCounts(reelId) {
+            try {
+                const response = await fetch(`/admin/view/reels/${reelId}`);
+                const data = await response.json();
+                
+                if (data.reel) {
+                    this.updateReelCounts(reelId, data.reel);
+                }
+            } catch (error) {
+                console.error('Error refreshing reel counts:', error);
+            }
+        },
+        
+        async refreshVisibleReelsCounts() {
+            // Get currently visible reels (current +/- 2)
+            const visibleIndexes = [];
+            for (let i = Math.max(0, this.currentVideoIndex - 2); 
+                 i <= Math.min(this.filteredReels.length - 1, this.currentVideoIndex + 2); 
+                 i++) {
+                visibleIndexes.push(i);
+            }
+            
+            // Batch update for better performance
+            const reelIds = visibleIndexes.map(i => this.filteredReels[i]?.id).filter(Boolean);
+            
+            if (reelIds.length === 0) return;
+            
+            try {
+                // Fetch counts for multiple reels in one request
+                const response = await fetch(`/admin/view/reels/batch-counts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({ reel_ids: reelIds })
+                });
+                
+                if (!response.ok) {
+                    // Fallback: update one by one
+                    for (const reelId of reelIds.slice(0, 3)) { // Limit to 3 to avoid too many requests
+                        await this.refreshReelCounts(reelId);
+                    }
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.reels) {
+                    data.reels.forEach(reel => {
+                        this.updateReelCounts(reel.id, reel);
+                    });
+                }
+            } catch (error) {
+                console.error('Error refreshing visible reels counts:', error);
+            }
+        },
+        
+        updateReelCounts(reelId, reelData) {
+            // Update in filteredReels
+            const reelIndex = this.filteredReels.findIndex(r => r.id === reelId);
+            if (reelIndex !== -1) {
+                this.filteredReels[reelIndex] = {
+                    ...this.filteredReels[reelIndex],
+                    likes_count: reelData.likes_count || 0,
+                    comments_count: reelData.comments_count || 0,
+                    gifts_count: reelData.gifts_count || 0,
+                    views_count: reelData.views_count || 0
+                };
+            }
+            
+            // Update in allReels
+            const allReelIndex = this.allReels.findIndex(r => r.id === reelId);
+            if (allReelIndex !== -1) {
+                this.allReels[allReelIndex] = {
+                    ...this.allReels[allReelIndex],
+                    likes_count: reelData.likes_count || 0,
+                    comments_count: reelData.comments_count || 0,
+                    gifts_count: reelData.gifts_count || 0,
+                    views_count: reelData.views_count || 0
+                };
+            }
+            
+            // Force reactivity
+            this.filteredReels = [...this.filteredReels];
+            this.allReels = [...this.allReels];
         },
         
         async selectReel(reelId) {
@@ -361,12 +464,49 @@ function reelsManager() {
                 const response = await fetch(`/admin/view/reels/${this.selectedReelId}`);
                 const data = await response.json();
                 
-                this.selectedReel = data.reel;
-                this.likes = data.likes;
-                this.comments = data.comments;
-                this.gifts = data.gifts;
+                // Update the selected reel with fresh data
+                if (data.reel) {
+                    this.selectedReel = data.reel;
+                    
+                    // Update the reel in the lists with actual counts - REACTIVE UPDATE
+                    const reelIndex = this.filteredReels.findIndex(r => r.id === this.selectedReelId);
+                    if (reelIndex !== -1) {
+                        // Create a new object to trigger reactivity
+                        this.filteredReels[reelIndex] = {
+                            ...this.filteredReels[reelIndex],
+                            likes_count: data.reel.likes_count || 0,
+                            comments_count: data.reel.comments_count || 0,
+                            gifts_count: data.reel.gifts_count || 0,
+                            views_count: data.reel.views_count || 0
+                        };
+                    }
+                    
+                    const allReelIndex = this.allReels.findIndex(r => r.id === this.selectedReelId);
+                    if (allReelIndex !== -1) {
+                        // Create a new object to trigger reactivity
+                        this.allReels[allReelIndex] = {
+                            ...this.allReels[allReelIndex],
+                            likes_count: data.reel.likes_count || 0,
+                            comments_count: data.reel.comments_count || 0,
+                            gifts_count: data.reel.gifts_count || 0,
+                            views_count: data.reel.views_count || 0
+                        };
+                    }
+                    
+                    // Force Alpine.js to re-render by updating the arrays
+                    this.filteredReels = [...this.filteredReels];
+                    this.allReels = [...this.allReels];
+                }
+                
+                this.likes = data.likes || [];
+                this.comments = data.comments || [];
+                this.gifts = data.gifts || [];
             } catch (error) {
                 console.error('Error fetching reel data:', error);
+                // Set empty arrays on error
+                this.likes = [];
+                this.comments = [];
+                this.gifts = [];
             }
         },
         
