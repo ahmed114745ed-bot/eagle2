@@ -502,7 +502,7 @@
                     <div class="space-y-3">
                         <template x-for="like in likes" :key="like.id">
                             <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
-                                 style="background-color: var(--box-background-color); border: 1px solid var(--primary-hover-alpha);">
+                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <img :src="like.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + like.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
                                      :alt="like.user?.name">
