@@ -48,6 +48,10 @@
     }
 
     @media (max-width: 768px) {
+        .rtl .dropdown-menu {
+            left: 12%;
+        }
+
         .main-sidebar, .left-side {
             padding-top: 20% !important;
         }

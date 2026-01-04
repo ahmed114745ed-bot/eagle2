@@ -368,48 +368,365 @@
         }
     }
 
+    /* Media query for phones 400-500px width */
+    @media (max-width: 500px) and (min-width: 400px) {
+        .dashboard-container {
+            padding: 8px !important;  /* Changed: symmetric padding */
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;  /* Added: was missing */
+            overflow-x: hidden;
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            margin: 18px 0 12px 0;
+            padding: 0 8px;  /* Changed: symmetric */
+        }
+
+        .stats-grid {
+            gap: 12px;
+            grid-template-columns: 1fr;
+            padding: 0;  /* Changed: removed asymmetric padding */
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .card-header {
+            padding: 11px 14px;
+            font-size: 0.95rem;
+        }
+
+        .tab-content {
+            padding: 12px 8px !important;  /* Changed: symmetric */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .tabs-container {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .widget-card {
+            margin-bottom: 12px;
+            overflow-x: auto;
+            margin-left: 0 !important;  /* Changed */
+            margin-right: 0 !important;  /* Changed */
+        }
+
+        .widget-card-premium {
+            padding: 18px;
+            border-radius: 16px;
+            margin-left: 0 !important;  /* Changed */
+            margin-right: 0 !important;  /* Changed */
+        }
+
+        .balance-card .row > div {
+            margin-bottom: 12px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 0 !important;  /* Changed: was -4px */
+            margin-right: 0 !important;  /* Changed: was -4px */
+        }
+
+        .col-md-6, .col-lg-3, .col-xl-2, .col-md-12, .col-lg-6, .col-12 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            padding-left: 0 !important;  /* Changed */
+            padding-right: 0 !important;  /* Changed */
+        }
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 3px 4px !important;  /* Changed: symmetric */
+            margin: 0 !important;  /* Changed */
+            border-radius: 8px;
+        }
+
+        .stats-masonry {
+            padding: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+
     @media (max-width: 480px) {
         .dashboard-container {
-            padding: 5px;
+            padding: 4px !important;  /* Smaller symmetric padding */
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            overflow-x: hidden;
         }
 
         .section-header {
             font-size: 1.2rem;
-            margin: 15px 0 10px 0;
+            margin: 12px 0 8px 0;  /* Smaller margins */
+            padding: 0 4px;  /* Smaller symmetric padding */
         }
 
         .stats-grid {
-            gap: 10px;
+            gap: 8px;  /* Smaller gap */
+            grid-template-columns: 1fr;
+            padding: 0;
+            margin: 0;
         }
 
         .card-body {
-            padding: 10px;
+            padding: 8px;  /* Smaller padding */
         }
 
         .card-header {
-            padding: 10px 12px;
+            padding: 8px 10px;  /* Smaller padding */
             font-size: 0.9rem;
         }
 
         .tab-content {
-            padding: 10px;
-            margin: 0 -5px;
+            padding: 8px 4px !important;  /* Smaller symmetric padding */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .tabs-container {
+            padding: 0 !important;
+            margin: 0 !important;
         }
 
         .widget-card {
-            margin-bottom: 10px;
+            margin-bottom: 8px;  /* Smaller margin */
+            overflow-x: auto;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
         }
 
         .widget-card-premium {
-            padding: 15px;
+            padding: 12px;  /* Smaller padding */
+            border-radius: 12px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .balance-card .row > div {
+            margin-bottom: 8px;  /* Smaller margin */
         }
 
         .row {
-            display: block !important;
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .col-md-6, .col-lg-3, .col-xl-2, .col-md-12, .col-lg-6, .col-12 {
+            width: 100% !important;
+            flex: 0 0 100%;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        table {
+            font-size: 0.8rem;  /* Smaller font */
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 2px 3px !important;  /* Smaller symmetric padding */
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .stats-masonry {
+            padding: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+
+    /* Responsive for small desktops/tablets 800-1024px */
+    @media (max-width: 1024px) and (min-width: 800px) {
+        .dashboard-container {
+            padding: 12px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            overflow-x: hidden;
+        }
+
+        .section-header {
+            font-size: 1.6rem;
+            margin: 20px 0 14px 0;
+            padding: 0;
+        }
+
+        .stats-grid {
+            gap: 12px;
+            grid-template-columns: 1fr;  /* Single column for better fit */
+            padding: 0;
+            margin: 0;
+        }
+
+        .stats-masonry {
+            grid-template-columns: 1fr;  /* Single column */
+            gap: 12px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .card {
+            margin-bottom: 12px;
+        }
+
+        .card-body {
+            padding: 14px;
+        }
+
+        .card-header {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+        }
+
+        .tab-content {
+            padding: 12px !important;
+            margin: 0 !important;
+            border-radius: 8px;
+        }
+
+        .tabs-container {
+            padding: 0 !important;
+            margin: 0 0 16px 0 !important;
         }
 
         .widget-card {
+            margin-bottom: 12px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .widget-card-premium {
+            padding: 16px;
+            border-radius: 14px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            gap: 12px;
+        }
+
+        /* Force single column layout for cleaner appearance */
+        .col-md-6,
+        .col-lg-3,
+        .col-xl-2,
+        .col-md-12,
+        .col-lg-6,
+        .col-12,
+        .col-lg-4,
+        .col-xl-3,
+        [class*="col-"] {
+            width: 100% !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Or if you want 2 columns, use this instead:
+        .col-lg-6,
+        .col-md-6 {
+            width: calc(50% - 6px) !important;
+            flex: 0 0 calc(50% - 6px) !important;
+            max-width: calc(50% - 6px) !important;
+        }
+        */
+
+        table {
+            font-size: 0.85rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 8px 10px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto !important;
+        }
+
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 4px !important;
+            margin: 0 !important;
+            border-radius: 8px;
             overflow-x: auto;
+        }
+
+        .nav-tabs li {
+            margin: 2px 4px;
+        }
+
+        .nav-tabs .nav-link {
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            white-space: nowrap;
+        }
+
+        /* RTL specific fixes */
+        [dir="rtl"] .dashboard-container {
+            padding: 12px !important;
+        }
+
+        [dir="rtl"] .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        [dir="rtl"] [class*="col-"] {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        /* Ensure content fills available width */
+        .tab-pane {
+            width: 100%;
+        }
+
+        .tab-pane > .col-md-12 {
+            padding: 0 !important;
+        }
+
+        /* Fix for mb-3 and mb-4 classes */
+        .mb-3 {
+            margin-bottom: 12px !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 16px !important;
         }
     }
 
@@ -510,6 +827,39 @@
 
         .nav-tabs .nav-link i {
             margin-right: 4px;
+        }
+    }
+
+    /* Optimized for 400-500px phones */
+    @media (max-width: 500px) and (min-width: 400px) {
+        .nav-tabs {
+            justify-content: flex-start;
+            padding: 3px 0;
+            margin: 0 4px;
+            border-radius: 8px;
+        }
+
+        .nav-tabs li {
+            margin: 2px 3px;
+            flex-shrink: 0;
+        }
+
+        .nav-tabs .nav-link {
+            font-size: 0.8rem;
+            padding: 7px 10px;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 3px;
+            font-size: 0.75rem;
+        }
+
+        .tab-content {
+            padding-top: 15px;
+            margin: 0;
+            border-radius: 0;
         }
     }
 

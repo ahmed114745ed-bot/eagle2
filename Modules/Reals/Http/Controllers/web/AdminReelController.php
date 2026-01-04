@@ -16,10 +16,8 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
-        $reels = Real::with('user')
-            ->withCount('Views')
-            ->select(['id', 'user_id', 'description', 'url', 'intro_image', 
-                      'like_num', 'comment_num', 'share_num', 'sub_video', 'created_at'])
+        $reels = Real::with(['user.profile', 'user.country'])
+            ->withCount(['likes', 'comments', 'Views'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
@@ -32,8 +30,8 @@ class AdminReelController extends MainController
                     'description' => $reel->description,
                     'video_url' => $reel->url,
                     'thumbnail_url' => $reel->intro_image ?: $reel->url,
-                    'likes_count' => $reel->like_num,
-                    'comments_count' => $reel->comment_num,
+                    'likes_count' => $reel->likes_count ?? 0,
+                    'comments_count' => $reel->comments_count ?? 0,
                     'views_count' => $reel->views_count ?? 0,
                     'gifts_count' => 0,
                     'created_at' => $reel->created_at,
@@ -41,8 +39,6 @@ class AdminReelController extends MainController
             });
 
         return $content
-            ->header('إدارة الريلز')
-            ->description('عرض وإدارة الريلز')
             ->body(view('reals::admin.reels.index', compact('reels')));
     }
     
@@ -51,10 +47,8 @@ class AdminReelController extends MainController
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 20);
         
-        $reels = Real::with('user:id,name,email')
-            ->withCount('Views')
-            ->select(['id', 'user_id', 'description', 'url', 'intro_image', 
-                      'like_num', 'comment_num', 'share_num', 'sub_video', 'created_at'])
+        $reels = Real::with(['user.profile', 'user.country'])
+            ->withCount(['likes', 'comments', 'Views'])
             ->orderBy('created_at', 'desc')
             ->skip($offset)
             ->take($limit)
@@ -68,8 +62,8 @@ class AdminReelController extends MainController
                     'description' => $reel->description,
                     'video_url' => $reel->url,
                     'thumbnail_url' => $reel->intro_image ?: $reel->url,
-                    'likes_count' => $reel->like_num,
-                    'comments_count' => $reel->comment_num,
+                    'likes_count' => $reel->likes_count ?? 0,
+                    'comments_count' => $reel->comments_count ?? 0,
                     'views_count' => $reel->views_count ?? 0,
                     'gifts_count' => 0,
                     'created_at' => $reel->created_at,
@@ -88,7 +82,8 @@ class AdminReelController extends MainController
 
     public function show($id, Content $content)
     {
-        $reel = Real::with(['user', 'likes.user', 'comments.user'])
+        $reel = Real::with(['user.profile', 'user.country', 'likes.user.profile', 'likes.user.country', 'comments.user.profile', 'comments.user.country'])
+            ->withCount(['likes', 'comments', 'Views'])
             ->findOrFail($id);
 
         return response()->json([
@@ -100,9 +95,9 @@ class AdminReelController extends MainController
                 'description' => $reel->description,
                 'video_url' => $reel->url,
                 'thumbnail_url' => $reel->intro_image ?: $reel->url,
-                'likes_count' => $reel->like_num,
-                'comments_count' => $reel->comment_num,
-                'views_count' => $reel->Views()->count(),
+                'likes_count' => $reel->likes_count ?? 0,
+                'comments_count' => $reel->comments_count ?? 0,
+                'views_count' => $reel->views_count ?? 0,
                 'gifts_count' => 0,
                 'created_at' => $reel->created_at,
             ],
@@ -115,7 +110,7 @@ class AdminReelController extends MainController
     public function getLikes($id)
     {
         $reel = Real::findOrFail($id);
-        $likes = $reel->likes()->with('user')->get();
+        $likes = $reel->likes()->with(['user.profile', 'user.country'])->get();
 
         return response()->json(['likes' => $likes]);
     }
@@ -123,7 +118,7 @@ class AdminReelController extends MainController
     public function getComments($id)
     {
         $reel = Real::findOrFail($id);
-        $comments = $reel->comments()->with('user')->orderBy('created_at', 'desc')->get();
+        $comments = $reel->comments()->with(['user.profile', 'user.country'])->orderBy('created_at', 'desc')->get();
 
         return response()->json(['comments' => $comments]);
     }
@@ -132,6 +127,41 @@ class AdminReelController extends MainController
     {
         // الهدايا غير مفعلة حالياً في النظام
         return response()->json(['gifts' => []]);
+    }
+    
+    public function batchCounts(Request $request)
+    {
+        try {
+            $reelIds = $request->input('reel_ids', []);
+            
+            if (empty($reelIds) || !is_array($reelIds)) {
+                return response()->json(['reels' => []]);
+            }
+            
+            // Limit to prevent abuse
+            $reelIds = array_slice($reelIds, 0, 10);
+            
+            $reels = Real::whereIn('id', $reelIds)
+                ->withCount(['likes', 'comments', 'Views'])
+                ->get(['id'])
+                ->map(function($reel) {
+                    return [
+                        'id' => $reel->id,
+                        'likes_count' => $reel->likes_count ?? 0,
+                        'comments_count' => $reel->comments_count ?? 0,
+                        'views_count' => $reel->views_count ?? 0,
+                        'gifts_count' => 0,
+                    ];
+                });
+            
+            return response()->json(['reels' => $reels]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching batch counts', [
+                'error' => $e->getMessage()
+            ]);
+            
+            return response()->json(['reels' => []], 500);
+        }
     }
     
     public function update($id, \Illuminate\Http\Request $request = null)
