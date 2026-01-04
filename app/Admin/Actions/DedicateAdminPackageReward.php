@@ -65,7 +65,7 @@ class DedicateAdminPackageReward extends Action
                         'type' => $reward->type,
                         'target' => $reward->target,
                         'expire' => $reward->expire,
-                        'no_reward' => $reward->quantity,
+                        'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement'? 1 : $reward->quantity,
                         'user_type' => $userType,
                         'created_by' => Admin::user()->id,
                     ]);
@@ -85,10 +85,10 @@ class DedicateAdminPackageReward extends Action
         $this->select('user_type', __('user Type'))->options(['area_manager' => __('Region Manager'), 'super_admin' => __('Country Manager'), 'user' => __('User')])->default('area_manager')->required()->attribute(['id' => 'user-type-select']);
 
         $this->multipleSelect('area_admin_id', __('Select Region Manager'))
-            ->options(self::getSuperAdmins())->attribute(['id' => 'area-admin-select']);
+            ->options(self::getAreaAdmins())->attribute(['id' => 'area-admin-select']);
 
         $this->multipleSelect('super_admin_id', __('Select Country Manager'))
-            ->options(self::getAreaAdmins())->attribute(['id' => 'super-admin-select']);
+            ->options(self::getSuperAdmins())->attribute(['id' => 'super-admin-select']);
         $this->text('user_uuid', __('user uuid'))->attribute(['id' => 'user-select']);
 
         Admin::script(<<<'SCRIPT'
@@ -177,7 +177,7 @@ class DedicateAdminPackageReward extends Action
         ]);
 
         switch ($reward->type) {
-            case "coins":
+            case "coin":
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
