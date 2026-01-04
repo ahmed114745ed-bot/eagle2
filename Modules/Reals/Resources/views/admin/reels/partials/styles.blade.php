@@ -22,6 +22,10 @@ body {
     gap: 0;
 }
 
+.reels-main-container.panel-open {
+    gap: 1rem;
+}
+
 /* Sidebar adjustments */
 .reels-sidebar {
     height: 100%;
@@ -35,6 +39,7 @@ body {
     height: 100%;
     flex: 1;
     min-width: 0;
+    transition: flex 0.2s ease-in-out;
 }
 
 .video-item-height {
@@ -44,39 +49,51 @@ body {
     margin: 0 auto;
 }
 
-/* Interactions Panel - Always visible on large screens */
+/* Interactions Panel - Part of flex layout when open */
 .interactions-panel {
     height: 100%;
-    width: 30%;
-    min-width: 400px;
-    max-width: 600px;
+    width: 0;
+    min-width: 0;
     flex-shrink: 0;
     background: white;
     border-left: 1px solid #e5e7eb;
-    overflow-y: auto;
+    overflow: hidden;
     position: relative;
+    transition: width 0.2s ease-in-out, min-width 0.2s ease-in-out;
+}
+
+.interactions-panel.show {
+    width: 30%;
+    min-width: 400px;
+    max-width: 600px;
+    overflow-y: auto;
 }
 
 /* Show panel as overlay on small/medium screens */
 @media (max-width: 1279px) {
     .interactions-panel {
-        position: fixed !important;
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 50;
+        transform: translateX(100%);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .interactions-panel.show {
         width: 500px;
         max-width: 90vw;
+        transform: translateX(0);
     }
 }
 
-/* On XL screens and larger, always show panel */
+/* On XL screens and larger, adjust width only */
 @media (min-width: 1280px) {
     .interactions-panel {
-        display: block !important;
-        position: relative !important;
-        transform: translateX(0) !important;
-    }
-    
-    /* Hide interaction buttons on large screens since panel is always visible */
-    .interaction-toggle-btn {
-        display: none;
+        width: 30%;
+        min-width: 400px;
+        max-width: 600px;
     }
 }
 

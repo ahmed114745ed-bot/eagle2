@@ -17,7 +17,9 @@
         @include('reals::admin.reels.partials.styles')
     </style>
 
-<div class="reels-main-container flex " x-data="reelsManager()" x-cloak>
+<div class="reels-main-container flex" 
+     :class="{'panel-open': showInteractionPanel}"
+     x-data="reelsManager()" x-cloak>
     <!-- Mobile Overlay Background -->
     <div class="mobile-sidebar-overlay" 
          :class="{ 'active': isMobileSidebarOpen }"
@@ -414,24 +416,16 @@
     </div>
 
 
-    <!-- Interactions Panel (Right Side) - Always visible on large screens, slide on small -->
-    <div class="interactions-panel xl:block xl:relative xl:translate-x-0
-                fixed right-0 top-0 md:top-0 bottom-0 w-full sm:w-[90%] md:w-[500px] lg:w-[600px] 
-                shadow-2xl transform transition-transform duration-200 ease-in-out z-50 max-md:top-[30px]"
-         style="background-color: var(--box-background-color);"
-         :class="{'translate-x-0': showInteractionPanel || window.innerWidth >= 1280, 'ltr:translate-x-full rtl:-translate-x-full': !showInteractionPanel && window.innerWidth < 1280}"
-         x-show="showInteractionPanel || window.innerWidth >= 1280"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full">
+    <!-- Interactions Panel (Right Side) - Opens only when clicking interaction buttons -->
+    <div class="interactions-panel"
+         :class="{'show': showInteractionPanel}"
+         x-show="showInteractionPanel"
+         style="background-color: var(--box-background-color);">
         
         <!-- Close Button (works on all screens) -->
-        <button @click="closeInteractionPanel()"
-                class="absolute top-4 right-4 ltr:right-4 rtl:left-4 w-10 h-10 sm:w-12 sm:h-12 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-lg z-10 transition">
-            <i class="fas fa-times text-lg sm:text-xl"></i>
+        <button @click.stop="showInteractionPanel = false"
+                class="absolute top-4 right-4 ltr:right-4 rtl:left-4 w-10 h-10 sm:w-12 sm:h-12 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-2xl z-[100] transition transform hover:scale-110 cursor-pointer">
+            <i class="fas fa-times text-lg sm:text-xl pointer-events-none"></i>
         </button>
 
         <!-- Tabs Header -->
@@ -643,10 +637,10 @@
         </div>
     </div>
 
-    <!-- Overlay (only on small screens) -->
-    <div class="xl:hidden fixed inset-0 bg-black/50 z-40"
-         x-show="showInteractionPanel && window.innerWidth < 1280"
-         @click="closeInteractionPanel()"
+    <!-- Overlay (only on small screens when panel is open) -->
+    <div class=" fixed inset-0 bg-black/50 z-40"
+         x-show="showInteractionPanel"
+         @click.stop="showInteractionPanel = false"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
