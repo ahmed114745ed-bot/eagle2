@@ -8,7 +8,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Modules\Reals\Entities\Real;
 use App\Admin\Controllers\MainController;
 
@@ -17,6 +17,7 @@ class AdminReelController extends MainController
     public function index(Content $content)
     {
         $reels = Real::with('user')
+            ->withCount('Views')
             ->select(['id', 'user_id', 'description', 'url', 'intro_image', 
                       'like_num', 'comment_num', 'share_num', 'sub_video', 'created_at'])
             ->orderBy('created_at', 'desc')
@@ -33,8 +34,8 @@ class AdminReelController extends MainController
                     'thumbnail_url' => $reel->intro_image ?: $reel->url,
                     'likes_count' => $reel->like_num,
                     'comments_count' => $reel->comment_num,
-                    'views_count' => $reel->Views()->count(),
-                    'gifts_count' => 0, // مؤقتاً حتى يتم إضافة نظام الهدايا
+                    'views_count' => $reel->views_count ?? 0,
+                    'gifts_count' => 0,
                     'created_at' => $reel->created_at,
                 ];
             });
@@ -47,10 +48,11 @@ class AdminReelController extends MainController
     
     public function loadMore(Request $request)
     {
-        $offset = $request->get('offset', 0);
-        $limit = $request->get('limit', 20);
+        $offset = $request->input('offset', 0);
+        $limit = $request->input('limit', 20);
         
         $reels = Real::with('user:id,name,email')
+            ->withCount('Views')
             ->select(['id', 'user_id', 'description', 'url', 'intro_image', 
                       'like_num', 'comment_num', 'share_num', 'sub_video', 'created_at'])
             ->orderBy('created_at', 'desc')
@@ -68,8 +70,8 @@ class AdminReelController extends MainController
                     'thumbnail_url' => $reel->intro_image ?: $reel->url,
                     'likes_count' => $reel->like_num,
                     'comments_count' => $reel->comment_num,
-                    'views_count' => $reel->Views()->count(),
-                    'gifts_count' => 0, // مؤقتاً حتى يتم إضافة نظام الهدايا
+                    'views_count' => $reel->views_count ?? 0,
+                    'gifts_count' => 0,
                     'created_at' => $reel->created_at,
                 ];
             });

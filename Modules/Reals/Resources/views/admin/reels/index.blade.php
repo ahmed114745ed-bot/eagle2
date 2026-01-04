@@ -56,6 +56,7 @@
     @media (max-width: 1024px) and (min-width: 769px) {
         .reels-sidebar {
             width: 300px;
+            margin-top: 50px;
         }
     }
     
@@ -63,20 +64,24 @@
     @media (max-width: 768px) {
         .reels-main-container {
             height: 100vh;
+            flex-direction: column-reverse;
         }
         
         .reels-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            height: 100vh;
-            width: 90%;
-            max-width: 400px;
-            z-index: 1000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease-in-out;
-            overflow-y: auto;
+            display: none;
         }
+        
+        .reels-video-container {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        /* Hide desktop sidebar on mobile */
+        .reels-sidebar:not(.mobile-sidebar-overlay) {
+            display: none !important;
+        }
+        
+        /* Mobile Sidebar will be the overlay only */
         
         .reels-sidebar.mobile-open {
             transform: translateX(0);
@@ -84,11 +89,12 @@
         
         .reels-video-container {
             width: 100%;
+            height: 100vh;
         }
         
         /* Mobile Overlay Background */
         .mobile-sidebar-overlay {
-            position: fixed;
+            /* position: fixed; */
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
@@ -397,19 +403,17 @@
                 <template x-for="reel in filteredReels" :key="reel.id">
                     <div @click="selectReel(reel.id); closeMobileSidebar()" 
                          :class="selectedReelId === reel.id ? 'ring-2 ring-blue-500 shadow-lg' : ''"
-                         class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in"
-                         x-intersect.once="loadThumbnail($el, reel)">
+                         class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200" style="padding-bottom: 177.78%; /* 16:9 ratio */">
                             <!-- Skeleton until image loads -->
                             <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
                             
-                            <img x-show="reel.thumbnailLoaded"
-                                 :src="reel.thumbnail_url" 
+                            <img :src="reel.thumbnail_url" 
                                  :alt="reel.title" 
                                  class="absolute inset-0 w-full h-full object-cover"
-                                 loading="lazy"
-                                 @load="reel.thumbnailLoaded = true"
-                                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E%D8%B1%D9%8A%D9%84%3C/text%3E%3C/svg%3E'; this.style.display='block'; reel.thumbnailLoaded = true;">
+                                 x-show="reel.thumbnailLoaded"
+                                 x-on:load="onThumbnailLoad(reel, $event)"
+                                 x-on:error="onThumbnailError(reel, $event)">
                             
                             <!-- User Info Overlay on Hover -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
@@ -943,10 +947,15 @@
     </div>
     
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 left-0 bg-white shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto pt-14"
-         :class="isMobileSidebarOpen ? 'translate-x-0' : 'ltr:translate-x-full rtl:-translate-x-full'"
-         x-ref="mobileSidebar"
-         x-show="true">
+    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] bg-white shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+         :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
+         x-show="isMobileSidebarOpen"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="translate-x-full">
         
         <div class="p-3 sm:p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white flex items-center justify-between">
             <h2 class="text-lg sm:text-xl font-bold">
@@ -982,13 +991,12 @@
                         <!-- Skeleton Loader -->
                         <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
                         
-                        <img x-show="reel.thumbnailLoaded"
-                             :src="reel.thumbnail_url" 
+                        <img :src="reel.thumbnail_url" 
                              :alt="reel.title" 
-                             class="w-full h-full object-cover"
-                             loading="lazy"
-                             @load="reel.thumbnailLoaded = true"
-                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23ddd%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2240%22 fill=%22%23999%22%3E%D8%B1%D9%8A%D9%84%3C/text%3E%3C/svg%3E'; this.style.display='block'; reel.thumbnailLoaded = true;">
+                             class="absolute inset-0 w-full h-full object-cover"
+                             x-show="reel.thumbnailLoaded"
+                             x-on:load="onThumbnailLoad(reel, $event)"
+                             x-on:error="onThumbnailError(reel, $event)">
                         
                         <!-- User Info Overlay on Hover for Mobile -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
@@ -1131,6 +1139,16 @@ function reelsManager() {
         closeMobileSidebar() {
             this.isMobileSidebarOpen = false;
             console.log('Close Mobile Sidebar');
+        },
+        
+        onThumbnailLoad(reel, event) {
+            reel.thumbnailLoaded = true;
+            console.log('✅ صورة محملة:', reel.id);
+        },
+        
+        onThumbnailError(reel, event) {
+            reel.thumbnailLoaded = true; // Show fallback
+            console.log('❌ خطأ في تحميل الصورة:', reel.id);
         },
         
         onVideoLoaded(event, reelId) {
