@@ -275,7 +275,7 @@
                                 ['uri' => '/official-message', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
-                          ['uri' => '/rewards', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
+                          ['uri' => '/rewards?type=vip', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
                         [
                             'uri' => '#',
                             'icon' => '👔',
@@ -340,13 +340,18 @@
                     @else
                         @if(hasPermission($link['permission'] ?? null))
                             <li class="crs-item">
-                                <a href="{{ areaManager_url($link['uri']) }}" class="crs-link crs-leaf">
-                                    @if(str_contains($link['icon'] ?? '', 'fa-'))
-                                        <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                <a href="{{ areaManager_url((string) ($link['uri'] ?? '')) }}" class="crs-link crs-leaf">
+                                    @if(is_string($link['icon'] ?? null) && str_contains($link['icon'], 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon"></i>
                                     @else
-                                        <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                        <span class="crs-icon emoji-icon">
+                                            {{ is_array($link['icon'] ?? null) ? '' : ($link['icon'] ?? '') }}
+                                        </span>
                                     @endif
-                                    <span class="crs-title">{{ $link['title'] }}</span>
+
+                                    <span class="crs-title">
+                                        {{ is_array($link['title'] ?? null) ? ($link['title'][app()->getLocale()] ?? '') : ($link['title'] ?? '') }}
+                                    </span>
                                 </a>
                             </li>
                         @endif

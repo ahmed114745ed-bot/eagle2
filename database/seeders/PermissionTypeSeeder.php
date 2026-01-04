@@ -92,7 +92,7 @@ class PermissionTypeSeeder extends Seeder
                         'except' => [],
                         'additional' => ['charge-switch'],
                         'types' => [
-                            PermissionType::ADMIN->value => ['charge-switch','create', 'edit', 'delete', 'show','browse'],
+                            PermissionType::ADMIN->value => ['charge-switch', 'create', 'edit', 'delete', 'show', 'browse'],
 
                         ],
                     ],
@@ -433,8 +433,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'complaints', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'change-country-request', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['status-switch','history-switch','all-status-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'status-switch', 'history-switch','all-status-switch'],
+                    ['key' => 'change-country-request', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['status-switch', 'history-switch', 'all-status-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'status-switch', 'history-switch', 'all-status-switch'],
                     ],],
                     ['key' => 'user-setting', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
@@ -949,8 +949,8 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'questions', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch','move-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['status-switch', 'move-switch','edit', 'browse'],
+                    ['key' => 'country', 'except' => ['show', 'create'], 'additional' => ['status-switch', 'move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['status-switch', 'move-switch', 'edit', 'browse'],
                     ],],
                     ['key' => 'page', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
@@ -1175,13 +1175,14 @@ class PermissionTypeSeeder extends Seeder
                 'types' => [
 
                     PermissionType::SUPER_ADMIN->value => ['sort' => 8],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 8],
                 ],
                 'permissions' => [
 
                     ['key' => 'reward-center', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-
-                        PermissionType::SUPER_ADMIN->value => ['browse', 'dedicate-switch'],
                         PermissionType::AREA_MANAGER->value => ['browse', 'dedicate-switch'],
+                        PermissionType::SUPER_ADMIN->value => ['browse', 'dedicate-switch'],
+
                     ],],
 
                 ],
@@ -1211,9 +1212,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-//                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
-//                        PermissionType::ADMIN->value => $defaultMethods,
-//                    ],],
+                    //                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
+                    //                        PermissionType::ADMIN->value => $defaultMethods,
+                    //                    ],],
                 ],
             ],
         ];
@@ -1336,5 +1337,17 @@ class PermissionTypeSeeder extends Seeder
             ->whereNotIn('slug', $allSlugs)
             ->where('slug', '!=', '*')
             ->delete();
+
+
+        $role = DB::table('admin_roles')->where('slug', 'area-manager')->first();
+        $permissions = DB::table('admin_permissions')
+            ->where('slug', 'like', '%reward-center%')
+            ->get();
+
+        foreach ($permissions as $permissionId) {
+            DB::table('admin_role_permissions')->updateOrInsert(
+                ['role_id' =>  $role->id, 'permission_id' => $permissionId->id]
+            );
+        }
     }
 }
