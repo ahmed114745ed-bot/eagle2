@@ -20,9 +20,6 @@ class DedicateRewardHistoryController extends AdminController
     public function index(Content $content)
     {
 
-        if (!request()->has('type')) {
-            return redirect()->to(url()->current() . '?type=user');
-        }
         return $content
             ->header(trans('Dedicated Rewards History'))
             ->row(function ($row) {
@@ -36,6 +33,7 @@ class DedicateRewardHistoryController extends AdminController
     protected function gridTabs()
     {
         $scope = request('type', 'user');
+        $rewardType = request('reward_type', 'vip');
 
         $html = '
     <style>
@@ -58,8 +56,8 @@ class DedicateRewardHistoryController extends AdminController
         }
     </style>
     <div class="tab-buttons">
-        <a href="?type=user" class="tab-button btn-dash ' . ($scope === 'user' ? 'active' : '') . '">' . __('user') . '</a>
-        <a href="?type=super_admin" class="tab-button btn-agency ' . ($scope === 'super_admin' ? 'active' : '') . '">' . __('Country Manager') . '</a>
+        <a href="?type=user&reward_type=' . $rewardType . '"  class="tab-button btn-dash ' . ($scope === 'user' ? 'active' : '') . '">' . __('user') . '</a>
+        <a href="?type=super_admin&reward_type=' . $rewardType . '"  class="tab-button btn-agency ' . ($scope === 'super_admin' ? 'active' : '') . '">' . __('Country Manager') . '</a>
     </div>';
 
         return new \Encore\Admin\Widgets\Box(__(), $html);
