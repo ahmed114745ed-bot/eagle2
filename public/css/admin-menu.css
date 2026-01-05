@@ -753,7 +753,7 @@ body.sidebar-collapse .sidebar .crs-icon,
     top: 0;
     right: 0;
     width: 5px;
-    height: 1000%;
+    height: 100%;
     cursor: col-resize;
     z-index: 1000;
 }
