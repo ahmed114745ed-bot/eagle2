@@ -17,6 +17,30 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.querySelector('.navbar');
+            if (nav && !nav.classList.contains('navbar-hidden')) {
+                nav.classList.add('navbar-hidden');
+            }
+
+            const updateAppClassMargin = () => {
+                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                document.querySelectorAll('.app-class').forEach(el => {
+                    el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                });
+            };
+
+            // Initial state: navbar hidden, zero top margin
+            updateAppClassMargin();
+
+            // Toggle margin when navbar hides/shows (e.g., on scroll)
+            window.addEventListener('scroll', () => {
+                // If nav is unhidden elsewhere, respect that by restoring margin
+                updateAppClassMargin();
+            });
+        });
+    </script>
     <style>
                 .content-header,
         .skin-black-light .content-header,
