@@ -117,7 +117,7 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) && request('type') != 'package') {
+        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*'))) {
             $grid->tools(function (Grid\Tools $tools) {
                 $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
