@@ -145,7 +145,7 @@ class SearchRepository implements SearchRepositoryInterface
                 $query->where('type', '!=', 'live')
                     ->orWhere(function ($subQuery) {
                         $subQuery->where('type', 'live')
-                            ->whereHas('owner.roomVisitor');
+                            ->whereHas('owner.roomVisitors');
                     });
             })
             ->orderBy('hot', 'desc')
