@@ -210,7 +210,12 @@ class SuperAdminRewardControllerHistory extends MainController
         } else {
             $grid->column('members', __('rewards'))->expand(function ($model) {
                 $mempers = SuperAdminReward::where(['super_admin_id' => $this->super_admin_id, 'package_id' => $this->target])
+                    ->with([
+                        'ware',
+                        'vip',
+                        'badge',
 
+                    ])
                     ->get()
                     ->map(function ($memper) {
 
