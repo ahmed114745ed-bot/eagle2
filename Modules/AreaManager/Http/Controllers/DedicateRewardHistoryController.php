@@ -129,6 +129,7 @@ class DedicateRewardHistoryController extends AdminController
             'user.receiverLevel',
             'user.profile',
             'user.country',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'reward'
         ])->whereHas('reward', function ($q) use ($rewardType) {
             $q->where('type', $rewardType);

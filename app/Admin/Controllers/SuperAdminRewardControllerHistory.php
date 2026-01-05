@@ -118,6 +118,7 @@ class SuperAdminRewardControllerHistory extends MainController
             ->with([
                 'superAdmin',
                 'admin',
+                'admin.agency',
                 'user',
                 'user.senderLevel',
                 'user.receiverLevel',
@@ -126,10 +127,11 @@ class SuperAdminRewardControllerHistory extends MainController
                 'areaManager',
                 'ware',
                 'vip',
-                'badge'
+                'badge',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
-        $grid->column('superadmin', __('super admin'))->display(function ($name) {
+        $grid->column('superadmin', __('user'))->display(function ($name) {
             if ($this->user_type == 'user') {
 
                 $user = $this->user;
@@ -180,10 +182,10 @@ class SuperAdminRewardControllerHistory extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
