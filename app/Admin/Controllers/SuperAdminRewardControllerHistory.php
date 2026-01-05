@@ -210,7 +210,7 @@ class SuperAdminRewardControllerHistory extends MainController
             $grid->column('no_reward', __('No reward'));
         } else {
             $grid->column('members', __('rewards'))->expand(function ($model) {
-                $mempers = $model->packageRewards
+                $mempers = $this->packageRewards()->get()
                     
                     ->map(function ($memper) {
 
@@ -305,7 +305,7 @@ class SuperAdminRewardControllerHistory extends MainController
         });
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/admin-rewards?type=vip');
-            $back = __(' back');
+            $back = __('back');
 
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">

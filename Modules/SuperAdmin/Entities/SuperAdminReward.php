@@ -73,8 +73,7 @@ class SuperAdminReward extends Model
 
     public function packageRewards()
     {
-        return $this->hasMany(SuperAdminReward::class, 'package_id', 'target')
-            ->where('super_admin_id', $this->super_admin_id) // filter by parent
+        return $this->hasMany(SuperAdminReward::class, 'package_id', 'id')
             ->with(['ware', 'vip', 'badge']);
     }
 

@@ -1841,7 +1841,7 @@
     }
 
     .navbar.navbar-static-top .fa {
-        color: var(--secondary-color);
+        color: var(--primary-color);
     }
 
     .navbar.navbar-static-top .slimScrollDiv .menu .fa {
