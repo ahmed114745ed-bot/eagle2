@@ -701,13 +701,15 @@ if (!function_exists('handleShowImageWithTypes')) {
                 $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
                 $style .= " vertical-align: middle;"; // aligns icons in table rows
 
+                $style .= " justify-content: center;";   // horizontal center
+                $style .= " align-items: center;";
                 if ($objectFit !== 'cover') {
                     $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
 
                 // Optional: scale and horizontal flip for RTL
                 $scale = 1;
-                $flip = $direction === 'rtl' ? 'scaleX(-1)' : 'scaleX(1)';
+                $flip = $direction === 'rtl' ? 'scaleX(-0.5)' : 'scaleX(1)';
                 $style .= " transform: {$flip} scale({$scale});";
 
                 // Add RTL/LTR class for CSS if needed
