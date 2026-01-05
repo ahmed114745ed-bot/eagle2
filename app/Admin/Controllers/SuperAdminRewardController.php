@@ -202,17 +202,33 @@ class SuperAdminRewardController extends MainController
                             break;
                     }
 
+                     $defaultImage = asset('images/reward.jpg');
+
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                $image = handleShowImageWithSvga(
+                    $memper->id,
+                    $url,
+                    50,
+                    50
+                );
+
                     return [
                         'id'       => $memper->id,
                         'type'     => $memper->type,
                         'gift'     => $gifts,
+                        'image'    => $image,
                         'quantity' => $memper->quantity,
                         'expire'   => $memper->expire,
                     ];
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'),__('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
