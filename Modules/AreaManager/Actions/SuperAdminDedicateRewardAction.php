@@ -65,8 +65,8 @@ class SuperAdminDedicateRewardAction extends Action
                 ]);
             }
 
-            $reward->gave_reward_no += 1;
-            $reward->save();
+            SuperAdminReward::where('id', $request->id)
+                ->increment('gave_reward_no', 1);
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
             dd($exception->getMessage());
