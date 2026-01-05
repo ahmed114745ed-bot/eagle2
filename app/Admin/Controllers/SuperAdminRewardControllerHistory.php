@@ -202,7 +202,7 @@ class SuperAdminRewardControllerHistory extends MainController
         $grid->column('expire', __('Expire'));
         $grid->column('no_reward', __('No reward'));
         $grid->column('created_at', __('created_at'));
-        $grid->column('created_by', __('created_by'))->display(function ($name) {
+        $grid->column('created_by', __('created by'))->display(function ($name) {
 
             $admin =  $this->admin;
             $name = @$admin->name ?? '';
