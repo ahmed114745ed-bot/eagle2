@@ -44,7 +44,7 @@ class AdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type);
+        $grid->model()->where('type',  $type)->whereRaw('no_reward - gave_reward_no != 0');
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
@@ -66,10 +66,10 @@ class AdminRewardController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -98,14 +98,14 @@ class AdminRewardController extends MainController
         }
 
         // if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
-            $grid->tools(function (Grid\Tools $tools) {
-                $url = '/areaManager/rewards-history?type=user&reward_type=' . request('type');
-                $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
-                $tools->append($button);
-            });
+        $grid->tools(function (Grid\Tools $tools) {
+            $url = '/areaManager/rewards-history?type=user&reward_type=' . request('type');
+            $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+            $tools->append($button);
+        });
         // }
 
-            Admin::script("
+        Admin::script("
         if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
         }
