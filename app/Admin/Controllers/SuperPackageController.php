@@ -134,7 +134,7 @@ class SuperPackageController extends MainController
 
                     $url =  getImagePath($path) ?? $defaultImage;
 
-                    if (! isImageExists($url)) {
+                    if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
 

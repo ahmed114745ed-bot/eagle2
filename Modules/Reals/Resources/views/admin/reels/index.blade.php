@@ -4,14 +4,14 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" as="style">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" media="print" onload="this.media='all'">
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Reels Styles -->
     <style>
         @include('reals::admin.reels.partials.styles')
@@ -58,11 +58,11 @@
         }
     </style>
 
-<div class="reels-main-container flex" 
+<div class="reels-main-container flex"
      :class="{'panel-open': showInteractionPanel}"
      x-data="reelsManager()" x-cloak>
     <!-- Mobile Overlay Background -->
-    <div class="mobile-sidebar-overlay" 
+    <div class="mobile-sidebar-overlay"
          :class="{ 'active': isMobileSidebarOpen }"
          @click="closeMobileSidebar()"
          x-show="isMobileSidebarOpen"
@@ -72,9 +72,9 @@
          x-transition:leave="transition ease-in duration-300"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"></div>
-    
+
     <!-- Mobile Toggle Button -->
-    <button class="mobile-reels-toggle md:hidden" 
+    <button class="mobile-reels-toggle md:hidden"
             :class="{ 'active': isMobileSidebarOpen }"
             @click="toggleMobileSidebar()">
         <i class="fas" :class="isMobileSidebarOpen ? 'fa-times' : 'fa-list'"></i>
@@ -83,38 +83,38 @@
               class="absolute -top-1 -left-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center"
               x-text="filteredReels.length"></span>
     </button>
-    
+
     <!-- Reels List (Sidebar) -->
     <div class="reels-sidebar border-l border-gray-200 shadow-lg flex flex-col"
          :class="{ 'mobile-open': isMobileSidebarOpen }"
          style="background-color: var(--box-background-color);">
         <!-- Search Filter -->
-        <div class="p-4 text-white border-b relative" style="background: var(--primary-gradient);">
+        <div class="p-4 border-b relative" style="background: var(--primary-gradient);">
             <!-- Close Button for Mobile -->
-            <button @click="closeMobileSidebar()" 
+            <button @click="closeMobileSidebar()"
                     class="md:hidden absolute top-3 left-3 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition">
                 <i class="fas fa-times"></i>
             </button>
-            
+
             <h2 class="text-lg font-bold mb-3 flex items-center">
                 <i class="fas fa-film ml-2" style="margin: 7px 10px;"></i>
                 {{ __('reels_admin.list_title') }}
             </h2>
-            
+
             <!-- Search Box -->
             <div class="relative">
-                <input type="text" 
+                <input type="text"
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="{{ __('reels_admin.search_placeholder') }}"
                        class="w-full px-3 py-2 ps-10 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none border border-white/30 dark:border-gray-700"
-                       style="box-shadow: 0 0 0 2px var(--primary-hover-alpha);">
+                       style="box-shadow: black;">
                 <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
-            
+
             <div class="flex items-center justify-between mt-2">
                 <p class="text-sm opacity-90" x-text="filteredReels.length + ' {{ __('reels_admin.reel_label') }}'"></p>
-                <button @click="loadMoreReels()" 
+                <button @click="loadMoreReels()"
                         x-show="hasMore && !loading"
                         class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded">
                     <i class="fas fa-sync-alt ml-1"></i>
@@ -122,9 +122,9 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- Reels Grid with Scroll -->
-        <div class="flex-1 overflow-y-auto" 
+        <div class="flex-1 overflow-y-auto"
              x-ref="sidebarContainer"
              style="background-color: var(--box-background-color);"
              @scroll="handleSidebarScroll()"
@@ -139,23 +139,23 @@
                     </template>
                 </div>
             </template>
-            
+
             <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
-                    <div @click="selectReel(reel.id); closeMobileSidebar()" 
+                    <div @click="selectReel(reel.id); closeMobileSidebar()"
                          :class="selectedReelId === reel.id ? 'ring-2 ring-blue-500 shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
                             <!-- Skeleton until image loads -->
                             <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
-                            
-                            <img :src="reel.thumbnail_url" 
-                                 :alt="reel.title" 
+
+                            <img :src="reel.thumbnail_url"
+                                 :alt="reel.title"
                                  class="absolute inset-0 w-full h-full object-cover"
                                  x-show="reel.thumbnailLoaded"
                                  x-on:load="onThumbnailLoad(reel, $event)"
                                  x-on:error="onThumbnailError(reel, $event)">
-                            
+
                             <!-- User Info Overlay on Hover -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
                                 <div class="flex items-center gap-2 mb-2">
@@ -182,7 +182,7 @@
                                     </span>
                                 </div>
                             </div>
-                            
+
                             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-1.5 group-hover:opacity-0 transition-opacity">
                                 <p class="text-white text-xs font-semibold truncate" x-text="reel.title"></p>
                                 <div class="flex items-center gap-2 text-white text-xs mt-0.5">
@@ -200,7 +200,7 @@
                     </div>
                 </template>
             </div>
-            
+
             <!-- Sidebar Loading Indicator -->
             <div x-show="loading" class="p-3 text-center">
                 <div class="inline-flex items-center space-x-2 space-x-reverse px-3 py-2 rounded-md" style="background-color: var(--primary-hover-alpha);">
@@ -208,10 +208,10 @@
                     <span class="text-xs font-semibold" style="color: var(--primary-color);">{{ __('reels_admin.loading') }}</span>
                 </div>
             </div>
-            
+
             <!-- Load More Button -->
             <div x-show="hasMore && !loading && filteredReels.length > 0" class="p-2">
-                <button @click="loadMoreReels()" 
+                <button @click="loadMoreReels()"
                         class="w-full py-2 text-white rounded-md font-semibold text-sm transition shadow"
                         style="background-color: var(--primary-color);"
                         onmouseover="this.style.backgroundColor='{{ config('themes.secondaryColor') }}'"
@@ -223,7 +223,7 @@
                     </span>
                 </button>
             </div>
-            
+
             <!-- No More Message -->
             <div x-show="!hasMore && filteredReels.length > 0" class="p-3 text-center text-gray-500 text-xs">
                 <i class="fas fa-check-circle mb-1 text-green-500"></i>
@@ -233,7 +233,7 @@
     </div>
 
     <!-- Main Video Player (Center) -->
-    <div class="reels-video-container  overflow-y-auto snap-y snap-mandatory scroll-smooth" 
+    <div class="reels-video-container  overflow-y-auto snap-y snap-mandatory scroll-smooth"
          x-ref="reelsContainer"
          @scroll.passive="handleScroll()">
         <template x-for="(reel, index) in visibleReels" :key="reel.id">
@@ -252,7 +252,7 @@
                                 </div>
                             </div>
                         </template>
-                        
+
                         <!-- Lazy load video only when needed -->
                         <template x-if="shouldLoadVideo(index)">
                             <div class="w-full h-full relative">
@@ -263,8 +263,8 @@
                                         <p class="text-sm">{{ __('reels_admin.video_loading') }}</p>
                                     </div>
                                 </div>
-                                
-                                <video :src="reel.video_url" 
+
+                                <video :src="reel.video_url"
                                        :id="'video-' + reel.id"
                                        class="w-full h-full object-contain"
                                        x-show="isVideoReady(reel.id)"
@@ -283,12 +283,12 @@
                                 </video>
                             </div>
                         </template>
-                        
+
                         <!-- Loading Spinner -->
                         <div class="loading-spinner absolute inset-0 flex items-center justify-center bg-black/50 hidden">
                             <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4" style="border-color: var(--primary-color);"></div>
                         </div>
-                        
+
                         <!-- User Profile Overlay (Top) -->
                         <div class="absolute top-4 right-4 left-4 flex items-center justify-between z-10">
                             <div class="flex items-center">
@@ -300,19 +300,19 @@
                                     <p class="text-white/80 text-sm drop-shadow" x-text="'{{ __('reels_admin.id_label') }}' + reel.user?.id"></p>
                                 </div>
                             </div>
-                            
+
                             <!-- Admin Actions -->
                             <div class="relative" x-data="{ open: false }">
-                                <button @click.stop="open = !open" 
+                                <button @click.stop="open = !open"
                                         class="w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center text-white transition shadow-lg"
                                         style="background-color: var(--primary-color);"
                                         onmouseover="this.style.backgroundColor='{{ config('themes.secondaryColor') }}'"
                                         onmouseout="this.style.backgroundColor='{{ config('themes.primaryColor') }}'">
                                     <i class="fas fa-ellipsis-v"></i>
                                 </button>
-                                
+
                                 <!-- Dropdown Menu -->
-                                <div x-show="open" 
+                                <div x-show="open"
                                      @click.away="open = false"
                                      x-transition:enter="transition ease-out duration-100"
                                      x-transition:enter-start="opacity-0 scale-95"
@@ -322,7 +322,7 @@
                                      x-transition:leave-end="opacity-0 scale-95"
                                      class="absolute mt-2 w-44 rounded-lg shadow-2xl z-50 overflow-hidden border-2"
                                      style="left: -88px; background: var(--primary-color); border-color: var(--primary-color);">
-                                    <button @click.stop="editReel(reel); open = false" 
+                                    <button @click.stop="editReel(reel); open = false"
                                             class="w-full px-4 py-3 text-right flex items-center gap-3 transition text-white"
                                             style="background-color: rgba(255, 255, 255, 0.05);"
                                             onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'"
@@ -331,7 +331,7 @@
                                         <span class="font-semibold">{{ __('reels_admin.edit') }}</span>
                                     </button>
                                     <div class="border-t" style="border-color: rgba(255, 255, 255, 0.2);"></div>
-                                    <button @click.stop="deleteReel(reel.id); open = false" 
+                                    <button @click.stop="deleteReel(reel.id); open = false"
                                             class="w-full px-4 py-3 text-right flex items-center gap-3 transition text-white"
                                             style="background-color: rgba(239, 68, 68, 0.1);"
                                             onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.25)'"
@@ -342,7 +342,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Video Info Overlay (Bottom) -->
                         <div class="absolute bottom-20 right-4 left-4 z-10">
                             <h3 class="text-white font-bold text-xl drop-shadow-lg mb-2" x-text="reel.title"></h3>
@@ -357,29 +357,29 @@
                         <div class="absolute bottom-4 left-4 right-4 z-20">
                             <div class="flex items-center gap-3">
                                 <!-- Mute/Unmute Button -->
-                                <button @click.stop="toggleMute(reel.id)" 
+                                <button @click.stop="toggleMute(reel.id)"
                                         :style="isMuted(reel.id) ? 'background-color: #ef4444cc;' : 'background-color: rgba(255, 255, 255, 0.2);'"
                                         class="w-10 h-10 hover:bg-white/30 rounded-full backdrop-blur-md flex items-center justify-center text-white transition transform hover:scale-110 shadow-xl flex-shrink-0">
                                     <i :class="isMuted(reel.id) ? 'fa-volume-mute' : 'fa-volume-up'" class="fas text-lg"></i>
                                 </button>
-                                
+
                                 <!-- Progress Bar with Time -->
                                 <div class="flex-1">
                                     <div class="flex items-center justify-between text-white text-xs mb-1 px-1">
                                         <span x-text="formatTime(getCurrentTime(reel.id))">0:00</span>
                                         <span x-text="formatTime(getDuration(reel.id))">0:00</span>
                                     </div>
-                                    <div class="bg-white/20 backdrop-blur-sm rounded-full h-2 cursor-pointer" 
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-full h-2 cursor-pointer"
                                          @click="seekVideo($event, reel.id)">
-                                        <div class="h-full rounded-full transition-all duration-100" 
+                                        <div class="h-full rounded-full transition-all duration-100"
                                              :style="'width: ' + getProgress(reel.id) + '%; background-color: var(--primary-color);'"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Interaction Buttons (Dynamic Position Based on Language) -->
-                        <div class="absolute bottom-24 flex flex-col gap-4 z-20 
+                        <div class="absolute bottom-24 flex flex-col gap-4 z-20
                                     {{ app()->getLocale() == 'ar' ? 'right-4 md:right-auto md:left-4' : 'left-4 md:left-auto md:right-4' }}">
                             <!-- Likes Button -->
                             <button @click.stop="toggleInteraction('likes', reel.id)"
@@ -408,7 +408,7 @@
                                 <span class="text-xs mt-1 font-semibold" x-text="formatNumber(reel.gifts_count)"></span>
                             </button>
 
-                          
+
                         </div>
 
                         <!-- Scroll Indicator -->
@@ -416,7 +416,7 @@
                              x-show="index < filteredReels.length - 1">
                             <i class="fas fa-chevron-down text-2xl"></i>
                         </div>
-                        
+
                         <!-- Loading Indicator -->
                         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
                              x-show="loading && index === filteredReels.length - 1">
@@ -429,7 +429,7 @@
                 </div>
             </div>
         </template>
-        
+
         <!-- End of List Message -->
         <template x-if="!hasMore && filteredReels.length > 0">
             <div class="h-32 flex items-center justify-center ">
@@ -440,11 +440,11 @@
                 </div>
             </div>
         </template>
-        
+
         <!-- Manual Load More Button -->
         <template x-if="hasMore && filteredReels.length > 0 && !loading">
             <div class="h-32 flex items-center justify-center ">
-                <button @click="loadMoreReels()" 
+                <button @click="loadMoreReels()"
                         class="px-6 py-3 text-white rounded-full font-semibold transition shadow-lg"
                         style="background-color: var(--primary-color);"
                         onmouseover="this.style.backgroundColor='{{ config('themes.secondaryColor') }}'"
@@ -461,9 +461,8 @@
     <!-- Interactions Panel (Right Side) - Opens only when clicking interaction buttons -->
     <div class="interactions-panel"
          :class="{'show': showInteractionPanel}"
-         x-show="showInteractionPanel"
-         style="background-color: var(--box-background-color);">
-        
+         x-show="showInteractionPanel">
+
         <!-- Close Button (works on all screens) -->
         <button @click.stop="showInteractionPanel = false"
                 class="absolute top-4 right-4 ltr:right-4 rtl:left-4 w-10 h-10 sm:w-12 sm:h-12 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center text-white shadow-2xl z-[100] transition transform hover:scale-110 cursor-pointer">
@@ -473,53 +472,49 @@
         <!-- Tabs Header -->
         <div class="p-3 sm:p-4 pt-5 sm:pt-6" style="background: var(--primary-gradient);">
             <!-- Refresh Button -->
-            <!-- <button @click="refreshReelCounts(selectedReelId)" 
+            <!-- <button @click="refreshReelCounts(selectedReelId)"
                     class="absolute top-16 left-4 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition text-white">
                 <i class="fas fa-sync-alt text-sm"></i>
             </button> -->
-            
-            <div class="flex space-x-1 sm:space-x-2 space-x-reverse">
-                <button @click="activeTab = 'likes'; loadTabData()" 
-                        :class="activeTab === 'likes' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
-                        :style="activeTab === 'likes' ? 'color: var(--primary-color);' : ''"
+
+            <div class="flex space-x-1 space-x-reverse">
+                <button @click="activeTab = 'likes'; loadTabData()"
+                        :class="activeTab === 'likes'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-heart ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">{{ __('reels_admin.likes') }}</span>
                     <span class="sm:hidden">{{ __('reels_admin.like') }}</span>
-                    <span x-show="selectedReel" 
-                          class="block text-xs sm:text-sm mt-1" 
+                    <span x-show="selectedReel"
+                          class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.likes_count || 0"></span>
                 </button>
-                
-                <button @click="activeTab = 'comments'; loadTabData()" 
-                        :class="activeTab === 'comments' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
-                        :style="activeTab === 'comments' ? 'color: var(--primary-color);' : ''"
+
+                <button @click="activeTab = 'comments'; loadTabData()"
+                        :class="activeTab === 'comments'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-comment ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">{{ __('reels_admin.comments') }}</span>
                     <span class="sm:hidden">{{ __('reels_admin.comment') }}</span>
-                    <span x-show="selectedReel" 
-                          class="block text-xs sm:text-sm mt-1" 
+                    <span x-show="selectedReel"
+                          class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.comments_count || 0"></span>
                 </button>
-                
-                <button @click="activeTab = 'gifts'; loadTabData()" 
-                        :class="activeTab === 'gifts' ? 'bg-white' : 'bg-white/20 text-white hover:bg-white/30'"
-                        :style="activeTab === 'gifts' ? 'color: var(--primary-color);' : ''"
+
+                <button @click="activeTab = 'gifts'; loadTabData()"
+                        :class="activeTab === 'gifts'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-gift ms-1 sm:ms-2"></i>
                     <span class="hidden sm:inline">{{ __('reels_admin.gifts') }}</span>
                     <span class="sm:hidden">{{ __('reels_admin.gift') }}</span>
-                    <span x-show="selectedReel" 
-                          class="block text-xs sm:text-sm mt-1" 
+                    <span x-show="selectedReel"
+                          class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.gifts_count || 0"></span>
                 </button>
             </div>
         </div>
 
         <!-- Content Area -->
-        <div class="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-y-auto p-3 sm:p-4"
-             style="background-color: var(--box-background-color);">
+        <div class="h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] overflow-y-auto p-3 sm:p-4">
             <!-- Likes Tab -->
             <div x-show="activeTab === 'likes'">
                 <template x-if="likes.length > 0">
@@ -532,21 +527,21 @@
                                      :alt="like.user?.name">
                                 <div class="ms-3 flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-1">
-                                        <strong class="text-base font-bold truncate" 
-                                                style="color: var(--text-primary-color);" 
+                                        <strong class="text-base font-bold truncate"
+                                                style="color: var(--text-primary-color);"
                                                 x-text="like.user?.name"></strong>
-                                        <img x-show="like.user?.country?.flag" 
+                                        <img x-show="like.user?.country?.flag"
                                              :src="like.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + like.user.country.flag : ''"
                                              class="w-5 h-auto"
                                              :title="like.user?.country?.name"
                                              style="vertical-align: middle;">
                                     </div>
                                     <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                        <span class="font-medium">{{ __('reels_admin.uid_label') }}</span> 
+                                        <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                         <span x-text="like.user?.original_uuid || like.user?.id"></span>
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-500">
-                                        <span class="font-medium">{{ __('reels_admin.special_label') }}</span> 
+                                        <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                         <span x-text="like.user?.uuid"></span>
                                     </p>
                                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(like.created_at)"></p>
@@ -557,7 +552,7 @@
                     </div>
                 </template>
                 <template x-if="likes.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
+                    <div class="text-center py-12">
                         <i class="fas fa-heart text-5xl mb-3 opacity-30"></i>
                         <p>{{ __('reels_admin.no_likes') }}</p>
                     </div>
@@ -577,25 +572,25 @@
                                          :alt="comment.user?.name">
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
-                                            <strong class="text-base font-bold truncate" 
-                                                    style="color: var(--text-primary-color);" 
+                                            <strong class="text-base font-bold truncate"
+                                                    style="color: var(--text-primary-color);"
                                                     x-text="comment.user?.name"></strong>
-                                            <img x-show="comment.user?.country?.flag" 
+                                            <img x-show="comment.user?.country?.flag"
                                                  :src="comment.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + comment.user.country.flag : ''"
                                                  class="w-5 h-auto"
                                                  :title="comment.user?.country?.name"
                                                  style="vertical-align: middle;">
                                         </div>
                                         <p class="text-xs text-gray-600 mb-1">
-                                                <span class="font-medium">{{ __('reels_admin.uid_label') }}</span> 
+                                                <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                                 <span x-text="comment.user?.original_uuid || comment.user?.id"></span>
                                             </p>
                                             <p class="text-xs text-gray-500 mb-2">
-                                                <span class="font-medium">{{ __('reels_admin.special_label') }}</span> 
+                                                <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                                 <span x-text="comment.user?.uuid"></span>
                                             </p>
-                                        <p class="p-2 rounded text-sm" 
-                                           style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);" 
+                                        <p class="p-2 rounded text-sm"
+                                           style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);"
                                            x-text="comment.comment"></p>
                                         <p class="text-xs text-gray-400 mt-2" x-text="formatDate(comment.created_at)"></p>
                                     </div>
@@ -605,7 +600,7 @@
                     </div>
                 </template>
                 <template x-if="comments.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
+                    <div class="text-center py-12">
                         <i class="fas fa-comment text-5xl mb-3 opacity-30"></i>
                         <p>{{ __('reels_admin.no_comments') }}</p>
                     </div>
@@ -624,35 +619,35 @@
                                     <img :src="gift.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + gift.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
                                          :alt="gift.user?.name">
-                                    
+
                                     <!-- معلومات المستخدم -->
                                     <div class="flex-1 min-w-0 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
-                                            <strong class="text-base font-bold truncate" 
-                                                    style="color: var(--text-primary-color);" 
+                                            <strong class="text-base font-bold truncate"
+                                                    style="color: var(--text-primary-color);"
                                                     x-text="gift.user?.name"></strong>
-                                            <img x-show="gift.user?.country?.flag" 
+                                            <img x-show="gift.user?.country?.flag"
                                                  :src="gift.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + gift.user.country.flag : ''"
                                                  class="w-5 h-auto"
                                                  :title="gift.user?.country?.name"
                                                  style="vertical-align: middle;">
                                         </div>
                                         <p class="text-xs text-gray-600 mb-1">
-                                            <span class="font-medium">{{ __('reels_admin.uid_label') }}</span> 
+                                            <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                             <span x-text="gift.user?.original_uuid || gift.user?.id"></span>
                                         </p>
                                         <p class="text-xs text-gray-500 mb-2">
-                                            <span class="font-medium">{{ __('reels_admin.special_label') }}</span> 
+                                            <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                             <span x-text="gift.user?.uuid"></span>
                                         </p>
-                                        
+
                                         <!-- معلومات الهدية -->
                                         <div class="mt-2 flex items-center gap-2 p-2 rounded-lg"
                                              style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                             <div class="text-3xl" x-text="getGiftEmoji(gift.gift_type)"></div>
                                             <div class="flex-1">
-                                                <p class="text-sm font-semibold" 
-                                                   style="color: var(--text-primary-color);" 
+                                                <p class="text-sm font-semibold"
+                                                   style="color: var(--text-primary-color);"
                                                    x-text="getGiftName(gift.gift_type)"></p>
                                                 <p class="text-xs text-gray-500">{{ __('reels_admin.type_label') }} <span x-text="gift.gift_type"></span></p>
                                             </div>
@@ -661,7 +656,7 @@
                                                 <p class="text-xs text-gray-500 dark:text-gray-500">{{ __('reels_admin.point_label') }}</p>
                                             </div>
                                         </div>
-                                        
+
                                         <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(gift.created_at)"></p>
                                     </div>
                                 </div>
@@ -670,7 +665,7 @@
                     </div>
                 </template>
                 <template x-if="gifts.length === 0 && selectedReel">
-                    <div class="text-center text-gray-400 dark:text-gray-500 py-12">
+                    <div class="text-center py-12">
                         <i class="fas fa-gift text-5xl mb-3 opacity-30"></i>
                         <p>{{ __('reels_admin.no_gifts') }}</p>
                     </div>
@@ -690,7 +685,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
     </div>
-    
+
     <!-- Delete Confirmation Modal -->
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
          x-show="showDeleteModal"
@@ -701,7 +696,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
-        
+
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6"
              x-show="showDeleteModal"
              @click.stop
@@ -711,29 +706,29 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-90">
-            
+
             <div class="flex flex-col items-center text-center">
                 <!-- Icon -->
                 <div class="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
                     <i class="fas fa-trash-alt text-4xl text-red-600 dark:text-red-400"></i>
                 </div>
-                
+
                 <!-- Title -->
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                     {{ __('reels_admin.delete_title') }}
                 </h3>
-                
+
                 <!-- Message -->
                 <p class="text-gray-600 dark:text-gray-300 mb-6">
                     {{ __('reels_admin.delete_message') }}<br>
                     <span class="text-sm text-red-600 font-semibold">{{ __('reels_admin.delete_warning') }}</span>
                 </p>
-                
+
                 <!-- Reel Info -->
                 <template x-if="deletingReel">
                     <div class="w-full bg-gray-50 dark:bg-gray-700 rounded-lg p-3 mb-6">
                         <div class="flex items-center gap-3">
-                            <img :src="deletingReel.thumbnail_url" 
+                            <img :src="deletingReel.thumbnail_url"
                                  class="w-16 h-16 rounded-lg object-cover">
                             <div class="flex-1 text-right">
                                 <p class="font-semibold text-gray-800 dark:text-gray-100 truncate" x-text="deletingReel.title"></p>
@@ -742,15 +737,15 @@
                         </div>
                     </div>
                 </template>
-                
+
                 <!-- Buttons -->
                 <div class="flex gap-3 w-full">
-                    <button @click="showDeleteModal = false" 
+                    <button @click="showDeleteModal = false"
                             class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                         <i class="fas fa-times ml-2"></i>
                         {{ __('reels_admin.cancel') }}
                     </button>
-                    <button @click="confirmDelete()" 
+                    <button @click="confirmDelete()"
                             class="flex-1 py-3 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-bold transition shadow-lg">
                         <i class="fas fa-trash ml-2"></i>
                         {{ __('reels_admin.delete_forever') }}
@@ -759,7 +754,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Edit Modal -->
     <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
          x-show="showEditModal"
@@ -770,7 +765,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
-        
+
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg p-6"
              x-show="showEditModal"
              @click.stop
@@ -780,29 +775,29 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-90">
-            
+
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-edit ml-2" style="color: var(--primary-color);"></i>
                     {{ __('reels_admin.edit_caption_title') }}
                 </h3>
-                <button @click="showEditModal = false" 
+                <button @click="showEditModal = false"
                         class="w-10 h-10 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition">
                     <i class="fas fa-times text-gray-600 dark:text-gray-300"></i>
                 </button>
             </div>
-            
+
             <template x-if="editingReel">
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('reels_admin.title_label') }}</label>
-                        <input type="text" 
+                        <input type="text"
                                x-model="editingReel.title"
                                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none transition"
                                style="border-color: var(--primary-color) !important;"
                                placeholder="{{ __('reels_admin.title_placeholder') }}">
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('reels_admin.description_label') }}</label>
                         <textarea x-model="editingReel.description"
@@ -811,9 +806,9 @@
                                   style="border-color: var(--primary-color) !important;"
                                   placeholder="{{ __('reels_admin.description_placeholder') }}"></textarea>
                     </div>
-                    
+
                     <div class="flex gap-3 pt-4">
-                        <button @click="updateReelCaption()" 
+                        <button @click="updateReelCaption()"
                                 class="flex-1 py-3 text-white rounded-lg font-bold transition shadow-lg"
                                 style="background: var(--primary-gradient);"
                                 onmouseover="this.style.opacity='0.9'"
@@ -821,7 +816,7 @@
                             <i class="fas fa-check ml-2"></i>
                             {{ __('reels_admin.save_changes') }}
                         </button>
-                        <button @click="showEditModal = false" 
+                        <button @click="showEditModal = false"
                                 class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                             <i class="fas fa-times ml-2"></i>
                             {{ __('reels_admin.cancel') }}
@@ -831,9 +826,9 @@
             </template>
         </div>
     </div>
-    
+
     <!-- Mobile Reels List Toggle Button -->
-    <button @click="toggleMobileSidebar()" 
+    <button @click="toggleMobileSidebar()"
             class="md:hidden fixed top-16 right-3 z-[60] group">
         <div class="relative">
             <!-- Main Button -->
@@ -848,7 +843,7 @@
             <!-- <div class="absolute inset-0 rounded-2xl animate-ping opacity-20" style="background-color: var(--primary-color);"></div> -->
         </div>
     </button>
-    
+
     <!-- Mobile Sidebar Overlay Background -->
     <div class="md:hidden fixed inset-0 bg-black/50 z-[55] transition-opacity duration-300"
          x-show="isMobileSidebarOpen"
@@ -860,7 +855,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0">
     </div>
-    
+
     <!-- Mobile Sidebar Overlay -->
     <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
          style="background-color: var(--box-background-color);"
@@ -872,7 +867,7 @@
          x-transition:leave="ease-in duration-200"
          x-transition:leave-start="translate-x-0"
          x-transition:leave-end="translate-x-full">
-        
+
         <div class="p-3 sm:p-4 text-white flex items-center justify-between" style="background: var(--primary-gradient);">
             <h2 class="text-lg sm:text-xl font-bold">
                 <i class="fas fa-list ml-2"></i>
@@ -883,37 +878,37 @@
                 <i class="fas fa-times text-lg sm:text-xl"></i>
             </button>
         </div>
-        
+
         <!-- Search Box -->
         <div class="p-3 sm:p-4">
             <div class="relative">
-                <input type="text" 
+                <input type="text"
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="{{ __('reels_admin.search_placeholder') }}"
-                       class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:border-purple-500 focus:outline-none">
+                       class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 text-gray-800 focus:border-purple-500 focus:outline-none">
                 <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
             <p class="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400" x-text="filteredReels.length + ' {{ __('reels_admin.reel_label') }}'"></p>
         </div>
-        
+
         <!-- Reels Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 sm:p-3">
             <template x-for="reel in filteredReels" :key="reel.id">
-                <div @click="selectReel(reel.id); closeMobileSidebar()" 
+                <div @click="selectReel(reel.id); closeMobileSidebar()"
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
                     <div class="relative aspect-[9/16] bg-gray-200 dark:bg-gray-700">
                         <!-- Skeleton Loader -->
                         <div class="absolute inset-0 skeleton" x-show="!reel.thumbnailLoaded"></div>
-                        
-                        <img :src="reel.thumbnail_url" 
-                             :alt="reel.title" 
+
+                        <img :src="reel.thumbnail_url"
+                             :alt="reel.title"
                              class="absolute inset-0 w-full h-full object-cover"
                              x-show="reel.thumbnailLoaded"
                              x-on:load="onThumbnailLoad(reel, $event)"
                              x-on:error="onThumbnailError(reel, $event)">
-                        
+
                         <!-- User Info Overlay on Hover for Mobile -->
                         <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-2">
                             <div class="flex items-center gap-2 mb-2">
@@ -940,7 +935,7 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-1.5 sm:p-2 group-hover:opacity-0 transition-opacity">
                             <p class="text-white text-xs font-semibold truncate" x-text="reel.title"></p>
                         </div>
