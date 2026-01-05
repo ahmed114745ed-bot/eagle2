@@ -124,6 +124,10 @@
         color: var(--text-secondary-color);
     }
 
+    .sidebarContainer {
+        background-color: var(--off-white);
+    }
+
     /* Show panel as overlay on small/medium screens */
     @media (max-width: 1279px) {
         .interactions-panel {

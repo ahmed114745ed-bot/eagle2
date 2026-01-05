@@ -80,6 +80,8 @@
     .dark-mode .modal-body2,
     .dark-mode .modal-no,
     .dark-mode .interactions-panel,
+    .dark-mode .reels-sidebar,
+    .dark-mode .sidebarContainer,
     .dark-mode .box-footer {
         background: var(--dark-primary-color) !important;
     }
@@ -95,6 +97,10 @@
     .dark-mode .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background: none !important;
         color: unset !important;
+    }
+
+    .dark-mode .skeleton {
+        background: var(--dark-secondry-color);
     }
 
     .dark-mode .box-header.with-border,

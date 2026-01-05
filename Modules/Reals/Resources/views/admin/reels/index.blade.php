@@ -85,7 +85,7 @@
     </button>
 
     <!-- Reels List (Sidebar) -->
-    <div class="reels-sidebar border-l border-gray-200 shadow-lg flex flex-col"
+    <div class="reels-sidebar border-gray-200 shadow-lg flex flex-col"
          :class="{ 'mobile-open': isMobileSidebarOpen }">
         <!-- Search Filter -->
         <div class="p-4 border-b relative">
@@ -123,9 +123,8 @@
         </div>
 
         <!-- Reels Grid with Scroll -->
-        <div class="flex-1 overflow-y-auto"
+        <div class="flex-1 overflow-y-auto sidebarContainer"
              x-ref="sidebarContainer"
-             style="background-color: var(--off-white);"
              @scroll="handleSidebarScroll()"
              style="height: calc(100% - 130px);">
             <!-- Skeleton Loader for Initial Load -->
