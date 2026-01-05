@@ -126,7 +126,8 @@ class SuperAdminRewardControllerHistory extends MainController
                 'areaManager',
                 'ware',
                 'vip',
-                'badge'
+                'badge',
+                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
