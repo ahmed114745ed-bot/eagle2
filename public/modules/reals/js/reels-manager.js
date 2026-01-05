@@ -28,12 +28,9 @@ function reelsManager() {
         deletingReel: null,
         
         init() {
-            // تحميل البيانات بشكل تدريجي لتحسين الأداء
             this.isGlobalMuted = false;
             
-            // تحميل البيانات بعد رندر الصفحة
             this.$nextTick(() => {
-                // استخدام requestIdleCallback لتحميل البيانات في وقت الفراغ
                 if (window.requestIdleCallback) {
                     requestIdleCallback(() => this.loadInitialData());
                 } else {
@@ -43,25 +40,24 @@ function reelsManager() {
         },
         
         loadInitialData() {
-            // تحميل البيانات من السيرفر
             const reelsData = window.initialReelsData || [];
             
-            // تحميل أول 6 فقط للبداية السريعة مع تهيئة thumbnailLoaded
             this.allReels = reelsData.map(reel => {
                 return {
                     ...reel,
-                    thumbnailLoaded: false
+                    thumbnailLoaded: Boolean(reel.thumbnail_url)
                 };
             });
             
-            // تحميل تدريجي - أول 6 للبداية
             this.filteredReels = this.allReels.slice(0, 6);
             this.reelsLoaded = true;
+
+            this.offset = this.allReels.length;
+            this.hasMore = this.allReels.length >= 10;
             
             // Load first video only
             this.loadedVideos.add(0);
             
-            // التأكد من أن القائمة مغلقة والريل مفتوح
             this.isMobileSidebarOpen = false;
             
             this.$nextTick(() => {
@@ -69,20 +65,19 @@ function reelsManager() {
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
                 
-                // تحديث الأرقام للريلز الأولية
                 this.refreshVisibleReelsCounts();
+
+                this.captureMissingThumbnails(this.filteredReels.slice(0, 6));
                 
-                // تحميل بقية الريلز بعد 500ms
                 setTimeout(() => {
                     if (this.filteredReels.length < this.allReels.length) {
                         const nextBatch = this.allReels.slice(6, 15);
                         this.filteredReels = [...this.filteredReels, ...nextBatch];
-                        // تحديث أرقام الدفعة الجديدة
+                        this.captureMissingThumbnails(nextBatch);
                         this.refreshVisibleReelsCounts();
                     }
                 }, 500);
                 
-                // تحديث الأرقام كل 30 ثانية للريلز المرئية
                 setInterval(() => {
                     this.refreshVisibleReelsCounts();
                 }, 30000);
@@ -90,7 +85,6 @@ function reelsManager() {
         },
         
         loadThumbnail(element, reel) {
-            // يتم تحميل الصورة فقط عندما تكون قريبة من الرؤية
         },
         
         isVideoReady(reelId) {
@@ -211,12 +205,18 @@ function reelsManager() {
                     const newReels = data.reels.filter(reel => !existingIds.has(reel.id));
                     
                     if (newReels.length > 0) {
-                        newReels.forEach(reel => {
-                            this.allReels.push(reel);
+                        const normalized = newReels.map(reel => ({
+                            ...reel,
+                            thumbnailLoaded: Boolean(reel.thumbnail_url)
+                        }));
+
+                        normalized.forEach(item => {
+                            this.allReels.push(item);
                             if (!this.searchQuery) {
-                                this.filteredReels.push(reel);
+                                this.filteredReels.push(item);
                             }
                         });
+                        this.captureMissingThumbnails(this.filteredReels.slice(-newReels.length));
                         
                         if (this.searchQuery) {
                             this.filterReels();
@@ -339,6 +339,67 @@ function reelsManager() {
             } else {
                 video.pause();
             }
+        },
+
+        async captureMissingThumbnails(reels) {
+            const batch = Array.isArray(reels) ? reels : [reels];
+            for (const reel of batch) {
+                if (!reel || reel.thumbnail_url) {
+                    continue;
+                }
+
+                const thumbnail = await this.captureFrameFromVideo(reel.video_url);
+                if (thumbnail) {
+                    reel.thumbnail_url = thumbnail;
+                    reel.thumbnailLoaded = true;
+                } else {
+                    reel.thumbnail_url = `https://picsum.photos/400/700?random=${reel.id || Math.random()}`;
+                    reel.thumbnailLoaded = true;
+                }
+            }
+        },
+
+        captureFrameFromVideo(videoUrl) {
+            return new Promise(resolve => {
+                if (!videoUrl) {
+                    return resolve(null);
+                }
+
+                const video = document.createElement('video');
+                video.crossOrigin = 'anonymous';
+                video.src = videoUrl;
+                video.muted = true;
+                video.playsInline = true;
+                video.preload = 'auto';
+
+                const handleError = () => resolve(null);
+                video.onerror = handleError;
+
+                video.onloadeddata = () => {
+                    if (!video.videoWidth || !video.videoHeight) {
+                        return resolve(null);
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        return resolve(null);
+                    }
+
+                    try {
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    } catch (e) {
+                        resolve(null);
+                    }
+                };
+
+                video.currentTime = 1;
+                video.load();
+            });
         },
         
         async toggleInteraction(tab, reelId) {
@@ -528,11 +589,9 @@ function reelsManager() {
                 });
             }
             
-            // الحفاظ على الريل الحالي حتى لو لم يكن في النتائج
             if (currentReelId && currentReel) {
                 const currentIndex = this.filteredReels.findIndex(r => r.id === currentReelId);
                 if (currentIndex !== -1) {
-                    // الريل الحالي موجود في النتائج - نبقى عليه
                     this.currentVideoIndex = currentIndex;
                     this.loadedVideos = new Set([
                         Math.max(0, currentIndex - 1),
@@ -540,7 +599,6 @@ function reelsManager() {
                         Math.min(this.filteredReels.length - 1, currentIndex + 1)
                     ]);
                 } else {
-                    // الريل الحالي غير موجود في النتائج - نضيفه في البداية
                     this.filteredReels = [currentReel, ...this.filteredReels];
                     this.currentVideoIndex = 0;
                     this.loadedVideos = new Set([0, 1, 2]);
