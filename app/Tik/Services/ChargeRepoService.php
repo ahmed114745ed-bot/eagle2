@@ -204,7 +204,7 @@ class ChargeRepoService
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (! isset($agency)) {
-                throw new Exception('api_responses.agency_stopped');
+                throw new Exception(__('your agency not found'));
             } // Your agency stopped call the administrator
 
             if ($agency->is_frozen === 1) {

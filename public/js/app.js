@@ -774,7 +774,7 @@ function createMockUserToken(token, projectId) {
     if (!sub) {
         throw new Error("mockUserToken must contain 'sub' or 'user_id' field!");
     }
-    const payload = Object.assign({ 
+    const payload = Object.assign({
         // Set all required fields to decent defaults
         iss: `https://securetoken.google.com/${project}`, aud: project, iat, exp: iat + 3600, auth_time: iat, sub, user_id: sub, firebase: {
             sign_in_provider: 'custom',
@@ -1023,7 +1023,7 @@ const ERROR_NAME = 'FirebaseError';
 class FirebaseError extends Error {
     constructor(
     /** The error code for this error. */
-    code, message, 
+    code, message,
     /** Custom data for this error. */
     customData) {
         super(message);
@@ -1917,7 +1917,7 @@ function validateNamespace(fnName, namespace, optional) {
         throw new Error(errorPrefix(fnName, 'namespace') + 'must be a valid firebase namespace.');
     }
 }
-function validateCallback(fnName, argumentName, 
+function validateCallback(fnName, argumentName,
 // eslint-disable-next-line @typescript-eslint/ban-types
 callback, optional) {
     if (optional && !callback) {
@@ -29155,7 +29155,7 @@ function buildURL(url, params, options) {
   if (!params) {
     return url;
   }
-  
+
   const _encode = options && options.encode || encode;
 
   const serializeFn = options && options.serialize;
@@ -36386,7 +36386,7 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -36400,17 +36400,17 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -36423,7 +36423,7 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/global */
 /******/ 	(() => {
 /******/ 		__webpack_require__.g = (function() {
@@ -36435,12 +36435,12 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /******/ 			}
 /******/ 		})();
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -36451,7 +36451,7 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/node module decorator */
 /******/ 	(() => {
 /******/ 		__webpack_require__.nmd = (module) => {
@@ -36460,7 +36460,7 @@ const unwrap = (value) => reverseTransformCache.get(value);
 /******/ 			return module;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.

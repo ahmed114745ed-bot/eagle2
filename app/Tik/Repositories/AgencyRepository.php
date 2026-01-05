@@ -206,7 +206,7 @@ class AgencyRepository extends AbstractRepository
             ->with('owner')
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%');
-            })->take(10)->get();
+            })->get();
     }
 
     public function countAgencyUserAdmin($userId)

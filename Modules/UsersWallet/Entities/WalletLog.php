@@ -28,13 +28,13 @@ class WalletLog extends Model
     {
         return $this->belongsTo(Target::class, 'related_id');
     }
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'related_id');
-    }
 
-       public function admin()
+    public function admin()
     {
         return $this->belongsTo(Admin::class, 'related_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

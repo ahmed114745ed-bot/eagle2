@@ -1,21 +1,23 @@
 <?php
 
-namespace Modules\SuperAdmin\Http\Controllers\Admin;
+namespace App\Admin\Controllers;
 
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use App\Selectables\Badges;
-use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Modules\Vip\Entities\OVip;
 use App\Selectables\SuperAdmins;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
+use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Modules\SuperAdmin\Entities\SuperAdmin;
+use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Encore\Admin\Widgets\Table;
 
 class SuperAdminRewardControllerHistory extends MainController
 {
@@ -26,11 +28,11 @@ class SuperAdminRewardControllerHistory extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward-history';
+    public $permission_name = 'admin-reward-history';
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Super Admin Reward History'))
+            ->title(trans('Reward History'))
             //    ->row(function (Row $row) {
             //         $row->column(12, $this->grid2());
             //     })
@@ -85,6 +87,8 @@ class SuperAdminRewardControllerHistory extends MainController
     {
         $grid = new Grid(new SuperAdminReward());
         $type = request('type') ?? 'vip';
+
+
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -92,6 +96,8 @@ class SuperAdminRewardControllerHistory extends MainController
                 $filter->where(function ($query) {
                     $query->whereHas('superAdmin', function ($subQuery) {
                         $subQuery->where('username', 'like', "%{$this->input}%");
+                    })->orWhereHas('user', function ($q) {
+                        $q->where('name', 'like', "%{$this->input}%");
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
@@ -107,12 +113,40 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('Created At'))->date();
             });
         });
-        $grid->model()->where('type', $type);
+        $grid->model()->when($type != 'other', function ($q) use ($type) {
+            $q->where('type', $type);
+        })->when($type == 'other', function ($q) {
+            $q->whereIn('type', ['coin', 'achievement']);
+        })
+            ->with([
+                'superAdmin',
+                'admin',
+                'admin.agency',
+                'user',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.profile',
+                'user.country',
+                'areaManager',
+                'ware',
+                'vip',
+                'badge',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ]);
         $grid->column('id', __('Id'));
-        $grid->column('superadmin', __('super admin'))->display(function ($name) {
-            $name = @$this->superAdmin->name ?? '';
-            $uid = @$this->superAdmin->username;
-            $path = @$this?->superAdmin?->avatar;
+        $grid->column('superadmin', __('user'))->display(function ($name) {
+            if ($this->user_type == 'user') {
+
+                $user = $this->user;
+                if (!$user) {
+                    return __('No User');
+                }
+                return app(UserService::class)->adminUserAvatar($user);
+            }
+            $admin = $this->user_type == 'super_admin' ? $this->superAdmin : $this->areaManager;
+            $name = @$admin->name ?? '';
+            $uid = @$admin->username ?? '';
+            $path = @$admin->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -134,47 +168,148 @@ class SuperAdminRewardControllerHistory extends MainController
                 </div>";
         });
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
-                return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
-                return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-        if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
-                    $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
-                    // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
-                } else {
-                    $path = 'coin.png';
+        if ($type != 'package') {
+            $grid->column('gift_id', __('gifts'))->display(function () {
+                if ($this->type == "ware") {
+                    return @$this->ware->name ?? '';
+                } elseif ($this->type == "vip") {
+                    return @$this->vip->name ?? '';
+                } elseif ($this->type == "badge") {
+                    return @$this->badge->name ?? '';
+                } elseif ($this->type == "coin") {
+                    return @$this->target;
+                } elseif ($this->type == "achievement") {
+                    $value = getDriverUrl() . '/' . @$this->target;
+                    return "<img src='$value' width='80' height='80'>";
                 }
+            });
+            if (!request()->filled('_export_')) {
+                $grid->column('image', __('image'))->display(function ($path) {
+                    if ($this->type == 'ware') {
+                        $ware = $this->ware;
+                        $path = $ware->img2 ?? ($ware->show_img ?? "");
+                    } elseif ($this->type == 'vip') {
+                        $vips = $this->vip;
+                        $path = $vips->img ?? '';
+                    } elseif ($this->type == 'badge') {
+                        // $vips = Badge::find($this->target);
+                        $path = @$this->badge->image ?? '';
+                    } elseif ($this->type == 'achievement') {
+                        $path = $this->target;
+                    } else {
+                        $path = 'coin.png';
+                    }
 
-                /** @var Gift $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                    /** @var Gift $this */
+                    $url = getImagePath($path);
+                    return handleShowImageWithTypes($this->id, $url, 50, 50);
+                });
+            }
+            $grid->column('expire', __('Expire'));
+            $grid->column('no_reward', __('No reward'));
+        } else {
+            $grid->column('members', __('rewards'))->expand(function ($model) {
+                $mempers = SuperAdminReward::where(['super_admin_id' => $this->super_admin_id, 'package_id' => $this->target])
+                    ->with([
+                        'ware',
+                        'vip',
+                        'badge',
+
+                    ])
+                    ->get()
+                    ->map(function ($memper) {
+
+                        $gifts = '';
+                        $path  = '';
+
+                        switch ($memper->type) {
+                            case 'ware':
+                                $gifts = $memper->ware->name ?? '';
+                                $path  = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
+                                break;
+
+                            case 'vip':
+                                $gifts = $memper->vip->name ?? '';
+                                $path  = $memper->vip->img ?? '';
+                                break;
+
+                            case 'badge':
+                                $gifts = $memper->badge->name ?? '';
+                                $path  = $memper->badge->image ?? '';
+                                break;
+
+                            case 'coins':
+                                $gifts = $memper->target;
+                                $path  = 'coin.png';
+                                break;
+
+                            case 'achievement':
+                                $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
+                                $path  = $memper->target;
+                                break;
+                        }
+
+                        $defaultImage = asset('images/reward.jpg');
+
+                        $url =  getImagePath($path) ?? $defaultImage;
+
+                        if (!isImageExists($url)) {
+                            $url = $defaultImage;
+                        }
+
+                        $image = handleShowImageWithSvga(
+                            $memper->id,
+                            $url,
+                            50,
+                            50
+                        );
+
+                        return [
+                            'id'       => $memper->id,
+                            'type'     => $memper->type,
+                            'gift'     => $gifts,
+                            'image'    => $image,
+                            'quantity' => $memper->quantity,
+                            'expire'   => $memper->expire,
+                        ];
+                    });
+
+                return new Table(
+                    ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                    $mempers->toArray()
+                );
             });
         }
-        $grid->column('expire', __('Expire'));
-        $grid->column('no_reward', __('No reward'));
+
         $grid->column('created_at', __('created_at'));
+        $grid->column('created_by', __('created by'))->display(function ($name) {
+
+            $admin =  $this->admin;
+            $name = @$admin->name ?? '';
+            $uid = @$admin->username ?? '';
+            $path = @$admin->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
+
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = $this ? url("admin/superadmin-users/{$this->id}") : 0;
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                    $image
+                    <div>
+                       <a href='{}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
+                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
+                        </a>
+                        <span style='color: #aaa; font-size: smaller;'>UUID: $uid</span>
+                    </div>
+                </div>";
+        });
         $grid->tools(function (Grid\Tools $tools) {
-            $url = url('admin/super-admin-rewards?type=vip');
+            $url = url('admin/admin-rewards?type=vip');
             $back = __(' back');
 
             $customButtonHTML = <<<HTML

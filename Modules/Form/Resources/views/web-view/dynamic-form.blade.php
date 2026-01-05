@@ -1020,7 +1020,7 @@ ease;
 
     @endif
 
-      
+
 
              <div class="text-center mb-5">
                 <button type="submit" class="btn btn-primary" id="submitBtn">
@@ -1029,7 +1029,7 @@ ease;
             </div>
     </form>
 
-    
+
 
 </div>
 
@@ -1047,7 +1047,7 @@ ease;
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 
-    
+
 
     const translations = {
         members: "{{ __('Members') }}",

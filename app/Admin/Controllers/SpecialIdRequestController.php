@@ -2,32 +2,20 @@
 
 namespace App\Admin\Controllers;
 
-use Admin;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use App\Models\Agency;
 use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;;
+
 use Modules\SpecialId\Entities\UserWare;
 use App\Admin\Controllers\MainController;
-use App\Admin\Widgets\Table;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Public\Http\Services\UpgradeLevelServices;
-use Modules\SwitchAccount\Entities\UserAccount;
+
 
 class SpecialIdRequestController extends MainController
 {
@@ -79,8 +67,15 @@ class SpecialIdRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserWare());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->model()
+            ->with([
+                'user',
+                'ware',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+
+            ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->where('disable', 0)->orderByDesc('id');
 
@@ -131,26 +126,6 @@ class SpecialIdRequestController extends MainController
         return $grid;
     }
 
-
-    protected function detail($id)
-    {
-        $show = new Show(StoreLog::findOrFail($id));
-
-        $show->id('ID');
-        $show->user_id('user_id');
-        $show->get_nums('get_nums');
-        $show->get_type('get_type');
-        $show->now_nums('now_nums');
-        $show->adduser('adduser');
-        $show->symbol('symbol');
-        $show->types('types');
-        $show->union_id('union_id');
-        $show->family_id('family_id');
-        $show->created_at(trans('admin.created_at'));
-        $show->updated_at(trans('admin.updated_at'));
-
-        return $show;
-    }
     protected function form()
     {
 
@@ -200,7 +175,7 @@ class SpecialIdRequestController extends MainController
                     $arr['is_read']   = 1;
                     $arr['use_num']   = $ware->num;
                     $arr['price']     = $total_price;
-                    $arr['receive_type'] ='special-id-form';
+                    $arr['receive_type'] = 'special-id-form';
 
                     $newPack = Pack::query()->create($arr);
                     DB::commit();

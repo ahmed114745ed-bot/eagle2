@@ -31,7 +31,7 @@ class HomeCarouselController extends Controller
 
             ->when($displayType, function ($q) use ($displayType, $now, $offset) {
                 $q->whereHas('displays', function ($sub) use ($displayType, $now, $offset) {
-                    $sub->where('display_type', $displayType)
+                    $sub->where('display_type', $displayType)->where('status', 1)
                         ->where(function ($inner) use ($now, $offset) {
                             // $inner->whereRaw("
                             //     CONVERT_TZ(end_at, '+00:00', ?) > ?

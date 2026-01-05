@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Dashboard\StatisticsController;
+use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -27,7 +29,6 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
-use App\Http\Controllers\TestDiamondController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -408,6 +409,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
+                Route::get('/categories', [CountryController::class, 'countryCategory']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
                 Route::post('change-request', [CountryController::class, 'changeRequest']);
@@ -760,3 +762,6 @@ Route::get('gifts-by-id', function (Request $request) {
 
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
+Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
+Route::get('dashboard/charts', [StatisticsController::class, 'charts']);
+Route::get('dashboard/top-rooms', [StatisticsController::class, 'topRooms']);

@@ -15,11 +15,6 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdminCountryController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdminNotificationController;
 
 
-
-
-
-
-
 /*
 |--------------------------------------------------------------------------
 | admin Routes
@@ -72,8 +67,7 @@ Route::group(
         Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
-        Route::resource('super-admin-rewards-histories', SuperAdminRewardControllerHistory::class);
-        Route::resource('super-admin-rewards', Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminRewardController::class);
+       
 
 
         Route::post('/set-preview-superadmin', function () {
@@ -93,9 +87,6 @@ Route::group(
             Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
         });
     });
-
-
-
 
 
 /*
@@ -212,7 +203,7 @@ Route::group(
             ]
         ]);
 
-         Route::get('superadmin-profile/{id}', [SuperAdminController::class,'profile']);
+        Route::get('superadmin-profile/{id}', [SuperAdminController::class, 'profile']);
 
         Route::resource('rooms', RoomController::class);
         Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
@@ -237,14 +228,14 @@ Route::group(
         Route::resource('super-admin-rewards', SuperAdminRewardController::class);
         Route::post('banner-request/{banner}', [HomeCarouselController::class, 'storeBannerRequest']);
         Route::post('home-carousel/resend-banner-request/{banner}', [HomeCarouselController::class, 'resendBannerRequest'])
-        ->name('banner.resend');
+            ->name('banner.resend');
 
         Route::prefix('notifications')->group(function () {
             Route::get('count', [SuperAdminNotificationController::class, 'count']);
             Route::get('list', [SuperAdminNotificationController::class, 'list']);
             Route::post('mark-as-read/{id}', [SuperAdminNotificationController::class, 'markAsRead']);
             Route::post('mark-all-read', [SuperAdminNotificationController::class, 'markAllRead']);
-            Route::get('grid', [ NotificationController::class, 'index'])->name('notifications.grid');
+            Route::get('grid', [NotificationController::class, 'index'])->name('notifications.grid');
         });
 
         Route::post('/save-fcm-token', function (Illuminate\Http\Request $request) {
@@ -278,9 +269,15 @@ Route::group(
             Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
         });
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/finance/cards', [HomeController::class, 'financeCards']);
+            Route::get('/finance/tables', [HomeController::class, 'financeTables']);
+            Route::get('/finance/chart', [HomeController::class, 'financeChartIndex']);
+            Route::get('wallet-logs/ajax', [HomeController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
+        });
 
-            Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
-             Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
+        Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
+        Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
     }
 );
 

@@ -163,7 +163,7 @@ class EnteranceRoomServices
 
         if ($event == 'room_login'){
             $this->addUserToVisitors($room->id, $user->id);
-            $user->now_room_uid = $room->uid;
+            $user->now_room_uid = $room->id;
         }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
             $user->now_room_uid = 0;
         }
@@ -217,7 +217,7 @@ class EnteranceRoomServices
 
         if ($event == 'room_login'){
             $this->addUserToVisitors($room->id, $user->id);
-            $user->now_room_uid = $room->uid;
+            $user->now_room_uid = $room->id;
         }elseif ($event == 'room_logout'  && $room->uid == $user->now_room_uid){
             $user->now_room_uid = 0;
         }
@@ -266,7 +266,7 @@ class EnteranceRoomServices
         if (in_array($eventType, [101, 103])) {
 
             $this->addUserToVisitors($room->id, $user->id);
-            $user->now_room_uid = $room->uid;
+            $user->now_room_uid = $room->id;
 
             if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
                     $room->update(['is_live' => true]);
@@ -571,7 +571,7 @@ class EnteranceRoomServices
 
         //send to zego
         $user->enableSaving = false;
-        $user->now_room_uid = (integer)$owner_id;
+        $user->now_room_uid = (integer)$room->id;
         $user->save();
 
         if (config('app.env') != "production") {

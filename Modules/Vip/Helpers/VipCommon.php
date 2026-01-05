@@ -13,13 +13,13 @@ use App\Models\Ware;
 class VipCommon
 {
 
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending' ,$isUsed = null): bool
+    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1): bool
     {
         try {
-            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType,$isUsed) {
+            DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType, $isUsed) {
                 $vipp = UserVip::create([
                     'type'      => 1,
-                    'sender_id' => $senderId ,
+                    'sender_id' => $senderId,
                     'user_id'   => $user->id,
                     'vip_id'    => $vip->id,
                     'level'     => $vip->level,
@@ -38,26 +38,27 @@ class VipCommon
                 ]);
             });
 
+            if ($sendNotification) {
+                Common::sendOfficialMessage(
+                    $user->id,
+                    __('congratulations'),
+                    __('vip_gift_message')
+                );
 
-            Common::sendOfficialMessage(
-                $user->id,
-                __('congratulations'),
-                __('vip_gift_message')
-            );
+                $tokens_notification = [
+                    DB::table('users')->where('id', $user->id)->value('notification_id')
+                ];
 
-            $tokens_notification = [
-                DB::table('users')->where('id', $user->id)->value('notification_id')
-            ];
-
-            Common::send_firebase_notification(
-                $tokens_notification,
-                config('app.name_ar'),
-                __('vip_gift_message') . $user->name
-            );
+                Common::send_firebase_notification(
+                    $tokens_notification,
+                    config('app.name_ar'),
+                    __('vip_gift_message') . $user->name
+                );
+            }
 
             return true;
         } catch (\Throwable $e) {
-          //  \Log::error($e->getMessage());
+            //  \Log::error($e->getMessage());
             return false;
         }
     }
@@ -238,7 +239,7 @@ class VipCommon
                 'vip_user_id' => $userVip->id,
                 'is_used'     => $userVip->is_used,
                 'using'       => 1,
-                'receive_type' => $userVip->receive_type .'-'. $userVip->level
+                'receive_type' => $userVip->receive_type . '-' . $userVip->level
 
             ]);
         }
@@ -276,7 +277,7 @@ class VipCommon
     }
 
 
-    public static function  removeVipFromUser( $user ,$id ,$receive_type)
+    public static function  removeVipFromUser($user, $id, $receive_type)
     {
         // \Log::info("Start removeVipFromUser", [
         //     'user_id' => $user->id,
@@ -287,24 +288,21 @@ class VipCommon
             ->where('user_id', $user->id)
             ->where('vip_id', $id)
             ->first();
-            if (!$vip) {
-                return; 
-            }
-         
-        
-            $vipReceiveType = $receive_type . '-' . $vip->level;
-            // \Log::info("Deleted Packs", [
-            //     'vip_user_id' => $vip->id,
-            //     'count_deleted' => $vipReceiveType,
-            // ]);
-            Pack::where('vip_user_id',  $vip->id)
-                ->where('receive_type', $vipReceiveType)
-                ->where('user_id', $user->id)
-                ->delete();
-        
-            $vip->delete();
+        if (!$vip) {
+            return;
+        }
+
+
+        $vipReceiveType = $receive_type . '-' . $vip->level;
+        // \Log::info("Deleted Packs", [
+        //     'vip_user_id' => $vip->id,
+        //     'count_deleted' => $vipReceiveType,
+        // ]);
+        Pack::where('vip_user_id',  $vip->id)
+            ->where('receive_type', $vipReceiveType)
+            ->where('user_id', $user->id)
+            ->delete();
+
+        $vip->delete();
     }
 }
-
-
-

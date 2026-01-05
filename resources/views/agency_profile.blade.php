@@ -15,9 +15,6 @@
             --secondary-color:
                 {{ config('themes.secondaryColor') }}
             ;
-            --green-color:
-                {{ config('themes.greenColor') }}
-            ;
             --text-primary-color:
                 {{ config('themes.textPrimaryColor') }}
             ;
@@ -90,27 +87,11 @@
             flex: 1;
         }
 
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            line-height: 1;
-        }
-
         .stat-label {
             font-size: 13px;
             color: #7f8c8d;
             margin-top: 5px;
         }
-
-        .section-box {
-            background: var(--secondary-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
 
         .section-header h4 {
             margin: 0;
@@ -195,20 +176,6 @@
 
         }
 
-        .agency-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 25px;
-            margin-bottom: 30px;
-            position: relative;
-            padding: 20px;
-            background: var(--secondary-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            /* filter: brightness(0.5); */
-
-        }
-
         .agency-avatar {
             width: 120px;
             height: 120px;
@@ -267,22 +234,6 @@
             gap: 15px;
         }
 
-        .stat-card {
-            background: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            min-width: 200px;
-
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #3498db;
-        }
-
         .stat-label {
             font-size: 12px;
             color: #7f8c8d;
@@ -304,27 +255,6 @@
             display: flex;
             align-items: center;
             gap: 5px;
-        }
-
-        .rtl .btn-back {
-            position: absolute;
-            top: 5px;
-            left: 20px;
-            background: #ecf0f1;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            color: #7f8c8d;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-back:hover {
-            background: #d6e0e3;
-            color: #34495e;
         }
 
         .notice-section {
@@ -362,24 +292,6 @@
             }
         }
 
-        .performers-card {
-            background: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            /* filter: brightness(0.5); */
-
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
         .stats-row {
             display: flex;
             gap: 15px;
@@ -393,15 +305,6 @@
             align-items: center;
             gap: 8px;
             color: #2c3e50;
-        }
-
-        .section-badge {
-            background: #3498db;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
         }
 
         .avatar-grid {
@@ -531,52 +434,10 @@
             margin-bottom: 30px;
         }
 
-        .card-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--secondary-color);
-        }
-
         .card-header h3 {
             margin: 0;
             font-size: 18px;
             color: #2c3e50;
-        }
-
-        .count-badge {
-            background: #ecf0f1;
-            color: #7f8c8d;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--secondary-color);
-        }
-
-
-        .table-section {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--secondary-color);
-        }
-
-        .data-table th {
-            /* text-align: left; */
-            padding: 12px 15px;
-            background: var(--secondary-color);
-
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
         }
 
         .data-table td {
@@ -587,10 +448,6 @@
 
         .data-table tr:last-child td {
             border-bottom: none;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
         }
 
         .user-cell {
@@ -761,23 +618,11 @@
             gap: 10px;
         }
 
-
-        .pagination-wrapper {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: center;
-            border-top: 1px solid #eee;
-            background: var(--secondary-color);
-        }
-
-
-
         .target-card-section-1 {
             /* display: inline-flex; */
             width: 100%;
             padding-top: 26px;
             margin-bottom: 35px;
-
         }
 
         .card-target-filter {

@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use DB;
-use Log;
-use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Traits\FollowTrait;
 use Modules\CP\Entities\Cp;
@@ -13,7 +11,6 @@ use App\Traits\User\UserLevel;
 use Modules\Vip\Entities\OVip;
 use App\Helpers\UserPackHelper;
 use Modules\Reals\Entities\Real;
-use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Badge\Entities\Badge;
 use Modules\Vip\Entities\UserVip;
@@ -36,6 +33,7 @@ use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
@@ -906,29 +904,22 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        // $userSalary = UserSallary::query()
 
-            ->where('user_id', $this->id)
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+        //     ->where('user_id', $this->id)
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+        //     $q->where('uid', $this->id);
+        // })
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('salary - cut_amount'));
 
-        $total = $userSalary + $roomSalary;
-        // $total =wallet_available_by_user($this->id); 
+        // $total = $userSalary + $roomSalary;
+        $total = wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
-
-    public function getSalaryV2Attribute()
-    {
-        $total = wallet_available_by_user($this->id); 
-        return floor($total * 100) / 100;
-    }
-
 
     public function getSalaryByAgencyAttribute()
     {
@@ -1004,13 +995,17 @@ class User extends Authenticatable
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
     }
-
 
     public function nowRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+    }
+
+     public function nowAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
     }
     public function myroom()
     {
@@ -1506,26 +1501,45 @@ class User extends Authenticatable
     /**
      * Custom accessor for UUID with special pack conditions.
      */
+    // public function getUuidAttribute($value)
+    // {
+    //     if ($this->relationLoaded('packs')) {
+
+    //         $pack = $this->packs
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->where('ware.value', $this->special_id)
+    //             ->first();
+    //     } else {
+
+    //         $pack = $this->packs()
+    //             ->with('ware')
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
+    //             ->first();
+    //     }
+
+    //     return ($this->special_id && $pack && $pack->is_used === 1)
+    //         ? $this->special_id
+    //         : $this->original_uuid;
+    // }
+
+
     public function getUuidAttribute($value)
     {
-        if ($this->relationLoaded('packs')) {
-
-            $pack = $this->packs
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->where('ware.value', $this->special_id)
-                ->first();
-        } else {
-
-            $pack = $this->packs()
-                ->with('ware')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
-                ->first();
+        if (!$this->relationLoaded('packs')) {
+            return $this->original_uuid;
         }
 
-        return ($this->special_id && $pack && $pack->is_used === 1)
+        $pack = $this->packs->first(
+            fn($pack) =>
+            $pack->type === 25 &&
+                $pack->is_used &&
+                optional($pack->ware)->value == $this->special_id
+        );
+
+        return ($this->special_id && $pack)
             ? $this->special_id
             : $this->original_uuid;
     }
@@ -1937,7 +1951,7 @@ class User extends Authenticatable
     //         }
 
     //         $originalProfile = $model->profile;
-    //         $newAvatar = request()->input('photo'); 
+    //         $newAvatar = request()->input('photo');
     //         if ($originalProfile && $newAvatar && $originalProfile->avatar !== $newAvatar) {
 
     //             $newCount = $model->profile_count + 1;
@@ -2290,9 +2304,16 @@ class User extends Authenticatable
     }
 
 
-    public function nowRoomOwner()
+    public function nowRoomOwner(): HasOneThrough
     {
-        return $this->belongsTo(User::class, 'now_room_uid');
+        return $this->hasOneThrough(
+            User::class,
+            Room::class,
+            'id',          
+            'id',          
+            'now_room_uid', 
+            'uid'           
+        );
     }
 
 
@@ -2316,11 +2337,6 @@ class User extends Authenticatable
     public function roomVisitors()
     {
         return $this->hasMany(RoomVisitor::class, 'user_id');
-    }
-
-    public function roomVisitor()
-    {
-        return $this->hasOne(RoomVisitor::class, 'user_id');
     }
     public function liveTimes()
     {

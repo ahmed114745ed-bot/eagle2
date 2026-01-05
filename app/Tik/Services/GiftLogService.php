@@ -183,7 +183,7 @@ class GiftLogService
 
             $price = ceil($realPrice);
 
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
 //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
             $settings = CacheHelper::cacheSettings();

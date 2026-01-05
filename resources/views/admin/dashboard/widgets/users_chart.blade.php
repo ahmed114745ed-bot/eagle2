@@ -17,9 +17,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    (function () {
-        var ctx = document.getElementById('salaryChart').getContext('2d');
-        var salaryChart = new Chart(ctx, {
+    let salaryChart;
+
+    function loadUsersChart() {
+        const canvas = document.getElementById('salaryChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        if (salaryChart) {
+            salaryChart.destroy();
+        }
+
+        salaryChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: [],
@@ -46,13 +56,32 @@
                 }
             }
         });
-        fetch('{{ url($prefix . "/statistics/top-users-data") }}')
-            .then(response => response.json())
-            .then(data => {
+
+        $.ajax({
+            url: '{{ url($prefix . "/statistics/top-users-data") }}',
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
                 salaryChart.data.labels = data.labels;
                 salaryChart.data.datasets[0].data = data.data;
                 salaryChart.update();
-            })
-            .catch(err => console.error('Error loading chart data:', err));
-    })();
+            },
+            error: function(err) {
+                console.error('AJAX Error loading chart data:', err);
+            }
+        });
+    }
+
+    // Execute immediately - this is the key!
+    loadUsersChart();
+
+    // Listen for PJAX completion to reload data
+    $(document).on('pjax:complete', function() {
+        setTimeout(loadUsersChart, 300);
+    });
+
+    // Also listen for pjax:end as backup
+    $(document).on('pjax:end', function() {
+        setTimeout(loadUsersChart, 300);
+    });
 </script>

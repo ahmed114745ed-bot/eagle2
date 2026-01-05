@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SuperAdmin\Http\Controllers\Admin;
+namespace App\Admin\Controllers;
 
 use App\Models\Ware;
 use Encore\Admin\Grid;
@@ -26,7 +26,7 @@ class SuperAdminRewardController extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward';
+    public $permission_name = 'admin-reward';
     public function index(Content $content)
     {
 
@@ -36,7 +36,7 @@ class SuperAdminRewardController extends MainController
 
         session(['last_ware_type' => request()->get('type', 'vip')]);
         return parent::index($content
-            ->title(trans('Super Admin Reward'))
+            ->title(trans('Reward'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
@@ -52,7 +52,7 @@ class SuperAdminRewardController extends MainController
     {
         $content = new Row();
 
-        $types =  ['vip', 'ware', 'badge', 'package'];
+        $types =  ['vip', 'ware', 'badge', 'package',/**'other'*/];
         $currentType = request()->get('type', 'vip');
 
         $box = new Box(content: view('admin.grid.Form.rewardTabs', [
@@ -99,7 +99,7 @@ class SuperAdminRewardController extends MainController
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
 
-                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
+                    return (new \App\Admin\Actions\DedicateAdminPackageReward($this->id))->render();
                 });
             }
         } else {
@@ -117,9 +117,9 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
+        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*'))) {
             $grid->tools(function (Grid\Tools $tools) {
-                $url = '/admin/super-admin-rewards-histories?type=' . request('type');
+                $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
                 $tools->append($button);
             });
@@ -202,17 +202,33 @@ class SuperAdminRewardController extends MainController
                             break;
                     }
 
+                     $defaultImage = asset('images/reward.jpg');
+
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                $image = handleShowImageWithSvga(
+                    $memper->id,
+                    $url,
+                    50,
+                    50
+                );
+
                     return [
                         'id'       => $memper->id,
                         'type'     => $memper->type,
                         'gift'     => $gifts,
+                        'image'    => $image,
                         'quantity' => $memper->quantity,
                         'expire'   => $memper->expire,
                     ];
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'),__('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });
