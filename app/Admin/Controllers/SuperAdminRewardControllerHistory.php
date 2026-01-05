@@ -131,6 +131,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'ware',
                 'vip',
                 'badge',
+                'packageRewards',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
@@ -209,14 +210,8 @@ class SuperAdminRewardControllerHistory extends MainController
             $grid->column('no_reward', __('No reward'));
         } else {
             $grid->column('members', __('rewards'))->expand(function ($model) {
-                $mempers = SuperAdminReward::where(['super_admin_id' => $this->super_admin_id, 'package_id' => $this->target])
-                    ->with([
-                        'ware',
-                        'vip',
-                        'badge',
-
-                    ])
-                    ->get()
+                $mempers = $model->packageRewards
+                    
                     ->map(function ($memper) {
 
                         $gifts = '';
