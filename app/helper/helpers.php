@@ -698,10 +698,8 @@ if (!function_exists('handleShowImageWithTypes')) {
 
                 // Style for table cell alignment
                 $style = "width: {$width}px; height: {$height}px;";
-                $style .= " display: flex;";             // use flex for centering
-                $style .= " justify-content: center;";   // horizontal center
-                $style .= " align-items: center;";       // vertical center
-                $style .= " margin: auto;";              // fallback // aligns icons in table rows
+                $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
+                $style .= " vertical-align: middle;"; // aligns icons in table rows
 
                 if ($objectFit !== 'cover') {
                     $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
