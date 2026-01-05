@@ -138,7 +138,7 @@ class SuperPackageController extends MainController
                         $url = $defaultImage;
                     }
 
-                $image = handleShowImageWithTypes(
+                $image = handleShowImageWithSvga(
                     $reward->id,
                     $url,
                     50,
