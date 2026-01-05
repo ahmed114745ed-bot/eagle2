@@ -95,6 +95,8 @@ class SuperAdminRewardControllerHistory extends MainController
                 $filter->where(function ($query) {
                     $query->whereHas('superAdmin', function ($subQuery) {
                         $subQuery->where('username', 'like', "%{$this->input}%");
+                    })->orWhereHas('user', function ($q) {
+                        $q->where('name', 'like', "%{$this->input}%");
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
