@@ -2347,10 +2347,12 @@
     }
 
     .fields-group .input-group.input-group-sm {
-        background: rgba(255, 255, 255, 0.03);
+        background: white;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         overflow: hidden;
+        position: absolute;
+        z-index: 1;
         transition: all 0.3s ease;
     }
 
