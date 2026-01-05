@@ -92,7 +92,7 @@ class DedicateRewardHistoryController extends AdminController
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('areaManager/rewards');
-            $back = __(' back');
+            $back = __('back');
 
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
