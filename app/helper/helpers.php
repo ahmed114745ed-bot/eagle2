@@ -695,19 +695,25 @@ if (!function_exists('handleShowImageWithTypes')) {
 
                 $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
                 $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
-                $translateX = $direction === 'rtl' ? 90 : -90;
 
+                // Style for table cell alignment
                 $style = "width: {$width}px; height: {$height}px;";
+                $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
+                $style .= " vertical-align: middle;"; // aligns icons in table rows
+
                 if ($objectFit !== 'cover') {
                     $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
 
-                // Apply RTL-aware transform
-                $style .= " transform: matrix(0.217391, 0, 0, 0.217391, {$translateX}, -30);";
+                // Optional: scale and horizontal flip for RTL
+                $scale = 1;
+                $flip = $direction === 'rtl' ? 'scaleX(-1)' : 'scaleX(1)';
+                $style .= " transform: {$flip} scale({$scale});";
 
-                $rtlClass = $direction === 'rtl' ? 'rtlSvga' : '';
+                // Add RTL/LTR class for CSS if needed
+                $directionClass = $direction === 'rtl' ? 'rtlSvga' : 'ltrSvga';
 
-                return "<div class='svga-player $rtlClass' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+                return "<div class='svga-player $directionClass' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
             } elseif ($imageType == 'mp4') {
                 return "
             <video width='$width' height='$height' controls autoplay muted loop>
