@@ -92,7 +92,7 @@ class DedicateRewardHistoryController extends AdminController
 
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('areaManager/rewards');
-            $back = __(' back');
+            $back = __('back');
 
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">
@@ -206,7 +206,7 @@ class DedicateRewardHistoryController extends AdminController
             if (!isImageExists($url)) $url = $defaultImage;
 
             $image = handleShowImageWithTypes($info->id, $url, 40, 40);
-            $showUrl = url("areaManager/area-manager-users/profile/{$info->id}");
+            $showUrl = url("areaManager/superadmin-users/{$info->id}");
             return "
                         <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                             <div style='display: flex; align-items: center; gap: 10px;'>

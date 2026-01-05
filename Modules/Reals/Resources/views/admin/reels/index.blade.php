@@ -17,6 +17,30 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.querySelector('.navbar');
+            if (nav && !nav.classList.contains('navbar-hidden')) {
+                nav.classList.add('navbar-hidden');
+            }
+
+            const updateAppClassMargin = () => {
+                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                document.querySelectorAll('.app-class').forEach(el => {
+                    el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                });
+            };
+
+            // Initial state: navbar hidden, zero top margin
+            updateAppClassMargin();
+
+            // Toggle margin when navbar hides/shows (e.g., on scroll)
+            window.addEventListener('scroll', () => {
+                // If nav is unhidden elsewhere, respect that by restoring margin
+                updateAppClassMargin();
+            });
+        });
+    </script>
     <style>
                 .content-header,
         .skin-black-light .content-header,
@@ -74,7 +98,7 @@
 
             <h2 class="text-lg font-bold mb-3 flex items-center">
                 <i class="fas fa-film ml-2" style="margin: 7px 10px;"></i>
-                قائمة الريلز
+                {{ __('reels_admin.list_title') }}
             </h2>
 
             <!-- Search Box -->
@@ -82,19 +106,19 @@
                 <input type="text"
                        x-model="searchQuery"
                        @input="filterReels()"
-                       placeholder="ابحث بالاسم أو المعرف..."
-                       class="w-full px-3 py-2 ps-10 rounded-md bg-white text-gray-800 dark:text-gray-200 text-sm focus:outline-none border border-white/30"
+                       placeholder="{{ __('reels_admin.search_placeholder') }}"
+                       class="w-full px-3 py-2 ps-10 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none border border-white/30 dark:border-gray-700"
                        style="box-shadow: black;">
                 <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
 
             <div class="flex items-center justify-between mt-2">
-                <p class="text-sm opacity-90" x-text="filteredReels.length + ' ريل'"></p>
+                <p class="text-sm opacity-90" x-text="filteredReels.length + ' {{ __('reels_admin.reel_label') }}'"></p>
                 <button @click="loadMoreReels()"
                         x-show="hasMore && !loading"
                         class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded">
                     <i class="fas fa-sync-alt ml-1"></i>
-                    تحديث
+                    {{ __('reels_admin.refresh') }}
                 </button>
             </div>
         </div>
@@ -140,7 +164,7 @@
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <p class="text-white text-xs font-bold truncate" x-text="reel.user?.name"></p>
-                                        <p class="text-white/70 text-[10px]" x-text="'ID: ' + reel.user?.id"></p>
+                                        <p class="text-white/70 text-[10px]" x-text="'{{ __('reels_admin.id_label') }}' + reel.user?.id"></p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 text-white text-[10px]">
@@ -181,7 +205,7 @@
             <div x-show="loading" class="p-3 text-center">
                 <div class="inline-flex items-center space-x-2 space-x-reverse px-3 py-2 rounded-md" style="background-color: var(--primary-hover-alpha);">
                     <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2" style="border-color: var(--primary-color);"></div>
-                    <span class="text-xs font-semibold" style="color: var(--primary-color);">جاري التحميل...</span>
+                    <span class="text-xs font-semibold" style="color: var(--primary-color);">{{ __('reels_admin.loading') }}</span>
                 </div>
             </div>
 
@@ -193,7 +217,7 @@
                         onmouseover="this.style.backgroundColor='{{ config('themes.secondaryColor') }}'"
                         onmouseout="this.style.backgroundColor='{{ config('themes.primaryColor') }}'">
                     <i class="fas fa-plus ml-1"></i>
-                    تحميل المزيد
+                    {{ __('reels_admin.load_more') }}
                     <span class="text-xs opacity-90 mr-2">
                         (<span x-text="filteredReels.length"></span>)
                     </span>
@@ -203,7 +227,7 @@
             <!-- No More Message -->
             <div x-show="!hasMore && filteredReels.length > 0" class="p-3 text-center text-gray-500 text-xs">
                 <i class="fas fa-check-circle mb-1 text-green-500"></i>
-                <p class="font-semibold">تم تحميل الكل</p>
+                <p class="font-semibold">{{ __('reels_admin.all_loaded') }}</p>
             </div>
         </div>
     </div>
@@ -236,7 +260,7 @@
                                 <div x-show="!isVideoReady(reel.id)" class="absolute inset-0 flex items-center justify-center bg-gray-900 dark:bg-gray-950">
                                     <div class="text-center text-white/50">
                                         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-500 dark:border-purple-400 mx-auto mb-4"></div>
-                                        <p class="text-sm">جاري تحميل الفيديو...</p>
+                                        <p class="text-sm">{{ __('reels_admin.video_loading') }}</p>
                                     </div>
                                 </div>
 
@@ -273,7 +297,7 @@
                                 </div>
                                 <div class="mr-3">
                                     <p class="text-white font-bold text-lg drop-shadow-lg" x-text="reel.user?.name"></p>
-                                    <p class="text-white/80 text-sm drop-shadow" x-text="'ID: ' + reel.user?.id"></p>
+                                    <p class="text-white/80 text-sm drop-shadow" x-text="'{{ __('reels_admin.id_label') }}' + reel.user?.id"></p>
                                 </div>
                             </div>
 
@@ -304,7 +328,7 @@
                                             onmouseover="this.style.backgroundColor='rgba(255, 255, 255, 0.15)'"
                                             onmouseout="this.style.backgroundColor='rgba(255, 255, 255, 0.05)'">
                                         <i class="fas fa-edit text-white"></i>
-                                        <span class="font-semibold">تعديل</span>
+                                        <span class="font-semibold">{{ __('reels_admin.edit') }}</span>
                                     </button>
                                     <div class="border-t" style="border-color: rgba(255, 255, 255, 0.2);"></div>
                                     <button @click.stop="deleteReel(reel.id); open = false"
@@ -313,7 +337,7 @@
                                             onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.25)'"
                                             onmouseout="this.style.backgroundColor='rgba(239, 68, 68, 0.1)'">
                                         <i class="fas fa-trash text-red-300"></i>
-                                        <span class="font-semibold">حذف</span>
+                                        <span class="font-semibold">{{ __('reels_admin.delete') }}</span>
                                     </button>
                                 </div>
                             </div>
@@ -325,7 +349,7 @@
                             <p class="text-white/90 text-sm drop-shadow-lg" x-text="reel.description"></p>
                             <div class="flex items-center mt-3 text-white text-sm">
                                 <i class="fas fa-eye ml-2"></i>
-                                <span x-text="formatNumber(reel.views_count) + ' مشاهدة'"></span>
+                                <span x-text="formatNumber(reel.views_count) + ' {{ __('reels_admin.views_label') }}'"></span>
                             </div>
                         </div>
 
@@ -398,7 +422,7 @@
                              x-show="loading && index === filteredReels.length - 1">
                             <div class="flex items-center space-x-2 space-x-reverse bg-black/70 backdrop-blur-md px-4 py-2 rounded-full">
                                 <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                                <span class="text-white text-sm">جاري التحميل...</span>
+                                <span class="text-white text-sm">{{ __('reels_admin.loading') }}</span>
                             </div>
                         </div>
                     </div>
@@ -411,8 +435,8 @@
             <div class="h-32 flex items-center justify-center ">
                 <div class="text-center text-white/60">
                     <i class="fas fa-check-circle text-3xl mb-2"></i>
-                    <p>لا يوجد المزيد من الريلز</p>
-                    <p class="text-sm mt-2">إجمالي: <span x-text="filteredReels.length"></span> ريل</p>
+                    <p>{{ __('reels_admin.no_more_reels') }}</p>
+                    <p class="text-sm mt-2">{{ __('reels_admin.total') }} <span x-text="filteredReels.length"></span> {{ __('reels_admin.reel_label') }}</p>
                 </div>
             </div>
         </template>
@@ -426,8 +450,8 @@
                         onmouseover="this.style.backgroundColor='{{ config('themes.secondaryColor') }}'"
                         onmouseout="this.style.backgroundColor='{{ config('themes.primaryColor') }}'">
                     <i class="fas fa-arrow-down ml-2"></i>
-                    تحميل المزيد
-                    <span class="text-sm block mt-1">(<span x-text="filteredReels.length"></span> من 100)</span>
+                    {{ __('reels_admin.load_more') }}
+                    <span class="text-sm block mt-1">(<span x-text="filteredReels.length"></span> {{ __('reels_admin.out_of_max') }})</span>
                 </button>
             </div>
         </template>
@@ -458,8 +482,8 @@
                         :class="activeTab === 'likes'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-heart ms-1 sm:ms-2"></i>
-                    <span class="hidden sm:inline">الإعجابات</span>
-                    <span class="sm:hidden">إعجاب</span>
+                    <span class="hidden sm:inline">{{ __('reels_admin.likes') }}</span>
+                    <span class="sm:hidden">{{ __('reels_admin.like') }}</span>
                     <span x-show="selectedReel"
                           class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.likes_count || 0"></span>
@@ -469,8 +493,8 @@
                         :class="activeTab === 'comments'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-comment ms-1 sm:ms-2"></i>
-                    <span class="hidden sm:inline">التعليقات</span>
-                    <span class="sm:hidden">تعليق</span>
+                    <span class="hidden sm:inline">{{ __('reels_admin.comments') }}</span>
+                    <span class="sm:hidden">{{ __('reels_admin.comment') }}</span>
                     <span x-show="selectedReel"
                           class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.comments_count || 0"></span>
@@ -480,8 +504,8 @@
                         :class="activeTab === 'gifts'? 'bg-white tab-active': 'bg-white/20 text-white hover:bg-white/30'"
                         class="flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-sm sm:text-base font-semibold transition">
                     <i class="fas fa-gift ms-1 sm:ms-2"></i>
-                    <span class="hidden sm:inline">الهدايا</span>
-                    <span class="sm:hidden">هدية</span>
+                    <span class="hidden sm:inline">{{ __('reels_admin.gifts') }}</span>
+                    <span class="sm:hidden">{{ __('reels_admin.gift') }}</span>
                     <span x-show="selectedReel"
                           class="block text-xs sm:text-sm mt-1"
                           x-text="selectedReel?.gifts_count || 0"></span>
@@ -513,11 +537,11 @@
                                              style="vertical-align: middle;">
                                     </div>
                                     <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                        <span class="font-medium">UID:</span>
+                                        <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                         <span x-text="like.user?.original_uuid || like.user?.id"></span>
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-500">
-                                        <span class="font-medium">Special:</span>
+                                        <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                         <span x-text="like.user?.uuid"></span>
                                     </p>
                                     <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(like.created_at)"></p>
@@ -530,7 +554,7 @@
                 <template x-if="likes.length === 0 && selectedReel">
                     <div class="text-center py-12">
                         <i class="fas fa-heart text-5xl mb-3 opacity-30"></i>
-                        <p>لا توجد إعجابات بعد</p>
+                        <p>{{ __('reels_admin.no_likes') }}</p>
                     </div>
                 </template>
             </div>
@@ -558,13 +582,13 @@
                                                  style="vertical-align: middle;">
                                         </div>
                                         <p class="text-xs text-gray-600 mb-1">
-                                            <span class="font-medium">UID:</span>
-                                            <span x-text="comment.user?.original_uuid || comment.user?.id"></span>
-                                        </p>
-                                        <p class="text-xs text-gray-500 mb-2">
-                                            <span class="font-medium">Special:</span>
-                                            <span x-text="comment.user?.uuid"></span>
-                                        </p>
+                                                <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
+                                                <span x-text="comment.user?.original_uuid || comment.user?.id"></span>
+                                            </p>
+                                            <p class="text-xs text-gray-500 mb-2">
+                                                <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
+                                                <span x-text="comment.user?.uuid"></span>
+                                            </p>
                                         <p class="p-2 rounded text-sm"
                                            style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);"
                                            x-text="comment.comment"></p>
@@ -578,7 +602,7 @@
                 <template x-if="comments.length === 0 && selectedReel">
                     <div class="text-center py-12">
                         <i class="fas fa-comment text-5xl mb-3 opacity-30"></i>
-                        <p>لا توجد تعليقات بعد</p>
+                        <p>{{ __('reels_admin.no_comments') }}</p>
                     </div>
                 </template>
             </div>
@@ -609,11 +633,11 @@
                                                  style="vertical-align: middle;">
                                         </div>
                                         <p class="text-xs text-gray-600 mb-1">
-                                            <span class="font-medium">UID:</span>
+                                            <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                             <span x-text="gift.user?.original_uuid || gift.user?.id"></span>
                                         </p>
                                         <p class="text-xs text-gray-500 mb-2">
-                                            <span class="font-medium">Special:</span>
+                                            <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                             <span x-text="gift.user?.uuid"></span>
                                         </p>
 
@@ -625,11 +649,11 @@
                                                 <p class="text-sm font-semibold"
                                                    style="color: var(--text-primary-color);"
                                                    x-text="getGiftName(gift.gift_type)"></p>
-                                                <p class="text-xs text-gray-500">النوع: <span x-text="gift.gift_type"></span></p>
+                                                <p class="text-xs text-gray-500">{{ __('reels_admin.type_label') }} <span x-text="gift.gift_type"></span></p>
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-xl font-bold" style="color: var(--secondary-color);" x-text="gift.gift_value"></span>
-                                                <p class="text-xs text-gray-500 dark:text-gray-500">نقطة</p>
+                                                <p class="text-xs text-gray-500 dark:text-gray-500">{{ __('reels_admin.point_label') }}</p>
                                             </div>
                                         </div>
 
@@ -643,7 +667,7 @@
                 <template x-if="gifts.length === 0 && selectedReel">
                     <div class="text-center py-12">
                         <i class="fas fa-gift text-5xl mb-3 opacity-30"></i>
-                        <p>لا توجد هدايا بعد</p>
+                        <p>{{ __('reels_admin.no_gifts') }}</p>
                     </div>
                 </template>
             </div>
@@ -691,13 +715,13 @@
 
                 <!-- Title -->
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
-                    تأكيد الحذف
+                    {{ __('reels_admin.delete_title') }}
                 </h3>
 
                 <!-- Message -->
                 <p class="text-gray-600 dark:text-gray-300 mb-6">
-                    هل أنت متأكد من حذف هذا الريل؟<br>
-                    <span class="text-sm text-red-600 font-semibold">لا يمكن التراجع عن هذا الإجراء</span>
+                    {{ __('reels_admin.delete_message') }}<br>
+                    <span class="text-sm text-red-600 font-semibold">{{ __('reels_admin.delete_warning') }}</span>
                 </p>
 
                 <!-- Reel Info -->
@@ -719,12 +743,12 @@
                     <button @click="showDeleteModal = false"
                             class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                         <i class="fas fa-times ml-2"></i>
-                        إلغاء
+                        {{ __('reels_admin.cancel') }}
                     </button>
                     <button @click="confirmDelete()"
                             class="flex-1 py-3 bg-red-500 hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 text-white rounded-lg font-bold transition shadow-lg">
                         <i class="fas fa-trash ml-2"></i>
-                        حذف نهائياً
+                        {{ __('reels_admin.delete_forever') }}
                     </button>
                 </div>
             </div>
@@ -755,7 +779,7 @@
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
                     <i class="fas fa-edit ml-2" style="color: var(--primary-color);"></i>
-                    تعديل الكابشن
+                    {{ __('reels_admin.edit_caption_title') }}
                 </h3>
                 <button @click="showEditModal = false"
                         class="w-10 h-10 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-full flex items-center justify-center transition">
@@ -766,21 +790,21 @@
             <template x-if="editingReel">
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">العنوان</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('reels_admin.title_label') }}</label>
                         <input type="text"
                                x-model="editingReel.title"
                                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none transition"
                                style="border-color: var(--primary-color) !important;"
-                               placeholder="أدخل عنوان الريل...">
+                               placeholder="{{ __('reels_admin.title_placeholder') }}">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">الوصف</label>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ __('reels_admin.description_label') }}</label>
                         <textarea x-model="editingReel.description"
                                   rows="4"
                                   class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none transition resize-none"
                                   style="border-color: var(--primary-color) !important;"
-                                  placeholder="أدخل وصف الريل..."></textarea>
+                                  placeholder="{{ __('reels_admin.description_placeholder') }}"></textarea>
                     </div>
 
                     <div class="flex gap-3 pt-4">
@@ -790,12 +814,12 @@
                                 onmouseover="this.style.opacity='0.9'"
                                 onmouseout="this.style.opacity='1'">
                             <i class="fas fa-check ml-2"></i>
-                            حفظ التعديلات
+                            {{ __('reels_admin.save_changes') }}
                         </button>
                         <button @click="showEditModal = false"
                                 class="px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg font-bold transition">
                             <i class="fas fa-times ml-2"></i>
-                            إلغاء
+                            {{ __('reels_admin.cancel') }}
                         </button>
                     </div>
                 </div>
@@ -847,7 +871,7 @@
         <div class="p-3 sm:p-4 text-white flex items-center justify-between" style="background: var(--primary-gradient);">
             <h2 class="text-lg sm:text-xl font-bold">
                 <i class="fas fa-list ml-2"></i>
-                قائمة الريلز
+                {{ __('reels_admin.list_title') }}
             </h2>
             <button @click="closeMobileSidebar()"
                     class="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center">
@@ -861,11 +885,11 @@
                 <input type="text"
                        x-model="searchQuery"
                        @input="filterReels()"
-                       placeholder="ابحث بالاسم أو المعرف..."
+                       placeholder="{{ __('reels_admin.search_placeholder') }}"
                        class="w-full px-3 sm:px-4 py-2 ps-10 text-sm sm:text-base rounded-lg border-2 border-purple-300 dark:border-purple-700 bg-white dark:bg-gray-800 text-gray-800 focus:border-purple-500 focus:outline-none">
                 <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
-            <p class="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400" x-text="filteredReels.length + ' ريل'"></p>
+            <p class="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400" x-text="filteredReels.length + ' {{ __('reels_admin.reel_label') }}'"></p>
         </div>
 
         <!-- Reels Grid -->
@@ -893,7 +917,7 @@
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-white text-xs font-bold truncate" x-text="reel.user?.name"></p>
-                                    <p class="text-white/70 text-[10px]" x-text="'ID: ' + reel.user?.id"></p>
+                                    <p class="text-white/70 text-[10px]" x-text="'{{ __('reels_admin.id_label') }}' + reel.user?.id"></p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 text-white text-[10px]">

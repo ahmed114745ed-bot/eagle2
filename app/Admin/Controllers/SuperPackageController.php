@@ -134,11 +134,11 @@ class SuperPackageController extends MainController
 
                     $url =  getImagePath($path) ?? $defaultImage;
 
-                    if (! isImageExists($url)) {
+                    if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
 
-                $image = handleShowImageWithTypes(
+                $image = handleShowImageWithSvga(
                     $reward->id,
                     $url,
                     50,

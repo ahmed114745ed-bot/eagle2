@@ -95,6 +95,8 @@ class SuperAdminRewardControllerHistory extends MainController
                 $filter->where(function ($query) {
                     $query->whereHas('superAdmin', function ($subQuery) {
                         $subQuery->where('username', 'like', "%{$this->input}%");
+                    })->orWhereHas('user', function ($q) {
+                        $q->where('name', 'like', "%{$this->input}%");
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
@@ -131,7 +133,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
-        $grid->column('superadmin', __('super admin'))->display(function ($name) {
+        $grid->column('superadmin', __('user'))->display(function ($name) {
             if ($this->user_type == 'user') {
 
                 $user = $this->user;

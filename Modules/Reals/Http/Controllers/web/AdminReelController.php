@@ -21,15 +21,19 @@ class AdminReelController extends MainController
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
-            ->map(function($reel) {
+            ->map(function ($reel) {
+                $videoUrl = $this->buildMediaUrl($reel->url);
+                $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
                     'user' => $reel->user,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
-                    'video_url' => $reel->url,
-                    'thumbnail_url' => $reel->intro_image ?: $reel->url,
+                    'video_url' => $videoUrl,
+                    'thumbnail_url' => $thumbnailUrl ?: null,
+                    'thumbnail_needs_capture' => empty($thumbnailUrl),
                     'likes_count' => $reel->likes_count ?? 0,
                     'comments_count' => $reel->comments_count ?? 0,
                     'views_count' => $reel->views_count ?? 0,
@@ -53,15 +57,19 @@ class AdminReelController extends MainController
             ->skip($offset)
             ->take($limit)
             ->get()
-            ->map(function($reel) {
+            ->map(function ($reel) {
+                $videoUrl = $this->buildMediaUrl($reel->url);
+                $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+
                 return [
                     'id' => $reel->id,
                     'user_id' => $reel->user_id,
                     'user' => $reel->user,
                     'title' => $reel->description ?: 'بدون عنوان',
                     'description' => $reel->description,
-                    'video_url' => $reel->url,
-                    'thumbnail_url' => $reel->intro_image ?: $reel->url,
+                    'video_url' => $videoUrl,
+                    'thumbnail_url' => $thumbnailUrl ?: null,
+                    'thumbnail_needs_capture' => empty($thumbnailUrl),
                     'likes_count' => $reel->likes_count ?? 0,
                     'comments_count' => $reel->comments_count ?? 0,
                     'views_count' => $reel->views_count ?? 0,
@@ -86,6 +94,9 @@ class AdminReelController extends MainController
             ->withCount(['likes', 'comments', 'Views'])
             ->findOrFail($id);
 
+        $videoUrl = $this->buildMediaUrl($reel->url);
+        $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+
         return response()->json([
             'reel' => [
                 'id' => $reel->id,
@@ -93,8 +104,9 @@ class AdminReelController extends MainController
                 'user' => $reel->user,
                 'title' => $reel->description ?: 'بدون عنوان',
                 'description' => $reel->description,
-                'video_url' => $reel->url,
-                'thumbnail_url' => $reel->intro_image ?: $reel->url,
+                'video_url' => $videoUrl,
+                'thumbnail_url' => $thumbnailUrl ?: null,
+                'thumbnail_needs_capture' => empty($thumbnailUrl),
                 'likes_count' => $reel->likes_count ?? 0,
                 'comments_count' => $reel->comments_count ?? 0,
                 'views_count' => $reel->views_count ?? 0,
@@ -250,5 +262,38 @@ class AdminReelController extends MainController
                 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    private function buildMediaUrl(?string $path): ?string
+    {
+        if (empty($path)) {
+            return null;
+        }
+
+        // Full URL already provided
+        if (filter_var($path, FILTER_VALIDATE_URL)) {
+            return $path;
+        }
+
+        // Highest priority: explicit base from env
+        $envBase = env('MEDIA_BASE_URL');
+        if ($envBase) {
+            return rtrim($envBase, '/') . '/' . ltrim($path, '/');
+        }
+
+        // Try the default disk URL first
+        $base = getDriverUrl();
+        if ($base) {
+            return rtrim($base, '/') . '/' . ltrim($path, '/');
+        }
+
+        // Fallback to explicit GCS disk URL if default disk has no URL configured (e.g., FILESYSTEM_DISK=local)
+        $gcsBase = config('filesystems.disks.gcs.url');
+        if ($gcsBase) {
+            return rtrim($gcsBase, '/') . '/' . ltrim($path, '/');
+        }
+
+        // Fallback to storage path
+        return asset('storage/' . ltrim($path, '/'));
     }
 }
