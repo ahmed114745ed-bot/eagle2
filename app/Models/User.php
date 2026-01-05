@@ -33,6 +33,7 @@ use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
@@ -994,12 +995,17 @@ class User extends Authenticatable
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
     }
 
     public function nowRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+    }
+
+     public function nowAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
     }
     public function myroom()
     {
@@ -2298,9 +2304,16 @@ class User extends Authenticatable
     }
 
 
-    public function nowRoomOwner()
+    public function nowRoomOwner(): HasOneThrough
     {
-        return $this->belongsTo(User::class, 'now_room_uid');
+        return $this->hasOneThrough(
+            User::class,
+            Room::class,
+            'id',          
+            'id',          
+            'now_room_uid', 
+            'uid'           
+        );
     }
 
 
