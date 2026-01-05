@@ -22,6 +22,7 @@ function reelsManager() {
         videoStates: {},
         videoReadyStates: {},
         isGlobalMuted: false,
+        thumbnailGenerating: {},
         showEditModal: false,
         editingReel: null,
         showDeleteModal: false,
@@ -107,8 +108,9 @@ function reelsManager() {
             reel.thumbnailLoaded = true;
         },
         
-        onThumbnailError(reel, event) {
-            reel.thumbnailLoaded = true;
+        async onThumbnailError(reel, event) {
+            // Attempt to regenerate the thumbnail from the video if loading fails
+            await this.generateThumbnailFromVideo(reel);
         },
         
         onVideoLoaded(event, reelId) {
@@ -344,19 +346,34 @@ function reelsManager() {
         async captureMissingThumbnails(reels) {
             const batch = Array.isArray(reels) ? reels : [reels];
             for (const reel of batch) {
-                if (!reel || reel.thumbnail_url) {
-                    continue;
-                }
-
-                const thumbnail = await this.captureFrameFromVideo(reel.video_url);
-                if (thumbnail) {
-                    reel.thumbnail_url = thumbnail;
-                    reel.thumbnailLoaded = true;
-                } else {
-                    reel.thumbnail_url = `https://picsum.photos/400/700?random=${reel.id || Math.random()}`;
-                    reel.thumbnailLoaded = true;
-                }
+                if (!reel) continue;
+                if (reel.thumbnail_url) continue;
+                await this.generateThumbnailFromVideo(reel);
             }
+        },
+
+        async generateThumbnailFromVideo(reel) {
+            if (!reel || !reel.video_url) {
+                return;
+            }
+
+            // Avoid double work for the same reel
+            if (this.thumbnailGenerating[reel.id]) {
+                return;
+            }
+
+            this.thumbnailGenerating[reel.id] = true;
+
+            const thumbnail = await this.captureFrameFromVideo(reel.video_url);
+            if (thumbnail) {
+                reel.thumbnail_url = thumbnail;
+                reel.thumbnailLoaded = true;
+            } else {
+                reel.thumbnail_url = `https://picsum.photos/400/700?random=${reel.id || Math.random()}`;
+                reel.thumbnailLoaded = true;
+            }
+
+            delete this.thumbnailGenerating[reel.id];
         },
 
         captureFrameFromVideo(videoUrl) {
