@@ -88,7 +88,7 @@ function pu(val) {
         ]);
 
         switch ($reward->type) {
-            case "coins":
+            case "coin":
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
