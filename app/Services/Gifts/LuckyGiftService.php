@@ -690,7 +690,6 @@ class LuckyGiftService
                     'is_popular'      => $iterationPopular,
                     'comment_message' => $commentMessage,
                     'winner_comment'  => $sendMessage,
-                    'receivers'       => $iterationWins,
                 ],
                 'error_message' => '',
             ];
