@@ -61,6 +61,17 @@ class DedicateAdminPackageReward extends Action
             }
 
             foreach ($superAdmins as $superAdmin) {
+
+                DB::table('admin_rewards')->insert([
+                    'super_admin_id' => $superAdmin,
+                    'type' => 'package',
+                    'target' => $superPackage->id,
+                    'expire' =>  1,
+                    'no_reward' => 1,
+                    'user_type' => $userType,
+                    'created_by' => Admin::user()->id,
+                    'created_at' => now(),
+                ]);
                 foreach ($superPackage->packageRewards as $reward) {
                     DB::table('admin_rewards')->insert([
                         'super_admin_id' => $superAdmin,
@@ -70,6 +81,8 @@ class DedicateAdminPackageReward extends Action
                         'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement' ? 1 : $reward->quantity,
                         'user_type' => $userType,
                         'created_by' => Admin::user()->id,
+                        'package_id' => $reward->super_package_id,
+                        'created_at' => now(),
                     ]);
                 }
             }
