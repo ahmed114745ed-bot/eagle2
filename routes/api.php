@@ -409,6 +409,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
+                Route::get('/categories', [CountryController::class, 'countryCategory']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
                 Route::post('change-request', [CountryController::class, 'changeRequest']);
