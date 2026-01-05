@@ -118,6 +118,7 @@ class SuperAdminRewardControllerHistory extends MainController
             ->with([
                 'superAdmin',
                 'admin',
+                'admin.agency',
                 'user',
                 'user.senderLevel',
                 'user.receiverLevel',
