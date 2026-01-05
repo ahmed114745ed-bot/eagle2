@@ -47,18 +47,18 @@ class DedicateAdminPackageReward extends Action
             if ($request->input('user_type') == 'user') {
                 $user = User::query()->searchByUuid($request->user_uuid)->first();
                 if (!$user)   return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-                DB::table('admin_rewards')->insert([
+                $id = DB::table('admin_rewards')->insertGetId([
                     'super_admin_id' => $user->id,
                     'type' => 'package',
                     'target' => $superPackage->id,
-                    'expire' =>  1,
+                    'expire' => 1,
                     'no_reward' => 1,
                     'user_type' => $userType,
                     'created_by' => Admin::user()->id,
                     'created_at' => now(),
                 ]);
                 foreach ($superPackage->packageRewards as $reward) {
-                    $this->assignRewards($reward, $user);
+                    $this->assignRewards($reward, $user, $id);
                 }
                 return $this->response()->success(__('Dedicated successfully'))->refresh();
             }
@@ -72,7 +72,7 @@ class DedicateAdminPackageReward extends Action
 
             foreach ($superAdmins as $superAdmin) {
 
-                DB::table('admin_rewards')->insert([
+                $id = DB::table('admin_rewards')->insertGetId([
                     'super_admin_id' => $superAdmin,
                     'type' => 'package',
                     'target' => $superPackage->id,
@@ -91,7 +91,7 @@ class DedicateAdminPackageReward extends Action
                         'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement' ? 1 : $reward->quantity,
                         'user_type' => $userType,
                         'created_by' => Admin::user()->id,
-                        'package_id' => $reward->super_package_id,
+                        'package_id' =>  $id,
                         'created_at' => now(),
                     ]);
                 }
@@ -187,7 +187,7 @@ class DedicateAdminPackageReward extends Action
     }
 
 
-    protected function assignRewards($request, $user)
+    protected function assignRewards($request, $user, $packageId)
     {
 
         $reward = SuperAdminReward::create([
@@ -198,7 +198,7 @@ class DedicateAdminPackageReward extends Action
             'no_reward' => 1,
             'user_type' => 'user',
             'created_by' => Admin::user()->id,
-            'package_id' => $request->super_package_id,
+            'package_id' => $packageId,
             'created_at' => now(),
 
         ]);
