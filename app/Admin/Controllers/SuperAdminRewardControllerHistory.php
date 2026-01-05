@@ -131,6 +131,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'ware',
                 'vip',
                 'badge',
+                'packageRewards',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
@@ -209,9 +210,8 @@ class SuperAdminRewardControllerHistory extends MainController
             $grid->column('no_reward', __('No reward'));
         } else {
             $grid->column('members', __('rewards'))->expand(function ($model) {
-                $mempers = SuperAdminReward::where(['super_admin_id' => $this->super_admin_id, 'package_id' => $this->target])
-
-                    ->get()
+                $mempers = $this->packageRewards()->get()
+                    
                     ->map(function ($memper) {
 
                         $gifts = '';
@@ -305,7 +305,7 @@ class SuperAdminRewardControllerHistory extends MainController
         });
         $grid->tools(function (Grid\Tools $tools) {
             $url = url('admin/admin-rewards?type=vip');
-            $back = __(' back');
+            $back = __('back');
 
             $customButtonHTML = <<<HTML
                      <div style="display: contents; align-items: center;">

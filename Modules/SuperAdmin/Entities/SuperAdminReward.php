@@ -71,7 +71,13 @@ class SuperAdminReward extends Model
         return $this->hasOne(Badge::class, 'id', 'target');
     }
 
-    
+    public function packageRewards()
+    {
+        return $this->hasMany(SuperAdminReward::class, 'package_id', 'id')
+            ->with(['ware', 'vip', 'badge']);
+    }
+
+
 
     public function getTarget1Attribute()
     {
