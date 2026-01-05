@@ -225,7 +225,7 @@ class DedicateAdminPackageReward extends Action
                 break;
             case "ware":
                 $ware = Ware::find($reward->target);
-                UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'admin_dedicate');
+                if ($ware) UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'admin_dedicate');
                 break;
             case "badge":
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'admin_dedicate');
