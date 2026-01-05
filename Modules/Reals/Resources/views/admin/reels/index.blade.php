@@ -85,11 +85,10 @@
     </button>
 
     <!-- Reels List (Sidebar) -->
-    <div class="reels-sidebar border-l border-gray-200 shadow-lg flex flex-col"
-         :class="{ 'mobile-open': isMobileSidebarOpen }"
-         style="background-color: var(--box-background-color);">
+    <div class="reels-sidebar border-gray-200 shadow-lg flex flex-col"
+         :class="{ 'mobile-open': isMobileSidebarOpen }">
         <!-- Search Filter -->
-        <div class="p-4 border-b relative" style="background: var(--primary-gradient);">
+        <div class="p-4 border-b relative">
             <!-- Close Button for Mobile -->
             <button @click="closeMobileSidebar()"
                     class="md:hidden absolute top-3 left-3 w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition">
@@ -107,8 +106,8 @@
                        x-model="searchQuery"
                        @input="filterReels()"
                        placeholder="{{ __('reels_admin.search_placeholder') }}"
-                       class="w-full px-3 py-2 ps-10 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none border border-white/30 dark:border-gray-700"
-                       style="box-shadow: black;">
+                       class="w-full px-3 py-2 ps-10 rounded-md bg-white text-gray-800 text-sm focus:outline-none border border-white/30"
+                       style="box-shadow: 0 0 0 1px black;">
                 <i class="fas fa-search absolute start-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 text-sm"></i>
             </div>
 
@@ -124,9 +123,8 @@
         </div>
 
         <!-- Reels Grid with Scroll -->
-        <div class="flex-1 overflow-y-auto"
+        <div class="flex-1 overflow-y-auto sidebarContainer"
              x-ref="sidebarContainer"
-             style="background-color: var(--box-background-color);"
              @scroll="handleSidebarScroll()"
              style="height: calc(100% - 130px);">
             <!-- Skeleton Loader for Initial Load -->
@@ -143,7 +141,7 @@
             <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
                     <div @click="selectReel(reel.id); closeMobileSidebar()"
-                         :class="selectedReelId === reel.id ? 'ring-2 ring-blue-500 shadow-lg' : ''"
+                         :class="selectedReelId === reel.id ? 'ring-2 reel-ring shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
                             <!-- Skeleton until image loads -->
@@ -520,7 +518,7 @@
                 <template x-if="likes.length > 0">
                     <div class="space-y-3">
                         <template x-for="like in likes" :key="like.id">
-                            <div class="flex items-start p-3 rounded-lg transition hover:shadow-md"
+                            <div class="user-card flex items-start p-3 rounded-lg transition hover:shadow-md"
                                  style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
                                 <img :src="like.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + like.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                      class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
@@ -528,7 +526,6 @@
                                 <div class="ms-3 flex-1 min-w-0">
                                     <div class="flex items-center gap-2 mb-1">
                                         <strong class="text-base font-bold truncate"
-                                                style="color: var(--text-primary-color);"
                                                 x-text="like.user?.name"></strong>
                                         <img x-show="like.user?.country?.flag"
                                              :src="like.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + like.user.country.flag : ''"
@@ -536,17 +533,17 @@
                                              :title="like.user?.country?.name"
                                              style="vertical-align: middle;">
                                     </div>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                    <p class="text-xs mb-1">
                                         <span class="font-medium">{{ __('reels_admin.uid_label') }}</span>
                                         <span x-text="like.user?.original_uuid || like.user?.id"></span>
                                     </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-500">
+                                    <p class="text-xs">
                                         <span class="font-medium">{{ __('reels_admin.special_label') }}</span>
                                         <span x-text="like.user?.uuid"></span>
                                     </p>
-                                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(like.created_at)"></p>
+                                    <p class="text-xs mt-2" x-text="formatDate(like.created_at)"></p>
                                 </div>
-                                <i class="fas fa-heart text-red-500 text-xl"></i>
+                                <i class="fas fa-heart text-red-500 text-xl" style="color: red !important;"></i>
                             </div>
                         </template>
                     </div>
@@ -564,8 +561,7 @@
                 <template x-if="comments.length > 0">
                     <div class="space-y-3">
                         <template x-for="comment in comments" :key="comment.id">
-                            <div class="rounded-lg p-4 transition hover:shadow-md"
-                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
+                            <div class="user-card rounded-lg p-4 transition hover:shadow-md">
                                 <div class="flex items-start gap-3">
                                     <img :src="comment.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + comment.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
                                          class="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm flex-shrink-0"
@@ -573,7 +569,6 @@
                                     <div class="flex-1 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
                                             <strong class="text-base font-bold truncate"
-                                                    style="color: var(--text-primary-color);"
                                                     x-text="comment.user?.name"></strong>
                                             <img x-show="comment.user?.country?.flag"
                                                  :src="comment.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + comment.user.country.flag : ''"
@@ -590,9 +585,9 @@
                                                 <span x-text="comment.user?.uuid"></span>
                                             </p>
                                         <p class="p-2 rounded text-sm"
-                                           style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);"
+                                           style="background-color: var(--dark-primary-colo);"
                                            x-text="comment.comment"></p>
-                                        <p class="text-xs text-gray-400 mt-2" x-text="formatDate(comment.created_at)"></p>
+                                        <p class="text-xs mt-2" x-text="formatDate(comment.created_at)"></p>
                                     </div>
                                 </div>
                             </div>
@@ -612,8 +607,7 @@
                 <template x-if="gifts.length > 0">
                     <div class="space-y-3">
                         <template x-for="gift in gifts" :key="gift.id">
-                            <div class="rounded-lg p-4 transition hover:shadow-md"
-                                 style="background-color: var(--off-white); border: 1px solid var(--primary-hover-alpha);">
+                            <div class="user-card rounded-lg p-4 transition hover:shadow-md">
                                 <div class="flex items-start gap-3">
                                     <!-- صورة المستخدم -->
                                     <img :src="gift.user?.profile?.avatar ? 'https://storage.googleapis.com/eagle-t/' + gift.user.profile.avatar : 'https://storage.googleapis.com/eagle-t/images/businessman-icon.jpg'"
@@ -624,7 +618,6 @@
                                     <div class="flex-1 min-w-0 min-w-0">
                                         <div class="flex items-center gap-2 mb-1">
                                             <strong class="text-base font-bold truncate"
-                                                    style="color: var(--text-primary-color);"
                                                     x-text="gift.user?.name"></strong>
                                             <img x-show="gift.user?.country?.flag"
                                                  :src="gift.user?.country?.flag ? 'https://storage.googleapis.com/eagle-t/' + gift.user.country.flag : ''"
@@ -653,11 +646,11 @@
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-xl font-bold" style="color: var(--secondary-color);" x-text="gift.gift_value"></span>
-                                                <p class="text-xs text-gray-500 dark:text-gray-500">{{ __('reels_admin.point_label') }}</p>
+                                                <p class="text-xs">{{ __('reels_admin.point_label') }}</p>
                                             </div>
                                         </div>
 
-                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-2" x-text="formatDate(gift.created_at)"></p>
+                                        <p class="text-xs mt-2" x-text="formatDate(gift.created_at)"></p>
                                     </div>
                                 </div>
                             </div>

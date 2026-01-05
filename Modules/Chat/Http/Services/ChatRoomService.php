@@ -418,7 +418,7 @@ class ChatRoomService
 
     public function getRoomData($user2)
     {
-        $room = Room::where('uid', $user2?->now_room_uid)->where('type','audio')->first();
+        $room = Room::where('id', $user2?->now_room_uid)->first();
         // $room = $user2?->nowRoom;
         $isHideRoom = $room?->owner->getPackWithType(16);
         $room = !$isHideRoom ? $room : null;

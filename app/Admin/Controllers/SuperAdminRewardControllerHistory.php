@@ -17,6 +17,7 @@ use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Encore\Admin\Widgets\Table;
 
 class SuperAdminRewardControllerHistory extends MainController
 {
@@ -130,6 +131,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 'ware',
                 'vip',
                 'badge',
+                'packageRewards',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ]);
         $grid->column('id', __('Id'));
@@ -167,44 +169,113 @@ class SuperAdminRewardControllerHistory extends MainController
                 </div>";
         });
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
-                return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
-                return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
-                return @$this->badge->name ?? '';
-            } elseif ($this->type == "coin") {
-                return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
-            }
-        });
-        if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
-                    $ware = $this->ware;
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
-                    $vips = $this->vip;
-                    $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
-                    // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
-                } else {
-                    $path = 'coin.png';
+        if ($type != 'package') {
+            $grid->column('gift_id', __('gifts'))->display(function () {
+                if ($this->type == "ware") {
+                    return @$this->ware->name ?? '';
+                } elseif ($this->type == "vip") {
+                    return @$this->vip->name ?? '';
+                } elseif ($this->type == "badge") {
+                    return @$this->badge->name ?? '';
+                } elseif ($this->type == "coin") {
+                    return @$this->target;
+                } elseif ($this->type == "achievement") {
+                    $value = getDriverUrl() . '/' . @$this->target;
+                    return "<img src='$value' width='80' height='80'>";
                 }
+            });
+            if (!request()->filled('_export_')) {
+                $grid->column('image', __('image'))->display(function ($path) {
+                    if ($this->type == 'ware') {
+                        $ware = $this->ware;
+                        $path = $ware->img2 ?? ($ware->show_img ?? "");
+                    } elseif ($this->type == 'vip') {
+                        $vips = $this->vip;
+                        $path = $vips->img ?? '';
+                    } elseif ($this->type == 'badge') {
+                        // $vips = Badge::find($this->target);
+                        $path = @$this->badge->image ?? '';
+                    } elseif ($this->type == 'achievement') {
+                        $path = $this->target;
+                    } else {
+                        $path = 'coin.png';
+                    }
 
-                /** @var Gift $this */
-                $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                    /** @var Gift $this */
+                    $url = getImagePath($path);
+                    return handleShowImageWithTypes($this->id, $url, 50, 50);
+                });
+            }
+            $grid->column('expire', __('Expire'));
+            $grid->column('no_reward', __('No reward'));
+        } else {
+            $grid->column('members', __('rewards'))->expand(function ($model) {
+                $mempers = $model->packageRewards
+                    
+                    ->map(function ($memper) {
+
+                        $gifts = '';
+                        $path  = '';
+
+                        switch ($memper->type) {
+                            case 'ware':
+                                $gifts = $memper->ware->name ?? '';
+                                $path  = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
+                                break;
+
+                            case 'vip':
+                                $gifts = $memper->vip->name ?? '';
+                                $path  = $memper->vip->img ?? '';
+                                break;
+
+                            case 'badge':
+                                $gifts = $memper->badge->name ?? '';
+                                $path  = $memper->badge->image ?? '';
+                                break;
+
+                            case 'coins':
+                                $gifts = $memper->target;
+                                $path  = 'coin.png';
+                                break;
+
+                            case 'achievement':
+                                $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
+                                $path  = $memper->target;
+                                break;
+                        }
+
+                        $defaultImage = asset('images/reward.jpg');
+
+                        $url =  getImagePath($path) ?? $defaultImage;
+
+                        if (!isImageExists($url)) {
+                            $url = $defaultImage;
+                        }
+
+                        $image = handleShowImageWithSvga(
+                            $memper->id,
+                            $url,
+                            50,
+                            50
+                        );
+
+                        return [
+                            'id'       => $memper->id,
+                            'type'     => $memper->type,
+                            'gift'     => $gifts,
+                            'image'    => $image,
+                            'quantity' => $memper->quantity,
+                            'expire'   => $memper->expire,
+                        ];
+                    });
+
+                return new Table(
+                    ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+                    $mempers->toArray()
+                );
             });
         }
-        $grid->column('expire', __('Expire'));
-        $grid->column('no_reward', __('No reward'));
+
         $grid->column('created_at', __('created_at'));
         $grid->column('created_by', __('created by'))->display(function ($name) {
 
