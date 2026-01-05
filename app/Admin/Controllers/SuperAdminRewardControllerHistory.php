@@ -210,7 +210,7 @@ class SuperAdminRewardControllerHistory extends MainController
             $grid->column('no_reward', __('No reward'));
         } else {
             $grid->column('members', __('rewards'))->expand(function ($model) {
-                $mempers = $model->packageRewards()->get()
+                $mempers = $this->packageRewards()->get()
                     
                     ->map(function ($memper) {
 
