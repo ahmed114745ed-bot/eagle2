@@ -695,15 +695,15 @@ if (!function_exists('handleShowImageWithTypes')) {
 
                 $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
                 $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
-                $translateX = $direction === 'rtl' ? 90 : -90;
+                $translateX = $direction === 'rtl' ? 0 : 0; // optional, adjust if needed
 
                 $style = "width: {$width}px; height: {$height}px;";
                 if ($objectFit !== 'cover') {
                     $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
 
-                // Apply RTL-aware transform
-                $style .= " transform: matrix(0.217391, 0, 0, 0.217391, {$translateX}, -30);";
+                $scale = 1; // 1 = full size, 0.5 = half, adjust as needed
+                $style .= " transform: scale({$scale}) translate({$translateX}px, 0px);";
 
                 $rtlClass = $direction === 'rtl' ? 'rtlSvga' : '';
 
