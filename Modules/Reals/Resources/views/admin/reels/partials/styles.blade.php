@@ -46,6 +46,10 @@
         gap: 1rem;
     }
 
+    .reel-ring {
+        --tw-ring-color: var(--primary-color);
+    }
+
     /* Sidebar adjustments */
     .reels-sidebar {
         height: 100%;
@@ -102,8 +106,22 @@
         transition: all 0.3s ease;
     }
 
+    .user-card {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+    }
+
+    /*.tab-active {*/
+    /*    color: var(--primary-color) !important;*/
+    /*}*/
+
+    .dark-mode .tab-active,
     .tab-active {
-        color: var(--primary-color);
+        background: var(--primary-color) !important;
+        color: var(--text-secondary-color);
     }
 
     /* Show panel as overlay on small/medium screens */
