@@ -118,6 +118,7 @@
     /*    color: var(--primary-color) !important;*/
     /*}*/
 
+    .dark-mode .tab-active,
     .tab-active {
         background: var(--primary-color) !important;
         color: var(--text-secondary-color);
