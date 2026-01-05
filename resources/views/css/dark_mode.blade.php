@@ -47,6 +47,7 @@
     .dark-mode .empty-table,
     .dark-mode .notification-item.unread,
     .dark-mode .notification-item.read,
+    .dark-mode .fields-group .input-group.input-group-sm,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
