@@ -707,7 +707,7 @@ if (!function_exists('handleShowImageWithTypes')) {
 
                 // Optional: scale and horizontal flip for RTL
                 $scale = 1;
-                $flip = $direction === 'rtl' ? 'scaleX(-10)' : 'scaleX(1)';
+                $flip = $direction === 'rtl' ? 'scaleX(-0.5)' : 'scaleX(1)';
                 $style .= " transform: {$flip} scale({$scale});";
 
                 // Add RTL/LTR class for CSS if needed
