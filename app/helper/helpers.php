@@ -703,7 +703,7 @@ if (!function_exists('handleShowImageWithTypes')) {
                 }
 
                 // Apply RTL-aware transform
-                $style .= " transform: matrix(0.217391, 0, 0, 0.217391, {$translateX}, -3);";
+                $style .= " transform: matrix(0.217391, 0, 0, 0.217391, {$translateX}, -30);";
 
                 $rtlClass = $direction === 'rtl' ? 'rtlSvga' : '';
 
