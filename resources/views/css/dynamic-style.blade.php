@@ -2932,6 +2932,28 @@
         background: var(--secondary-color) !important;
         color: var(--text-secondary-color);
     }
+
+    .form-divider {
+        position: relative;
+        margin: 30px 0 20px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .form-divider span {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        background: #fff;
+        padding: 0 10px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .ltr .box-tools .btn-group.pull-right {
+        margin-left: 5px;
+        margin-right: 0 !important;
+    }
 </style>
 
 @include('css.dark_mode')
