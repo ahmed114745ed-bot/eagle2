@@ -700,7 +700,7 @@ if (!function_exists('handleShowImageWithTypes')) {
                 $style = "width: {$width}px; height: {$height}px;";
                 $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
                 $style .= " vertical-align: middle;"; // aligns icons in table rows
-                $style .= " display: flex;";             // use flex for centering
+
                 $style .= " justify-content: center;";   // horizontal center
                 $style .= " align-items: center;";
                 if ($objectFit !== 'cover') {
