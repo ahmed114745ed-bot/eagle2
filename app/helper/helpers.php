@@ -692,12 +692,21 @@ if (!function_exists('handleShowImageWithTypes')) {
             if ($imageType == 'svga' || $imageType == 'zz') {
                 $id = 'svga_' . $uniqueId;
                 $safeUrl = e($url);
+
+                $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
+                $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
+                $translateX = $direction === 'rtl' ? 90 : -90;
+
                 $style = "width: {$width}px; height: {$height}px;";
                 if ($objectFit !== 'cover') {
                     $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
 
+                // Apply RTL-aware transform
+                $style .= " transform: matrix(0.217391, 0, 0, 0.217391, {$translateX}, -3);";
+
                 $rtlClass = $direction === 'rtl' ? 'rtlSvga' : '';
+
                 return "<div class='svga-player $rtlClass' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
             } elseif ($imageType == 'mp4') {
                 return "
