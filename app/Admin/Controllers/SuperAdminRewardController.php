@@ -117,7 +117,7 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) && request('type') != 'package') {
+        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*'))) {
             $grid->tools(function (Grid\Tools $tools) {
                 $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
@@ -202,17 +202,33 @@ class SuperAdminRewardController extends MainController
                             break;
                     }
 
+                     $defaultImage = asset('images/reward.jpg');
+
+                    $url =  getImagePath($path) ?? $defaultImage;
+
+                    if (!isImageExists($url)) {
+                        $url = $defaultImage;
+                    }
+
+                $image = handleShowImageWithSvga(
+                    $memper->id,
+                    $url,
+                    50,
+                    50
+                );
+
                     return [
                         'id'       => $memper->id,
                         'type'     => $memper->type,
                         'gift'     => $gifts,
+                        'image'    => $image,
                         'quantity' => $memper->quantity,
                         'expire'   => $memper->expire,
                     ];
                 });
 
             return new Table(
-                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
+                ['ID', __('type'), __('gift'),__('image'), __('quantity'), __('expire')],
                 $mempers->toArray()
             );
         });

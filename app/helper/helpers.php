@@ -645,32 +645,88 @@ if (!function_exists('handleShowImageWithTypes')) {
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
     if (!function_exists('handleShowImageWithSvga')) {
-        function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
-        {
+        // function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
+        // {
+        //     $imageType = getFileExtension($url);
+        //     if ($imageType == 'svga' || $imageType == 'zz') {
+        //         // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
+        //         $id = 'svga_' . $uniqueId;
+        //         $safeUrl = e($url);
+        //         $style = "width: {$width}px; height: {$height}px;";
+        //         if ($objectFit !== 'cover') {
+        //             $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+        //         }
+        //         return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+        //     } elseif ($imageType == 'mp4') {
+        //         return "
+        //         <video width='$width' height='$height' controls autoplay muted loop>
+        //             <source src='$url' type='video/mp4'>
+        //             <source src='$url' type='video/webm'>
+
+        //             Your browser does not support the video tag.
+        //          </video>
+        //         ";
+        //     } elseif ($objectFit !== 'cover') {
+        //         return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+        //     }
+
+
+
+        //     return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+        // }
+
+        function handleShowImageWithSvga(
+            string $uniqueId,
+            ?string $url,
+            int $width = null,
+            int $height = null,
+            $borderRadius = 50,
+            $objectFit = 'cover'
+        ): string {
             $imageType = getFileExtension($url);
+
+            // Detect RTL or LTR dynamically
+            $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
+            $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
+
             if ($imageType == 'svga' || $imageType == 'zz') {
-                // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
                 $id = 'svga_' . $uniqueId;
                 $safeUrl = e($url);
+
+                $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
+                $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
+
+                // Style for table cell alignment
                 $style = "width: {$width}px; height: {$height}px;";
+                $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
+                $style .= " vertical-align: middle;"; // aligns icons in table rows
+
+                $style .= " justify-content: center;";   // horizontal center
+                $style .= " align-items: center;";
                 if ($objectFit !== 'cover') {
-                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
-                return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+
+                // Optional: scale and horizontal flip for RTL
+                $scale = 1;
+                $flip = $direction === 'rtl' ? 'scaleX(-0.5)' : 'scaleX(1)';
+                $style .= " transform: {$flip} scale({$scale});";
+
+                // Add RTL/LTR class for CSS if needed
+                $directionClass = $direction === 'rtl' ? 'rtlSvga' : 'ltrSvga';
+
+                return "<div class='svga-player $directionClass' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
             } elseif ($imageType == 'mp4') {
                 return "
-                <video width='$width' height='$height' controls autoplay muted loop>
-                    <source src='$url' type='video/mp4'>
-                    <source src='$url' type='video/webm'>
-
-                    Your browser does not support the video tag.
-                 </video>
-                ";
+            <video width='$width' height='$height' controls autoplay muted loop>
+                <source src='$url' type='video/mp4'>
+                <source src='$url' type='video/webm'>
+                Your browser does not support the video tag.
+             </video>
+        ";
             } elseif ($objectFit !== 'cover') {
-                return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+                return '<img src="' . e($url) . '" alt="" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; ' . $marginSide . ': 4px;">';
             }
-
-
 
             return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
         }

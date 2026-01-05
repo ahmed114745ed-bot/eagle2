@@ -1,6 +1,7 @@
 function reelsManager() {
     return {
         filteredReels: [],
+        visibleReels: [],
         allReels: [],
         likes: [],
         comments: [],
@@ -22,6 +23,8 @@ function reelsManager() {
         videoStates: {},
         videoReadyStates: {},
         isGlobalMuted: false,
+        thumbnailGenerating: {},
+        scrollingToSelection: false,
         showEditModal: false,
         editingReel: null,
         showDeleteModal: false,
@@ -48,7 +51,7 @@ function reelsManager() {
                     thumbnailLoaded: Boolean(reel.thumbnail_url)
                 };
             });
-            
+            this.visibleReels = this.allReels;
             this.filteredReels = this.allReels.slice(0, 6);
             this.reelsLoaded = true;
 
@@ -107,8 +110,9 @@ function reelsManager() {
             reel.thumbnailLoaded = true;
         },
         
-        onThumbnailError(reel, event) {
-            reel.thumbnailLoaded = true;
+        async onThumbnailError(reel, event) {
+            // Attempt to regenerate the thumbnail from the video if loading fails
+            await this.generateThumbnailFromVideo(reel);
         },
         
         onVideoLoaded(event, reelId) {
@@ -116,18 +120,9 @@ function reelsManager() {
             this.markVideoReady(reelId);
             
             video.muted = this.isGlobalMuted;
-            
-            const rect = video.getBoundingClientRect();
-            const screenHeight = window.innerHeight;
-            
-            if (rect.top >= 0 && rect.bottom <= screenHeight) {
-                video.muted = true;
-                video.play().then(() => {
-                    setTimeout(() => {
-                        video.muted = this.isGlobalMuted;
-                    }, 100);
-                }).catch(e => console.log('خطأ في التشغيل التلقائي:', e));
-            }
+
+            // إيقاف أي تشغيل تلقائي للمعاينة
+            video.pause();
         },
         
         shouldLoadVideo(index) {
@@ -212,6 +207,7 @@ function reelsManager() {
 
                         normalized.forEach(item => {
                             this.allReels.push(item);
+                            this.visibleReels.push(item);
                             if (!this.searchQuery) {
                                 this.filteredReels.push(item);
                             }
@@ -239,11 +235,9 @@ function reelsManager() {
         },
         
         playFirstVideo() {
-            const firstVideo = document.querySelector('video');
-            if (firstVideo) {
-                firstVideo.play().catch(() => {});
-                this.selectedReelId = this.filteredReels[0]?.id;
-            }
+            // لا تشغيل تلقائي عند الفتح؛ فقط عيّن أول ريل كاختيار مبدئي
+            this.selectedReelId = this.visibleReels[0]?.id;
+            this.selectedReel = this.visibleReels[0] || null;
         },
         
         handleScroll() {
@@ -257,20 +251,20 @@ function reelsManager() {
                 this.currentVideoIndex = newIndex;
                 
                 for (let i = newIndex - 1; i <= newIndex + 2; i++) {
-                    if (i >= 0 && i < this.filteredReels.length) {
+                    if (i >= 0 && i < this.visibleReels.length) {
                         this.loadedVideos.add(i);
                     }
                 }
                 
                 const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 5);
                 farVideos.forEach(i => {
-                    const video = document.getElementById('video-' + this.filteredReels[i]?.id);
+                    const video = document.getElementById('video-' + this.visibleReels[i]?.id);
                     if (video) {
                         video.src = '';
                         video.load();
                     }
                     this.loadedVideos.delete(i);
-                    delete this.videoReadyStates[this.filteredReels[i]?.id];
+                    delete this.videoReadyStates[this.visibleReels[i]?.id];
                 });
             }
             
@@ -286,10 +280,10 @@ function reelsManager() {
                     
                     if (this.selectedReelId !== reelId) {
                         this.selectedReelId = reelId;
-                        this.selectedReel = this.filteredReels.find(r => r.id === reelId);
+                        this.selectedReel = this.visibleReels.find(r => r.id === reelId);
                         
-                        const currentIndex = this.filteredReels.findIndex(r => r.id === reelId);
-                        const remaining = this.filteredReels.length - currentIndex;
+                        const currentIndex = this.visibleReels.findIndex(r => r.id === reelId);
+                        const remaining = this.visibleReels.length - currentIndex;
                         
                         if (remaining <= 10 && this.hasMore && !this.loading) {
                             this.loadMoreReels();
@@ -299,17 +293,16 @@ function reelsManager() {
                     const isInCenter = rect.top >= -50 && rect.bottom <= screenHeight + 50;
                     if (isInCenter) {
                         activeVideo = video;
-                        if (video.paused && video.src) {
-                            video.muted = true;
-                            setTimeout(() => {
-                                video.play().then(() => {
-                                    setTimeout(() => {
-                                        video.muted = this.isGlobalMuted;
-                                    }, 100);
-                                }).catch(e => console.log('خطأ في التشغيل:', e));
-                            }, 100);
-                        } else if (video.src) {
-                            video.muted = this.isGlobalMuted;
+                        // أثناء التمرير، شغّل الفيديو الظاهر فقط
+                        if (this.scrollingToSelection && reelId !== this.selectedReelId) {
+                            video.pause();
+                        } else {
+                            if (video.src) {
+                                video.muted = this.isGlobalMuted;
+                            }
+                            if (video.paused && video.src) {
+                                video.play().catch(() => {});
+                            }
                         }
                     } else {
                         if (!video.paused) {
@@ -344,19 +337,34 @@ function reelsManager() {
         async captureMissingThumbnails(reels) {
             const batch = Array.isArray(reels) ? reels : [reels];
             for (const reel of batch) {
-                if (!reel || reel.thumbnail_url) {
-                    continue;
-                }
-
-                const thumbnail = await this.captureFrameFromVideo(reel.video_url);
-                if (thumbnail) {
-                    reel.thumbnail_url = thumbnail;
-                    reel.thumbnailLoaded = true;
-                } else {
-                    reel.thumbnail_url = `https://picsum.photos/400/700?random=${reel.id || Math.random()}`;
-                    reel.thumbnailLoaded = true;
-                }
+                if (!reel) continue;
+                if (reel.thumbnail_url) continue;
+                await this.generateThumbnailFromVideo(reel);
             }
+        },
+
+        async generateThumbnailFromVideo(reel) {
+            if (!reel || !reel.video_url) {
+                return;
+            }
+
+            // Avoid double work for the same reel
+            if (this.thumbnailGenerating[reel.id]) {
+                return;
+            }
+
+            this.thumbnailGenerating[reel.id] = true;
+
+            const thumbnail = await this.captureFrameFromVideo(reel.video_url);
+            if (thumbnail) {
+                reel.thumbnail_url = thumbnail;
+                reel.thumbnailLoaded = true;
+            } else {
+                reel.thumbnail_url = `https://picsum.photos/400/700?random=${reel.id || Math.random()}`;
+                reel.thumbnailLoaded = true;
+            }
+
+            delete this.thumbnailGenerating[reel.id];
         },
 
         captureFrameFromVideo(videoUrl) {
@@ -437,13 +445,13 @@ function reelsManager() {
             // Get currently visible reels (current +/- 2)
             const visibleIndexes = [];
             for (let i = Math.max(0, this.currentVideoIndex - 2); 
-                 i <= Math.min(this.filteredReels.length - 1, this.currentVideoIndex + 2); 
+                 i <= Math.min(this.visibleReels.length - 1, this.currentVideoIndex + 2); 
                  i++) {
                 visibleIndexes.push(i);
             }
             
             // Batch update for better performance
-            const reelIds = visibleIndexes.map(i => this.filteredReels[i]?.id).filter(Boolean);
+            const reelIds = visibleIndexes.map(i => this.visibleReels[i]?.id).filter(Boolean);
             
             if (reelIds.length === 0) return;
             
@@ -479,7 +487,19 @@ function reelsManager() {
         },
         
         updateReelCounts(reelId, reelData) {
-            // Update in filteredReels
+            // Update in visibleReels (player)
+            const visIndex = this.visibleReels.findIndex(r => r.id === reelId);
+            if (visIndex !== -1) {
+                this.visibleReels[visIndex] = {
+                    ...this.visibleReels[visIndex],
+                    likes_count: reelData.likes_count || 0,
+                    comments_count: reelData.comments_count || 0,
+                    gifts_count: reelData.gifts_count || 0,
+                    views_count: reelData.views_count || 0
+                };
+            }
+
+            // Update in filteredReels (sidebar)
             const reelIndex = this.filteredReels.findIndex(r => r.id === reelId);
             if (reelIndex !== -1) {
                 this.filteredReels[reelIndex] = {
@@ -504,18 +524,69 @@ function reelsManager() {
             }
             
             // Force reactivity
+            this.visibleReels = [...this.visibleReels];
             this.filteredReels = [...this.filteredReels];
             this.allReels = [...this.allReels];
         },
         
         async selectReel(reelId) {
+            this.scrollingToSelection = true;
+            this.pauseAllVideos();
             this.selectedReelId = reelId;
-            this.selectedReel = this.filteredReels.find(r => r.id === reelId);
-            
+            this.selectedReel = this.visibleReels.find(r => r.id === reelId);
+
+            const targetIndex = this.visibleReels.findIndex(r => r.id === reelId);
+            if (targetIndex !== -1) {
+                this.currentVideoIndex = targetIndex;
+                this.loadedVideos = new Set([
+                    Math.max(0, targetIndex - 1),
+                    targetIndex,
+                    Math.min(this.visibleReels.length - 1, targetIndex + 1)
+                ]);
+            }
+
             const reelElement = document.querySelector(`[data-reel-id="${reelId}"]`);
             if (reelElement) {
-                reelElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                const container = this.$refs.reelsContainer;
+                if (container) {
+                    container.scrollTo({ top: reelElement.offsetTop, behavior: 'auto' });
+                } else {
+                    reelElement.scrollIntoView({ behavior: 'auto', block: 'center' });
+                }
             }
+
+            // Play only the selected video after scroll settles
+            this.$nextTick(() => {
+                this.playVideoById(reelId);
+                // Allow normal scroll autoplay again
+                this.scrollingToSelection = false;
+            });
+        },
+
+        playVideoById(reelId) {
+            const video = document.getElementById('video-' + reelId);
+            if (!video) return;
+            if (!video.src) return;
+            video.muted = this.isGlobalMuted;
+            if (video.readyState < 2) {
+                const onCanPlay = () => {
+                    video.removeEventListener('canplay', onCanPlay);
+                    video.play().catch(() => {});
+                };
+                video.addEventListener('canplay', onCanPlay, { once: true });
+                video.load();
+            } else {
+                video.play().catch(() => {});
+            }
+        },
+
+        pauseAllVideos() {
+            const allVideos = document.querySelectorAll('video');
+            allVideos.forEach(v => {
+                if (!v.paused) {
+                    v.pause();
+                }
+            });
         },
         
         async loadTabData() {
@@ -529,34 +600,8 @@ function reelsManager() {
                 if (data.reel) {
                     this.selectedReel = data.reel;
                     
-                    // Update the reel in the lists with actual counts - REACTIVE UPDATE
-                    const reelIndex = this.filteredReels.findIndex(r => r.id === this.selectedReelId);
-                    if (reelIndex !== -1) {
-                        // Create a new object to trigger reactivity
-                        this.filteredReels[reelIndex] = {
-                            ...this.filteredReels[reelIndex],
-                            likes_count: data.reel.likes_count || 0,
-                            comments_count: data.reel.comments_count || 0,
-                            gifts_count: data.reel.gifts_count || 0,
-                            views_count: data.reel.views_count || 0
-                        };
-                    }
-                    
-                    const allReelIndex = this.allReels.findIndex(r => r.id === this.selectedReelId);
-                    if (allReelIndex !== -1) {
-                        // Create a new object to trigger reactivity
-                        this.allReels[allReelIndex] = {
-                            ...this.allReels[allReelIndex],
-                            likes_count: data.reel.likes_count || 0,
-                            comments_count: data.reel.comments_count || 0,
-                            gifts_count: data.reel.gifts_count || 0,
-                            views_count: data.reel.views_count || 0
-                        };
-                    }
-                    
-                    // Force Alpine.js to re-render by updating the arrays
-                    this.filteredReels = [...this.filteredReels];
-                    this.allReels = [...this.allReels];
+                    // Sync counts across lists
+                    this.updateReelCounts(this.selectedReelId, data.reel);
                 }
                 
                 this.likes = data.likes || [];
@@ -573,39 +618,19 @@ function reelsManager() {
         
         filterReels() {
             const query = this.searchQuery.toLowerCase().trim();
-            const currentReelId = this.selectedReelId || (this.filteredReels[this.currentVideoIndex]?.id);
-            const currentReel = this.filteredReels[this.currentVideoIndex];
-            
             if (!query) {
                 this.filteredReels = this.allReels;
             } else {
-                this.filteredReels = this.allReels.filter(reel => {
+                const matches = this.allReels.filter(reel => {
                     const titleMatch = reel.title.toLowerCase().includes(query);
                     const userNameMatch = reel.user?.name?.toLowerCase().includes(query);
                     const idMatch = reel.id.toString().includes(query);
                     const userIdMatch = reel.user?.id.toString().includes(query);
-                    
                     return titleMatch || userNameMatch || idMatch || userIdMatch;
                 });
-            }
-            
-            if (currentReelId && currentReel) {
-                const currentIndex = this.filteredReels.findIndex(r => r.id === currentReelId);
-                if (currentIndex !== -1) {
-                    this.currentVideoIndex = currentIndex;
-                    this.loadedVideos = new Set([
-                        Math.max(0, currentIndex - 1),
-                        currentIndex,
-                        Math.min(this.filteredReels.length - 1, currentIndex + 1)
-                    ]);
-                } else {
-                    this.filteredReels = [currentReel, ...this.filteredReels];
-                    this.currentVideoIndex = 0;
-                    this.loadedVideos = new Set([0, 1, 2]);
-                }
-            } else {
-                this.currentVideoIndex = 0;
-                this.loadedVideos = new Set([0, 1, 2]);
+
+                // عرض النتائج فقط حتى لو فارغة
+                this.filteredReels = matches;
             }
         },
         

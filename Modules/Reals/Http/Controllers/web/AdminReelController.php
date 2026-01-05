@@ -275,6 +275,12 @@ class AdminReelController extends MainController
             return $path;
         }
 
+        // Highest priority: explicit base from env
+        $envBase = env('MEDIA_BASE_URL');
+        if ($envBase) {
+            return rtrim($envBase, '/') . '/' . ltrim($path, '/');
+        }
+
         // Try the default disk URL first
         $base = getDriverUrl();
         if ($base) {
