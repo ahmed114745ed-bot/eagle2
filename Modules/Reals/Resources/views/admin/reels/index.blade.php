@@ -236,7 +236,7 @@
     <div class="reels-video-container  overflow-y-auto snap-y snap-mandatory scroll-smooth"
          x-ref="reelsContainer"
          @scroll.passive="handleScroll()">
-        <template x-for="(reel, index) in visibleReels" :key="reel.id">
+        <template x-for="(reel, index) in (visibleReels || [])" :key="reel.id">
             <div class="video-item-height snap-start flex items-center justify-center relative"
                  :data-reel-id="reel.id"
                  :data-index="index">
