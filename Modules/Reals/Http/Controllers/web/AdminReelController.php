@@ -275,10 +275,16 @@ class AdminReelController extends MainController
             return $path;
         }
 
-        // Prefix with default filesystem URL (e.g., Google Cloud / S3)
+        // Try the default disk URL first
         $base = getDriverUrl();
         if ($base) {
             return rtrim($base, '/') . '/' . ltrim($path, '/');
+        }
+
+        // Fallback to explicit GCS disk URL if default disk has no URL configured (e.g., FILESYSTEM_DISK=local)
+        $gcsBase = config('filesystems.disks.gcs.url');
+        if ($gcsBase) {
+            return rtrim($gcsBase, '/') . '/' . ltrim($path, '/');
         }
 
         // Fallback to storage path
