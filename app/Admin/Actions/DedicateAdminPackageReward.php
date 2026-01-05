@@ -19,6 +19,8 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
+use Illuminate\Support\Facades\DB;
+
 
 class DedicateAdminPackageReward extends Action
 {
@@ -60,12 +62,12 @@ class DedicateAdminPackageReward extends Action
 
             foreach ($superAdmins as $superAdmin) {
                 foreach ($superPackage->packageRewards as $reward) {
-                    SuperAdminReward::create([
+                    DB::table('admin_rewards')->insert([
                         'super_admin_id' => $superAdmin,
                         'type' => $reward->type,
                         'target' => $reward->target,
                         'expire' => $reward->expire,
-                        'no_reward' => $reward->quantity,
+                        'no_reward' => $reward->type == 'coin'  || $reward->type == 'achievement' ? 1 : $reward->quantity,
                         'user_type' => $userType,
                         'created_by' => Admin::user()->id,
                     ]);
@@ -85,10 +87,10 @@ class DedicateAdminPackageReward extends Action
         $this->select('user_type', __('user Type'))->options(['area_manager' => __('Region Manager'), 'super_admin' => __('Country Manager'), 'user' => __('User')])->default('area_manager')->required()->attribute(['id' => 'user-type-select']);
 
         $this->multipleSelect('area_admin_id', __('Select Region Manager'))
-            ->options(self::getSuperAdmins())->attribute(['id' => 'area-admin-select']);
+            ->options(self::getAreaAdmins())->attribute(['id' => 'area-admin-select']);
 
         $this->multipleSelect('super_admin_id', __('Select Country Manager'))
-            ->options(self::getAreaAdmins())->attribute(['id' => 'super-admin-select']);
+            ->options(self::getSuperAdmins())->attribute(['id' => 'super-admin-select']);
         $this->text('user_uuid', __('user uuid'))->attribute(['id' => 'user-select']);
 
         Admin::script(<<<'SCRIPT'
@@ -168,7 +170,7 @@ class DedicateAdminPackageReward extends Action
         $reward = SuperAdminReward::create([
             'super_admin_id' => $user->id,
             'type' => $request->type,
-            'target' => $request->uid,
+            'target' => $request->target,
             'expire' => $request->expire,
             'no_reward' => 1,
             'user_type' => 'user',
@@ -177,7 +179,7 @@ class DedicateAdminPackageReward extends Action
         ]);
 
         switch ($reward->type) {
-            case "coins":
+            case "coin":
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(

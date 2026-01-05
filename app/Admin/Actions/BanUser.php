@@ -32,6 +32,7 @@ class BanUser extends Action
 
     public function handle(Request $request)
     {
+      
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
@@ -131,8 +132,9 @@ class BanUser extends Action
         }
 
         if ($request->ban_type_id) {
+
             $haveBan = Ban::query()->where('uid', $userUuid)->where('user_id', $userId)->where('ban_type_id', $request->ban_type_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")->exists();
-            if ($haveBan)  $messages[] = __('already have ban');
+             if ($haveBan)  $messages[] = __('already have ban');
             $ban = Ban::query()->create(
                 [
                     'uid' => $userUuid,
@@ -149,10 +151,10 @@ class BanUser extends Action
             );
 
             $route = $ban->banType?->route;
+                           
 
-            if ($route == 'rooms/enter_room' && $user->room) {
+            if ($route == 'rooms/enter_room' && $user->nowRoom) {
                 Log::info('ban user send unableToEnterRoom to zego for user id ' . $user->id);
-                // dd( $user->room());
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToEnterRoom",
@@ -163,9 +165,9 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
-               $response =  Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
+               $response =  Common::sendToZego('SendCustomCommand', @$user->nowRoom->id, $user->nowRoom->uid, $json);
                 Log::info('ban user send unableToEnterRoom to zego response for user id ' . $user->id, ['response' => $response]);
-            } else if ($route == 'rooms/up_microphone' && $user->room) {
+            } else if ($route == 'rooms/up_microphone' && $user->nowRoom) {
                 $ms = [
                     'messageContent' => [
                         "message" => "unableToUPMicrophone",
@@ -176,8 +178,8 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
-                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
-            } else if ($route == 'rooms/up-microphone' && $user->room) {
+                Common::sendToZego('SendCustomCommand', @$user->nowRoom->id, $user->nowRoom->uid, $json);
+            } else if ($route == 'rooms/up-microphone' && $user->nowRoom) {
                 Log::info('ban user send unableToUPMicrophone to zego for user id ' . $user->id);
                 $ms = [
                     'messageContent' => [
@@ -189,7 +191,7 @@ class BanUser extends Action
                     ]
                 ];
                 $json = json_encode($ms);
-                Common::sendToZego('SendCustomCommand', @$user->room->id, $user->room->uid, $json);
+                Common::sendToZego('SendCustomCommand', @$user->nowRoom->id, $user->nowRoom->uid, $json);
             }
         }
         if ($room && $newBan) {
@@ -209,7 +211,6 @@ class BanUser extends Action
         if ($newBan) {
             CustomNotification::banUser($user, $request->duration);
         }
-
         if (count($messages) > 0) {
             return $this->response()->error(implode("<br>", $messages))->refresh();
         }

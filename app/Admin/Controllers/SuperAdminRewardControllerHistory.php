@@ -27,7 +27,7 @@ class SuperAdminRewardControllerHistory extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward-history';
+    public $permission_name = 'admin-reward-history';
     public function index(Content $content)
     {
         return parent::index($content
@@ -110,19 +110,24 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('Created At'))->date();
             });
         });
-        $grid->model()->where('type', $type)->with([
-            'superAdmin',
-            'admin',
-            'user',
-            'user.senderLevel',
-            'user.receiverLevel',
-            'user.profile',
-            'user.country',
-            'areaManager',
-            'ware',
-            'vip',
-            'badge'
-        ]);
+        $grid->model()->when($type != 'other', function ($q) use ($type) {
+            $q->where('type', $type);
+        })->when($type == 'other', function ($q) {
+            $q->whereIn('type', ['coin', 'achievement']);
+        })
+            ->with([
+                'superAdmin',
+                'admin',
+                'user',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.profile',
+                'user.country',
+                'areaManager',
+                'ware',
+                'vip',
+                'badge'
+            ]);
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('super admin'))->display(function ($name) {
             if ($this->user_type == 'user') {
@@ -165,7 +170,7 @@ class SuperAdminRewardControllerHistory extends MainController
                 return @$this->vip->name ?? '';
             } elseif ($this->type == "badge") {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            } elseif ($this->type == "coin") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;

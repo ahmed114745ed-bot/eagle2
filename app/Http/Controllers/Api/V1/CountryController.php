@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
+use App\Http\Resources\CountryCategoryResource;
 use App\Http\Resources\CountrySupportersResource;
 
 class CountryController extends Controller
@@ -19,9 +20,10 @@ class CountryController extends Controller
 
     public function __construct(private CountryService $countryService) {}
 
-    public function allCountries(): JsonResponse
+    public function allCountries(Request $request): JsonResponse
     {
-        $countries = $this->countryService->indexByHotAndSupporters();
+        $categoryId = $request->category_id;
+        $countries = $this->countryService->indexByHotAndSupporters($categoryId);
         return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
     }
 
@@ -67,6 +69,12 @@ class CountryController extends Controller
         ];
 
         return Common::apiResponse(1, '', $data);
+    }
+
+    public function countryCategory()
+    {
+        $data = $this->countryService->countryCategory();
+        return Common::apiResponse(1, '', CountryCategoryResource::collection($data));
     }
 
     public function searchCountries(Request $request)

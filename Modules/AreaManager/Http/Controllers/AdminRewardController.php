@@ -56,7 +56,7 @@ class AdminRewardController extends MainController
                 return @$this->vip->name ?? '';
             } elseif ($this->type == "badge") {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            } elseif ($this->type == "coin") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
@@ -105,6 +105,12 @@ class AdminRewardController extends MainController
             });
         // }
 
+            Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+
         $grid->disableActions();
         $grid->disableRowSelector();
         $grid->disableExport();
@@ -124,7 +130,8 @@ class AdminRewardController extends MainController
             'vip',
             'ware',
             'badge',
-            /** 'achievement'*/
+            'achievement',
+            'coin'
         ];
         $currentType = request()->get('type', 'vip');
 

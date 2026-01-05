@@ -39,9 +39,12 @@ class CountryRepository extends AbstractRepository
             ->get();
     }
 
-    public function orderByHotAndSupporters(): Collection|array
+    public function orderByHotAndSupporters($categoryId): Collection|array
     {
         return $this->model->query()
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $q->where('country_category_id', $categoryId);
+            })
             ->select('id', 'name', 'e_name', 'flag', 'language', 'phone_code', 'iso')
             ->where('status', 1)
             ->withCount(['rooms as hot_rooms_count' => function ($q) {
