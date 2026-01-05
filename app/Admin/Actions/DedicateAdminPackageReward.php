@@ -40,13 +40,23 @@ class DedicateAdminPackageReward extends Action
     {
         try {
             $superPackage = SuperPackageReward::with('packageRewards')->find($request->uid);
-
+            $userType = $request->input('user_type');
             if (!$superPackage) {
                 return $this->response()->error(__('Super Package not found.'));
             }
             if ($request->input('user_type') == 'user') {
                 $user = User::query()->searchByUuid($request->user_uuid)->first();
                 if (!$user)   return $this->response()->error(__('dashboard.userNotFound'))->refresh();
+                DB::table('admin_rewards')->insert([
+                    'super_admin_id' => $user->id,
+                    'type' => 'package',
+                    'target' => $superPackage->id,
+                    'expire' =>  1,
+                    'no_reward' => 1,
+                    'user_type' => $userType,
+                    'created_by' => Admin::user()->id,
+                    'created_at' => now(),
+                ]);
                 foreach ($superPackage->packageRewards as $reward) {
                     $this->assignRewards($reward, $user);
                 }
@@ -55,7 +65,7 @@ class DedicateAdminPackageReward extends Action
 
             $superAdmins = $request->input('super_admin_id', []);
             $areaAdmins = $request->input('area_admin_id', []);
-            $userType = $request->input('user_type');
+
             if ($request->input('user_type') == 'area_manager') {
                 $superAdmins = $areaAdmins;
             }
@@ -188,6 +198,8 @@ class DedicateAdminPackageReward extends Action
             'no_reward' => 1,
             'user_type' => 'user',
             'created_by' => Admin::user()->id,
+            'package_id' => $request->super_package_id,
+            'created_at' => now(),
 
         ]);
 
