@@ -585,7 +585,7 @@
                                                 <span x-text="comment.user?.uuid"></span>
                                             </p>
                                         <p class="p-2 rounded text-sm"
-                                           style="color: var(--text-primary-color); background-color: var(--dark-primary-colo);"
+                                           style="background-color: var(--dark-primary-colo);"
                                            x-text="comment.comment"></p>
                                         <p class="text-xs mt-2" x-text="formatDate(comment.created_at)"></p>
                                     </div>
