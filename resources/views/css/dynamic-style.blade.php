@@ -2956,6 +2956,10 @@
         margin-left: 5px;
         margin-right: 0 !important;
     }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background: var(--primary-color) !important;
+    }
 </style>
 
 @include('css.dark_mode')
