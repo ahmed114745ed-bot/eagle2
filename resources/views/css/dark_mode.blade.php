@@ -127,9 +127,9 @@
         color: #ffffff !important;
     }
 
-    .dark-mode .box-header.with-border.filter-box label {
-        background: linear-gradient(to bottom, var(--dark-secondry-color) 50%, var(--dark-primary-color) 50%) !important;
-    }
+    /*.dark-mode .box-header.with-border.filter-box label {*/
+    /*    background: linear-gradient(to bottom, var(--dark-secondry-color) 50%, var(--dark-primary-color) 50%) !important;*/
+    /*}*/
 
     .dark-mode .datepicker table tr td.old,
     .dark-mode .datepicker table tr td.new {
