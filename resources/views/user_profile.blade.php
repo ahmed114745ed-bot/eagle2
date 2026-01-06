@@ -1087,7 +1087,7 @@
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
 
-                        <span class="meta-value d-block">{{ $availableBalance }}</span>
+                        <span class="meta-value d-block">{{ @$user->salary }}</span>
                         <!-- <span class="meta-value">{{ $curantBalance }}</span>
                                 <span class="meta-value">{{ $availableBalance }}</span> -->
 
@@ -1518,73 +1518,50 @@
             </div>
 
             <div class="box-body p-3">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                              class="form-horizontal gift-log-form" pjax-container="">
-                            <input type="hidden" name="tab" value="salary">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="box-body">
-                                        <div class="fields-group">
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">السنة</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة"
-                                                               name="year"
-                                                               value="{{ request('year') }}" style="text-align: right;">
-                                                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
+                                  class="form-horizontal" pjax-container="">
+                                <input type="hidden" name="tab" value="salary">
+                                <div class="filter-container">
+                                    <div class="filter-content">
+                                        <div class="filter-group">
+                                            <label class="form-label">السنة</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-pencil"></i>
                                                 </div>
+                                                <input type="text" class="form-control year" placeholder="السنة"
+                                                       name="year"
+                                                       value="{{ request('year') }}" style="text-align: right;">
                                             </div>
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">الشهر</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </div>
-                                                        <input type="text" class="form-control month"
-                                                               placeholder="الشهر"
-                                                               name="month" value="{{ request('month') }}"
-                                                               style="text-align: right;">
-                                                    </div>
+                                        </div>
+                                        <div class="filter-group">
+                                            <label class="form-label">الشهر</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-pencil"></i>
                                                 </div>
+                                                <input type="text" class="form-control month"
+                                                       placeholder="الشهر"
+                                                       name="month" value="{{ request('month') }}"
+                                                       style="text-align: right;">
                                             </div>
+                                        </div>
+                                        <div class="filter-actions">
+                                            <button class="btn btn-info submit btn-sm">
+                                                <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                            </button>
+                                            <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
+                                               class="btn btn-default btn-sm">
+                                                <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- /.box-body -->
-                            <div class="box-footer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="col-md-2"></div>
-                                        <div class="col-md-8">
-                                            <div class="btn-group pull-left">
-                                                <button class="btn btn-info submit btn-sm">
-                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
-                                                </button>
-                                            </div>
-                                            <div class="btn-group pull-left" style="margin-left: 10px;">
-                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
-                                                   class="btn btn-default btn-sm">
-                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
 
                 <div class="table-responsive">
                     <div class="box-body ">
