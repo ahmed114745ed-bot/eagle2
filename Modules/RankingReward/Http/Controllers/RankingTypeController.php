@@ -115,8 +115,8 @@ class RankingTypeController extends MainController
                     <div class='modal-dialog modal-lg'>
                         <div class='modal-content'>
                             <div class='modal-header'>
-                                <h5 class='modal-title'>${modalTitle}</h5>
                                 <button type='button' class='close' data-dismiss='modal'>&times;</button>
+                                <h5 class='modal-title'>${modalTitle}</h5>
                             </div>
                             <div class='modal-body'>Loading...</div>
                         </div>
