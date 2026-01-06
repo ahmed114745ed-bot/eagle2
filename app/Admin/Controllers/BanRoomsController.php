@@ -87,7 +87,17 @@ class BanRoomsController extends MainController
         $grid = new Grid(new BanRoom());
         $countryID =session('filter_country_id');
         $grid->disableRowSelector();
-        $grid->model()->whereHas('room')
+        $grid->model()
+            ->with([
+                'room',
+                'room.owner',
+                'room.owner.agency',
+                'room.owner.profile:user_id,avatar',
+                'room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+
+                'staff'
+            ])
+            ->whereHas('room')
             ->when($countryID, fn($q) => $q->whereHas('room', fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID))))
             ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
             // ->select('id','room_id', 'duration', 'staff_id',
