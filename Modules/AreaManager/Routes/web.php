@@ -139,8 +139,10 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
-         Route::resource('rewards', AdminRewardController::class);
-         Route::resource('rewards-history', DedicateRewardHistoryController::class);
+        Route::resource('rewards', AdminRewardController::class);
+        Route::get('search/super-admin', [AdminRewardController::class, 'getSuperAdmins'])->name('super-admin');
+
+        Route::resource('rewards-history', DedicateRewardHistoryController::class);
         //
         Route::resource('rooms', RoomController::class);
 
