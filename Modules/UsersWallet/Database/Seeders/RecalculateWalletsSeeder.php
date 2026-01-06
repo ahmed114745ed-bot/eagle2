@@ -253,58 +253,6 @@ class RecalculateWalletsSeeder extends Seeder
             }
         });
 
-        // BD host shares (bd_agency_host_sallaries): ensure credited once per host record
-        DB::table('bd_agency_host_sallaries')->orderBy('id')->chunk(200, function ($rows) {
-            foreach ($rows as $host) {
-                try {
-                    $bd = \App\Models\Bd::find($host->bd_id);
-                    if (! $bd || ! $bd->app_id) {
-                        continue;
-                    }
-
-                    $userId = $bd->app_id;
-                    $amount = (float) ($host->salary ?? $host->amount ?? 0);
-                    if ($amount == 0.0) {
-                        continue;
-                    }
-
-                    // Skip if already applied (same related_id and type bd_host changes balance)
-                    $alreadyNet = (float) DB::table('wallet_logs')
-                        ->where('user_id', $userId)
-                        ->where('type', 'bd')
-                        ->where('related_id', $host->id)
-                        ->whereColumn('after_amount', '<>', 'before_amount')
-                        ->sum('amount');
-
-                    $diff = round($amount - $alreadyNet, 8);
-                    if ($diff == 0.0) {
-                        continue;
-                    }
-
-                    $walletModel = \Modules\UsersWallet\Entities\UserWallet::firstOrCreate(['user_id' => $userId]);
-                    $before = wallet_available_by_wallet($walletModel);
-                    $walletModel->balance += $diff;
-                    $walletModel->save();
-                    $after = wallet_available_by_wallet($walletModel);
-
-                    if (abs($after - $before) > 1e-8) {
-                        \Modules\UsersWallet\Entities\WalletLog::create([
-                            'wallet_id' => $walletModel->id,
-                            'user_id' => $userId,
-                            'amount' => $diff,
-                            'operation' => $diff > 0 ? 'add' : 'subtract',
-                            'type' => 'bd',
-                            'before_amount' => $before,
-                            'after_amount' => $after,
-                            'related_id' => $host->id,
-                        ]);
-                    }
-                } catch (\Throwable $e) {
-                    Log::error('RecalculateWalletsSeeder failed for bd_host '.$host->id, ['err' => $e->getMessage()]);
-                }
-            }
-        });
-
         // Verification: compare wallets to expected sums and fail if mismatch
         $errors = [];
         $stop = false;
@@ -342,18 +290,13 @@ class RecalculateWalletsSeeder extends Seeder
                 if (!empty($bdIds)) {
                     $bdSalarySum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('salary');
                     $bdCutSum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('cut_amount');
-                    // Host shares (dB) were added per-target; include them in expected to align with rebuilt wallet
-                    $bdHostSum = (float) DB::table('bd_agency_host_sallaries')
-                        ->whereIn('bd_id', $bdIds)
-                        ->selectRaw('COALESCE(SUM(COALESCE(salary, amount, 0)), 0) as total')
-                        ->value('total');
                 } else {
                     $bdSalarySum = 0.0;
                     $bdCutSum = 0.0;
-                    $bdHostSum = 0.0;
                 }
 
-                $expectedBalance = $ownSalary + $agencySalarySum + $bdSalarySum + $bdHostSum;
+                // Host shares (dB) are applied per-target via UserSallary; do not double count here
+                $expectedBalance = $ownSalary + $agencySalarySum + $bdSalarySum;
                 $expectedCut = $ownCut + $agencyCutSum + $bdCutSum;
                 $expectedPending = (float) DB::table('user_withdrawals')->where('user_id', $uid)->where('status', 'pending')->sum('amount');
 
