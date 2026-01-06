@@ -1131,8 +1131,8 @@
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
 
-                             <span class="meta-value d-block">{{ $availableBalance }}</span>
-                                <!-- <span class="meta-value">{{ $curantBalance }}</span>
+                        <span class="meta-value d-block">{{ @$user->salary }}</span>
+                        <!-- <span class="meta-value">{{ $curantBalance }}</span>
                                 <span class="meta-value">{{ $availableBalance }}</span> -->
 
                     </div>
