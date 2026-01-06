@@ -127,8 +127,11 @@
         color: #ffffff !important;
     }
 
-    /*.dark-mode .box-header.with-border.filter-box label {*/
-    /*    background: linear-gradient(to bottom, var(--dark-secondry-color) 50%, var(--dark-primary-color) 50%) !important;*/
+    /*.dark-mode .box-header .form-group .control-label,*/
+    /*.dark-mode .box-header .form-group > label,*/
+    /*.dark-mode .filter-box .form-group .control-label,*/
+    /*.dark-mode .filter-box .form-group > label {*/
+    /*    background: linear-gradient(to bottom, var(--dark-secondry-color) 70%, var(--dark-primary-color) 30%) !important;*/
     /*}*/
 
     .dark-mode .datepicker table tr td.old,
