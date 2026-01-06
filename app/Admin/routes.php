@@ -612,7 +612,9 @@ Route::group(
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
         Route::resource('super-package-rewards', SuperPackageController::class);
        Route::resource('admin-rewards-histories', SuperAdminRewardControllerHistory::class);
-        Route::resource('admin-rewards', SuperAdminRewardController::class);
+        Route::get('admin-rewards', [SuperAdminRewardController::class,'index']);
+               Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
+
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
         //             ->icon('fa-file');
