@@ -11,7 +11,7 @@ use Modules\LuckyBox\Entities\UserLuckyGift;
 
 class CoinReportController extends MainController
 {
-     public $permission_name = 'user-coin-report';
+    public $permission_name = 'user-coin-report';
     public function index(Content $content)
     {
 
@@ -46,23 +46,27 @@ class CoinReportController extends MainController
     protected function lucky_gift()
     {
         $grid = new Grid(new UserLuckyGift());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
 
-        $grid->model()
+        $grid->model()->with([
+            'gift',
+            'user',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->selectRaw(
-            'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
-                'SUM(user_lucky_gifts.number) as total_number, ' .
-                'user_lucky_gifts.gift_id, ' .
-                'user_lucky_gifts.user_id, ' .
-                'MAX(users.name) as user_name, ' . // Aggregated using MAX
-                'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
-                'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
-                'user_lucky_gifts.gift_price, ' .
-                'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win'
-        )
+                'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
+                    'SUM(user_lucky_gifts.number) as total_number, ' .
+                    'user_lucky_gifts.gift_id, ' .
+                    'user_lucky_gifts.user_id, ' .
+                    'MAX(users.name) as user_name, ' . // Aggregated using MAX
+                    'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
+                    'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
+                    'user_lucky_gifts.gift_price, ' .
+                    'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win'
+            )
             ->leftJoin('users', 'user_lucky_gifts.user_id', '=', 'users.id')
             ->leftJoin('gifts', 'user_lucky_gifts.gift_id', '=', 'gifts.id')
             ->groupBy(
@@ -112,7 +116,7 @@ class CoinReportController extends MainController
     protected function games()
     {
         $grid = new Grid(new CoinGameUser());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
 
