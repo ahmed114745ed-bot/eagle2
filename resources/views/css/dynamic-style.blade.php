@@ -2877,6 +2877,7 @@
         height: auto !important;
         object-fit: contain !important;
         border-radius: 8px !important;
+        border: unset !important;
     }
 
     .main-header .logo .logo-icon img {
