@@ -11,10 +11,10 @@
     <div class="box-body no-padding">
         <ul class="nav nav-pills nav-stacked">
             <li class="{{ request()->name == 'lucky_gift' || request()->name == null ? 'active' : '' }}"><a href="?name=lucky_gift"
-                    class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{ __('lucky_gift') }}</a>
+                    class="charge_action"><i class="fa fa-arrow-right text-red"></i>{{ __('lucky_gift_title') }}</a>
             </li>
             <li class="{{ request()->name == 'games' ? 'active' : '' }}"><a href="?name=games" class="charge_action"><i
-                        class="fa fa-arrow-right text-red"></i>{{ __('games') }}</a>
+                        class="fa fa-arrow-right text-red"></i>{{ __('Games') }}</a>
             </li>
         </ul>
     </div>
