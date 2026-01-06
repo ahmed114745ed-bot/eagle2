@@ -98,6 +98,9 @@ class AppServiceProvider extends ServiceProvider
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
 
+        if (class_exists(\Laravel\Octane\Octane::class)) {
+            \Laravel\Octane\Octane::tick('csrf-refresh', fn () => null)->seconds(60);
+        }
         // Load your custom settings
         $start = Common::getSettingValue('week_start') ?? 'monday';
         $end   = Common::getSettingValue('week_end')   ?? 'sunday';
