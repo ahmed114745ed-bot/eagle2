@@ -71,9 +71,9 @@ class TicketController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->model()->with([
-            'user',
+            'user:id,name,uuid,phone', 
             'user.agency',
-            'user.profile',
+            'user.profile:user_id,avatar',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
         ])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 
@@ -88,7 +88,7 @@ class TicketController extends MainController
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-';
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$user->avatar;
+            $avatarPath = @$user->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
             if (!isImageExists($avatar)) {
