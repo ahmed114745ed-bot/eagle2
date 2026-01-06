@@ -63,6 +63,8 @@ class BanRoomsController extends MainController
                 'room',
                 'room.owner',
                 'room.owner.profile:user_id,avatar',
+                'room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+
                 'staff'
             ])
             ->whereHas('room')
