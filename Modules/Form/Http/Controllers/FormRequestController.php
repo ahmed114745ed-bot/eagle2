@@ -1,6 +1,6 @@
 <?php
 
-namespace  Modules\Form\Http\Controllers;
+namespace Modules\Form\Http\Controllers;
 
 
 use App\Models\Bd;
@@ -9,14 +9,11 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Widgets\Box;
 use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
-use Modules\Form\Entities\FormField;
 use Modules\Form\Entities\FormRequest;
 use Modules\Form\Services\FormRenderService;
 
@@ -35,18 +32,69 @@ class FormRequestController extends MainController
     {
         $type = request()->get('type', 'host_agency');
 
+        $pendingCounts = FormRequest::where('status', 'pending')
+            ->selectRaw('form_template_type, COUNT(*) as count')
+            ->groupBy('form_template_type')
+            ->pluck('count', 'form_template_type')
+            ->toArray();
+
         $buttons = [
-            'host_agency'    => __('Host Agency'),
-            'bd_form'        => __('BD Form'),
+            'host_agency' => __('Host Agency'),
+            'bd_form' => __('BD Form'),
             'shipping_agency' => __('Shaping Agency'),
         ];
 
-        $header = '<div style="margin-bottom:15px;">';
+        Admin::style('
+            .tab-btn {
+                position: relative;
+            }
+            .tab-btn .pending-badge {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background-color: var(--primary-color);
+                filter: brightness(1.5);
+                color: var(--text-secondary-color);
+                border-radius: 50%;
+                padding: 2px 6px;
+                font-size: 10px;
+                min-width: 18px;
+                height: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+            .tab-btn.active-tab {
+                background: var(--primary-color);
+                color: white;
+            }
+            .tab-btn .pending-badge.pulse {
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 70%, transparent); }
+                70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary-color) 0%, transparent); }
+                100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 0%, transparent); }
+            }
+        ');
+
+        $header = '<div style="margin-bottom:15px; display: flex; gap: 10px;">';
         foreach ($buttons as $key => $label) {
-            $active = $type === $key ? 'background:#1890ff;color:white;' : 'background:#f5f5f5;';
-            $header .= "<a href='?type={$key}' class='btn btn-sm' style='margin-right:5px;{$active}'>{$label}</a>";
+            $activeClass = $type === $key ? 'active-tab' : '';
+            $count = $pendingCounts[$key] ?? 0;
+
+            // Badge HTML - only show if count > 0
+            $badge = '';
+            if ($count > 0) {
+                $pulseClass = $count > 0 ? 'pulse' : '';
+                $badge = "<span class='pending-badge {$pulseClass}'>{$count}</span>";
+            }
+
+            $header .= "<a href='?type={$key}' class='btn tab-btn {$activeClass}' style='position: relative;'>{$label}{$badge}</a>";
         }
         $header .= '</div>';
+
         $content->title(__('requests_title'));
 
         if (Admin::user()->can('type-switch-' . $this->permission_name) || Admin::user()->can('*')) {
@@ -63,14 +111,23 @@ class FormRequestController extends MainController
         $grid = new Grid(new FormRequest());
 
         $grid->model()
-            ->with(['user', 'template', 'bd'])
+            ->select(['id', 'name', 'bd_id', 'whatsapp_number', 'submitted_by', 'form_template_type', 'status'])
+            ->with([
+                'user',
+                'user.country',
+                'user.senderLevel',
+                'user.receiverLevel',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'template',
+                'bd'
+            ])
             ->where('form_template_type', $type)->orderByDesc('id');
 
         $grid->column('user', __('user'))
             ->display(function ($name) {
 
                 $user = $this->user;
-                if (! $user) {
+                if (!$user) {
                     return '';
                 }
 
@@ -85,7 +142,7 @@ class FormRequestController extends MainController
                     return $name;
                 }
                 if (!$this->bd) {
-                    return  '-';
+                    return '-';
                 }
 
                 $id = $this->bd->id ?? '-';
@@ -118,6 +175,14 @@ class FormRequestController extends MainController
         if ($type == 'bd_form') {
             $grid->column('country', __('country'))->display(fn($v) => $v ?? '-');
         }
+
+        Admin::style('
+            .grid-table .label-default {
+                background-color: var(--primary-color) !important;
+                color: #fff !important;
+            }
+        ');
+
         $grid->column('status', __('status'))->label([
             'pending' => 'default',
             'approved' => 'success',
@@ -126,10 +191,9 @@ class FormRequestController extends MainController
             return __($status);
         });
 
-
         $grid->column('actions', __('Actions'))->display(function () {
             $approveUrl = admin_url("requests/{$this->id}/approve");
-            $rejectUrl  = admin_url("requests/{$this->id}/reject");
+            $rejectUrl = admin_url("requests/{$this->id}/reject");
             $showUrl = admin_url('form-requests', $this->id);
 
             if ($this->status === 'rejected') {
@@ -141,165 +205,148 @@ class FormRequestController extends MainController
             }
 
             $approveText = __('Approved');
-            $rejectText  = __('Reject');
-            $viewText    = __('Preview');
-
-            // return <<<HTML
-            // if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //        <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
-            //             <i class="fa fa-eye"></i> {$viewText}
-            //         </a>}
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">{$approveText}</button>
-            //         }
-            //         if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
-            //     <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">✖ {$rejectText}</button>
-            //         }
-            // HTML;
+            $rejectText = __('Reject');
+            $viewText = __('Preview');
 
             $html = '';
-
             if (Admin::user()->can('show-' . $this->permission_name) || Admin::user()->can('*')) {
                 $html .= <<<HTML
                     <a href="{$showUrl}" class="btn btn-info btn-sm me-1">
-                        <i class="fa fa-eye"></i> {$viewText}
+                        <i class="fa fa-eye"></i>
                     </a>
-                    HTML;
+                HTML;
             }
 
             if (Admin::user()->can('approve-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $html .= <<<HTML
-                    <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">
-                        {$approveText}
+                    <button class="btn btn-success btn-sm approve-btn me-1" data-url="{$approveUrl}">
+                        <i class="fa fa-check"></i>
                     </button>
-                    HTML;
+                HTML;
             }
 
             if (Admin::user()->can('reject-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $html .= <<<HTML
                     <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">
-                        ✖ {$rejectText}
+                        ✖
                     </button>
-                    HTML;
+                HTML;
             }
 
             return $html;
         });
 
         Admin::script("
-function initFormRequestActions() {
+            function initFormRequestActions() {
 
-    function sendRequest(url) {
-        return fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': LA.token,
-                'Accept': 'application/json',
-            },
-        }).then(res => res.json());
-    }
-
-    function handleAction(button, actionType) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            const messages = {
-                approve: {
-                    title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
-                    confirm: 'نعم',
-                    cancel: 'إلغاء',
-                    color: '#28a745'
-                },
-                reject: {
-                    title: 'هل أنت متأكد من رفض هذا الطلب؟',
-                    confirm: 'نعم',
-                    cancel: 'إلغاء',
-                    color: '#dc3545'
-                },
-                success: {
-                    en: 'Action completed successfully!',
-                    ar: 'تمت العملية بنجاح!',
-                    hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
-                    tr: 'İşlem başarıyla tamamlandı!'
-                },
-                error: {
-                    en: 'An error occurred!',
-                    ar: 'حدث خطأ أثناء العملية',
-                    hi: 'एक त्रुटि हुई!',
-                    tr: 'İşlem sırasında hata oluştu!'
+                function sendRequest(url) {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': LA.token,
+                            'Accept': 'application/json',
+                        },
+                    }).then(res => res.json());
                 }
-            };
 
-            const locale = document.documentElement.lang || 'ar';
+                function handleAction(button, actionType) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
 
-            Swal.fire({
-                title: messages[actionType].title,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: messages[actionType].confirm,
-                cancelButtonText: messages[actionType].cancel,
-                confirmButtonColor: messages[actionType].color,
-                cancelButtonColor: '#6c757d',
-            }).then((result) => {
-                if (result.value) {
-                    const url = button.dataset.url;
+                        const messages = {
+                            approve: {
+                                title: 'هل أنت متأكد من الموافقة على هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#28a745'
+                            },
+                            reject: {
+                                title: 'هل أنت متأكد من رفض هذا الطلب؟',
+                                confirm: 'نعم',
+                                cancel: 'إلغاء',
+                                color: '#dc3545'
+                            },
+                            success: {
+                                en: 'Action completed successfully!',
+                                ar: 'تمت العملية بنجاح!',
+                                hi: 'क्रिया सफलतापूर्वक पूरी हुई!',
+                                tr: 'İşlem başarıyla tamamlandı!'
+                            },
+                            error: {
+                                en: 'An error occurred!',
+                                ar: 'حدث خطأ أثناء العملية',
+                                hi: 'एक त्रुटि हुई!',
+                                tr: 'İşlem sırasında hata oluştu!'
+                            }
+                        };
 
-                    Swal.fire({
-                        title: 'جاري التنفيذ...',
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+                        const locale = document.documentElement.lang || 'ar';
 
-                    sendRequest(url)
-                        .then(res => {
-                            Swal.close();
+                        Swal.fire({
+                            title: messages[actionType].title,
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: messages[actionType].confirm,
+                            cancelButtonText: messages[actionType].cancel,
+                            confirmButtonColor: messages[actionType].color,
+                            cancelButtonColor: '#6c757d',
+                        }).then((result) => {
+                            if (result.value) {
+                                const url = button.dataset.url;
 
-                            if (res.success) {
                                 Swal.fire({
-                                    title: res.message || messages.success[locale],
-                                    icon: res.icon || 'success', // 💡 Use icon from backend
-                                    timer: 2000,
-                                    showConfirmButton: false
+                                    title: 'جاري التنفيذ...',
+                                    allowOutsideClick: false,
+                                    didOpen: () => Swal.showLoading()
                                 });
 
-                                // Reload grid without full refresh
-                                $.pjax.reload('#pjax-container');
-                            } else {
-                                Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                sendRequest(url)
+                                    .then(res => {
+                                        Swal.close();
+
+                                        if (res.success) {
+                                            Swal.fire({
+                                                title: res.message || messages.success[locale],
+                                                icon: res.icon || 'success', // 💡 Use icon from backend
+                                                timer: 2000,
+                                                showConfirmButton: false
+                                            });
+
+                                            // Reload grid without full refresh
+                                            $.pjax.reload('#pjax-container');
+                                        } else {
+                                            Swal.fire('خطأ', res.message || messages.error[locale], 'error');
+                                        }
+                                    })
+                                    .catch((err) => {
+                                        console.error('Fetch error:', err);
+                                        Swal.fire('خطأ', messages.error[locale], 'error');
+                                    });
                             }
-                        })
-                        .catch((err) => {
-                            console.error('Fetch error:', err);
-                            Swal.fire('خطأ', messages.error[locale], 'error');
                         });
+                    });
                 }
+
+                document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
+                document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
+            }
+
+            initFormRequestActions();
+
+            $(document).off('pjax:end').on('pjax:end', function() {
+                initFormRequestActions();
             });
-        });
-    }
-
-    document.querySelectorAll('.approve-btn').forEach(btn => handleAction(btn, 'approve'));
-    document.querySelectorAll('.reject-btn').forEach(btn => handleAction(btn, 'reject'));
-}
-
-initFormRequestActions();
-
-$(document).off('pjax:end').on('pjax:end', function() {
-    initFormRequestActions();
-});
-");
-
-
-
-
+        ");
 
 
         $grid->disableActions();
         $grid->disableCreateButton();
+        $grid->disableExport();
+        $grid->disableColumnSelector();
+        $grid->disableRowSelector();
 
         return $grid;
     }
-
-
 
 
     protected function form()
@@ -353,7 +400,7 @@ $(document).off('pjax:end').on('pjax:end', function() {
         if ($this->checkUserAlreadyOwnsEntity($owner, Agency::class)) {
             return response()->json([
                 'success' => false,
-                'key'     => 'user_already_has_agency',
+                'key' => 'user_already_has_agency',
                 'message' => __('user_already_has_agency'),
             ], 400);
         }
@@ -393,7 +440,7 @@ $(document).off('pjax:end').on('pjax:end', function() {
         if ($this->checkUserAlreadyOwnsEntity($phoneUser, Bd::class)) {
             return response()->json([
                 'success' => false,
-                'key'     => 'user_already_has_bd',
+                'key' => 'user_already_has_bd',
                 'message' => __('user_already_has_bd'),
             ], 400);
         }
@@ -425,11 +472,11 @@ $(document).off('pjax:end').on('pjax:end', function() {
             ], 404);
         }
 
-        if ($this->checkUserAlreadyOwnsEntity($owner,  ShippingAgency::class)) {
+        if ($this->checkUserAlreadyOwnsEntity($owner, ShippingAgency::class)) {
 
             return response()->json([
                 'success' => false,
-                'key'     => 'user_already_has_shipping_agency',
+                'key' => 'user_already_has_shipping_agency',
                 'message' => __('user_already_has_shipping_agency'),
             ], 400);
         }
@@ -446,17 +493,16 @@ $(document).off('pjax:end').on('pjax:end', function() {
     }
 
 
-
     protected function checkUserAlreadyOwnsEntity(User $user, string $modelClass): bool
     {
-        if (! class_exists($modelClass)) {
+        if (!class_exists($modelClass)) {
             throw new \InvalidArgumentException("Invalid model class: {$modelClass}");
         }
 
         $model = new $modelClass;
         $table = $model->getTable();
 
-        if (! \Schema::hasTable($table)) {
+        if (!\Schema::hasTable($table)) {
             throw new \RuntimeException("Table for model {$modelClass} does not exist.");
         }
 
@@ -479,7 +525,7 @@ $(document).off('pjax:end').on('pjax:end', function() {
         $request->save();
         return response()->json([
             'success' => true,
-            'message' =>  __('admin.rejected_success'),
+            'message' => __('admin.rejected_success'),
             'icon' => 'success',
         ]);
         admin_toastr(__('rejected_message'), 'error');

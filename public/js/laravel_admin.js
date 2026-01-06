@@ -131,7 +131,7 @@ function loadScriptsSequentially(scripts, callback = () => {}) {
     $.getScript(first)
         .done(() => loadScriptsSequentially(rest, callback))
         .fail((xhr, status, error) => {
-        
+
             console.error('[Map Error] فشل تحميل:', first, error);
             window.location.reload();
         });
@@ -143,3 +143,41 @@ const scripts = [
 ];
 
 loadScriptsSequentially(scripts);
+
+// Navbar hide on scroll down, show on scroll up
+(function() {
+    'use strict';
+
+    const navbar = document.querySelector('.navbar.navbar-static-top');
+    if (!navbar) {
+        console.log('❌ Navbar not found');
+        return;
+    }
+
+    let lastScrollTop = 0;
+    const scrollThreshold = 30;
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Always show at top of page
+        if (currentScroll <= 0) {
+            navbar.classList.remove('navbar-hidden');
+            lastScrollTop = 0;
+            return;
+        }
+
+        // Check scroll direction
+        if (currentScroll > lastScrollTop + scrollThreshold) {
+            // Scrolling DOWN - hide navbar
+            navbar.classList.add('navbar-hidden');
+            lastScrollTop = currentScroll;
+        } else if (currentScroll < lastScrollTop - scrollThreshold) {
+            // Scrolling UP - show navbar
+            navbar.classList.remove('navbar-hidden');
+            lastScrollTop = currentScroll;
+        }
+    });
+
+    console.log('✅ Navbar scroll behavior loaded');
+})();

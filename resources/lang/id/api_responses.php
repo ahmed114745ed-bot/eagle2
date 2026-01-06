@@ -16,6 +16,7 @@ return [
     'cant_follow_your_self'                                     => 'Anda tidak bisa mengikuti diri sendiri!',
     'this_user_not_found'                                       => 'Pengguna ini tidak ditemukan',
     'follow_done'                                               => 'Berhasil mengikuti pengguna ini',
+    'freeze_charge_settings' => 'Pengisian saat ini dinonaktifkan oleh administrator.',
     'unfollow_done'                                             => 'Berhasil berhenti mengikuti pengguna ini',
     'owner_id_required'                                         => 'Owner ID diperlukan',
     'room_not_found'                                            => 'Ruang tidak ditemukan',

@@ -1,31 +1,15 @@
 <aside id="main-sidebar" class="main-sidebar">
-
-    <!-- sidebar: style can be found in sidebar.less -->
+    <link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
+    <script src="{{ asset('js/admin-menu.js') }}"></script>
+    </section>
     <section class="sidebar">
-
-        <!-- Sidebar user panel (optional) -->
-        {{--        <div class="user-panel">--}}
-        {{--            <div class="pull-left image">--}}
-        {{--                <img src="{{ Admin::user()->image }}" class="img-circle" alt="User Image">--}}
-        {{--            </div>--}}
-        {{--            <div class="pull-left info">--}}
-        {{--                <p>{{ Admin::user()->name }}</p>--}}
-        {{--                <!-- Status -->--}}
-        {{--                <a href="#"><i class="fa fa-circle text-success"></i> {{ trans('admin.online') }}</a>--}}
-        {{--            </div>--}}
-        {{--            <div class="pull-role">--}}
-        {{--            {{ Auth::user()->roles[0]->name ?? '' }}--}}
-        {{--            <!-- Status -->--}}
-        {{--            </div>--}}
-        {{--        </div>--}}
-
         @if(config('admin.enable_menu_search'))
             <!-- search form (Optional) -->
             <form class="sidebar-form" style="overflow: initial;" onsubmit="return false;">
                 <div class="input-group">
                     <input type="text" autocomplete="off" class="form-control autocomplete" placeholder="Search...">
                     <span class="input-group-btn">
-                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i>🔍</i>
                 </button>
               </span>
                     <ul class="dropdown-menu" role="menu" style="min-width: 210px;max-height: 300px;overflow: auto;">
@@ -72,25 +56,29 @@
             })->values()->all();
         @endphp
 
-        <ul class="sidebar-menu">
-            <li class="header">{{ trans('admin.menu') }}</li>
+        <ul class="crs-menu">
+            <!-- <li class="header">{{ trans('admin.menu') }}</li> -->
 
             @if (Admin::user()->type == 'bd')
                 @php
                     $bdLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Home')],
-                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges')],
-                        ['uri' => '/agencies', 'icon' => 'fa-building', 'title' => __('agencies')],
-                        ['uri' => '/salaries', 'icon' => 'fa-building', 'title' => __('salaries')],
-                        ['uri' => '/request-agencies', 'icon' => 'fa-building', 'title' => __('request-agencies')],
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Home')],
+                        ['uri' => '/charges', 'icon' => '💸', 'title' => __('charges')],
+                        ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('agencies')],
+                        ['uri' => '/salaries', 'icon' => '💰', 'title' => __('salaries')],
+                        ['uri' => '/request-agencies', 'icon' => '📝', 'title' => __('request-agencies')],
                     ];
                 @endphp
 
                 @foreach($bdLinks as $link)
-                    <li>
-                        <a href="{{ bd_url($link['uri']) }}">
-                            <i class="fa {{ $link['icon'] }}"></i>
-                            <span>{{ $link['title'] }}</span>
+                    <li class="crs-item">
+                        <a href="{{ bd_url($link['uri']) }}" class="crs-link crs-leaf">
+                            @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                            @else
+                                <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                            @endif
+                            <span class="crs-title">{{ $link['title'] }}</span>
                         </a>
                     </li>
                 @endforeach
@@ -99,62 +87,62 @@
             @if (in_array(Admin::user()->type, ['superadmin', 'sub_super_admin']))
                 @php
                     $superadminLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
-                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge']
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/users', 'icon' => '👥', 'title' => __('Users'), 'permission' => 'users'],
+                        ['uri' => '/charges', 'icon' => '💸', 'title' => __('charges'), 'permission' => 'coin-recharge']
                         ,
                         [
                             'uri' => '#',
-                            'icon' => 'fa-briefcase',
+                            'icon' => '👨‍💼',
                             'title' => __('BD'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/usersBd', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
-                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ['uri' => '/usersBd', 'icon' => '💼', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => '✈️', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
-                                ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
-                                ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
-                                ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                                ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                ['uri' => '/charge-agencies', 'icon' => '💳', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                ['uri' => '/ag/users', 'icon' => '👥', 'title' => __('Hosts'), 'permission' => 'host'],
+                                ['uri' => '/ag/professional/users', 'icon' => '✈️', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏠',
                             'title' => __('rooms'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
-                                ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                ['uri' => '/rooms', 'icon' => '🚪', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                ['uri' => '/live-rooms', 'icon' => '📺', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '📢',
                             'title' => __('Advertisements'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/home-carousel', 'icon' => 'fa-home', 'title' => __('HomeCarousel'), 'permission' => 'banner'],
-                                ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'banner'],
+                                ['uri' => '/home-carousel', 'icon' => '🎠', 'title' => __('HomeCarousel'), 'permission' => 'banner'],
+                                ['uri' => '/official-message', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'banner'],
 
                             ],
                         ],
-                        ['uri' => '/super-admin-rewards', 'icon' => 'fa-home', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
+                        ['uri' => '/super-admin-rewards', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '👔',
                             'title' => __('Employees and Permissions'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('Sub Super Admin'), 'permission' => 'auth-users'],
+                                ['uri' => '/roles', 'icon' => '🔐', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth-users', 'icon' => '👥', 'title' => __('Sub Super Admin'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
@@ -185,19 +173,28 @@
 
                     @if(isset($link['children']))
                         @if(hasVisibleChildren($link['children']))
-                            <li class="treeview">
-                                <a href="#">
-                                    <i class="fa {{ $link['icon'] }}"></i>
-                                    <span>{{ $link['title'] }}</span>
-                                    <i class="fa fa-angle-left pull-right"></i>
+                            <li class="crs-tree crs-item">
+                                <a href="#" class="crs-link crs-toggle">
+                                    @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                    @else
+                                        <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                    @endif
+                                    <span class="crs-title">{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left crs-arrow"></i>
                                 </a>
-                                <ul class="treeview-menu">
+                                <ul class="crs-submenu">
                                     @foreach($link['children'] as $child)
                                         @if(hasPermission($child['permission'] ?? null))
-                                            <li>
-                                                <a href="{{ superadmin_url($child['uri']) }}">
-                                                    <i class="fa {{ $child['icon'] }}"></i>
-                                                    <span>{{ $child['title'] }}</span>
+                                            <li class="crs-item">
+                                                <a href="{{ superadmin_url($child['uri']) }}" class="crs-link crs-leaf">
+                                                    @if(str_contains($child['icon'] ?? '', 'fa-'))
+                                                        <i class="fa {{ $child['icon'] }} crs-icon"
+                                                           aria-hidden="true"></i>
+                                                    @else
+                                                        <span class="crs-icon emoji-icon">{{ $child['icon'] }}</span>
+                                                    @endif
+                                                    <span class="crs-title">{{ $child['title'] }}</span>
                                                 </a>
                                             </li>
                                         @endif
@@ -207,10 +204,14 @@
                         @endif
                     @else
                         @if(hasPermission($link['permission'] ?? null))
-                            <li>
-                                <a href="{{ superadmin_url($link['uri']) }}">
-                                    <i class="fa {{ $link['icon'] }}"></i>
-                                    <span>{{ $link['title'] }}</span>
+                            <li class="crs-item">
+                                <a href="{{ superadmin_url($link['uri']) }}" class="crs-link crs-leaf">
+                                    @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                    @else
+                                        <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                    @endif
+                                    <span class="crs-title">{{ $link['title'] }}</span>
                                 </a>
                             </li>
                         @endif
@@ -221,67 +222,68 @@
             @if (in_array(Admin::user()->type, ['area-manager', 'sub_area_manager']) )
                 @php
                     $areaManagerLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-users',
+                            'icon' => '🌍',
                             'title' => __('Super Admin'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
+                                ['uri' => '/superadmin-users', 'icon' => '👤', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                             ],
                         ],
-                        ['uri' => '/charges', 'icon' => 'fa-building', 'title' => __('charges'), 'permission' => 'coin-recharge'],
+                        ['uri' => '/charges', 'icon' => '💸', 'title' => __('charges'), 'permission' => 'coin-recharge'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-briefcase',
+                            'icon' => '💼',
                             'title' => __('BD'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
-                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ['uri' => '/user-Bds', 'icon' => '👥', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => '✈️', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
                             ],
                         ],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
+                        ['uri' => '/users', 'icon' => '👥', 'title' => __('Users'), 'permission' => 'users'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
-                                ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
-                                ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
-                                ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                                ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                ['uri' => '/charge-agencies', 'icon' => '💳', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                ['uri' => '/ag/users', 'icon' => '👥', 'title' => __('Hosts'), 'permission' => 'host'],
+                                ['uri' => '/ag/professional/users', 'icon' => '✈️', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏠',
                             'title' => __('rooms'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
-                                ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                ['uri' => '/rooms', 'icon' => '🚪', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                ['uri' => '/live-rooms', 'icon' => '📺', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '📢',
                             'title' => __('Advertisements'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/official-message', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                ['uri' => '/official-message', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
+                          ['uri' => '/rewards?type=vip', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '👔',
                             'title' => __('Employees and Permissions'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth-users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ['uri' => '/roles', 'icon' => '🔐', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth-users', 'icon' => '👥', 'title' => __('users'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
@@ -305,19 +307,29 @@
                 @foreach($areaManagerLinks as $link)
                     @if(isset($link['children']))
                         @if(hasVisibleChildren($link['children']))
-                            <li class="treeview">
-                                <a href="#">
-                                    <i class="fa {{ $link['icon'] }}"></i>
-                                    <span>{{ $link['title'] }}</span>
-                                    <i class="fa fa-angle-left pull-right"></i>
+                            <li class="crs-tree crs-item">
+                                <a href="#" class="crs-link crs-toggle">
+                                    @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                    @else
+                                        <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                    @endif
+                                    <span class="crs-title">{{ $link['title'] }}</span>
+                                    <i class="fa fa-angle-left crs-arrow"></i>
                                 </a>
-                                <ul class="treeview-menu">
+                                <ul class="crs-submenu">
                                     @foreach($link['children'] as $child)
                                         @if(hasPermission($child['permission'] ?? null))
-                                            <li>
-                                                <a href="{{ areaManager_url($child['uri']) }}">
-                                                    <i class="fa {{ $child['icon'] }}"></i>
-                                                    <span>{{ $child['title'] }}</span>
+                                            <li class="crs-item">
+                                                <a href="{{ areaManager_url($child['uri']) }}"
+                                                   class="crs-link crs-leaf">
+                                                    @if(str_contains($child['icon'] ?? '', 'fa-'))
+                                                        <i class="fa {{ $child['icon'] }} crs-icon"
+                                                           aria-hidden="true"></i>
+                                                    @else
+                                                        <span class="crs-icon emoji-icon">{{ $child['icon'] }}</span>
+                                                    @endif
+                                                    <span class="crs-title">{{ $child['title'] }}</span>
                                                 </a>
                                             </li>
                                         @endif
@@ -327,10 +339,19 @@
                         @endif
                     @else
                         @if(hasPermission($link['permission'] ?? null))
-                            <li>
-                                <a href="{{ areaManager_url($link['uri']) }}">
-                                    <i class="fa {{ $link['icon'] }}"></i>
-                                    <span>{{ $link['title'] }}</span>
+                            <li class="crs-item">
+                                <a href="{{ areaManager_url((string) ($link['uri'] ?? '')) }}" class="crs-link crs-leaf">
+                                    @if(is_string($link['icon'] ?? null) && str_contains($link['icon'], 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon"></i>
+                                    @else
+                                        <span class="crs-icon emoji-icon">
+                                            {{ is_array($link['icon'] ?? null) ? '' : ($link['icon'] ?? '') }}
+                                        </span>
+                                    @endif
+
+                                    <span class="crs-title">
+                                        {{ is_array($link['title'] ?? null) ? ($link['title'][app()->getLocale()] ?? '') : ($link['title'] ?? '') }}
+                                    </span>
                                 </a>
                             </li>
                         @endif
@@ -343,53 +364,67 @@
             @endphp
 
             @if (!in_array(Admin::user()->type, $adminTypes) && !session('preview_superadmin') &&!session('preview_area_manager'))
-                @each('admin::partials.menu', $filteredMenu, 'item')
+                @each('vendor.admin.partials.menu', $filteredMenu, 'item')
             @elseif(session('preview_superadmin'))
                 @php
                     $superadminPreviewLinks = [
-                        ['uri' => '/superadmin/statistics','icon' => 'fa-home','title' => __('Dashboard')],
-                        ['uri' => '/superadmin/profile','icon' => 'fa-home','title' => __('Super Admin Profile')],
-                        ['uri' => '/users','icon' => 'fa-users','title' => __('Users')],
-                        ['uri' => '/usersBd','icon' => 'fa-briefcase','title' => __('BD')],
+                        ['uri' => '/superadmin/statistics','icon' => '🏠','title' => __('Dashboard')],
+                        ['uri' => '/superadmin/profile','icon' => '👤','title' => __('Super Admin Profile')],
+                        ['uri' => '/users','icon' => '👥','title' => __('Users')],
+                        ['uri' => '/usersBd','icon' => '💼','title' => __('BD')],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'children' => [
-                                ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies')],
-                                ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies')],
-                                ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts')],
-                                ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host')],
+                                ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('Host Agencies')],
+                                ['uri' => '/charge-agencies', 'icon' => '💳', 'title' => __('Shipping Agencies')],
+                                ['uri' => '/ag/users', 'icon' => '👥', 'title' => __('Hosts')],
+                                ['uri' => '/ag/professional/users', 'icon' => '✈️', 'title' => __('Professional Host')],
                             ],
                         ],
-                        ['uri' => '/rooms','icon' => 'fa-home','title' => __('rooms')],
-                        ['uri' => '/live-rooms','icon' => 'fa-home','title' => __('Live Rooms')],
-                        ['uri' => '/superadmin/home-carousel','icon' => 'fa-home','title' => __('HomeCarousel')],
+                        ['uri' => '/rooms','icon' => '🚪','title' => __('rooms')],
+                        ['uri' => '/live-rooms','icon' => '📺','title' => __('Live Rooms')],
+                        ['uri' => '/superadmin/home-carousel','icon' => '🎠','title' => __('HomeCarousel')],
                     ];
                 @endphp
 
                 @foreach($superadminPreviewLinks as $link)
                     @if(isset($link['children']))
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa {{ $link['icon'] }}"></i>
-                                <span>{{ $link['title'] }}</span>
-                                <i class="fa fa-angle-left pull-right"></i>
+                        <li class="crs-tree crs-item">
+                            <a href="#" class="crs-link crs-toggle">
+                                @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                    <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                @else
+                                    <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                @endif
+                                <span class="crs-title">{{ $link['title'] }}</span>
+                                <i class="fa fa-angle-left crs-arrow"></i>
                             </a>
-                            <ul class="treeview-menu">
+                            <ul class="crs-submenu">
                                 @foreach($link['children'] as $child)
-                                    <li>
-                                        <a href="{{ admin_url($child['uri']) }}">
-                                            <i class="fa {{ $child['icon'] }}"></i> {{ $child['title'] }}
+                                    <li class="crs-item">
+                                        <a href="{{ admin_url($child['uri']) }}" class="crs-link crs-leaf">
+                                            @if(str_contains($child['icon'] ?? '', 'fa-'))
+                                                <i class="fa {{ $child['icon'] }} crs-icon" aria-hidden="true"></i>
+                                            @else
+                                                <span class="crs-icon emoji-icon">{{ $child['icon'] }}</span>
+                                            @endif
+                                            <span class="crs-title">{{ $child['title'] }}</span>
                                         </a>
                                     </li>
                                 @endforeach
                             </ul>
                         </li>
                     @else
-                        <li>
-                            <a href="{{ admin_url($link['uri']) }}">
-                                <i class="fa {{ $link['icon'] }}"></i> {{ $link['title'] }}
+                        <li class="crs-item">
+                            <a href="{{ admin_url($link['uri']) }}" class="crs-link crs-leaf">
+                                @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                    <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                @else
+                                    <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                @endif
+                                <span class="crs-title">{{ $link['title'] }}</span>
                             </a>
                         </li>
                     @endif
@@ -397,67 +432,67 @@
             @elseif(session('preview_area_manager'))
                 @php
                     $areaManagerPreviewLinks = [
-                        ['uri' => '/', 'icon' => 'fa-home', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
+                        ['uri' => '/', 'icon' => '🏠', 'title' => __('Dashboard'), 'permission' => 'dashboard'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-users',
+                            'icon' => '🌍',
                             'title' => __('Super Admin'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/superadmin-users', 'icon' => 'fa-users', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
+                                ['uri' => '/superadmin-users', 'icon' => '👤', 'title' => __('Super Admin'), 'permission' => 'superadmin'],
                             ],
                         ],
-                        ['uri' => '/area-manager-charges-reports', 'icon' => 'fa-building', 'title' => __('charges')],
+                        ['uri' => '/area-manager-charges-reports', 'icon' => '📃', 'title' => __('charges')],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-briefcase',
+                            'icon' => '💼',
                             'title' => __('BD'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/user-Bds', 'icon' => 'fa-briefcase', 'title' => __('BD'), 'permission' => 'Bds'],
-                                ['uri' => '/professional-bd', 'icon' => 'fa-plane', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
+                                ['uri' => '/user-Bds', 'icon' => '👥', 'title' => __('BD'), 'permission' => 'Bds'],
+                                ['uri' => '/professional-bd', 'icon' => '✈️', 'title' => __('Professional BD'), 'permission' => 'professional-bd'],
                             ],
                         ],
-                        ['uri' => '/users', 'icon' => 'fa-users', 'title' => __('Users'), 'permission' => 'users'],
+                        ['uri' => '/users', 'icon' => '👥', 'title' => __('Users'), 'permission' => 'users'],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏢',
                             'title' => __('Agencies'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/agencies', 'icon' => 'fa-list', 'title' => __('Host Agencies'), 'permission' => 'agency'],
-                                ['uri' => '/charge-agencies', 'icon' => 'fa-users', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
-                                ['uri' => '/ag/users', 'icon' => 'fa-users', 'title' => __('Hosts'), 'permission' => 'host'],
-                                ['uri' => '/ag/professional/users', 'icon' => 'fa-plane', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
+                                ['uri' => '/agencies', 'icon' => '🏠', 'title' => __('Host Agencies'), 'permission' => 'agency'],
+                                ['uri' => '/charge-agencies', 'icon' => '💳', 'title' => __('Shipping Agencies'), 'permission' => 'shipping-agency'],
+                                ['uri' => '/ag/users', 'icon' => '👥', 'title' => __('Hosts'), 'permission' => 'host'],
+                                ['uri' => '/ag/professional/users', 'icon' => '✈️', 'title' => __('Professional Host'), 'permission' => 'professional-users'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-building',
+                            'icon' => '🏠',
                             'title' => __('rooms'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/rooms', 'icon' => 'fa-home', 'title' => __('rooms'), 'permission' => 'rooms'],
-                                ['uri' => '/live-rooms', 'icon' => 'fa-home', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
+                                ['uri' => '/rooms', 'icon' => '🚪', 'title' => __('rooms'), 'permission' => 'rooms'],
+                                ['uri' => '/live-rooms', 'icon' => '📺', 'title' => __('Live Rooms'), 'permission' => 'live-rooms'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '📢',
                             'title' => __('Advertisements'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/official_msgs', 'icon' => 'fa-list', 'title' => __('Official messages'), 'permission' => 'official-messages'],
+                                ['uri' => '/official_msgs', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
                         [
                             'uri' => '#',
-                            'icon' => 'fa-home',
+                            'icon' => '👔',
                             'title' => __('Employees and Permissions'),
                             'permission' => null,
                             'children' => [
-                                ['uri' => '/auth/roles', 'icon' => 'fa-home', 'title' => __('roles'), 'permission' => 'roles'],
-                                ['uri' => '/auth/users', 'icon' => 'fa-home', 'title' => __('users'), 'permission' => 'auth-users'],
+                                ['uri' => '/auth/roles', 'icon' => '🔐', 'title' => __('roles'), 'permission' => 'roles'],
+                                ['uri' => '/auth/users', 'icon' => '👥', 'title' => __('users'), 'permission' => 'auth-users'],
                             ],
                         ],
                     ];
@@ -465,26 +500,36 @@
 
                 @foreach($areaManagerPreviewLinks as $link)
                     @if(isset($link['children']))
-                        <li class="treeview">
-                            <a href="#">
-                                <i class="fa {{ $link['icon'] }}"></i>
-                                <span>{{ $link['title'] }}</span>
-                                <i class="fa fa-angle-left pull-right"></i>
+                        <li class="crs-tree crs-item">
+                            <a href="#" class="crs-link crs-toggle">
+                                @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                    <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                @else
+                                    <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                @endif
+                                <span class="crs-title">{{ $link['title'] }}</span>
+                                <i class="fa fa-angle-left crs-arrow"></i>
                             </a>
-                            <ul class="treeview-menu">
+                            <ul class="crs-submenu">
                                 @foreach($link['children'] as $child)
-                                    <li>
-                                        <a href="{{ admin_url($child['uri']) }}">
-                                            <i class="fa {{ $child['icon'] }}"></i> {{ $child['title'] }}
+                                    <li class="crs-item">
+                                        <a href="{{ admin_url($child['uri']) }}" class="crs-link crs-leaf">
+                                            <i class="fa {{ $child['icon'] }} crs-icon"></i>
+                                            <span class="crs-title">{{ $child['title'] }}</span>
                                         </a>
                                     </li>
                                 @endforeach
                             </ul>
                         </li>
                     @else
-                        <li>
-                            <a href="{{ admin_url($link['uri']) }}">
-                                <i class="fa {{ $link['icon'] }}"></i> {{ $link['title'] }}
+                        <li class="crs-item">
+                            <a href="{{ admin_url($link['uri']) }}" class="crs-link crs-leaf">
+                                @if(str_contains($link['icon'] ?? '', 'fa-'))
+                                    <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                @else
+                                    <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                @endif
+                                <span class="crs-title">{{ $link['title'] }}</span>
                             </a>
                         </li>
                     @endif
@@ -492,14 +537,7 @@
             @endif
         </ul>
 
-        <!-- Sidebar Menu -->
-        <!-- <ul class="sidebar-menu">
-            <li class="header">{{ trans('admin.menu') }}</li>
 
-            @each('admin::partials.menu', Admin::menu(), 'item')
-
-        </ul> -->
-        <!-- /.sidebar-menu -->
     </section>
 
     <style>
@@ -524,4 +562,218 @@
         Loading...
     </div>
     <!-- /.sidebar -->
+
+    <div class="sidebar-resizer" id="sidebar-resizer"></div>
 </aside>
+
+<script>
+    (function() {
+        'use strict';
+
+        const MIN_WIDTH = 18;
+        const MAX_WIDTH = 40;
+        const DEFAULT_WIDTH = 18;
+        const STORAGE_KEY = 'sidebar-width-percent';
+        const MOBILE_BREAKPOINT = 768; // pixels
+
+        let isResizing = false;
+        let startX = 0;
+        let startWidthPercent = 0;
+
+        function isRTL() {
+            return document.documentElement.dir === 'rtl' ||
+                document.body.dir === 'rtl' ||
+                document.body.classList.contains('rtl') ||
+                document.documentElement.classList.contains('rtl');
+        }
+
+        function isSidebarCollapsed() {
+            return document.body.classList.contains('sidebar-collapse');
+        }
+
+        function isMobile() {
+            return window.innerWidth <= MOBILE_BREAKPOINT;
+        }
+
+        function pxToPercent(px) {
+            return (px / window.innerWidth) * 100;
+        }
+
+        function clearInlineStyles() {
+            const sidebar = document.querySelector('.main-sidebar');
+            const navbar = document.querySelector('.navbar-static-top');
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const logo = document.querySelector('.main-header .logo');
+
+            if (sidebar) sidebar.style.width = '';
+            if (navbar) navbar.style.width = '';
+            if (logo) logo.style.width = '';
+            if (contentWrapper) {
+                contentWrapper.style.marginLeft = '';
+                contentWrapper.style.marginRight = '';
+            }
+        }
+
+        function updateLayout(sidebarWidthPercent) {
+            // Don't apply if mobile or sidebar is collapsed
+            if (isMobile() || isSidebarCollapsed()) {
+                clearInlineStyles();
+                return;
+            }
+
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const navbar = document.querySelector('.navbar-static-top');
+            const sidebar = document.querySelector('.main-sidebar');
+            const logo = document.querySelector('.main-header .logo');
+
+            const navbarWidth = 100 - sidebarWidthPercent - 0.5;
+
+            const logoOffset = isRTL() ? 0.6 : 0.7;
+            const logoWidth = sidebarWidthPercent - logoOffset;
+
+            if (sidebar) {
+                sidebar.style.width = sidebarWidthPercent + '%';
+            }
+
+            if (logo) {
+                logo.style.setProperty('width', logoWidth + '%', 'important');
+            }
+
+            if (navbar) {
+                navbar.style.width = navbarWidth + '%';
+            }
+
+            if (contentWrapper) {
+                if (isRTL()) {
+                    contentWrapper.style.marginRight = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginLeft = '0';
+                } else {
+                    contentWrapper.style.marginLeft = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginRight = '0';
+                }
+            }
+        }
+
+        function init() {
+            const resizer = document.getElementById('sidebar-resizer');
+            const sidebar = document.querySelector('.main-sidebar');
+
+            if (!resizer || !sidebar) return;
+
+            // Don't initialize on mobile
+            if (isMobile()) {
+                clearInlineStyles();
+                return;
+            }
+
+            // Only apply saved width if sidebar is NOT collapsed and NOT mobile
+            if (!isSidebarCollapsed() && !isMobile()) {
+                const savedWidth = localStorage.getItem(STORAGE_KEY);
+                if (savedWidth) {
+                    updateLayout(parseFloat(savedWidth));
+                }
+            }
+
+            // Watch for sidebar collapse/expand changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        // Skip on mobile
+                        if (isMobile()) {
+                            clearInlineStyles();
+                            return;
+                        }
+
+                        if (isSidebarCollapsed()) {
+                            clearInlineStyles();
+                        } else {
+                            const savedWidth = localStorage.getItem(STORAGE_KEY);
+                            if (savedWidth) {
+                                updateLayout(parseFloat(savedWidth));
+                            }
+                        }
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
+            // Handle window resize - clear styles if resized to mobile
+            window.addEventListener('resize', function() {
+                if (isMobile()) {
+                    clearInlineStyles();
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                } else if (!isSidebarCollapsed()) {
+                    const savedWidth = localStorage.getItem(STORAGE_KEY);
+                    if (savedWidth) {
+                        updateLayout(parseFloat(savedWidth));
+                    }
+                }
+            });
+
+            resizer.addEventListener('mousedown', function(e) {
+                // Don't allow resizing on mobile or when collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
+
+                e.preventDefault();
+                isResizing = true;
+                startX = e.clientX;
+                startWidthPercent = pxToPercent(sidebar.offsetWidth);
+                document.body.classList.add('sidebar-resizing');
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isResizing) return;
+
+                // Stop if mobile or sidebar gets collapsed during resize
+                if (isMobile() || isSidebarCollapsed()) {
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                    clearInlineStyles();
+                    return;
+                }
+
+                const deltaX = e.clientX - startX;
+                const deltaPercent = (deltaX / window.innerWidth) * 100;
+
+                let newWidthPercent;
+                if (isRTL()) {
+                    newWidthPercent = startWidthPercent - deltaPercent;
+                } else {
+                    newWidthPercent = startWidthPercent + deltaPercent;
+                }
+
+                newWidthPercent = Math.min(Math.max(newWidthPercent, MIN_WIDTH), MAX_WIDTH);
+
+                updateLayout(newWidthPercent);
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (!isResizing) return;
+
+                isResizing = false;
+                document.body.classList.remove('sidebar-resizing');
+
+                // Only save if not mobile and sidebar is not collapsed
+                if (!isMobile() && !isSidebarCollapsed()) {
+                    const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
+                    localStorage.setItem(STORAGE_KEY, finalWidth);
+                }
+            });
+
+            resizer.addEventListener('dblclick', function() {
+                // Don't do anything if mobile or collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
+
+                clearInlineStyles();
+                localStorage.removeItem(STORAGE_KEY);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    })();
+</script>

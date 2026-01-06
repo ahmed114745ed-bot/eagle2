@@ -35,10 +35,13 @@ enum UserCoinLogType: string
     case ROOM_BOOM = 'room_boom';
     case INVITATION_CHARGE_EARNINGS = 'invitation_charge_earnings';
     case SUPER_ADMIN_REWARD = 'super_admin_reward';
+    case REGION_MANAGER_REWARD = 'region_manager_reward';
+    case ADMIN_REWARD = 'admin_reward';
     case REMAINING_DIAMONDS = 'remaining_diamonds';
     case MILESTONE = 'milestone';
     case ROOM_CUP = 'room_cup';
     case HOST_LEVEL = 'host_level';
+    case GIFT_RANKING = 'gift-ranking';
 
     public function meta(): array
     {
@@ -69,7 +72,16 @@ enum UserCoinLogType: string
                 'item_name' => 'rewards',
                 'queue_job' => null,
             ],
-
+            self::REGION_MANAGER_REWARD => [
+                'sub_type' => 'region_manager_reward',
+                'item_name' => 'rewards',
+                'queue_job' => null,
+            ],
+            self::ADMIN_REWARD => [
+                'sub_type' => 'admin_reward',
+                'item_name' => 'rewards',
+                'queue_job' => null,
+            ],
             self::HUAWEI_PAY => [
                 'sub_type' => 'charges',
                 'item_name' => 'huawei_pay',
@@ -218,6 +230,11 @@ enum UserCoinLogType: string
             self::REMAINING_DIAMONDS => [
                 'sub_type' => 'remaining_diamonds',
                 'item_name' => 'remaining_diamonds',
+                'queue_job' => null,
+            ],
+            self::GIFT_RANKING => [
+                'sub_type' => 'gift-ranking',
+                'item_name' => 'gift-ranking',
                 'queue_job' => null,
             ],
         };

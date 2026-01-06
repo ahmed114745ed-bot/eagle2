@@ -142,6 +142,26 @@ Route::get('/page/{name}', function ($name) {
     return (app()->getLocale() == 'ar' ? $page->content : ($page->content_en ?? $page->content));
 })->middleware('localization');
 
+Route::match(['get', 'post'], '/debug-request', function (\Illuminate\Http\Request $request) {
+    // Get headers using Laravel's request object (works with all servers)
+    $headersOld = array_change_key_case(getallheaders(), CASE_UPPER);
+    $headers = array_change_key_case($request->headers->all(), CASE_UPPER);
+
+    // Flatten the headers array (Laravel returns arrays for each header)
+    $headers = array_map(function ($value) {
+        return is_array($value) ? $value[0] : $value;
+    }, $headers);
+
+    return response()->json([
+        'headersOld' => $headersOld,
+        'headers' => $headers,
+        'request_body' => $request->all(),
+        'raw_content' => $request->getContent(),
+        'method' => $request->method(),
+        'url' => $request->fullUrl(),
+    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+});
+
 Route::get('/clear', function () {
 
     Artisan::call('cache:clear');
@@ -193,8 +213,8 @@ Route::get('/run-seeders', function () {
     Artisan::call('db:seed', ['--class' => 'SyncBdCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'SyncAgencyCountrySeeder']);
     Artisan::call('db:seed', ['--class' => 'PermissionTypeSeeder']);
-    Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
-    Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
+    // Artisan::call('db:seed', ['--class' => SuperAdminRoleSeeder::class]);
+    // Artisan::call('db:seed', ['--class' => AreaManagerRoleSeeder::class]);
 
     return response()->json([
         'status' => 'success',
@@ -1110,4 +1130,9 @@ Route::get('/run-lucky-gift-unit-test', function () {
     $output = $process->getOutput() . $process->getErrorOutput();
 
     return response('<pre>'.e($output).'</pre>');
+});
+
+Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+    Debugbar::info('Viewport:', $request->all());
+    return response()->json(['ok' => true]);
 });

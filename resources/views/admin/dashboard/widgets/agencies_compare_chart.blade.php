@@ -54,15 +54,23 @@
 @endphp
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const endpoint = `/{{ $prefix }}/statistics/comparison-agencies-target`;
+function loadAgenciesCompareChart() {
+    const canvas = document.getElementById("agenciesCompareChart");
+    if (!canvas) return;
 
-    fetch(endpoint)
-        .then(response => response.json())
-        .then(({ achieved, notAchieved }) => {
-            const ctx = document.getElementById("agenciesCompareChart").getContext("2d");
+    // Check if chart already exists
+    if (window.agenciesCompareChartInstance) {
+        window.agenciesCompareChartInstance.destroy();
+    }
 
-            new Chart(ctx, {
+    $.ajax({
+        url: "/{{ $prefix }}/statistics/comparison-agencies-target",
+        type: "GET",
+        dataType: "json",
+        success: function(response) {
+            const ctx = canvas.getContext("2d");
+
+            window.agenciesCompareChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: [
@@ -71,12 +79,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     ],
                     datasets: [{
                         label: "{{ __('Agencies') }}",
-                        data: [achieved, notAchieved],
+                        data: [response.achieved, response.notAchieved],
                         backgroundColor: ['#22c55e', '#ef4444']
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
                         title: {
@@ -87,7 +96,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     scales: { y: { beginAtZero: true, precision: 0 } }
                 }
             });
-        })
-        .catch(error => console.error('Error fetching agency comparison data:', error));
-});
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching agency comparison data:', error);
+        }
+    });
+}
+
+// Load immediately - no DOM waiting, no multiple event listeners
+loadAgenciesCompareChart();
 </script>

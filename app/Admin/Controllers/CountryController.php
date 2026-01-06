@@ -7,9 +7,15 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
+use App\Models\CountryCategory;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\App;
 use App\Admin\Controllers\MainController;
+
+
+use App\Admin\Actions\Grid\MoveGroupCountry;
+use App\Admin\Actions\MoveCountryCategoryAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 
@@ -18,6 +24,13 @@ class CountryController extends MainController
     use HasResourceActions;
 
     public $permission_name = 'country';
+
+    protected $filterId;
+
+    public function __construct()
+    {
+        $this->filterId = request('filter');
+    }
 
     public function index(Content $content)
     {
@@ -70,12 +83,36 @@ class CountryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Country);
-        $grid->model()->orderByDesc('status');
+        $filterType = request()->get('filter', 'all');
+        $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
+            $q->where('country_category_id', $filterType);
+        })->orderByDesc('status');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
             $filter->equal('e_name', __('name'));
+        });
+
+        $grid->header(function () use ($filterType) {
+            $locale = App::getLocale();
+
+            $tabs = ['all' => __('All')];
+            $categories = CountryCategory::orderBy('id')->get();
+            foreach ($categories as $category) {
+                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+                $tabs[$category->id] = $title;
+            }
+
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = $filterType == $key ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
+
+            return $html;
         });
 
         $grid->id(__('ID'));
@@ -89,11 +126,27 @@ class CountryController extends MainController
         }
         $this->extendGrid($grid);
         $grid->disableExport();
-        $grid->actions(function ($actions) {
+         $permission    = $this->permission_name;
+        $grid->actions(function ($actions)  use ($permission) {
             $actions->disableView();
             $actions->disableDelete();
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new MoveCountryCategoryAction());
+            }
         });
         $grid->disableCreateButton();
+
+       
+       
+
+
+        $grid->batchActions(function ($batch) use ($permission) {
+            $batch->disableDelete();
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                $batch->add(new MoveGroupCountry());
+            }
+        });
+
         return $grid;
     }
 
@@ -135,7 +188,7 @@ class CountryController extends MainController
         $form->text('name', trans('name'))->rules('required');;
         $form->text('e_name', trans('english name'))->rules('required');;
         $form->image('flag', trans('flag'))->rules('required');
-        $form->switch('status', trans('	status'))->states (Common::getSwitchStates());
+        $form->switch('status', trans('	status'))->states(Common::getSwitchStates());
 
 
 

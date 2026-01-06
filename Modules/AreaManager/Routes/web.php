@@ -16,9 +16,11 @@ use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
+use Modules\AreaManager\Http\Controllers\AdminRewardController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
 use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
+use Modules\AreaManager\Http\Controllers\DedicateRewardHistoryController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
@@ -137,6 +139,10 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+        Route::resource('rewards', AdminRewardController::class);
+        Route::get('search/super-admin', [AdminRewardController::class, 'getSuperAdmins'])->name('super-admin');
+
+        Route::resource('rewards-history', DedicateRewardHistoryController::class);
         //
         Route::resource('rooms', RoomController::class);
 
@@ -175,6 +181,12 @@ Route::group(
             Route::get('rooms-activity', [HomeController::class, 'roomsActivity'])->name('owner.rooms-activity');
             Route::get('top-users-visits', [HomeController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [HomeController::class, 'onlineStats'])->name('users.online.stats');
+        });
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/finance/cards', [HomeController::class, 'financeCards']);
+            Route::get('/finance/tables', [HomeController::class, 'financeTables']);
+            Route::get('/finance/chart', [HomeController::class, 'financeChartIndex']);
+            Route::get('wallet-logs/ajax', [HomeController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
         });
     }
 );

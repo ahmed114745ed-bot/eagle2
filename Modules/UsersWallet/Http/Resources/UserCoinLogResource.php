@@ -149,13 +149,41 @@ class UserCoinLogResource extends JsonResource
                     __('create_room_title'),
                     __('create_room_description', ['amount' => abs($this->amount)]),
                 ];
+            case 'user':
+            case 'agency_owner':
+            case 'bd':
+                switch ($this->sub_type) {
+                    case 'add':
+                        return [
+                            __('add_title'),
+                            __('add_description', ['amount' => abs($this->amount)]),
+                        ];
+                    case 'transfer':
+                        return [
+                            __('transfer_title'),
+                            __('transfer_description', ['amount' => abs($this->amount)]),
+                        ];
+                    case 'subtract':
+                        return [
+                            __('subtract_title'),
+                            __('subtract_description', ['amount' => abs($this->amount)]),
+                        ];
+                    default:
+                        return [
+                            __('general_title'),
+                            __('general_description'),
+                        ];
+                }
 
-
+    
             default:
                 return [
                     __('wallet.general_title'),
                     __('wallet.general_description'),
                 ];
+
+
+
         }
     }
 }

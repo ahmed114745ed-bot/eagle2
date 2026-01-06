@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\Badge;
 use App\Models\Language;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -100,6 +101,12 @@ class BadgeController extends MainController
         });
 
         $grid->paginate(20);
+
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
