@@ -917,7 +917,7 @@ class User extends Authenticatable
             ->sum(DB::raw('salary - cut_amount'));
 
         $total = $userSalary + $roomSalary;
-        $total = wallet_available_by_user($this->id);
+        // $total = wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
 
