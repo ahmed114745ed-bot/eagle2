@@ -337,7 +337,7 @@
 </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class="menu-link logo d-flex align-items-center gap-2">
-        <div class="logo-icon ms-2" style="display: flex; align-items: center; justify-content: center; padding: 8px;">
+        <div class="logo-icon ms-2">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();
@@ -348,8 +348,7 @@
 
             @if(!empty($logo))
                 <img src="{{ $logo }}"
-                     alt="{{ $appName }}"
-                     style="max-height: 40px; width: auto; object-fit: contain;">
+                     alt="{{ $appName }}">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
                       style="height:32px; width:32px; font-weight:bold;">

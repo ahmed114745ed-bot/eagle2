@@ -2351,9 +2351,17 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         overflow: hidden;
-        position: absolute;
+        position: relative;
         z-index: 1;
         transition: all 0.3s ease;
+    }
+
+    .fields-group .input-group.input-group-sm:has(#to_date) {
+        position: absolute !important;
+    }
+
+    .fields-group .input-group.input-group-sm:has(#from_date) {
+        position: absolute !important;
     }
 
     .fields-group .input-group.input-group-sm:hover {
@@ -2840,20 +2848,43 @@
         overflow: hidden !important;
     }
 
-    .main-header .logo .logo-icon {
+    .sidebar-collapse .main-header .logo .logo-icon {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         width: auto !important;
         height: 100% !important;
+
+        border-radius: 0 !important;
+        overflow: unset !important;
+        border: unset !important;
+        margin-top: 0 !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .main-header .logo .logo-icon img {
+    .main-header .logo .logo-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-collapse .main-header .logo .logo-icon img {
         max-height: 70px !important;
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
         border-radius: 8px !important;
+    }
+
+    .main-header .logo .logo-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.1);
     }
 
     .main-header .logo .logo-icon img.circular-logo {
