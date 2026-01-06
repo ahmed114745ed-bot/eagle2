@@ -170,6 +170,15 @@ class RankingTypeController extends MainController
             $this->extendGrid($grid);
         }
 
+        Admin::style('
+            audio, canvas, progress, video {
+               transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
+            }
+
+            .svga-player rtlSvga {
+                transform: scaleX(1) scale(1);
+            }
+        ');
         return $grid;
     }
 

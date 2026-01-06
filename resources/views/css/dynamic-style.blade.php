@@ -2991,10 +2991,6 @@
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background: var(--primary-color) !important;
     }
-
-    audio, canvas, progress, video {
-        transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
-    }
 </style>
 
 @include('css.dark_mode')
