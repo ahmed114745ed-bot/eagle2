@@ -44,7 +44,7 @@ class AdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type)->whereRaw('no_reward - gave_reward_no != 0');
+        $grid->model()->where('type',  $type)->with(['ware','vip','badge'])->whereRaw('no_reward - gave_reward_no != 0');
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;

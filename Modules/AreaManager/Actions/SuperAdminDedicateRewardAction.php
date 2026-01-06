@@ -52,7 +52,7 @@ class SuperAdminDedicateRewardAction extends Action
             } else {
                 $user = SuperAdmin::find($request->super_admin_id);
                 if (!$user) return $this->response()->error(__('dashboard.userNotFound'))->refresh();
-                SuperAdminReward::create([
+                DB::table('admin_rewards')->insert([
                     'super_admin_id' => $user->id,
                     'type' => $reward->type,
                     'target' => $reward->target,
@@ -60,15 +60,16 @@ class SuperAdminDedicateRewardAction extends Action
                     'no_reward' => 1,
                     'user_type' => 'super_admin',
                     'created_by' => Admin::user()->id,
+                    'created_at' => now()
 
                 ]);
             }
 
-            $reward->gave_reward_no += 1;
-            $reward->save();
+            SuperAdminReward::where('id', $request->id)
+                ->increment('gave_reward_no', 1);
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
-          dd($exception->getMessage());
+            dd($exception->getMessage());
             return $this->response()->error('you dedicate all reward');
         }
     }
@@ -121,7 +122,7 @@ function pu(val) {
         static $admins = null;
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
 
-         $region = Region::where('manager_id', $authId)->with('countries')->first();
+        $region = Region::where('manager_id', $authId)->with('countries')->first();
         $countries = $region->countries->pluck('id')->toArray();
         if ($admins === null) {
             $admins = SuperAdmin::query()
