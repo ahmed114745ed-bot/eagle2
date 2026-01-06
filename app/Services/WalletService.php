@@ -61,7 +61,7 @@ class WalletService
                     
                     $wallet->cut_amount += $amount;
                     $operation = 'subtract';
-                    $logAmount = $amount; // Store positive amount in log
+                    $logAmount = -$amount; // Store positive amount in log
                     break;
 
                 case 'pending':
