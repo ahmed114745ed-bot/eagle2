@@ -46,10 +46,9 @@
     /* .col-sm-8 {
     width: 80.66666667%;
 } */
-
-    .col-sm-2 {
-        width: auto;
-    }
+    /* .col-sm-2 {
+    width: 5.66666667%;
+} */
 
     .rtl label {
         margin: 0 !important;
@@ -132,179 +131,6 @@
 
         .box-header form {
             padding-top: 0 !important;
-        }
-    }
-
-    /* Modern Dark Filter Design */
-    .box-header.with-border.filter-box {
-        border-radius: 16px !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-    }
-
-    .box-header.with-border.filter-box .row {
-        display: flex !important;
-        flex-wrap: wrap !important;
-        gap: 20px 16px !important;
-        align-items: start !important;
-        justify-content: flex-start !important;
-    }
-
-    .box-header.with-border.filter-box .row > div[class*="col-"] {
-        min-width: 0 !important;
-    }
-
-    .box-header.with-border.filter-box .row .col-md-6,
-    .box-header.with-border.filter-box .row .col-md-4,
-    .box-header.with-border.filter-box .row .col-md-3,
-    .box-header.with-border.filter-box .row .col-md-2 {
-        flex: none !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-        float: none !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-
-    .box-header.with-border.filter-box .box-body {
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .box-header.with-border.filter-box .fields-group {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 20px !important;
-        margin-bottom: 10px;
-    }
-
-    .box-header.with-border.filter-box .fields-group .form-group {
-        /*display: block !important;*/
-        width: auto !important;
-        flex-direction: unset !important;
-    }
-
-    /* Filter Form Group Styling */
-    .box-header.with-border.filter-box .form-group {
-        margin-bottom: 0 !important;
-        position: relative !important;
-    }
-
-    .box-header.with-border.filter-box label {
-        position: absolute !important;
-        top: -20% !important;
-        left: 5% !important;
-        transform: translateX(-50%) !important;
-        font-size: 11px !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.6px !important;
-        pointer-events: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        z-index: 2 !important;
-        background: white !important;
-        padding: 0 4px !important;
-    }
-
-    .rtl .box-header.with-border.filter-box label {
-        right: 5% !important;
-        left: auto !important;
-    }
-
-    /* Filter Input and Select Styling */
-    .box-header.with-border.filter-box .form-control,
-    .box-header.with-border.filter-box select {
-        border-radius: 10px !important;
-        padding: 10px 14px !important;
-        height: 42px !important;
-        font-size: 13px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-        width: 100% !important;
-    }
-
-    .box-header.with-border.filter-box .form-control::placeholder {
-        color: #7d8aad !important;
-    }
-
-    .box-header.with-border.filter-box .form-control:focus,
-    .box-header.with-border.filter-box select:focus {
-        outline: none !important;
-    }
-
-    .box-header.with-border.filter-box .form-control:focus + label,
-    .box-header.with-border.filter-box select:focus + label,
-    .box-header.with-border.filter-box .form-control:not(:placeholder-shown) + label,
-    .box-header.with-border.filter-box select:not([value=""]) + label {
-        top: -8px !important;
-        left: 10px !important;
-        font-size: 9px !important;
-        padding: 0 6px !important;
-        border-radius: 4px !important;
-    }
-
-    /* Select Option Styling */
-    .box-header.with-border.filter-box select option {
-        background: #1a1f2e !important;
-        color: #ffffff !important;
-    }
-
-    /* Icon styling for inputs */
-    .box-header.with-border.filter-box .input-group {
-        display: flex !important;
-        align-items: center !important;
-    }
-
-    .box-header.with-border.filter-box .input-group-addon {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 8px !important;
-        color: #8b9dcf !important;
-        font-size: 14px !important;
-    }
-
-    /* Filter Footer Buttons */
-    .box-header.with-border.filter-box .box-footer {
-        background: transparent !important;
-        padding: 0 !important;
-        border-radius: 0 !important;
-        grid-column: 1 / -1 !important;
-    }
-
-    /* Responsive Filter Design */
-    @media (max-width: 1400px) {
-        .box-header.with-border.filter-box .row {
-            grid-template-columns: repeat(3, 1fr) !important;
-        }
-    }
-
-    @media (max-width: 1024px) {
-        .box-header.with-border.filter-box {
-            padding: 20px !important;
-        }
-
-        .box-header.with-border.filter-box .row {
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 16px 12px !important;
-        }
-    }
-
-
-    @media (max-width: 768px) {
-        .box-header.with-border.filter-box {
-            padding: 16px !important;
-            margin: 0 0 16px 0 !important;
-        }
-
-        .box-header.with-border.filter-box .row {
-            grid-template-columns: 1fr !important;
-            gap: 12px !important;
-        }
-
-        .box-header.with-border.filter-box .box-footer {
-            margin-top: 12px !important;
         }
     }
 
@@ -1121,7 +947,7 @@
     }
 
     .box-footer {
-        border-top: unset;
+        border-top: 2px solid var(--second-alpha) !important;
     }
 
     .btn-info {
@@ -1256,8 +1082,8 @@
         /*border-left: 1px solid var(--second-alpha) !important;*/
     }
 
-    .skin-black-light .main-header > .navbar .navbar-custom-menu .navbar-nav > li > a,
-    .skin-black-light .main-header > .navbar .navbar-right > li > a {
+    .skin-black-light .main-header>.navbar .navbar-custom-menu .navbar-nav>li>a,
+    .skin-black-light .main-header>.navbar .navbar-right>li>a {
         border-left: unset !important;
     }
 
@@ -1889,6 +1715,7 @@
     .rtl .box-header .form-horizontal .row {
         display: block !important;
         direction: rtl !important;
+        margin-bottom: 10px;
     }
 
     .ltr .form-horizontal .row {
@@ -2504,7 +2331,7 @@
     .fields-group > .form-group {
         display: flex;
         align-items: center;
-        /*gap: 35px;*/
+        gap: 35px;
         margin-bottom: 0;
     }
 
@@ -2529,11 +2356,11 @@
         transition: all 0.3s ease;
     }
 
-    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
+    .fields-group .input-group.input-group-sm:has(#to_date) {
         position: absolute !important;
     }
 
-    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
+    .fields-group .input-group.input-group-sm:has(#from_date) {
         position: absolute !important;
     }
 
@@ -2999,11 +2826,11 @@
         border-collapse: collapse;
     }
 
-    .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+    .nav-pills>li.active>a, .nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
         background: var(--primary-color) !important;
     }
 
-    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    .nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
         border-top-color: var(--secondary-color) !important;
     }
 
@@ -3113,11 +2940,11 @@
         padding: 0 10px !important;
     }
 
-    .navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li > a:hover, .navbar-nav > .messages-menu > .dropdown-menu > li .menu > li > a:hover, .navbar-nav > .tasks-menu > .dropdown-menu > li .menu > li > a:hover {
+    .navbar-nav>.notifications-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.tasks-menu>.dropdown-menu>li .menu>li>a:hover {
         background: var(--primary-color);
     }
 
-    .transferModal {
+    .transferModal{
         display: none;
         position: fixed;
         top: 25%;
@@ -3131,11 +2958,11 @@
         height: 60%;
     }
 
-    .dropdown-menu > li > a:focus, .dropdown-menu > li > a:hover {
+    .dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
         background-color: var(--primary-color);
     }
 
-    .nav > li > a:hover, .nav > li > a:active, .nav > li > a:focus {
+    .nav>li>a:hover, .nav>li>a:active, .nav>li>a:focus {
         background: var(--secondary-color) !important;
         color: var(--text-secondary-color);
     }
