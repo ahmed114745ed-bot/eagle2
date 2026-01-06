@@ -73,7 +73,7 @@ class TicketController extends MainController
         $grid->model()->with([
             'user',
             'user.agency',
-            'user.profile:user_id,avatar',
+            'user.profile',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
         ])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 
