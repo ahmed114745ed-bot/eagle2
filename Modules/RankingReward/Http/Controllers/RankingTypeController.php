@@ -176,7 +176,7 @@ class RankingTypeController extends MainController
             }
 
             .svga-player.rtlSvga {
-                transform: scaleX(1) scale(1);
+                transform: scaleX(1) scale(1) !important;
             }
         ');
         return $grid;
