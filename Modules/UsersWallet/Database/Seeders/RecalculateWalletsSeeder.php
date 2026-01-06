@@ -44,7 +44,7 @@ class RecalculateWalletsSeeder extends Seeder
                         $newData = [
                             'sallary' => (float) $s->sallary,
                             'agency_sallary' => (float) $s->agency_sallary,
-                            'dB' => (float) $s->dB,
+                            'dB' => 0.0, // prevent BD double-credit; handled via bd_salaries aggregation below
                         ];
 
                         // If agency owner was not active in this period, zero out agency_sallary share
