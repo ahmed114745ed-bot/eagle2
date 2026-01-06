@@ -171,11 +171,8 @@ class RankingTypeController extends MainController
         }
 
         Admin::style('
-            audio:dir(rtl),
-            canvas:dir(rtl),
-            progress:dir(rtl),
-            video:dir(rtl) {
-              transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
+            [dir="rtl"] audio, canvas, progress, video {
+               transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
             }
 
             .svga-player.rtlSvga {
