@@ -81,7 +81,9 @@ class SuperAdminDedicateRewardAction extends Action
 
         $this->text('user_uuid', __('user uuid'))->attribute(['id' => 'user-select']);
         $this->select('super_admin_id', __('Select Country Manager'))
-            ->options(self::getSuperAdmins())->attribute(['id' => 'super-admin-select']);
+             ->options(self::getSuperAdmins())
+           // ->ajax('/areaManager/search/super-admin', 'id', 'name')
+            ->attribute(['id' => 'super-admin-select']);
 
         Admin::script(<<<'SCRIPT'
             function toggleUserTypeFields() {
