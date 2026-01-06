@@ -175,7 +175,7 @@ class RankingTypeController extends MainController
                transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
             }
 
-            .svga-player rtlSvga {
+            .svga-player.rtlSvga {
                 transform: scaleX(1) scale(1);
             }
         ');
