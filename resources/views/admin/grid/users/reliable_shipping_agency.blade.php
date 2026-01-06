@@ -106,7 +106,10 @@
                 $.ajax({
                     url: '/admin/transfer-salary-reliable-shipping-agency',
                     method: 'POST',
-                    data: { transfer_salary_reliable_shipping_agency: isChecked },
+                    data: { 
+                        transfer_salary_reliable_shipping_agency: isChecked,
+                        _token: '{{ csrf_token() }}'
+                    },
                     success: function(response) { console.log(response); },
                     error: function(error) { console.error(error); }
                 });
