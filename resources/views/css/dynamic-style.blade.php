@@ -46,9 +46,10 @@
     /* .col-sm-8 {
     width: 80.66666667%;
 } */
-    /* .col-sm-2 {
-    width: 5.66666667%;
-} */
+
+    /*.col-sm-2 {*/
+    /*    width: auto;*/
+    /*}*/
 
     .rtl label {
         margin: 0 !important;
@@ -2331,7 +2332,7 @@
     .fields-group > .form-group {
         display: flex;
         align-items: center;
-        gap: 35px;
+        /*gap: 35px;*/
         margin-bottom: 0;
     }
 
@@ -2351,9 +2352,17 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         overflow: hidden;
-        position: absolute;
+        position: relative;
         z-index: 1;
         transition: all 0.3s ease;
+    }
+
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
+        position: absolute !important;
+    }
+
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
+        position: absolute !important;
     }
 
     .fields-group .input-group.input-group-sm:hover {
@@ -2840,20 +2849,44 @@
         overflow: hidden !important;
     }
 
-    .main-header .logo .logo-icon {
+    .sidebar-collapse .main-header .logo .logo-icon {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         width: auto !important;
         height: 100% !important;
+
+        border-radius: 0 !important;
+        overflow: unset !important;
+        border: unset !important;
+        margin-top: 0 !important;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    .main-header .logo .logo-icon img {
+    .main-header .logo .logo-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-collapse .main-header .logo .logo-icon img {
         max-height: 70px !important;
         width: auto !important;
         height: auto !important;
         object-fit: contain !important;
         border-radius: 8px !important;
+        border: unset !important;
+    }
+
+    .main-header .logo .logo-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid rgba(255, 255, 255, 0.1);
     }
 
     .main-header .logo .logo-icon img.circular-logo {
@@ -2960,6 +2993,48 @@
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background: var(--primary-color) !important;
     }
+
+    /*!* Label on input border *!*/
+    /*.box-header .form-group,*/
+    /*.filter-box .form-group {*/
+    /*    position: relative !important;*/
+    /*    margin-top: 12px !important;*/
+    /*}*/
+
+    /*.box-header .form-group .control-label,*/
+    /*.box-header .form-group > label,*/
+    /*.filter-box .form-group .control-label,*/
+    /*.filter-box .form-group > label {*/
+    /*    position: absolute !important;*/
+    /*    top: -35% !important;*/
+    /*    left: 40px !important;*/
+    /*    background: white !important;*/
+    /*    padding: 0 6px !important;*/
+    /*    font-size: 12px !important;*/
+    /*    z-index: 10 !important;*/
+    /*    margin: 0 !important;*/
+    /*}*/
+
+    /*!* RTL *!*/
+    /*.rtl .box-header .form-group .control-label,*/
+    /*.rtl .filter-box .form-group .control-label {*/
+    /*    left: auto !important;*/
+    /*    right: 25px !important;*/
+    /*}*/
+
+    /*.box-header .form-group .form-control,*/
+    /*.filter-box .form-group .form-control,*/
+    /*.box-header .form-group .select2-container,*/
+    /*.filter-box .form-group .select2-container {*/
+    /*    min-width: 280px !important;*/
+    /*    width: 100% !important;*/
+    /*}*/
+
+    /*.box-header .form-group {*/
+    /*    width: 45% !important;*/
+    /*    display: inline-block !important;*/
+    /*    margin-right: 5% !important;*/
+    /*}*/
 </style>
 
 @include('css.dark_mode')

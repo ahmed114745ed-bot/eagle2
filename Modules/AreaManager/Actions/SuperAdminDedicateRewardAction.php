@@ -65,8 +65,8 @@ class SuperAdminDedicateRewardAction extends Action
                 ]);
             }
 
-            $reward->gave_reward_no += 1;
-            $reward->save();
+            SuperAdminReward::where('id', $request->id)
+                ->increment('gave_reward_no', 1);
             return $this->response()->success(__('dashboard.successful'));
         } catch (\Exception $exception) {
             dd($exception->getMessage());
@@ -81,7 +81,9 @@ class SuperAdminDedicateRewardAction extends Action
 
         $this->text('user_uuid', __('user uuid'))->attribute(['id' => 'user-select']);
         $this->select('super_admin_id', __('Select Country Manager'))
-            ->options(self::getSuperAdmins())->attribute(['id' => 'super-admin-select']);
+            ->options(self::getSuperAdmins())
+            // ->ajax('/areaManager/search/super-admin', 'id', 'name')
+            ->attribute(['id' => 'super-admin-select']);
 
         Admin::script(<<<'SCRIPT'
             function toggleUserTypeFields() {
@@ -117,24 +119,52 @@ function pu(val) {
     }
 
 
+    // protected static function getSuperAdmins()
+    // {
+    //     static $admins = null;
+    //     $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
+
+    //     $region = Region::where('manager_id', $authId)->with('countries')->first();
+    //     $countries = $region->countries->pluck('id')->toArray();
+    //     if ($admins === null) {
+    //         $admins = SuperAdmin::query()
+    //             ->whereIn('country_id', $countries)
+    //             ->where('type', 'superadmin')
+    //             ->whereNull('deleted_at')
+    //             ->pluck('name', 'id')
+    //             ->toArray();
+    //     }
+
+    //     return $admins;
+    // }
+
     protected static function getSuperAdmins()
     {
-        static $admins = null;
-        $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
+        $authId = auth()->user()->type === 'area-manager'
+            ? auth()->user()->id
+            : auth()->user()->parent_id;
 
-        $region = Region::where('manager_id', $authId)->with('countries')->first();
+        return cache()->remember(
+            "super_admins_by_manager_{$authId}",
+            600,
+            function () use ($authId){
+                $region = Region::where('manager_id', $authId)->with('countries')->first();
         $countries = $region->countries->pluck('id')->toArray();
-        if ($admins === null) {
-            $admins = SuperAdmin::query()
-                ->whereIn('country_id', $countries)
-                ->where('type', 'superadmin')
-                ->whereNull('deleted_at')
-                ->pluck('name', 'id')
-                ->toArray();
-        }
 
-        return $admins;
+                return SuperAdmin::query()
+                    ->select('id', 'name')
+                    ->whereIn('country_id', $countries)
+                    ->where('type', 'superadmin')
+                    ->whereNull('deleted_at')
+                    ->pluck('name', 'id')
+                    ->toArray();
+            }
+        );
     }
+
+   
+
+
 
 
     protected function assignRewards($reward, $user)

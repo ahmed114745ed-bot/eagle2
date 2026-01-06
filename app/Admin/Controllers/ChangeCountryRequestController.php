@@ -56,7 +56,8 @@ class ChangeCountryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user', 'user.packs'])->where('status', 'pending')->orderByDesc('created_at');
+        $grid->model()->with(['country','user.profile','user.senderLevel',
+                'user.receiverLevel','user.country', 'user', 'user.packs'])->where('status', 'pending')->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

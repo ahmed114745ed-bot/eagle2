@@ -5,12 +5,15 @@ namespace Modules\AreaManager\Http\Controllers;
 use App\Models\Ware;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Illuminate\Http\Request;
 
+use Encore\Admin\Widgets\Box;
 use Modules\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Modules\AreaManager\Entities\Region;
 use App\Admin\Controllers\MainController;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Modules\AreaManager\Actions\SuperAdminDedicateRewardAction;
 
@@ -44,7 +47,7 @@ class AdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type)->whereRaw('no_reward - gave_reward_no != 0');
+        $grid->model()->where('type',  $type)->with(['ware','vip','badge'])->whereRaw('no_reward - gave_reward_no != 0');
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
@@ -144,4 +147,30 @@ class AdminRewardController extends MainController
 
         return $content;
     }
+
+
+    protected static function getSuperAdmins(Request $request)
+    {
+        static $admins = null;
+        $key = $request->q;
+         $page = $request->get('page', 1);
+         $perPage = 10;
+        $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
+
+        $region = Region::where('manager_id', $authId)->with('countries')->first();
+        $countries = $region->countries->pluck('id')->toArray();
+       
+            $admins = SuperAdmin::selectRaw('concat(username, " - ", id) as name, id')
+                ->whereIn('country_id', $countries)
+                ->where('type', 'superadmin')
+                ->whereNull('deleted_at')
+                 ->where(function ($query) use ($key) {
+                $query->where('username', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%');
+            })
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return $admins;
+    }
+
 }

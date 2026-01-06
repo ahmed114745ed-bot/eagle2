@@ -1,6 +1,8 @@
-- Replace 'fa-home' with '🏠' in sidebar.blade.php
-- Replace 'fa-users' with '👥' in sidebar.blade.php
-- Replace 'fa-building' with '🏢' in sidebar.blade.php
-- Replace 'fa-briefcase' with '💼' in sidebar.blade.php
-- Replace 'fa-plane' with '✈️' in sidebar.blade.php
-- Replace 'fa-list' with '📋' in sidebar.blade.php
+# TODO: Dynamic Style Design Changes
+
+## Tasks
+- [x] Modify grid layout to display 3 filters per row on larger screens (desktop/tablet)
+- [x] Implement floating labels by positioning labels inside input fields at the top
+- [x] Adjust input padding and positioning to accommodate floating labels
+- [x] Add appropriate styling for focus states and transitions for floating labels
+- [x] Ensure responsive design maintains 1 filter per row on mobile
