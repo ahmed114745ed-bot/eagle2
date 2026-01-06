@@ -16,8 +16,7 @@ class CoinReportController extends MainController
     {
 
         return $content
-            ->title("Reports")
-            ->description("Charges")
+            ->title("reports")
             ->row(function ($row) {
                 $row->column(2, view('admin.grid.common.report.coins'));
                 $row->column(10, $this->grid());
