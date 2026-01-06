@@ -47,28 +47,42 @@
             $isHost = request()->name == 'host';
 
             $getUserByUuid = function ($uuid) {
+                // Avoid running queries for empty or default '0' UUIDs
+                if (empty($uuid) || $uuid === '0') {
+                    return null;
+                }
                 return \App\Models\User::where('uuid', $uuid)->first() ?? \App\Models\ShippingAgency::where('id', $uuid)->first();
             };
 
             $calculateReceiverValue = function ($user, $request) use ($isDashboard, $isApp, $isStripe, $isStripeNew, $isInApp) {
                 if ($isDashboard || $isApp) {
-                    return \App\Models\Charge::where('user_id', $user?->id)->sum('amount');
+                    $query = \App\Models\Charge::query();
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('amount');
                 } elseif ($isStripe) {
-                    return \App\Models\CoinLog::where('user_id', $user?->id)
-                        ->whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay'])
-                        ->sum('obtained_coins');
+                    $query = \App\Models\CoinLog::whereNotIn('method', ['huawei_pay', 'google_pay', 'strip', 'apple_pay']);
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
                 } elseif ($isStripeNew) {
-                    return \App\Models\CoinLog::where('user_id', $user?->id)
-                        ->where('method', 'strip')
-                        ->sum('obtained_coins');
+                    $query = \App\Models\CoinLog::where('method', 'strip');
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
                 } elseif ($isInApp) {
-                    return $request->name_for_url_shortcut
-                        ? \App\Models\CoinLog::where('user_id', $user?->id)
-                            ->where('method', $request->name_for_url_shortcut)
-                            ->sum('obtained_coins')
-                        : \App\Models\CoinLog::where('user_id', $user?->id)
-                            ->whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay'])
-                            ->sum('obtained_coins');
+                    if ($request->name_for_url_shortcut) {
+                        $query = \App\Models\CoinLog::where('method', $request->name_for_url_shortcut);
+                    } else {
+                        $query = \App\Models\CoinLog::whereIn('method', ['huawei_pay', 'google_pay', 'apple_pay']);
+                    }
+                    if ($user) {
+                        $query->where('user_id', $user->id);
+                    }
+                    return $query->sum('obtained_coins');
                 }
                 return 0;
             };
@@ -95,7 +109,7 @@
         <div class="stats-cards-container">
             @foreach ($fields as $name => $field)
                 @php
-                    $uuid = request($name)['uuid'] ?? '0';
+                    $uuid = data_get(request($name), 'uuid') ?: null;
                     $user = $getUserByUuid($uuid);
                     $value = 0;
 
@@ -109,7 +123,7 @@
                         if($isApp) {
                             $value = \App\Models\Charge::where('charger_type', 'agency')->sum('amount');
                         } else {
-                            $value = \App\Models\Charge::where('charger_id', $user?->id)->sum('amount');
+                            $value = $user ? \App\Models\Charge::where('charger_id', $user->id)->sum('amount') : \App\Models\Charge::sum('amount');
                         }
                     } elseif ($name === 'dollar') {
                         if($isDashboard) {
