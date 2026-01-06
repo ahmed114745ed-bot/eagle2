@@ -171,7 +171,7 @@ class RankingTypeController extends MainController
         }
 
         Admin::style('
-            audio, canvas, progress, video {
+            .rtl audio, canvas, progress, video {
                transform: matrix(0.294118, 0, 0, 0.294118, 60, -60) !important;
             }
 
