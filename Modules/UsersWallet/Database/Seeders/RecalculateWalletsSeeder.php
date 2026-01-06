@@ -5,12 +5,28 @@ namespace Modules\UsersWallet\Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
 use Modules\UsersWallet\Helpers\WalletHelper;
 
 class RecalculateWalletsSeeder extends Seeder
 {
+    private function ownerActiveForPeriod(int $agencyId, int $ownerId, int $year, int $month): bool
+    {
+        $periodStart = Carbon::create($year, $month, 1)->startOfDay();
+        $periodEnd = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
+
+        return DB::table('users_joined_agencies')
+            ->where('agency_id', $agencyId)
+            ->where('user_id', $ownerId)
+            ->where('join_date', '<=', $periodEnd)
+            ->where(function ($q) use ($periodStart) {
+                $q->whereNull('leave_date')->orWhere('leave_date', '>=', $periodStart);
+            })
+            ->exists();
+    }
+
     public function run()
     {
         // Truncate wallets and logs
@@ -31,6 +47,16 @@ class RecalculateWalletsSeeder extends Seeder
                             'dB' => (float) $s->dB,
                         ];
 
+                        // If agency owner was not active in this period, zero out agency_sallary share
+                        if ($s->user_agency_id) {
+                            $agency = Agency::find($s->user_agency_id);
+                            if ($agency && $agency->app_owner_id) {
+                                if (! $this->ownerActiveForPeriod((int) $agency->id, (int) $agency->app_owner_id, (int) $s->year, (int) $s->month)) {
+                                    $newData['agency_sallary'] = 0.0;
+                                }
+                            }
+                        }
+
                         // Apply salary for this target (acts like UpdateUserWalletBalances job)
                         WalletHelper::addAllBalancesByDiffs($s->user_id, $newData, ['sallary' => 0, 'agency_sallary' => 0, 'dB' => 0], $s->user_agency_id ?? null, 'sallary_update', $s->target_id);
 
@@ -42,16 +68,18 @@ class RecalculateWalletsSeeder extends Seeder
                             $walletModel->save();
                             $after = wallet_available_by_wallet($walletModel);
 
-                            \Modules\UsersWallet\Entities\WalletLog::create([
-                                'wallet_id' => $walletModel->id,
-                                'user_id' => $s->user_id,
-                                'amount' => -(float) $s->cut_amount,
-                                'operation' => 'subtract',
-                                'type' => 'user',
-                                'before_amount' => $before,
-                                'after_amount' => $after,
-                                'related_id' => $s->target_id,
-                            ]);
+                            if (abs($after - $before) > 1e-8) {
+                                \Modules\UsersWallet\Entities\WalletLog::create([
+                                    'wallet_id' => $walletModel->id,
+                                    'user_id' => $s->user_id,
+                                    'amount' => -(float) $s->cut_amount,
+                                    'operation' => 'subtract',
+                                    'type' => 'user',
+                                    'before_amount' => $before,
+                                    'after_amount' => $after,
+                                    'related_id' => $s->target_id,
+                                ]);
+                            }
                         }
 
                     } catch (\Throwable $e) {
@@ -89,22 +117,30 @@ class RecalculateWalletsSeeder extends Seeder
                             continue;
                         }
 
+                        // Skip if owner was not active in this period
+                        if (! $this->ownerActiveForPeriod((int) $agency->id, (int) $agency->app_owner_id, (int) $a->year, (int) $a->month)) {
+                            continue;
+                        }
+
                         $ownerId = $agency->app_owner_id;
                         $walletModel = \Modules\UsersWallet\Entities\UserWallet::firstOrCreate(['user_id' => $ownerId]);
                         $before = wallet_available_by_wallet($walletModel);
                         $walletModel->cut_amount += (float) $a->cut_amount;
                         $walletModel->save();
+                        $after = wallet_available_by_wallet($walletModel);
 
-                        \Modules\UsersWallet\Entities\WalletLog::create([
-                            'wallet_id' => $walletModel->id,
-                            'user_id' => $ownerId,
-                            'amount' => - (float) $a->cut_amount,
-                            'operation' => 'subtract',
-                            'type' => 'agency_owner',
-                            'before_amount' => $before,
-                            'after_amount' => wallet_available_by_wallet($walletModel),
-                            'related_id' => $a->id,
-                        ]);
+                        if (abs($after - $before) > 1e-8) {
+                            \Modules\UsersWallet\Entities\WalletLog::create([
+                                'wallet_id' => $walletModel->id,
+                                'user_id' => $ownerId,
+                                'amount' => - (float) $a->cut_amount,
+                                'operation' => 'subtract',
+                                'type' => 'agency_owner',
+                                'before_amount' => $before,
+                                'after_amount' => $after,
+                                'related_id' => $a->id,
+                            ]);
+                        }
                     }
                 } catch (\Throwable $e) {
                     Log::error('RecalculateWalletsSeeder failed applying agency cut for agency_sallary '.$a->id, ['err' => $e->getMessage()]);
@@ -151,43 +187,36 @@ class RecalculateWalletsSeeder extends Seeder
                         if ($diff > 0) {
                             $walletModel->balance += $diff;
                             $walletModel->save();
-                            \Modules\UsersWallet\Entities\WalletLog::create([
-                                'wallet_id' => $walletModel->id,
-                                'user_id' => $userId,
-                                'amount' => $diff,
-                                'operation' => 'add',
-                                'type' => 'bd',
-                                'before_amount' => $before,
-                                'after_amount' => wallet_available_by_wallet($walletModel),
-                                'related_id' => $b->id,
-                            ]);
                         } else {
                             // negative diff -> remove excess (record as subtract)
                             $walletModel->balance += $diff; // diff negative
                             $walletModel->save();
+                        }
+
+                        $after = wallet_available_by_wallet($walletModel);
+                        if (abs($after - $before) > 1e-8) {
                             \Modules\UsersWallet\Entities\WalletLog::create([
                                 'wallet_id' => $walletModel->id,
                                 'user_id' => $userId,
                                 'amount' => $diff,
-                                'operation' => 'subtract',
+                                'operation' => $diff > 0 ? 'add' : 'subtract',
                                 'type' => 'bd',
                                 'before_amount' => $before,
-                                'after_amount' => wallet_available_by_wallet($walletModel),
+                                'after_amount' => $after,
                                 'related_id' => $b->id,
                             ]);
                         }
                     }
 
-                    // Apply cut: sum existing subtract logs of type 'bd' (these are negative amounts);
-                    // treat cuts as wallet cut_amount and log them with type 'bd' and operation 'subtract'
-                    $existingCutSum = (float) DB::table('wallet_logs')
+                    // Apply cut idempotently: compare desired cut with existing subtract logs for this bd record
+                    $existingCutAbs = (float) DB::table('wallet_logs')
                         ->where('user_id', $userId)
                         ->where('related_id', $b->id)
-                        ->where('type', 'bd')
+                        ->whereIn('type', ['bd', 'bd_cut'])
                         ->where('operation', 'subtract')
-                        ->sum('amount'); // negative values expected
+                        ->selectRaw('COALESCE(SUM(ABS(amount)),0) as total')
+                        ->value('total');
 
-                    $existingCutAbs = abs($existingCutSum);
                     $cutDiff = round($addCut - $existingCutAbs, 8);
 
                     if ($cutDiff != 0) {
@@ -196,31 +225,23 @@ class RecalculateWalletsSeeder extends Seeder
                         if ($cutDiff > 0) {
                             $walletModel->cut_amount += $cutDiff;
                             $walletModel->save();
-
-                            \Modules\UsersWallet\Entities\WalletLog::create([
-                                'wallet_id' => $walletModel->id,
-                                'user_id' => $userId,
-                                'amount' => -$cutDiff,
-                                'operation' => 'subtract',
-                                'type' => 'bd',
-                                'before_amount' => $beforeCut,
-                                'after_amount' => wallet_available_by_wallet($walletModel),
-                                'related_id' => $b->id,
-                            ]);
                         } else {
                             // revert excess cut
                             $revert = abs($cutDiff);
                             $walletModel->cut_amount = max(0, $walletModel->cut_amount - $revert);
                             $walletModel->save();
+                        }
 
+                        $afterCut = wallet_available_by_wallet($walletModel);
+                        if (abs($afterCut - $beforeCut) > 1e-8) {
                             \Modules\UsersWallet\Entities\WalletLog::create([
                                 'wallet_id' => $walletModel->id,
                                 'user_id' => $userId,
-                                'amount' => $revert,
-                                'operation' => 'add',
+                                'amount' => $cutDiff > 0 ? -$cutDiff : abs($cutDiff),
+                                'operation' => $cutDiff > 0 ? 'subtract' : 'add',
                                 'type' => 'bd',
                                 'before_amount' => $beforeCut,
-                                'after_amount' => wallet_available_by_wallet($walletModel),
+                                'after_amount' => $afterCut,
                                 'related_id' => $b->id,
                             ]);
                         }
@@ -243,16 +264,23 @@ class RecalculateWalletsSeeder extends Seeder
                 $ownSalary = (float) DB::table('user_sallaries')->where('user_id', $uid)->sum('sallary');
                 $ownCut = (float) DB::table('user_sallaries')->where('user_id', $uid)->sum('cut_amount');
 
-                // agency sums where user is agency owner
-                $agencySalarySum = (float) DB::table('agency_sallaries as a')
-                    ->join('agencies as g', 'a.agency_id', '=', 'g.id')
-                    ->where('g.app_owner_id', $uid)
-                    ->sum('a.sallary');
-
-                $agencyCutSum = (float) DB::table('agency_sallaries as a')
-                    ->join('agencies as g', 'a.agency_id', '=', 'g.id')
-                    ->where('g.app_owner_id', $uid)
-                    ->sum('a.cut_amount');
+                // agency sums where user is agency owner AND was active in that period
+                $agencySalarySum = 0.0;
+                $agencyCutSum = 0.0;
+                $ownerAgencies = DB::table('agencies')->where('app_owner_id', $uid)->pluck('id');
+                if ($ownerAgencies->isNotEmpty()) {
+                    DB::table('agency_sallaries as a')
+                        ->whereIn('a.agency_id', $ownerAgencies)
+                        ->orderBy('a.id')
+                        ->chunk(200, function ($rows) use (&$agencySalarySum, &$agencyCutSum, $uid) {
+                            foreach ($rows as $row) {
+                                if ($this->ownerActiveForPeriod((int) $row->agency_id, (int) $uid, (int) $row->year, (int) $row->month)) {
+                                    $agencySalarySum += (float) $row->sallary;
+                                    $agencyCutSum += (float) $row->cut_amount;
+                                }
+                            }
+                        });
+                }
 
                 // BD sums for this user: find bd records (admin_users) that link to this app user and aggregate their salaries/cuts.
                 // NOTE: bd_agency_host_sallaries (host amounts) are already applied per-target when processing UserSallary (dB)
@@ -262,14 +290,13 @@ class RecalculateWalletsSeeder extends Seeder
                 if (!empty($bdIds)) {
                     $bdSalarySum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('salary');
                     $bdCutSum = (float) DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->sum('cut_amount');
-                    $bdHostSum = 0.0; // excluded to avoid double-counting (host amounts handled via per-target processing)
                 } else {
                     $bdSalarySum = 0.0;
                     $bdCutSum = 0.0;
-                    $bdHostSum = 0.0;
                 }
 
-                $expectedBalance = $ownSalary + $agencySalarySum + $bdSalarySum + $bdHostSum;
+                // Host shares (dB) are applied per-target via UserSallary; do not double count here
+                $expectedBalance = $ownSalary + $agencySalarySum + $bdSalarySum;
                 $expectedCut = $ownCut + $agencyCutSum + $bdCutSum;
                 $expectedPending = (float) DB::table('user_withdrawals')->where('user_id', $uid)->where('status', 'pending')->sum('amount');
 
