@@ -40,7 +40,10 @@ class TrashedUserAccountController extends  MainController
         $grid = new Grid(new User());
         $countryID = session('filter_country_id');
 
-        $grid->model()->with(['profile'])
+        $grid->model()->with([
+            'profile',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->onlyTrashed()->orderByDesc('deleted_at');
 
