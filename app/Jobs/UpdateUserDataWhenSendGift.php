@@ -38,7 +38,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
-        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 100;
+        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
 
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
@@ -47,7 +47,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            'owner' => function ($query) {
                                $query->withoutAppends();
                            }
-                       ])->first();
+                       ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
