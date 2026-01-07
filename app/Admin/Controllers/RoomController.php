@@ -288,9 +288,10 @@ class RoomController extends MainController
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
+                $labelText = is_array($label) ? ($label['label'] ?? $key) : $label;
                 $active = $filterType === $key ? 'active' : '';
                 $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$label}</a></li>";
+                $html .= "<li class='{$active}'><a href='{$url}' class='tab-link'>{$labelText}</a></li>";
             }
             $html .= '</ul></div>';
 
