@@ -2932,22 +2932,15 @@
         z-index: 99999 !important;
     }
 
-    .input-group:has(input.sort) .input-group-btn:first-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort) .input-group-btn:last-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort_num) .input-group-btn:first-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort_num) .input-group-btn:last-child > .btn {
+    .input-group:has(input.sort) .input-group-btn > .btn,
+    .input-group:has(input.sort_num) .input-group-btn > .btn,
+    .input-group:has(input.expire) .input-group-btn > .btn,
+    .input-group:has(input.price) .input-group-btn > .btn,
+    .input-group:has(input.level) .input-group-btn > .btn,
+    .input-group:has(input.num) .input-group-btn > .btn,
+    .input-group:has(input.exp) .input-group-btn > .btn,
+    .input-group:has(input.t_length) .input-group-btn > .btn,
+    .input-group:has(input.priority) .input-group-btn > .btn {
         height: 34px;
         padding: 0 10px !important;
     }
