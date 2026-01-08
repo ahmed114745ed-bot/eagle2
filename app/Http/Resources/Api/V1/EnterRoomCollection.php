@@ -65,7 +65,7 @@ class EnterRoomCollection extends JsonResource
             //////////////////////////////////////////////////////////
             ///
             ///
-            'lucky_gift_coins' =>(bool) Common::getConfig('hide_comments_room') ?? 0, 
+            'lucky_gift_coins' => (int)Common::getSettingsValue('lucky_gift_coins') ?? 0, 
             "room_id_num"         => $this->numid,
             "room_status"         => (string)$this->room_status,
 

@@ -154,6 +154,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
+                <button onclick="showSection('number_comment')">{{ __('lucky gift coins') }}</button>
             </div>
         </div>
 
@@ -218,6 +219,51 @@
                                 placeholder="{{ __('Enter  value') }}" required />
                         </div>
                         
+
+                        <!-- Submit Button -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+             <div id="number_comment" class="settings-section active">
+              
+
+                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    {{-- Show global errors --}}
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Show specific error
+                    @error('gift_percentage')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror --}}
+                    <div class="form">
+                        <!-- Wallet Lucky Box -->
+                        <div class="form-group">
+                            <label for="number_comments">{{ __('lucky gift coins') }}</label>
+                            <input type="number" 
+                                id="lucky_gift_coins" 
+                                name="lucky_gift_coins" 
+                                min="1" 
+                                value="{{ $config['lucky_gift_coins'] ?? 0 }}" 
+                                class="form-control" 
+                                placeholder="{{ __('Enter the lucky gift coins value') }}" required />
+                    
+       
+                        </div>
 
                         <!-- Submit Button -->
                         <div class="form-group">
