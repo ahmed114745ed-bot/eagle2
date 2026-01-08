@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
@@ -154,24 +155,37 @@ class ConfigController extends Controller
         Cache::forget('pusher_config');
 
         $keys = array_keys($request->all());
+        Log::info('updateConfigAgoraZego received keys', ['keys' => $keys]);
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
+            $value = $request->input($key);
 
             if ($config) {
-                $config->value = $request->input($key);
+                $config->value = $value;
             } else {
                 $config = new Config();
                 $config->name = $key;  // Set name first
-                $config->value = $request->input($key);
+                $config->value = $value;
             }
 
             $config->save();
+
+            Log::info('updateConfigAgoraZego stored key', [
+                'key' => $key,
+            ]);
         }
 
         Cache::forget('pusher_config');
 
         Artisan::call('config:cache');
 
-        return Redirect::back();
+        Log::info('updateConfigAgoraZego completed and cache refreshed');
+
+        $redirectBack = Redirect::back();
+        Log::info('updateConfigAgoraZego redirecting back', [
+            'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
+        ]);
+
+        return $redirectBack;
     }
 }
