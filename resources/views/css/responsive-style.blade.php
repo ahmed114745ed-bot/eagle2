@@ -441,8 +441,8 @@
 
         .fields-group .col-sm-2.control-label {
             flex: 0 0 auto;
-            width: 16.66666667%;
-            min-width: 80px;
+            /*width: 16.66666667%;*/
+            /*min-width: 80px;*/
             text-align: right;
             margin-bottom: 0;
             font-size: 12px;

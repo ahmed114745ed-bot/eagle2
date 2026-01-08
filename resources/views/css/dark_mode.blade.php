@@ -81,8 +81,8 @@
     .dark-mode .modal-no,
     .dark-mode .interactions-panel,
     .dark-mode .reels-sidebar,
-    .dark-mode .sidebarContainer,
-    .dark-mode .box-footer {
+        /*.dark-mode .box-footer {*/
+    .dark-mode .sidebarContainer{
         background: var(--dark-primary-color) !important;
     }
 
@@ -108,6 +108,10 @@
         border-bottom: 1px solid var(--white) !important;
     }
 
+    .dark-mode .box-footer {
+        border-top: 2px solid var(--white) !important;
+    }
+
     .dark-mode .btn:hover,
     .dark-mode .btn-success:hover,
     .dark-mode .button:hover {
@@ -127,12 +131,12 @@
         color: #ffffff !important;
     }
 
-    /*.dark-mode .box-header .form-group .control-label,*/
-    /*.dark-mode .box-header .form-group > label,*/
-    /*.dark-mode .filter-box .form-group .control-label,*/
-    /*.dark-mode .filter-box .form-group > label {*/
-    /*    background: linear-gradient(to bottom, var(--dark-secondry-color) 70%, var(--dark-primary-color) 30%) !important;*/
-    /*}*/
+    .dark-mode .box-header .form-group .control-label,
+    .dark-mode .box-header .form-group > label,
+    .dark-mode .filter-box .form-group .control-label,
+    .dark-mode .filter-box .form-group > label {
+        background: linear-gradient(to bottom, var(--dark-secondry-color) 70%, var(--dark-primary-color) 30%) !important;
+    }
 
     .dark-mode .datepicker table tr td.old,
     .dark-mode .datepicker table tr td.new {

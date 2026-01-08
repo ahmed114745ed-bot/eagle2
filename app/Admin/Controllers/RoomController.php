@@ -668,6 +668,9 @@ class RoomController extends MainController
             if (!$appended) {
                 $html .= '
         <style>
+   
+
+
             .image-container {
                 display: flex;
                 justify-content: start;
@@ -703,6 +706,19 @@ class RoomController extends MainController
 
             return $html;
         });
+
+Admin::style('
+    .dropdown-backdrop { 
+        position: absolute !important;
+        
+    }
+    html.ltr .dropdown-menu {
+    
+        right: 38px !important;
+    }
+
+');
+        
     }
 
 
