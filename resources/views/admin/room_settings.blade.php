@@ -238,8 +238,6 @@
                 <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
                  <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
-                 <button onclick="showSection('live_settings')">{{ __('Live Settings') }}</button>
-
             </div>
         </div>
 
@@ -380,30 +378,11 @@
             <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST">
                 <div class="form">
                     @csrf
-
                     <label>{{ __('admins number') }}</label>
                     <input class="form-control" type="number" min="1" name="max_room_admin"
                            value="{{ $settings['max_room_admin'] ?? 4 }}">
                     <small class="form-text text-muted" style="    position: relative; top: -15px;">
                         {{ __('This is the default number of admins allowed per room.') }}
-                    </small>
-                    <br>
-                    <button type="submit">{{ __('save') }}</button>
-                </div>
-            </form>
-        </div>
-
-        <div id="live_settings" class="settings-section">
-            <h3>{{ __('Live Settings') }}</h3>
-            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST">
-                <div class="form">
-                    @csrf
-
-                    <label>{{ __('max task stream') }}</label>
-                    <input class="form-control" type="number" min="1" name="max_mix_stream"
-                           value="{{ $settings['max_mix_stream'] ?? 4 }}">
-                    <small class="form-text text-muted" style="position: relative; top: -15px;">
-                        {{ __('This is the default number of rooms allowed per task.') }}
                     </small>
                     <br>
                     <button type="submit">{{ __('save') }}</button>
