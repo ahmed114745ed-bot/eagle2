@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
@@ -172,6 +173,21 @@ class ConfigController extends Controller
 
         Artisan::call('config:cache');
 
-        return Redirect::back();
+        Log::info('updateConfigAgoraZego completed and cache refreshed');
+
+        $redirectTo = $request->input('redirect_to');
+        if ($redirectTo) {
+            Log::info('updateConfigAgoraZego redirecting to provided redirect_to', [
+                'redirect_to' => $redirectTo,
+            ]);
+            return Redirect::to($redirectTo);
+        }
+
+        $redirectBack = Redirect::back();
+        Log::info('updateConfigAgoraZego redirecting back', [
+            'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
+        ]);
+
+        return $redirectBack;
     }
 }
