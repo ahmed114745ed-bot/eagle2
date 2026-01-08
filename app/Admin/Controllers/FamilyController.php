@@ -5,7 +5,6 @@ namespace App\Admin\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Family;
-use Illuminate\Support\Facades\DB;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -88,18 +87,16 @@ class FamilyController extends MainController
         });
         $grid->model()
             ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
-            ->select('families.*', DB::raw('(select id from family_levels where exp <= families.total_diamond order by exp desc limit 1) as level_max_id'))
-            ->withCount(['members', 'admins'])
             ->with([
-                'owner:id,name,uuid', // only needed fields
-                'owner.profile:id,user_id,avatar',
-                'owner.packs' => fn($q) => $q
-                    ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                    ->where('type', 25)
-                    ->where('is_used', true)
-                    ->with('ware:id,value'),
-                'levelMaxStatic',
-                 ])->orderByDesc('id');
+            'owner:id,name,uuid', // only needed fields
+            'owner.profile:id,user_id,avatar',
+            'owner.packs' => fn($q) => $q
+                ->select('id', 'user_id', 'type', 'is_used', 'target_id')
+                ->where('type', 25)
+                ->where('is_used', true)
+                ->with('ware:id,value'),
+        ])->orderByDesc('id');
+
         $grid->id(__('ID'));
         $grid->column('image', __('family'))->display(function ($image) {
             $path = @$image;
@@ -148,10 +145,10 @@ class FamilyController extends MainController
         });
 
         $grid->column('num', __('number of people'))->display(function ($value) {
-            return ($this->members_count ?? $this->getMembersCountAttribute()) . '/' . $value;
-        });; 
+            return $this->members_count . '/' . $value;
+        });;
         $grid->column('num_admins', __('number of admins'))->display(function ($value) {
-            return ($this->admins_count ?? $this->getAdminsNumAttribute()) . '/' . $value;
+            return $this->admins_num . '/' . $value;
         });
         $grid->column('max_level', __('level'));
         $grid->column('max_exp', __('exp'));

@@ -30,11 +30,6 @@ class Family extends Model
 
     public function getMembersNumAttribute()
     {
-        // If the query used withCount('members') the value will be available in attributes
-        if (array_key_exists('members_count', $this->attributes) && $this->attributes['members_count'] !== null) {
-            return (int) $this->attributes['members_count'];
-        }
-
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */->count();
 
         return $fu;
@@ -57,11 +52,6 @@ class Family extends Model
 
     public function getMembersCountAttribute()
     {
-        // Prefer preloaded count from ->withCount('members') when available (avoid extra query)
-        if (array_key_exists('members_count', $this->attributes) && $this->attributes['members_count'] !== null) {
-            return (int) $this->attributes['members_count'];
-        }
-
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)->count();
 
         return $fu - 1;
@@ -69,11 +59,6 @@ class Family extends Model
 
     public function getAdminsNumAttribute()
     {
-        // Prefer preloaded count from ->withCount('admins') when available (avoid extra query)
-        if (array_key_exists('admins_count', $this->attributes) && $this->attributes['admins_count'] !== null) {
-            return (int) $this->attributes['admins_count'];
-        }
-
         $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)->where('user_type', 1)->count();
 
         return $fu;
@@ -118,11 +103,6 @@ class Family extends Model
 
     public function getLevelMax()
     {
-        // Prefer the preloaded static relation when available to avoid per-instance queries
-        if ($this->relationLoaded('levelMaxStatic') && $this->levelMaxStatic) {
-            return $this->levelMaxStatic;
-        }
-
         if ($this->cachedLevelMax === null) {
             $giftLogs = $this->total_diamond;
             $this->cachedLevelMax = FamilyLevel::query()
@@ -132,15 +112,6 @@ class Family extends Model
         }
 
         return $this->cachedLevelMax;
-    }
-
-    /**
-     * Static relation that uses a pre-computed `level_max_id` column (set via a subselect in listings)
-     * Allows eager-loading family levels for many families in one query.
-     */
-    public function levelMaxStatic()
-    {
-        return $this->belongsTo(FamilyLevel::class, 'level_max_id');
     }
 
     public function getLevelMaxMembersNumAttribute()
