@@ -778,11 +778,9 @@ class UserController extends MainController
         }
 
         $form->html('<div class="full-column-width">');
-
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
         })->useTable()->disableCreate()->disableDelete();
-
         $form->html('</div>');
 
         Admin::style('
