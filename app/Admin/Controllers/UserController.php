@@ -785,24 +785,24 @@ class UserController extends MainController
 
         $form->html('</div>');
 
-        Admin::style('
-            .has-many-images .has-many-images-forms {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 20px !important;
-            }
-
-            .has-many-images .form-group {
-                margin-bottom: 0 !important;
-            }
-
-            .has-many-images .file-preview-image {
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: cover !important;
-                border-radius: 8px !important;
-            }
-        ');
+//        Admin::style('
+//            .has-many-images .has-many-images-forms {
+//                display: flex !important;
+//                flex-wrap: wrap !important;
+//                gap: 20px !important;
+//            }
+//
+//            .has-many-images .form-group {
+//                margin-bottom: 0 !important;
+//            }
+//
+//            .has-many-images .file-preview-image {
+//                width: 100% !important;
+//                height: 100% !important;
+//                object-fit: cover !important;
+//                border-radius: 8px !important;
+//            }
+//        ');
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
