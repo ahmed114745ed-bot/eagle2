@@ -255,6 +255,7 @@
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
                  <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
                  <button onclick="showSection('live_settings')">{{ __('Live Settings') }}</button>
+                  <button onclick="showSection('hide_comment')">{{ __('hide comments') }}</button>
             </div>
         </div>
 
@@ -287,7 +288,34 @@
                     </div>
                 </form>
             </div>
+            <div id="hide_comment" class="settings-section">
+                <h2>{{ __('hide comments') }}</h2>
+                <form id="hide_commentForm" action="{{ route('admin.room-settings.store') }}" method="POST">
+                    @csrf
+                    <div class="form">
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable hide comments') }}</span>
 
+                               <label class="switch">
+                                    <input type="hidden" name="hide_comments_room" value="0">
+
+                                    <input type="checkbox"
+                                        name="hide_comments_room"
+                                        id="hide_comments_room"
+                                        value="1"
+                                        {{ ($settings['hide_comments_room'] ?? 0) == 1 ? 'checked' : '' }}>
+
+                                    <span class="slider round"></span>
+                                </label>
+                        
+                            
+                        </div>
+
+
+                        <button type="submit">{{ __('Save') }}</button>
+                    </div>
+                </form>
+            </div>
             <div id="custom_background_settings" class="settings-section">
 
                 <h3> {{ __('Custom Background settings') }}</h3>
@@ -352,7 +380,11 @@
 
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
-            </form>
+                </form>
+            </div>
+
+             
+
 
             <script>
                 document.getElementById('roomSettingsForm').addEventListener('submit', function (e) {
