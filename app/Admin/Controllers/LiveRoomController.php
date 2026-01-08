@@ -524,12 +524,12 @@ class LiveRoomController extends MainController
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
-                $countries = Cache::rememberForever('filter_countries_list', function () {
+                
                     $locale = app()->getLocale(); // 'ar', 'en', etc.
                     $column = $locale === 'ar' ? 'name' : 'e_name';
 
-                    return \App\Models\Country::query()->pluck($column, 'id');
-                });
+                    $countries =\App\Models\Country::query()->pluck($column, 'id');
+                
 
                 $filter->where(function ($query) {
                     if ($this->input) {
