@@ -186,12 +186,12 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             //     return Broadcast::auth($request);
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
-                try {
+                // try {
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
-                } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-                }
+                // } catch (\Exception $e) {
+                //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                // }
             });
 
             Route::get('/user-gifts', [UserController::class, 'userGifts']);
