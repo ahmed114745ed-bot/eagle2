@@ -81,8 +81,8 @@
     .dark-mode .modal-no,
     .dark-mode .interactions-panel,
     .dark-mode .reels-sidebar,
-    .dark-mode .sidebarContainer,
-    .dark-mode .box-footer {
+        /*.dark-mode .box-footer {*/
+    .dark-mode .sidebarContainer{
         background: var(--dark-primary-color) !important;
     }
 
@@ -106,6 +106,10 @@
     .dark-mode .box-header.with-border,
     .dark-mode .section-header {
         border-bottom: 1px solid var(--white) !important;
+    }
+
+    .dark-mode .box-footer {
+        border-top: 2px solid var(--white) !important;
     }
 
     .dark-mode .btn:hover,

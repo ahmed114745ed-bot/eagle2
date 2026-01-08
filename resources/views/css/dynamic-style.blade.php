@@ -1716,7 +1716,7 @@
     .rtl .box-header .form-horizontal .row {
         display: block !important;
         direction: rtl !important;
-        margin-bottom: 10px;
+        /*margin-bottom: 10px;*/
     }
 
     .ltr .form-horizontal .row {
@@ -1943,7 +1943,8 @@
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        padding: 10px;
+        padding-bottom: 0 !important;
+        background: transparent !important;
     }
 
     .pagination-info {
@@ -2256,7 +2257,6 @@
     .form-horizontal + .box-footer,
     .form-horizontal .box-footer {
         display: grid !important;
-        padding: 16px 24px !important;
         direction: rtl !important;
     }
 
