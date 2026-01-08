@@ -105,7 +105,7 @@ class GiftController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Gift);
-       
+
         $filterType = request('filter', 'all');
         $category  = [];
         if (request('filter') != 'all') {
@@ -404,7 +404,7 @@ class GiftController extends MainController
         )->required();
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
-        
+
 
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
@@ -467,7 +467,9 @@ class GiftController extends MainController
     public function luckyGiftSettings(Content $content)
     {
         if (!Admin::user()->can('*')) {
-            return $content->view('lucky_gift', compact('config'));
+            Permission::check('browse-' . 'lucky-gift-setting');
         }
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        return $content->view('lucky_gift', compact('config'));
     }
 }
