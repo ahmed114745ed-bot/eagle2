@@ -166,6 +166,7 @@
 
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
                     <div class="form">
                         <select name="library" id="">
                             <option value="0" {{ $library == "0" ? "selected" : "" }}>{{ __('admin.Agora') }}</option>
@@ -185,6 +186,7 @@
 
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
                     <div class="form">
                         <select name="library" id="">
                             <option value="0" {{ $library == "0" ? "selected" : "" }}>{{ __('admin.Agora') }}</option>

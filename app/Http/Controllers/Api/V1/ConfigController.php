@@ -181,6 +181,14 @@ class ConfigController extends Controller
 
         Log::info('updateConfigAgoraZego completed and cache refreshed');
 
+        $redirectTo = $request->input('redirect_to');
+        if ($redirectTo) {
+            Log::info('updateConfigAgoraZego redirecting to provided redirect_to', [
+                'redirect_to' => $redirectTo,
+            ]);
+            return Redirect::to($redirectTo);
+        }
+
         $redirectBack = Redirect::back();
         Log::info('updateConfigAgoraZego redirecting back', [
             'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
