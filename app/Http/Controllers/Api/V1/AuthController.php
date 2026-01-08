@@ -142,11 +142,11 @@ class AuthController extends Controller
             //     Common::apiResponse(false, 'email already taken', $resource, 405);
             // }
         } catch (\Exception $exception) {
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         }
 
         if (!$this->canLogin($user)) {
-            return Common::apiResponse(false, 'you are blocked', [], 408);
+            return Common::apiResponse(false, 'you are blocked', [], 422);
         }
         $user->auth_token = $token;
         try {
