@@ -230,18 +230,18 @@
 </head>
 
 <body>
-<div class="all-page">
-    <div class="settings-sidebar">
-        <h2>{{__("setting")}}</h2>
-        <div class="settings-menu">
-            <button onclick="showSection('PaidRoom')">{{ __('Paid Room') }}</button>
-            <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
-            <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
-            <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
-            <button onclick="showSection('live_settings')">{{ __('Live Settings') }}</button>
-            <button onclick="showSection('hide_comment')">{{ __('hide comments') }}</button>
+    <div class="all-page">
+        <div class="settings-sidebar">
+            <h2>{{__("setting")}}</h2>
+            <div class="settings-menu">
+                <button onclick="showSection('PaidRoom')">{{ __('Paid Room') }}</button>
+                <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
+                <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
+                 <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
+                 <button onclick="showSection('live_settings')">{{ __('Live Settings') }}</button>
+
+            </div>
         </div>
-    </div>
 
     <div class="settings-content">
 
@@ -269,46 +269,19 @@
                                value="{{ $settings['paid_room_amount'] ?? '' }}">
                     </div>
 
-                    <button type="submit">{{ __('Save') }}</button>
-                </div>
-            </form>
-        </div>
-        <div id="hide_comment" class="settings-section">
-            <h2>{{ __('hide comments') }}</h2>
-            <form id="hide_commentForm" class="new-form" action="{{ route('admin.room-settings.store') }}" method="POST">
-                @csrf
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable hide comments') }}</span>
-
-                        <label class="switch">
-                            <input type="hidden" name="hide_comments_room" value="0">
-
-                            <input type="checkbox"
-                                   name="hide_comments_room"
-                                   id="hide_comments_room"
-                                   value="1"
-                                {{ ($settings['hide_comments_room'] ?? 0) == 1 ? 'checked' : '' }}>
-
-                            <span class="slider round"></span>
-                        </label>
-
-
+                        <button type="submit">{{ __('Save') }}</button>
                     </div>
+                </form>
+            </div>
 
-
-                    <button type="submit">{{ __('Save') }}</button>
-                </div>
-            </form>
-        </div>
-        <div id="custom_background_settings" class="settings-section">
-            <h3> {{ __('Custom Background settings') }}</h3>
-            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="form">
-                    <label>{{ __('Cost of background request:') }} </label>
-                    <input type="text" name="cost_request_background"
-                           value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
+            <div id="custom_background_settings" class="settings-section">
+                <h3> {{ __('Custom Background settings') }}</h3>
+                <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form">
+                        <label>{{ __('Cost of background request:') }} </label>
+                        <input type="text" name="cost_request_background"
+                            value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
 
                     <label>{{ __('Background expiration in days:') }} </label>
                     <input type="text" name="background_expiration"
@@ -364,7 +337,6 @@
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
             </form>
-
             <script>
                 document.getElementById('roomSettingsForm').addEventListener('submit', function (e) {
                     let isValid = true;
@@ -386,7 +358,6 @@
                     }
                 });
             </script>
-
             <style>
                 .is-invalid {
                     border-color: #dc3545 !important;
@@ -402,7 +373,6 @@
                     direction: ltr;
                 }
             </style>
-
         </div>
 
         <div id="admin_settings" class="settings-section">
