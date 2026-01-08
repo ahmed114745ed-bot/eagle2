@@ -381,7 +381,7 @@
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
                 </form>
-            </div>
+          
 
              
 
