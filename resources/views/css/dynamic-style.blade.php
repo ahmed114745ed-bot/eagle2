@@ -1869,6 +1869,7 @@
 
     button {
         background: var(--primary-color);
+        color: var(--text-secondary-color);
         padding: 10px;
         border: none;
         cursor: pointer;

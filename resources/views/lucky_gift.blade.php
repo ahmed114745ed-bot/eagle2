@@ -7,6 +7,24 @@
     }
 
     /* القائمة الجانبية */
+    .settings-menu button {
+        display: block;
+        width: 100%;
+        text-align: right;
+        padding: 15px;
+        color: black;
+        background: white;
+        border: none;
+        margin-bottom: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .settings-menu button:hover {
+        background: var(--primary-color);
+        color: var(--text-secondary-color);
+    }
 
     .settings-menu button {
         display: block;
@@ -208,7 +226,7 @@
 
 
              <div id="number_comment" class="settings-section active">
-              
+
 
                 <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
                     @csrf
@@ -232,15 +250,15 @@
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
                             <label for="number_comments">{{ __('lucky gift coins') }}</label>
-                            <input type="number" 
-                                id="lucky_gift_coins" 
-                                name="lucky_gift_coins" 
-                                min="1" 
-                                value="{{ $config['lucky_gift_coins'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="lucky_gift_coins"
+                                name="lucky_gift_coins"
+                                min="1"
+                                value="{{ $config['lucky_gift_coins'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter the lucky gift coins value') }}" required />
-                    
-       
+
+
                         </div>
 
                         <!-- Submit Button -->
