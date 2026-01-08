@@ -3,25 +3,10 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #121212;
-        color: white;
         display: flex;
     }
 
     /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: #222;
-        min-height: 400px;
-
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: #ff9800;
-    }
 
     .settings-menu button {
         display: block;
@@ -52,13 +37,6 @@
 
     .active {
         display: block;
-    }
-
-    /* تنسيق النماذج */
-    form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
     }
 
     label {
@@ -162,7 +140,7 @@
             <div id="VipSettings" class="settings-section active">
                 <h3>{{ __('Luck gift Settings') }}</h3>
 
-                <form action="{{ route('admin.lucky.gift.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.lucky.gift.settings.update') }}" class="new-form" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     {{-- Show global errors --}}
@@ -184,41 +162,41 @@
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
                             <label for="app_wallet_lucky_gift">{{ __('application wallet percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="app_wallet_lucky_gift" 
-                                name="app_wallet_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="app_wallet_lucky_gift"
+                                name="app_wallet_lucky_gift"
+                                min="1"
+                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
                                  <small class="form-text text-muted">{{ __('App owner profit') }}</small>
-       
+
                         </div>
 
                         <div class="form-group">
                             <label for="owner_lucky_gift">{{ __('owner percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="owner_lucky_gift" 
-                                name="owner_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['owner_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="owner_lucky_gift"
+                                name="owner_lucky_gift"
+                                min="1"
+                                value="{{ $config['owner_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}"  required/>
                                 <small class="form-text text-muted">{{ __('owner gift') }}</small>
                         </div>
 
-                        
+
                         <div class="form-group">
                             <label for="host_lucky_gift">{{ __('host percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="host_lucky_gift" 
-                                name="host_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['host_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="host_lucky_gift"
+                                name="host_lucky_gift"
+                                min="1"
+                                value="{{ $config['host_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
                         </div>
-                        
+
 
                         <!-- Submit Button -->
                         <div class="form-group">
