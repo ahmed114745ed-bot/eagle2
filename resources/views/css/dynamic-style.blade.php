@@ -46,9 +46,10 @@
     /* .col-sm-8 {
     width: 80.66666667%;
 } */
-    /* .col-sm-2 {
-    width: 5.66666667%;
-} */
+
+    /*.col-sm-2 {*/
+    /*    width: auto;*/
+    /*}*/
 
     .rtl label {
         margin: 0 !important;
@@ -2331,7 +2332,7 @@
     .fields-group > .form-group {
         display: flex;
         align-items: center;
-        gap: 35px;
+        /*gap: 35px;*/
         margin-bottom: 0;
     }
 
@@ -2356,11 +2357,11 @@
         transition: all 0.3s ease;
     }
 
-    .fields-group .input-group.input-group-sm:has(#to_date) {
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
         position: absolute !important;
     }
 
-    .fields-group .input-group.input-group-sm:has(#from_date) {
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
         position: absolute !important;
     }
 
@@ -2992,6 +2993,48 @@
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background: var(--primary-color) !important;
     }
+
+    /*!* Label on input border *!*/
+    /*.box-header .form-group,*/
+    /*.filter-box .form-group {*/
+    /*    position: relative !important;*/
+    /*    margin-top: 12px !important;*/
+    /*}*/
+
+    /*.box-header .form-group .control-label,*/
+    /*.box-header .form-group > label,*/
+    /*.filter-box .form-group .control-label,*/
+    /*.filter-box .form-group > label {*/
+    /*    position: absolute !important;*/
+    /*    top: -35% !important;*/
+    /*    left: 40px !important;*/
+    /*    background: white !important;*/
+    /*    padding: 0 6px !important;*/
+    /*    font-size: 12px !important;*/
+    /*    z-index: 10 !important;*/
+    /*    margin: 0 !important;*/
+    /*}*/
+
+    /*!* RTL *!*/
+    /*.rtl .box-header .form-group .control-label,*/
+    /*.rtl .filter-box .form-group .control-label {*/
+    /*    left: auto !important;*/
+    /*    right: 25px !important;*/
+    /*}*/
+
+    /*.box-header .form-group .form-control,*/
+    /*.filter-box .form-group .form-control,*/
+    /*.box-header .form-group .select2-container,*/
+    /*.filter-box .form-group .select2-container {*/
+    /*    min-width: 280px !important;*/
+    /*    width: 100% !important;*/
+    /*}*/
+
+    /*.box-header .form-group {*/
+    /*    width: 45% !important;*/
+    /*    display: inline-block !important;*/
+    /*    margin-right: 5% !important;*/
+    /*}*/
 </style>
 
 @include('css.dark_mode')

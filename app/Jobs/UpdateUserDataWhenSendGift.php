@@ -47,7 +47,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            'owner' => function ($query) {
                                $query->withoutAppends();
                            }
-                       ])->first();
+                       ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();

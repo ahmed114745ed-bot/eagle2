@@ -604,7 +604,10 @@
             section.classList.remove('active');
         });
 
-        document.getElementById(sectionId).classList.add('active');
+        const activeSection = document.getElementById(sectionId);
+        if (activeSection) {
+            activeSection.classList.add('active');
+        }
 
         document.querySelectorAll('.settings-menu button').forEach(button => {
             button.style.backgroundColor = '';
@@ -613,8 +616,8 @@
 
         const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
         if (activeButton) {
-            activeButton.style.backgroundColor = 'var(--primary-color) !important';
-            activeButton.style.color = 'var(--text-secondary-color) !important';
+            activeButton.style.backgroundColor = 'var(--primary-color)';
+            activeButton.style.color = 'var(--text-secondary-color)';
         }
 
         const url = new URL(window.location);
@@ -634,15 +637,49 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        var agencyHiddenValue = document.getElementById('host_agency_value').value;
-        document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
+        try {
+            var agencyHiddenValue = document.getElementById('host_agency_value')?.value;
+            if (document.getElementById('agency_toggle')) {
+                document.getElementById('agency_toggle').checked = (agencyHiddenValue === '1');
+            }
 
-        var reelHiddenValue = document.getElementById('host_reel_value').value;
-        document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');
-        var youtubeHiddenValue = document.getElementById('host_youtube_value').value;
-        document.getElementById('youtube_toggle').checked = (youtubeHiddenValue === '1')
-        var liveHiddenValue = document.getElementById('host_live_value').value;
-        document.getElementById('live_toggle').checked = (liveHiddenValue === '1')
+            var reelHiddenValue = document.getElementById('host_reel_value')?.value;
+            if (document.getElementById('reel_toggle')) {
+                document.getElementById('reel_toggle').checked = (reelHiddenValue === '1');
+            }
+
+            var youtubeHiddenValue = document.getElementById('host_youtube_value')?.value;
+            if (document.getElementById('youtube_toggle')) {
+                document.getElementById('youtube_toggle').checked = (youtubeHiddenValue === '1');
+            }
+
+            var liveHiddenValue = document.getElementById('host_live_value')?.value;
+            if (document.getElementById('live_toggle')) {
+                document.getElementById('live_toggle').checked = (liveHiddenValue === '1');
+            }
+
+            var roomCupValue = document.getElementById('room_cup_value')?.value;
+            if (document.getElementById('room_cup_toggle')) {
+                document.getElementById('room_cup_toggle').checked = (roomCupValue === '1');
+            }
+
+            var momentStatusValue = document.getElementById('moment_status_value')?.value;
+            if (document.getElementById('moment_status_toggle')) {
+                document.getElementById('moment_status_toggle').checked = (momentStatusValue === '1');
+            }
+
+            var hostLevelValue = document.getElementById('host_level_value')?.value;
+            if (document.getElementById('host_level_toggle')) {
+                document.getElementById('host_level_toggle').checked = (hostLevelValue === '1');
+            }
+
+            var shareRoomValue = document.getElementById('share_room_value')?.value;
+            if (document.getElementById('share_room_toggle')) {
+                document.getElementById('share_room_toggle').checked = (shareRoomValue === '1');
+            }
+        } catch (error) {
+            console.error('Error initializing toggles:', error);
+        }
     });
 </script>
 </body>
