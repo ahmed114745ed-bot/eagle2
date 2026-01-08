@@ -2942,6 +2942,16 @@
         padding: 0 10px !important;
     }
 
+    .input-group:has(input.sort_num) .input-group-btn:first-child > .btn {
+        height: 34px;
+        padding: 0 10px !important;
+    }
+
+    .input-group:has(input.sort_num) .input-group-btn:last-child > .btn {
+        height: 34px;
+        padding: 0 10px !important;
+    }
+
     .navbar-nav>.notifications-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.tasks-menu>.dropdown-menu>li .menu>li>a:hover {
         background: var(--primary-color);
     }

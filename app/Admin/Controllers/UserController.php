@@ -780,7 +780,7 @@ class UserController extends MainController
 
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
-        })->useTable()->disableCreate()->disableDelete();
+        })->disableCreate()->disableDelete();
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
