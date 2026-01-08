@@ -668,7 +668,7 @@ class RoomController extends MainController
             if (!$appended) {
                 $html .= '
         <style>
-   
+
 
 
             .image-container {
@@ -708,17 +708,17 @@ class RoomController extends MainController
         });
 
 Admin::style('
-    .dropdown-backdrop { 
+    .dropdown-backdrop {
         position: absolute !important;
-        
+
     }
     html.ltr .dropdown-menu {
-    
+
         right: 38px !important;
     }
 
 ');
-        
+
     }
 
 
@@ -903,7 +903,6 @@ Admin::style('
     {
         $form = new Form(new Room);
         $this->disableFormTools($form);
-        $form->display(__('ID'));
         if (!$form->isEditing()) {
            $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
         } else {
