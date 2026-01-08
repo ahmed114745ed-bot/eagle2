@@ -284,7 +284,7 @@ class WalletController extends MainController
             $appID,
             'add',
             $request->amount,
-            'user_transaction',
+            'user',
             'transfer_to_wallet',
             [],
             'trans_to_my_wallet'
@@ -385,14 +385,17 @@ class WalletController extends MainController
             $receiver->increment('di', $coins);
             $descriptionData = ['receiver_id'  => $receiver->id];
 
-            WalletTransaction::create([
-                'user_id' => $sender->id,
-                'type' => 'cut',
-                'transactions_type' => 'user_transaction',
-                'value' => $amount,
-                'description_data' => is_array($descriptionData) ? json_encode($descriptionData) : $descriptionData,
-                'message' => 'transfer_to_',
-            ]);
+            // Deduct from BD's linked user wallet
+            $bdUserId = $sender->app_id ?? $sender->id;
+            WalletService::storeTransaction(
+                $bdUserId,
+                'cut',
+                $amount,
+                'user',
+                'transfer_to_user',
+                $descriptionData,
+                'charge'
+            );
 
 
 
@@ -485,15 +488,16 @@ class WalletController extends MainController
         $fromUser->incrementCutAmountInBdSallary($usd);
         $toAgency->increment('coins', $coins);
 
+        // Deduct from BD's linked user wallet
+        $bdUserId = $fromUser->app_id ?? $fromUser->id;
         WalletService::storeTransaction(
-            $fromUser->id,
+            $bdUserId,
             'cut',
             $usd,
-            'user_transaction',
+            'user',
             'transfer_to_agency',
             ['agency_id' => $toAgency->id],
-            'trans_to_agency'
-
+            'charge'
         );
 
         $data = [

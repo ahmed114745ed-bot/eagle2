@@ -58,7 +58,7 @@ input:checked+.slider {
     border-color: #eaeaea;
 }
 
-.skin-black-light .main-header>.logo{background-color:#edfbff !important;color:#222!important;}
+.skin-black-light .main-header>.logo{color:#222!important;}
 
 .content-header>.breadcrumb{
     background: #edfbff!important;

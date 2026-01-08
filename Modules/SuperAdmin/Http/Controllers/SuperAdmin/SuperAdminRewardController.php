@@ -112,7 +112,8 @@ class SuperAdminRewardController extends MainController
         $typeMap = SELECTED_USED_WARE;
 
         $types =  ['vip', 'ware',  'badge',
-            /** 'achievement'*/
+           'achievement',
+            'coin'
         ];
         $currentType = request()->get('type', 'vip');
 

@@ -33,9 +33,6 @@
 </div>
 
 <style>
-.column-selector {
-    margin-right: 10px;
-}
 
 .column-selector .dropdown-menu {
     padding: 10px;

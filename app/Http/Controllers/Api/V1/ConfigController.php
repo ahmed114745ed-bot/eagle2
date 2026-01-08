@@ -88,6 +88,8 @@ class ConfigController extends Controller
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
 
+   
+
     public function index()
     {
         $data = $this->configService->getAllConfigs();
@@ -143,7 +145,7 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
-         admin_success('Saved Successfully');
+        admin_success('Saved Successfully');
         return Redirect::back();
     }
 

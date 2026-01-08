@@ -35,5 +35,6 @@
     "SuperAdmin": true,
     "TaskStream": true,
     "HostLevel": true,
-    "UsersWallet": true
+    "UsersWallet": true,
+    "RankingReward": true
 }

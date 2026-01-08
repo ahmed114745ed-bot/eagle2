@@ -84,7 +84,9 @@ class GiftCategoryController extends MainController
         });
         $grid->column('type', __('type'));
 
+        $this->extendGrid($grid);
 
+        $grid->disableExport();
         return $grid;
     }
 

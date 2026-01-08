@@ -53,15 +53,23 @@
 @endphp
 
 <script>
-$(document).ready(function() {
+function loadTopSendersChart() {
+    const canvas = document.getElementById("topSendersPolar");
+    if (!canvas) return;
+
+    // Check if chart already exists
+    if (window.topSendersChartInstance) {
+        window.topSendersChartInstance.destroy();
+    }
+
     $.ajax({
         url: "{{ url($prefix . '/statistics/top-sender') }}",
         type: "GET",
         dataType: "json",
         success: function(response) {
-            const ctx = document.getElementById("topSendersPolar").getContext("2d");
+            const ctx = canvas.getContext("2d");
 
-            new Chart(ctx, {
+            window.topSendersChartInstance = new Chart(ctx, {
                 type: 'polarArea',
                 data: {
                     labels: response.labels,
@@ -78,6 +86,7 @@ $(document).ready(function() {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'right',
@@ -110,6 +119,9 @@ $(document).ready(function() {
             console.error("Error loading chart data:", error);
         }
     });
-});
+}
+
+// Load immediately - no DOM waiting, no multiple event listeners
+loadTopSendersChart();
 </script>
 

@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 
     <style>
 
@@ -12,7 +13,6 @@
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
-            --green-color: {{ config('themes.greenColor') }};
             --text-primary-color: {{ config('themes.textPrimaryColor') }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -20,7 +20,6 @@
              --background-image:{{ config('themes.backgroundImage') }};
             --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
             --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-            --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
             --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
             --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
@@ -279,20 +278,6 @@
             color: #333;
             /* background: var(--secondary-color); */
             /* filter: brightness(0.85); */
-
-        }
-
-        .agency-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 25px;
-            margin-bottom: 30px;
-            position: relative;
-            padding: 20px;
-            background: var(--secondary-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            /* filter: brightness(0.5); */
 
         }
 
@@ -644,15 +629,6 @@
             margin-bottom: 30px;
         }
 
-        .card-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--secondary-color);
-        }
-
         .card-header h3 {
             margin: 0;
             font-size: 18px;
@@ -808,16 +784,6 @@
             align-items: center;
             gap: 10px;
         }
-
-
-        .pagination-wrapper {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: center;
-            border-top: 1px solid #eee;
-            background: var(--secondary-color);
-        }
-
 
         .target-card-section-1 {
             /* display: inline-flex; */
@@ -1071,10 +1037,6 @@
             color: #333;
             font-weight: 500;
         }
-        .table tbody tr:nth-child(even) {
-            background-color: var(--secondary-color) !important;
-            filter: brightness(0.95);
-        }
     </style>
 
 </head>
@@ -1309,7 +1271,7 @@
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
                                         @if ($admin)
-                                            <a href="{{ $url ?? '#' }}"  
+                                            <a href="{{ $url ?? '#' }}"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ $image }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -1776,7 +1738,7 @@
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
                                             @if(!empty($kickedBy) && !empty($kickedBy->id))
-                                                <a href="{{ $kickedByUrl ?? '#' }}"  
+                                                <a href="{{ $kickedByUrl ?? '#' }}"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
                                                     <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
@@ -1988,7 +1950,7 @@
                             <tr>
                                 <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{  '#' }}"  
+                                    <a href="{{  '#' }}"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2184,7 +2146,7 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ url('bd/users/profile/' . $id) }}"  
+                                    <a href="{{ url('bd/users/profile/' . $id) }}"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2196,7 +2158,7 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"  
+                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
@@ -2241,7 +2203,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" 
+                                    <a href="#"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
@@ -2252,7 +2214,7 @@
                                 @if($giftType == 'receiver')
                                     <td>
                                         @if ($giftSLog->agency_id)
-                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"  
+                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"
                                                class="d-flex align-items-center text-decoration-none">
                                                 <img src="{{ $agencyImage }}"
                                                      width="50" height="30"
