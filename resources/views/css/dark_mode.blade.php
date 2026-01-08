@@ -169,6 +169,10 @@
         color: var(--text-primary-color) !important;
     }
 
+    .dark-mode .settings-menu button:hover {
+        background: var(--primary-color) !important;
+    }
+
     .dark-mode input,
     .dark-mode textarea,
     .dark-mode .table > tbody > tr:hover,

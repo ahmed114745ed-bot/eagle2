@@ -1869,6 +1869,7 @@
 
     button {
         background: var(--primary-color);
+        color: var(--text-secondary-color);
         padding: 10px;
         border: none;
         cursor: pointer;
@@ -3105,6 +3106,25 @@
         padding: 24px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid #eaeaea;
+    }
+
+    .settings-menu button {
+        display: block;
+        width: 100%;
+        text-align: right;
+        padding: 15px;
+        color: black;
+        background: white;
+        border: none;
+        margin-bottom: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .settings-menu button:hover {
+        background: var(--primary-color);
+        color: var(--text-secondary-color);
     }
 </style>
 
