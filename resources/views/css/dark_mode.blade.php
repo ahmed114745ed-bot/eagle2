@@ -108,7 +108,7 @@
         border-bottom: 1px solid var(--white) !important;
     }
 
-    .dark-color .box-footer {
+    .dark-mode .box-footer {
         border-top: 2px solid var(--white) !important;
     }
 
