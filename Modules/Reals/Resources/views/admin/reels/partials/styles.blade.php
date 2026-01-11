@@ -158,9 +158,9 @@
             transform: translateX(0);
             min-width: 330px !important;
         }
-        .w-full{
-         top: -25px !important;
-        height: 85% !important;
+        .video-container{
+         top: -10px !important;
+        height: 91% !important;
         }
     }
 

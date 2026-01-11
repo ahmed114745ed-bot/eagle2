@@ -10,7 +10,7 @@
     const csrf = cfg.csrf || '';
 
     let currentPage = 1;
-    let currentSort = 'newest';
+    let currentSort = 'random'; // الترتيب الافتراضي عشوائي
     let totalPages = 1;
     let searchQuery = '';
     let userIdFilter = '';
@@ -117,19 +117,19 @@
         $('#sortSelect').on('change', function() {
             currentSort = $(this).val();
             currentPage = 1;
-            if (currentSort === 'random' && routes.resetRandom) {
-                $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
-            } else {
-                loadMoments();
-            }
+            loadMoments();
         });
 
-        // تحديث
         // تحديث
         $('#refreshBtn').on('click', function() {
             const icon = $(this).find('i');
             icon.addClass('fa-spin');
             currentPage = 1;
+            
+            // مسح الكاش وإعادة التحميل
+            allMomentsLoaded = [];
+            currentlyVisibleCount = 0;
+            
             loadMoments().always(() => {
                 setTimeout(() => icon.removeClass('fa-spin'), 400);
             });
@@ -398,6 +398,7 @@
         
         const createdAt = new Date(moment.created_at);
         const timeAgo = getTimeAgo(createdAt);
+        const fullDateTime = formatDateTime(createdAt);
 
         return `
             <div class="moment-post" data-moment-id="${moment.id}">
@@ -410,7 +411,7 @@
                         </div>
                         <div class="user-meta">
                             <span class="user-uuid">ID: ${userId} • UUID: ${userUuid}</span>
-                            <span class="post-time"> • ${timeAgo}</span>
+                            <span class="post-time" title="${fullDateTime}"> • ${timeAgo}</span>
                         </div>
                     </div>
                     <div class="post-menu">
@@ -485,25 +486,17 @@
         
         const seeMoreText = seeMoreTexts[lang] || seeMoreTexts.en;
         
-        return `
-            <div class="post-content">
+        return `<div class="post-content">
                 <div class="post-description ${needsSeeMore ? 'collapsible' : ''}" 
                      id="desc-${momentId}" 
                      dir="${textDir}" 
                      style="text-align: ${textAlign};"
                      data-full-text="${escapedDesc}"
-                     data-collapsed="true">
-                    <span class="description-text">${escapedDesc}</span>
-                </div>
-                ${needsSeeMore ? `
-                    <button class="see-more-btn" 
-                            onclick="toggleDescription(${momentId}, event)"
-                            data-lang="${lang}">
-                        ${seeMoreText.more}
-                    </button>
-                ` : ''}
-            </div>
-        `;
+                     data-collapsed="true"><span class="description-text">${escapedDesc}</span></div>${needsSeeMore ? `
+                <button class="see-more-btn" 
+                        onclick="toggleDescription(${momentId}, event)"
+                        data-lang="${lang}">${seeMoreText.more}</button>` : ''}
+            </div>`;
     }
 
     function renderMedia(momentId, allMedia) {
@@ -719,7 +712,9 @@
                             const userUuid = user.uuid || '';
                             const userId = user.id || '';
                             const userUrl = adminUserUrl + userId;
-                            const timeAgo = getTimeAgo(new Date(comment.created_at));
+                            const commentDate = new Date(comment.created_at);
+                            const timeAgo = getTimeAgo(commentDate);
+                            const fullDateTime = formatDateTime(commentDate);
                             const commentDir = detectTextDirection(comment.comment);
                             
                             html += `
@@ -735,7 +730,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
-                                    <div class="modal-comment-time">${timeAgo}</div>
+                                    <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>
                                 </div>
                             `;
                         });
@@ -816,6 +811,9 @@
                             const userUuid = user.uuid || '';
                             const userId = user.id || '';
                             const userUrl = adminUserUrl + userId;
+                            const likeDate = new Date(like.created_at);
+                            const timeAgo = getTimeAgo(likeDate);
+                            const fullDateTime = formatDateTime(likeDate);
                             
                             html += `
                                 <div class="modal-user-item" onclick="window.open('${userUrl}', '_blank')">
@@ -824,7 +822,10 @@
                                         <div class="modal-user-name">${escapeHtml(userName)}</div>
                                         <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
                                     </div>
-                                    <i class="fas fa-heart modal-like-icon"></i>
+                                    <div class="modal-like-info">
+                                        <i class="fas fa-heart modal-like-icon"></i>
+                                        <span class="modal-like-time" title="${fullDateTime}">${timeAgo}</span>
+                                    </div>
                                 </div>
                             `;
                         });
@@ -911,6 +912,10 @@
                                 ? getImagePath(gift.gift_img) 
                                 : '';
                             
+                            const giftDate = new Date(gift.created_at);
+                            const timeAgo = getTimeAgo(giftDate);
+                            const fullDateTime = formatDateTime(giftDate);
+                            
                             html += `
                                 <div class="modal-gift-item">
                                     <div class="modal-user-item" onclick="window.open('${userUrl}', '_blank')">
@@ -925,6 +930,7 @@
                                         <div class="gift-details">
                                             <div class="gift-name">${escapeHtml(giftName)}</div>
                                             <div class="gift-value"><i class="fas fa-coins"></i> ${giftValue}</div>
+                                            <div class="gift-time" title="${fullDateTime}">${timeAgo}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1306,20 +1312,38 @@
     }
 
     function getTimeAgo(date) {
-        const seconds = Math.floor((new Date() - date) / 1000);
+        // تحويل التاريخ مع مراعاة timezone
+        const momentDate = new Date(date);
+        const now = new Date();
+        const seconds = Math.floor((now - momentDate) / 1000);
+        
         const intervals = [
             { label: texts.years || 'y', seconds: 31536000 },
-            { label: texts.months || 'm', seconds: 2592000 },
+            { label: texts.months || 'mo', seconds: 2592000 },
             { label: texts.days || 'd', seconds: 86400 },
             { label: texts.hours || 'h', seconds: 3600 },
-            { label: texts.minutes || 'm', seconds: 60 }
+            { label: texts.minutes || 'min', seconds: 60 }
         ];
         
         for (const interval of intervals) {
             const count = Math.floor(seconds / interval.seconds);
             if (count >= 1) return count + interval.label;
         }
-        return texts.now || 'just now';
+        return texts.now || 'now';
+    }
+    
+    function formatDateTime(date) {
+        // عرض التاريخ والوقت الكامل مع timezone
+        const momentDate = new Date(date);
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZoneName: 'short'
+        };
+        return momentDate.toLocaleString('en-US', options);
     }
 
     window.loadMoments = loadMoments;

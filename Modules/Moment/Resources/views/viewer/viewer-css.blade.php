@@ -1361,10 +1361,14 @@ body.modal-open {
 }
 
 .modal-user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 12px 20px;
     transition: background 0.15s ease;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
+    gap: 16px;
 }
 
 .modal-user-item:hover {
@@ -1379,6 +1383,9 @@ body.modal-open {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
     position: relative;
 }
 
@@ -1415,10 +1422,24 @@ body.modal-open {
     text-overflow: ellipsis;
 }
 
+.modal-like-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 .modal-like-icon {
     color: #e4405f;
-    font-size: 20px;
+    font-size: 18px;
     flex-shrink: 0;
+}
+
+.modal-like-time {
+    color: var(--text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
 }
 
 /* Gift Item Styles */
@@ -1480,6 +1501,12 @@ body.modal-open {
 
 .gift-value i {
     font-size: 12px;
+}
+
+.gift-time {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
 }
 
 .modal-delete-btn {
