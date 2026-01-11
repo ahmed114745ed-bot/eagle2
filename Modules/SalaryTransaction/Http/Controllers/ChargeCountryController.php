@@ -74,7 +74,7 @@ class ChargeCountryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChargeCountry());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()->with(['country'])->when($countryID, fn($q) => $q->whereHas('country', fn($q) => $q->where('id', $countryID)));
 
