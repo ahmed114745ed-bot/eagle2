@@ -61,6 +61,13 @@ class ReportController extends MainController
 
         $grid->disableRowSelector();
         $grid->model()
+        ->with([
+             'profile',
+              'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+              'targets',
+              'userSallary',
+              'agency'
+        ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->where('agency_id', '!=', 0)
             ->where('agency_id', '!=', '')
