@@ -322,7 +322,7 @@ class SallariesController extends MainController
         // })->default(0);
 
         $grid->column('sallary', __('salary'))->display(function ($v) {
-             $v = truncateAndTrim($v) ?? 0;
+            $v = truncateAndTrim($v) ?? 0;
             $img = asset('images/dollar.jpg');
             return "<div style='display:flex;align-items:center'>
               <span>{$v}</span>
@@ -342,7 +342,7 @@ class SallariesController extends MainController
         // })->default(0);
 
         $grid->column('withdrawal', __('withdrawal'))->display(function ($v) {
-             $v = truncateAndTrim($v) ?? 0;
+            $v = floor($v ?? 0);
             $img = asset('images/dollar.jpg');
             return "<div style='display:flex;align-items:center'>
               <span>{$v}</span>
