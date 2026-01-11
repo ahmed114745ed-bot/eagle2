@@ -544,7 +544,7 @@ class ReportController extends MainController
         $userId = $request->user_id;
         $month  = $request->month;
         $year   = $request->year;
- dd( $userId,$month, $year);
+//  dd( $userId,$month, $year);
         $salary = UserSallary::query()
             ->where('user_id', $userId)
             ->where('month', $month)
