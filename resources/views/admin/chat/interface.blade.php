@@ -52,11 +52,12 @@
         </div>
 
         <!-- Message Input -->
-        <div class="chat-input">
-
-            <input type="text" id="messageInput" placeholder="{{ __('Type your message here') }}" class="message-input">
-
-            <button class="send-btn" onclick="sendMessage()">
+        <div class="chat-input {{ !$canSendMessages ? 'disabled' : '' }}">
+            <input type="text" id="messageInput"
+                   placeholder="{{ $canSendMessages ? __('Type your message here') : __('You cannot send messages') }}"
+                   class="message-input"
+                {{ !$canSendMessages ? 'disabled' : '' }}>
+            <button class="send-btn" onclick="sendMessage()" {{ !$canSendMessages ? 'disabled' : '' }}>
                 <i class="fa fa-paper-plane"></i>
             </button>
         </div>
@@ -110,7 +111,8 @@
     };
 
     const csrfToken = '{{ csrf_token() }}';
-    const adminUserId = {{ Admin::user()->id ?? 1 }};
+    const adminAppId = {{ $adminAppId ?? 0 }};
+    const canSendMessages = {{ $canSendMessages ? 'true' : 'false' }};
 
     let currentPage = 1;
     let lastPage = 1;
@@ -289,7 +291,7 @@
     }
 
     function createMessageElement(message) {
-        const isAdmin = message.user_id == adminUserId;
+        const isAdmin = message.user_id == adminAppId;
         const messageClass = isAdmin ? 'sent-message' : 'received-message';
         const time = new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const avatarUrl = message.user_avatar || '{{ asset("images/default-avatar.png") }}';
@@ -426,11 +428,16 @@
     }
 
     function sendMessage() {
+        if (!canSendMessages) {
+            toastr.error("{{ __('You cannot send messages. Your account is not linked to an app user.') }}");
+            return;
+        }
+
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
         if (!text) { toastr.warning(translations.pleaseEnterMessage); return; }
 
-        const payload = { text, user_id: adminUserId };
+        const payload = { text};
         if (replyingTo) payload.parent_id = replyingTo;
 
         fetch('{{ route("admin.chat.store") }}', {

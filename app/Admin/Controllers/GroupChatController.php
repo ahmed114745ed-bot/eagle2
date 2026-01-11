@@ -2,6 +2,8 @@
 
 namespace App\Admin\Controllers;
 
+use App\Jobs\SendNotificationsToAllUsers;
+use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -13,6 +15,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Modules\Public\Http\Services\UpgradeLevelServices;
 
 class GroupChatController extends MainController
 {
@@ -250,12 +253,41 @@ class GroupChatController extends MainController
         return $form;
     }
 
+    private function canAdminSendMessages(): bool
+    {
+        $admin = Admin::user();
+
+        if (!$admin || empty($admin->app_id) || $admin->app_id <= 0) {
+            return false;
+        }
+
+        return $admin->user()->exists();
+    }
+
+    private function getAdminAppId(): ?int
+    {
+        $admin = Admin::user();
+
+        if (!$admin || empty($admin->app_id) || $admin->app_id <= 0) {
+            return null;
+        }
+
+        if (!$admin->user()->exists()) {
+            return null;
+        }
+
+        return (int) $admin->app_id;
+    }
+
     public function chatView(Content $content)
     {
         return $content
             ->title(__('Group Chat'))
             ->description(__('Manage Messages'))
-            ->body(view('admin.chat.interface'));
+            ->body(view('admin.chat.interface', [
+                'canSendMessages' => $this->canAdminSendMessages(),
+                'adminAppId' => $this->getAdminAppId(),
+            ]));
     }
 
     public function updateMessage(Request $request): JsonResponse
@@ -340,21 +372,37 @@ class GroupChatController extends MainController
 
     public function storeMessage(Request $request): JsonResponse
     {
+        if (!$this->canAdminSendMessages()) {
+            return response()->json([
+                'success' => false,
+                'error' => __('You cannot send messages. Your admin account is not connected to an app user account.')
+            ], 403);
+        }
+
         $request->validate([
             'text' => 'required|string|max:1000',
-            'user_id' => 'required|integer',
-            'parent_id' => 'nullable|integer|exists:group_chats,id'
+            'parent_id' => 'nullable|integer|exists:group_chat,id'
         ]);
+
+        $appUserId = $this->getAdminAppId();
+
+        $user = User::find($appUserId);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'error' => __('User account not found.')
+            ], 404);
+        }
 
         $message = GroupChat::create([
             'text' => $request->text,
-            'user_id' => $request->user_id,
+            'user_id' => $appUserId,
             'parent_id' => $request->parent_id,
             'created_at' => now(),
             'updated_at' => now()
         ]);
 
-        // Load relationships
         $message->load(['user.profile', 'parent.user']);
 
         $avatarPath = $message->user->profile->avatar ?? null;
@@ -371,21 +419,37 @@ class GroupChatController extends MainController
             ];
         }
 
+        $responseData = [
+            'id' => $message->id,
+            'text' => $message->text,
+            'user_id' => $message->user_id,
+            'image' => $message->image,
+            'parent_id' => $message->parent_id,
+            'parent' => $parentData,
+            'created_at' => $message->created_at,
+            'updated_at' => $message->updated_at,
+            'user_name' => $message->user->name ?? __('Admin'),
+            'user_avatar' => $avatarUrl,
+            'user_uuid' => $message->user->uuid ?? null,
+        ];
+
+        (new UpgradeLevelServices())->sendWorldChat($user);
+
+        try {
+            event(new \Modules\Chat\Events\GroupChat($responseData));
+        } catch (\Throwable $th) {
+            // Log error if needed
+            // \Log::error('Pusher error: ' . $th->getMessage());
+        }
+
+        dispatchJobToQueue(
+            new SendNotificationsToAllUsers($user, $request->text, $responseData),
+            queueName: 'heavyProcessing'
+        );
+
         return response()->json([
             'success' => true,
-            'message' => [
-                'id' => $message->id,
-                'text' => $message->text,
-                'user_id' => $message->user_id,
-                'image' => $message->image,
-                'parent_id' => $message->parent_id,
-                'parent' => $parentData,
-                'created_at' => $message->created_at,
-                'updated_at' => $message->updated_at,
-                'user_name' => $message->user->name ?? __('Admin'),
-                'user_avatar' => $avatarUrl,
-                'user_uuid' => $message->user->uuid ?? null,
-            ]
+            'message' => $responseData
         ]);
     }
 }
