@@ -4379,6 +4379,13 @@
     "View Chat Interface": "Sohbet Arayüzünü Görüntüle",
     "Parent ID": "Üst Mesaj ID",
     "Created Date": "Oluşturulma Tarihi",
+    "You cannot send messages. Your admin account is not connected to an app user account.": "Mesaj gönderemezsiniz. Yönetici hesabınız bir uygulama kullanıcı hesabına bağlı değil.",
+    "You cannot send messages. Your account is not linked to an app user.": "Mesaj gönderemezsiniz. Hesabınız bir uygulama kullanıcısına bağlı değil.",
+    "Your admin account is not linked to an app user. You can view messages but cannot send.": "Yönetici hesabınız bir uygulama kullanıcısına bağlı değil. Mesajları görüntüleyebilirsiniz ancak gönderemezsiniz.",
+    "You cannot send messages": "Mesaj gönderemezsiniz",
+    "User account not found.": "Kullanıcı hesabı bulunamadı.",
+    "User account not found or has been deleted.": "Kullanıcı hesabı bulunamadı veya silinmiş.",
+
     "moment_viewer.noData": "Veri döndürülmedi",
     "moment_viewer.failedLoad": "Anlar yüklenemedi",
     "moment_viewer.noMoments": "Hiç An Bulunamadı",

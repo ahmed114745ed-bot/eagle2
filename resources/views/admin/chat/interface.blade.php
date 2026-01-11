@@ -45,18 +45,19 @@
 {{--                    <i class="fa fa-arrow-up"></i> Load More Messages--}}
 {{--                </button>--}}
 {{--            </div>--}}
-            <div class="loading-indicator" id="loadingIndicator">
-                <i class="fa fa-spinner"></i>
-                <p>{{ __('Loading messages...') }}</p>
-            </div>
+{{--            <div class="loading-indicator" id="loadingIndicator">--}}
+{{--                <i class="fa fa-spinner"></i>--}}
+{{--                <p>{{ __('Loading messages...') }}</p>--}}
+{{--            </div>--}}
         </div>
 
         <!-- Message Input -->
-        <div class="chat-input">
-
-            <input type="text" id="messageInput" placeholder="{{ __('Type your message here') }}" class="message-input">
-
-            <button class="send-btn" onclick="sendMessage()">
+        <div class="chat-input {{ !$canSendMessages ? 'disabled' : '' }}">
+            <input type="text" id="messageInput"
+                   placeholder="{{ $canSendMessages ? __('Type your message here') : __('You cannot send messages') }}"
+                   class="message-input"
+                {{ !$canSendMessages ? 'disabled' : '' }}>
+            <button class="send-btn" onclick="sendMessage()" {{ !$canSendMessages ? 'disabled' : '' }}>
                 <i class="fa fa-paper-plane"></i>
             </button>
         </div>
@@ -89,7 +90,6 @@
 </div>
 
 <script>
-    // Translations object
     const translations = {
         loadingMessages: "{{ __('Loading messages...') }}",
         failedToLoadMessages: "{{ __('Failed to load messages') }}",
@@ -110,425 +110,414 @@
         user: "{{ __('User') }}"
     };
 
-    // CSRF Token
     const csrfToken = '{{ csrf_token() }}';
-    const adminUserId = {{ Admin::user()->id ?? 1 }};
+    const adminAppId = {{ $adminAppId ?? 0 }};
+    const canSendMessages = {{ $canSendMessages ? 'true' : 'false' }};
 
-    // Pagination state
     let currentPage = 1;
     let lastPage = 1;
     let isLoading = false;
     let allMessages = [];
     let initialLoad = true;
-
-    // Reply state
+    let hasMoreMessages = true;
+    let loadedMessageIds = new Set();
     let replyingTo = null;
 
-    // Scroll threshold
     const SCROLL_THRESHOLD = 100;
+    let scrollDebounceTimer = null;
 
-    // Get chat container
     const chatContainer = document.getElementById('chatMessages');
 
-    // Scroll event listener
-    chatContainer.addEventListener('scroll', function() {
-        if (chatContainer.scrollTop <= SCROLL_THRESHOLD && !isLoading && currentPage < lastPage) {
-            loadMoreMessages();
-        }
-    });
+    // Scroll handler - load more when at TOP
+    function handleScroll() {
+        if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer);
 
-    // Load initial messages
+        scrollDebounceTimer = setTimeout(() => {
+            if (chatContainer.scrollTop <= SCROLL_THRESHOLD && !isLoading && hasMoreMessages) {
+                loadMoreMessages();
+            }
+        }, 300);
+    }
+
+    chatContainer.addEventListener('scroll', handleScroll);
+
+    // Load initial messages (newest - page 1)
     function loadMessages() {
         if (isLoading) return;
 
         isLoading = true;
         showTopLoader();
 
-        fetch(`{{ route("admin.chat.messages") }}?page=${currentPage}`)
-            .then(response => response.json())
+        fetch(`{{ route("admin.chat.messages") }}?page=1`)
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    allMessages = data.messages;
-                    lastPage = data.last_page;
-                    currentPage = data.current_page;
+                    allMessages = [];
+                    loadedMessageIds.clear();
+
+                    (data.messages || []).forEach(msg => {
+                        if (!loadedMessageIds.has(msg.id)) {
+                            loadedMessageIds.add(msg.id);
+                            allMessages.push(msg);
+                        }
+                    });
+
+                    lastPage = data.last_page || 1;
+                    currentPage = 1;
+                    hasMoreMessages = currentPage < lastPage;
 
                     renderMessages();
                     hideTopLoader();
 
                     if (initialLoad) {
-                        scrollToBottom();
-                        initialLoad = false;
+                        setTimeout(() => {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            initialLoad = false;
+                        }, 100);
                     }
                 }
                 isLoading = false;
             })
-            .catch(error => {
-                console.error('Error loading messages:', error);
+            .catch(err => {
+                console.error(err);
                 toastr.error(translations.failedToLoadMessages);
                 hideTopLoader();
                 isLoading = false;
             });
     }
 
-    // Load more messages
+    // Load older messages (higher page numbers)
     function loadMoreMessages() {
-        if (currentPage >= lastPage || isLoading) return;
+        if (isLoading || !hasMoreMessages || currentPage >= lastPage) return;
 
         const nextPage = currentPage + 1;
         isLoading = true;
         showTopLoader();
 
-        const previousScrollHeight = chatContainer.scrollHeight;
+        // IMPORTANT: Store scroll height BEFORE loading
+        const scrollHeightBefore = chatContainer.scrollHeight;
 
         fetch(`{{ route("admin.chat.messages") }}?page=${nextPage}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    allMessages = [...data.messages, ...allMessages];
-                    currentPage = data.current_page;
-                    lastPage = data.last_page;
+                    const olderMessages = data.messages || [];
+
+                    // Add older messages (they go to the TOP visually)
+                    olderMessages.forEach(msg => {
+                        if (!loadedMessageIds.has(msg.id)) {
+                            loadedMessageIds.add(msg.id);
+                            allMessages.push(msg); // Just add, sorting handles position
+                        }
+                    });
+
+                    currentPage = nextPage;
+                    hasMoreMessages = currentPage < lastPage;
 
                     renderMessages();
 
-                    const newScrollHeight = chatContainer.scrollHeight;
-                    chatContainer.scrollTop = newScrollHeight - previousScrollHeight;
+                    // IMPORTANT: Maintain scroll position
+                    // New content was added at TOP, so adjust scroll
+                    setTimeout(() => {
+                        const scrollHeightAfter = chatContainer.scrollHeight;
+                        const addedHeight = scrollHeightAfter - scrollHeightBefore;
+                        chatContainer.scrollTop = addedHeight;
+                    }, 10);
 
                     hideTopLoader();
                 }
                 isLoading = false;
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(err => {
+                console.error(err);
                 toastr.error(translations.failedToLoadMoreMessages);
                 hideTopLoader();
                 isLoading = false;
             });
     }
 
-    // Show top loader
     function showTopLoader() {
         let loader = document.getElementById('topLoader');
         if (!loader) {
             loader = document.createElement('div');
             loader.id = 'topLoader';
             loader.className = 'top-loading-indicator';
-            loader.innerHTML = `
-                <div class="loading-spinner">
-                    <i class="fa fa-spinner fa-spin"></i>
-                    <span>${translations.loadingMessages}</span>
-                </div>
-            `;
-            chatContainer.insertBefore(loader, chatContainer.firstChild);
+            loader.innerHTML = `<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> <span>${translations.loadingMessages}</span></div>`;
+            chatContainer.prepend(loader);
         }
         loader.style.display = 'flex';
     }
 
-    // Hide top loader
     function hideTopLoader() {
         const loader = document.getElementById('topLoader');
         if (loader) loader.style.display = 'none';
-
-        const initialLoader = document.getElementById('loadingIndicator');
-        if (initialLoader) initialLoader.style.display = 'none';
     }
 
-    // Refresh messages
     function refreshMessages() {
         currentPage = 1;
+        lastPage = 1;
         allMessages = [];
+        loadedMessageIds.clear();
         initialLoad = true;
-
-        const messageElements = chatContainer.querySelectorAll('.message-wrapper');
-        messageElements.forEach(el => el.remove());
-
+        hasMoreMessages = true;
+        isLoading = false;
+        chatContainer.innerHTML = '';
         loadMessages();
         toastr.info(translations.refreshingMessages);
     }
 
-    // Render messages
+    // Render: Sort oldest TOP, newest BOTTOM
     function renderMessages() {
-        const messageElements = chatContainer.querySelectorAll('.message-wrapper');
-        messageElements.forEach(el => el.remove());
+        chatContainer.querySelectorAll('.message-wrapper, .scroll-up-indicator').forEach(el => el.remove());
 
-        let scrollIndicator = document.getElementById('scrollUpIndicator');
-        if (currentPage < lastPage) {
-            if (!scrollIndicator) {
-                scrollIndicator = document.createElement('div');
-                scrollIndicator.id = 'scrollUpIndicator';
-                scrollIndicator.className = 'scroll-up-indicator';
-                scrollIndicator.innerHTML = `
-                    <i class="fa fa-arrow-up"></i>
-                    <span>${translations.scrollUpForOlderMessages}</span>
-                `;
-            }
+        // Sort: oldest first (small date/id) at TOP
+        const sorted = [...allMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        // Show indicator if more pages
+        if (hasMoreMessages) {
+            const indicator = document.createElement('div');
+            indicator.className = 'scroll-up-indicator';
+            indicator.id = 'scrollUpIndicator';
+            indicator.innerHTML = `<i class="fa fa-arrow-up"></i> <span>${translations.scrollUpForOlderMessages}</span>`;
             const loader = document.getElementById('topLoader');
-            if (loader && loader.nextSibling) {
-                chatContainer.insertBefore(scrollIndicator, loader.nextSibling);
-            }
-        } else if (scrollIndicator) {
-            scrollIndicator.remove();
+            if (loader) loader.after(indicator);
+            else chatContainer.prepend(indicator);
         }
 
-        allMessages.forEach(message => {
-            const messageHtml = createMessageElement(message);
-            chatContainer.insertAdjacentHTML('beforeend', messageHtml);
+        // Render oldest to newest
+        sorted.forEach(msg => {
+            chatContainer.insertAdjacentHTML('beforeend', createMessageElement(msg));
         });
     }
 
-    // Create message element
     function createMessageElement(message) {
-        const isAdmin = message.user_id == adminUserId;
+        const isAdmin = message.user_id == adminAppId;
         const messageClass = isAdmin ? 'sent-message' : 'received-message';
-        const time = new Date(message.created_at).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
+        const time = new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const avatarUrl = message.user_avatar || '{{ asset("images/default-avatar.png") }}';
         const userName = message.user_name || translations.user;
         const userInitial = userName.charAt(0).toUpperCase();
 
-        // Reply bubble HTML
         let replyHtml = '';
         if (message.parent) {
             replyHtml = `
                 <div class="replied-message" onclick="scrollToMessage(${message.parent.id})">
                     <div class="replied-user">${escapeHtml(message.parent.user_name)}</div>
                     <div class="replied-text">${escapeHtml(message.parent.text)}</div>
-                </div>
-            `;
+                </div>`;
         }
+
+        const actionMenuHtml = `
+            <div class="message-actions">
+                <button class="more-btn" onclick="toggleActionMenu(event, ${message.id})">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <div class="action-menu" id="action-menu-${message.id}">
+                    <button class="action-menu-item reply-item" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
+                        <i class="fa fa-reply"></i> {{ __('Reply') }}
+        </button>
+        <button class="action-menu-item edit-item" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
+                        <i class="fa fa-edit"></i> {{ __('Edit') }}
+        </button>
+        <button class="action-menu-item delete-item" onclick="deleteMessage(${message.id})">
+                        <i class="fa fa-trash"></i> {{ __('Delete') }}
+        </button>
+    </div>
+</div>`;
 
         if (isAdmin) {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                <div class="action-buttons">
-                    <button class="reply-btn" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
-                        <i class="fa fa-reply"></i>
-                    </button>
-                    <button class="edit-btn" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <button class="delete-btn" onclick="deleteMessage(${message.id})">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        <p>${escapeHtml(message.text)}</p>
-                        <div class="message-footer">
-                            <span class="message-time">${time}</span>
-                            <i class="fa fa-check-double"></i>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    ${actionMenuHtml}
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            <p>${escapeHtml(message.text)}</p>
+                            <div class="message-footer">
+                                <span class="message-time">${time}</span>
+                                <i class="fa fa-check-double"></i>
+                            </div>
+                        </div>
+                        <div class="user-avatar sender">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
                         </div>
                     </div>
-                    <div class="user-avatar sender">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
-                    </div>
-                </div>
-            </div>
-        `;
+                </div>`;
         } else {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                <div class="message-content">
-                    <div class="user-avatar">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    <div class="message-content">
+                        <div class="user-avatar">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                        </div>
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            <p class="user-name-label">${userName}</p>
+                            <p>${escapeHtml(message.text)}</p>
+                            <span class="message-time">${time}</span>
+                        </div>
                     </div>
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        <p class="user-name-label">${userName}</p>
-                        <p>${escapeHtml(message.text)}</p>
-                        <span class="message-time">${time}</span>
-                    </div>
-                </div>
-                <div class="action-buttons">
-                    <button class="reply-btn" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
-                        <i class="fa fa-reply"></i>
-                    </button>
-                    <button class="edit-btn" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <button class="delete-btn" onclick="deleteMessage(${message.id})">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+                    ${actionMenuHtml}
+                </div>`;
         }
     }
 
-    // Set reply
+    function toggleActionMenu(event, messageId) {
+        event.stopPropagation();
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
+
+        const menu = document.getElementById(`action-menu-${messageId}`);
+        if (!menu) return;
+
+        const wrapper = menu.closest('.message-wrapper');
+        const containerRect = chatContainer.getBoundingClientRect();
+        const msgRect = wrapper.getBoundingClientRect();
+
+        if (containerRect.bottom - msgRect.bottom < 150) {
+            menu.classList.add('open-up');
+        } else {
+            menu.classList.add('open-down');
+        }
+        menu.classList.add('show');
+    }
+
+    document.addEventListener('click', e => {
+        if (!e.target.closest('.message-actions')) {
+            document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
+        }
+    });
+
+    chatContainer.addEventListener('scroll', () => {
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
+    });
+
     function setReply(messageId, userName, messageText) {
         replyingTo = messageId;
         document.getElementById('replyToId').value = messageId;
         document.getElementById('replyToName').textContent = `${translations.replyingTo} ${userName}`;
         document.getElementById('replyToText').textContent = messageText;
-        document.getElementById('replyPreview').classList.add('active');
         document.getElementById('replyPreview').style.display = 'flex';
         document.getElementById('messageInput').focus();
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     }
 
-    // Cancel reply
     function cancelReply() {
         replyingTo = null;
         document.getElementById('replyToId').value = '';
-        document.getElementById('replyPreview').classList.remove('active');
         document.getElementById('replyPreview').style.display = 'none';
     }
 
-    // Scroll to message
     function scrollToMessage(messageId) {
-        const messageElement = document.querySelector(`.message-wrapper[data-id="${messageId}"]`);
-        if (messageElement) {
-            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            messageElement.classList.add('highlighted');
-            setTimeout(() => {
-                messageElement.classList.remove('highlighted');
-            }, 2000);
+        const el = document.querySelector(`.message-wrapper[data-id="${messageId}"]`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('highlighted');
+            setTimeout(() => el.classList.remove('highlighted'), 2000);
         } else {
             toastr.info(translations.messageNotLoaded);
         }
     }
 
-    // Escape HTML
     function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
-    // Scroll to bottom
-    function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // Send message
     function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const text = input.value.trim();
-
-        if (text === '') {
-            toastr.warning(translations.pleaseEnterMessage);
+        if (!canSendMessages) {
+            toastr.error("{{ __('You cannot send messages. Your account is not linked to an app user.') }}");
             return;
         }
 
-        const payload = {
-            text: text,
-            user_id: adminUserId
-        };
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text) { toastr.warning(translations.pleaseEnterMessage); return; }
 
-        if (replyingTo) {
-            payload.parent_id = replyingTo;
-        }
+        const payload = { text};
+        if (replyingTo) payload.parent_id = replyingTo;
 
         fetch('{{ route("admin.chat.store") }}', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
             body: JSON.stringify(payload)
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     input.value = '';
                     cancelReply();
-                    allMessages.push(data.message);
+                    if (!loadedMessageIds.has(data.message.id)) {
+                        allMessages.push(data.message);
+                        loadedMessageIds.add(data.message.id);
+                    }
                     renderMessages();
-                    scrollToBottom();
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                     toastr.success(translations.messageSentSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToSendMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToSendMessage); });
     }
 
-    // Edit message
     function editMessage(id, text) {
         document.getElementById('editMessageId').value = id;
         document.getElementById('editMessageText').value = text;
         document.getElementById('editModal').classList.add('active');
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     }
 
-    // Close edit modal
     function closeEditModal() {
         document.getElementById('editModal').classList.remove('active');
     }
 
-    // Save edit
     function saveEdit() {
         const id = document.getElementById('editMessageId').value;
         const text = document.getElementById('editMessageText').value.trim();
-
-        if (text === '') {
-            toastr.warning(translations.messageCannotBeEmpty);
-            return;
-        }
+        if (!text) { toastr.warning(translations.messageCannotBeEmpty); return; }
 
         fetch('{{ route("admin.chat.update") }}', {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ id: id, text: text })
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            body: JSON.stringify({ id, text })
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     closeEditModal();
-                    const index = allMessages.findIndex(m => m.id == id);
-                    if (index !== -1) {
-                        allMessages[index].text = text;
-                        renderMessages();
-                    }
+                    const idx = allMessages.findIndex(m => m.id == id);
+                    if (idx !== -1) { allMessages[idx].text = text; renderMessages(); }
                     toastr.success(translations.messageUpdatedSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToUpdateMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToUpdateMessage); });
     }
 
-    // Delete message
     function deleteMessage(id) {
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
         if (!confirm(translations.confirmDeleteMessage)) return;
 
         fetch(`{{ route("admin.chat.delete", "") }}/${id}`, {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': csrfToken }
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     allMessages = allMessages.filter(m => m.id != id);
+                    loadedMessageIds.delete(parseInt(id));
                     renderMessages();
                     toastr.success(translations.messageDeletedSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToDeleteMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToDeleteMessage); });
     }
 
-    // Enter key to send
-    document.getElementById('messageInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
 
-    // Close modal on outside click
-    document.getElementById('editModal').addEventListener('click', function(e) {
-        if (e.target === this) closeEditModal();
-    });
-
-    // Load initial messages
+    // START
     loadMessages();
 </script>

@@ -16,10 +16,14 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
+        // جلب عشوائي مع seed للاتساق
+        $sessionSeed = session('reels_random_seed', time());
+        session(['reels_random_seed' => $sessionSeed]);
+        
         $reels = Real::with(['user.profile', 'user.country'])
             ->withCount(['likes', 'comments', 'Views'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->inRandomOrder()
+            ->limit(15) // زيادة العدد للتخزين المسبق
             ->get()
             ->map(function ($reel) {
                 $videoUrl = $this->buildMediaUrl($reel->url);
@@ -50,11 +54,18 @@ class AdminReelController extends MainController
     {
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 20);
+        $excludeIds = $request->input('exclude_ids', []);
         
-        $reels = Real::with(['user.profile', 'user.country'])
-            ->withCount(['likes', 'comments', 'Views'])
-            ->orderBy('created_at', 'desc')
-            ->skip($offset)
+        // جلب عشوائي مع تجنب الريلز المعروضة مسبقاً
+        $query = Real::with(['user.profile', 'user.country'])
+            ->withCount(['likes', 'comments', 'Views']);
+        
+        // استبعاد الريلز المحملة مسبقاً
+        if (!empty($excludeIds) && is_array($excludeIds)) {
+            $query->whereNotIn('id', $excludeIds);
+        }
+        
+        $reels = $query->inRandomOrder()
             ->take($limit)
             ->get()
             ->map(function ($reel) {
@@ -78,14 +89,17 @@ class AdminReelController extends MainController
                 ];
             });
         
-        \Log::info('Load More Reels', [
-            'offset' => $offset,
+        \Log::info('Load More Reels (Random)', [
+            'excluded_count' => count($excludeIds),
             'limit' => $limit,
             'returned' => $reels->count(),
-            'total' => Real::count()
+            'total_available' => Real::whereNotIn('id', $excludeIds)->count()
         ]);
             
-        return response()->json(['reels' => $reels]);
+        return response()->json([
+            'reels' => $reels,
+            'has_more' => Real::whereNotIn('id', array_merge($excludeIds, $reels->pluck('id')->toArray()))->exists()
+        ]);
     }
 
     public function show($id, Content $content)

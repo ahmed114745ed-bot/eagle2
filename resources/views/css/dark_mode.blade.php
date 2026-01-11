@@ -52,6 +52,8 @@
     .dark-mode .sm\:text-base,
     .dark-mode .user-card,
     .dark-mode .received-message .message-bubble,
+    .dark-mode .action-menu,
+    .dark-mode .more-btn:hover,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -89,6 +91,7 @@
     .dark-mode .delete-btn,
     .dark-mode .chat-header,
     .dark-mode .refresh-btn,
+    .dark-mode .action-menu-item:hover,
         /*.dark-mode .box-footer {*/
     .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;

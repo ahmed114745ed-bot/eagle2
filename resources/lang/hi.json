@@ -3981,6 +3981,13 @@
     "View Chat Interface": "चैट इंटरफ़ेस देखें",
     "Parent ID": "मूल संदेश आईडी",
     "Created Date": "निर्माण तिथि",
+    "You cannot send messages. Your admin account is not connected to an app user account.": "आप संदेश नहीं भेज सकते। आपका एडमिन खाता किसी ऐप उपयोगकर्ता खाते से जुड़ा नहीं है।",
+    "You cannot send messages. Your account is not linked to an app user.": "आप संदेश नहीं भेज सकते। आपका खाता किसी ऐप उपयोगकर्ता से जुड़ा नहीं है।",
+    "Your admin account is not linked to an app user. You can view messages but cannot send.": "आपका एडमिन खाता किसी ऐप उपयोगकर्ता से जुड़ा नहीं है। आप संदेश देख सकते हैं लेकिन भेज नहीं सकते।",
+    "You cannot send messages": "आप संदेश नहीं भेज सकते",
+    "User account not found.": "उपयोगकर्ता खाता नहीं मिला।",
+    "User account not found or has been deleted.": "उपयोगकर्ता खाता नहीं मिला या हटा दिया गया है।",
+
     "moment_viewer.noData": "कोई डेटा वापस नहीं आया",
     "moment_viewer.failedLoad": "मोमेंट लोड करने में विफल",
     "moment_viewer.noMoments": "कोई मोमेंट नहीं मिला",
