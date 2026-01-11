@@ -159,8 +159,8 @@
             min-width: 330px !important;
         }
         .video-container{
-         top: -15px !important;
-        height: 85% !important;
+         top: -10px !important;
+        height: 89% !important;
         }
     }
 
