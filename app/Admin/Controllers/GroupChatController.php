@@ -343,13 +343,13 @@ class GroupChatController extends MainController
         $request->validate([
             'text' => 'required|string|max:1000',
             'user_id' => 'required|integer',
-            'parent_id' => 'nullable|integer|exists:group_chats,id' // Add parent_id validation
+            'parent_id' => 'nullable|integer|exists:group_chats,id'
         ]);
 
         $message = GroupChat::create([
             'text' => $request->text,
             'user_id' => $request->user_id,
-            'parent_id' => $request->parent_id, // Save parent_id
+            'parent_id' => $request->parent_id,
             'created_at' => now(),
             'updated_at' => now()
         ]);

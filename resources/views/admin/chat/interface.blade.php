@@ -78,10 +78,10 @@
         <textarea id="editMessageText" rows="4" placeholder="{{ __('Type your message...') }}"></textarea>
         <input type="hidden" id="editMessageId">
         <div class="modal-footer">
-            <button class="cancel-btn" onclick="closeEditModal()">
+            <button class="btn-danger" onclick="closeEditModal()">
                 <i class="fa fa-times"></i> {{ __('Cancel') }}
             </button>
-            <button class="save-btn" onclick="saveEdit()">
+            <button class="btn-info" onclick="saveEdit()">
                 <i class="fa fa-check"></i> {{ __('Save') }}
             </button>
         </div>
