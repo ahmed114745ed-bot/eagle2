@@ -89,7 +89,6 @@
 </div>
 
 <script>
-    // Translations object
     const translations = {
         loadingMessages: "{{ __('Loading messages...') }}",
         failedToLoadMessages: "{{ __('Failed to load messages') }}",
@@ -110,65 +109,37 @@
         user: "{{ __('User') }}"
     };
 
-    // CSRF Token
     const csrfToken = '{{ csrf_token() }}';
     const adminUserId = {{ Admin::user()->id ?? 1 }};
 
-    // Pagination state
     let currentPage = 1;
     let lastPage = 1;
     let isLoading = false;
     let allMessages = [];
     let initialLoad = true;
     let hasMoreMessages = true;
-
-    // Reply state
+    let loadedMessageIds = new Set();
     let replyingTo = null;
 
-    // Scroll threshold - only trigger when user reaches the very top
-    const SCROLL_THRESHOLD = 50;
-
-    // Debounce timer
+    const SCROLL_THRESHOLD = 100;
     let scrollDebounceTimer = null;
 
-    // Get chat container
     const chatContainer = document.getElementById('chatMessages');
 
-    // Debounced scroll handler
+    // Scroll handler - load more when at TOP
     function handleScroll() {
-        // Clear previous timer
-        if (scrollDebounceTimer) {
-            clearTimeout(scrollDebounceTimer);
-        }
+        if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer);
 
-        // Set new timer - wait 200ms after scrolling stops
         scrollDebounceTimer = setTimeout(() => {
-            // Only load if:
-            // 1. User is at the top (scrollTop is very small)
-            // 2. Not currently loading
-            // 3. There are more pages to load
-            // 4. Has more messages flag is true
-            if (
-                chatContainer.scrollTop <= SCROLL_THRESHOLD &&
-                !isLoading &&
-                currentPage < lastPage &&
-                hasMoreMessages
-            ) {
-                console.log('Loading more messages...', {
-                    scrollTop: chatContainer.scrollTop,
-                    currentPage: currentPage,
-                    lastPage: lastPage,
-                    isLoading: isLoading
-                });
+            if (chatContainer.scrollTop <= SCROLL_THRESHOLD && !isLoading && hasMoreMessages) {
                 loadMoreMessages();
             }
-        }, 200);
+        }, 300);
     }
 
-    // Scroll event listener with debounce
     chatContainer.addEventListener('scroll', handleScroll);
 
-    // Load initial messages
+    // Load initial messages (newest - page 1)
     function loadMessages() {
         if (isLoading) return;
 
@@ -176,201 +147,151 @@
         showTopLoader();
 
         fetch(`{{ route("admin.chat.messages") }}?page=1`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    allMessages = data.messages || [];
-                    lastPage = data.last_page || 1;
-                    currentPage = data.current_page || 1;
-                    hasMoreMessages = currentPage < lastPage;
+                    allMessages = [];
+                    loadedMessageIds.clear();
 
-                    console.log('Initial load:', {
-                        messagesCount: allMessages.length,
-                        currentPage: currentPage,
-                        lastPage: lastPage,
-                        hasMore: hasMoreMessages
+                    (data.messages || []).forEach(msg => {
+                        if (!loadedMessageIds.has(msg.id)) {
+                            loadedMessageIds.add(msg.id);
+                            allMessages.push(msg);
+                        }
                     });
+
+                    lastPage = data.last_page || 1;
+                    currentPage = 1;
+                    hasMoreMessages = currentPage < lastPage;
 
                     renderMessages();
                     hideTopLoader();
 
                     if (initialLoad) {
-                        // Small delay to ensure DOM is updated
                         setTimeout(() => {
-                            scrollToBottom();
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            initialLoad = false;
                         }, 100);
-                        initialLoad = false;
                     }
                 }
                 isLoading = false;
             })
-            .catch(error => {
-                console.error('Error loading messages:', error);
+            .catch(err => {
+                console.error(err);
                 toastr.error(translations.failedToLoadMessages);
                 hideTopLoader();
                 isLoading = false;
             });
     }
 
-    // Load more messages (older messages)
+    // Load older messages (higher page numbers)
     function loadMoreMessages() {
-        // Double check conditions
-        if (isLoading || currentPage >= lastPage || !hasMoreMessages) {
-            console.log('Blocked load more:', {
-                isLoading: isLoading,
-                currentPage: currentPage,
-                lastPage: lastPage,
-                hasMoreMessages: hasMoreMessages
-            });
-            return;
-        }
+        if (isLoading || !hasMoreMessages || currentPage >= lastPage) return;
 
         const nextPage = currentPage + 1;
         isLoading = true;
         showTopLoader();
 
-        // Store scroll position before loading
-        const previousScrollHeight = chatContainer.scrollHeight;
-        const previousScrollTop = chatContainer.scrollTop;
-
-        console.log('Fetching page:', nextPage);
+        // IMPORTANT: Store scroll height BEFORE loading
+        const scrollHeightBefore = chatContainer.scrollHeight;
 
         fetch(`{{ route("admin.chat.messages") }}?page=${nextPage}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    const newMessages = data.messages || [];
+                    const olderMessages = data.messages || [];
 
-                    // Prepend older messages to the beginning
-                    allMessages = [...newMessages, ...allMessages];
-                    currentPage = data.current_page;
-                    lastPage = data.last_page;
-                    hasMoreMessages = currentPage < lastPage;
-
-                    console.log('Loaded more:', {
-                        newMessagesCount: newMessages.length,
-                        totalMessages: allMessages.length,
-                        currentPage: currentPage,
-                        lastPage: lastPage,
-                        hasMore: hasMoreMessages
+                    // Add older messages (they go to the TOP visually)
+                    olderMessages.forEach(msg => {
+                        if (!loadedMessageIds.has(msg.id)) {
+                            loadedMessageIds.add(msg.id);
+                            allMessages.push(msg); // Just add, sorting handles position
+                        }
                     });
+
+                    currentPage = nextPage;
+                    hasMoreMessages = currentPage < lastPage;
 
                     renderMessages();
 
-                    // Maintain scroll position after rendering
-                    requestAnimationFrame(() => {
-                        const newScrollHeight = chatContainer.scrollHeight;
-                        const scrollDiff = newScrollHeight - previousScrollHeight;
-                        chatContainer.scrollTop = previousScrollTop + scrollDiff;
-                    });
+                    // IMPORTANT: Maintain scroll position
+                    // New content was added at TOP, so adjust scroll
+                    setTimeout(() => {
+                        const scrollHeightAfter = chatContainer.scrollHeight;
+                        const addedHeight = scrollHeightAfter - scrollHeightBefore;
+                        chatContainer.scrollTop = addedHeight;
+                    }, 10);
 
                     hideTopLoader();
-                } else {
-                    hasMoreMessages = false;
                 }
                 isLoading = false;
             })
-            .catch(error => {
-                console.error('Error loading more messages:', error);
+            .catch(err => {
+                console.error(err);
                 toastr.error(translations.failedToLoadMoreMessages);
                 hideTopLoader();
                 isLoading = false;
             });
     }
 
-    // Show top loader
     function showTopLoader() {
         let loader = document.getElementById('topLoader');
         if (!loader) {
             loader = document.createElement('div');
             loader.id = 'topLoader';
             loader.className = 'top-loading-indicator';
-            loader.innerHTML = `
-                <div class="loading-spinner">
-                    <i class="fa fa-spinner fa-spin"></i>
-                    <span>${translations.loadingMessages}</span>
-                </div>
-            `;
-            chatContainer.insertBefore(loader, chatContainer.firstChild);
+            loader.innerHTML = `<div class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> <span>${translations.loadingMessages}</span></div>`;
+            chatContainer.prepend(loader);
         }
         loader.style.display = 'flex';
     }
 
-    // Hide top loader
     function hideTopLoader() {
         const loader = document.getElementById('topLoader');
         if (loader) loader.style.display = 'none';
-
-        const initialLoader = document.getElementById('loadingIndicator');
-        if (initialLoader) initialLoader.style.display = 'none';
     }
 
-    // Refresh messages
     function refreshMessages() {
-        // Reset all state
         currentPage = 1;
         lastPage = 1;
         allMessages = [];
+        loadedMessageIds.clear();
         initialLoad = true;
         hasMoreMessages = true;
         isLoading = false;
-
-        // Clear all message elements
-        const messageElements = chatContainer.querySelectorAll('.message-wrapper');
-        messageElements.forEach(el => el.remove());
-
-        // Remove scroll indicator if exists
-        const scrollIndicator = document.getElementById('scrollUpIndicator');
-        if (scrollIndicator) scrollIndicator.remove();
-
+        chatContainer.innerHTML = '';
         loadMessages();
         toastr.info(translations.refreshingMessages);
     }
 
-    // Render messages
+    // Render: Sort oldest TOP, newest BOTTOM
     function renderMessages() {
-        // Remove existing message elements only
-        const messageElements = chatContainer.querySelectorAll('.message-wrapper');
-        messageElements.forEach(el => el.remove());
+        chatContainer.querySelectorAll('.message-wrapper, .scroll-up-indicator').forEach(el => el.remove());
 
-        // Remove old scroll indicator
-        const oldScrollIndicator = document.getElementById('scrollUpIndicator');
-        if (oldScrollIndicator) oldScrollIndicator.remove();
+        // Sort: oldest first (small date/id) at TOP
+        const sorted = [...allMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-        // Add scroll up indicator if there are more messages
-        if (hasMoreMessages && currentPage < lastPage) {
-            const scrollIndicator = document.createElement('div');
-            scrollIndicator.id = 'scrollUpIndicator';
-            scrollIndicator.className = 'scroll-up-indicator';
-            scrollIndicator.innerHTML = `
-                <i class="fa fa-arrow-up"></i>
-                <span>${translations.scrollUpForOlderMessages}</span>
-            `;
-
+        // Show indicator if more pages
+        if (hasMoreMessages) {
+            const indicator = document.createElement('div');
+            indicator.className = 'scroll-up-indicator';
+            indicator.id = 'scrollUpIndicator';
+            indicator.innerHTML = `<i class="fa fa-arrow-up"></i> <span>${translations.scrollUpForOlderMessages}</span>`;
             const loader = document.getElementById('topLoader');
-            if (loader) {
-                loader.after(scrollIndicator);
-            } else {
-                chatContainer.insertBefore(scrollIndicator, chatContainer.firstChild);
-            }
+            if (loader) loader.after(indicator);
+            else chatContainer.prepend(indicator);
         }
 
-        // Render all messages
-        allMessages.forEach(message => {
-            const messageHtml = createMessageElement(message);
-            chatContainer.insertAdjacentHTML('beforeend', messageHtml);
+        // Render oldest to newest
+        sorted.forEach(msg => {
+            chatContainer.insertAdjacentHTML('beforeend', createMessageElement(msg));
         });
     }
 
-    // Create message element
     function createMessageElement(message) {
         const isAdmin = message.user_id == adminUserId;
         const messageClass = isAdmin ? 'sent-message' : 'received-message';
-        const time = new Date(message.created_at).toLocaleTimeString('en-US', {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-
+        const time = new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const avatarUrl = message.user_avatar || '{{ asset("images/default-avatar.png") }}';
         const userName = message.user_name || translations.user;
         const userInitial = userName.charAt(0).toUpperCase();
@@ -381,8 +302,7 @@
                 <div class="replied-message" onclick="scrollToMessage(${message.parent.id})">
                     <div class="replied-user">${escapeHtml(message.parent.user_name)}</div>
                     <div class="replied-text">${escapeHtml(message.parent.text)}</div>
-                </div>
-            `;
+                </div>`;
         }
 
         const actionMenuHtml = `
@@ -401,8 +321,7 @@
                         <i class="fa fa-trash"></i> {{ __('Delete') }}
         </button>
     </div>
-</div>
-`;
+</div>`;
 
         if (isAdmin) {
             return `
@@ -422,8 +341,7 @@
                             <span class="avatar-fallback" style="display:none;">${userInitial}</span>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         } else {
             return `
                 <div class="message-wrapper ${messageClass}" data-id="${message.id}">
@@ -440,81 +358,66 @@
                         </div>
                     </div>
                     ${actionMenuHtml}
-                </div>
-            `;
+                </div>`;
         }
     }
 
-    // Toggle action menu
     function toggleActionMenu(event, messageId) {
         event.stopPropagation();
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
 
-        // Close all other action menus
-        document.querySelectorAll('.action-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
+        const menu = document.getElementById(`action-menu-${messageId}`);
+        if (!menu) return;
 
-        const actionMenu = document.getElementById(`action-menu-${messageId}`);
-        if (actionMenu) {
-            actionMenu.classList.toggle('show');
+        const wrapper = menu.closest('.message-wrapper');
+        const containerRect = chatContainer.getBoundingClientRect();
+        const msgRect = wrapper.getBoundingClientRect();
+
+        if (containerRect.bottom - msgRect.bottom < 150) {
+            menu.classList.add('open-up');
+        } else {
+            menu.classList.add('open-down');
         }
+        menu.classList.add('show');
     }
 
-    // Close action menu on outside click
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', e => {
         if (!e.target.closest('.message-actions')) {
-            document.querySelectorAll('.action-menu.show').forEach(menu => {
-                menu.classList.remove('show');
-            });
+            document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
         }
     });
 
-    // Close action menu when scrolling
-    chatContainer.addEventListener('scroll', function() {
-        document.querySelectorAll('.action-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
+    chatContainer.addEventListener('scroll', () => {
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     });
 
-    // Set reply
     function setReply(messageId, userName, messageText) {
         replyingTo = messageId;
         document.getElementById('replyToId').value = messageId;
         document.getElementById('replyToName').textContent = `${translations.replyingTo} ${userName}`;
         document.getElementById('replyToText').textContent = messageText;
-        document.getElementById('replyPreview').classList.add('active');
         document.getElementById('replyPreview').style.display = 'flex';
         document.getElementById('messageInput').focus();
-
-        // Close any open action menus
-        document.querySelectorAll('.action-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     }
 
-    // Cancel reply
     function cancelReply() {
         replyingTo = null;
         document.getElementById('replyToId').value = '';
-        document.getElementById('replyPreview').classList.remove('active');
         document.getElementById('replyPreview').style.display = 'none';
     }
 
-    // Scroll to message
     function scrollToMessage(messageId) {
-        const messageElement = document.querySelector(`.message-wrapper[data-id="${messageId}"]`);
-        if (messageElement) {
-            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            messageElement.classList.add('highlighted');
-            setTimeout(() => {
-                messageElement.classList.remove('highlighted');
-            }, 2000);
+        const el = document.querySelector(`.message-wrapper[data-id="${messageId}"]`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('highlighted');
+            setTimeout(() => el.classList.remove('highlighted'), 2000);
         } else {
             toastr.info(translations.messageNotLoaded);
         }
     }
 
-    // Escape HTML
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -522,145 +425,92 @@
         return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
 
-    // Scroll to bottom
-    function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    // Send message
     function sendMessage() {
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
+        if (!text) { toastr.warning(translations.pleaseEnterMessage); return; }
 
-        if (text === '') {
-            toastr.warning(translations.pleaseEnterMessage);
-            return;
-        }
-
-        const payload = {
-            text: text,
-            user_id: adminUserId
-        };
-
-        if (replyingTo) {
-            payload.parent_id = replyingTo;
-        }
+        const payload = { text, user_id: adminUserId };
+        if (replyingTo) payload.parent_id = replyingTo;
 
         fetch('{{ route("admin.chat.store") }}', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
             body: JSON.stringify(payload)
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     input.value = '';
                     cancelReply();
-                    allMessages.push(data.message);
+                    if (!loadedMessageIds.has(data.message.id)) {
+                        allMessages.push(data.message);
+                        loadedMessageIds.add(data.message.id);
+                    }
                     renderMessages();
-                    scrollToBottom();
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                     toastr.success(translations.messageSentSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToSendMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToSendMessage); });
     }
 
-    // Edit message
     function editMessage(id, text) {
         document.getElementById('editMessageId').value = id;
         document.getElementById('editMessageText').value = text;
         document.getElementById('editModal').classList.add('active');
-
-        // Close action menu
-        document.querySelectorAll('.action-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     }
 
-    // Close edit modal
     function closeEditModal() {
         document.getElementById('editModal').classList.remove('active');
     }
 
-    // Save edit
     function saveEdit() {
         const id = document.getElementById('editMessageId').value;
         const text = document.getElementById('editMessageText').value.trim();
-
-        if (text === '') {
-            toastr.warning(translations.messageCannotBeEmpty);
-            return;
-        }
+        if (!text) { toastr.warning(translations.messageCannotBeEmpty); return; }
 
         fetch('{{ route("admin.chat.update") }}', {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify({ id: id, text: text })
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            body: JSON.stringify({ id, text })
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     closeEditModal();
-                    const index = allMessages.findIndex(m => m.id == id);
-                    if (index !== -1) {
-                        allMessages[index].text = text;
-                        renderMessages();
-                    }
+                    const idx = allMessages.findIndex(m => m.id == id);
+                    if (idx !== -1) { allMessages[idx].text = text; renderMessages(); }
                     toastr.success(translations.messageUpdatedSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToUpdateMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToUpdateMessage); });
     }
 
-    // Delete message
     function deleteMessage(id) {
-        // Close action menu first
-        document.querySelectorAll('.action-menu.show').forEach(menu => {
-            menu.classList.remove('show');
-        });
-
+        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
         if (!confirm(translations.confirmDeleteMessage)) return;
 
         fetch(`{{ route("admin.chat.delete", "") }}/${id}`, {
             method: 'DELETE',
             headers: { 'X-CSRF-TOKEN': csrfToken }
         })
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     allMessages = allMessages.filter(m => m.id != id);
+                    loadedMessageIds.delete(parseInt(id));
                     renderMessages();
                     toastr.success(translations.messageDeletedSuccessfully);
                 }
             })
-            .catch(error => {
-                console.error('Error:', error);
-                toastr.error(translations.failedToDeleteMessage);
-            });
+            .catch(err => { console.error(err); toastr.error(translations.failedToDeleteMessage); });
     }
 
-    // Enter key to send
-    document.getElementById('messageInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
+    document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
 
-    // Close modal on outside click
-    document.getElementById('editModal').addEventListener('click', function(e) {
-        if (e.target === this) closeEditModal();
-    });
-
-    // Load initial messages
+    // START
     loadMessages();
 </script>
