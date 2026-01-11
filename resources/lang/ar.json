@@ -5061,6 +5061,12 @@
     "View Chat Interface": "عرض واجهة المحادثة",
     "Parent ID": "معرف الرسالة الأصلية",
     "Created Date": "تاريخ الإنشاء",
+    "You cannot send messages. Your admin account is not connected to an app user account.": "لا يمكنك إرسال الرسائل. حساب المسؤول الخاص بك غير مرتبط بحساب مستخدم في التطبيق.",
+    "You cannot send messages. Your account is not linked to an app user.": "لا يمكنك إرسال الرسائل. حسابك غير مرتبط بمستخدم في التطبيق.",
+    "Your admin account is not linked to an app user. You can view messages but cannot send.": "حساب المسؤول الخاص بك غير مرتبط بمستخدم في التطبيق. يمكنك عرض الرسائل ولكن لا يمكنك الإرسال.",
+    "You cannot send messages": "لا يمكنك إرسال الرسائل",
+    "User account not found.": "حساب المستخدم غير موجود.",
+    "User account not found or has been deleted.": "حساب المستخدم غير موجود أو تم حذفه.",
 
     "reels_admin.delete": "حذف",
     "moment_viewer.noData": "لم يتم إرجاع أي بيانات",
