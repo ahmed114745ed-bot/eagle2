@@ -424,38 +424,11 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-        // $grid->column('owner.name', __('owner'))->display(function ($name) {
-        //     $uid = $this->owner?->uuid;
-        //     $path = $this->owner?->profile?->avatar;
-        //     $defaultImage = asset('images/businessman-icon.jpg');
-        //     $url = getImagePath($path) ?? $defaultImage;
-
-        //     // Check if the image exists
-        //     if (!isImageExists($url)) {
-        //         $url = $defaultImage;
-        //     }
-
-        //     $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
-
-        //     $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-        //     return "<div style='display: flex; align-items: center; gap: 10px;'>
-        //             {$image}
-        //             <div>
-        //                 <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-        //                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-        //                 </a>
-        //                 <span style='font-size: smaller;'>UUID: $uid</span>
-        //             </div>
-        //         </div>";
-        // });
+       
         $grid->column('hosts', __('dashboard.hosts'))->display(function () {
             return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
         });
 
-        // $grid->tools(function (Grid\Tools $tools) {
-        //     $tools->append('<a href="' . route('agency-export-report', ['month' => request('month'), 'year' => request()->year, 'agency_id' => request()->id]) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
-        // });
         $grid->tools(function (Grid\Tools $tools) {
             $query = http_build_query([
                 'id' => request('id'),
@@ -476,7 +449,11 @@ class ReportController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
-        $grid->model()
+        $grid->model()->with([
+            'user',
+            'user.profile',
+             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->where('app_id', '!=', 0);
 
