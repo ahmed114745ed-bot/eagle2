@@ -15,8 +15,12 @@
     let searchQuery = '';
     let userIdFilter = '';
     let isLoading = false;
+    let allMomentsLoaded = []; // تخزين جميع الـ Moments المحملة
+    let currentlyVisibleCount = 0; // عدد العناصر المرئية حالياً
+    const INITIAL_LOAD = 10; // تحميل أول 10 عناصر
+    const LOAD_MORE_COUNT = 10; // تحميل 10 عناصر في كل دفعة
+    const TRIGGER_THRESHOLD = 3; // التحميل عند الوصول لآخر 3 عناصر
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const perPage = isMobile ? 5 : 10; // تحميل أقل على الموبايل
 
     $(document).ready(function() {
         // اكتشاف اللغة وتطبيق الاتجاه
@@ -113,6 +117,7 @@
         });
 
         // تحديث
+        // تحديث
         $('#refreshBtn').on('click', function() {
             const icon = $(this).find('i');
             icon.addClass('fa-spin');
@@ -120,14 +125,6 @@
             loadMoments().always(() => {
                 setTimeout(() => icon.removeClass('fa-spin'), 400);
             });
-        });
-
-        // زر تحميل المزيد
-        $('#loadMoreBtn').on('click', function() {
-            if (currentPage < totalPages) {
-                currentPage++;
-                loadMoments(true);
-            }
         });
 
         // زر العودة للأعلى
@@ -145,9 +142,8 @@
         let ticking = false;
         let lastScrollTime = 0;
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const scrollDelay = isMobile ? 200 : 100; // تأخير أكبر على الموبايل
+        const scrollDelay = isMobile ? 150 : 100;
         
-        // دعم التمرير من عدة عناصر
         const scrollElements = [
             $('.content-wrapper'),
             $(window),
@@ -158,11 +154,11 @@
             if (el.length) {
                 el.on('scroll', function() {
                     const now = Date.now();
-                    if (now - lastScrollTime < scrollDelay) return; // تجاهل الـ scroll السريع
+                    if (now - lastScrollTime < scrollDelay) return;
                     
                     if (!ticking) {
                         window.requestAnimationFrame(function() {
-                            handleScroll(el);
+                            handleInfiniteScroll();
                             ticking = false;
                             lastScrollTime = now;
                         });
@@ -172,17 +168,48 @@
             }
         });
         
-        // تحقق دوري من الموقع - أطول على الموبايل
-        const checkInterval = isMobile ? 2000 : 1000;
-        setInterval(() => {
-            if (!isLoading) {
-                const scrollEl = $('.content-wrapper').length ? $('.content-wrapper') : $(window);
-                handleScroll(scrollEl);
-            }
-        }, checkInterval);
+        // Intersection Observer لمراقبة العناصر المرئية
+        setupIntersectionObserver();
+    }
+    
+    function setupIntersectionObserver() {
+        const options = {
+            root: null,
+            rootMargin: '300px', // بدء التحميل قبل 300px من النهاية
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const momentCard = $(entry.target);
+                    const index = momentCard.index();
+                    const totalVisible = $('.moment-post:visible').length;
+                    
+                    // إذا وصل المستخدم لآخر 3-4 عناصر، حمل المزيد
+                    if (totalVisible - index <= TRIGGER_THRESHOLD && !isLoading) {
+                        loadMoreMomentsFromCache();
+                    }
+                }
+            });
+        }, options);
+        
+        // مراقبة العناصر المرئية
+        window.momentObserver = observer;
+    }
+    
+    function observeVisibleMoments() {
+        if (window.momentObserver) {
+            // مراقبة آخر 5 عناصر فقط
+            const moments = $('.moment-post:visible').slice(-5);
+            moments.each(function() {
+                window.momentObserver.observe(this);
+            });
+        }
     }
 
-    function handleScroll(scrollEl) {
+    function handleInfiniteScroll() {
+        const scrollEl = $('.content-wrapper').length ? $('.content-wrapper') : $(window);
         const scrollTop = scrollEl.scrollTop();
         const scrollHeight = scrollEl[0]?.scrollHeight || $(document).height();
         const clientHeight = scrollEl.height();
@@ -194,13 +221,12 @@
             $('#scrollTopBtn').removeClass('visible');
         }
 
-        // تحميل المزيد عند الوصول لأسفل الصفحة
+        // التحقق من القرب من النهاية
         const distanceFromBottom = scrollHeight - (scrollTop + clientHeight);
-        console.log('Scroll:', { distanceFromBottom, isLoading, currentPage, totalPages });
-        if (distanceFromBottom < 300 && !isLoading && currentPage < totalPages) {
-            console.log('Loading next page:', currentPage + 1);
-            currentPage++;
-            loadMoments(true);
+        
+        // إذا كان المستخدم قريباً من النهاية (أقل من 500px)
+        if (distanceFromBottom < 500 && !isLoading) {
+            loadMoreMomentsFromCache();
         }
     }
 
@@ -214,9 +240,11 @@
         
         const feed = $('#momentsFeed');
         if (!append) {
+            // إعادة تعيين كل شيء
+            allMomentsLoaded = [];
+            currentlyVisibleCount = 0;
+            currentPage = 1;
             feed.html('<div class="loading-container"><div class="spinner"></div></div>');
-        } else {
-            feed.append('<div id="feed-loading" class="loading-container"><div class="spinner"></div></div>');
         }
         
         isLoading = true;
@@ -229,15 +257,24 @@
             data: { 
                 sort: currentSort, 
                 page: currentPage, 
-                per_page: perPage, 
+                per_page: INITIAL_LOAD, 
                 search: searchQuery,
                 user_id: userIdFilter 
             },
             success: function(response) {
-                if (response.success) {
-                    renderMoments(response.data, append);
+                if (response.success && response.data) {
+                    // تخزين البيانات المحملة
+                    if (append) {
+                        allMomentsLoaded = allMomentsLoaded.concat(response.data);
+                    } else {
+                        allMomentsLoaded = response.data;
+                    }
+                    
+                    // عرض أول 10 عناصر فقط
+                    renderInitialMoments(append);
+                    
                     if (response.pagination) {
-                        updatePagination(response.pagination);
+                        totalPages = response.pagination.last_page;
                     }
                 } else {
                     showError(texts.noData || 'No data returned');
@@ -249,39 +286,37 @@
             },
             complete: function() {
                 isLoading = false;
-                $('#feed-loading').remove();
             }
         });
     }
-
-    function renderMoments(moments, append = false) {
+    
+    function renderInitialMoments(append = false) {
         const feed = $('#momentsFeed');
         
-        if (!moments || moments.length === 0) {
-            if (append) {
-                totalPages = currentPage;
-                $('#loadMoreContainer').hide();
-                return;
+        if (!allMomentsLoaded || allMomentsLoaded.length === 0) {
+            if (!append) {
+                feed.html(`
+                    <div class="empty-state">
+                        <i class="fas fa-photo-video"></i>
+                        <h3>${texts.noMoments || 'No Moments Found'}</h3>
+                        <p>${texts.noMomentsMsg || 'There are no moments to display'}</p>
+                        ${(searchQuery || userIdFilter) ? `
+                            <button class="refresh-btn" onclick="clearFilters()" style="margin-top: 20px;">
+                                <i class="fas fa-times"></i> ${texts.clearSearch || 'Clear Filters'}
+                            </button>
+                        ` : ''}
+                    </div>
+                `);
             }
-            
-            feed.html(`
-                <div class="empty-state">
-                    <i class="fas fa-photo-video"></i>
-                    <h3>${texts.noMoments || 'No Moments Found'}</h3>
-                    <p>${texts.noMomentsMsg || 'There are no moments to display'}</p>
-                    ${(searchQuery || userIdFilter) ? `
-                        <button class="refresh-btn" onclick="clearFilters()" style="margin-top: 20px;">
-                            <i class="fas fa-times"></i> ${texts.clearSearch || 'Clear Filters'}
-                        </button>
-                    ` : ''}
-                </div>
-            `);
-            $('#loadMoreContainer').hide();
             return;
         }
 
+        // عرض أول INITIAL_LOAD عناصر
+        const momentsToShow = allMomentsLoaded.slice(0, INITIAL_LOAD);
+        currentlyVisibleCount = momentsToShow.length;
+        
         let html = '';
-        moments.forEach(moment => {
+        momentsToShow.forEach(moment => {
             html += renderMomentCard(moment);
         });
 
@@ -290,6 +325,54 @@
         } else {
             feed.html(html);
         }
+        
+        // مراقبة العناصر المرئية
+        setTimeout(() => {
+            observeVisibleMoments();
+        }, 100);
+    }
+    
+    function loadMoreMomentsFromCache() {
+        if (isLoading) return;
+        
+        // إذا كانت جميع العناصر المحملة معروضة بالفعل
+        if (currentlyVisibleCount >= allMomentsLoaded.length) {
+            // جلب صفحة جديدة من السيرفر
+            if (currentPage < totalPages) {
+                currentPage++;
+                loadMoments(true);
+            }
+            return;
+        }
+        
+        isLoading = true;
+        
+        // عرض LOAD_MORE_COUNT عنصر إضافي من الكاش
+        const nextBatch = allMomentsLoaded.slice(
+            currentlyVisibleCount, 
+            currentlyVisibleCount + LOAD_MORE_COUNT
+        );
+        
+        if (nextBatch.length > 0) {
+            const feed = $('#momentsFeed');
+            let html = '';
+            
+            nextBatch.forEach(moment => {
+                html += renderMomentCard(moment);
+            });
+            
+            feed.append(html);
+            currentlyVisibleCount += nextBatch.length;
+            
+            // مراقبة العناصر الجديدة
+            setTimeout(() => {
+                observeVisibleMoments();
+            }, 100);
+        }
+        
+        setTimeout(() => {
+            isLoading = false;
+        }, 300);
     }
 
     function renderMomentCard(moment) {
@@ -418,18 +501,6 @@
         
         mediaHtml += '</div>';
         return mediaHtml;
-    }
-
-    function updatePagination(pagination) {
-        totalPages = pagination.last_page || 1;
-        currentPage = pagination.current_page || 1;
-        
-        const loadMoreContainer = $('#loadMoreContainer');
-        if (currentPage < totalPages) {
-            loadMoreContainer.show();
-        } else {
-            loadMoreContainer.hide();
-        }
     }
 
     function showError(message) {
