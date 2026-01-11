@@ -110,15 +110,21 @@ class SalariesController extends MainController
                 $q->where('country_id', $countryID)
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
-            ->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
+            ->where('agency_id', '!=', 0)->withSum(
+                ['totalUserSalary as total' => function ($q) {
+                    $q->select(DB::raw('SUM(sallary - cut_amount)'));
+                }],
+                ''
+            );
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
         }
         $model->with([
             'profile:id,user_id,avatar',
+            'totalUserSalary',
+            'country',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])
-            ->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+        ])->orderByRaw('total DESC');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
