@@ -98,7 +98,12 @@
             filterTimeout = setTimeout(function() {
                 userIdFilter = $('#userIdFilter').val().trim();
                 currentPage = 1;
-                loadMoments();
+                // إعادة تعيين الترتيب العشوائي عند تغيير الفلتر
+                if (currentSort === 'random' && routes.resetRandom) {
+                    $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
+                } else {
+                    loadMoments();
+                }
             }, 500);
         });
 
@@ -109,7 +114,12 @@
             searchTimeout = setTimeout(function() {
                 searchQuery = $('#userSearch').val().trim();
                 currentPage = 1;
-                loadMoments();
+                // إعادة تعيين الترتيب العشوائي عند تغيير البحث
+                if (currentSort === 'random' && routes.resetRandom) {
+                    $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
+                } else {
+                    loadMoments();
+                }
             }, 500);
         });
 
@@ -485,25 +495,17 @@
         
         const seeMoreText = seeMoreTexts[lang] || seeMoreTexts.en;
         
-        return `
-            <div class="post-content">
+        return `<div class="post-content">
                 <div class="post-description ${needsSeeMore ? 'collapsible' : ''}" 
                      id="desc-${momentId}" 
                      dir="${textDir}" 
                      style="text-align: ${textAlign};"
                      data-full-text="${escapedDesc}"
-                     data-collapsed="true">
-                    <span class="description-text">${escapedDesc}</span>
-                </div>
-                ${needsSeeMore ? `
-                    <button class="see-more-btn" 
-                            onclick="toggleDescription(${momentId}, event)"
-                            data-lang="${lang}">
-                        ${seeMoreText.more}
-                    </button>
-                ` : ''}
-            </div>
-        `;
+                     data-collapsed="true"><span class="description-text">${escapedDesc}</span></div>${needsSeeMore ? `
+                <button class="see-more-btn" 
+                        onclick="toggleDescription(${momentId}, event)"
+                        data-lang="${lang}">${seeMoreText.more}</button>` : ''}
+            </div>`;
     }
 
     function renderMedia(momentId, allMedia) {
