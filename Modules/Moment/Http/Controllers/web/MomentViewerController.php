@@ -59,6 +59,7 @@ class MomentViewerController extends MainController
         try {
             $sortBy = $request->get('sort', config('moment.viewer.default_sort', 'newest')); // random, newest, oldest
             $perPage = $request->get('per_page', 10); // تحميل 10 moments في كل مرة
+            $page = $request->get('page', 1); // رقم الصفحة الحالية
             $countryId = session('filter_country_id');
             $search = $request->get('search', '');
             $userId = $request->get('user_id', ''); // فلتر بالمعرف
@@ -103,14 +104,52 @@ class MomentViewerController extends MainController
                     break;
                 case 'random':
                 default:
-                    // استخدام session seed للحفاظ على نفس الترتيب العشوائي في الجلسة
-                    $seed = $request->session()->get('moment_random_seed');
-                    if (!$seed) {
-                        $seed = rand(1, 100000);
-                        $request->session()->put('moment_random_seed', $seed);
+                    // نظام جلب عشوائي محسّن بدون تكرار
+                    $sessionKey = 'moment_random_ids_' . md5($search . $userId . $countryId);
+                    $randomIds = $request->session()->get($sessionKey);
+                    
+                    if (!$randomIds || empty($randomIds)) {
+                        // جلب جميع الـ IDs المتاحة وترتيبها عشوائياً مرة واحدة فقط
+                        $allIds = (clone $query)->pluck('id')->shuffle()->toArray();
+                        $request->session()->put($sessionKey, $allIds);
+                        $randomIds = $allIds;
                     }
-                    $query->inRandomOrder($seed);
-                    break;
+                    
+                    // حساب العناصر للصفحة الحالية
+                    $offset = ($page - 1) * $perPage;
+                    $pageIds = array_slice($randomIds, $offset, $perPage);
+                    
+                    if (empty($pageIds)) {
+                        // لا توجد عناصر في هذه الصفحة
+                        return response()->json([
+                            'success' => true,
+                            'data' => [],
+                            'pagination' => [
+                                'current_page' => $page,
+                                'last_page' => ceil(count($randomIds) / $perPage),
+                                'per_page' => $perPage,
+                                'total' => count($randomIds),
+                            ]
+                        ]);
+                    }
+                    
+                    // جلب العناصر بنفس ترتيب الـ IDs العشوائية
+                    $query->whereIn('id', $pageIds)
+                          ->orderByRaw('FIELD(id, ' . implode(',', $pageIds) . ')');
+                    
+                    $moments = $query->get();
+                    
+                    // إرجاع البيانات مع pagination info يدوي
+                    return response()->json([
+                        'success' => true,
+                        'data' => $moments,
+                        'pagination' => [
+                            'current_page' => $page,
+                            'last_page' => ceil(count($randomIds) / $perPage),
+                            'per_page' => $perPage,
+                            'total' => count($randomIds),
+                        ]
+                    ]);
             }
 
             $moments = $query->paginate($perPage);
@@ -273,15 +312,15 @@ class MomentViewerController extends MainController
                 'moment_user_gifts.*',
                 'users.name as user_name',
                 'users.uuid as user_uuid',
-                'gifts.name_en as gift_name',
+                DB::raw('COALESCE(gifts.e_name, gifts.name) as gift_name'),
                 'gifts.img as gift_img',
-                'gifts.coin as gift_value'
+                'gifts.price as gift_value'
             ]);
 
         // تطبيق الترتيب
         switch ($sortBy) {
             case 'highest_value':
-                $query->orderByDesc('gifts.coin');
+                $query->orderByDesc('gifts.price');
                 break;
             case 'newest':
             default:
@@ -370,11 +409,20 @@ class MomentViewerController extends MainController
      */
     public function resetRandomSeed(Request $request)
     {
+        // مسح جميع الـ random IDs المخزنة في الـ session
+        $sessionKeys = $request->session()->all();
+        foreach ($sessionKeys as $key => $value) {
+            if (strpos($key, 'moment_random_ids_') === 0) {
+                $request->session()->forget($key);
+            }
+        }
+        
+        // مسح الـ seed القديم (للتوافق مع الإصدارات السابقة)
         $request->session()->forget('moment_random_seed');
 
         return response()->json([
             'success' => true,
-            'message' => __('Random seed reset successfully')
+            'message' => __('Random order reset successfully')
         ]);
     }
 }
