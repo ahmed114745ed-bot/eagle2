@@ -185,7 +185,7 @@ html[dir="rtl"] body {
 
 /* Post Card - Facebook Style */
 .moment-post {
-    background: var(--bg-primary);
+    background: var(--primary-color);
     border-radius: 8px;
     box-shadow: var(--shadow-1);
     border: 1px solid var(--border-color);
