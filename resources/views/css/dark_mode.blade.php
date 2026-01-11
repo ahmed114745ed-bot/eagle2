@@ -51,6 +51,7 @@
     .dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice,
     .dark-mode .sm\:text-base,
     .dark-mode .user-card,
+    .dark-mode .received-message .message-bubble,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -81,8 +82,15 @@
     .dark-mode .modal-no,
     .dark-mode .interactions-panel,
     .dark-mode .reels-sidebar,
+    .dark-mode .chat-input,
+    .dark-mode .chat-messages,
+    .dark-mode .edit-btn,
+    .dark-mode .reply-btn,
+    .dark-mode .delete-btn,
+    .dark-mode .chat-header,
+    .dark-mode .refresh-btn,
         /*.dark-mode .box-footer {*/
-    .dark-mode .sidebarContainer{
+    .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;
     }
 
@@ -99,6 +107,8 @@
         color: unset !important;
     }
 
+    .dark-mode .top-loading-indicator,
+    .dark-mode .reply-preview,
     .dark-mode .skeleton {
         background: var(--dark-secondry-color);
     }
@@ -158,6 +168,7 @@
     .dark-mode .box-body.table-responsive,
     .dark-mode .content-wrapper,
     .dark-mode .CardwalletLogsTable,
+    .dark-mode .chat-messages,
     .dark-mode .main-sidebar {
         scrollbar-color: var(--dark-secondry-color) var(--dark-primary-color) !important;
         scrollbar-width: thin;

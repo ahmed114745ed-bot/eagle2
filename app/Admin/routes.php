@@ -595,7 +595,14 @@ Route::group(
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
+
         Route::resource('/group-chat', 'GroupChatController');
+        Route::get('chat/view', 'GroupChatController@chatView')->name('chat.view');
+        Route::get('chat/messages', 'GroupChatController@getMessages')->name('chat.messages');
+        Route::post('chat/message', 'GroupChatController@storeMessage')->name('chat.store');
+        Route::put('chat/message', 'GroupChatController@updateMessage')->name('chat.update');
+        Route::delete('chat/message/{id}', 'GroupChatController@deleteMessage')->name('chat.delete');
+
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
