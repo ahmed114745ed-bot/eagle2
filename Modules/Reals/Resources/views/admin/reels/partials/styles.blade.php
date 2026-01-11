@@ -164,8 +164,7 @@
         .interactions-panel {
             max-width: 100vw;
             width: 100vw;
-            top: 106px;
-
+            top: 50px;
         }
 
         /* Smaller padding on mobile */
@@ -225,15 +224,9 @@
 
     /* Mobile & Small Tablets */
     @media (max-width: 768px) {
-        /* تقليل animations لتحسين الأداء */
-        *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-        }
-        
         .reels-main-container {
-            height: 100vh;
+            height: calc(100vh - 50px);
+            margin-top: 50px;
             flex-direction: column-reverse;
         }
 
@@ -243,7 +236,7 @@
 
         .reels-video-container {
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 50px);
         }
 
         /* Hide desktop sidebar on mobile */
@@ -278,7 +271,7 @@
         /* Mobile Toggle Button */
         .mobile-reels-toggle {
             position: fixed;
-            bottom: 234px;
+            bottom: 80px;
             right: 20px;
             width: 56px;
             height: 56px;
@@ -325,10 +318,9 @@
         }
     }
 
-    /* User Profile Overlay */
-    @media (max-width: 768px) {
+        /* User Profile Overlay */
         .absolute.top-4 {
-            top: 0.5rem;
+            top: 60px;
             right: 0.5rem;
             left: 0.5rem;
         }
@@ -339,7 +331,7 @@
         }
 
         .absolute.top-4 .text-lg {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .absolute.top-4 .text-sm {
@@ -371,8 +363,7 @@
         /* Interaction Buttons */
         .absolute.left-4.bottom-24 {
             left: 0.5rem;
-            bottom: 13.5rem;
-
+            bottom: 6rem;
         }
 
         .w-14.h-14 {
@@ -398,6 +389,10 @@
 
     /* Extra Small Mobile */
     @media (max-width: 480px) {
+        .reels-main-container {
+            height: calc(100vh - 50px);
+        }
+        
         .absolute.top-4 .w-12.h-12 {
             width: 2rem;
             height: 2rem;
@@ -412,9 +407,9 @@
         }
 
         .w-14.h-14 {
-            width: 4.75rem;
-            height: 4.75rem;
-            margin: 12px 2px;
+            width: 3.5rem;
+            height: 3.5rem;
+            margin: 8px 2px;
         }
 
         .w-10.h-10 {
