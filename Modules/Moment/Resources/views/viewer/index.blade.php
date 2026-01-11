@@ -15,9 +15,9 @@
                 <input type="text" id="userIdFilter" class="filter-input" placeholder="{{ __('moment_viewer.filterByUserId') }}">
                 <input type="text" id="userSearch" class="search-input" placeholder="{{ __('moment_viewer.searchByName') }}">
                 <select id="sortSelect" class="sort-select">
+                    <option value="random" selected>{{ __('moment_viewer.randomOrder') }} 🔀</option>
                     <option value="newest">{{ __('moment_viewer.newestFirst') }} 🆕</option>
                     <option value="oldest">{{ __('moment_viewer.oldestFirst') }} 🕰</option>
-                    <option value="random">{{ __('moment_viewer.randomOrder') }} 🔀</option>
                 </select>
                 <button id="refreshBtn" class="refresh-btn">
                     <i class="fas fa-sync-alt"></i>

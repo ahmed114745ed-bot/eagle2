@@ -95,6 +95,24 @@ class MomentViewerController extends MainController
             }
 
             // تطبيق الترتيب
+            if ($sortBy === 'random') {
+                // جلب عشوائي مباشر - بدون session
+                $query->inRandomOrder();
+                $moments = $query->paginate($perPage);
+                
+                return response()->json([
+                    'success' => true,
+                    'data' => $moments->items(),
+                    'pagination' => [
+                        'current_page' => $moments->currentPage(),
+                        'last_page' => $moments->lastPage(),
+                        'per_page' => $moments->perPage(),
+                        'total' => $moments->total(),
+                    ]
+                ]);
+            }
+            
+            // الترتيب العادي
             switch ($sortBy) {
                 case 'newest':
                     $query->orderByDesc('created_at');
@@ -102,54 +120,6 @@ class MomentViewerController extends MainController
                 case 'oldest':
                     $query->orderBy('created_at');
                     break;
-                case 'random':
-                default:
-                    // نظام جلب عشوائي محسّن بدون تكرار
-                    $sessionKey = 'moment_random_ids_' . md5($search . $userId . $countryId);
-                    $randomIds = $request->session()->get($sessionKey);
-                    
-                    if (!$randomIds || empty($randomIds)) {
-                        // جلب جميع الـ IDs المتاحة وترتيبها عشوائياً مرة واحدة فقط
-                        $allIds = (clone $query)->pluck('id')->shuffle()->toArray();
-                        $request->session()->put($sessionKey, $allIds);
-                        $randomIds = $allIds;
-                    }
-                    
-                    // حساب العناصر للصفحة الحالية
-                    $offset = ($page - 1) * $perPage;
-                    $pageIds = array_slice($randomIds, $offset, $perPage);
-                    
-                    if (empty($pageIds)) {
-                        // لا توجد عناصر في هذه الصفحة
-                        return response()->json([
-                            'success' => true,
-                            'data' => [],
-                            'pagination' => [
-                                'current_page' => $page,
-                                'last_page' => ceil(count($randomIds) / $perPage),
-                                'per_page' => $perPage,
-                                'total' => count($randomIds),
-                            ]
-                        ]);
-                    }
-                    
-                    // جلب العناصر بنفس ترتيب الـ IDs العشوائية
-                    $query->whereIn('id', $pageIds)
-                          ->orderByRaw('FIELD(id, ' . implode(',', $pageIds) . ')');
-                    
-                    $moments = $query->get();
-                    
-                    // إرجاع البيانات مع pagination info يدوي
-                    return response()->json([
-                        'success' => true,
-                        'data' => $moments,
-                        'pagination' => [
-                            'current_page' => $page,
-                            'last_page' => ceil(count($randomIds) / $perPage),
-                            'per_page' => $perPage,
-                            'total' => count($randomIds),
-                        ]
-                    ]);
             }
 
             $moments = $query->paginate($perPage);
@@ -409,20 +379,29 @@ class MomentViewerController extends MainController
      */
     public function resetRandomSeed(Request $request)
     {
+        $keysDeleted = 0;
+        
         // مسح جميع الـ random IDs المخزنة في الـ session
         $sessionKeys = $request->session()->all();
         foreach ($sessionKeys as $key => $value) {
             if (strpos($key, 'moment_random_ids_') === 0) {
                 $request->session()->forget($key);
+                $keysDeleted++;
             }
         }
         
         // مسح الـ seed القديم (للتوافق مع الإصدارات السابقة)
         $request->session()->forget('moment_random_seed');
 
+        \Log::info('Reset random seed', [
+            'keys_deleted' => $keysDeleted,
+            'remaining_keys' => array_keys($request->session()->all())
+        ]);
+
         return response()->json([
             'success' => true,
-            'message' => __('Random order reset successfully')
+            'message' => __('Random order reset successfully'),
+            'keys_deleted' => $keysDeleted
         ]);
     }
 }
