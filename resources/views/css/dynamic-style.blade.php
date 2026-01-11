@@ -1716,7 +1716,7 @@
     .rtl .box-header .form-horizontal .row {
         display: block !important;
         direction: rtl !important;
-        margin-bottom: 10px;
+        /*margin-bottom: 10px;*/
     }
 
     .ltr .form-horizontal .row {
@@ -1869,6 +1869,7 @@
 
     button {
         background: var(--primary-color);
+        color: var(--text-secondary-color);
         padding: 10px;
         border: none;
         cursor: pointer;
@@ -1943,7 +1944,8 @@
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        padding: 10px;
+        padding-bottom: 0 !important;
+        background: transparent !important;
     }
 
     .pagination-info {
@@ -2256,7 +2258,6 @@
     .form-horizontal + .box-footer,
     .form-horizontal .box-footer {
         display: grid !important;
-        padding: 16px 24px !important;
         direction: rtl !important;
     }
 
@@ -2267,7 +2268,7 @@
 
     .form-horizontal + .box-footer .col-md-8,
     .form-horizontal .box-footer .col-md-8 {
-        float: none !important;
+        /*float: none !important;*/
         width: auto !important;
         display: flex !important;
         align-items: center !important;
@@ -2941,6 +2942,16 @@
         padding: 0 10px !important;
     }
 
+    .input-group:has(input.sort_num) .input-group-btn:first-child > .btn {
+        height: 34px;
+        padding: 0 10px !important;
+    }
+
+    .input-group:has(input.sort_num) .input-group-btn:last-child > .btn {
+        height: 34px;
+        padding: 0 10px !important;
+    }
+
     .navbar-nav>.notifications-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.messages-menu>.dropdown-menu>li .menu>li>a:hover, .navbar-nav>.tasks-menu>.dropdown-menu>li .menu>li>a:hover {
         background: var(--primary-color);
     }
@@ -3085,6 +3096,26 @@
             font-size: 10px !important;
             top: -8px !important;
         }
+    }
+
+    .settings-sidebar {
+        width: 250px;
+        min-height: 400px;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .settings-sidebar h2 {
+        text-align: center;
+        color: var(--primary-color);
+    }
+
+    .new-form {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eaeaea;
     }
 </style>
 

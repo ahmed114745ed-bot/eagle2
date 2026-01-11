@@ -179,7 +179,7 @@ class ConfigController extends Controller
 
         Artisan::call('config:cache');
 
-        Log::info('updateConfigAgoraZego completed and cache refreshed');
+        // Log::info('updateConfigAgoraZego completed and cache refreshed');
 
         $redirectTo = $request->input('redirect_to');
         if ($redirectTo) {
@@ -190,9 +190,9 @@ class ConfigController extends Controller
         }
 
         $redirectBack = Redirect::back();
-        Log::info('updateConfigAgoraZego redirecting back', [
-            'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
-        ]);
+        // Log::info('updateConfigAgoraZego redirecting back', [
+        //     'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
+        // ]);
 
         return $redirectBack;
     }

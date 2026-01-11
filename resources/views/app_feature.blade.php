@@ -7,45 +7,6 @@
         display: flex;
     }
 
-    /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        min-height: 400px;
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: var(--primary-color);
-    }
-
-    .settings-menu button {
-        display: block;
-        width: 100%;
-        text-align: right;
-        padding: 15px;
-        color: black;
-        background: white;
-        border: none;
-        margin-bottom: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    .new-form {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #eaeaea;
-    }
-
-    .settings-menu button:hover {
-        background: var(--primary-color);
-    }
-
     /* محتوى الصفحة */
     .settings-content {
         flex-grow: 1;
@@ -260,7 +221,7 @@
         <h2>{{ __('Settings') }}</h2>
         <div class="settings-menu">
             <button onclick="showSection('AppFeature')"
-                    style="background: var(--primary-color); color: var(--text-secondary-color);">
+                    style="background: var(--primary-color) !important; color: var(--text-secondary-color) !important;">
                 {{ __('Agency Feature') }}
             </button>
             <button onclick="showSection('ReelSettings')"
@@ -619,8 +580,8 @@
 
         const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
         if (activeButton) {
-            activeButton.style.backgroundColor = 'var(--primary-color)';
-            activeButton.style.color = 'var(--text-secondary-color)';
+            activeButton.style.setProperty('background-color', 'var(--primary-color)', 'important');
+            activeButton.style.setProperty('color', 'var(--text-secondary-color)', 'important');
         }
 
         const url = new URL(window.location);
