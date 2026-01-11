@@ -854,6 +854,13 @@ html[dir="rtl"] .dropdown-item,
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* تعطيل الانميشن على الموبايل للسرعة */
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
     .viewer-container {
         padding: 12px 0;
     }
@@ -893,6 +900,18 @@ html[dir="rtl"] .dropdown-item,
     .post-media img,
     .post-media video {
         max-height: 400px;
+        image-rendering: -webkit-optimize-contrast;
+    }
+    
+    /* تحسين الأداء */
+    .moment-post {
+        will-change: auto;
+        contain: layout style;
+    }
+    
+    .user-avatar,
+    .modal-user-avatar {
+        will-change: auto;
     }
 
     .scroll-top {
@@ -934,6 +953,11 @@ html[dir="rtl"] .dropdown-item,
 }
 
 @media (max-width: 480px) {
+    /* تحسين الأداء للشاشات الصغيرة */
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+    
     .viewer-container {
         padding: 8px 0;
     }

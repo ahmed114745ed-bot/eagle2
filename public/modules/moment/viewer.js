@@ -15,7 +15,8 @@
     let searchQuery = '';
     let userIdFilter = '';
     let isLoading = false;
-    const perPage = 10; // تحميل مومنت واحدة في كل مرة للسرعة
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const perPage = isMobile ? 5 : 10; // تحميل أقل على الموبايل
 
     $(document).ready(function() {
         // اكتشاف اللغة وتطبيق الاتجاه
@@ -142,6 +143,9 @@
 
     function setupScrollHandling() {
         let ticking = false;
+        let lastScrollTime = 0;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const scrollDelay = isMobile ? 200 : 100; // تأخير أكبر على الموبايل
         
         // دعم التمرير من عدة عناصر
         const scrollElements = [
@@ -153,10 +157,14 @@
         scrollElements.forEach(el => {
             if (el.length) {
                 el.on('scroll', function() {
+                    const now = Date.now();
+                    if (now - lastScrollTime < scrollDelay) return; // تجاهل الـ scroll السريع
+                    
                     if (!ticking) {
                         window.requestAnimationFrame(function() {
                             handleScroll(el);
                             ticking = false;
+                            lastScrollTime = now;
                         });
                         ticking = true;
                     }
@@ -164,13 +172,14 @@
             }
         });
         
-        // تحقق دوري من الموقع
+        // تحقق دوري من الموقع - أطول على الموبايل
+        const checkInterval = isMobile ? 2000 : 1000;
         setInterval(() => {
             if (!isLoading) {
                 const scrollEl = $('.content-wrapper').length ? $('.content-wrapper') : $(window);
                 handleScroll(scrollEl);
             }
-        }, 1000);
+        }, checkInterval);
     }
 
     function handleScroll(scrollEl) {
