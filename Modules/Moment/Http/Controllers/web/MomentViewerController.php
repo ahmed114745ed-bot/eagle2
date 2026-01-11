@@ -71,7 +71,7 @@ class MomentViewerController extends MainController
                         ]),
                     'images' => fn($q) => $q->select(['id', 'moment_id', 'image']),
                 ])
-                ->withCount(['likes', 'comments']);
+                ->withCount(['likes', 'comments', 'gifts']);
 
             // فلتر بالمعرف (ID)
             if (!empty($userId)) {
