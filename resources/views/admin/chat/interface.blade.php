@@ -5,7 +5,7 @@
         <!-- Header -->
         <div class="chat-header">
             <a href="{{ route('admin.group-chat.index') }}" class="back-btn">
-                <i class="fa fa-arrow-right"></i>
+                <i class="fa fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }}"></i>
             </a>
             <div class="profile-pic">
                 <i class="fa fa-comments"></i>
