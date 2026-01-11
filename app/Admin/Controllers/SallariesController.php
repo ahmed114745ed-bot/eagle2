@@ -47,17 +47,17 @@ class SallariesController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
 
-        $model =
-            //$grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
-            $grid->model()
-                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-                ->where('agency_id', '!=', 0);
-
-        // $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'), DB::raw('SUM(user_sallaries.sallary) AS salary'), DB::raw('SUM(user_sallaries.cut_amount) AS withdrawal'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+        $grid->model()
+            ->with([
+                'profile',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->where('agency_id', '!=', 0);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
@@ -147,7 +147,7 @@ class SallariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID));
 
