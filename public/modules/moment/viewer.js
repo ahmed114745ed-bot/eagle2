@@ -348,29 +348,28 @@
                 ${validMedia && validMedia.length > 0 ? renderMedia(moment.id, validMedia) : ''}
                 
                 <div class="post-stats">
-                    <div class="stats-left" onclick="toggleLikes(${moment.id}, event)">
-                        ${moment.likes_count > 0 ? `
-                            <div class="like-icon">
-                                <i class="fas fa-heart"></i>
-                                <span>${moment.likes_count}</span>
-                            </div>
-                        ` : '<span></span>'}
+                    <div class="stats-left">
+                        <div class="stat-item" onclick="toggleLikes(${moment.id}, event)">
+                            <i class="fas fa-heart"></i>
+                            <span>${moment.likes_count || 0}</span>
+                        </div>
+                        <div class="stat-item" onclick="toggleGifts(${moment.id}, event)">
+                            <i class="fas fa-gift"></i>
+                            <span>${moment.gifts_count || 0}</span>
+                        </div>
                     </div>
                     <div class="stats-right">
-                        ${moment.comments_count > 0 ? `
-                            <span onclick="toggleComments(${moment.id}, event)">${moment.comments_count} ${texts.comments || 'comments'}</span>
-                        ` : ''}
+                        <div class="stat-item" onclick="toggleComments(${moment.id}, event)">
+                            <i class="far fa-comment"></i>
+                            <span>${moment.comments_count || 0}</span>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="post-actions">
-                    <button class="action-btn" onclick="toggleComments(${moment.id}, event)">
-                        <i class="far fa-comment"></i>
-                        <span>${texts.comment || 'Comment'}</span>
-                    </button>
-                </div>
+               
                 
                 <div class="likes-section" id="likes-${moment.id}"></div>
+                <div class="gifts-section" id="gifts-${moment.id}"></div>
                 <div class="comments-section" id="comments-${moment.id}"></div>
             </div>
         `;
@@ -478,6 +477,11 @@
         openSideModal('likes', momentId);
     };
 
+    window.toggleGifts = function(momentId, event) {
+        if (event) event.stopPropagation();
+        openSideModal('gifts', momentId);
+    };
+
     function openSideModal(type, momentId) {
         const modalId = 'sideModal';
         let modal = $(`#${modalId}`);
@@ -507,6 +511,8 @@
         // تحديث العنوان والمحتوى
         const title = type === 'comments' 
             ? (texts.comments || 'Comments') 
+            : type === 'gifts'
+            ? (texts.gifts || 'Gifts')
             : (texts.likes || 'Likes');
         
         modal.find('.side-modal-title').text(title);
@@ -519,6 +525,8 @@
         // تحميل البيانات
         if (type === 'comments') {
             loadCommentsInModal(momentId);
+        } else if (type === 'gifts') {
+            loadGiftsInModal(momentId);
         } else {
             loadLikesInModal(momentId);
         }
@@ -717,6 +725,108 @@
         });
     }
 
+    let modalGiftsPage = 1;
+    let modalGiftsTotalPages = 1;
+    let modalGiftsLoading = false;
+
+    function loadGiftsInModal(momentId, page = 1, append = false) {
+        if (modalGiftsLoading) return;
+        
+        const url = routes.gifts.replace(':id', momentId);
+        const container = $('#sideModal .side-modal-body');
+        
+        if (!append) {
+            currentModalMomentId = momentId;
+            currentModalType = 'gifts';
+            modalGiftsPage = 1;
+            container.html('<div class="loading-container"><div class="spinner"></div></div>');
+        } else {
+            container.find('.modal-list').append('<div class="modal-loading"><div class="spinner"></div></div>');
+        }
+        
+        modalGiftsLoading = true;
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: { page: page, per_page: 20 },
+            success: function(response) {
+                if (response.success && response.data) {
+                    modalGiftsTotalPages = response.pagination?.last_page || 1;
+                    modalGiftsPage = page;
+                    
+                    if (response.data.length > 0) {
+                        let html = '';
+                        response.data.forEach(gift => {
+                            const userName = gift.user_name || 'Unknown';
+                            const userId = gift.user_id;
+                            const userUuid = gift.user_uuid || '';
+                            const userUrl = adminUserUrl + userId;
+                            const avatar = gift.user_avatar 
+                                ? getImagePath(gift.user_avatar) 
+                                : defaultAvatar;
+                            
+                            const giftName = gift.gift_name || 'Gift';
+                            const giftValue = gift.gift_value || 0;
+                            const giftImg = gift.gift_img 
+                                ? getImagePath(gift.gift_img) 
+                                : '';
+                            
+                            html += `
+                                <div class="modal-gift-item">
+                                    <div class="modal-user-item" onclick="window.open('${userUrl}', '_blank')">
+                                        <img src="${avatar}" alt="${escapeHtml(userName)}" class="modal-user-avatar" loading="lazy">
+                                        <div class="modal-user-info">
+                                            <div class="modal-user-name">${escapeHtml(userName)}</div>
+                                            <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
+                                        </div>
+                                    </div>
+                                    <div class="gift-info">
+                                        ${giftImg ? `<img src="${giftImg}" alt="${escapeHtml(giftName)}" class="gift-img" loading="lazy">` : '<i class="fas fa-gift gift-icon"></i>'}
+                                        <div class="gift-details">
+                                            <div class="gift-name">${escapeHtml(giftName)}</div>
+                                            <div class="gift-value"><i class="fas fa-coins"></i> ${giftValue}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        if (append) {
+                            container.find('.modal-loading').remove();
+                            container.find('.modal-list').append(html);
+                        } else {
+                            container.html('<div class="modal-list">' + html + '</div>');
+                            setupModalScrolling();
+                        }
+                    } else if (!append) {
+                        container.html(`
+                            <div class="modal-empty">
+                                <i class="fas fa-gift"></i>
+                                <p>${texts.noGifts || 'No gifts yet'}</p>
+                            </div>
+                        `);
+                    }
+                }
+            },
+            error: function() {
+                if (append) {
+                    container.find('.modal-loading').remove();
+                } else {
+                    container.html(`
+                        <div class="modal-empty">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p style="color: #e4405f;">${texts.failGifts || 'Failed to load gifts'}</p>
+                        </div>
+                    `);
+                }
+            },
+            complete: function() {
+                modalGiftsLoading = false;
+            }
+        });
+    }
+
     function setupModalScrolling() {
         const modalBody = $('#sideModal .side-modal-body');
         
@@ -731,6 +841,8 @@
                     loadCommentsInModal(currentModalMomentId, modalCommentsPage + 1, true);
                 } else if (currentModalType === 'likes' && modalLikesPage < modalLikesTotalPages && !modalLikesLoading) {
                     loadLikesInModal(currentModalMomentId, modalLikesPage + 1, true);
+                } else if (currentModalType === 'gifts' && modalGiftsPage < modalGiftsTotalPages && !modalGiftsLoading) {
+                    loadGiftsInModal(currentModalMomentId, modalGiftsPage + 1, true);
                 }
             }
         });

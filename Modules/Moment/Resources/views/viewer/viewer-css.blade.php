@@ -49,7 +49,9 @@ body[dir="rtl"],
 html[dir="rtl"] body {
     direction: rtl;
 }
-
+.content-header{
+    display: none !important;
+}
 .content-wrapper {
     background: var(--bg-primary) !important;
     min-height: 100vh !important;
@@ -429,6 +431,7 @@ html[dir="rtl"] .dropdown-item,
 
 /* Post Media */
 .post-media {
+    height:370px !important;
     width: 100%;
     background: #000;
     position: relative;
@@ -513,17 +516,50 @@ html[dir="rtl"] .dropdown-item,
     color: var(--text-secondary);
 }
 
-.stats-left {
+.stats-left,
+.stats-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
-.stats-left:hover {
-    text-decoration: underline;
+.stat-item:hover {
+    background: var(--hover-bg);
 }
 
+.stat-item i {
+    font-size: 16px;
+}
+
+.stat-item:first-child i {
+    color: #e4405f;
+}
+
+.stat-item:nth-child(2) i {
+    color: #9b59b6;
+}
+
+.stats-right .stat-item i {
+    color: var(--text-secondary);
+}
+
+.stat-item span {
+    font-weight: 500;
+    min-width: 16px;
+    text-align: left;
+}
+
+/* Legacy styles for backward compatibility */
 .like-icon {
     display: flex;
     align-items: center;
@@ -1371,6 +1407,67 @@ body.modal-open {
     color: #e4405f;
     font-size: 20px;
     flex-shrink: 0;
+}
+
+/* Gift Item Styles */
+.modal-gift-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+}
+
+.modal-gift-item:hover {
+    background: var(--hover-bg);
+}
+
+.modal-gift-item:last-child {
+    border-bottom: none;
+}
+
+.gift-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.gift-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.gift-icon {
+    font-size: 32px;
+    color: #9b59b6;
+}
+
+.gift-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gift-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.gift-value {
+    font-size: 13px;
+    color: #f39c12;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.gift-value i {
+    font-size: 12px;
 }
 
 .modal-delete-btn {
