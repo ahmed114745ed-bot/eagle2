@@ -451,6 +451,7 @@ html[dir="rtl"] .dropdown-item,
     display: grid;
     gap: 2px;
     cursor: pointer;
+        max-height: 370px;
 }
 
 /* Grid Layouts */
