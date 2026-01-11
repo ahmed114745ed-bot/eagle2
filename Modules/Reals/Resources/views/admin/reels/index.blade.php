@@ -24,29 +24,50 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // إظهار navbar على الشاشات الصغيرة فقط
             const nav = document.querySelector('.navbar');
-            if (nav && !nav.classList.contains('navbar-hidden')) {
-                nav.classList.add('navbar-hidden');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (nav) {
+                if (isMobile) {
+                    // إظهار navbar على الموبايل
+                    nav.classList.remove('navbar-hidden');
+                    nav.style.display = '';
+                } else {
+                    // إخفاء navbar على الديسكتوب
+                    if (!nav.classList.contains('navbar-hidden')) {
+                        nav.classList.add('navbar-hidden');
+                    }
+                }
             }
 
             const updateAppClassMargin = () => {
                 const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                const isMobile = window.innerWidth <= 768;
+                
                 document.querySelectorAll('.app-class').forEach(el => {
-                    el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    if (isMobile) {
+                        el.style.setProperty('margin-top', '50px', 'important');
+                    } else {
+                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    }
                 });
             };
 
-            // Initial state: navbar hidden, zero top margin
             updateAppClassMargin();
-
-            // Toggle margin when navbar hides/shows (e.g., on scroll)
-            // تحسين الأداء بتقليل استدعاءات scroll
-            let scrollTimeout;
-            window.addEventListener('scroll', () => {
-                clearTimeout(scrollTimeout);
-                scrollTimeout = setTimeout(() => {
-                    updateAppClassMargin();
-                }, 100);
+            
+            // تحديث عند تغيير حجم الشاشة
+            window.addEventListener('resize', () => {
+                const isMobile = window.innerWidth <= 768;
+                if (nav) {
+                    if (isMobile) {
+                        nav.classList.remove('navbar-hidden');
+                        nav.style.display = '';
+                    } else {
+                        nav.classList.add('navbar-hidden');
+                    }
+                }
+                updateAppClassMargin();
             }, { passive: true });
         });
     </script>
@@ -277,18 +298,19 @@
                                        class="w-full h-full object-contain"
                                        x-show="isVideoReady(reel.id)"
                                        loop
-                                       muted
-                                       preload="none"
+                                       :muted="isGlobalMuted"
+                                       :preload="index === currentVideoIndex ? 'auto' : 'metadata'"
                                        :poster="reel.thumbnail_url || null"
                                        playsinline
-                                       loading="lazy"
+                                       webkit-playsinline
                                        x-ref="video"
                                        @click="togglePlay($event)"
                                        @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
                                        @canplay="markVideoReady(reel.id)"
-                                       @timeupdate.throttle.1000ms="updateProgress($event)"
+                                       @timeupdate.throttle.500ms="updateProgress($event)"
                                        @play="updateProgress($event)"
-                                       @pause="updateProgress($event)">
+                                       @pause="updateProgress($event)"
+                                       @ended="onVideoEnded($event)">
                                 </video>
                             </div>
                         </template>
