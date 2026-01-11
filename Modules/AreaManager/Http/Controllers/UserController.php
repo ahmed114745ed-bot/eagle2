@@ -213,7 +213,7 @@ class UserController extends MainController
     {
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
-       
+
         $countriesIds = Common::areaCountries();
         $grid->model()
             ->whereIn('country_id', $countriesIds)
@@ -330,7 +330,7 @@ class UserController extends MainController
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
 
-        Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {
                 max-width: 90%;

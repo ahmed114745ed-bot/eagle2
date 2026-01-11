@@ -8,7 +8,7 @@
 
     <style>
 
-     
+
 
     /* RTL Specific Styles */
     [dir="rtl"] .form-check {
@@ -26,7 +26,6 @@
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
-            --green-color: {{ config('themes.greenColor') }};
             --text-primary-color: {{ config('themes.textPrimaryColor') }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -1164,7 +1163,7 @@
             filter: brightness(0.95);
         }
 
-    
+
     </style>
 
 </head>
@@ -1182,7 +1181,7 @@
 
         <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('area manager') }}</a>
 
-        
+
 
     </div>
     <div id="tab-loading" style="
@@ -1348,7 +1347,7 @@
         <div class="card-body">
 
             @php
-                       
+
                         // Group permissions by category first
                         $grouped = $areaPermissions->groupBy('category');
                         $permissionType = $areaPermissionType ??'role-country-manager';
@@ -1474,21 +1473,21 @@
 
 
 
-  
-   
-
-    
-     
-     
 
 
 
 
 
 
-  
 
-     
+
+
+
+
+
+
+
+
 
 
 <!-- jQuery أولاً -->
@@ -1502,7 +1501,7 @@
 
 
 
-    
+
 
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -1571,7 +1570,7 @@
     });
 
 
-    
+
          $(function () {
         let selectedPermissions = new Set(@json($selected ?? []));
 
@@ -1761,12 +1760,12 @@
     });
 
 
-      
-
-       
 
 
-   
+
+
+
+
 
 </script>
 
@@ -1812,7 +1811,7 @@
 @endphp
 
 <style>
-    
+
 </style>
 
 <input type="hidden" name="permissions_all" id="permissions_all">

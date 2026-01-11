@@ -14,13 +14,12 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/rooms-activity";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/rooms-activity";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/rooms-activity";
     }
-    $fetchUrl = $prefix . "/statistics/rooms-activity";
 @endphp
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -74,20 +73,25 @@
     }
 
     function loadRoomsActivity(period = 'day') {
-        $.ajax({
-            url: "{{ $fetchUrl }}",
-            data: { period: period },
-            success: function(res) {
-                if (res.success) {
-                    renderRoomsActivity(res.labels, res.newRooms, res.inactiveRooms);
-                } else {
-                    renderRoomsActivity([], [], []);
+        if (!window.roomsActivityLoaded) {
+            window.roomsActivityLoaded = true;
+            $.ajax({
+                url: "{{ $fetchUrl }}",
+                data: { period: period },
+                success: function(res) {
+                    if (res.success) {
+                        renderRoomsActivity(res.labels, res.newRooms, res.inactiveRooms);
+                    } else {
+                        renderRoomsActivity([], [], []);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     $('#rooms-activity-filter').on('change', function () {
+        // Allow filter changes to reload data
+        window.roomsActivityLoaded = false;
         loadRoomsActivity($(this).val());
     });
 

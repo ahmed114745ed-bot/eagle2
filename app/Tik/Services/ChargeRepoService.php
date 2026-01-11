@@ -204,7 +204,7 @@ class ChargeRepoService
 
             $agency = $this->agencyRepository->findByStatus($sender->agency_id);
             if (! isset($agency)) {
-                throw new Exception('api_responses.agency_stopped');
+                throw new Exception(__('your agency not found'));
             } // Your agency stopped call the administrator
 
             if ($agency->is_frozen === 1) {
@@ -288,18 +288,17 @@ class ChargeRepoService
     public function charge($sender, User $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
 
-        if ($chargeType === 'user') {
             WalletService::storeTransaction(
-                $sender->id,
+                $this->getWalletUserId($sender),
                 'cut',
                 $usd,
-                'user_transaction',
+                'user',
                 'transfer_to_user',
                 ['receiver_id' => $receiver->id],
-                'charge_to_user'
+                'charge'
 
             );
-        }
+    
         $amountBefore =  $receiver->di;
         UserCoinLogHelper::logByType(
             $receiver->id,
@@ -336,13 +335,13 @@ class ChargeRepoService
         $receiver->increment('coins', $amount);
 
         WalletService::storeTransaction(
-            $sender->id,
+            $this->getWalletUserId($sender),
             'cut',
             $usd,
-            'user_transaction',
+            'user',
             'transfer_to_agency',
             ['agency_id' => $receiver->id],
-            'charge_to_agency'
+            'charge'
         );
 
         $data = [
@@ -362,7 +361,16 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-   
+        // Deduct from wallet (owner's wallet if sender is agency)
+        WalletService::storeTransaction(
+            $this->getWalletUserId($sender),
+            'cut',
+            $usd,
+            'user',
+            'transfer_to_agency',
+            ['agency_id' => $receiver->id],
+            'charge'
+        );
 
         $receiver->increment('coins', $amount);
 
@@ -540,6 +548,17 @@ class ChargeRepoService
         $chargeAgency->increment('coins', $amount);
         $usdRate = $amount / Common::getCoinsValue('shipping_coins');
 
+        // Deduct from agency owner's wallet
+        WalletService::storeTransaction(
+            $this->getWalletUserId($authAgency),
+            'cut',
+            $usdRate,
+            'user',
+            'transfer_to_agency',
+            ['agency_id' => $chargeAgency->id],
+            'charge'
+        );
+
         $this->agencyCharge(
             chargerId: $authAgency->id,
             userId: $chargeAgency->id,
@@ -571,6 +590,17 @@ class ChargeRepoService
         $receiver->increment('di', $amount);
         $usdRate = $amount / Common::getCoinsValue('user_coins');
 
+        // Deduct from agency owner's wallet
+        WalletService::storeTransaction(
+            $this->getWalletUserId($authAgency),
+            'cut',
+            $usdRate,
+            'user',
+            'transfer_to_user',
+            ['receiver_id' => $receiver->id],
+            'charge'
+        );
+
         $this->agencyCharge(
             chargerId: $authAgency->id,
             userId: $receiver->id,
@@ -587,5 +617,18 @@ class ChargeRepoService
 
         UserCommon::UserEarnedInvitation($receiver->id, $amount );
         UserCommon::addChargeLevel($receiver->id, $amount);
+    }
+
+    /**
+     * Get wallet user ID - returns user ID directly for User, or owner ID for Agency
+     */
+    private function getWalletUserId($sender): int
+    {
+        if ($sender instanceof User) {
+            return $sender->id;
+        }
+
+        // For Agency/ShippingAgency, get owner's wallet
+        return $sender->app_owner_id ?? $sender->owner_id ?? $sender->id;
     }
 }

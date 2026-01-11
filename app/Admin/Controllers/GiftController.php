@@ -212,7 +212,7 @@ class GiftController extends MainController
             $model = $actions->row;
 
             if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
-                && $model->category->type != null
+                && $model->category?->type != null
             ) {
                 $actions->add(new MoveGiftCategory());
             }
@@ -468,7 +468,7 @@ class GiftController extends MainController
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'lucky-gift-setting');
         }
-        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins','host_lucky_gift'])->pluck('value', 'key')->toArray();
         return $content->view('lucky_gift', compact('config'));
     }
 }

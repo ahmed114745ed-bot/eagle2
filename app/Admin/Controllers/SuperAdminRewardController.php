@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\SuperAdmin\Http\Controllers\Admin;
+namespace App\Admin\Controllers;
 
 use App\Models\Ware;
 use Encore\Admin\Grid;
@@ -26,7 +26,7 @@ class SuperAdminRewardController extends MainController
      */
     protected $title = 'SuperAdminReward';
 
-    public $permission_name = 'super-admin-reward';
+    public $permission_name = 'admin-reward';
     public function index(Content $content)
     {
 
@@ -36,7 +36,7 @@ class SuperAdminRewardController extends MainController
 
         session(['last_ware_type' => request()->get('type', 'vip')]);
         return parent::index($content
-            ->title(trans('Super Admin Reward'))
+            ->title(trans('Reward'))
             ->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             })
@@ -99,7 +99,7 @@ class SuperAdminRewardController extends MainController
             if (Admin::user()->can('dedicate-switch-' . $this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('return', __('dedicate'))->display(function () {
 
-                    return (new \App\Admin\Actions\DedicateSuperPackageRewardAction($this->id))->render();
+                    return (new \App\Admin\Actions\DedicateAdminPackageReward($this->id))->render();
                 });
             }
         } else {
@@ -117,9 +117,9 @@ class SuperAdminRewardController extends MainController
         $grid->disableActions();
         $grid->disableCreateButton();
 
-        if (Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*')) {
+        if ((Admin::user()->can($this->permission_name . '-history') || Admin::user()->can('*'))) {
             $grid->tools(function (Grid\Tools $tools) {
-                $url = '/admin/super-admin-rewards-histories?type=' . request('type');
+                $url = '/admin/admin-rewards-histories?type=' . request('type');
                 $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
                 $tools->append($button);
             });
@@ -161,61 +161,48 @@ class SuperAdminRewardController extends MainController
     protected function package($grid)
     {
         $grid->column('title', __('package'));
-        $grid->column('members', __('rewards'))->expand(function ($model) {
-            $mempers = $model->packageRewards()
-                ->with([
-                    'ware:id,name,img2,show_img',
-                    'vip:id,name,img',
-                    'badge:id,name,image',
-                ])
-                ->select('id', 'type', 'target', 'expire', 'quantity', 'super_package_id')
-                ->get()
-                ->map(function ($memper) {
-
-                    $gifts = '';
-                    $path  = '';
-
-                    switch ($memper->type) {
-                        case 'ware':
-                            $gifts = $memper->ware->name ?? '';
-                            $path  = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
-                            break;
-
-                        case 'vip':
-                            $gifts = $memper->vip->name ?? '';
-                            $path  = $memper->vip->img ?? '';
-                            break;
-
-                        case 'badge':
-                            $gifts = $memper->badge->name ?? '';
-                            $path  = $memper->badge->image ?? '';
-                            break;
-
-                        case 'coins':
-                            $gifts = $memper->target;
-                            $path  = 'coin.png';
-                            break;
-
-                        case 'achievement':
-                            $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
-                            $path  = $memper->target;
-                            break;
-                    }
-
-                    return [
-                        'id'       => $memper->id,
-                        'type'     => $memper->type,
-                        'gift'     => $gifts,
-                        'quantity' => $memper->quantity,
-                        'expire'   => $memper->expire,
-                    ];
-                });
-
-            return new Table(
-                ['ID', __('type'), __('gift'), __('quantity'), __('expire')],
-                $mempers->toArray()
-            );
+        $grid->column('members', __('Rewards'))->display(function () {
+            $text = __('View Rewards'); // Translation key
+            return "<button class='btn btn-sm btn-primary show-rewards-modal' data-id='{$this->id}'>$text</button>";
         });
+
+        $modalTitle = __('Rewards'); // PHP variable with translation
+
+        Admin::script("
+    $(document).on('click', '.show-rewards-modal', function() {
+        var id = $(this).data('id');
+        var modalTitle = '" . e($modalTitle) . "'; // escape for JS
+
+        // Show modal
+        if (!$('#rewardsModal').length) {
+            $('body').append(`
+                <div class='modal fade' id='rewardsModal' tabindex='-1'>
+                    <div class='modal-dialog modal-lg'>
+                        <div class='modal-content'>
+                            <div class='modal-header'>
+                                <h5 class='modal-title'>${modalTitle}</h5>
+                                <button type='button' class='close' data-dismiss='modal'>&times;</button>
+                            </div>
+                            <div class='modal-body'>Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        } else {
+            $('#rewardsModal .modal-title').text(modalTitle);
+        }
+
+        $('#rewardsModal .modal-body').html('Loading...');
+        $('#rewardsModal').modal('show');
+
+        // Load rewards via AJAX
+        $.get('/admin/admin-rewards/' + id, function(html) {
+            $('#rewardsModal .modal-body').html(html);
+        }).fail(function() {
+            $('#rewardsModal .modal-body').html('<p class=\"text-danger\">Failed to load rewards.</p>');
+        });
+    });
+");
     }
 
 
@@ -248,5 +235,86 @@ class SuperAdminRewardController extends MainController
             }
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
+    }
+
+
+
+
+    public function getRewards($id)
+    {
+        // Load the RankingRange and its rewards
+        $model = SuperPackageReward::with(['packageRewards'])->findOrFail($id);
+        $members = $mempers = $model->packageRewards()
+            ->with([
+                'ware:id,name,img2,show_img',
+                'vip:id,name,img',
+                'badge:id,name,image',
+            ])
+            ->select('id', 'type', 'target', 'expire', 'quantity', 'super_package_id')
+            ->get()
+            ->map(function ($memper) {
+
+                $gifts = '';
+                $path  = '';
+
+                switch ($memper->type) {
+                    case 'ware':
+                        $gifts = $memper->ware->name ?? '';
+                        $path  = $memper->ware->img2 ?? $memper->ware->show_img ?? '';
+                        break;
+
+                    case 'vip':
+                        $gifts = $memper->vip->name ?? '';
+                        $path  = $memper->vip->img ?? '';
+                        break;
+
+                    case 'badge':
+                        $gifts = $memper->badge->name ?? '';
+                        $path  = $memper->badge->image ?? '';
+                        break;
+
+                    case 'coins':
+                        $gifts = $memper->target;
+                        $path  = 'coin.png';
+                        break;
+
+                    case 'achievement':
+                        $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
+                        $path  = $memper->target;
+                        break;
+                }
+
+                $defaultImage = asset('images/reward.jpg');
+
+                $url =  getImagePath($path) ?? $defaultImage;
+
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+
+                $image = handleShowImageWithSvga(
+                    $memper->id,
+                    $url,
+                    50,
+                    50
+                );
+
+                return [
+                    'id'       => $memper->id,
+                    'type'     => $memper->type,
+                    'gift'     => $gifts,
+                    'image'    => $image,
+                    'quantity' => $memper->quantity,
+                    'expire'   => $memper->expire,
+                ];
+            });
+
+        $table =  new Table(
+            ['ID', __('type'), __('gift'), __('image'), __('quantity'), __('expire')],
+            $mempers->toArray()
+        );
+
+        // Render HTML for modal
+        return $table->render();
     }
 }

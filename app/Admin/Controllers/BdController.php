@@ -554,7 +554,7 @@ class BdController extends MainController
         $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
 
         $id = $bd->id;
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;

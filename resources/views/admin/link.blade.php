@@ -12,7 +12,6 @@
         :root {
         --primary-color: {{ config('themes.primaryColor') }};
         --secondary-color: {{ config('themes.secondaryColor') }};
-        --green-color: {{ config('themes.greenColor') }};
         --text-primary-color: {{ config('themes.textPrimaryColor') }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -233,7 +232,7 @@
             .settings-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .all-page {
                 padding: 10px;
             }
@@ -247,10 +246,10 @@
                 <div class="p-4">
                     <!-- Room Cup Target Section -->
                     <div class="section-header">
-                        
+
                         <h2 class="section-title">{{__('Room Cup Target Settings')}}</h2>
                     </div>
-                    
+
                     <div class="settings-grid">
                         <div class="card">
                             <br>
@@ -259,7 +258,7 @@
                                 <select id="lang_id" name="lang_id" class="form-control" style="width: 100%;" required></select>
                             </div>
                         </div>
-                        
+
                         <div class="card">
                             <div class="card-title">{{__('Room Cup Target Details')}}</div>
                             <div class="form-group">
@@ -271,16 +270,16 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="divider">
                         <span class="divider-text">{{__('Super Admin Configuration')}}</span>
                     </div>
-                    
+
                     <!-- Super Admin Section -->
                     <div class="section-header">
                         <h2 class="section-title">{{__('Super Admin Details')}}</h2>
                     </div>
-                    
+
                     <div class="settings-grid">
                         <div class="card">
                             <br>
@@ -288,9 +287,9 @@
                                 <label for="target_id" class="form-label">{{__('Countries')}}</label>
                                 <select id="target_id" name="country_id" class="form-control" style="width: 100%;" required></select>
                             </div>
-                            
+
                         </div>
-                        
+
                         <div class="card">
                             <div class="card-title">{{__('Super Admin Details')}}</div>
                             <div class="form-group">
@@ -299,7 +298,7 @@
                                     <input type="text" class="form-control" id="super_admin_link" readonly>
                                     <button type="button" class="btn btn-outline-secondary btn-copy" id="copy-admin-link">{{__('Copy')}}</button>
                                 </div>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -431,7 +430,7 @@
     });
 
 
-            
+
 });
     </script>
 </body>

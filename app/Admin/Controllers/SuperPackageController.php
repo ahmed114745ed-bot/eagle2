@@ -134,11 +134,11 @@ class SuperPackageController extends MainController
 
                     $url =  getImagePath($path) ?? $defaultImage;
 
-                    if (! isImageExists($url)) {
+                    if (!isImageExists($url)) {
                         $url = $defaultImage;
                     }
 
-                $image = handleShowImageWithTypes(
+                $image = handleShowImageWithSvga(
                     $reward->id,
                     $url,
                     50,
@@ -209,9 +209,6 @@ class SuperPackageController extends MainController
      *
      * @return Form
      */
-
-
-
     protected function form($id = null)
     {
         $form = new Form(new SuperPackageReward());
@@ -230,9 +227,6 @@ class SuperPackageController extends MainController
 
 
         $form->text('title', __('title'))->required();
-
-
-        $form->divider(__('Rewards'));
 
         $rankingRangeId = null;
         if ($form->isEditing()) {
@@ -287,7 +281,7 @@ class SuperPackageController extends MainController
                     <div class="col-md-3 col-sm-4 col-xs-6" id="reward-item-' . $reward->id . '">
                         <div class="card" style="border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 15px; text-align: center; position: relative;">
                             <button type="button" class="btn btn-danger btn-xs delete-reward" data-id="' . $reward->id . '"
-                                style="position: absolute; top: 5px; right: 5px; border-radius: 50%; width: 24px; height: 24px; padding: 0; z-index: 10;">
+                                style="position: absolute; top: 5px; right: 5px;">
                                 <i class="fa fa-times"></i>
                             </button>
 
@@ -317,6 +311,8 @@ class SuperPackageController extends MainController
                 $form->html($html);
             }
         }
+
+        $form->html('<div class="form-divider full-column-width"> <span>' . __('Rewards') . '</span> </div>');
 
         $form->select('type', trans('type'))->options([
             "ware" => __('ware'),
@@ -509,8 +505,6 @@ class SuperPackageController extends MainController
         return $form;
     }
 
-
-
     protected function addWareField(Form $form)
     {
         $prefix = 'wares';
@@ -524,7 +518,7 @@ class SuperPackageController extends MainController
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');

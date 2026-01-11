@@ -97,13 +97,49 @@ class ChargeReportController extends MainController
                 $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
-            ->orderByDesc('created_at')->with(['sender', 'receiver']);
+            ->orderByDesc('created_at')->with([
+                // 'sender',
+                // 'sender.profile:id,user_id,avatar',
+                'receiver',
+                'receiver.profile:id,user_id,avatar',
+                // 'sender.packs' => function ($q) {
+                //     $q->whereIn('type', [25])
+                //         ->where('is_used', true)
+                //         ->with('ware:id,value');
+                // },
+                'receiver.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'admin',
+                'admin.agency',
+                'senderUser',
+                'senderUser.profile:id,user_id,avatar',
+                'senderUser.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'receiveragency',
+
+            ]);
 
         if ($charger_type == "dash") {
             $grid->model()->where('charger_type', "dash");
         } elseif (request("name") == "host") {
 
-            $grid->model()->where('charger_type', 'host_agency');
+            $grid->model()->where('charger_type', 'host_agency')->with([
+                'senderAgency',
+                'senderAgency.owner',
+                'senderAgency.owner.packs' => function ($q) {
+                    $q->whereIn('type', [25])
+                        ->where('is_used', true)
+                        ->with('ware:id,value');
+                },
+                'senderAgency.owner.specialId.ware',
+                'senderAgency.owner.packs'
+            ]);
         } else {
             $grid->model()->where(function ($query) {
                 $query->where('charger_type', 'agency')
@@ -111,92 +147,7 @@ class ChargeReportController extends MainController
             });
         }
         if ($charger_type == "shipping-agency-activity") {
-            $grid->filter(function (Grid\Filter $filter) {
-
-                if (!request()->has('filter_type')) {
-                    request()->merge(['filter_type' => 'shipping']);
-                }
-                $filter->disableIdFilter();
-                $filter->expand();
-
-                $filter->column(1 / 4, function ($filter) {
-                    $filter->where(function () {}, __('Type'), 'filter_type')
-                        ->select([
-                            'user'     => 'User',
-                            'shipping' => 'Shipping Agency',
-                        ])->default('shipping');
-                });
-
-                $filter->column(3 / 4, function ($filter) {
-                    $filter->where(function ($query) {
-                        $type  = request('filter_type');
-                        $value = trim($this->input);
-
-                        if ($type === 'user') {
-                            $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value))
-                                ->orWhereHas('receiverUser', fn($q) => $q->where('uuid', $value));
-                        } elseif ($type === 'shipping') {
-                            $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value))
-                                ->orWhereHas('shippingAgency', fn($q) => $q->where('id', $value));
-                        }
-                    }, __('Dynamic Sender/Receiver Filter'));
-                });
-
-                $filter->column(1 / 4, function ($filter) {
-                    $filter->where(function () {}, __('sender type'), 'sender_type')
-                        ->select([
-                            'user'     => 'User',
-                            'shipping' => 'Shipping Agency',
-                        ])->default('shipping');
-                });
-
-                $filter->column(3 / 4, function ($filter) {
-                    $filter->where(function ($query) {
-                        $type  = request('sender_type');
-                        $value = trim($this->input);
-
-                        if ($type === 'user') {
-                            $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value));
-                        } elseif ($type === 'shipping') {
-                            $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value));
-                        }
-                    }, __('Sender UUID or Shipping Agency ID'));
-                });
-
-                $filter->column(1 / 4, function ($filter) {
-                    $filter->where(function () {}, __('receiver type'), 'receiver_type')
-                        ->select([
-                            'user'     => 'User',
-                            'shipping' => 'Shipping Agency',
-                        ])->default('shipping');
-                });
-
-                $filter->column(3 / 4, function ($filter) {
-                    $filter->where(function ($query) {
-                        $type  = request('receiver_type');
-                        $value = trim($this->input);
-
-                        if ($type === 'user') {
-                            $query->whereHas('receiverUser', fn($q) => $q->where('uuid', $value));
-                        } elseif ($type === 'shipping') {
-                            $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
-                        }
-                    }, __('Receiver UUID or Shipping Agency ID'));
-                });
-
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        $from = request('from_date');
-                    }, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
-                });
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        $to = request('to_date');
-                    }, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
-                });
-            });
+            $this->filterShipping($grid);
         }
 
         Admin::style("
@@ -210,45 +161,7 @@ class ChargeReportController extends MainController
             }
         ");
         if ($charger_type != "shipping-agency-activity") {
-            $grid->filter(function (Grid\Filter $filter) {
-                $filter->disableIdFilter();
-                $filter->expand();
-                $filter->column(1 / 4, function ($filter) {
-                    $filter->where(function () {}, __('Type'), 'filter_type')
-                        ->select([
-                            'user'     => 'User',
-                            'shipping' => 'Shipping Agency',
-                        ])->default('shipping');
-                });
-
-                $filter->column(3 / 4, function ($filter) {
-                    $filter->where(function ($query) {
-                        $input = $this->input;
-                        $type  = request('filter_type');
-                        if ($type == 'user') {
-                            $query->whereHas('receiverUser', function ($q) use ($input) {
-                                $q->where('uuid', $input)
-                                    ->orWhere('name', 'like', "%$input%");
-                            });
-                        } else {
-                            $query->whereHas('receiver', function ($q) use ($input) {
-                                $q->where('id', $input)
-                                    ->orWhere('name', 'like', "%$input%");
-                            });
-                        }
-                    }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
-                });
-
-
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
-                });
-
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
-                });
-            });
+            $this->filterChargeDash($grid);
         }
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
@@ -264,7 +177,7 @@ class ChargeReportController extends MainController
         $grid->column('id', __('transaction id'));
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
-            $sender = Common::getChargerInfo($this);
+            $sender = Common::getChargerInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -308,7 +221,7 @@ class ChargeReportController extends MainController
         $grid->column('user_id', __('recipient'))->display(function ($recever) {
 
 
-            $sender = Common::getReceiverInfo($this);
+            $sender = Common::getReceiverInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -432,6 +345,138 @@ class ChargeReportController extends MainController
         return $grid;
     }
 
+    public function filterShipping($grid)
+    {
+        $grid->filter(function (Grid\Filter $filter) {
+
+            if (!request()->has('filter_type')) {
+                request()->merge(['filter_type' => 'shipping']);
+            }
+            $filter->disableIdFilter();
+            $filter->expand();
+
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('Type'), 'filter_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
+            });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $type  = request('filter_type');
+                    $value = trim($this->input);
+
+                    if ($type === 'user') {
+                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value))
+                            ->orWhereHas('receiverUser', fn($q) => $q->where('uuid', $value));
+                    } elseif ($type === 'shipping') {
+                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value))
+                            ->orWhereHas('shippingAgency', fn($q) => $q->where('id', $value));
+                    }
+                }, __('Dynamic Sender/Receiver Filter'));
+            });
+
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('sender type'), 'sender_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
+            });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $type  = request('sender_type');
+                    $value = trim($this->input);
+
+                    if ($type === 'user') {
+                        $query->whereHas('senderUser', fn($q) => $q->where('uuid', $value));
+                    } elseif ($type === 'shipping') {
+                        $query->whereHas('senderShippingAgency', fn($q) => $q->where('id', $value));
+                    }
+                }, __('Sender UUID or Shipping Agency ID'));
+            });
+
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('receiver type'), 'receiver_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
+            });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $type  = request('receiver_type');
+                    $value = trim($this->input);
+
+                    if ($type === 'user') {
+                        $query->whereHas('receiverUser', fn($q) => $q->where('uuid', $value));
+                    } elseif ($type === 'shipping') {
+                        $query->whereHas('shippingAgency', fn($q) => $q->where('id', $value));
+                    }
+                }, __('Receiver UUID or Shipping Agency ID'));
+            });
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $from = request('from_date');
+                }, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $to = request('to_date');
+                }, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+        });
+    }
+    public function filterChargeDash($grid)
+    {
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->disableIdFilter();
+            $filter->expand();
+            $filter->column(1 / 4, function ($filter) {
+                $filter->where(function () {}, __('Type'), 'filter_type')
+                    ->select([
+                        'user'     => 'User',
+                        'shipping' => 'Shipping Agency',
+                    ])->default('shipping');
+            });
+
+            $filter->column(3 / 4, function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $type  = request('filter_type');
+                    if ($type == 'user') {
+                        $query->whereHas('receiverUser', function ($q) use ($input) {
+                            $q->where('uuid', $input)
+                                ->orWhere('name', 'like', "%$input%");
+                        });
+                    } else {
+                        $query->whereHas('receiver', function ($q) use ($input) {
+                            $q->where('id', $input)
+                                ->orWhere('name', 'like', "%$input%");
+                        });
+                    }
+                }, __('Receiver UUID or Shipping Agency ID'), 'filtering');
+            });
+
+
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {}, __('From Date'), 'from_date')->date()->default(now()->startOfMonth()->toDateString());
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {}, __('To Date'), 'to_date')->date()->default(convertArabicToEnglishNumbers(request('to_date')));
+            });
+        });
+    }
+
     protected function stripe()
     {
         $grid = new Grid(new CoinLog());
@@ -439,12 +484,89 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
+        Admin::style("
+            /* Force date picker inputs to be smaller - very specific selectors */
+            input[type='date'],
+            input[type='date'].form-control,
+            .form-control[type='date'],
+            .filter-container input[type='date'],
+            .filter-item input[type='date'],
+            .col-md-6 input[type='date'],
+            .col-md-2 input[type='date'],
+            .col-md-3 input[type='date'],
+            .col-md-4 input[type='date'],
+            .col-md-5 input[type='date'],
+            .col-md-8 input[type='date'] {
+                max-width: 100px !important;
+                width: 100px !important;
+                font-size: 0.75rem !important;
+                padding: 0.15rem 0.3rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Target date picker containers specifically */
+            .input-group:has(input[type='date']),
+            .input-group:has(.form-control[type='date']) {
+                max-width: 110px !important;
+                width: 110px !important;
+            }
+
+            /* Reduce spacing for filter columns */
+            .filter-item,
+            .filter-item-date,
+            .col-md-6,
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-8 {
+                margin-bottom: 5px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* Make buttons in input groups smaller */
+            .input-group .btn,
+            .input-group-append .btn,
+            .input-group-btn .btn {
+                padding: 0.15rem 0.3rem !important;
+                font-size: 0.75rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Override any existing date picker styles */
+            .daterangepicker,
+            .bootstrap-datepicker,
+            .datepicker {
+                font-size: 0.75rem !important;
+                width: 180px !important;
+                max-width: 180px !important;
+            }
+
+            .daterangepicker .calendar-table,
+            .bootstrap-datepicker .datepicker-days,
+            .datepicker table {
+                font-size: 0.7rem !important;
+            }
+        ");
+
         $grid->model()->when(!request('from_date'), function ($query,) {
 
             $start = now()->startOfMonth();
             $end   = $end   = now()->endOfMonth();
             $query->whereBetween('created_at', [$start, $end]);
-        })
+        })->with([
+            'user',
+            'user.profile',
+            'user.packs' => function ($q) {
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
+        ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at');
 
@@ -650,6 +772,75 @@ class ChargeReportController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
+
+        Admin::style("
+            /* Force date picker inputs to be smaller - very specific selectors */
+            input[type='date'],
+            input[type='date'].form-control,
+            .form-control[type='date'],
+            .filter-container input[type='date'],
+            .filter-item input[type='date'],
+            .col-md-6 input[type='date'],
+            .col-md-2 input[type='date'],
+            .col-md-3 input[type='date'],
+            .col-md-4 input[type='date'],
+            .col-md-5 input[type='date'],
+            .col-md-8 input[type='date'] {
+                max-width: 100px !important;
+                width: 100px !important;
+                font-size: 0.75rem !important;
+                padding: 0.15rem 0.3rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+                box-sizing: border-box !important;
+            }
+
+            /* Target date picker containers specifically */
+            .input-group:has(input[type='date']),
+            .input-group:has(.form-control[type='date']) {
+                max-width: 110px !important;
+                width: 110px !important;
+            }
+
+            /* Reduce spacing for filter columns */
+            .filter-item,
+            .filter-item-date,
+            .col-md-6,
+            .col-md-2,
+            .col-md-3,
+            .col-md-4,
+            .col-md-5,
+            .col-md-8 {
+                margin-bottom: 5px !important;
+                padding-left: 5px !important;
+                padding-right: 5px !important;
+            }
+
+            /* Make buttons in input groups smaller */
+            .input-group .btn,
+            .input-group-append .btn,
+            .input-group-btn .btn {
+                padding: 0.15rem 0.3rem !important;
+                font-size: 0.75rem !important;
+                height: 26px !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Override any existing date picker styles */
+            .daterangepicker,
+            .bootstrap-datepicker,
+            .datepicker {
+                font-size: 0.75rem !important;
+                width: 180px !important;
+                max-width: 180px !important;
+            }
+
+            .daterangepicker .calendar-table,
+            .bootstrap-datepicker .datepicker-days,
+            .datepicker table {
+                font-size: 0.7rem !important;
+            }
+        ");
         $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
 
             $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
@@ -792,17 +983,26 @@ class ChargeReportController extends MainController
 
         $grid->disableRowSelector();
 
-        $grid->model()->when(request('from_date') && request('to_date'), function ($query,) {
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.packs' => function ($q) {
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
+        ])
+            ->when(request('from_date') && request('to_date'), function ($query,) {
 
-            $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
-            $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
-            $query->whereBetween('created_at', [$start, $end]);
-        })->when(!request('from_date'), function ($query,) {
+                $start = Carbon::parse(convertArabicToEnglishNumbers(request('from_date')))->startOfDay();
+                $end   = Carbon::parse(convertArabicToEnglishNumbers(request('to_date')))->endOfDay();
+                $query->whereBetween('created_at', [$start, $end]);
+            })->when(!request('from_date'), function ($query,) {
 
-            $start = now()->startOfMonth();
-            $end   = $end   = now()->endOfMonth();
-            $query->whereBetween('created_at', [$start, $end]);
-        })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+                $start = now()->startOfMonth();
+                $end   = $end   = now()->endOfMonth();
+                $query->whereBetween('created_at', [$start, $end]);
+            })->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('created_at')->where('status', 1);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

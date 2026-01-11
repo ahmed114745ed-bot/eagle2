@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use function request;
 use App\Traits\Families\ResourceTrait;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Model;
 
-use function request;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Family extends Model
 {
@@ -114,10 +115,18 @@ class Family extends Model
         return $this->cachedLevelMax;
     }
 
+    public function levelMax(): HasOne
+    {
+        // This is a query builder, not a real foreign key relation
+        return $this->hasOne(FamilyLevel::class, 'id', 'id')
+            ->where('exp', '<=', $this->total_diamond)
+            ->orderByDesc('exp');
+    }
+
     public function getLevelMaxMembersNumAttribute()
     {
-        $level = $this->getLevelMax();
-
+      //  $level = $this->getLevelMax();
+      $level = $this->levelMax;
         if ($level) {
             return $level->members;
         }
@@ -127,7 +136,8 @@ class Family extends Model
 
     public function getMaxExpAttribute()
     {
-        $level = $this->getLevelMax();
+       // $level = $this->getLevelMax();
+        $level = $this->levelMax;
 
         if ($level) {
             return $level->exp;
@@ -138,7 +148,8 @@ class Family extends Model
 
     public function getMaxLevelAttribute()
     {
-        $level = $this->getLevelMax();
+       // $level = $this->getLevelMax();
+        $level = $this->levelMax;
 
         if ($level) {
             return app()->getLocale() === 'ar' ? ($level->name ?? $level->name_en) : ($level->name_en ?? $level->name);
@@ -151,7 +162,8 @@ class Family extends Model
 
     public function getLevelMaxAdminsNumAttribute()
     {
-        $level = $this->getLevelMax();
+        //$level = $this->getLevelMax();
+         $level = $this->levelMax;
         if ($level) {
             return $level->admins;
         }

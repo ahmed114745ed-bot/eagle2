@@ -9,30 +9,39 @@
 
 @php
     if (request()->is('superadmin*')) {
-        $prefix = 'superadmin';
+        $fetchUrl = "superadmin/statistics/users-online-stats";
     } elseif (request()->is('areaManager*')) {
-        $prefix = 'areaManager';
+        $fetchUrl = "areaManager/statistics/users-online-stats";
     } else {
-        $prefix = 'admin';
+        $fetchUrl = "statistics/users-online-stats";
     }
-    $fetchUrl = $prefix . "/statistics/users-online-stats";
+    $onlineUsersLabel = __('online_users');
+    $offlineUsersLabel = __('offline_users');
 @endphp
 
 @if(request()->is('superadmin') || request()->is('admin/superadmin/statistics') || request()->is('admin') ||  request()->is('areaManager'))
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const ctx = document.getElementById('usersOnlineChart').getContext('2d');
+        let usersOnlineChart;
 
-            let chart = new Chart(ctx, {
+        function renderUsersOnlineChart(online, offline) {
+            const canvas = document.getElementById('usersOnlineChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            if (usersOnlineChart) {
+                usersOnlineChart.destroy();
+            }
+
+            usersOnlineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Users'], // نقطة واحدة فقط على X
                     datasets: [
                         {
                             label: "{{ __('online_users') }}",
-
-                            data: [0], // يبدأ من 0
+                            data: [online], // يبدأ من 0
                             borderColor: '#28a745',
                             borderWidth: 2,
                             fill: false,
@@ -40,7 +49,7 @@
                         },
                         {
                             label: "{{ __('offline_users') }}",
-                            data: [0], // يبدأ من 0
+                            data: [offline], // يبدأ من 0
                             borderColor: '#dc3545',
                             borderWidth: 2,
                             fill: false,
@@ -71,34 +80,31 @@
                     }
                 }
             });
+        }
 
-            function fetchData() {
-                fetch("{{ $fetchUrl }}", {
-                    headers: { 'Accept': 'application/json' }
-                })
-                    .then(async res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.includes("application/json")) {
-                            return res.json();
-                        } else {
-                            const text = await res.text();
-                            throw new Error("Expected JSON, got: " + text);
-                        }
-                    })
-                    .then(data => {
-                        // تحديث الخطوط بالنقاط الجديدة
-                        chart.data.datasets[0].data = [data.online];   // Online
-                        chart.data.datasets[1].data = [data.offline];  // Offline
-                        chart.update();
-                        console.log("Online:", data.online, "Offline:", data.offline);
-                    })
-                    .catch(err => {
-                        console.error("Fetch Error:", err); // طباعة الأخطاء في Console
-                    });
-            }
+        function loadUsersOnlineData() {
+            $.ajax({
+                url: "{{ $fetchUrl }}",
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    console.log("Online:", data.online, "Offline:", data.offline);
+                    renderUsersOnlineChart(data.online || 0, data.offline || 0);
+                },
+                error: function(err) {
+                    console.error("Error:", err);
+                    renderUsersOnlineChart(0, 0);
+                }
+            });
+        }
 
-            fetchData();
-            setInterval(fetchData, 10000);
-        });
+        // تنفيذ مباشر - هذا هو المفتاح!
+        loadUsersOnlineData();
+
+        // تحديث كل 10 ثواني
+        if (window.usersOnlineInterval) {
+            clearInterval(window.usersOnlineInterval);
+        }
+        window.usersOnlineInterval = setInterval(loadUsersOnlineData, 10000);
     </script>
 @endif

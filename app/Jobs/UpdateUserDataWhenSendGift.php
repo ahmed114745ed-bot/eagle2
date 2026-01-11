@@ -38,6 +38,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     public function handle(): void
     {
         $user = User::Find($this->userId);
+        $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
 
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
@@ -46,7 +47,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            'owner' => function ($query) {
                                $query->withoutAppends();
                            }
-                       ])->first();
+                       ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
@@ -57,19 +58,19 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
 //        $room->enableSaving = false;
 //        $room->session      += (int)$totalPrice * 0.1;
 //        $room->save();
-        $coins = (int)$totalPrice * 0.1;
+        $coins = (int)$totalPrice * $hostPercentage;
         if ($this->userCoin != null) {
             UserCommon::UserLuckyGift(0, $this->userId, $gift, ($this->userCoin), $this->number,$this->totalNumWin,$this->totalUserWin);
         }
-        $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number);
+        $this->updateUserDataWhenSendGift($user, $room, $coins, $this->receiversIds, $gift, $this->number,$hostPercentage);
     }
 
-    private function updateUserDataWhenSendGift( $user, $room, $coins, array $receiversIds, $gift, $number)
+    private function updateUserDataWhenSendGift( $user, $room, $coins, array $receiversIds, $gift, $number,$hostPercentage)
     {
         $this->updateRoomCoinsToUser($user, $room, $coins);
         $receivedUsers = User::withoutAppends()->with(['agency', 'profile'])->whereIn('id', $receiversIds)->get();
 
-        $price = $number * ($gift->price * 0.1);
+        $price = $number * ($gift->price * $hostPercentage);
 
         $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
 

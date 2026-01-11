@@ -3,24 +3,15 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #121212;
-        color: white;
         display: flex;
     }
 
     /* القائمة الجانبية */
     .settings-sidebar {
         width: 250px;
-        background: #222;
         min-height: 400px;
-
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: #ff9800;
     }
 
     .settings-menu button {
@@ -28,16 +19,18 @@
         width: 100%;
         text-align: right;
         padding: 15px;
-        background: #333;
-        color: white;
+        color: black;
+        background: white;
         border: none;
         margin-bottom: 5px;
         cursor: pointer;
         font-size: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
 
     .settings-menu button:hover {
-        background: #ff9800;
+        background: var(--primary-color);
+        color: var(--text-secondary-color);
     }
 
     /* محتوى الصفحة */
@@ -144,6 +137,7 @@
     button {
         width: 200px;
     }
+
     /* Toggle Switch Styling */
     .feature-toggle-container {
         display: flex;
@@ -228,21 +222,27 @@
 
     @media (max-width: 576px) {
     }
+
     @media (max-width: 768px) {
         .all-page {
             display: block;
         }
+
         .settings-content {
             width: 100%;
         }
+
         .form-control {
             width: auto;
         }
     }
+
     @media (max-width: 992px) {
     }
+
     @media (max-width: 1200px) {
     }
+
     @media (max-width: 1400px) {
     }
 </style>
@@ -257,34 +257,34 @@
                 <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
                  <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
-                 <button onclick="showSection('live_settings')">{{ __('Live Settings') }}</button>
             </div>
         </div>
 
-        <div class="settings-content">
+    <div class="settings-content">
 
-            <div id="PaidRoom" class="settings-section active">
-                <h2>{{ __('Paid Room') }}</h2>
-                <form id="paidRoomForm" action="{{ route('admin.room-settings.store') }}" method="POST">
-                    @csrf
-                    <div class="form">
-                        <div class="feature-toggle-container">
-                            <span class="toggle-label">{{ __('Enable Pay Room') }}</span>
-                            <label class="switch">
-                                <input type="checkbox" id="switch_toggle"
-                                       {{ $settings['paid_room'] ?? false ? 'checked' : '' }}
-                                       onchange="toggleNumberInput(this);">
-                                <span class="slider round"></span>
-                            </label>
-                            <input type="hidden" name="paid_room" id="switch_value"
-                                   value="{{ $settings['paid_room'] ?? '0' }}">
-                        </div>
+        <div id="PaidRoom" class="settings-section active">
+            <h2>{{ __('Paid Room') }}</h2>
+            <form id="paidRoomForm" class="new-form" action="{{ route('admin.room-settings.store') }}" method="POST">
+                @csrf
+                <div class="form">
+                    <div class="feature-toggle-container">
+                        <span class="toggle-label">{{ __('Enable Pay Room') }}</span>
+                        <label class="switch">
+                            <input type="checkbox" id="switch_toggle"
+                                   {{ $settings['paid_room'] ?? false ? 'checked' : '' }}
+                                   onchange="toggleNumberInput(this);">
+                            <span class="slider round"></span>
+                        </label>
+                        <input type="hidden" name="paid_room" id="switch_value"
+                               value="{{ $settings['paid_room'] ?? '0' }}">
+                    </div>
 
-                        <div id="numberInputContainer" style="{{ $settings['paid_room'] ?? false ? 'display: block;' : 'display: none;' }}">
-                            <label>{{ __('Enter Number') }}</label>
-                            <input type="number" name="paid_room_amount" class="form-control"
-                                   value="{{ $settings['paid_room_amount'] ?? '' }}">
-                        </div>
+                    <div id="numberInputContainer"
+                         style="{{ $settings['paid_room'] ?? false ? 'display: block;' : 'display: none;' }}">
+                        <label>{{ __('Enter Number') }}</label>
+                        <input type="number" name="paid_room_amount" class="form-control"
+                               value="{{ $settings['paid_room_amount'] ?? '' }}">
+                    </div>
 
                         <button type="submit">{{ __('Save') }}</button>
                     </div>
@@ -292,71 +292,68 @@
             </div>
 
             <div id="custom_background_settings" class="settings-section">
-
                 <h3> {{ __('Custom Background settings') }}</h3>
-
-                <form action="{{ route('admin.room-settings.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST" enctype="multipart/form-data">
                     @csrf
                     <div class="form">
                         <label>{{ __('Cost of background request:') }} </label>
                         <input type="text" name="cost_request_background"
                             value="{{ $settings['cost_request_background'] ?? '' }}" class="form-control">
 
-                        <label>{{ __('Background expiration in days:') }} </label>
-                        <input type="text" name="background_expiration"
-                            value="{{ $settings['background_expiration'] ?? '' }}" class="form-control">
+                    <label>{{ __('Background expiration in days:') }} </label>
+                    <input type="text" name="background_expiration"
+                           value="{{ $settings['background_expiration'] ?? '' }}" class="form-control">
 
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
+                    <button type="submit">{{ __('save') }}</button>
+                </div>
 
-                </form>
-            </div>
+            </form>
+        </div>
 
-            <div id="additional_settings" class="settings-section">
-                <h3>{{ __('Additional settings') }}</h3>
-                <form action="{{ route('admin.room-settings.store') }}" method="POST" id="roomSettingsForm" novalidate>
+        <div id="additional_settings" class="settings-section">
+            <h3>{{ __('Additional settings') }}</h3>
+            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST" class="new-form" id="roomSettingsForm"
+                  novalidate>
                 <div class="form">
                     @csrf
-
                     <label>{{ __('Room Rule:') }}</label>
                     <input class="form-control" type="text" name="room_rule"
-                        value="{{ $settings['room_rule'] ?? '' }}" required>
+                           value="{{ $settings['room_rule'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('Room Rule en:') }}</label>
                     <input class="form-control" type="text" name="room_rule_en"
-                        value="{{ $settings['room_rule_en'] ?? '' }}" required>
+                           value="{{ $settings['room_rule_en'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('Youtube Key:') }}</label>
                     <input class="form-control" type="text" name="youtube_key"
-                        value="{{ $settings['youtube_key'] ?? '' }}" required>
+                           value="{{ $settings['youtube_key'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('Pk Background:') }}</label>
                     <input class="form-control" type="text" name="pk_background"
-                        value="{{ $settings['pk_background'] ?? '' }}" required>
+                           value="{{ $settings['pk_background'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('Private Comment Price:') }}</label>
                     <input class="form-control" type="text" name="private_comment_price"
-                        value="{{ $settings['private_comment_price'] ?? '' }}" required>
+                           value="{{ $settings['private_comment_price'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('Total Gift Price:') }}</label>
                     <input class="form-control" type="number" name="total_gift_price"
-                        value="{{ $settings['total_gift_price'] ?? '' }}" required>
+                           value="{{ $settings['total_gift_price'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <label>{{ __('special bar coin') }}</label>
                     <input class="form-control" type="number" name="special_bar_coin"
-                        value="{{ $settings['special_bar_coin'] ?? '' }}" required>
+                           value="{{ $settings['special_bar_coin'] ?? '' }}" required>
                     <!-- <small class="text-danger d-none">{{ __('This field is required') }}</small> -->
 
                     <button type="submit" class="btn btn-primary mt-3">{{ __('save') }}</button>
                 </div>
             </form>
-
             <script>
                 document.getElementById('roomSettingsForm').addEventListener('submit', function (e) {
                     let isValid = true;
@@ -378,139 +375,119 @@
                     }
                 });
             </script>
-
             <style>
                 .is-invalid {
                     border-color: #dc3545 !important;
                 }
+
                 small.text-danger {
                     font-size: 0.85rem;
                 }
+
                 input[type=number] {
-                        font-variant-numeric: normal;
-                        unicode-bidi: plaintext;
-                        direction: ltr;
-                    }
+                    font-variant-numeric: normal;
+                    unicode-bidi: plaintext;
+                    direction: ltr;
+                }
             </style>
-
-            </div>
-
-            <div id="admin_settings" class="settings-section">
-                <h3>{{ __('Admin settings') }}</h3>
-                <form action="{{ route('admin.room-settings.store') }}" method="POST">
-                    <div class="form">
-                        @csrf
-
-                        <label>{{ __('admins number') }}</label>
-                        <input class="form-control" type="number" min="1" name="max_room_admin"
-                            value="{{ $settings['max_room_admin'] ?? 4 }}">
-                            <small class="form-text text-muted" style="    position: relative; top: -15px;">
-                                {{ __('This is the default number of admins allowed per room.') }}
-                            </small>
-                            <br>
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="live_settings" class="settings-section">
-                <h3>{{ __('Live Settings') }}</h3>
-                <form action="{{ route('admin.room-settings.store') }}" method="POST">
-                    <div class="form">
-                        @csrf
-
-                        <label>{{ __('max task stream') }}</label>
-                        <input class="form-control" type="number" min="1" name="max_mix_stream"
-                               value="{{ $settings['max_mix_stream'] ?? 4 }}">
-                        <small class="form-text text-muted" style="position: relative; top: -15px;">
-                            {{ __('This is the default number of rooms allowed per task.') }}
-                        </small>
-                        <br>
-                        <button type="submit">{{ __('save') }}</button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-        <div id="imageModal" class="modal" onclick="closeFullScreen()">
-            <span class="close">&times;</span>
-            <img class="modal-content" id="fullImage">
         </div>
 
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var reelHiddenValue = document.getElementById('host_reel_value').value;
-                document.getElementById('use_zego').checked = (reelHiddenValue === '1');
-            });
-
-            function toggleNumberInput(checkbox) {
-                const numberContainer = document.getElementById('numberInputContainer');
-                const switchValue = document.getElementById('switch_value');
-
-                if (checkbox.checked) {
-                    numberContainer.style.display = 'block';
-                    switchValue.value = '1';
-                } else {
-                    numberContainer.style.display = 'none';
-                    switchValue.value = '0';
-                }
-            }
-
-           // showSection('PaidRoom');
-            document.addEventListener("DOMContentLoaded", function() {
-                // Function to get query parameter by name
-                function getQueryParam(name) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    return urlParams.get(name);
-                }
-
-                // Get the 'firsttab' parameter from URL or default to 'PaidRoom'
-                const activeTab = getQueryParam("firsttab") || "PaidRoom";
-
-                // Show the selected tab
-                showSection(activeTab);
-            });
-
-            function showSection(sectionId) {
-                // Remove active class from all sections
-                document.querySelectorAll('.settings-section').forEach(section => {
-                    section.classList.remove('active');
-                });
-
-                // Add active class to the selected section
-                document.getElementById(sectionId).classList.add('active');
-
-                // Reset button styles
-                document.querySelectorAll('.settings-menu button').forEach(button => {
-                    button.style.backgroundColor = '';
-                    button.style.color = '';
-                });
-
-                // Highlight the active button
-                const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-                if (activeButton) {
-                    activeButton.style.backgroundColor = 'var(--primary-color)';
-                    activeButton.style.color = 'var(--text-secondary-color)';
-                }
-
-                // Update the URL with the selected tab without reloading
-                const url = new URL(window.location);
-                url.searchParams.set("firsttab", sectionId);
-                window.history.pushState({}, "", url);
-            }
-
-            function openFullScreen(imgElement) {
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("fullImage");
-
-                modal.style.display = "block";
-                modalImg.src = imgElement.src;
-            }
-
-            function closeFullScreen() {
-                document.getElementById("imageModal").style.display = "none";
-            }
-        </script>
+        <div id="admin_settings" class="settings-section">
+            <h3>{{ __('Admin settings') }}</h3>
+            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST">
+                <div class="form">
+                    @csrf
+                    <label>{{ __('admins number') }}</label>
+                    <input class="form-control" type="number" min="1" name="max_room_admin"
+                           value="{{ $settings['max_room_admin'] ?? 4 }}">
+                    <small class="form-text text-muted" style="    position: relative; top: -15px;">
+                        {{ __('This is the default number of admins allowed per room.') }}
+                    </small>
+                    <br>
+                    <button type="submit">{{ __('save') }}</button>
+                </div>
+            </form>
+        </div>
     </div>
+    <div id="imageModal" class="modal" onclick="closeFullScreen()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="fullImage">
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var reelHiddenValue = document.getElementById('host_reel_value').value;
+            document.getElementById('use_zego').checked = (reelHiddenValue === '1');
+        });
+
+        function toggleNumberInput(checkbox) {
+            const numberContainer = document.getElementById('numberInputContainer');
+            const switchValue = document.getElementById('switch_value');
+
+            if (checkbox.checked) {
+                numberContainer.style.display = 'block';
+                switchValue.value = '1';
+            } else {
+                numberContainer.style.display = 'none';
+                switchValue.value = '0';
+            }
+        }
+
+        // showSection('PaidRoom');
+        document.addEventListener("DOMContentLoaded", function () {
+            // Function to get query parameter by name
+            function getQueryParam(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            // Get the 'firsttab' parameter from URL or default to 'PaidRoom'
+            const activeTab = getQueryParam("firsttab") || "PaidRoom";
+
+            // Show the selected tab
+            showSection(activeTab);
+        });
+
+        function showSection(sectionId) {
+            // Remove active class from all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Add active class to the selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Reset button styles
+            document.querySelectorAll('.settings-menu button').forEach(button => {
+                button.style.backgroundColor = '';
+                button.style.color = '';
+            });
+
+            // Highlight the active button
+            const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+            if (activeButton) {
+                activeButton.style.setProperty('background-color', 'var(--primary-color)', 'important');
+                activeButton.style.setProperty('color', 'var(--text-secondary-color)', 'important');
+            }
+
+            // Update the URL with the selected tab without reloading
+            const url = new URL(window.location);
+            url.searchParams.set("firsttab", sectionId);
+            window.history.pushState({}, "", url);
+        }
+
+        function openFullScreen(imgElement) {
+            var modal = document.getElementById("imageModal");
+            var modalImg = document.getElementById("fullImage");
+
+            modal.style.display = "block";
+            modalImg.src = imgElement.src;
+        }
+
+        function closeFullScreen() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+    </script>
+</div>
 </body>

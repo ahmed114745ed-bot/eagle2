@@ -3,6 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Helpers\Common;
+use App\Models\CountryCategory;
 use App\Models\ChangeCountryRequest;
 use Modules\AreaManager\Entities\Region;
 use App\Tik\Repositories\CountryRepository;
@@ -25,9 +26,9 @@ class CountryService
         return $this->countryRepository->getCountriesWithSupporters();
     }
 
-    public function indexByHotAndSupporters(): Collection|array
+    public function indexByHotAndSupporters($categoryId): Collection|array
     {
-        return $this->countryRepository->orderByHotAndSupporters();
+        return $this->countryRepository->orderByHotAndSupporters($categoryId);
     }
     public function findById($id)
     {
@@ -63,6 +64,11 @@ class CountryService
             ->where('name', 'like', '%' . $key . '%')
             ->orWhere('id', 'like', '%' . $key . '%')
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    public function countryCategory()
+    {
+        return CountryCategory::orderBy('sort', 'asc')->get();
     }
 
     public function changeRequest($data): true

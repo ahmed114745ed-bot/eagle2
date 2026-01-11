@@ -71,9 +71,9 @@ class SpecialHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SpecialHistory());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
+        $grid->model()->with(['user','user.profile', 'ware','user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)));
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();

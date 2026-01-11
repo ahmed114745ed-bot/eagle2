@@ -35,7 +35,17 @@ class CountryRequestHistoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ChangeCountryRequest());
-        $grid->model()->with(['country', 'user', 'user.packs'])->where('status', '!=', 'pending')->orderByDesc('created_at');
+        $grid->model()
+            ->with([
+                'country',
+                'user.profile',
+                'user',
+                'user.country',
+                'user.receiverLevel',
+                'user.senderLevel',
+                'oldCountry',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ])->where('status', '!=', 'pending')->orderByDesc('created_at');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
