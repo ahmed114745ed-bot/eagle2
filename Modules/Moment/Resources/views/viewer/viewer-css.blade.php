@@ -1364,11 +1364,19 @@ body.modal-open {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px;
+    padding: 10px 16px;
     transition: background 0.15s ease;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
-    gap: 16px;
+    gap: 12px;
+    min-height: 56px;
+}
+
+/* ارتفاع أكبر للتعليقات الطويلة */
+.modal-user-item:has(.modal-comment-text) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    min-height: 70px;
 }
 
 .modal-user-item:hover {
@@ -1382,40 +1390,49 @@ body.modal-open {
 .modal-user-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex: 1;
     min-width: 0;
-}
     position: relative;
 }
 
 .modal-user-avatar {
-    width: 48px !important;
-    height: 48px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     flex-shrink: 0;
+    min-width: 36px;
+}
+
+/* حجم أكبر للصور في موديل التعليقات */
+.modal-list .modal-user-item:has(.modal-comment-text) .modal-user-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 25px;
+    min-width: 44px;
 }
 
 .modal-user-info {
     flex: 1;
     min-width: 0;
+    max-width: 200px;
     overflow: hidden;
 }
 
 .modal-user-name {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .modal-user-meta {
-    font-size: 13px;
+    font-size: 11px;
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
@@ -1425,20 +1442,21 @@ body.modal-open {
 .modal-like-info {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
     margin-left: auto;
+    min-width: 60px;
 }
 
 .modal-like-icon {
     color: #e4405f;
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
 }
 
 .modal-like-time {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 12px;
     white-space: nowrap;
 }
 
@@ -1447,9 +1465,10 @@ body.modal-open {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px;
+    padding: 10px 16px;
     border-bottom: 1px solid var(--border-color);
     transition: background 0.2s;
+    min-height: 60px;
 }
 
 .modal-gift-item:hover {
@@ -1467,27 +1486,35 @@ body.modal-open {
 }
 
 .gift-img {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     object-fit: contain;
     border-radius: 8px;
+    flex-shrink: 0;
+    min-width: 40px;
 }
 
 .gift-icon {
-    font-size: 32px;
+    font-size: 28px;
     color: #9b59b6;
+    min-width: 40px;
 }
 
 .gift-details {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
 }
 
 .gift-name {
     font-weight: 500;
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .gift-value {
@@ -1531,7 +1558,7 @@ body.modal-open {
 
 .modal-comment-text {
     margin-top: 12px;
-    margin-left: 60px;
+    margin-left: 70px;
     font-size: 15px;
     color: var(--text-primary);
     line-height: 1.4;
@@ -1544,38 +1571,38 @@ body.modal-open {
     text-align: right !important;
     direction: rtl;
     margin-left: 0;
-    margin-right: 60px;
+    margin-right: 70px;
 }
 
 .modal-comment-text[dir="ltr"] {
     text-align: left !important;
     direction: ltr;
-    margin-left: 60px;
+    margin-left: 70px;
     margin-right: 0;
 }
 
 /* RTL Support for Comment Text */
 [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
     margin-left: 0;
-    margin-right: 60px;
+    margin-right: 70px;
 }
 
 .modal-comment-time {
     margin-top: 6px;
-    margin-left: 60px;
+    margin-left: 70px;
     font-size: 12px;
     color: var(--text-secondary);
 }
 
 .modal-comment-time[dir="rtl"] {
     margin-left: 0;
-    margin-right: 60px;
+    margin-right: 70px;
 }
 
 /* RTL Support for Comment Time */
 [dir="rtl"] .modal-comment-time:not([dir="ltr"]) {
     margin-left: 0;
-    margin-right: 60px;
+    margin-right: 70px;
 }
 
 .modal-empty {
