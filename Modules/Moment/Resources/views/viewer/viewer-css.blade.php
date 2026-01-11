@@ -54,12 +54,15 @@ html[dir="rtl"] body {
     background: var(--bg-primary) !important;
     min-height: 100vh !important;
     padding-bottom: 40px !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
 }
 
 .content {
     height: auto !important;
     min-height: 100vh !important;
     overflow: visible !important;
+    touch-action: pan-y pinch-zoom;
 }
 
 .viewer-container {
@@ -69,8 +72,11 @@ html[dir="rtl"] body {
     padding: 20px 0 80px;
     min-height: 100vh !important;
     height: auto !important;
-    overflow: scroll !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
     display: block !important;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y pinch-zoom;
 }
 
 /* إعادة تعيين أحجام الصور */
@@ -196,6 +202,7 @@ html[dir="rtl"] body {
     backface-visibility: hidden;
     position: relative;
     z-index: 1;
+    touch-action: pan-y;
 }
 
 .moment-post:hover {
@@ -854,6 +861,18 @@ html[dir="rtl"] .dropdown-item,
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    /* تحسين التمرير على الموبايل */
+    body {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y pinch-zoom;
+        overflow-x: hidden;
+    }
+    
+    html {
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        touch-action: manipulation;
+    }
+    
     /* تعطيل الانميشن على الموبايل للسرعة */
     * {
         animation-duration: 0.01ms !important;
@@ -863,6 +882,10 @@ html[dir="rtl"] .dropdown-item,
     
     .viewer-container {
         padding: 12px 0;
+        touch-action: pan-y;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
     }
 
     .viewer-header {
