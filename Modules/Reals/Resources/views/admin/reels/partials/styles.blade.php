@@ -160,7 +160,7 @@
         }
         .video-container{
          top: -10px !important;
-        height: 89% !important;
+        height: 95% !important;
         }
     }
 
