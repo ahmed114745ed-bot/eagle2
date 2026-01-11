@@ -6,6 +6,7 @@
     const texts = cfg.texts || {};
     const adminUserUrl = cfg.adminUserUrl || '';
     const defaultAvatar = cfg.defaultAvatar || '';
+    const storageUrl = cfg.storageUrl || '';
     const csrf = cfg.csrf || '';
 
     let currentPage = 1;
@@ -998,7 +999,7 @@
     function getImagePath(path) {
         if (!path) return defaultAvatar;
         if (path.startsWith('http')) return path;
-        return cfg.storageBase ? cfg.storageBase + '/' + path : '/storage/' + path;
+        return storageUrl ? storageUrl + '/' + path : '/storage/' + path;
     }
 
     function escapeHtml(text) {
