@@ -88,9 +88,56 @@
         }
     </style>
 
+    <!-- مؤشر التحميل المسبق للموبايل -->
+    <style>
+        .preload-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .preload-indicator .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
 <div class="reels-main-container flex"
      :class="{'panel-open': showInteractionPanel}"
      x-data="reelsManager()" x-cloak>
+     
+    <!-- مؤشر التحميل في الخلفية -->
+    <div x-show="isPreloading && isMobile" 
+         class="preload-indicator"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="spinner"></div>
+        <span>جاري التحميل في الخلفية...</span>
+    </div>
+    
     <!-- Mobile Overlay Background -->
     <div class="mobile-sidebar-overlay"
          :class="{ 'active': isMobileSidebarOpen }"
@@ -264,7 +311,7 @@
     <div class="reels-video-container overflow-y-auto snap-y snap-mandatory"
          style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
          x-ref="reelsContainer"
-         @scroll.passive.debounce.150ms="handleScroll()">
+         @scroll.passive="handleScroll()">
         <template x-for="(reel, index) in (visibleReels || [])" :key="reel.id">
             <div class="video-item-height snap-start flex items-center justify-center relative"
                  :data-reel-id="reel.id"
@@ -304,7 +351,8 @@
                                        playsinline
                                        webkit-playsinline
                                        x-ref="video"
-                                       @click="togglePlay($event)"
+                                       @click.stop="togglePlay($event)"
+                                       @touchstart.stop
                                        @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
                                        @canplay="markVideoReady(reel.id)"
                                        @timeupdate.throttle.500ms="updateProgress($event)"
