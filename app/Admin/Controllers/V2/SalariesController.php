@@ -19,13 +19,13 @@ use App\Helpers\Common;
 
 class SalariesController extends MainController
 {
-   public $permission_name = 'salary';
+    public $permission_name = 'salary';
     public function index(Content $content)
     {
         return $content->title(trans('Sallaries'))->description(__(request('desc') ?: 'users'))->row(function ($row) {
-                $row->column(2, view('admin.grid.common.sallaries'));
-                $row->column(10, $this->grid());
-            });
+            $row->column(2, view('admin.grid.common.sallaries'));
+            $row->column(10, $this->grid());
+        });
     }
 
     protected function grid()
@@ -45,7 +45,9 @@ class SalariesController extends MainController
     {
         $grid = new Grid(new User());
         $grid->column('id', __('id'));
-        $grid->column('agency', __('agency'))->display(function () { return @$this->agency->name; });
+        $grid->column('agency', __('agency'))->display(function () {
+            return @$this->agency->name;
+        });
         // $grid->column ('uuid',__ ('uuid'));
         $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this));
         $grid->column('old_usd', __('old usd'));
@@ -99,20 +101,30 @@ class SalariesController extends MainController
     protected function users()
     {
         $grid  = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $model =
             $grid->model()
-                ->when($countryID, fn($q) =>
-                $q->where(function ($q) use ($countryID) {
-                    $q->where('country_id', $countryID)
-                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
-                }))
-                ->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
+            ->when($countryID, fn($q) =>
+            $q->where(function ($q) use ($countryID) {
+                $q->where('country_id', $countryID)
+                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            }))
+            ->where('agency_id', '!=', 0)->withSum(
+                ['totalUserSalary as total' => function ($q) {
+                    $q->select(DB::raw('SUM(sallary - cut_amount)'));
+                }],
+                ''
+            );
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
         }
-        $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+        $model->with([
+            'profile:id,user_id,avatar',
+            'totalUserSalary',
+            'country',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->orderByRaw('total DESC');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
@@ -134,20 +146,15 @@ class SalariesController extends MainController
             });
         });
         $grid->column('id', __('id'));
-        $grid->column('uuid', __('uuid'));
         $grid->column('name', __('name'))->display(fn($f) => app(UserService::class)->adminUserAvatar($this, withoutLevels: true));
         $grid->column('total', __('salary'))->default(0);
-//        $grid->column('cashing', __('cashing'))->display(function () {
-//            return (new SalariesAction($this->id, 'user'))->render();
-//        });
         if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
             $grid->column('pay', __('pay'))->display(function () {
-                return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
+                return (new PaySalariesAction($this->id, 'user', ))->render();
             });
         }
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=0') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
-
         });
         return $grid;
     }
@@ -155,15 +162,15 @@ class SalariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $model = $grid->model()
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
-                 ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
-//            ->where('agencies.id', request('id'))
-                 ->orderByRaw('total desc')
-                 ->groupBy('agencies.id', 'agencies.name');
+            ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total'))
+            //            ->where('agencies.id', request('id'))
+            ->orderByRaw('total desc')
+            ->groupBy('agencies.id', 'agencies.name');
 
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
@@ -172,11 +179,10 @@ class SalariesController extends MainController
             $filter->disableIdFilter();
             $filter->expand();
 
-            $filter->column(12, function(Grid\Filter $filter) {
-                $filter->where( function ($q) {
+            $filter->column(12, function (Grid\Filter $filter) {
+                $filter->where(function ($q) {
                     $q->where('agencies.id', '=', $this->input);
-                } , 'id');
-
+                }, 'id');
             });
         });
 
@@ -184,18 +190,16 @@ class SalariesController extends MainController
         $grid->column('name', __('name'));
         $grid->column('total', __('salary'))->default(0);
 
-//        $grid->column('cashing', __('cashing'))->display(function () {
-//            $options = ['agency' => __('agency')];
-//            return (new SalariesAction($this->id, 'agency'))->render();
-//        });
+        //        $grid->column('cashing', __('cashing'))->display(function () {
+        //            $options = ['agency' => __('agency')];
+        //            return (new SalariesAction($this->id, 'agency'))->render();
+        //        });
         $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'agency',$this->salary))->render();
+            return (new PaySalariesAction($this->id, 'agency', ))->render();
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
         return $grid;
     }
-
-
 }
