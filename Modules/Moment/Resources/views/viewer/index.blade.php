@@ -31,13 +31,6 @@
                 <div class="spinner"></div>
             </div>
         </div>
-
-        <div id="loadMoreContainer" class="load-more-container" style="display: none;">
-            <button id="loadMoreBtn" class="load-more-btn">
-                <i class="fas fa-arrow-down"></i>
-                {{ __('moment_viewer.loadMore') }}
-            </button>
-        </div>
     </div>
 
     <button class="scroll-top" id="scrollTopBtn">

@@ -156,6 +156,11 @@
 
         .interactions-panel.show {
             transform: translateX(0);
+            min-width: 330px !important;
+        }
+        .w-full{
+         top: -17px !important;
+        height: 90% !important;
         }
     }
 
@@ -226,7 +231,7 @@
     @media (max-width: 768px) {
         .reels-main-container {
             height: calc(100vh - 65px);
-            margin-top: 50px;
+            /* margin-top: 50px; */
             flex-direction: column-reverse;
         }
 
@@ -271,8 +276,8 @@
         /* Mobile Toggle Button */
         .mobile-reels-toggle {
             position: fixed;
-            bottom: 80px;
-            right: 20px;
+            bottom: 338px;
+            right: 9px;
             width: 56px;
             height: 56px;
             background: var(--primary-gradient);

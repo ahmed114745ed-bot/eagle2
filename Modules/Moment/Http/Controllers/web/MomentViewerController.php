@@ -58,7 +58,7 @@ class MomentViewerController extends MainController
     {
         try {
             $sortBy = $request->get('sort', config('moment.viewer.default_sort', 'newest')); // random, newest, oldest
-            $perPage = $request->get('per_page', 1); // تحميل مومنت واحدة في كل مرة
+            $perPage = $request->get('per_page', 10); // تحميل 10 moments في كل مرة
             $countryId = session('filter_country_id');
             $search = $request->get('search', '');
             $userId = $request->get('user_id', ''); // فلتر بالمعرف
