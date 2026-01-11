@@ -115,10 +115,7 @@ class SalariesController extends MainController
             $model->having('total', '>', 0);
         }
         $model->with([
-            'profile',
-            'country',
-            'senderLevel',
-            'receiverLevel',
+            'profile:id,user_id,avatar',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
