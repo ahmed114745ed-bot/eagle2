@@ -60,44 +60,51 @@
 @endphp
 
 <script>
-$(document).ready(function() {
-    $.ajax({
-        url: "{{ url($prefix . '/statistics/top-room-gifts') }}",
-        type: "GET",
-        dataType: "json",
-        success: function(response) {
-            const ctxGift = document.getElementById('giftedRoomsChart').getContext('2d');
+    function loadTopGiftedRooms() {
+        if (!window.topGiftedRoomsLoaded) {
+            window.topGiftedRoomsLoaded = true;
+            $.ajax({
+                url: "{{ url($prefix . '/statistics/top-room-gifts') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    const ctxGift = document.getElementById('giftedRoomsChart').getContext('2d');
 
-            new Chart(ctxGift, {
-                type: 'bar',
-                data: {
-                    labels: response.labels,
-                    datasets: [{
-                        label: '{{ __("Total Gifts") }}',
-                        data: response.data,
-                        backgroundColor: [
-                            '#f87171','#60a5fa','#34d399','#fbbf24',
-                            '#a78bfa','#f472b6','#38bdf8','#facc15',
-                            '#ef4444','#10b981'
-                        ]
-                    }]
+                    new Chart(ctxGift, {
+                        type: 'bar',
+                        data: {
+                            labels: response.labels,
+                            datasets: [{
+                                label: '{{ __("Total Gifts") }}',
+                                data: response.data,
+                                backgroundColor: [
+                                    '#f87171','#60a5fa','#34d399','#fbbf24',
+                                    '#a78bfa','#f472b6','#38bdf8','#facc15',
+                                    '#ef4444','#10b981'
+                                ]
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y', // horizontal bars ✅
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: true }
+                            },
+                            scales: {
+                                x: { beginAtZero: true }
+                            }
+                        }
+                    });
                 },
-                options: {
-                    indexAxis: 'y', // horizontal bars ✅
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: true }
-                    },
-                    scales: {
-                        x: { beginAtZero: true }
-                    }
+                error: function(xhr, status, error) {
+                    console.error("Error loading chart data:", error);
                 }
             });
-        },
-        error: function(xhr, status, error) {
-            console.error("Error loading chart data:", error);
         }
+    }
+
+    $(document).ready(function() {
+        loadTopGiftedRooms();
     });
-});
 </script>

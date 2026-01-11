@@ -320,7 +320,7 @@ class RoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()
             ->audio()
@@ -527,9 +527,15 @@ class RoomController extends MainController
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
-                $countries = Cache::rememberForever('filter_countries_list', function () {
-                    return \App\Models\Country::query()->pluck('name', 'id');
-                });
+                // $countries = Cache::rememberForever('filter_countries_list', function () {
+                //     return \App\Models\Country::query()->pluck('name', 'id');
+                // });
+
+                $locale = app()->getLocale(); // 'ar', 'en', etc.
+                $column = $locale === 'ar' ? 'name' : 'e_name';
+
+                $countries = \App\Models\Country::query()->pluck($column, 'id');
+
 
                 $filter->where(function ($query) {
                     if ($this->input) {
@@ -668,6 +674,9 @@ class RoomController extends MainController
             if (!$appended) {
                 $html .= '
         <style>
+
+
+
             .image-container {
                 display: flex;
                 justify-content: start;
@@ -703,6 +712,18 @@ class RoomController extends MainController
 
             return $html;
         });
+
+        Admin::style('
+    .dropdown-backdrop {
+        position: absolute !important;
+
+    }
+    html.ltr .dropdown-menu {
+
+        right: 38px !important;
+    }
+
+');
     }
 
 
@@ -887,9 +908,8 @@ class RoomController extends MainController
     {
         $form = new Form(new Room);
         $this->disableFormTools($form);
-        $form->display(__('ID'));
         if (!$form->isEditing()) {
-           $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
+            $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
         } else {
             $form->text('numid', __('numid'));
         }

@@ -29,6 +29,15 @@ class OVip extends Model
         return $this->belongsToMany(VipPrivilege::class, 'vip_prev', 'o_vip_id', 'o_vip_privilege_id', 'id', 'id');
     }
 
+
+    public function waresOvip()
+    {
+        return $this->hasMany(Ware::class, 'level', 'level')
+            ->where('get_type', 1)
+            ->where('enable', 1)
+            ->where('is_active_for_vip', 1);
+    }
+
     public function wareIcon()
     {
         return $this->hasOne(Ware::class, 'level', 'level')

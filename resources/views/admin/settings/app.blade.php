@@ -1,4 +1,4 @@
-<div id="appSettings" class="settings-section">
+<div id="appSettings" class="app-settings settings-section">
     <h3>{{ __('App Settings') }}</h3>
     <form action="{{ route('admin.app-config.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -143,7 +143,7 @@
         <div class="col-12 d-flex gap-3 mt-3">
             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
             <button type="button" id="resetAppColorsSettings"
-                    class="btn btn-secondary">{{ __('Reset Colors') }}</button>
+                    class="btn btn-info">{{ __('Reset Colors') }}</button>
         </div>
     </form>
 </div>

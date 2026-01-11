@@ -57,7 +57,7 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
 Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
     return [
         'id'   => $user->id,
-        'name' => $user->name,
+       // 'name' => $user->name,
     ];
 });
 

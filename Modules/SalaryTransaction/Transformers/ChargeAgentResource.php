@@ -42,6 +42,7 @@ class ChargeAgentResource extends JsonResource
             'image_color'          => @$user->color_image ?? null,
             'id_image'             => @$user->specialId?->ware?->show_img ?? '',
             'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+            'status'       => @$user->online,
             // 'charge_count' => $userDetails->charges_count ?? 0,
         ];
     }

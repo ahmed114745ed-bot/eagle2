@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
+use App\Http\Resources\CountryCategoryResource;
 use App\Http\Resources\CountrySupportersResource;
 
 class CountryController extends Controller
@@ -19,9 +20,10 @@ class CountryController extends Controller
 
     public function __construct(private CountryService $countryService) {}
 
-    public function allCountries(): JsonResponse
+    public function allCountries(Request $request): JsonResponse
     {
-        $countries = $this->countryService->indexByHotAndSupporters();
+        $categoryId = $request->category_id;
+        $countries = $this->countryService->indexByHotAndSupporters($categoryId);
         return Common::apiResponse(1, '', CountrySupportersResource::collection($countries));
     }
 
@@ -69,6 +71,12 @@ class CountryController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
+    public function countryCategory()
+    {
+        $data = $this->countryService->countryCategory();
+        return Common::apiResponse(1, '', CountryCategoryResource::collection($data));
+    }
+
     public function searchCountries(Request $request)
     {
         $key = $request->q;
@@ -92,7 +100,7 @@ class CountryController extends Controller
             'country_id' => ['required', 'integer', Rule::exists('countries', 'id')],
         ]);
 
-        if ($request->user()->country_id == $request->country_id) return Common::apiResponse(0, __('this is your country'), 400);
+        if ($request->user()->country_id == $request->country_id) return Common::apiResponse(0, __('You are already using this country.'), 400);
         try {
             $this->countryService->changeRequest($data);
         } catch (Exception $exception) {

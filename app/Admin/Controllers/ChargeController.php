@@ -54,7 +54,7 @@ class ChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ShippingAgency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
             ->when($countryID, fn($q) =>
@@ -63,10 +63,10 @@ class ChargeController extends MainController
                     ->orWhereHas('owner', fn($q) => $q->where('country_id', $countryID));
             }))
             ->with([
-            'owner:id,name,uuid',
-            'owner.profile:id,user_id,avatar',
-            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ]);
+                'owner:id,name,uuid',
+                'owner.profile:id,user_id,avatar',
+                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ]);
         $grid->disableRowSelector();
 
         $grid->filter(function (Grid\Filter $filter) {

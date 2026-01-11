@@ -2,6 +2,8 @@
 
 namespace App\Classes\Gifts;
 
+use App\Enums\UserDiamondLogType;
+use App\Helpers\UserDiamondLogHelper;
 use App\Models\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
@@ -46,12 +48,27 @@ class SendGiftService
         DB::table('gift_logs')->insert($data);
     }
 
-    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null)
+    public function sendGift3($number, Room $room, Gift $gift, User $senderUser, Collection $receivedUsers, $isPlay = 0, $totalPrice = null, $isPk = false, array $cpIds = null , $sourceType = null,$type = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
         $roomBoomUuid = (string) Str::uuid();
         $data = [];
         foreach ($receivedUsers as $receivedUser) {
+            if ($type !== 'bag') {
+                $featureType = $room->type === 'audio'
+                    ? UserDiamondLogType::GIFT_ROOM_AUDIO
+                    : UserDiamondLogType::GIFT_ROOM_LIVE;
+
+                UserDiamondLogHelper::logByType(
+                    $receivedUser->id,
+                    $totalPrice,
+                    $receivedUser->monthly_diamond_received,
+                    $featureType,
+                    $senderUser->id,
+
+
+                );
+            }
             $cpId = @$cpIds[$receivedUser->id] ?? null;
             $info = $this->getGiftLogData($gift, $room, $number, $totalPrice, $senderUser, $receivedUser, $isPlay, isPk: $isPk, cpId: $cpId , sourceType: $sourceType);
             $info['room_boom_uuid'] = $roomBoomUuid;

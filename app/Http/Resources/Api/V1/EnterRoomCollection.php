@@ -65,6 +65,7 @@ class EnterRoomCollection extends JsonResource
             //////////////////////////////////////////////////////////
             ///
             ///
+            'lucky_gift_coins' => Common::getSettingsValue('lucky_gift_coins') ?? 0, 
             "room_id_num"         => $this->numid,
             "room_status"         => (string)$this->room_status,
 

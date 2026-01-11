@@ -78,64 +78,71 @@
 @endphp
 
 <script>
-    $(document).ready(function() {
-        $.ajax({
-            url: "{{ url($prefix . '/statistics/distribution-rooms') }}",
-            type: "GET",
-            dataType: "json",
-            success: function(response) {
-                // Create chart after data is loaded
-                var ctx = document.getElementById('roomsDistributionChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: response.labels,
-                        datasets: [{
-                            data: response.data,
-                            backgroundColor: [
-                                'rgba(75, 192, 192, 0.7)',
-                                'rgba(255, 206, 86, 0.7)',
-                                'rgba(54, 162, 235, 0.7)',
-                                'rgba(255, 99, 132, 0.7)',
-                            ],
-                            borderColor: [
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 99, 132, 1)',
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    font: { size: 14 },
-                                    color: '#333'
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        let value = context.parsed;
-                                        let total = context.chart._metasets[context.datasetIndex].total;
-                                        let percentage = ((value / total) * 100).toFixed(1);
-                                        return `${label}: ${value} (${percentage}%)`;
+    function loadRoomsDistribution() {
+        if (!window.roomsDistributionLoaded) {
+            window.roomsDistributionLoaded = true;
+            $.ajax({
+                url: "{{ url($prefix . '/statistics/distribution-rooms') }}",
+                type: "GET",
+                dataType: "json",
+                success: function(response) {
+                    // Create chart after data is loaded
+                    var ctx = document.getElementById('roomsDistributionChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: response.labels,
+                            datasets: [{
+                                data: response.data,
+                                backgroundColor: [
+                                    'rgba(75, 192, 192, 0.7)',
+                                    'rgba(255, 206, 86, 0.7)',
+                                    'rgba(54, 162, 235, 0.7)',
+                                    'rgba(255, 99, 132, 0.7)',
+                                ],
+                                borderColor: [
+                                    'rgba(75, 192, 192, 1)',
+                                    'rgba(255, 206, 86, 1)',
+                                    'rgba(54, 162, 235, 1)',
+                                    'rgba(255, 99, 132, 1)',
+                                ],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        font: { size: 14 },
+                                        color: '#333'
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            let value = context.parsed;
+                                            let total = context.chart._metasets[context.datasetIndex].total;
+                                            let percentage = ((value / total) * 100).toFixed(1);
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error("Error fetching chart data:", error);
-            }
-        });
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error fetching chart data:", error);
+                }
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        loadRoomsDistribution();
     });
 </script>
 

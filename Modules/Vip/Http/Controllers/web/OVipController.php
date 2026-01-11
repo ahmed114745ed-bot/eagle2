@@ -45,7 +45,7 @@ class OVipController extends MainController
         }
 
         $config = Config::pluck('value', 'name')->toArray();
-        $config['enable_vip_auto'] = true; 
+        $config['enable_vip_auto'] = true;
         return $content->view('vip_settings', compact('config'));
     }
 
@@ -90,12 +90,12 @@ class OVipController extends MainController
      *
      * @return Grid
      */
- 
+
 
 
     protected function grid()
     {
- 
+
         $grid = new Grid(new OVip);
         $grid->model()->with('privilegs');
         $grid->id('ID');
@@ -111,7 +111,7 @@ class OVipController extends MainController
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('price', __('price'))->display(function ($coin) {
-            $icon = asset('images/coin.jpg'); 
+            $icon = asset('images/coin.jpg');
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
                     <span>" . number_format($coin) . "</span>
@@ -178,23 +178,24 @@ class OVipController extends MainController
         }
         $form->display(__('ID'));
         $form->number('level', __('level'))
-        ->rules(function () use ($form) {
-            return [
-                'required',
-                $form->isCreating()
-                    ? Rule::unique('o_vips', 'level')
-                    : Rule::unique('o_vips', 'level')->ignore($form->model()->id),
-            ];
-        });
-        
+            ->rules(function () use ($form) {
+                return [
+                    'required',
+                    $form->isCreating()
+                        ? Rule::unique('o_vips', 'level')
+                        : Rule::unique('o_vips', 'level')->ignore($form->model()->id),
+                ];
+            });
+
         $form->text('name', __('name'));
-       
-        $form->file('img', trans('img'))->name(function ($file) {
+        $form->image('image2', trans('img'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
+
+        $form->file('img', trans('svga'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         });
-      
+
         $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
-        
+
         if (Admin::user()->can('*')) {
             $form->number('expire', __('expire'))->rules('required|numeric|gt:0');
         } else {

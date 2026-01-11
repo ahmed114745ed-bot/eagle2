@@ -17,6 +17,7 @@ return [
     'has_color_name_title' => 'Renkli İsim',
     'anonymous_title'      => 'Anonim',
     'country_title'        => 'Ülke Başlığı',
+'rankingRewardLevel' => "Tebrikler! :level seviyesinde ödül kazandınız",
     'last_active_title'    => 'Son Aktif',
     'visit_title'          => 'Ziyaret',
     'admins_greater_than' => 'Yönetici sayısı :limit değerinden büyük olmalıdır.',

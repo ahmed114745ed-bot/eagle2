@@ -3,6 +3,7 @@
 namespace App\Admin\Controllers;
 
 use App\Models\Role;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -17,6 +18,7 @@ use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 class RoleControllerNew extends MainController
 {
     public $permission_name = 'roles';
+
     /**
      * {@inheritdoc}
      */
@@ -39,6 +41,7 @@ class RoleControllerNew extends MainController
             ->description($this->description['edit'] ?? trans('admin.edit'))
             ->body($this->form($id)->edit($id)));
     }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -51,12 +54,14 @@ class RoleControllerNew extends MainController
     {
         return $this->form()->store();
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
             ->title(trans(__('Roles')))
             ->body($this->detail($id)));
     }
+
     public function update($id)
     {
         return $this->form()->update($id);
@@ -76,12 +81,12 @@ class RoleControllerNew extends MainController
         if ($areaManagerId) {
             session(['area_manager_id' => $areaManagerId]);
         }
-    
+
         if (request()->has('clear_area_manager')) {
             session()->forget('area_manager_id');
             $areaManagerId = null;
         }
-    
+
         $roleAuthId = $areaManagerId ?? session('area_manager_id');
 
         $grid = new Grid(new $roleModel());
@@ -89,9 +94,9 @@ class RoleControllerNew extends MainController
 
         if ($roleAuthId) {
             $grid->model()->where('admin_id', $roleAuthId);
-        } else{
-             $grid->model()->where('admin_id', null);
-  
+        } else {
+            $grid->model()->where('admin_id', null);
+
         }
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
@@ -121,13 +126,11 @@ class RoleControllerNew extends MainController
         $grid->column('updated_at', trans('admin.updated_at'));
 
 
-
-
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             // $protectedSlugs = ['administrator', 'admin', 'developer', 'agency', 'charger'];
 
             // if (in_array($actions->row->slug, $protectedSlugs)) {
-            //     $actions->disableDelete(); 
+            //     $actions->disableDelete();
             // } else {
             $actions->disableDelete();
             $actions->add(new DeleteRole());
@@ -141,10 +144,14 @@ class RoleControllerNew extends MainController
         });
 
 
-
-
         $grid->disableExport();
         // $this->extendGrid($grid);
+
+        Admin::style('
+            .box {
+                overflow: auto !important;
+            }
+        ');
         return $grid;
     }
 
@@ -196,18 +203,18 @@ class RoleControllerNew extends MainController
         // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
 
         $form->text('name', trans('role name'))->rules(function ($form) {
-                // Get the record ID if editing, otherwise null
-                $id = $form->model()?->id ?? null;
+            // Get the record ID if editing, otherwise null
+            $id = $form->model()?->id ?? null;
 
-                // Get the type from request or from existing model when editing
-                $type = PermissionType::ADMIN->value ?? $form->model()?->type;
+            // Get the type from request or from existing model when editing
+            $type = PermissionType::ADMIN->value ?? $form->model()?->type;
 
-                // Default to empty string if not found (avoids SQL issues)
-                $type = $type ?? '';
+            // Default to empty string if not found (avoids SQL issues)
+            $type = $type ?? '';
 
-                // Build unique rule with type condition
-                return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
-            });
+            // Build unique rule with type condition
+            return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
+        });
 
         // Hide default listbox and use custom tabbed permission UI
         // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
@@ -258,7 +265,7 @@ class RoleControllerNew extends MainController
 
             foreach ($resourceActions as $resource => $actions) {
                 $hasBrowse = !empty($actions['browse']);
-                $hasCrud   = !empty($actions['create']) || !empty($actions['edit']) || !empty($actions['delete']);
+                $hasCrud = !empty($actions['create']) || !empty($actions['edit']) || !empty($actions['delete']);
 
                 if ($hasBrowse) {
                     if (isset($slugToId["browse-$resource"])) $finalPermissionIds[] = $slugToId["browse-$resource"];

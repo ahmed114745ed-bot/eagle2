@@ -256,10 +256,10 @@
                     style="background: var(--primary-color); color: var(--text-secondary-color);">
                 {{ __('CP Settings') }}
             </button>
-            
 
-            
-            
+
+
+
         </div>
     </div>
 
@@ -304,9 +304,9 @@
             </form>
         </div>
 
-       
 
-        
+
+
     </div>
 </div>
 
