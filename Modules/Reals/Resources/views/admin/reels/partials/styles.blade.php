@@ -56,6 +56,9 @@
         position: relative;
         width: 380px;
         flex-shrink: 0;
+        /* تحسين الأداء */
+        will-change: transform;
+        transform: translateZ(0);
     }
 
     /* Video container */
@@ -64,6 +67,11 @@
         flex: 1;
         min-width: 0;
         transition: flex 0.2s ease-in-out;
+        /* تحسينات الأداء على الموبايل */
+        -webkit-overflow-scrolling: touch;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
     }
 
     .video-item-height {
@@ -71,6 +79,9 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
+        /* تحسين الرسوم المتحركة */
+        will-change: transform;
+        transform: translateZ(0);
     }
 
     /* Interactions Panel - Part of flex layout when open */
@@ -214,6 +225,13 @@
 
     /* Mobile & Small Tablets */
     @media (max-width: 768px) {
+        /* تقليل animations لتحسين الأداء */
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+        
         .reels-main-container {
             height: 100vh;
             flex-direction: column-reverse;
@@ -271,21 +289,14 @@
             justify-content: center;
             color: white;
             font-size: 22px;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5), 0 0 0 0 rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
             z-index: 998;
             cursor: pointer;
             transition: all 0.3s ease;
-            animation: pulse-button 2s ease-in-out infinite;
             border: 3px solid white;
-        }
-
-        @keyframes pulse-button {
-            0%, 100% {
-                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 30px rgba(102, 126, 234, 0.8), 0 0 0 8px rgba(102, 126, 234, 0.2);
-            }
+            /* تقليل animation لتحسين الأداء */
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         .mobile-reels-toggle:active {
@@ -434,9 +445,16 @@
 
     /* Skeleton Loader Styles */
     .skeleton {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading 1.5s ease-in-out infinite;
+        background: #e0e0e0;
+    }
+    
+    /* Skeleton animation فقط على الديسكتوب */
+    @media (min-width: 769px) {
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+        }
     }
 
     /* User Avatar Styles */
@@ -485,21 +503,39 @@
         content-visibility: auto;
         contain-intrinsic-height: 100vh;
     }
-
-    /* Fade in animation */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    
+    /* تحسين أداء الفيديو */
+    video {
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
-    .fade-in {
-        animation: fadeIn 0.3s ease-out;
+    /* Fade in animation - معطل على الموبايل */
+    @media (min-width: 769px) {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .fade-in {
+            /* لا animation على الموبايل */
+            animation: none;
+        }
     }
 
     /* Alpine cloak */

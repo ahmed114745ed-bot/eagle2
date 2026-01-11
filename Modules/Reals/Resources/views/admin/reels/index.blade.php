@@ -1,4 +1,9 @@
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -35,10 +40,14 @@
             updateAppClassMargin();
 
             // Toggle margin when navbar hides/shows (e.g., on scroll)
+            // تحسين الأداء بتقليل استدعاءات scroll
+            let scrollTimeout;
             window.addEventListener('scroll', () => {
-                // If nav is unhidden elsewhere, respect that by restoring margin
-                updateAppClassMargin();
-            });
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    updateAppClassMargin();
+                }, 100);
+            }, { passive: true });
         });
     </script>
     <style>
@@ -231,9 +240,10 @@
     </div>
 
     <!-- Main Video Player (Center) -->
-    <div class="reels-video-container  overflow-y-auto snap-y snap-mandatory scroll-smooth"
+    <div class="reels-video-container overflow-y-auto snap-y snap-mandatory"
+         style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
          x-ref="reelsContainer"
-         @scroll.passive="handleScroll()">
+         @scroll.passive.debounce.150ms="handleScroll()">
         <template x-for="(reel, index) in (visibleReels || [])" :key="reel.id">
             <div class="video-item-height snap-start flex items-center justify-center relative"
                  :data-reel-id="reel.id"
@@ -268,14 +278,15 @@
                                        x-show="isVideoReady(reel.id)"
                                        loop
                                        muted
-                                        preload="metadata"
-                                        :poster="reel.thumbnail_url || null"
+                                       preload="none"
+                                       :poster="reel.thumbnail_url || null"
                                        playsinline
+                                       loading="lazy"
                                        x-ref="video"
                                        @click="togglePlay($event)"
                                        @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
                                        @canplay="markVideoReady(reel.id)"
-                                       @timeupdate.throttle.500ms="updateProgress($event)"
+                                       @timeupdate.throttle.1000ms="updateProgress($event)"
                                        @play="updateProgress($event)"
                                        @pause="updateProgress($event)">
                                 </video>
