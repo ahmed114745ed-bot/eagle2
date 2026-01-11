@@ -159,8 +159,8 @@
             min-width: 330px !important;
         }
         .w-full{
-         top: -17px !important;
-        height: 90% !important;
+         top: -25px !important;
+        height: 85% !important;
         }
     }
 

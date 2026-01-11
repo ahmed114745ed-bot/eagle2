@@ -21,6 +21,14 @@
     const LOAD_MORE_COUNT = 10; // تحميل 10 عناصر في كل دفعة
     const TRIGGER_THRESHOLD = 3; // التحميل عند الوصول لآخر 3 عناصر
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // ترجمات See More لأربع لغات
+    const seeMoreTexts = {
+        ar: { more: 'عرض المزيد', less: 'عرض أقل' },
+        en: { more: 'See More', less: 'See Less' },
+        fr: { more: 'Voir Plus', less: 'Voir Moins' },
+        es: { more: 'Ver Más', less: 'Ver Menos' }
+    };
 
     $(document).ready(function() {
         // اكتشاف اللغة وتطبيق الاتجاه
@@ -422,11 +430,7 @@
                     </div>
                 </div>
                 
-                ${moment.description ? `
-                    <div class="post-content">
-                        <div class="post-description" id="desc-${moment.id}" dir="${detectTextDirection(moment.description)}" style="text-align: ${detectTextDirection(moment.description) === 'rtl' ? 'right' : 'left'};">${escapeHtml(moment.description)}</div>
-                    </div>
-                ` : ''}
+                ${moment.description ? renderDescription(moment.id, moment.description) : ''}
                 
                 ${validMedia && validMedia.length > 0 ? renderMedia(moment.id, validMedia) : ''}
                 
@@ -454,6 +458,50 @@
                 <div class="likes-section" id="likes-${moment.id}"></div>
                 <div class="gifts-section" id="gifts-${moment.id}"></div>
                 <div class="comments-section" id="comments-${moment.id}"></div>
+            </div>
+        `;
+    }
+    
+    function renderDescription(momentId, description) {
+        if (!description) return '';
+        
+        const textDir = detectTextDirection(description);
+        const textAlign = textDir === 'rtl' ? 'right' : 'left';
+        const escapedDesc = escapeHtml(description);
+        
+        // حساب عدد الأسطر التقريبي بناءً على طول النص
+        const estimatedLines = Math.ceil(escapedDesc.length / 60); // تقريبا 60 حرف للسطر
+        const needsSeeMore = estimatedLines > 2;
+        
+        // اختيار اللغة المناسبة
+        let lang = 'en';
+        if (textDir === 'rtl') {
+            lang = 'ar';
+        } else {
+            const htmlLang = document.documentElement.lang || '';
+            if (htmlLang.startsWith('fr')) lang = 'fr';
+            else if (htmlLang.startsWith('es')) lang = 'es';
+        }
+        
+        const seeMoreText = seeMoreTexts[lang] || seeMoreTexts.en;
+        
+        return `
+            <div class="post-content">
+                <div class="post-description ${needsSeeMore ? 'collapsible' : ''}" 
+                     id="desc-${momentId}" 
+                     dir="${textDir}" 
+                     style="text-align: ${textAlign};"
+                     data-full-text="${escapedDesc}"
+                     data-collapsed="true">
+                    <span class="description-text">${escapedDesc}</span>
+                </div>
+                ${needsSeeMore ? `
+                    <button class="see-more-btn" 
+                            onclick="toggleDescription(${momentId}, event)"
+                            data-lang="${lang}">
+                        ${seeMoreText.more}
+                    </button>
+                ` : ''}
             </div>
         `;
     }
@@ -517,6 +565,26 @@
     }
 
     // Global Functions
+    window.toggleDescription = function(momentId, event) {
+        if (event) event.stopPropagation();
+        
+        const descElement = $(`#desc-${momentId}`);
+        const btn = $(event.target);
+        const lang = btn.data('lang') || 'en';
+        const seeMoreText = seeMoreTexts[lang] || seeMoreTexts.en;
+        const isCollapsed = descElement.data('collapsed');
+        
+        if (isCollapsed) {
+            // عرض النص الكامل
+            descElement.removeClass('collapsible').data('collapsed', false);
+            btn.text(seeMoreText.less);
+        } else {
+            // إخفاء النص
+            descElement.addClass('collapsible').data('collapsed', true);
+            btn.text(seeMoreText.more);
+        }
+    };
+    
     window.toggleMenu = function(momentId, event) {
         if (event) event.stopPropagation();
         const menu = $(`#menu-${momentId}`);

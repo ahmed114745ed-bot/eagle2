@@ -393,11 +393,12 @@ html[dir="rtl"] .dropdown-item,
 .post-description {
     font-size: 15px;
     color: var(--text-primary);
-    line-height: 1.3333;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-wrap: break-word;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     unicode-bidi: plaintext;
+    transition: max-height 0.3s ease;
 }
 
 .post-description[dir="rtl"] {
@@ -410,19 +411,30 @@ html[dir="rtl"] .dropdown-item,
     direction: ltr;
 }
 
-.post-description.collapsed {
-    max-height: 80px;
+.post-description.collapsible {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .see-more-btn {
-    color: var(--text-secondary);
+    color: var(--primary-color);
     font-weight: 600;
     cursor: pointer;
     background: none;
     border: none;
-    padding: 0;
-    font-size: 15px;
+    padding: 4px 0;
+    font-size: 14px;
+    margin-top: 4px;
+    transition: opacity 0.2s;
+}
+
+.see-more-btn:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
 }
 
 .see-more-btn:hover {
