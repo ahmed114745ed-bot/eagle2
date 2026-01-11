@@ -515,7 +515,7 @@
         else if (count === 4) gridClass += ' grid-4';
         else gridClass += ' grid-5-plus';
         
-        let mediaHtml = `<div class="post-media ${gridClass}" data-moment-id="${momentId}">`;
+        let mediaHtml = `<div class="post-media ${gridClass}" data-moment-id="${momentId}" data-media='${JSON.stringify(validMedia).replace(/'/g, "&apos;")}'>`;
         
         const maxDisplay = count > 5 ? 5 : count;
         validMedia.slice(0, maxDisplay).forEach((media, index) => {
@@ -582,12 +582,22 @@
     window.openMediaLightbox = function(momentId, startIndex, event) {
         if (event) event.stopPropagation();
         
-        // الحصول على جميع الوسائط من moment
-        const moment = allMomentsLoaded.find(m => m.id === momentId);
-        if (!moment || !moment.image) return;
+        // الحصول على البيانات من DOM
+        const postMedia = $(`.post-media[data-moment-id="${momentId}"]`);
+        if (postMedia.length === 0) return;
         
-        const validMedia = moment.image.filter(media => media && media.image && media.image.trim() !== '');
-        if (validMedia.length === 0) return;
+        const mediaData = postMedia.attr('data-media');
+        if (!mediaData) return;
+        
+        let validMedia;
+        try {
+            validMedia = JSON.parse(mediaData);
+        } catch (e) {
+            console.error('Error parsing media data:', e);
+            return;
+        }
+        
+        if (!validMedia || validMedia.length === 0) return;
         
         // إنشاء lightbox modal
         let lightbox = $('#mediaLightbox');
