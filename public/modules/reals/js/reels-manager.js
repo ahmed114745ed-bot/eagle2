@@ -17,7 +17,7 @@ function reelsManager() {
         offset: 0,
         reelsLoaded: false,
         currentVideoIndex: 0,
-        loadedVideos: new Set([0, 1, 2]),
+        loadedVideos: new Set([0]),
         videoProgress: {},
         videoDurations: {},
         videoStates: {},
@@ -29,6 +29,7 @@ function reelsManager() {
         editingReel: null,
         showDeleteModal: false,
         deletingReel: null,
+        scrollRAF: null,
         
         init() {
             this.isGlobalMuted = false;
@@ -51,7 +52,7 @@ function reelsManager() {
                     thumbnailLoaded: Boolean(reel.thumbnail_url)
                 };
             });
-            this.visibleReels = this.allReels;
+            this.visibleReels = this.allReels.slice(0, 3); // تحميل 3 فيديوهات فقط في البداية
             this.filteredReels = this.allReels.slice(0, 6);
             this.reelsLoaded = true;
 
@@ -72,18 +73,20 @@ function reelsManager() {
 
                 this.captureMissingThumbnails(this.filteredReels.slice(0, 6));
                 
+                // تحميل تدريجي بعد التهيئة لتحسين الأداء
                 setTimeout(() => {
                     if (this.filteredReels.length < this.allReels.length) {
-                        const nextBatch = this.allReels.slice(6, 15);
+                        const nextBatch = this.allReels.slice(6, 12);
                         this.filteredReels = [...this.filteredReels, ...nextBatch];
                         this.captureMissingThumbnails(nextBatch);
                         this.refreshVisibleReelsCounts();
                     }
-                }, 500);
+                }, 1000);
                 
+                // تقليل تردد التحديث لتحسين الأداء
                 setInterval(() => {
                     this.refreshVisibleReelsCounts();
-                }, 30000);
+                }, 60000);
             });
         },
         
@@ -127,7 +130,8 @@ function reelsManager() {
         
         shouldLoadVideo(index) {
             const currentIndex = this.currentVideoIndex;
-            return Math.abs(index - currentIndex) <= 2 || this.loadedVideos.has(index);
+            // تحميل الفيديو الحالي والتالي فقط لتحسين الأداء
+            return Math.abs(index - currentIndex) <= 1 || this.loadedVideos.has(index);
         },
         
         setupSidebarScroll() {
@@ -161,12 +165,14 @@ function reelsManager() {
             let scrollTimeout;
             let lastScrollTop = 0;
             
+            // تحسين الأداء باستخدام passive listener
             container.addEventListener('scroll', () => {
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
                     const scrollTop = container.scrollTop;
                     
-                    if (Math.abs(scrollTop - lastScrollTop) > 50) {
+                    // تقليل استدعاء handleScroll
+                    if (Math.abs(scrollTop - lastScrollTop) > 100) {
                         this.handleScroll();
                         lastScrollTop = scrollTop;
                     }
@@ -177,10 +183,11 @@ function reelsManager() {
                     const clientHeight = container.clientHeight;
                     const scrollPercentage = ((scrollTop + clientHeight) / scrollHeight) * 100;
                     
-                    if (scrollPercentage >= 70) {
+                    // تحميل أقل تكراراً
+                    if (scrollPercentage >= 80) {
                         this.loadMoreReels();
                     }
-                }, 150);
+                }, 200);
             }, { passive: true });
         },
         
@@ -207,7 +214,10 @@ function reelsManager() {
 
                         normalized.forEach(item => {
                             this.allReels.push(item);
-                            this.visibleReels.push(item);
+                            // إضافة 3 فيديوهات فقط للعرض في كل مرة
+                            if (this.visibleReels.length < this.allReels.length) {
+                                this.visibleReels.push(item);
+                            }
                             if (!this.searchQuery) {
                                 this.filteredReels.push(item);
                             }
@@ -242,6 +252,8 @@ function reelsManager() {
         
         handleScroll() {
             const container = this.$refs.reelsContainer;
+            if (!container) return;
+            
             const scrollTop = container.scrollTop;
             const screenHeight = window.innerHeight;
             
@@ -250,16 +262,19 @@ function reelsManager() {
             if (newIndex !== this.currentVideoIndex) {
                 this.currentVideoIndex = newIndex;
                 
-                for (let i = newIndex - 1; i <= newIndex + 2; i++) {
+                // تحميل الفيديو الحالي والتالي فقط
+                for (let i = newIndex; i <= newIndex + 1; i++) {
                     if (i >= 0 && i < this.visibleReels.length) {
                         this.loadedVideos.add(i);
                     }
                 }
                 
-                const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 5);
+                // تنظيف الفيديوهات البعيدة لتحرير الذاكرة
+                const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 3);
                 farVideos.forEach(i => {
                     const video = document.getElementById('video-' + this.visibleReels[i]?.id);
                     if (video) {
+                        video.pause();
                         video.src = '';
                         video.load();
                     }
@@ -268,14 +283,24 @@ function reelsManager() {
                 });
             }
             
+            // تحسين: تقليل عمليات DOM باستخدام requestAnimationFrame
+            if (!this.scrollRAF) {
+                this.scrollRAF = requestAnimationFrame(() => {
+                    this.updateVisibleVideos(container, screenHeight);
+                    this.scrollRAF = null;
+                });
+            }
+        },
+        
+        updateVisibleVideos(container, screenHeight) {
             const videos = container.querySelectorAll('video');
             let activeVideo = null;
             
-            videos.forEach((video, idx) => {
+            videos.forEach((video) => {
                 const rect = video.getBoundingClientRect();
-                const isVisible = rect.top >= -100 && rect.bottom <= screenHeight + 100;
+                const isInCenter = rect.top >= -50 && rect.bottom <= screenHeight + 50;
                 
-                if (isVisible) {
+                if (isInCenter) {
                     const reelId = parseInt(video.id.replace('video-', ''));
                     
                     if (this.selectedReelId !== reelId) {
@@ -285,29 +310,15 @@ function reelsManager() {
                         const currentIndex = this.visibleReels.findIndex(r => r.id === reelId);
                         const remaining = this.visibleReels.length - currentIndex;
                         
-                        if (remaining <= 10 && this.hasMore && !this.loading) {
+                        if (remaining <= 5 && this.hasMore && !this.loading) {
                             this.loadMoreReels();
                         }
                     }
                     
-                    const isInCenter = rect.top >= -50 && rect.bottom <= screenHeight + 50;
-                    if (isInCenter) {
-                        activeVideo = video;
-                        // أثناء التمرير، شغّل الفيديو الظاهر فقط
-                        if (this.scrollingToSelection && reelId !== this.selectedReelId) {
-                            video.pause();
-                        } else {
-                            if (video.src) {
-                                video.muted = this.isGlobalMuted;
-                            }
-                            if (video.paused && video.src) {
-                                video.play().catch(() => {});
-                            }
-                        }
-                    } else {
-                        if (!video.paused) {
-                            video.pause();
-                        }
+                    activeVideo = video;
+                    if (video.src && video.paused) {
+                        video.muted = this.isGlobalMuted;
+                        video.play().catch(() => {});
                     }
                 } else {
                     if (!video.paused) {
@@ -316,6 +327,7 @@ function reelsManager() {
                 }
             });
             
+            // إيقاف جميع الفيديوهات الأخرى
             if (activeVideo) {
                 videos.forEach(v => {
                     if (v !== activeVideo && !v.paused) {
