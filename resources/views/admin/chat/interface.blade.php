@@ -23,6 +23,60 @@
             </button>
         </div>
 
+        <div class="chat-filter">
+            <div class="filter-toggle" onclick="toggleFilterPanel()">
+                <i class="fa fa-filter"></i>
+                <span>{{ __('Filters') }}</span>
+                <i class="fa fa-chevron-down toggle-icon" id="filterToggleIcon"></i>
+            </div>
+
+            <div class="filter-panel" id="filterPanel" style="display: none;">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="userIdFilter">{{ __('User ID') }}:</label>
+                        <input type="number" id="userIdFilter" class="filter-input" placeholder="{{ __('Enter User ID') }}" min="1">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="userNameFilter">{{ __('User Name') }}:</label>
+                        <input type="text" id="userNameFilter" class="filter-input" placeholder="{{ __('Enter User Name') }}">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="uuidFilter">{{ __('UUID') }}:</label>
+                        <input type="text" id="uuidFilter" class="filter-input" placeholder="{{ __('Enter UUID') }}">
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="dateFromFilter">{{ __('Date From') }}:</label>
+                        <input type="date" id="dateFromFilter" class="filter-input">
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="dateToFilter">{{ __('Date To') }}:</label>
+                        <input type="date" id="dateToFilter" class="filter-input">
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="btn-info apply-filter" onclick="applyFilters()">
+                            <i class="fa fa-search"></i> {{ __('Apply') }}
+                        </button>
+                        <button class="btn-danger" onclick="clearFilters()" id="clearFilterBtn" style="display: none;">
+                            <i class="fa fa-times"></i> {{ __('Clear') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Filters Badge -->
+            <div class="active-filters" id="activeFilters" style="display: none;">
+                <span class="active-filters-label">{{ __('Active Filters') }}:</span>
+                <div class="filter-badges" id="filterBadges"></div>
+            </div>
+        </div>
+
         <!-- Reply Preview (shown when replying to a message) -->
         <div class="reply-preview" id="replyPreview" style="display: none;">
             <div class="reply-content">
@@ -90,6 +144,7 @@
 </div>
 
 <script>
+    // Translations
     const translations = {
         loadingMessages: "{{ __('Loading messages...') }}",
         failedToLoadMessages: "{{ __('Failed to load messages') }}",
@@ -107,13 +162,27 @@
         messageNotLoaded: "{{ __('Message not loaded. Loading older messages...') }}",
         scrollUpForOlderMessages: "{{ __('Scroll up for older messages') }}",
         replyingTo: "{{ __('Replying to') }}",
-        user: "{{ __('User') }}"
+        user: "{{ __('User') }}",
+        filtersApplied: "{{ __('Filters applied') }}",
+        filtersCleared: "{{ __('Filters cleared') }}",
+        noFiltersApplied: "{{ __('No filters to clear') }}",
+        userId: "{{ __('User ID') }}",
+        userName: "{{ __('User Name') }}",
+        uuid: "{{ __('UUID') }}",
+        dateFrom: "{{ __('Date From') }}",
+        dateTo: "{{ __('Date To') }}"
     };
 
+    // Configuration
     const csrfToken = '{{ csrf_token() }}';
     const adminAppId = {{ $adminAppId ?? 0 }};
     const canSendMessages = {{ $canSendMessages ? 'true' : 'false' }};
+    const messagesRoute = '{{ route("admin.chat.messages") }}';
+    const storeRoute = '{{ route("admin.chat.store") }}';
+    const updateRoute = '{{ route("admin.chat.update") }}';
+    const deleteRouteBase = '{{ route("admin.chat.delete", "") }}';
 
+    // State variables
     let currentPage = 1;
     let lastPage = 1;
     let isLoading = false;
@@ -123,12 +192,179 @@
     let loadedMessageIds = new Set();
     let replyingTo = null;
 
+    // Filter state
+    let activeFilters = {
+        user_id: null,
+        user_name: null,
+        uuid: null,
+        date_from: null,
+        date_to: null
+    };
+
     const SCROLL_THRESHOLD = 100;
     let scrollDebounceTimer = null;
 
+    // DOM Elements
     const chatContainer = document.getElementById('chatMessages');
+    const filterPanel = document.getElementById('filterPanel');
+    const filterToggleIcon = document.getElementById('filterToggleIcon');
+    const clearFilterBtn = document.getElementById('clearFilterBtn');
+    const activeFiltersContainer = document.getElementById('activeFilters');
+    const filterBadgesContainer = document.getElementById('filterBadges');
 
-    // Scroll handler - load more when at TOP
+    // ==================== FILTER FUNCTIONS ====================
+
+    function toggleFilterPanel() {
+        const toggle = document.querySelector('.filter-toggle');
+
+        if (filterPanel.style.display === 'none') {
+            filterPanel.style.display = 'block';
+            toggle.classList.add('active');
+        } else {
+            filterPanel.style.display = 'none';
+            toggle.classList.remove('active');
+        }
+    }
+
+    function applyFilters() {
+        // Get filter values
+        const userId = document.getElementById('userIdFilter').value.trim();
+        const userName = document.getElementById('userNameFilter').value.trim();
+        const uuid = document.getElementById('uuidFilter').value.trim();
+        const dateFrom = document.getElementById('dateFromFilter').value;
+        const dateTo = document.getElementById('dateToFilter').value;
+
+        // Update active filters
+        activeFilters.user_id = userId || null;
+        activeFilters.user_name = userName || null;
+        activeFilters.uuid = uuid || null;
+        activeFilters.date_from = dateFrom || null;
+        activeFilters.date_to = dateTo || null;
+
+        // Check if any filter is applied
+        const hasFilters = Object.values(activeFilters).some(v => v !== null);
+
+        // Update UI
+        updateFilterUI(hasFilters);
+
+        // Reset and reload messages
+        resetAndReload();
+
+        if (hasFilters) {
+            toastr.info(translations.filtersApplied);
+        }
+    }
+
+    function clearFilters() {
+        // Check if any filter is active
+        const hasFilters = Object.values(activeFilters).some(v => v !== null);
+
+        if (!hasFilters) {
+            toastr.info(translations.noFiltersApplied);
+            return;
+        }
+
+        // Clear filter values
+        document.getElementById('userIdFilter').value = '';
+        document.getElementById('userNameFilter').value = '';
+        document.getElementById('uuidFilter').value = '';
+        document.getElementById('dateFromFilter').value = '';
+        document.getElementById('dateToFilter').value = '';
+
+        // Reset active filters
+        activeFilters = {
+            user_id: null,
+            user_name: null,
+            uuid: null,
+            date_from: null,
+            date_to: null
+        };
+
+        // Update UI
+        updateFilterUI(false);
+
+        // Reset and reload messages
+        resetAndReload();
+
+        toastr.info(translations.filtersCleared);
+    }
+
+    function removeFilter(filterKey) {
+        activeFilters[filterKey] = null;
+
+        // Clear corresponding input
+        const inputMap = {
+            user_id: 'userIdFilter',
+            user_name: 'userNameFilter',
+            uuid: 'uuidFilter',
+            date_from: 'dateFromFilter',
+            date_to: 'dateToFilter'
+        };
+
+        const inputId = inputMap[filterKey];
+        if (inputId) {
+            document.getElementById(inputId).value = '';
+        }
+
+        // Check if any filter remains
+        const hasFilters = Object.values(activeFilters).some(v => v !== null);
+        updateFilterUI(hasFilters);
+
+        // Reload messages
+        resetAndReload();
+    }
+
+    function updateFilterUI(hasFilters) {
+        // Show/hide clear button
+        clearFilterBtn.style.display = hasFilters ? 'inline-flex' : 'none';
+
+        // Show/hide active filters badges
+        activeFiltersContainer.style.display = hasFilters ? 'flex' : 'none';
+
+        if (hasFilters) {
+            renderFilterBadges();
+        }
+    }
+
+    function renderFilterBadges() {
+        const labelMap = {
+            user_id: translations.userId,
+            user_name: translations.userName,
+            uuid: translations.uuid,
+            date_from: translations.dateFrom,
+            date_to: translations.dateTo
+        };
+
+        let badgesHtml = '';
+
+        Object.entries(activeFilters).forEach(([key, value]) => {
+            if (value !== null) {
+                badgesHtml += `
+                    <span class="filter-badge">
+                        ${labelMap[key]}: ${value}
+                        <i class="fa fa-times badge-remove" onclick="removeFilter('${key}')"></i>
+                    </span>
+                `;
+            }
+        });
+
+        filterBadgesContainer.innerHTML = badgesHtml;
+    }
+
+    function buildFilterQueryString() {
+        const params = new URLSearchParams();
+
+        if (activeFilters.user_id) params.append('user_id', activeFilters.user_id);
+        if (activeFilters.user_name) params.append('user_name', activeFilters.user_name);
+        if (activeFilters.uuid) params.append('uuid', activeFilters.uuid);
+        if (activeFilters.date_from) params.append('date_from', activeFilters.date_from);
+        if (activeFilters.date_to) params.append('date_to', activeFilters.date_to);
+
+        return params.toString();
+    }
+
+    // ==================== SCROLL HANDLER ====================
+
     function handleScroll() {
         if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer);
 
@@ -141,14 +377,21 @@
 
     chatContainer.addEventListener('scroll', handleScroll);
 
-    // Load initial messages (newest - page 1)
+    // ==================== MESSAGE LOADING ====================
+
     function loadMessages() {
         if (isLoading) return;
 
         isLoading = true;
         showTopLoader();
 
-        fetch(`{{ route("admin.chat.messages") }}?page=1`)
+        let url = `${messagesRoute}?page=1`;
+        const filterQuery = buildFilterQueryString();
+        if (filterQuery) {
+            url += `&${filterQuery}`;
+        }
+
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
@@ -186,7 +429,6 @@
             });
     }
 
-    // Load older messages (higher page numbers)
     function loadMoreMessages() {
         if (isLoading || !hasMoreMessages || currentPage >= lastPage) return;
 
@@ -194,35 +436,46 @@
         isLoading = true;
         showTopLoader();
 
-        // IMPORTANT: Store scroll height BEFORE loading
-        const scrollHeightBefore = chatContainer.scrollHeight;
+        const anchorElement = chatContainer.querySelector('.message-wrapper');
 
-        fetch(`{{ route("admin.chat.messages") }}?page=${nextPage}`)
+        let url = `${messagesRoute}?page=${nextPage}`;
+        const filterQuery = buildFilterQueryString();
+        if (filterQuery) {
+            url += `&${filterQuery}`;
+        }
+
+        fetch(url)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     const olderMessages = data.messages || [];
 
-                    // Add older messages (they go to the TOP visually)
-                    olderMessages.forEach(msg => {
+                    const sortedOlderMessages = [...olderMessages].sort((a, b) =>
+                        new Date(a.created_at) - new Date(b.created_at)
+                    );
+
+                    let htmlToInsert = '';
+                    sortedOlderMessages.forEach(msg => {
                         if (!loadedMessageIds.has(msg.id)) {
                             loadedMessageIds.add(msg.id);
-                            allMessages.push(msg); // Just add, sorting handles position
+                            allMessages.push(msg);
+                            htmlToInsert += createMessageElement(msg);
                         }
                     });
+
+                    if (anchorElement && htmlToInsert) {
+                        anchorElement.insertAdjacentHTML('beforebegin', htmlToInsert);
+                        anchorElement.scrollIntoView({ block: 'start', behavior: 'instant' });
+                        chatContainer.scrollTop -= 100;
+                    }
 
                     currentPage = nextPage;
                     hasMoreMessages = currentPage < lastPage;
 
-                    renderMessages();
-
-                    // IMPORTANT: Maintain scroll position
-                    // New content was added at TOP, so adjust scroll
-                    setTimeout(() => {
-                        const scrollHeightAfter = chatContainer.scrollHeight;
-                        const addedHeight = scrollHeightAfter - scrollHeightBefore;
-                        chatContainer.scrollTop = addedHeight;
-                    }, 10);
+                    const scrollUpIndicator = document.getElementById('scrollUpIndicator');
+                    if (!hasMoreMessages && scrollUpIndicator) {
+                        scrollUpIndicator.remove();
+                    }
 
                     hideTopLoader();
                 }
@@ -235,6 +488,8 @@
                 isLoading = false;
             });
     }
+
+    // ==================== LOADER FUNCTIONS ====================
 
     function showTopLoader() {
         let loader = document.getElementById('topLoader');
@@ -253,7 +508,9 @@
         if (loader) loader.style.display = 'none';
     }
 
-    function refreshMessages() {
+    // ==================== RESET & REFRESH ====================
+
+    function resetAndReload() {
         currentPage = 1;
         lastPage = 1;
         allMessages = [];
@@ -263,17 +520,20 @@
         isLoading = false;
         chatContainer.innerHTML = '';
         loadMessages();
+    }
+
+    function refreshMessages() {
+        resetAndReload();
         toastr.info(translations.refreshingMessages);
     }
 
-    // Render: Sort oldest TOP, newest BOTTOM
+    // ==================== RENDER MESSAGES ====================
+
     function renderMessages() {
         chatContainer.querySelectorAll('.message-wrapper, .scroll-up-indicator').forEach(el => el.remove());
 
-        // Sort: oldest first (small date/id) at TOP
         const sorted = [...allMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-        // Show indicator if more pages
         if (hasMoreMessages) {
             const indicator = document.createElement('div');
             indicator.className = 'scroll-up-indicator';
@@ -284,7 +544,6 @@
             else chatContainer.prepend(indicator);
         }
 
-        // Render oldest to newest
         sorted.forEach(msg => {
             chatContainer.insertAdjacentHTML('beforeend', createMessageElement(msg));
         });
@@ -364,6 +623,8 @@
         }
     }
 
+    // ==================== ACTION MENU ====================
+
     function toggleActionMenu(event, messageId) {
         event.stopPropagation();
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
@@ -393,6 +654,8 @@
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     });
 
+    // ==================== REPLY FUNCTIONS ====================
+
     function setReply(messageId, userName, messageText) {
         replyingTo = messageId;
         document.getElementById('replyToId').value = messageId;
@@ -420,12 +683,16 @@
         }
     }
 
+    // ==================== UTILITY FUNCTIONS ====================
+
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
     }
+
+    // ==================== SEND MESSAGE ====================
 
     function sendMessage() {
         if (!canSendMessages) {
@@ -435,14 +702,20 @@
 
         const input = document.getElementById('messageInput');
         const text = input.value.trim();
-        if (!text) { toastr.warning(translations.pleaseEnterMessage); return; }
+        if (!text) {
+            toastr.warning(translations.pleaseEnterMessage);
+            return;
+        }
 
-        const payload = { text};
+        const payload = { text };
         if (replyingTo) payload.parent_id = replyingTo;
 
-        fetch('{{ route("admin.chat.store") }}', {
+        fetch(storeRoute, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
             body: JSON.stringify(payload)
         })
             .then(res => res.json())
@@ -457,14 +730,21 @@
                     renderMessages();
                     chatContainer.scrollTop = chatContainer.scrollHeight;
                     toastr.success(translations.messageSentSuccessfully);
+                } else {
+                    toastr.error(data.error || translations.failedToSendMessage);
                 }
             })
-            .catch(err => { console.error(err); toastr.error(translations.failedToSendMessage); });
+            .catch(err => {
+                console.error(err);
+                toastr.error(translations.failedToSendMessage);
+            });
     }
+
+    // ==================== EDIT MESSAGE ====================
 
     function editMessage(id, text) {
         document.getElementById('editMessageId').value = id;
-        document.getElementById('editMessageText').value = text;
+        document.getElementById('editMessageText').value = text.replace(/\\'/g, "'").replace(/\\"/g, '"');
         document.getElementById('editModal').classList.add('active');
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
     }
@@ -476,11 +756,18 @@
     function saveEdit() {
         const id = document.getElementById('editMessageId').value;
         const text = document.getElementById('editMessageText').value.trim();
-        if (!text) { toastr.warning(translations.messageCannotBeEmpty); return; }
 
-        fetch('{{ route("admin.chat.update") }}', {
+        if (!text) {
+            toastr.warning(translations.messageCannotBeEmpty);
+            return;
+        }
+
+        fetch(updateRoute, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
             body: JSON.stringify({ id, text })
         })
             .then(res => res.json())
@@ -488,20 +775,33 @@
                 if (data.success) {
                     closeEditModal();
                     const idx = allMessages.findIndex(m => m.id == id);
-                    if (idx !== -1) { allMessages[idx].text = text; renderMessages(); }
+                    if (idx !== -1) {
+                        allMessages[idx].text = text;
+                        renderMessages();
+                    }
                     toastr.success(translations.messageUpdatedSuccessfully);
+                } else {
+                    toastr.error(data.error || translations.failedToUpdateMessage);
                 }
             })
-            .catch(err => { console.error(err); toastr.error(translations.failedToUpdateMessage); });
+            .catch(err => {
+                console.error(err);
+                toastr.error(translations.failedToUpdateMessage);
+            });
     }
+
+    // ==================== DELETE MESSAGE ====================
 
     function deleteMessage(id) {
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
+
         if (!confirm(translations.confirmDeleteMessage)) return;
 
-        fetch(`{{ route("admin.chat.delete", "") }}/${id}`, {
+        fetch(`${deleteRouteBase}/${id}`, {
             method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': csrfToken }
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
+            }
         })
             .then(res => res.json())
             .then(data => {
@@ -510,14 +810,42 @@
                     loadedMessageIds.delete(parseInt(id));
                     renderMessages();
                     toastr.success(translations.messageDeletedSuccessfully);
+                } else {
+                    toastr.error(data.error || translations.failedToDeleteMessage);
                 }
             })
-            .catch(err => { console.error(err); toastr.error(translations.failedToDeleteMessage); });
+            .catch(err => {
+                console.error(err);
+                toastr.error(translations.failedToDeleteMessage);
+            });
     }
 
-    document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
-    document.getElementById('editModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeEditModal(); });
+    // ==================== EVENT LISTENERS ====================
 
-    // START
+    // Send message on Enter key
+    document.getElementById('messageInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // Close modal on backdrop click
+    document.getElementById('editModal').addEventListener('click', e => {
+        if (e.target === e.currentTarget) closeEditModal();
+    });
+
+    // Apply filter on Enter key in filter inputs
+    document.getElementById('userIdFilter').addEventListener('keypress', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
+    document.getElementById('userNameFilter').addEventListener('keypress', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
+    document.getElementById('uuidFilter').addEventListener('keypress', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+
+    // ==================== INITIALIZE ====================
+
     loadMessages();
 </script>

@@ -54,6 +54,9 @@
     .dark-mode .received-message .message-bubble,
     .dark-mode .action-menu,
     .dark-mode .more-btn:hover,
+    .dark-mode .filter-toggle,
+    .dark-mode .filter-panel,
+    .dark-mode .active-filters,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
