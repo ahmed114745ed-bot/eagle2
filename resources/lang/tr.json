@@ -4385,6 +4385,7 @@
     "You cannot send messages": "Mesaj gönderemezsiniz",
     "User account not found.": "Kullanıcı hesabı bulunamadı.",
     "User account not found or has been deleted.": "Kullanıcı hesabı bulunamadı veya silinmiş.",
+    "Reply": "Yanıtla",
 
     "moment_viewer.noData": "Veri döndürülmedi",
     "moment_viewer.failedLoad": "Anlar yüklenemedi",

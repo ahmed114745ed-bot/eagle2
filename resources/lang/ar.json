@@ -5067,6 +5067,7 @@
     "You cannot send messages": "لا يمكنك إرسال الرسائل",
     "User account not found.": "حساب المستخدم غير موجود.",
     "User account not found or has been deleted.": "حساب المستخدم غير موجود أو تم حذفه.",
+    "Reply": "رد",
 
     "reels_admin.delete": "حذف",
     "moment_viewer.noData": "لم يتم إرجاع أي بيانات",

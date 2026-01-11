@@ -3987,6 +3987,7 @@
     "You cannot send messages": "आप संदेश नहीं भेज सकते",
     "User account not found.": "उपयोगकर्ता खाता नहीं मिला।",
     "User account not found or has been deleted.": "उपयोगकर्ता खाता नहीं मिला या हटा दिया गया है।",
+    "Reply": "जवाब दें",
 
     "moment_viewer.noData": "कोई डेटा वापस नहीं आया",
     "moment_viewer.failedLoad": "मोमेंट लोड करने में विफल",
