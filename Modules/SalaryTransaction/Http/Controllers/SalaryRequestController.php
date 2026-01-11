@@ -38,7 +38,7 @@ class SalaryRequestController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('salary-requests'))
             ->body($this->detail($id)));
     }
@@ -52,7 +52,7 @@ class SalaryRequestController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('salary-requests'))
             ->body($this->form()->edit($id)));
     }
@@ -72,9 +72,21 @@ class SalaryRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new SalaryRequest());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()
+        $grid->model()->with([
+            'agency',
+            'agencyOwner',
+            'agencyOwner.profile',
+            'agencyOwner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'host',
+            'host.profile',
+            'host.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'payment_gateway',
+            'country'
+
+
+        ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('agencyOwner', fn($q) => $q->where('country_id', $countryID))
@@ -82,64 +94,63 @@ class SalaryRequestController extends MainController
                     ->orWhereHas('host', fn($q) => $q->where('country_id', $countryID));
             }))
             ->orderByDesc('id');
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('status',__('status'))->select([0=>__('waiting'),1=>__('accepting'),2=>__('transferred'),3=>__('completed'),4=>__('rejected')]);
-
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('status', __('status'))->select([0 => __('waiting'), 1 => __('accepting'), 2 => __('transferred'), 3 => __('completed'), 4 => __('rejected')]);
             });
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('agency_id',__('agency'))->select(Common::by_agency_filter ());
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
 
-                $filter->equal('agency_owner_id',__('Agency owner'))->select(Common::by_user_filter ());
+                $filter->equal('agency_owner_id', __('Agency owner'))->select(Common::by_user_filter());
             });
         });
         $grid->column('id', __('Id'));
         $grid->column('agency.name', __('Agency'))
-        ->display(function ($name) {
-            $path = @$this->agency->img;
-            $defaultImage = asset("images/icon-agency.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $path = @$this->agency->img;
+                $defaultImage = asset("images/icon-agency.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            if ($this->agency) {
-                $showUrl = url("admin/agencies/{$this->agency->id}");
-                $link = "
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                if ($this->agency) {
+                    $showUrl = url("admin/agencies/{$this->agency->id}");
+                    $link = "
                     <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
                         <span style='text-decoration: underline; cursor: pointer;'>$name</span>
                     </a>
                 ";
-            } else {
-                $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
-            }
+                } else {
+                    $link = "<span style='color: gray;'>No Agency</span>"; // Handle missing agency
+                }
 
-            return "
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     $link
                 </div>
             ";
-        });
+            });
 
         $grid->column('agencyOwner.name', __('Agency owner'))
-        ->display(function ($name) {
-            $name = $name ??'';
-            $uid = @$this->agencyOwner->uuid;
-            $path = @$this->agencyOwner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $name = $name ?? '';
+                $uid = @$this->agencyOwner->uuid;
+                $path = @$this->agencyOwner?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$this->agencyOwner->id}");
-            return "
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = url("admin/users/{$this->agencyOwner->id}");
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -150,23 +161,23 @@ class SalaryRequestController extends MainController
                     </div>
                 </div>
             ";
-        });
+            });
 
         $grid->column('host.name', __('host'))
-        ->display(function ($name) {
-            $uid = @$this->host->uuid;
-            $path = @$this->host?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function ($name) {
+                $uid = @$this->host->uuid;
+                $path = @$this->host?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$this->host->id}");
-            return "
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = url("admin/users/{$this->host->id}");
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -177,7 +188,7 @@ class SalaryRequestController extends MainController
                     </div>
                 </div>
             ";
-        });
+            });
         $grid->column('status', __('status'))->display(function ($status) {
             switch ($status) {
                 case 0:
@@ -257,19 +268,19 @@ class SalaryRequestController extends MainController
         //     }
         // ");
 
-        $grid->column( __('bill image'))->modal('show image' , function ( ) {
+        $grid->column(__('bill image'))->modal('show image', function () {
             $img = $this->bill_image;
-            if($img == null || $img == ''){
+            if ($img == null || $img == '') {
                 return 'No image founded';
             }
 
-            $img = getDriverUrl().'/'.$img;
-            $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+            $img = getDriverUrl() . '/' . $img;
+            $img = "<img src='" . $img . "' style='width:500px;height:500px' class='img img-thumbnail'$ />";
 
             return (new WidgetsTable([__('img')], [[$img]]));
         });
 
-        $grid->disableActions ();
+        $grid->disableActions();
         $grid->disableCreateButton();
         return $grid;
     }
