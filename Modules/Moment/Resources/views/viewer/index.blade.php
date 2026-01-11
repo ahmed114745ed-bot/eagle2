@@ -61,7 +61,7 @@
             },
             adminUserUrl: "{{ admin_url('users') }}/",
             defaultAvatar: "{{ asset('images/businessman-icon.jpg') }}",
-            storageBase: "{{ asset('storage') }}",
+            storageUrl: "{{ config('filesystems.disks.' . config('filesystems.default') . '.url') }}",
             csrf: '{{ csrf_token() }}',
             texts: {
                 error: '{{ __('moment_viewer.error') }}',
