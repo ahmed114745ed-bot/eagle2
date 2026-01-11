@@ -45,10 +45,10 @@
 {{--                    <i class="fa fa-arrow-up"></i> Load More Messages--}}
 {{--                </button>--}}
 {{--            </div>--}}
-            <div class="loading-indicator" id="loadingIndicator">
-                <i class="fa fa-spinner"></i>
-                <p>{{ __('Loading messages...') }}</p>
-            </div>
+{{--            <div class="loading-indicator" id="loadingIndicator">--}}
+{{--                <i class="fa fa-spinner"></i>--}}
+{{--                <p>{{ __('Loading messages...') }}</p>--}}
+{{--            </div>--}}
         </div>
 
         <!-- Message Input -->
@@ -120,22 +120,53 @@
     let isLoading = false;
     let allMessages = [];
     let initialLoad = true;
+    let hasMoreMessages = true;
 
     // Reply state
     let replyingTo = null;
 
-    // Scroll threshold
-    const SCROLL_THRESHOLD = 100;
+    // Scroll threshold - only trigger when user reaches the very top
+    const SCROLL_THRESHOLD = 50;
+
+    // Debounce timer
+    let scrollDebounceTimer = null;
 
     // Get chat container
     const chatContainer = document.getElementById('chatMessages');
 
-    // Scroll event listener
-    chatContainer.addEventListener('scroll', function() {
-        if (chatContainer.scrollTop <= SCROLL_THRESHOLD && !isLoading && currentPage < lastPage) {
-            loadMoreMessages();
+    // Debounced scroll handler
+    function handleScroll() {
+        // Clear previous timer
+        if (scrollDebounceTimer) {
+            clearTimeout(scrollDebounceTimer);
         }
-    });
+
+        // Set new timer - wait 200ms after scrolling stops
+        scrollDebounceTimer = setTimeout(() => {
+            // Only load if:
+            // 1. User is at the top (scrollTop is very small)
+            // 2. Not currently loading
+            // 3. There are more pages to load
+            // 4. Has more messages flag is true
+            if (
+                chatContainer.scrollTop <= SCROLL_THRESHOLD &&
+                !isLoading &&
+                currentPage < lastPage &&
+                hasMoreMessages
+            ) {
+                console.log('Loading more messages...', {
+                    scrollTop: chatContainer.scrollTop,
+                    currentPage: currentPage,
+                    lastPage: lastPage,
+                    isLoading: isLoading
+                });
+                loadMoreMessages();
+            }
+        }, 200);
+    }
+
+    // Scroll event listener with debounce
+    chatContainer.addEventListener('scroll', handleScroll);
 
     // Load initial messages
     function loadMessages() {
@@ -144,19 +175,30 @@
         isLoading = true;
         showTopLoader();
 
-        fetch(`{{ route("admin.chat.messages") }}?page=${currentPage}`)
+        fetch(`{{ route("admin.chat.messages") }}?page=1`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    allMessages = data.messages;
-                    lastPage = data.last_page;
-                    currentPage = data.current_page;
+                    allMessages = data.messages || [];
+                    lastPage = data.last_page || 1;
+                    currentPage = data.current_page || 1;
+                    hasMoreMessages = currentPage < lastPage;
+
+                    console.log('Initial load:', {
+                        messagesCount: allMessages.length,
+                        currentPage: currentPage,
+                        lastPage: lastPage,
+                        hasMore: hasMoreMessages
+                    });
 
                     renderMessages();
                     hideTopLoader();
 
                     if (initialLoad) {
-                        scrollToBottom();
+                        // Small delay to ensure DOM is updated
+                        setTimeout(() => {
+                            scrollToBottom();
+                        }, 100);
                         initialLoad = false;
                     }
                 }
@@ -170,35 +212,66 @@
             });
     }
 
-    // Load more messages
+    // Load more messages (older messages)
     function loadMoreMessages() {
-        if (currentPage >= lastPage || isLoading) return;
+        // Double check conditions
+        if (isLoading || currentPage >= lastPage || !hasMoreMessages) {
+            console.log('Blocked load more:', {
+                isLoading: isLoading,
+                currentPage: currentPage,
+                lastPage: lastPage,
+                hasMoreMessages: hasMoreMessages
+            });
+            return;
+        }
 
         const nextPage = currentPage + 1;
         isLoading = true;
         showTopLoader();
 
+        // Store scroll position before loading
         const previousScrollHeight = chatContainer.scrollHeight;
+        const previousScrollTop = chatContainer.scrollTop;
+
+        console.log('Fetching page:', nextPage);
 
         fetch(`{{ route("admin.chat.messages") }}?page=${nextPage}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    allMessages = [...data.messages, ...allMessages];
+                    const newMessages = data.messages || [];
+
+                    // Prepend older messages to the beginning
+                    allMessages = [...newMessages, ...allMessages];
                     currentPage = data.current_page;
                     lastPage = data.last_page;
+                    hasMoreMessages = currentPage < lastPage;
+
+                    console.log('Loaded more:', {
+                        newMessagesCount: newMessages.length,
+                        totalMessages: allMessages.length,
+                        currentPage: currentPage,
+                        lastPage: lastPage,
+                        hasMore: hasMoreMessages
+                    });
 
                     renderMessages();
 
-                    const newScrollHeight = chatContainer.scrollHeight;
-                    chatContainer.scrollTop = newScrollHeight - previousScrollHeight;
+                    // Maintain scroll position after rendering
+                    requestAnimationFrame(() => {
+                        const newScrollHeight = chatContainer.scrollHeight;
+                        const scrollDiff = newScrollHeight - previousScrollHeight;
+                        chatContainer.scrollTop = previousScrollTop + scrollDiff;
+                    });
 
                     hideTopLoader();
+                } else {
+                    hasMoreMessages = false;
                 }
                 isLoading = false;
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error loading more messages:', error);
                 toastr.error(translations.failedToLoadMoreMessages);
                 hideTopLoader();
                 isLoading = false;
@@ -234,12 +307,21 @@
 
     // Refresh messages
     function refreshMessages() {
+        // Reset all state
         currentPage = 1;
+        lastPage = 1;
         allMessages = [];
         initialLoad = true;
+        hasMoreMessages = true;
+        isLoading = false;
 
+        // Clear all message elements
         const messageElements = chatContainer.querySelectorAll('.message-wrapper');
         messageElements.forEach(el => el.remove());
+
+        // Remove scroll indicator if exists
+        const scrollIndicator = document.getElementById('scrollUpIndicator');
+        if (scrollIndicator) scrollIndicator.remove();
 
         loadMessages();
         toastr.info(translations.refreshingMessages);
@@ -247,28 +329,33 @@
 
     // Render messages
     function renderMessages() {
+        // Remove existing message elements only
         const messageElements = chatContainer.querySelectorAll('.message-wrapper');
         messageElements.forEach(el => el.remove());
 
-        let scrollIndicator = document.getElementById('scrollUpIndicator');
-        if (currentPage < lastPage) {
-            if (!scrollIndicator) {
-                scrollIndicator = document.createElement('div');
-                scrollIndicator.id = 'scrollUpIndicator';
-                scrollIndicator.className = 'scroll-up-indicator';
-                scrollIndicator.innerHTML = `
-                    <i class="fa fa-arrow-up"></i>
-                    <span>${translations.scrollUpForOlderMessages}</span>
-                `;
-            }
+        // Remove old scroll indicator
+        const oldScrollIndicator = document.getElementById('scrollUpIndicator');
+        if (oldScrollIndicator) oldScrollIndicator.remove();
+
+        // Add scroll up indicator if there are more messages
+        if (hasMoreMessages && currentPage < lastPage) {
+            const scrollIndicator = document.createElement('div');
+            scrollIndicator.id = 'scrollUpIndicator';
+            scrollIndicator.className = 'scroll-up-indicator';
+            scrollIndicator.innerHTML = `
+                <i class="fa fa-arrow-up"></i>
+                <span>${translations.scrollUpForOlderMessages}</span>
+            `;
+
             const loader = document.getElementById('topLoader');
-            if (loader && loader.nextSibling) {
-                chatContainer.insertBefore(scrollIndicator, loader.nextSibling);
+            if (loader) {
+                loader.after(scrollIndicator);
+            } else {
+                chatContainer.insertBefore(scrollIndicator, chatContainer.firstChild);
             }
-        } else if (scrollIndicator) {
-            scrollIndicator.remove();
         }
 
+        // Render all messages
         allMessages.forEach(message => {
             const messageHtml = createMessageElement(message);
             chatContainer.insertAdjacentHTML('beforeend', messageHtml);
@@ -288,7 +375,6 @@
         const userName = message.user_name || translations.user;
         const userInitial = userName.charAt(0).toUpperCase();
 
-        // Reply bubble HTML
         let replyHtml = '';
         if (message.parent) {
             replyHtml = `
@@ -299,66 +385,96 @@
             `;
         }
 
+        const actionMenuHtml = `
+            <div class="message-actions">
+                <button class="more-btn" onclick="toggleActionMenu(event, ${message.id})">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <div class="action-menu" id="action-menu-${message.id}">
+                    <button class="action-menu-item reply-item" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
+                        <i class="fa fa-reply"></i> {{ __('Reply') }}
+        </button>
+        <button class="action-menu-item edit-item" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
+                        <i class="fa fa-edit"></i> {{ __('Edit') }}
+        </button>
+        <button class="action-menu-item delete-item" onclick="deleteMessage(${message.id})">
+                        <i class="fa fa-trash"></i> {{ __('Delete') }}
+        </button>
+    </div>
+</div>
+`;
+
         if (isAdmin) {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                <div class="action-buttons">
-                    <button class="reply-btn" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
-                        <i class="fa fa-reply"></i>
-                    </button>
-                    <button class="edit-btn" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <button class="delete-btn" onclick="deleteMessage(${message.id})">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        <p>${escapeHtml(message.text)}</p>
-                        <div class="message-footer">
-                            <span class="message-time">${time}</span>
-                            <i class="fa fa-check-double"></i>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    ${actionMenuHtml}
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            <p>${escapeHtml(message.text)}</p>
+                            <div class="message-footer">
+                                <span class="message-time">${time}</span>
+                                <i class="fa fa-check-double"></i>
+                            </div>
+                        </div>
+                        <div class="user-avatar sender">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
                         </div>
                     </div>
-                    <div class="user-avatar sender">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
-                    </div>
                 </div>
-            </div>
-        `;
+            `;
         } else {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                <div class="message-content">
-                    <div class="user-avatar">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    <div class="message-content">
+                        <div class="user-avatar">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                        </div>
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            <p class="user-name-label">${userName}</p>
+                            <p>${escapeHtml(message.text)}</p>
+                            <span class="message-time">${time}</span>
+                        </div>
                     </div>
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        <p class="user-name-label">${userName}</p>
-                        <p>${escapeHtml(message.text)}</p>
-                        <span class="message-time">${time}</span>
-                    </div>
+                    ${actionMenuHtml}
                 </div>
-                <div class="action-buttons">
-                    <button class="reply-btn" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
-                        <i class="fa fa-reply"></i>
-                    </button>
-                    <button class="edit-btn" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
-                        <i class="fa fa-edit"></i>
-                    </button>
-                    <button class="delete-btn" onclick="deleteMessage(${message.id})">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
         }
     }
+
+    // Toggle action menu
+    function toggleActionMenu(event, messageId) {
+        event.stopPropagation();
+
+        // Close all other action menus
+        document.querySelectorAll('.action-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+
+        const actionMenu = document.getElementById(`action-menu-${messageId}`);
+        if (actionMenu) {
+            actionMenu.classList.toggle('show');
+        }
+    }
+
+    // Close action menu on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.message-actions')) {
+            document.querySelectorAll('.action-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+    });
+
+    // Close action menu when scrolling
+    chatContainer.addEventListener('scroll', function() {
+        document.querySelectorAll('.action-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    });
 
     // Set reply
     function setReply(messageId, userName, messageText) {
@@ -369,6 +485,11 @@
         document.getElementById('replyPreview').classList.add('active');
         document.getElementById('replyPreview').style.display = 'flex';
         document.getElementById('messageInput').focus();
+
+        // Close any open action menus
+        document.querySelectorAll('.action-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
     }
 
     // Cancel reply
@@ -395,6 +516,7 @@
 
     // Escape HTML
     function escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML.replace(/'/g, "\\'").replace(/"/g, '\\"');
@@ -454,6 +576,11 @@
         document.getElementById('editMessageId').value = id;
         document.getElementById('editMessageText').value = text;
         document.getElementById('editModal').classList.add('active');
+
+        // Close action menu
+        document.querySelectorAll('.action-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
     }
 
     // Close edit modal
@@ -499,6 +626,11 @@
 
     // Delete message
     function deleteMessage(id) {
+        // Close action menu first
+        document.querySelectorAll('.action-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+
         if (!confirm(translations.confirmDeleteMessage)) return;
 
         fetch(`{{ route("admin.chat.delete", "") }}/${id}`, {
