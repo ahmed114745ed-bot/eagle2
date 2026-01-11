@@ -319,7 +319,7 @@
                  :data-index="index">
                 <div class="w-full max-w-2xl h-full relative">
                     <!-- Video Container -->
-                    <div class="relative h-full bg-black flex items-center justify-center">
+                    <div class="video-container relative h-full bg-black flex items-center justify-center">
                         <!-- Skeleton Loader while video loading -->
                         <template x-if="!shouldLoadVideo(index)">
                             <div class="w-full h-full flex items-center justify-center bg-gray-900 dark:bg-gray-950">
