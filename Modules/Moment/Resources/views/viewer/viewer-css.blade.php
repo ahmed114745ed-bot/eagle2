@@ -431,6 +431,7 @@ html[dir="rtl"] .dropdown-item,
 
 /* Post Media */
 .post-media {
+    height:370px !important;
     width: 100%;
     background: #000;
     position: relative;
