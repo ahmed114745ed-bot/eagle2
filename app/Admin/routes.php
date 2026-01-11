@@ -597,11 +597,11 @@ Route::group(
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
 
         Route::resource('/group-chat', 'GroupChatController');
-        Route::get('chat/view', 'GroupChatController@chatView')->name('chat.view');
-        Route::get('chat/messages', 'GroupChatController@getMessages')->name('chat.messages');
-        Route::post('chat/message', 'GroupChatController@storeMessage')->name('chat.store');
-        Route::put('chat/message', 'GroupChatController@updateMessage')->name('chat.update');
-        Route::delete('chat/message/{id}', 'GroupChatController@deleteMessage')->name('chat.delete');
+        Route::get('chat/view', [GroupChatController::class, 'chatView'])->name('chat.view');
+        Route::get('chat/messages', [GroupChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
+        Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
+        Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
