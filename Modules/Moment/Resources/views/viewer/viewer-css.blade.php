@@ -85,7 +85,7 @@ html[dir="rtl"] body {
 
 /* Header */
 .viewer-header {
-    background: var(--bg-secondary);
+    background: var(--primary-color);
     padding: 16px 24px;
     margin-bottom: 16px;
     box-shadow: var(--shadow-1);
@@ -434,11 +434,11 @@ html[dir="rtl"] .dropdown-item,
     width: 100% !important;
     height: auto !important;
     display: block !important;
-    max-height: 600px !important;
+    max-height: 500px !important;
     max-width: 100% !important;
-    min-height: auto !important;
+    min-height: 200px !important;
     min-width: auto !important;
-    object-fit: contain !important;
+    object-fit: cover !important;
     will-change: transform;
     transform: translateZ(0);
 }
