@@ -507,38 +507,32 @@
         
         if (validMedia.length === 0) return '';
         
-        let mediaHtml = '<div class="post-media"><div class="media-gallery" id="gallery-' + momentId + '">';
+        const count = validMedia.length;
+        let gridClass = 'media-grid';
+        if (count === 1) gridClass += ' grid-1';
+        else if (count === 2) gridClass += ' grid-2';
+        else if (count === 3) gridClass += ' grid-3';
+        else if (count === 4) gridClass += ' grid-4';
+        else gridClass += ' grid-5-plus';
         
-        validMedia.forEach((media, index) => {
+        let mediaHtml = `<div class="post-media ${gridClass}" data-moment-id="${momentId}">`;
+        
+        const maxDisplay = count > 5 ? 5 : count;
+        validMedia.slice(0, maxDisplay).forEach((media, index) => {
             const mediaPath = getImagePath(media.image);
             const isVideo = mediaPath && (mediaPath.includes('.mp4') || mediaPath.includes('.mov') || mediaPath.includes('.webm'));
             
             mediaHtml += `
-                <div class="media-item ${index === 0 ? 'active' : ''}" data-index="${index}">
+                <div class="media-item" data-index="${index}" onclick="openMediaLightbox(${momentId}, ${index}, event)">
                     ${isVideo ? 
-                        `<video src="${mediaPath}" controls preload="metadata"></video>` : 
+                        `<video src="${mediaPath}" preload="metadata"></video>` : 
                         `<img src="${mediaPath}" alt="Moment" loading="lazy" 
                              onerror="this.style.display='none'">`
                     }
+                    ${index === 4 && count > 5 ? `<div class="media-overlay">+${count - 5}</div>` : ''}
                 </div>
             `;
         });
-        
-        mediaHtml += '</div>';
-        
-        if (validMedia.length > 1) {
-            mediaHtml += `
-                <div class="media-counter">${validMedia.length} <i class="fas fa-images"></i></div>
-                <div class="media-navigation">
-                    <button class="nav-btn" onclick="navigateGallery(${momentId}, -1, event)">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="nav-btn" onclick="navigateGallery(${momentId}, 1, event)">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            `;
-        }
         
         mediaHtml += '</div>';
         return mediaHtml;
@@ -585,19 +579,94 @@
         menu.toggleClass('show');
     };
 
-    window.navigateGallery = function(momentId, direction, event) {
+    window.openMediaLightbox = function(momentId, startIndex, event) {
         if (event) event.stopPropagation();
-        const gallery = $(`#gallery-${momentId}`);
-        const items = gallery.find('.media-item');
-        const currentIndex = items.filter('.active').data('index');
-        let newIndex = currentIndex + direction;
         
-        if (newIndex < 0) newIndex = items.length - 1;
-        if (newIndex >= items.length) newIndex = 0;
+        // الحصول على جميع الوسائط من moment
+        const moment = allMomentsLoaded.find(m => m.id === momentId);
+        if (!moment || !moment.image) return;
         
-        items.removeClass('active');
-        items.eq(newIndex).addClass('active');
+        const validMedia = moment.image.filter(media => media && media.image && media.image.trim() !== '');
+        if (validMedia.length === 0) return;
+        
+        // إنشاء lightbox modal
+        let lightbox = $('#mediaLightbox');
+        if (lightbox.length === 0) {
+            $('body').append(`
+                <div id="mediaLightbox" class="media-lightbox">
+                    <div class="lightbox-overlay" onclick="closeMediaLightbox()"></div>
+                    <div class="lightbox-content">
+                        <button class="lightbox-close" onclick="closeMediaLightbox()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1, event)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1, event)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="lightbox-media"></div>
+                        <div class="lightbox-counter"></div>
+                    </div>
+                </div>
+            `);
+            lightbox = $('#mediaLightbox');
+        }
+        
+        // تخزين البيانات في lightbox
+        lightbox.data('media', validMedia);
+        lightbox.data('currentIndex', startIndex);
+        
+        // عرض الصورة
+        updateLightboxMedia(startIndex);
+        
+        // إظهار lightbox
+        lightbox.addClass('active');
+        $('body').addClass('modal-open');
     };
+    
+    window.closeMediaLightbox = function() {
+        const lightbox = $('#mediaLightbox');
+        lightbox.removeClass('active');
+        $('body').removeClass('modal-open');
+    };
+    
+    window.navigateLightbox = function(direction, event) {
+        if (event) event.stopPropagation();
+        
+        const lightbox = $('#mediaLightbox');
+        const media = lightbox.data('media');
+        const currentIndex = lightbox.data('currentIndex');
+        
+        let newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = media.length - 1;
+        if (newIndex >= media.length) newIndex = 0;
+        
+        lightbox.data('currentIndex', newIndex);
+        updateLightboxMedia(newIndex);
+    };
+    
+    function updateLightboxMedia(index) {
+        const lightbox = $('#mediaLightbox');
+        const media = lightbox.data('media');
+        const currentMedia = media[index];
+        const mediaPath = getImagePath(currentMedia.image);
+        const isVideo = mediaPath && (mediaPath.includes('.mp4') || mediaPath.includes('.mov') || mediaPath.includes('.webm'));
+        
+        const mediaHtml = isVideo ? 
+            `<video src="${mediaPath}" controls autoplay></video>` : 
+            `<img src="${mediaPath}" alt="Moment">`;
+        
+        lightbox.find('.lightbox-media').html(mediaHtml);
+        lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
+        
+        // إخفاء أزرار التنقل إذا كانت صورة واحدة فقط
+        if (media.length === 1) {
+            lightbox.find('.lightbox-nav').hide();
+        } else {
+            lightbox.find('.lightbox-nav').show();
+        }
+    }
 
     window.toggleComments = function(momentId, event) {
         if (event) event.stopPropagation();
