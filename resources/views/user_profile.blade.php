@@ -1742,13 +1742,13 @@
                                         <div class="fields-group">
 
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <label class="col-sm-2 control-label">{{__("year")}}</label>
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة"
+                                                        <input type="text" class="form-control year"  placeholder="{{ __('year') }}"
                                                                name="year"
                                                                value="{{ request('year') }}" style="text-align: right;">
                                                     </div>
@@ -1756,14 +1756,14 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <label class="col-sm-2 control-label">{{__('month')}}</label>
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
                                                         <input type="text" class="form-control month"
-                                                               placeholder="الشهر"
+                                                               placeholder="{{__('month')}}"
                                                                name="month" value="{{ request('month') }}"
                                                                style="text-align: right;">
                                                     </div>
