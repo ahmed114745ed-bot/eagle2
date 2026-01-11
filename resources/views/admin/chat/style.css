@@ -89,13 +89,11 @@
     border: 2px solid #2563eb;
     color: #2563eb;
     padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
     transition: all 0.3s;
 }
 
@@ -144,8 +142,12 @@
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Load More Button */
@@ -362,7 +364,7 @@
     transition: all 0.3s;
 }
 
-.message-input:focus     {
+.message-input:focus {
     background: white;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0 var(--primary-color);
@@ -427,6 +429,10 @@
         opacity: 1;
         transform: scale(1) translateY(0);
     }
+}
+
+.rtl .modal-header {
+    display: flex !important;
 }
 
 .modal-header {
