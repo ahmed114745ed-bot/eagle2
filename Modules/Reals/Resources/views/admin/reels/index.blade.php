@@ -3,6 +3,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -906,9 +907,9 @@
             class="md:hidden fixed top-16 right-3 z-[60] group">
         <div class="relative">
             <!-- Main Button -->
-            <div class="w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110" style="background: var(--primary-gradient);">
+            <!-- <div class="w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110" style="background: var(--primary-gradient);">
                 <i class="fas fa-film text-white text-xl"></i>
-            </div>
+            </div> -->
             <!-- Counter Badge -->
             <div class="absolute -top-1 -left-1 min-w-[24px] h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
                 <span class="text-white text-xs font-bold px-1.5" x-text="filteredReels.length"></span>

@@ -34,6 +34,9 @@ function reelsManager() {
         isMobile: window.innerWidth <= 768,
         preloadQueue: [],
         isPreloading: false,
+        loadedReelIds: new Set(),
+        isAutoLoading: false,
+        batchCache: [],
         
         init() {
             this.isGlobalMuted = false;
@@ -55,6 +58,8 @@ function reelsManager() {
             const reelsData = window.initialReelsData || [];
             
             this.allReels = reelsData.map(reel => {
+                // حفظ IDs لتجنب التكرار
+                this.loadedReelIds.add(reel.id);
                 return {
                     ...reel,
                     thumbnailLoaded: Boolean(reel.thumbnail_url)
@@ -68,7 +73,7 @@ function reelsManager() {
             this.reelsLoaded = true;
 
             this.offset = this.allReels.length;
-            this.hasMore = this.allReels.length >= 10;
+            this.hasMore = true; // دائماً true للتحميل العشوائي
             
             // تحميل أول فيديو فقط
             this.loadedVideos.add(0);
@@ -91,14 +96,9 @@ function reelsManager() {
                 this.refreshVisibleReelsCounts();
                 this.captureMissingThumbnails(this.filteredReels.slice(0, 6));
                 
-                // تحميل تدريجي في الخلفية
+                // تحميل batch إضافي في الخلفية
                 setTimeout(() => {
-                    if (this.filteredReels.length < this.allReels.length) {
-                        const nextBatch = this.allReels.slice(6, 12);
-                        this.filteredReels = [...this.filteredReels, ...nextBatch];
-                        this.captureMissingThumbnails(nextBatch);
-                        this.refreshVisibleReelsCounts();
-                    }
+                    this.preloadNextBatch();
                     
                     // بدء التحميل المسبق للباقي
                     if (this.isMobile) {
@@ -311,6 +311,46 @@ function reelsManager() {
             }
         },
         
+        async preloadNextBatch() {
+            // تحميل batch إضافي في الخلفية
+            if (this.batchCache.length > 0 || this.isAutoLoading) {
+                return;
+            }
+            
+            this.isAutoLoading = true;
+            console.log('📦 تحميل batch جديد في الخلفية...');
+            
+            try {
+                const excludeIds = Array.from(this.loadedReelIds);
+                
+                const response = await fetch(`/admin/view/reels/load-more?limit=10`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        exclude_ids: excludeIds
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.reels && data.reels.length > 0) {
+                    this.batchCache = data.reels.map(reel => ({
+                        ...reel,
+                        thumbnailLoaded: Boolean(reel.thumbnail_url)
+                    }));
+                    
+                    console.log(`✅ تم تخزين ${this.batchCache.length} فيديو في الكاش`);
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل batch:', error);
+            } finally {
+                this.isAutoLoading = false;
+            }
+        },
+        
         // ==================== نهاية دوال التخزين المؤقت ====================
         
         shouldLoadVideo(index) {
@@ -386,14 +426,27 @@ function reelsManager() {
         },
         
         async loadMoreReels() {
-            if (this.loading || !this.hasMore) {
+            if (this.loading || !this.hasMore || this.isAutoLoading) {
                 return;
             }
             
             this.loading = true;
             
             try {
-                const response = await fetch(`/admin/view/reels/load-more?offset=${this.offset}&limit=20`);
+                // تحضير IDs المستبعدة
+                const excludeIds = Array.from(this.loadedReelIds);
+                
+                const response = await fetch(`/admin/view/reels/load-more?limit=20`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        exclude_ids: excludeIds
+                    })
+                });
+                
                 const data = await response.json();
                 
                 if (data.reels && data.reels.length > 0) {
@@ -408,6 +461,8 @@ function reelsManager() {
 
                         normalized.forEach(item => {
                             this.allReels.push(item);
+                            this.loadedReelIds.add(item.id);
+                            
                             // إضافة 3 فيديوهات فقط للعرض في كل مرة
                             if (this.visibleReels.length < this.allReels.length) {
                                 this.visibleReels.push(item);
@@ -421,13 +476,12 @@ function reelsManager() {
                         if (this.searchQuery) {
                             this.filterReels();
                         }
+                        
+                        console.log(`✅ تم تحميل ${newReels.length} ريل جديد`);
                     }
                     
                     this.offset += data.reels.length;
-                    
-                    if (data.reels.length < 20) {
-                        this.hasMore = false;
-                    }
+                    this.hasMore = data.has_more !== false;
                 } else {
                     this.hasMore = false;
                 }
@@ -506,8 +560,10 @@ function reelsManager() {
                     this.selectedReelId = this.visibleReels[newIndex]?.id;
                     this.selectedReel = this.visibleReels[newIndex];
                     
+                    // تحميل تلقائي عند الوصول للفيديو قبل الأخير بـ 3
                     const remaining = this.visibleReels.length - newIndex;
-                    if (remaining <= 5 && this.hasMore && !this.loading) {
+                    if (remaining <= 3 && this.hasMore && !this.loading) {
+                        console.log('🚀 تحميل تلقائي: متبقي', remaining, 'فيديوهات');
                         this.loadMoreReels();
                     }
                 }
