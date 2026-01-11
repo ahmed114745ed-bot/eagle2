@@ -264,7 +264,7 @@
     <div class="reels-video-container overflow-y-auto snap-y snap-mandatory"
          style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
          x-ref="reelsContainer"
-         @scroll.passive.debounce.150ms="handleScroll()">
+         @scroll.passive="handleScroll()">
         <template x-for="(reel, index) in (visibleReels || [])" :key="reel.id">
             <div class="video-item-height snap-start flex items-center justify-center relative"
                  :data-reel-id="reel.id"
@@ -304,7 +304,8 @@
                                        playsinline
                                        webkit-playsinline
                                        x-ref="video"
-                                       @click="togglePlay($event)"
+                                       @click.stop="togglePlay($event)"
+                                       @touchstart.stop
                                        @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
                                        @canplay="markVideoReady(reel.id)"
                                        @timeupdate.throttle.500ms="updateProgress($event)"

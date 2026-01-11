@@ -225,7 +225,7 @@
     /* Mobile & Small Tablets */
     @media (max-width: 768px) {
         .reels-main-container {
-            height: calc(100vh - 50px);
+            height: calc(100vh - 65px);
             margin-top: 50px;
             flex-direction: column-reverse;
         }
@@ -236,7 +236,7 @@
 
         .reels-video-container {
             width: 100%;
-            height: calc(100vh - 50px);
+            height: calc(100vh - 65px);
         }
 
         /* Hide desktop sidebar on mobile */
@@ -390,7 +390,11 @@
     /* Extra Small Mobile */
     @media (max-width: 480px) {
         .reels-main-container {
-            height: calc(100vh - 50px);
+            height: calc(100vh - 65px);
+        }
+        
+        .reels-video-container {
+            height: calc(100vh - 65px);
         }
         
         .absolute.top-4 .w-12.h-12 {
