@@ -349,13 +349,58 @@ class ReportController extends MainController
     {
         $grid = new Grid(new Agency());
         $countryID = session('filter_country_id');
+        $month = request('month', now()->month);
+        $year  = request('year', now()->year);
 
         $grid->disableRowSelector();
 
+        $userSalarySub = DB::table('user_sallaries')
+            ->selectRaw('
+            user_agency_id as agency_id,
+            SUM(target_diamonds) as total_target
+        ')
+            ->where('month', $month)
+            ->where('year', $year)
+            ->groupBy('user_agency_id');
+
+        $agencySalarySub = DB::table('agency_sallaries')
+            ->selectRaw('
+            agency_id,
+            SUM(sallary) as salary_sum,
+            SUM(cut_amount) as cut_sum,
+            SUM(sallary - cut_amount) as net_salary
+        ')
+            ->where('is_paid', 0)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month")
+            ->groupBy('agency_id');
+
+        // $grid->model()
+        //     ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+        //     ->withCount(['users'])
+        //     ->with(['owner.profile']);
+
         $grid->model()
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->withCount(['users'])
-            ->with(['owner.profile']);
+
+            ->leftJoinSub(
+                $userSalarySub,
+                'user_salary_table',
+                fn($j) => $j->on('user_salary_table.agency_id', '=', 'agencies.id')
+            )
+            ->leftJoinSub(
+                $agencySalarySub,
+                'agency_salary_table',
+                fn($j) => $j->on('agency_salary_table.agency_id', '=', 'agencies.id')
+            )
+            ->when($countryID, fn($q) => $q->where('agencies.country_id', $countryID))
+            ->with(['owner.profile'])
+
+            ->select([
+                'agencies.*',
+                DB::raw('COALESCE(user_salary_table.total_target,0) as target'),
+                DB::raw('COALESCE(agency_salary_table.salary_sum,0) as total_salary'),
+                DB::raw('COALESCE(agency_salary_table.cut_sum,0) as expenses'),
+                DB::raw('COALESCE(agency_salary_table.net_salary,0) as net_salary'),
+            ])->withCount(['users']);
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -405,15 +450,21 @@ class ReportController extends MainController
                     </a>";
         });
 
-        $grid->column('target', __('target'))->display(function () {
-            return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
-        });
-        $grid->column('net_salary', __('Net Salary'))->display(function () {
-            return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
-        });
-        $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
-        });
+        // $grid->column('target', __('target'))->display(function () {
+        //     return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
+        // });
+
+        $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+        // $grid->column('net_salary', __('Net Salary'))->display(function () {
+        //     return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
+        // });
+
+        $grid->column('net_salary', __('Net Salary'))->display(fn($v) => round($v, 2));
+        // $grid->column('expenses', __('expenses'))->display(function () {
+        //     return @$this->getTotalCutAmountAgency(request('month'), request('year')) ?? 0;
+        // });
+
+        $grid->column('expenses', __('expenses'))->display(fn($v) => round($v, 2));
 
 
         $grid->column('total', __('salary'))->display(function () {
@@ -424,9 +475,22 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-       
-        $grid->column('hosts', __('dashboard.hosts'))->display(function () {
-            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
+
+        // $grid->column('total', __('salary'))->display(function ($v) {
+        //     $salary = round($v, 2);
+        //     $image = asset('images/dollar.jpg');
+        //     return "<div style='display: flex; align-items: center;'>
+        //             <span>{$salary}</span>
+        //             <img src='{$image}' alt='USD' width='20' height='20'>
+        //         </div>";
+        // });
+
+        // $grid->column('hosts', __('dashboard.hosts'))->display(function () {
+        //     return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
+        // });
+
+        $grid->column('users_count', __('dashboard.hosts'))->display(function ($value) {
+            return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $value . '</a>';
         });
 
         $grid->tools(function (Grid\Tools $tools) {
@@ -452,7 +516,7 @@ class ReportController extends MainController
         $grid->model()->with([
             'user',
             'user.profile',
-             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->where('app_id', '!=', 0);
@@ -521,7 +585,7 @@ class ReportController extends MainController
         $userId = $request->user_id;
         $month  = $request->month;
         $year   = $request->year;
-//  dd( $userId,$month, $year);
+        //  dd( $userId,$month, $year);
         $salary = UserSallary::query()
             ->where('user_id', $userId)
             ->where('month', $month)
