@@ -486,7 +486,7 @@
         const textAlign = textDir === 'rtl' ? 'right' : 'left';
         const escapedDesc = escapeHtml(description);
         
-        const estimatedLines = Math.ceil(escapedDesc.length / 60); // تقريبا 60 حرف للسطر
+        const estimatedLines = Math.ceil(escapedDesc.length / 60); 
         const needsSeeMore = estimatedLines > 2;
         
         let lang = 'en';
