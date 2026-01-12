@@ -392,11 +392,11 @@ class ReportController extends MainController
                 fn($j) => $j->on('agency_salary_table.agency_id', '=', 'agencies.id')
             )
             ->when($countryID, fn($q) => $q->where('agencies.country_id', $countryID))
-            ->with(['owner.profile'])
+          //  ->with(['owner.profile'])
 
             ->select([
                 'agencies.*',
-                DB::raw('COALESCE(user_salary_table.total_target,0) as target'),
+                DB::raw('COALESCE(user_salary_table.total_target,0) as total_target'),
                 DB::raw('COALESCE(agency_salary_table.salary_sum,0) as total_salary'),
                 DB::raw('COALESCE(agency_salary_table.cut_sum,0) as expenses'),
                 DB::raw('COALESCE(agency_salary_table.net_salary,0) as net_salary'),
@@ -454,7 +454,11 @@ class ReportController extends MainController
         //     return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
         // });
 
-        $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+        //  $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+        $grid->column('total_target', __('target'))->display(function ($v) {
+            $value = is_array($v) ? ($v['target'] ?? 0) : $v;
+            return floor((float) $value);
+        });
         // $grid->column('net_salary', __('Net Salary'))->display(function () {
         //     return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
         // });
@@ -467,23 +471,23 @@ class ReportController extends MainController
         $grid->column('expenses', __('expenses'))->display(fn($v) => round($v, 2));
 
 
-        $grid->column('total', __('salary'))->display(function () {
-            $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
-            $image = asset('images/dollar.jpg');
-            return "<div style='display: flex; align-items: center;'>
-                    <span>{$salary}</span>
-                    <img src='{$image}' alt='USD' width='20' height='20'>
-                </div>";
-        });
-
-        // $grid->column('total', __('salary'))->display(function ($v) {
-        //     $salary = round($v, 2);
+        // $grid->column('total', __('salary'))->display(function () {
+        //     $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
         //     $image = asset('images/dollar.jpg');
         //     return "<div style='display: flex; align-items: center;'>
         //             <span>{$salary}</span>
         //             <img src='{$image}' alt='USD' width='20' height='20'>
         //         </div>";
         // });
+
+        $grid->column('total_salary', __('salary'))->display(function ($v) {
+            $salary = round($v, 2);
+            $image = asset('images/dollar.jpg');
+            return "<div style='display: flex; align-items: center;'>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
+        });
 
         // $grid->column('hosts', __('dashboard.hosts'))->display(function () {
         //     return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
