@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-       $grid->header(fn() => $this->buildTabsHeader($filterType));
+        $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -344,7 +344,7 @@ class RoomController extends MainController
         (SELECT GROUP_CONCAT(user_id)
          FROM room_visitors
          WHERE room_visitors.room_id = rooms.id) AS visitor_ids
-    ")
+     ")
             )
 
             ->with([
@@ -352,7 +352,9 @@ class RoomController extends MainController
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
+
                 ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
+                'microphones.user.profile:id,user_id,avatar',
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
@@ -550,181 +552,286 @@ class RoomController extends MainController
 
 
 
-    protected function defineGridColumns($grid)
-    {
-        $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
+    //     protected function defineGridColumns($grid)
+    //     {
+    //         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
-        // Preload users for this page only
-        $grid->model()->collection(function (Collection $collection) {
-            // collect all microphone user IDs from the current page rows
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
+    //         // Preload users for this page only
+    //         $grid->model()->collection(function (Collection $collection) {
+    //             // collect all microphone user IDs from the current page rows
+    //             $allIds = $collection->flatMap(function ($row) {
+    //                 return array_filter(explode(',', (string) $row->microphone));
+    //             })->unique()->values()->all();
 
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                    ->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
+    //             // fetch all needed users once
+    //             $users = collect();
+    //             if (!empty($allIds)) {
+    //                 $users = User::select(['id', 'name'])
+    //                     ->with('profile:id,user_id,avatar')
+    //                     ->whereIn('id', $allIds)
+    //                     ->get()
+    //                     ->keyBy('id');
+    //             }
 
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
+    //             // attach a ready-to-use collection on each row
+    //             $collection->each(function ($row) use ($users) {
+    //                 $ids = array_filter(explode(',', (string) $row->microphone));
+    //                 $row->microphone_users = collect($ids)
+    //                     ->map(fn($id) => $users->get($id))
+    //                     ->filter()
+    //                     ->values();
+    //             });
 
-            return $collection; // IMPORTANT: return the collection
+    //             return $collection; // IMPORTANT: return the collection
+    //         });
+
+    //         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
+    //             return $pin == 1
+    //                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
+    //                 : '<span class="text-muted"> </span>';
+    //         });
+
+    //         $grid->id(__('ID'));
+
+    //         $grid->column('room_name', __('room'))->display(function ($name) {
+    //             $path = @$this->room_cover;
+    //             $id = @$this->id;
+    //             $defaultImage = asset("images/room.jpg");
+    //             $url = getImagePath($path) ?? $defaultImage;
+
+    //             if (!isImageExists($url)) {
+    //                 $url = $defaultImage;
+    //             }
+
+    //             if (strlen($name) > 50) {
+    //                 $name = substr($name, 0, 50) . ' ...';
+    //             }
+    //             return "
+    //                 <div style='display: flex; align-items: center; gap: 10px;'>
+    //                     <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+    //                     <div>
+    //                         <span style='cursor: pointer;'>$name</span><br>
+    //                         <span style='cursor: pointer;'>ID: $id</span>
+    //                     </div>
+    //                 </div>
+    //             ";
+    //         });
+
+    //         $grid->column('owner_id', __('room owner'))->display(function ($name) {
+    //             $user = $this->owner;
+    //             if (! $user) {
+    //                 return __('No User');
+    //             }
+
+    //             return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+    //         });
+
+    //         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
+    //             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
+    //             return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
+    //         });
+
+
+    //         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
+
+
+    //         $grid->column(__('microphone'))->display(function () {
+
+    //             $microphones = $this->microphones->sortBy('position');
+
+
+    //             if ($microphones->isEmpty()) {
+    //                 return '';
+    //             }
+
+    //             $html = '<div class="image-container">';
+
+    //             foreach ($microphones as $mic) {
+    //                 $user = $mic->user;
+
+    //                 if (!$user) continue;
+
+    //                 $url = $user->profile?->avatar
+    //                     ? getImagePath($user->profile->avatar)
+    //                     : asset("images/businessman-icon.jpg");
+
+    //                 $name = e($user->name);
+    //                 $id   = e($user->id);
+
+    //                 $html .= <<<HTML
+    //             <div class="image-wrapper" onclick="window.location.href='{$id}'">
+    //                 <img src="{$url}" title="{$name}"
+    //                 style="width: 40px; height: 40px; border-radius: 50%;
+    //                         object-fit: cover; border: 2px solid white;
+    //                         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    //                         transition: transform 0.3s ease;"/>
+    //             </div>
+    //          HTML;
+    //             }
+
+    //             $html .= '</div>';
+
+    //             // Add the same CSS block only once
+    //             static $appended = false;
+    //             if (!$appended) {
+    //                 $html .= '
+    //           <style>
+
+
+
+    //             .image-container {
+    //                 display: flex;
+    //                 justify-content: start;
+    //                 align-items: center;
+    //                 gap: -10px; /* Overlap the images slightly */
+    //                 padding: 8px 0;
+    //                 overflow-y: overlay;
+    //                 width: 218px;
+    //                 padding-right: 16px;
+    //             }
+    //             .image-wrapper {
+    //                 display: inline-block;
+    //                 position: relative;
+    //                 margin-right: -12px;
+    //             }
+    //             .image-wrapper img {
+    //                 width: 40px;
+    //                 height: 40px;
+    //                 border-radius: 50%;
+    //                 object-fit: cover;
+    //                 border: 2px solid #fff;
+    //                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    //                 transition: transform 0.3s ease, box-shadow 0.3s ease;
+    //                 cursor: pointer;
+    //             }
+    //             .image-wrapper img:hover {
+    //                 transform: scale(1.2);
+    //                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    //             }
+    //             </style>';
+    //                 $appended = true;
+    //             }
+
+    //             return $html;
+    //         });
+
+    //         Admin::style('
+    //     .dropdown-backdrop {
+    //         position: absolute !important;
+
+    //     }
+    //     html.ltr .dropdown-menu {
+
+    //         right: 38px !important;
+    //     }
+
+    // ');
+    //     }
+
+
+    protected function defineGridColumns(Grid $grid)
+{
+    $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
+
+    // Preload microphone users for this page
+    $grid->model()->collection(function (Collection $collection) {
+        $collection->each(function ($row) {
+            $row->microphone_users = $row->microphones
+                ->sortBy('position') // keep microphone positions
+                ->map(fn($mic) => $mic->user) // get eager-loaded users
+                ->filter()              // remove null users
+                ->values();             // reindex
         });
+        return $collection;
+    });
 
-        $grid->column('pin', __('Pin Status'))->display(function ($pin) {
-            return $pin == 1
-                ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
-                : '<span class="text-muted"> </span>';
-        });
+    // Pin status column
+    $grid->column('pin', __('Pin Status'))->display(
+        fn($pin) => $pin == 1
+            ? '<span class="text-success"><i class="fa fa-thumb-tack"></i></span>'
+            : '<span class="text-muted"></span>'
+    );
 
-        $grid->id(__('ID'));
+    // Room ID
+    $grid->id(__('ID'));
 
-        $grid->column('room_name', __('room'))->display(function ($name) {
-            $path = @$this->room_cover;
-            $id = @$this->id;
-            $defaultImage = asset("images/room.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+    // Room Name + Cover
+    $grid->column('room_name', __('Room'))->display(function ($name) {
+        $path = $this->room_cover;
+        $id = $this->id;
+        $defaultImage = asset("images/room.jpg");
+        $url = getImagePath($path) ?? $defaultImage;
+        if (!isImageExists($url)) $url = $defaultImage;
+        if (strlen($name) > 50) $name = substr($name, 0, 50) . ' ...';
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
-            }
-            return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                    <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
-                    </div>
-                </div>
-            ";
-        });
-
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
-            $user = $this->owner;
-            if (! $user) {
-                return __('No User');
-            }
-
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
-        });
-
-        $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
-            $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
-            return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
-        });
-
-
-        $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
-
-
-        $grid->column(__('microphone'))->display(function () {
-
-            $microphones = $this->microphones->sortBy('position');
-
-
-            if ($microphones->isEmpty()) {
-                return '';
-            }
-
-            $html = '<div class="image-container">';
-
-            foreach ($microphones as $mic) {
-                $user = $mic->user;
-
-                if (!$user) continue;
-
-                $url = $user->profile?->avatar
-                    ? getImagePath($user->profile->avatar)
-                    : asset("images/businessman-icon.jpg");
-
-                $name = e($user->name);
-                $id   = e($user->id);
-
-                $html .= <<<HTML
-            <div class="image-wrapper" onclick="window.location.href='{$id}'">
-                <img src="{$url}" title="{$name}"
-                style="width: 40px; height: 40px; border-radius: 50%;
-                        object-fit: cover; border: 2px solid white;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                        transition: transform 0.3s ease;"/>
+        return "
+        <div style='display: flex; align-items: center; gap: 10px;'>
+            <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+            <div>
+                <span style='cursor: pointer;'>$name</span><br>
+                <span style='cursor: pointer;'>ID: $id</span>
             </div>
-         HTML;
-            }
+        </div>";
+    });
 
-            $html .= '</div>';
+    // Room Owner
+    $grid->column('owner_id', __('Room Owner'))->display(function () {
+        $user = $this->owner;
+        if (!$user) return __('No User');
+        return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+    });
 
-            // Add the same CSS block only once
-            static $appended = false;
-            if (!$appended) {
-                $html .= '
-          <style>
+    // Max Admins
+    $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
+        $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
+        return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
+    });
 
+    // Number of users in the room
+    $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
+    // Microphones column (optimized)
+    $grid->column(__('Microphones'))->display(function () {
+        $microphones = $this->microphone_users;
+        if ($microphones->isEmpty()) return '';
 
-            .image-container {
-                display: flex;
-                justify-content: start;
-                align-items: center;
-                gap: -10px; /* Overlap the images slightly */
-                padding: 8px 0;
-                overflow-y: overlay;
-                width: 218px;
-                padding-right: 16px;
-            }
-            .image-wrapper {
-                display: inline-block;
-                position: relative;
-                margin-right: -12px;
-            }
-            .image-wrapper img {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid #fff;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                cursor: pointer;
-            }
-            .image-wrapper img:hover {
-                transform: scale(1.2);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            }
+        $html = '<div class="image-container">';
+
+        foreach ($microphones as $user) {
+            $url = $user->profile?->avatar ? getImagePath($user->profile->avatar) : asset("images/businessman-icon.jpg");
+            $name = e($user->name);
+            $id   = e($user->id);
+
+            $html .= <<<HTML
+<div class="image-wrapper" onclick="window.location.href='{$id}'">
+    <img src="{$url}" title="{$name}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.3s ease;"/>
+</div>
+HTML;
+        }
+
+        $html .= '</div>';
+
+        // Add CSS only once
+        static $appended = false;
+        if (!$appended) {
+            $html .= '<style>
+            .image-container { display: flex; justify-content: start; align-items: center; gap: -10px; padding: 8px 0; overflow-y: overlay; width: 218px; padding-right: 16px; }
+            .image-wrapper { display: inline-block; position: relative; margin-right: -12px; }
+            .image-wrapper img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; }
+            .image-wrapper img:hover { transform: scale(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
             </style>';
-                $appended = true;
-            }
+            $appended = true;
+        }
 
-            return $html;
-        });
+        return $html;
+    });
 
-        Admin::style('
-    .dropdown-backdrop {
-        position: absolute !important;
-
-    }
-    html.ltr .dropdown-menu {
-
-        right: 38px !important;
-    }
-
-');
-    }
+    // Extra Admin styles
+    Admin::style('
+        .dropdown-backdrop { position: absolute !important; }
+        html.ltr .dropdown-menu { right: 38px !important; }
+    ');
+}
 
 
 
