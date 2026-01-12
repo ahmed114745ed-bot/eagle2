@@ -5086,6 +5086,7 @@
     "Enter User Name": "أدخل اسم المستخدم",
     "Enter UUID": "أدخل المعرف الفريد",
 
+    "Unique ID": "معرف مميز",
     "reels_admin.delete": "حذف",
     "moment_viewer.noData": "لم يتم إرجاع أي بيانات",
     "moment_viewer.failedLoad": "فشل تحميل المومنتات",

@@ -4006,6 +4006,7 @@
     "Enter User Name": "उपयोगकर्ता का नाम दर्ज करें",
     "Enter UUID": "यूयूआईडी दर्ज करें",
 
+    "Unique ID": "विशिष्ट पहचान",
     "moment_viewer.noData": "कोई डेटा वापस नहीं आया",
     "moment_viewer.failedLoad": "मोमेंट लोड करने में विफल",
     "moment_viewer.noMoments": "कोई मोमेंट नहीं मिला",

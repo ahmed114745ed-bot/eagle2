@@ -4404,6 +4404,7 @@
     "Enter User Name": "Kullanıcı Adı Girin",
     "Enter UUID": "UUID Girin",
 
+    "Unique ID": "Benzersiz Kimlik",
     "moment_viewer.noData": "Veri döndürülmedi",
     "moment_viewer.failedLoad": "Anlar yüklenemedi",
     "moment_viewer.noMoments": "Hiç An Bulunamadı",
