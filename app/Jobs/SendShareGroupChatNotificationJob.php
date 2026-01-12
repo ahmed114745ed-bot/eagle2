@@ -120,10 +120,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             $totalFailed = 0;
 
             foreach ($notificationsIdsChunks as $chunkIndex => $notificationsIds) {
-                Log::info('SendShareGroupChatNotificationJob: Processing chunk', [
-                    'chunk_index' => $chunkIndex,
-                    'chunk_size' => count($notificationsIds)
-                ]);
+            
 
                 foreach ($notificationsIds as $notificationUser) {
                     try {
@@ -163,11 +160,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 }
             }
 
-            Log::info('SendShareGroupChatNotificationJob: Job completed', [
-                'room_id' => $roomId,
-                'total_sent' => $totalSent,
-                'total_failed' => $totalFailed
-            ]);
+        
         } catch (\Throwable $e) {
             Log::error('SendShareGroupChatNotificationJob: Exception in handleShareRoom', [
                 'user_id' => $this->user->id,

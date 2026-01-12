@@ -1080,13 +1080,11 @@ class Common
     {
         try {
             if ($tokens == null) {
-                Log::warning('send_firebase_notification_with_room_image: tokens is null');
                 return false;
             }
 
             $api_access_key = self::getGoogleAccessToken();
             if (!$api_access_key) {
-                Log::error('send_firebase_notification_with_room_image: Failed to get Google Access Token');
                 return false;
             }
 
@@ -1108,11 +1106,7 @@ class Common
             } else {
                 if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
-                Log::info('send_firebase_notification_with_room_image: Dispatching to queue', [
-                    'tokens_count' => count($tokens),
-                    'room_id' => $roomId,
-                    'message_type' => $messageType
-                ]);
+              
 
                 SendFirebaseNotificationJob::dispatch(
                     tokens: $tokens,
@@ -1174,12 +1168,7 @@ class Common
 
             $projectId = env('FIREBASE_PROJECT_NAME');
 
-            Log::info('send_firebase_notification_with_room_image: Sending notification', [
-                'room_id' => $roomId,
-                'room_image' => $roomImage,
-                'title' => $title,
-                'message_type' => $messageType
-            ]);
+        
 
             $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'message' => $payload
@@ -1188,16 +1177,9 @@ class Common
             $resultDecoded = json_decode($result->body());
 
             if ($result->successful()) {
-                Log::info('send_firebase_notification_with_room_image: Notification sent successfully', [
-                    'room_id' => $roomId,
-                    'response' => $resultDecoded
-                ]);
+             
             } else {
-                Log::error('send_firebase_notification_with_room_image: Failed to send notification', [
-                    'room_id' => $roomId,
-                    'status' => $result->status(),
-                    'response' => $resultDecoded
-                ]);
+           
             }
 
             // Remove group with $key if is group
