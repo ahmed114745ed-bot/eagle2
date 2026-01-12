@@ -81,26 +81,18 @@ class GroupChatController extends Controller
         }
 
         try {
-            Log::info('GroupChatController: Dispatching notification', [
-                'message_type' => $request->message_type,
-                'user_id' => $user->id,
-                'has_image' => !empty($resourceData['image_url'] ?? ''),
-                'text' => $request->text
-            ]);
+
 
             switch ($request->message_type) {
                 case 'reel':
                 case 'share_room':
                 case 'room':
                     dispatchJobToQueue(new \App\Jobs\SendShareGroupChatNotificationJob($user, $request->text, $resourceData), queueName: 'heavyProcessing');
-                    Log::info('GroupChatController: SendShareGroupChatNotificationJob dispatched', [
-                        'message_type' => $request->message_type
-                    ]);
+ 
                     break;
             
                 default:
                     dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
-                    Log::info('GroupChatController: SendNotificationsToAllUsers dispatched');
                     break;
             }
         } catch (\Throwable $th) {

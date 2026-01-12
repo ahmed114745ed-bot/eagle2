@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\GroupChatResource;
 use App\Models\User;
+use App\Models\Room;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -34,21 +35,13 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            Log::info('SendShareGroupChatNotificationJob: Starting job', [
-                'user_id' => $this->user->id,
-                'text' => $this->text,
-                'has_image' => !empty($this->groupChatResource['image_url'] ?? '')
-            ]);
+    
 
             if ($this->text && str_starts_with($this->text, 'share_room:')) {
-                Log::info('SendShareGroupChatNotificationJob: Detected share_room pattern');
                 $this->handleShareRoom();
                 return;
             }
 
-            Log::warning('SendShareGroupChatNotificationJob: No share_room pattern found', [
-                'text' => $this->text
-            ]);
         } catch (\Throwable $e) {
             Log::error('SendShareGroupChatNotificationJob: Exception in handle', [
                 'user_id' => $this->user->id,
@@ -66,11 +59,9 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
         try {
             $parts = explode(':', $this->text);
             $roomId = $parts[1] ?? null;
-            $roomImage = $this->groupChatResource['image_url'] ?? '';
 
             Log::info('SendShareGroupChatNotificationJob: Processing share room', [
                 'room_id' => $roomId,
-                'room_image' => $roomImage,
                 'parts_count' => count($parts)
             ]);
 
@@ -80,6 +71,25 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
                 ]);
                 return;
             }
+
+            // Fetch room from database to get the image
+            $room = Room::find($roomId);
+            
+            if (!$room) {
+                Log::error('SendShareGroupChatNotificationJob: Room not found in database', [
+                    'room_id' => $roomId
+                ]);
+                return;
+            }
+
+            // Get room image from the room model
+            $roomImage = $room->final_room_image ?? $this->groupChatResource['image_url'] ?? '';
+
+            Log::info('SendShareGroupChatNotificationJob: Room image fetched', [
+                'room_id' => $roomId,
+                'room_image' => $roomImage,
+                'room_name' => $room->name ?? 'N/A'
+            ]);
 
             $userLang = $this->user->lan ?? 'en';
             $translatedMessage = __('share_room_message', [], $userLang);
