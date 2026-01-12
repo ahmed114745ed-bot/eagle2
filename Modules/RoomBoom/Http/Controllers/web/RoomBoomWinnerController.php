@@ -32,7 +32,12 @@ class RoomBoomWinnerController extends MainController
             'reward.gift',
             'reward.ware',
             'boom.roomBoomLevel',
-            'boom.totalRoomGift.room'
+            'boom.totalRoomGift.room',
+            'user',
+            'user.profile',
+            'user.country',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+
         ]);
 
         $grid->column('id', __('ID'))->sortable();
