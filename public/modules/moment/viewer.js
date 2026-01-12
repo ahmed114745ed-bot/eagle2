@@ -486,11 +486,9 @@
         const textAlign = textDir === 'rtl' ? 'right' : 'left';
         const escapedDesc = escapeHtml(description);
         
-        // حساب عدد الأسطر التقريبي بناءً على طول النص
         const estimatedLines = Math.ceil(escapedDesc.length / 60); // تقريبا 60 حرف للسطر
         const needsSeeMore = estimatedLines > 2;
         
-        // اختيار اللغة المناسبة
         let lang = 'en';
         if (textDir === 'rtl') {
             lang = 'ar';
