@@ -254,7 +254,7 @@
                                 id="lucky_gift_coins"
                                 name="lucky_gift_coins"
                                 min="1"
-                                value="{{ $config['lucky_gift_coins'] ?? 0 }}"
+                                value="{{ $config['lucky_gift_coins'] ?? 2000 }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter the lucky gift coins value') }}" required />
 
