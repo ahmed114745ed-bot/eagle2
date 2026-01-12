@@ -636,7 +636,7 @@
         if (isShareRoom) {
             messageContent = `
                 <div class="share-room-content">
-                    <img src="{{ asset('images/loading.gif') }}" alt="Room" class="room-share-image" style="max-width: 100%; border-radius: 8px; margin-bottom: 8px; display: ${roomImage === 'loading' ? 'block' : 'none'};">
+                    <img src="{{ asset('images/loading.gif') }}" alt="Room" class="room-share-image" style="max-width: 50%; border-radius: 8px; margin-bottom: 8px; display: ${roomImage === 'loading' ? 'block' : 'none'};">
                     <p class="share-room-text">${shareRoomText}</p>
                 </div>`;
         } else {
