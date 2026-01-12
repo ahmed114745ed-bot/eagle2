@@ -145,7 +145,7 @@ class GroupChatController extends MainController
                 $filter->equal('user_id', __('User ID'));
             });
 
-            $filter->column(1 / 2, function ($filter) {
+            $filter->column(6, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $query->whereDate('created_at', '>=', $this->input);
@@ -153,7 +153,7 @@ class GroupChatController extends MainController
                 }, __('From Date'), 'from_date')->date();
             });
 
-            $filter->column(1 / 2, function ($filter) {
+            $filter->column(6, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
                         $query->whereDate('created_at', '<=', $this->input);
@@ -531,7 +531,7 @@ class GroupChatController extends MainController
     {
         try {
             $room = \App\Models\Room::find($id);
-            
+
             if (!$room) {
                 return response()->json([
                     'success' => false,
@@ -540,7 +540,7 @@ class GroupChatController extends MainController
             }
 
             $roomImage = $room->room_cover ?? $room->final_room_image ?? '';
-            
+
             if (!empty($roomImage)) {
                 $roomImage = getImagePath($roomImage);
             }
