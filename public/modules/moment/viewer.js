@@ -1004,9 +1004,17 @@
                                 ? getImagePath(gift.gift_img) 
                                 : '';
                             
-                            const giftDate = new Date(gift.created_at);
-                            const timeAgo = getTimeAgo(giftDate);
-                            const fullDateTime = formatDateTime(giftDate);
+                            // التحقق من وجود التاريخ وصحته
+                            let timeAgo = texts.unknown || 'Unknown';
+                            let fullDateTime = '';
+                            if (gift.created_at) {
+                                const giftDate = new Date(gift.created_at);
+                                // التحقق من أن التاريخ صحيح (بعد 2020)
+                                if (!isNaN(giftDate.getTime()) && giftDate.getFullYear() > 2020) {
+                                    timeAgo = getTimeAgo(giftDate);
+                                    fullDateTime = formatDateTime(giftDate);
+                                }
+                            }
                             
                             html += `
                                 <div class="modal-gift-item">
