@@ -1272,6 +1272,12 @@ class User extends Authenticatable
         return $this->hanMany(AdminUser::class);
     }
 
+    public function latestUserSallary()
+    {
+        // Laravel 8+ supports latestOfMany
+        return $this->hasOne(UserSallary::class)->latestOfMany();
+    }
+
     public function getUserDiamondAttribute()
     {
         if ($this->type_user === 0 || $this->type_user === 3) {

@@ -1481,6 +1481,13 @@
         color: black !important;
     }
 
+    /*.sort-select option:checked,*/
+    /*.sort-select option:focus,*/
+    /*.sort-select option:active {*/
+    /*    background-color: var(--primary-color) !important;*/
+    /*    color: white;*/
+    /*}*/
+
     #target_type:focus option:checked {
         background: var(--primary-color) !important;
         color: white !important;

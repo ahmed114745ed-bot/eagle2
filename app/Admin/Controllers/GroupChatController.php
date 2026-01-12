@@ -124,7 +124,9 @@ class GroupChatController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
-            $filter->column('1/2', function ($filter) {
+
+            // Row 1
+            $filter->column(6, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
                     $query->whereHas('user', function ($query) use ($input) {
@@ -132,6 +134,31 @@ class GroupChatController extends MainController
                             ->orWhere('uuid', 'like', "%$input%");
                     });
                 }, __('User'))->placeholder(__('Search by name or UUID '));
+            });
+
+            $filter->column(6, function ($filter) {
+                $filter->like('text', __('Message'));
+            });
+
+            // Row 2
+            $filter->column(6, function ($filter) {
+                $filter->equal('user_id', __('User ID'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereDate('created_at', '>=', $this->input);
+                    }
+                }, __('From Date'), 'from_date')->date();
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($this->input) {
+                        $query->whereDate('created_at', '<=', $this->input);
+                    }
+                }, __('To Date'), 'to_date')->date();
             });
         });
 
@@ -149,11 +176,11 @@ class GroupChatController extends MainController
         $grid->column('created_at', __('Created at'))->sortable();
         $grid->column('updated_at', __('Updated at'))->sortable();
 
-        $grid->filter(function($filter){
-            $filter->like('text', 'Message');
-            $filter->equal('user_id', 'User ID');
-            $filter->between('created_at', 'Created Date')->datetime();
-        });
+//        $grid->filter(function($filter){
+//            $filter->like('text', 'Message');
+//            $filter->equal('user_id', 'User ID');
+//            $filter->between('created_at', 'Created Date')->datetime();
+//        });
 
         return $grid;
 //        $grid = new Grid(new GroupChat);
