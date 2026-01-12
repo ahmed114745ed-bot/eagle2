@@ -504,9 +504,9 @@ html[dir="rtl"] .dropdown-item,
 
 .post-media img,
 .post-media video {
-    width: 100% !important;
+    width: 62% !important;
     height: 100% !important;
-    object-fit: cover !important;
+    <!-- object-fit: cover !important; -->
     display: block !important;
     transition: transform 0.3s ease;
 }
