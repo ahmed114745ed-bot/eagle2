@@ -135,15 +135,36 @@ class Room extends Model
         return $this->owner->country->language ?? null;
     }
 
+    // public function getCountryAttribute()
+    // {
+    //     if (self::$withoutAppends) {
+    //         return;
+    //     }
+    //     $country = @$this->owner->country;
+
+    //     return $country;
+    // }
+
     public function getCountryAttribute()
     {
         if (self::$withoutAppends) {
-            return;
+            return null;
         }
-        $country = @$this->owner->country;
 
-        return $country;
+        // prevent lazy-loading queries
+        if (! $this->relationLoaded('owner')) {
+            return null;
+        }
+
+        $owner = $this->owner;
+
+        if (! $owner || ! $owner->relationLoaded('country')) {
+            return null;
+        }
+
+        return $owner->country;
     }
+
 
     public function myClass()
     {
