@@ -106,6 +106,7 @@ class ReportController extends MainController
             )
 
             ->with([
+                'latestUserSallary',
                 'latestTarget',
                 'profile',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
@@ -263,14 +264,7 @@ class ReportController extends MainController
                 </div>";
         });
         $grid->column('sallary_year', __('Year'))->display(function () {
-
-            $sallary = $this->userSallary()
-                // ->where('month', $month)
-                // ->where('year', $year)
-                ->latest()
-                ->first();
-
-            return $sallary?->year ?? '-';
+            return $this->latestUserSallary?->year ?? '-';
         });
 
         $grid->column('sallary_month', __('Month'))->display(function () {
