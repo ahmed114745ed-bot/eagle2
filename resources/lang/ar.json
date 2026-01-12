@@ -5086,6 +5086,7 @@
     "Enter User Name": "أدخل اسم المستخدم",
     "Enter UUID": "أدخل المعرف الفريد",
 
+    "Unique ID": "معرف مميز",
     "reels_admin.delete": "حذف",
     "moment_viewer.noData": "لم يتم إرجاع أي بيانات",
     "moment_viewer.failedLoad": "فشل تحميل المومنتات",
@@ -5134,5 +5135,6 @@
     "moment_viewer.oldestFirst": "الأقدم أولاً",
     "moment_viewer.randomOrder": "ترتيب عشوائي",
     "moment_viewer.refresh": "تحديث",
-    "moment_viewer.loadMore": "تحميل المزيد"
+    "moment_viewer.loadMore": "تحميل المزيد",
+    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
 }

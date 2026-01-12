@@ -4404,6 +4404,7 @@
     "Enter User Name": "Kullanıcı Adı Girin",
     "Enter UUID": "UUID Girin",
 
+    "Unique ID": "Benzersiz Kimlik",
     "moment_viewer.noData": "Veri döndürülmedi",
     "moment_viewer.failedLoad": "Anlar yüklenemedi",
     "moment_viewer.noMoments": "Hiç An Bulunamadı",
@@ -4451,5 +4452,6 @@
     "moment_viewer.oldestFirst": "En Eski Önce",
     "moment_viewer.randomOrder": "Rastgele Sıralama",
     "moment_viewer.refresh": "Yenile",
-    "moment_viewer.loadMore": "Daha Fazla Yükle"
+    "moment_viewer.loadMore": "Daha Fazla Yükle",
+    "share_room_message": "Merhaba, gel ve benimle bu odaya katıl, gerçekten çok eğlenceli"
   }

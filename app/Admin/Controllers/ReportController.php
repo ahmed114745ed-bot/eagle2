@@ -128,30 +128,40 @@ class ReportController extends MainController
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('uuid', __('uuid'));
+            $filter->disableIdFilter();
+
+            $filter->column(1/2, function ($filter) {
+                $filter->equal('id', __('ID'));
             });
 
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
+            $filter->column(1/2, function ($filter) {
+                $filter->equal('uuid', __('Unique ID'));
+            });
+
+            $filter->column(1/2, function ($filter) {
+                $filter->equal('agency_id', __('agency'))
+                    ->select(Common::by_agency_filter());
+            });
+
+            $filter->column(1/2, function ($filter) {
                 $filter->where(function ($query) {
-                    $year = request('year');
-                    if (!empty($year)) {
-                        $query->whereHas('userSallary', function ($q) use ($year) {
-                            $q->where('year', $year);
-                        });
+                    if (!empty($this->input)) {
+                        $query->whereHas('userSallary', fn($q) =>
+                        $q->where('year', $this->input)
+                        );
                     }
                 }, __('Year'), 'year')->integer();
             });
 
-            $filter->where(function ($query) {
-                $month = request('month');
-                if (!empty($month)) {
-                    $query->whereHas('userSallary', function ($q) use ($month) {
-                        $q->where('month', $month);
-                    });
-                }
-            }, __('Month'), 'month')->integer();
+            $filter->column(1/2, function ($filter) {
+                $filter->where(function ($query) {
+                    if (!empty($this->input)) {
+                        $query->whereHas('userSallary', fn($q) =>
+                        $q->where('month', $this->input)
+                        );
+                    }
+                }, __('Month'), 'month')->integer();
+            });
         });
         $grid->column('id', __('Id'));
 
@@ -293,7 +303,7 @@ class ReportController extends MainController
             $year   = request('year', now()->year);
 
             return <<<HTML
-        <div 
+        <div
             class="moments-reels"
             data-user="{$userId}"
             data-month="{$month}"
