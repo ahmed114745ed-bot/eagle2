@@ -571,7 +571,7 @@ class RoomController extends MainController
             $users = collect();
             if (!empty($allIds)) {
                 $users = User::select(['id', 'name'])
-                    ->with('profile:id,user_id,avatar')
+                    //->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
                     ->keyBy('id');
