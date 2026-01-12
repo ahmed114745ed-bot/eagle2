@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        //  $grid->header(fn() => $this->buildTabsHeader($filterType));
+          $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -557,33 +557,33 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        // $grid->model()->collection(function (Collection $collection) {
-        //     // collect all microphone user IDs from the current page rows
-        //     $allIds = $collection->flatMap(function ($row) {
-        //         return array_filter(explode(',', (string) $row->microphone));
-        //     })->unique()->values()->all();
+        $grid->model()->collection(function (Collection $collection) {
+            // collect all microphone user IDs from the current page rows
+            $allIds = $collection->flatMap(function ($row) {
+                return array_filter(explode(',', (string) $row->microphone));
+            })->unique()->values()->all();
 
-        //     // fetch all needed users once
-        //     $users = collect();
-        //     if (!empty($allIds)) {
-        //         $users = User::select(['id', 'name'])
-        //             ->with('profile:id,user_id,avatar')
-        //             ->whereIn('id', $allIds)
-        //             ->get()
-        //             ->keyBy('id');
-        //     }
+            // fetch all needed users once
+            $users = collect();
+            if (!empty($allIds)) {
+                $users = User::select(['id', 'name'])
+                    ->with('profile:id,user_id,avatar')
+                    ->whereIn('id', $allIds)
+                    ->get()
+                    ->keyBy('id');
+            }
 
-        //     // attach a ready-to-use collection on each row
-        //     $collection->each(function ($row) use ($users) {
-        //         $ids = array_filter(explode(',', (string) $row->microphone));
-        //         $row->microphone_users = collect($ids)
-        //             ->map(fn($id) => $users->get($id))
-        //             ->filter()
-        //             ->values();
-        //     });
+            // attach a ready-to-use collection on each row
+            $collection->each(function ($row) use ($users) {
+                $ids = array_filter(explode(',', (string) $row->microphone));
+                $row->microphone_users = collect($ids)
+                    ->map(fn($id) => $users->get($id))
+                    ->filter()
+                    ->values();
+            });
 
-        //     return $collection; // IMPORTANT: return the collection
-        // });
+            return $collection; // IMPORTANT: return the collection
+        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
@@ -635,124 +635,88 @@ class RoomController extends MainController
         $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
 
-        // $grid->column(__('microphone'))->display(function () {
+        $grid->column(__('microphone'))->display(function () {
 
-        //     $microphones = $this->microphones->sortBy('position');
-
-
-        //     if ($microphones->isEmpty()) {
-        //         return '';
-        //     }
-
-        //     $html = '<div class="image-container">';
-
-        //     foreach ($microphones as $mic) {
-        //         $user = $mic->user;
-
-        //         if (!$user) continue;
-
-        //         $url = $user->profile?->avatar
-        //             ? getImagePath($user->profile->avatar)
-        //             : asset("images/businessman-icon.jpg");
-
-        //         $name = e($user->name);
-        //         $id   = e($user->id);
-
-        //         $html .= <<<HTML
-        //         <div class="image-wrapper" onclick="window.location.href='{$id}'">
-        //             <img src="{$url}" title="{$name}"
-        //             style="width: 40px; height: 40px; border-radius: 50%;
-        //                     object-fit: cover; border: 2px solid white;
-        //                     box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        //                     transition: transform 0.3s ease;"/>
-        //         </div>
-        //      HTML;
-        //     }
-
-        //     $html .= '</div>';
-
-        //     // Add the same CSS block only once
-        //     static $appended = false;
-        //     if (!$appended) {
-        //         $html .= '
-        //       <style>
+            $microphones = $this->microphones->sortBy('position');
 
 
+            if ($microphones->isEmpty()) {
+                return '';
+            }
 
-        //         .image-container {
-        //             display: flex;
-        //             justify-content: start;
-        //             align-items: center;
-        //             gap: -10px; /* Overlap the images slightly */
-        //             padding: 8px 0;
-        //             overflow-y: overlay;
-        //             width: 218px;
-        //             padding-right: 16px;
-        //         }
-        //         .image-wrapper {
-        //             display: inline-block;
-        //             position: relative;
-        //             margin-right: -12px;
-        //         }
-        //         .image-wrapper img {
-        //             width: 40px;
-        //             height: 40px;
-        //             border-radius: 50%;
-        //             object-fit: cover;
-        //             border: 2px solid #fff;
-        //             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        //             transition: transform 0.3s ease, box-shadow 0.3s ease;
-        //             cursor: pointer;
-        //         }
-        //         .image-wrapper img:hover {
-        //             transform: scale(1.2);
-        //             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        //         }
-        //         </style>';
-        //         $appended = true;
-        //     }
+            $html = '<div class="image-container">';
 
-        //     return $html;
-        // });
+            foreach ($microphones as $mic) {
+                $user = $mic->user;
 
-        $grid->column(__('Microphones'))->display(function () {
-            // Placeholder container, AJAX will fill it
-            $roomId = $this->id;
-            return "<div class='microphone-container' data-room-id='{$roomId}'>
-                Loading...
-            </div>";
-        });
-Admin::script('
-document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll(".microphone-container").forEach(function(container) {
-        const roomId = container.dataset.roomId;
+                if (!$user) continue;
 
-        fetch("/admin/rooms/" + roomId + "/microphones") // endpoint you will create
-            .then(response => response.json())
-            .then(data => {
-                if (!data || !data.length) {
-                    container.innerHTML = "";
-                    return;
+                $url = $user->profile?->avatar
+                    ? getImagePath($user->profile->avatar)
+                    : asset("images/businessman-icon.jpg");
+
+                $name = e($user->name);
+                $id   = e($user->id);
+
+                $html .= <<<HTML
+                <div class="image-wrapper" onclick="window.location.href='{$id}'">
+                    <img src="{$url}" title="{$name}"
+                    style="width: 40px; height: 40px; border-radius: 50%;
+                            object-fit: cover; border: 2px solid white;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                            transition: transform 0.3s ease;"/>
+                </div>
+             HTML;
+            }
+
+            $html .= '</div>';
+
+            // Add the same CSS block only once
+            static $appended = false;
+            if (!$appended) {
+                $html .= '
+              <style>
+
+
+
+                .image-container {
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: -10px; /* Overlap the images slightly */
+                    padding: 8px 0;
+                    overflow-y: overlay;
+                    width: 218px;
+                    padding-right: 16px;
                 }
+                .image-wrapper {
+                    display: inline-block;
+                    position: relative;
+                    margin-right: -12px;
+                }
+                .image-wrapper img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #fff;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    cursor: pointer;
+                }
+                .image-wrapper img:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                }
+                </style>';
+                $appended = true;
+            }
 
-                let html = "<div class=\"image-container\">";
+            return $html;
+        });
 
-                data.forEach(user => {
-                    const url = user.avatar || "' . asset("images/businessman-icon.jpg") . '";
-                    html += `<div class="image-wrapper" onclick="window.location.href=\'/admin/users/${user.id}\'">
-                                <img src="${url}" title="${user.name}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid white;"/>
-                             </div>`;
-                });
 
-                html += "</div>";
-                container.innerHTML = html;
-            })
-            .catch(() => {
-                container.innerHTML = "Error loading";
-            });
-    });
-});
-');
+
 
 
         Admin::style('
@@ -767,6 +731,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     ');
     }
+
+
+
 
 
     public function getRoomMicrophones($roomId)
