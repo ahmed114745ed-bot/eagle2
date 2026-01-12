@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        //    $grid->header(fn() => $this->buildTabsHeader($filterType));
+            $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
