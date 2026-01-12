@@ -396,7 +396,7 @@ class ReportController extends MainController
 
             ->select([
                 'agencies.*',
-                DB::raw('COALESCE(user_salary_table.total_target,0) as target'),
+                DB::raw('COALESCE(user_salary_table.total_target,0) as total_target'),
                 DB::raw('COALESCE(agency_salary_table.salary_sum,0) as total_salary'),
                 DB::raw('COALESCE(agency_salary_table.cut_sum,0) as expenses'),
                 DB::raw('COALESCE(agency_salary_table.net_salary,0) as net_salary'),
@@ -455,7 +455,7 @@ class ReportController extends MainController
         // });
 
         //  $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
-        $grid->column('target', __('target'))->display(function ($v) {
+        $grid->column('total_target', __('target'))->display(function ($v) {
             $value = is_array($v) ? ($v['target'] ?? 0) : $v;
             return floor((float) $value);
         });
