@@ -17,7 +17,7 @@
     --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
     --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-    
+
     /* تعيين المتغيرات المستخدمة في التصميم */
     --primary: {{ config('themes.primaryColor') }};
     --primary-hover: {{ adjustColor(config('themes.primaryColor'), -10, -10, -10) }};
@@ -131,7 +131,6 @@ body {
     border-radius: 20px;
     font-size: 15px;
     background: var(--bg-secondary);
-    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s;
 }

@@ -95,6 +95,7 @@
     .dark-mode .chat-header,
     .dark-mode .refresh-btn,
     .dark-mode .action-menu-item:hover,
+    .dark-mode select > option,
         /*.dark-mode .box-footer {*/
     .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;

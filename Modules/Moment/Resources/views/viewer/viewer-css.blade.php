@@ -17,7 +17,7 @@
     --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
     --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
     --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-    
+
     /* تعيين المتغيرات المستخدمة في التصميم */
     --primary: {{ config('themes.primaryColor') }};
     --primary-hover: {{ adjustColor(config('themes.primaryColor'), -10, -10, -10) }};
@@ -151,7 +151,7 @@ html[dir="rtl"] body {
     border-radius: 20px;
     font-size: 15px;
     background: var(--bg-primary);
-    color: var(--text-primary);
+    color: black;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -249,7 +249,7 @@ html[dir="rtl"] body {
     line-height: 1.3;
     display: block;
     text-align: left !important;
-     
+
 }
 
 .user-name:hover {
@@ -1052,19 +1052,19 @@ html[dir="rtl"] .dropdown-item,
         touch-action: pan-y pinch-zoom;
         overflow-x: hidden;
     }
-    
+
     html {
         -webkit-tap-highlight-color: rgba(0,0,0,0);
         touch-action: manipulation;
     }
-    
+
     /* تعطيل الانميشن على الموبايل للسرعة */
     * {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .viewer-container {
         padding: 12px 0;
         touch-action: pan-y;
@@ -1110,21 +1110,21 @@ html[dir="rtl"] .dropdown-item,
         max-height: 400px;
         image-rendering: -webkit-optimize-contrast;
     }
-    
+
     .lightbox-nav {
         width: 44px;
         height: 44px;
         font-size: 20px;
     }
-    
+
     .lightbox-prev {
         left: 10px;
     }
-    
+
     .lightbox-next {
         right: 10px;
     }
-    
+
     .lightbox-close {
         width: 40px;
         height: 40px;
@@ -1132,26 +1132,26 @@ html[dir="rtl"] .dropdown-item,
         right: 10px;
         font-size: 20px;
     }
-    
+
     .lightbox-counter {
         bottom: 10px;
         font-size: 14px;
         padding: 6px 16px;
     }
-    
+
     .media-grid.grid-2,
     .media-grid.grid-3,
     .media-grid.grid-4,
     .media-grid.grid-5-plus {
         max-height: 300px;
     }
-    
+
     /* تحسين الأداء */
     .moment-post {
         will-change: auto;
         contain: layout style;
     }
-    
+
     .user-avatar,
     .modal-user-avatar {
         will-change: auto;
@@ -1163,33 +1163,33 @@ html[dir="rtl"] .dropdown-item,
         width: 48px;
         height: 48px;
     }
-    
+
     .dropdown-menu {
         min-width: 180px;
         font-size: 14px;
     }
-    
+
     .post-header {
         padding: 10px 12px;
     }
-    
+
     .user-name {
         font-size: 14px;
     }
-    
+
     .user-meta {
         font-size: 11px;
     }
-    
+
     .post-description {
         font-size: 14px;
     }
-    
+
     .post-stats {
         font-size: 13px;
         padding: 10px 12px 6px;
     }
-    
+
     .action-btn {
         font-size: 14px;
     }
@@ -1200,7 +1200,7 @@ html[dir="rtl"] .dropdown-item,
     html {
         -webkit-tap-highlight-color: transparent;
     }
-    
+
     .viewer-container {
         padding: 8px 0;
     }
@@ -1313,19 +1313,19 @@ html[dir="rtl"] .dropdown-item,
         height: 44px;
         font-size: 18px;
     }
-    
+
     .empty-state {
         padding: 40px 16px;
     }
-    
+
     .empty-state i {
         font-size: 48px;
     }
-    
+
     .empty-state h3 {
         font-size: 18px;
     }
-    
+
     .empty-state p {
         font-size: 14px;
     }
@@ -1863,30 +1863,30 @@ body.modal-open {
     .side-modal-content {
         max-width: 100%;
     }
-    
+
     .modal-user-avatar {
         width: 44px !important;
         height: 44px !important;
     }
-    
+
     .modal-user-name {
         font-size: 15px;
     }
-    
+
     .modal-comment-text {
         margin-left: 56px;
         font-size: 14px;
     }
-    
+
     .modal-comment-text[dir="rtl"] {
         margin-left: 0;
         margin-right: 56px;
     }
-    
+
     .modal-comment-time {
         margin-left: 56px;
     }
-    
+
     .modal-comment-time[dir="rtl"] {
         margin-left: 0;
         margin-right: 56px;
@@ -1898,38 +1898,38 @@ body.modal-open {
         width: 40px !important;
         height: 40px !important;
     }
-    
+
     .modal-user-name {
         font-size: 14px;
     }
-    
+
     .modal-user-meta {
         font-size: 12px;
     }
-    
+
     .modal-comment-text {
         margin-left: 52px;
         font-size: 14px;
     }
-    
+
     .modal-comment-text[dir="rtl"] {
         margin-left: 0;
         margin-right: 52px;
     }
-    
+
     .modal-comment-time {
         margin-left: 52px;
     }
-    
+
     .modal-comment-time[dir="rtl"] {
         margin-left: 0;
         margin-right: 52px;
     }
-    
+
     .side-modal-header {
         padding: 12px 16px;
     }
-    
+
     .side-modal-title {
         font-size: 18px;
     }
