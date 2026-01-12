@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-          $grid->header(fn() => $this->buildTabsHeader($filterType));
+        //    $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -354,6 +354,10 @@ class RoomController extends MainController
                     'country:id,flag,name,e_name',
 
                 ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
+                'microphones' => function ($q) {
+                    $q->orderBy('position');
+                },
+                'microphones.user:id,name',
                 'microphones.user.profile:id,user_id,avatar',
 
             ])
@@ -557,7 +561,7 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        $grid->model()->collection(function (Collection $collection) {
+        $grid->model()->with('microphones')->collection(function (Collection $collection) {
             // collect all microphone user IDs from the current page rows
             $allIds = $collection->flatMap(function ($row) {
                 return array_filter(explode(',', (string) $row->microphone));
@@ -731,6 +735,9 @@ class RoomController extends MainController
 
     ');
     }
+
+
+
 
 
 

@@ -188,20 +188,40 @@ class Room extends Model
     //        return implode(',', $array);
     //    }
 
+    // public function getMicrophoneAttribute()
+    // {
+    //     return $this->microphones()
+    //         ->orderBy('position')
+    //         ->get()
+    //         ->map(function ($mic) {
+    //             $userId = $mic->user_id ?? 0;
+    //             $status = $mic->status ?? 0;
+
+    //             if ($userId > 0) {
+    //                 return "{$userId}#{$status}";
+    //             } else {
+    //                 return (string)$status;
+    //             }
+    //         })
+    //         ->implode(',');
+    // }
+
     public function getMicrophoneAttribute()
     {
-        return $this->microphones()
-            ->orderBy('position')
-            ->get()
+        // Use already-loaded relation
+        $microphones = $this->relationLoaded('microphones')
+            ? $this->microphones
+            : collect(); // or $this->microphones()->get() if you REALLY need fallback
+
+        return $microphones
+            ->sortBy('position')
             ->map(function ($mic) {
                 $userId = $mic->user_id ?? 0;
                 $status = $mic->status ?? 0;
 
-                if ($userId > 0) {
-                    return "{$userId}#{$status}";
-                } else {
-                    return (string)$status;
-                }
+                return $userId > 0
+                    ? "{$userId}#{$status}"
+                    : (string) $status;
             })
             ->implode(',');
     }
