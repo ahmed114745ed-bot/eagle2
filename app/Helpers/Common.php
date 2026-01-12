@@ -1157,8 +1157,14 @@ class Common
             // Add room image to notification
             if ($roomImage && !empty($roomImage)) {
                 $payload['notification']['image'] = $roomImage;
+                Log::info('send_firebase_notification_with_room_image: Image added to notification', [
+                    'image' => $roomImage
+                ]);
             } else {
                 $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+                Log::warning('send_firebase_notification_with_room_image: Using default image', [
+                    'room_image_was' => $roomImage
+                ]);
             }
 
             $headers = [
@@ -1168,7 +1174,10 @@ class Common
 
             $projectId = env('FIREBASE_PROJECT_NAME');
 
-        
+            Log::info('send_firebase_notification_with_room_image: Sending to Firebase', [
+                'has_notification_image' => isset($payload['notification']['image']),
+                'notification_image' => $payload['notification']['image'] ?? null
+            ]);
 
             $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'message' => $payload
