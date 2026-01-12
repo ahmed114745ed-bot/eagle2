@@ -76,7 +76,17 @@ class GroupChatController extends Controller
         } catch (\Throwable $th) {
            // return $th->getMessage();
         }
-        dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+        switch ($request->message_type) {
+            case 'reel':
+            case 'share_room':
+            case 'room':
+                 dispatchJobToQueue(new \App\Jobs\SendShareGroupChatNotificationJob($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+                break;
+        
+            default:
+                 dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+                break;
+        }
 
         return Common::apiResponse(1, 'created done', $resourceData, 201);
     }

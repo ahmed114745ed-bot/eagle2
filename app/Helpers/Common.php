@@ -1073,6 +1073,95 @@ class Common
         return $result;
     }
 
+    /**
+     * Send Firebase notification for room sharing with image support
+     */
+    public static function send_firebase_notification_with_room_image($tokens, $title, $body, $roomImage = '', $roomId = null, $data = [], $messageType = 'share-room', $user = null)
+    {
+        if ($tokens == null) return;
+        $api_access_key = self::getGoogleAccessToken();
+        $userData = [];
+
+        if (gettype($tokens) == 'string') {
+            $tokens = [$tokens];
+        }
+
+        $notification = [
+            'title' => $title,
+            'body' => $body,
+        ];
+
+        if (count($tokens) == 1) {
+            $token = $tokens[0];
+        } else {
+            if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+
+            SendFirebaseNotificationJob::dispatch(
+                tokens: $tokens,
+                title: $title,
+                body: $body,
+                data: array_merge($data, [
+                    'room_id' => $roomId,
+                    'room_image' => $roomImage
+                ]),
+                messageType: $messageType,
+                user: $user,
+            )->onQueue('notification_heavy');
+
+            return true;
+        }
+
+        if ($user) {
+            $userData = [
+                'user_id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid,
+                'has_color_name' => self::hasInPack($user->id, 18, true),
+                'image' => $user->profile->avatar,
+            ];
+        }
+
+        $payload = [
+            'token' => $token,
+            'notification' => $notification,
+            'data' => [
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                'message-type' => json_encode($messageType ?? ''),
+                'data' => !empty($data) ? json_encode(array_merge($data, [
+                    'room_id' => $roomId,
+                    'room_image' => $roomImage
+                ])) : json_encode([
+                    'room_id' => $roomId,
+                    'room_image' => $roomImage
+                ]),
+            ],
+        ];
+
+        if (isset($userData) && is_array($userData)) {
+            $payload['data']['user'] = json_encode($userData);
+        }
+
+        // Add room image to notification
+        if ($roomImage && !empty($roomImage)) {
+            $payload['notification']['image'] = $roomImage;
+        } else {
+            $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+        }
+
+        $headers = [
+            'Authorization' => 'Bearer ' . $api_access_key,
+            'Content-Type' => 'application/json',
+        ];
+
+        $projectId = env('FIREBASE_PROJECT_NAME');
+
+        $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+            'message' => $payload
+        ]);
+
+        return json_decode($result);
+    }
+
 
 
 
