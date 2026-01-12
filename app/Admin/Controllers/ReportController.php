@@ -211,18 +211,39 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-        // $grid->column('target', __('target'))->display(function () {
-        //     // return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
-        //     $lastTargetFromRelation = optional($this->targets()->orderByDesc('id')->first())->target_id ?? 0;
-        //     return $lastTargetFromRelation;
-        // });
 
         $grid->column('target', __('Target'))->display(function () {
             return $this->latestTarget->target_id ?? 0;
         });
-        $grid->column('expenses', __('expenses'))->display(function () {
-            return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;
+        // $grid->column('expenses', __('expenses'))->display(function () {
+        //     return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;
+        // });
+
+        $grid->column('expenses', __('Expenses'))->display(function () {
+            $url = admin_url('expenses') . '?' . http_build_query([
+                'id'    => $this->id,
+                'month' => request('month'),
+                'year'  => request('year'),
+            ]);
+
+            return <<<HTML
+                    <div class="user-expenses" data-url="{$url}">
+                        <span class="expenses-value">...</span>
+                    </div>
+                    HTML;
         });
+        Admin::script(<<<JS
+                document.querySelectorAll('.user-expenses').forEach(el => {
+                    fetch(el.dataset.url)
+                        .then(res => res.json())
+                        .then(data => {
+                            el.querySelector('.expenses-value').innerText = data.expenses ?? 0;
+                        })
+                        .catch(() => {
+                            el.querySelector('.expenses-value').innerText = '0';
+                        });
+                });
+         JS);
 
         // $grid->column('total', __('salary'))->display(function () {
         //     $salary = $this->getSalary(request('month'), request('year')) ?? 0;
@@ -690,5 +711,32 @@ JS);
         return response()->json([
             'salary' => floor($netSalary),
         ]);
+    }
+
+    public function expenses(Request $request)
+    {
+        $id = $request->id;
+        $month = $request->month ?? now()->month;
+        $year  = $request->year ?? now()->year;
+
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['expenses' => 0]);
+        }
+
+        if ($user->agency_id) {
+            $userSallary = UserSallary::query()
+                ->where('user_id', $user->id)
+                ->where('user_agency_id', $user->agency_id)
+                ->where('is_paid', 0)
+                ->where(DB::raw('concat(year,"-", month)'), '<=', "$year-$month")
+                ->sum(DB::raw('cut_amount'));
+
+            return response()->json([
+                'expenses' => floor($userSallary ?? 0),
+            ]);
+        }
+
+        return response()->json(['expenses' => 0]);
     }
 }
