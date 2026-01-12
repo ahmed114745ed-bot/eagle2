@@ -31,15 +31,14 @@ class RoomCupReportsController extends AdminController
                 'gift:id,current_total,room_id',
                 'gift.room:id,id,room_name,room_cover,uid',
                 'user:id,id,name,uuid,special_id',
-                // 'user.packs:id,user_id,type,is_used,target_id,expire',
-                // 'user.packs.ware:id',
+                'user.packs:id,user_id,type,is_used,target_id,expire',
+                'user.packs.ware:id',
                 'user.profile:id,user_id,avatar',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner:id,id,name,uuid,special_id',
-               // 'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
-               // 'gift.room.owner.packs.ware:id',
+               'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
+               'gift.room.owner.packs.ware:id',
                 'gift.room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-
                 'gift.room.owner.profile:id,user_id,avatar',
             ])
             ->orderBy('created_at', 'desc');
