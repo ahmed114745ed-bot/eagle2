@@ -24,7 +24,7 @@
 /* Header Styles */
 .chat-header {
     background: white;
-    padding: 20px;
+    padding: 0 15px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -1293,7 +1293,7 @@
     }
 
     .chat-header {
-        padding: 15px;
+        padding: 0 15px;
         gap: 12px;
     }
 
@@ -1344,7 +1344,7 @@
     }
 
     .chat-header {
-        padding: 12px 15px;
+        padding: 0 15px;
         gap: 10px;
     }
 
@@ -1808,7 +1808,7 @@
 /* Extra Small Devices */
 @media (max-width: 360px) {
     .chat-header {
-        padding: 8px 10px;
+        padding: 0 10px;
     }
 
     .profile-pic {
@@ -1872,7 +1872,7 @@
     }
 
     .chat-header {
-        padding: 8px 15px;
+        padding: 0 15px;
     }
 
     .profile-pic {
