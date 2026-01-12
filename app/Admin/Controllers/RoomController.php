@@ -744,18 +744,69 @@ class RoomController extends MainController
         $users = collect(explode(',', $room->microphone))
             ->filter()
             ->map(function ($id) {
-                $user = User::with('profile:id,user_id,avatar')->find($id);
-                if (!$user) return null;
+                return (int) $id;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        if (empty($users)) return response()->json([]);
+
+        $profiles = User::with('profile:id,user_id,avatar')
+            ->whereIn('id', $users)
+            ->get()
+            ->map(function ($user) {
                 return [
                     'id' => $user->id,
                     'name' => $user->name,
                     'avatar' => $user->profile?->avatar ? getImagePath($user->profile->avatar) : null,
                 ];
             })
-            ->filter()
             ->values();
 
-        return response()->json($users);
+        return response()->json($profiles);
+    }
+
+    // New batched endpoint to fetch microphones for multiple rooms at once
+    public function getRoomsMicrophones(Request $request)
+    {
+        $roomsParam = $request->get('rooms');
+        if (!$roomsParam) return response()->json([]);
+
+        $roomIds = is_array($roomsParam) ? $roomsParam : explode(',', $roomsParam);
+        $roomIds = array_filter(array_map('intval', $roomIds));
+        if (empty($roomIds)) return response()->json([]);
+
+        // fetch microphone rows for all requested rooms in one query
+        $micRows = \DB::table('room_microphones')
+            ->whereIn('room_id', $roomIds)
+            ->orderBy('position')
+            ->get(['room_id', 'user_id', 'position']);
+
+        $userIds = collect($micRows)->pluck('user_id')->filter()->unique()->values()->all();
+
+        $users = [];
+        if (!empty($userIds)) {
+            $users = User::with('profile:id,user_id,avatar')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->keyBy('id');
+        }
+
+        $result = [];
+        foreach ($micRows as $row) {
+            if (!$row->user_id) continue;
+            $u = $users->get($row->user_id);
+            if (!$u) continue;
+            $result[$row->room_id][] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->profile?->avatar ? getImagePath($u->profile->avatar) : null,
+                'position' => $row->position,
+            ];
+        }
+
+        return response()->json($result);
     }
 
 
