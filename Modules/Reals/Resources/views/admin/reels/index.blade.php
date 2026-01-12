@@ -932,7 +932,7 @@
     </div>
 
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+    <div class="Overlay-top md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
          style="background-color: var(--box-background-color);"
          :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
          x-show="isMobileSidebarOpen"
