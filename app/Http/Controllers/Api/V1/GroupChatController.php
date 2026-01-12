@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\GroupChatService;
 use App\Jobs\SendNotificationsToAllUsers;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\GroupChatResource;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -41,6 +42,7 @@ class GroupChatController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('GroupChatController@store', ['request' => $request->all()]);
         $validator = Validator::make($request->all(), [
             'image' => 'sometimes|image|mimes:jpeg,png,gif,bmp,tiff,webp',
             'image_url' => 'sometimes|string|max:255',
