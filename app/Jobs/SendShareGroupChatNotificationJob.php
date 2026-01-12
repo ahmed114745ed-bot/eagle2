@@ -58,16 +58,19 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
     {
         try {
             $parts = explode(':', $this->text);
-            $roomId = $parts[1] ?? null;
+            
+            $roomId = $parts[3] ?? null;
 
             Log::info('SendShareGroupChatNotificationJob: Processing share room', [
                 'room_id' => $roomId,
-                'parts_count' => count($parts)
+                'parts_count' => count($parts),
+                'full_text' => $this->text
             ]);
 
             if (!$roomId) {
                 Log::error('SendShareGroupChatNotificationJob: Room ID not found in text', [
-                    'text' => $this->text
+                    'text' => $this->text,
+                    'parts' => $parts
                 ]);
                 return;
             }
