@@ -12,7 +12,7 @@
 .chat-container {
     max-width: 1200px;
     margin: 0 auto;
-    height: 80vh;
+    height: 85vh;
     background: white;
     display: flex;
     flex-direction: column;
@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 20px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -159,7 +159,7 @@
 
 .load-more-btn {
     background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
+    color: var(--text-secondary-color);
     border: none;
     padding: 10px 25px;
     border-radius: 20px;
@@ -200,7 +200,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 16px;
     flex-shrink: 0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -236,7 +236,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 18px;
     font-weight: bold;
     flex-shrink: 0;
@@ -245,7 +245,7 @@
 
 .sent-message .message-bubble {
     background: var(--gradient-primary);
-    color: white;
+    color: var(--text-secondary-color);
     padding: 12px 20px;
     border-radius: 16px;
     border-bottom-right-radius: 4px;
@@ -376,7 +376,7 @@
     background: var(--gradient-primary);
     border: none;
     border-radius: 50%;
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 20px;
     cursor: pointer;
     display: flex;
@@ -517,7 +517,7 @@
 
 .save-btn {
     background: linear-gradient(135deg, #34d399, #10b981);
-    color: white;
+    color: var(--text-secondary-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -567,7 +567,7 @@
 }
 
 .user-avatar .avatar-fallback {
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 16px;
     font-weight: bold;
     display: flex;
@@ -693,7 +693,7 @@
 }
 
 .user-avatar .avatar-fallback {
-    color: white;
+    color: var(--text-secondary-color);
     font-size: 16px;
     font-weight: bold;
     display: flex;
@@ -855,10 +855,10 @@
 }
 
 @keyframes highlight {
-    0%, 100% {
+    0% {
         background: transparent;
     }
-    50% {
+    100% {
         background: var(--primary-color);
     }
 }
@@ -1113,8 +1113,8 @@
 
 .filter-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-color);
 }
 
 .filter-actions {
@@ -1139,18 +1139,18 @@
 }
 
 .filter-btn.apply-filter {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: var(--gradient-primary);
+    color: var(--text-secondary-color);
 }
 
 .filter-btn.apply-filter:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px var(--primary-color);
 }
 
 .filter-btn.clear-filter {
     background: #dc3545;
-    color: white;
+    color: var(--text-secondary-color);
 }
 
 .filter-btn.clear-filter:hover {
@@ -1186,7 +1186,7 @@
     gap: 6px;
     padding: 5px 12px;
     background: var(--primary-color);
-    color: white;
+    color: var(--text-secondary-color);
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
@@ -1216,7 +1216,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #667eea;
+    color: var(--primary-color);
     font-weight: 500;
 }
 
@@ -1241,8 +1241,8 @@
 }
 
 @keyframes highlightMessage {
-    0%, 100% { background: transparent; }
-    50% { background: rgba(102, 126, 234, 0.2); }
+    0% { background: transparent; }
+    100% { background: var(--primary-color); }
 }
 
 /* Responsive */
@@ -2002,69 +2002,246 @@
     }
 }
 
-/* Dark Mode Support (Optional) */
-@media (prefers-color-scheme: dark) {
-    /* Uncomment if you want automatic dark mode support
-    .chat-container {
-        background: #1f2937;
-    }
+/* New Message Animation */
+.new-message-animation {
+    animation: newMessagePulse 0.5s ease-out;
+}
 
-    .chat-header {
-        background: #111827;
-        border-color: #374151;
+@keyframes newMessagePulse {
+    0% {
+        background-color: var(--primary-color);
+        transform: scale(1.02);
     }
+    100% {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
 
-    .chat-info h2 {
-        color: #f9fafb;
-    }
+/* New Message Indicator */
+.new-message-indicator {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: var(--text-secondary-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px var(--primary-color);
+    z-index: 100;
+    animation: bounceIn 0.3s ease-out;
+    transition: transform 0.2s ease;
+}
 
-    .status {
-        color: #9ca3af;
-    }
+.new-message-indicator:hover {
+    transform: translateX(-50%) scale(1.05);
+}
 
-    .chat-messages {
-        background: #1f2937;
-    }
+.new-message-indicator i {
+    animation: bounce 1s infinite;
+}
 
-    .received-message .message-bubble {
-        background: #374151;
-        color: #f9fafb;
-        border-color: #4b5563;
-    }
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(3px); }
+}
 
-    .chat-input {
-        background: #111827;
-        border-color: #374151;
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
     }
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
 
-    .message-input {
-        background: #374151;
-        border-color: #4b5563;
-        color: #f9fafb;
-    }
+/* Connection Status Styles */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+}
 
-    .filter-panel {
-        background: #1f2937;
-    }
+.status-dot.connected {
+    background-color: #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+}
 
-    .filter-input {
-        background: #374151;
-        border-color: #4b5563;
-        color: #f9fafb;
-    }
+.status-dot.disconnected {
+    background-color: #f44336;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.6);
+}
 
-    .modal-content {
-        background: #1f2937;
-    }
+/* Highlighted message when scrolling to replied message */
+.message-wrapper.highlighted {
+    animation: highlightPulse 2s ease-out;
+}
 
-    .modal-header h3 {
-        color: #f9fafb;
+@keyframes highlightPulse {
+    0% {
+        background-color: transparent;
     }
+    100% {
+        background-color: rgba(255, 193, 7, 0.2);
+    }
+}
 
-    #editMessageText {
-        background: #374151;
-        border-color: #4b5563;
-        color: #f9fafb;
+/* New Message Notification Banner */
+.new-message-notification {
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient-primary);
+    color: var(--text-secondary-color);
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px var(--primary-color);
+    z-index: 100;
+    animation: slideDown 0.3s ease-out;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.new-message-notification:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 6px 25px var(--primary-color);
+}
+
+.new-message-notification i {
+    font-size: 16px;
+}
+
+.new-message-notification .message-count {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
     }
-    */
+    100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Scroll to Latest Button */
+.scroll-to-latest {
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gradient-primary);
+    color: var(--text-secondary-color);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px var(--primary-color);
+    z-index: 100;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-to-latest:hover {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 6px 20px var(--primary-color);
+}
+
+.scroll-to-latest i {
+    font-size: 20px;
+    animation: bounceDown 1s infinite;
+}
+
+.scroll-to-latest .unread-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: var(--text-secondary-color);
+    font-size: 11px;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+}
+
+@keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* New Message Animation */
+.new-message-animation {
+    animation: newMessagePulse 0.5s ease-out;
+}
+
+@keyframes newMessagePulse {
+    0% {
+        background-color: var(--primary-color);
+        transform: scale(1.02);
+    }
+    100% {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+/* Message highlight when clicking notification */
+.message-wrapper.highlighted {
+    animation: highlightMessage 2s ease-out;
+}
+
+@keyframes highlightMessage {
+    0% {
+        background-color: transparent;
+    }
+    100% {
+        background-color: var(--primary-color);
+        border-radius: 10px;
+    }
+}
+
+[dir="rtl"] .scroll-to-latest .unread-badge {
+    right: auto;
+    left: -5px;
 }

@@ -125,40 +125,28 @@ class GroupChatController extends MainController
             $filter->expand();
             $filter->disableIdFilter();
 
-            // Row 1
-            $filter->column(6, function ($filter) {
+            // Row 1: User search and Message
+            $filter->column(1/2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
                     $query->whereHas('user', function ($query) use ($input) {
                         $query->where('name', 'like', "%$input%")
                             ->orWhere('uuid', 'like', "%$input%");
                     });
-                }, __('User'))->placeholder(__('Search by name or UUID '));
+                }, __('User'))->placeholder(__('Search by name or UUID'));
             });
 
-            $filter->column(6, function ($filter) {
+            $filter->column(1/2, function ($filter) {
                 $filter->like('text', __('Message'));
             });
 
-            // Row 2
-            $filter->column(6, function ($filter) {
+            // Row 2: User ID and Date Range
+            $filter->column(1/2, function ($filter) {
                 $filter->equal('user_id', __('User ID'));
             });
 
-            $filter->column(6, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $query->whereDate('created_at', '>=', $this->input);
-                    }
-                }, __('From Date'), 'from_date')->date();
-            });
-
-            $filter->column(6, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($this->input) {
-                        $query->whereDate('created_at', '<=', $this->input);
-                    }
-                }, __('To Date'), 'to_date')->date();
+            $filter->column(1/2, function ($filter) {
+                $filter->between('created_at', __('Created At'))->date();
             });
         });
 
