@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
+use App\Models\Config;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\AdminUser;
@@ -15,6 +16,7 @@ use App\Models\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Models\AgencyMangerPullingOut;
 use App\Admin\Controllers\MainController;
 
 class ReportController extends MainController
@@ -392,7 +394,7 @@ class ReportController extends MainController
                 fn($j) => $j->on('agency_salary_table.agency_id', '=', 'agencies.id')
             )
             ->when($countryID, fn($q) => $q->where('agencies.country_id', $countryID))
-          //  ->with(['owner.profile'])
+            //  ->with(['owner.profile'])
 
             ->select([
                 'agencies.*',
@@ -555,15 +557,43 @@ class ReportController extends MainController
                 </div>";
         });;
 
-        $grid->column('due', __('due'))->display(function ($_) {
-            $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
-                    <span>{$salary}</span>
-                    <img src='{$image}' alt='USD' width='20' height='20'>
-                </div>";
-        });
+        // $grid->column('due1', __('due'))->display(function ($_) {
+        //     $salary = ManagerHelper::getTotalAgenciesSalary($this->managerAgenciesWithoutScope()->get(), $this->app_id);
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
+        //             <span>{$salary}</span>
+        //             <img src='{$image}' alt='USD' width='20' height='20'>
+        //         </div>";
+        // });
+        $grid->column('due', __('Due'))->display(function () {
+            $url = admin_url('due-salary') . '?' . http_build_query([
+                'id'     => $this->id,
+                'app_id' => $this->app_id,
+            ]);
 
+            $image = asset('images/dollar.jpg');
+
+            return <<<HTML
+<div class="due-salary"
+     data-url="{$url}"
+     style="display:flex;align-items:center;gap:6px;">
+    <span class="salary-value">...</span>
+    <img src="{$image}" alt="USD" width="20" height="20">
+</div>
+HTML;
+        });
+        Admin::script(<<<JS
+document.querySelectorAll('.due-salary').forEach(el => {
+    fetch(el.dataset.url)
+        .then(res => res.json())
+        .then(data => {
+            el.querySelector('.salary-value').innerText = data.salary;
+        })
+        .catch(() => {
+            el.querySelector('.salary-value').innerText = '0';
+        });
+});
+JS);
         $grid->export(function ($export) {
             $export->filename('report');
             $export->column('uuid', function ($value, $original) {
@@ -608,6 +638,38 @@ class ReportController extends MainController
             'html' => view('moments-reels', [
                 'extras' => $extras
             ])->render()
+        ]);
+    }
+
+    public function dueSalary(Request $request)
+    {
+        $managerId = (int) $request->get('app_id');
+        $adminUserId = (int) $request->get('id');
+
+        $adminUser = AdminUser::findOrFail($adminUserId);
+        $agencies = $adminUser->managerAgenciesWithoutScope()->get();
+
+        if ($agencies->isEmpty()) {
+            return response()->json(['salary' => 0]);
+        }
+
+        $totalSalary = $agencies->toQuery()
+            ->withSum('agencySalaries as total_salaries', 'sallary')
+            ->get()
+            ->sum('total_salaries');
+
+        $config = Config::where('name', 'agency_manager_percentage')->first();
+        $percentage = ((int) ($config->value ?? 100)) / 100;
+
+        $pullingOut = (float) AgencyMangerPullingOut::where(
+            'agency_manger_id',
+            $managerId
+        )->sum('amount');
+
+        $netSalary = ($totalSalary * $percentage) - $pullingOut;
+
+        return response()->json([
+            'salary' => floor($netSalary),
         ]);
     }
 }
