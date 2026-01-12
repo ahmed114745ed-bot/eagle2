@@ -126,6 +126,9 @@ class ReportController extends MainController
                 DB::raw('COALESCE(diamond_table.diamonds,0) as diamonds'),
                 DB::raw('COALESCE(salary_table.cut_sum,0) as expenses'),
                 DB::raw('COALESCE(salary_table.total_salary,0) as total'),
+                DB::raw('(SELECT year FROM user_sallaries 
+              WHERE user_sallaries.user_id = users.id 
+              ORDER BY id DESC LIMIT 1) as latest_salary_year')
             ]);
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -263,8 +266,12 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
+        // $grid->column('sallary_year', __('Year'))->display(function () {
+        //     return $this->latestUserSallary?->year ?? '-';
+        // });
+
         $grid->column('sallary_year', __('Year'))->display(function () {
-            return $this->latestUserSallary?->year ?? '-';
+            return $this->latest_salary_year ?? '-';
         });
 
         $grid->column('sallary_month', __('Month'))->display(function () {
