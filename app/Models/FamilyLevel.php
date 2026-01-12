@@ -19,4 +19,11 @@ class FamilyLevel extends Model
         'members',
         'admins',
     ];
+
+    protected static function booted(): void
+    {
+        // Clear cache when levels are created, updated, or deleted
+        static::saved(fn() => \Cache::forget('family_levels_all'));
+        static::deleted(fn() => \Cache::forget('family_levels_all'));
+    }
 }
