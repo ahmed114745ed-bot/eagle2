@@ -10,7 +10,7 @@
     const csrf = cfg.csrf || '';
 
     let currentPage = 1;
-    let currentSort = 'newest';
+    let currentSort = 'random'; // الترتيب الافتراضي عشوائي
     let totalPages = 1;
     let searchQuery = '';
     let userIdFilter = '';
@@ -98,12 +98,7 @@
             filterTimeout = setTimeout(function() {
                 userIdFilter = $('#userIdFilter').val().trim();
                 currentPage = 1;
-                // إعادة تعيين الترتيب العشوائي عند تغيير الفلتر
-                if (currentSort === 'random' && routes.resetRandom) {
-                    $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
-                } else {
-                    loadMoments();
-                }
+                loadMoments();
             }, 500);
         });
 
@@ -114,12 +109,7 @@
             searchTimeout = setTimeout(function() {
                 searchQuery = $('#userSearch').val().trim();
                 currentPage = 1;
-                // إعادة تعيين الترتيب العشوائي عند تغيير البحث
-                if (currentSort === 'random' && routes.resetRandom) {
-                    $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
-                } else {
-                    loadMoments();
-                }
+                loadMoments();
             }, 500);
         });
 
@@ -127,19 +117,19 @@
         $('#sortSelect').on('change', function() {
             currentSort = $(this).val();
             currentPage = 1;
-            if (currentSort === 'random' && routes.resetRandom) {
-                $.post(routes.resetRandom, {_token: csrf}).always(() => loadMoments());
-            } else {
-                loadMoments();
-            }
+            loadMoments();
         });
 
-        // تحديث
         // تحديث
         $('#refreshBtn').on('click', function() {
             const icon = $(this).find('i');
             icon.addClass('fa-spin');
             currentPage = 1;
+            
+            // مسح الكاش وإعادة التحميل
+            allMomentsLoaded = [];
+            currentlyVisibleCount = 0;
+            
             loadMoments().always(() => {
                 setTimeout(() => icon.removeClass('fa-spin'), 400);
             });
@@ -408,6 +398,7 @@
         
         const createdAt = new Date(moment.created_at);
         const timeAgo = getTimeAgo(createdAt);
+        const fullDateTime = formatDateTime(createdAt);
 
         return `
             <div class="moment-post" data-moment-id="${moment.id}">
@@ -420,7 +411,7 @@
                         </div>
                         <div class="user-meta">
                             <span class="user-uuid">ID: ${userId} • UUID: ${userUuid}</span>
-                            <span class="post-time"> • ${timeAgo}</span>
+                            <span class="post-time" title="${fullDateTime}"> • ${timeAgo}</span>
                         </div>
                     </div>
                     <div class="post-menu">
@@ -516,38 +507,32 @@
         
         if (validMedia.length === 0) return '';
         
-        let mediaHtml = '<div class="post-media"><div class="media-gallery" id="gallery-' + momentId + '">';
+        const count = validMedia.length;
+        let gridClass = 'media-grid';
+        if (count === 1) gridClass += ' grid-1';
+        else if (count === 2) gridClass += ' grid-2';
+        else if (count === 3) gridClass += ' grid-3';
+        else if (count === 4) gridClass += ' grid-4';
+        else gridClass += ' grid-5-plus';
         
-        validMedia.forEach((media, index) => {
+        let mediaHtml = `<div class="post-media ${gridClass}" data-moment-id="${momentId}" data-media='${JSON.stringify(validMedia).replace(/'/g, "&apos;")}'>`;
+        
+        const maxDisplay = count > 5 ? 5 : count;
+        validMedia.slice(0, maxDisplay).forEach((media, index) => {
             const mediaPath = getImagePath(media.image);
             const isVideo = mediaPath && (mediaPath.includes('.mp4') || mediaPath.includes('.mov') || mediaPath.includes('.webm'));
             
             mediaHtml += `
-                <div class="media-item ${index === 0 ? 'active' : ''}" data-index="${index}">
+                <div class="media-item" data-index="${index}" onclick="openMediaLightbox(${momentId}, ${index}, event)">
                     ${isVideo ? 
-                        `<video src="${mediaPath}" controls preload="metadata"></video>` : 
+                        `<video src="${mediaPath}" preload="metadata"></video>` : 
                         `<img src="${mediaPath}" alt="Moment" loading="lazy" 
                              onerror="this.style.display='none'">`
                     }
+                    ${index === 4 && count > 5 ? `<div class="media-overlay">+${count - 5}</div>` : ''}
                 </div>
             `;
         });
-        
-        mediaHtml += '</div>';
-        
-        if (validMedia.length > 1) {
-            mediaHtml += `
-                <div class="media-counter">${validMedia.length} <i class="fas fa-images"></i></div>
-                <div class="media-navigation">
-                    <button class="nav-btn" onclick="navigateGallery(${momentId}, -1, event)">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="nav-btn" onclick="navigateGallery(${momentId}, 1, event)">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            `;
-        }
         
         mediaHtml += '</div>';
         return mediaHtml;
@@ -594,19 +579,104 @@
         menu.toggleClass('show');
     };
 
-    window.navigateGallery = function(momentId, direction, event) {
+    window.openMediaLightbox = function(momentId, startIndex, event) {
         if (event) event.stopPropagation();
-        const gallery = $(`#gallery-${momentId}`);
-        const items = gallery.find('.media-item');
-        const currentIndex = items.filter('.active').data('index');
-        let newIndex = currentIndex + direction;
         
-        if (newIndex < 0) newIndex = items.length - 1;
-        if (newIndex >= items.length) newIndex = 0;
+        // الحصول على البيانات من DOM
+        const postMedia = $(`.post-media[data-moment-id="${momentId}"]`);
+        if (postMedia.length === 0) return;
         
-        items.removeClass('active');
-        items.eq(newIndex).addClass('active');
+        const mediaData = postMedia.attr('data-media');
+        if (!mediaData) return;
+        
+        let validMedia;
+        try {
+            validMedia = JSON.parse(mediaData);
+        } catch (e) {
+            console.error('Error parsing media data:', e);
+            return;
+        }
+        
+        if (!validMedia || validMedia.length === 0) return;
+        
+        // إنشاء lightbox modal
+        let lightbox = $('#mediaLightbox');
+        if (lightbox.length === 0) {
+            $('body').append(`
+                <div id="mediaLightbox" class="media-lightbox">
+                    <div class="lightbox-overlay" onclick="closeMediaLightbox()"></div>
+                    <div class="lightbox-content">
+                        <button class="lightbox-close" onclick="closeMediaLightbox()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1, event)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="lightbox-nav lightbox-next" onclick="navigateLightbox(1, event)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div class="lightbox-media"></div>
+                        <div class="lightbox-counter"></div>
+                    </div>
+                </div>
+            `);
+            lightbox = $('#mediaLightbox');
+        }
+        
+        // تخزين البيانات في lightbox
+        lightbox.data('media', validMedia);
+        lightbox.data('currentIndex', startIndex);
+        
+        // عرض الصورة
+        updateLightboxMedia(startIndex);
+        
+        // إظهار lightbox
+        lightbox.addClass('active');
+        $('body').addClass('modal-open');
     };
+    
+    window.closeMediaLightbox = function() {
+        const lightbox = $('#mediaLightbox');
+        lightbox.removeClass('active');
+        $('body').removeClass('modal-open');
+    };
+    
+    window.navigateLightbox = function(direction, event) {
+        if (event) event.stopPropagation();
+        
+        const lightbox = $('#mediaLightbox');
+        const media = lightbox.data('media');
+        const currentIndex = lightbox.data('currentIndex');
+        
+        let newIndex = currentIndex + direction;
+        if (newIndex < 0) newIndex = media.length - 1;
+        if (newIndex >= media.length) newIndex = 0;
+        
+        lightbox.data('currentIndex', newIndex);
+        updateLightboxMedia(newIndex);
+    };
+    
+    function updateLightboxMedia(index) {
+        const lightbox = $('#mediaLightbox');
+        const media = lightbox.data('media');
+        const currentMedia = media[index];
+        const mediaPath = getImagePath(currentMedia.image);
+        const isVideo = mediaPath && (mediaPath.includes('.mp4') || mediaPath.includes('.mov') || mediaPath.includes('.webm'));
+        
+        const mediaHtml = isVideo ? 
+            `<video src="${mediaPath}" controls autoplay></video>` : 
+            `<img src="${mediaPath}" alt="Moment">`;
+        
+        lightbox.find('.lightbox-media').html(mediaHtml);
+        lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
+        
+        // إخفاء أزرار التنقل إذا كانت صورة واحدة فقط
+        if (media.length === 1) {
+            lightbox.find('.lightbox-nav').hide();
+        } else {
+            lightbox.find('.lightbox-nav').show();
+        }
+    }
 
     window.toggleComments = function(momentId, event) {
         if (event) event.stopPropagation();
@@ -721,7 +791,9 @@
                             const userUuid = user.uuid || '';
                             const userId = user.id || '';
                             const userUrl = adminUserUrl + userId;
-                            const timeAgo = getTimeAgo(new Date(comment.created_at));
+                            const commentDate = new Date(comment.created_at);
+                            const timeAgo = getTimeAgo(commentDate);
+                            const fullDateTime = formatDateTime(commentDate);
                             const commentDir = detectTextDirection(comment.comment);
                             
                             html += `
@@ -737,7 +809,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
-                                    <div class="modal-comment-time">${timeAgo}</div>
+                                    <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>
                                 </div>
                             `;
                         });
@@ -818,6 +890,9 @@
                             const userUuid = user.uuid || '';
                             const userId = user.id || '';
                             const userUrl = adminUserUrl + userId;
+                            const likeDate = new Date(like.created_at);
+                            const timeAgo = getTimeAgo(likeDate);
+                            const fullDateTime = formatDateTime(likeDate);
                             
                             html += `
                                 <div class="modal-user-item" onclick="window.open('${userUrl}', '_blank')">
@@ -826,7 +901,10 @@
                                         <div class="modal-user-name">${escapeHtml(userName)}</div>
                                         <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
                                     </div>
-                                    <i class="fas fa-heart modal-like-icon"></i>
+                                    <div class="modal-like-info">
+                                        <i class="fas fa-heart modal-like-icon"></i>
+                                        <span class="modal-like-time" title="${fullDateTime}">${timeAgo}</span>
+                                    </div>
                                 </div>
                             `;
                         });
@@ -913,6 +991,10 @@
                                 ? getImagePath(gift.gift_img) 
                                 : '';
                             
+                            const giftDate = new Date(gift.created_at);
+                            const timeAgo = getTimeAgo(giftDate);
+                            const fullDateTime = formatDateTime(giftDate);
+                            
                             html += `
                                 <div class="modal-gift-item">
                                     <div class="modal-user-item" onclick="window.open('${userUrl}', '_blank')">
@@ -927,6 +1009,7 @@
                                         <div class="gift-details">
                                             <div class="gift-name">${escapeHtml(giftName)}</div>
                                             <div class="gift-value"><i class="fas fa-coins"></i> ${giftValue}</div>
+                                            <div class="gift-time" title="${fullDateTime}">${timeAgo}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -1308,20 +1391,38 @@
     }
 
     function getTimeAgo(date) {
-        const seconds = Math.floor((new Date() - date) / 1000);
+        // تحويل التاريخ مع مراعاة timezone
+        const momentDate = new Date(date);
+        const now = new Date();
+        const seconds = Math.floor((now - momentDate) / 1000);
+        
         const intervals = [
             { label: texts.years || 'y', seconds: 31536000 },
-            { label: texts.months || 'm', seconds: 2592000 },
+            { label: texts.months || 'mo', seconds: 2592000 },
             { label: texts.days || 'd', seconds: 86400 },
             { label: texts.hours || 'h', seconds: 3600 },
-            { label: texts.minutes || 'm', seconds: 60 }
+            { label: texts.minutes || 'min', seconds: 60 }
         ];
         
         for (const interval of intervals) {
             const count = Math.floor(seconds / interval.seconds);
             if (count >= 1) return count + interval.label;
         }
-        return texts.now || 'just now';
+        return texts.now || 'now';
+    }
+    
+    function formatDateTime(date) {
+        // عرض التاريخ والوقت الكامل مع timezone
+        const momentDate = new Date(date);
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZoneName: 'short'
+        };
+        return momentDate.toLocaleString('en-US', options);
     }
 
     window.loadMoments = loadMoments;

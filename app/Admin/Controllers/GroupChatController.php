@@ -324,9 +324,43 @@ class GroupChatController extends MainController
     {
         $page = $request->input('page', 1);
         $perPage = 10;
+        $userId = $request->input('user_id');
+        $userName = $request->input('user_name');
+        $uuid = $request->input('uuid');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
 
-        $messages = GroupChat::with(['user.profile', 'parent.user']) // Add parent relationship
-        ->orderBy('created_at', 'desc')
+        $query = GroupChat::with(['user.profile', 'parent.user']);
+
+        // Filter by user_id
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        // Filter by user name
+        if ($userName) {
+            $query->whereHas('user', function ($q) use ($userName) {
+                $q->where('name', 'like', "%{$userName}%");
+            });
+        }
+
+        // Filter by UUID
+        if ($uuid) {
+            $query->whereHas('user', function ($q) use ($uuid) {
+                $q->where('uuid', 'like', "%{$uuid}%");
+            });
+        }
+
+        // Filter by date range
+        if ($dateFrom) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
+        $messages = $query->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
         // Transform messages to include avatar URL and parent data
@@ -366,7 +400,14 @@ class GroupChatController extends MainController
             'current_page' => $messages->currentPage(),
             'last_page' => $messages->lastPage(),
             'total' => $messages->total(),
-            'has_more' => $messages->hasMorePages()
+            'has_more' => $messages->hasMorePages(),
+            'filters' => [
+                'user_id' => $userId,
+                'user_name' => $userName,
+                'uuid' => $uuid,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+            ]
         ]);
     }
 
