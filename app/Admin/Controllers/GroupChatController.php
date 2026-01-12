@@ -520,4 +520,43 @@ class GroupChatController extends MainController
             'message' => $responseData
         ]);
     }
+
+    /**
+     * Get room image by ID
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getRoomImage($id): JsonResponse
+    {
+        try {
+            $room = \App\Models\Room::find($id);
+            
+            if (!$room) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Room not found'
+                ], 404);
+            }
+
+            $roomImage = $room->room_cover ?? $room->final_room_image ?? '';
+            
+            if (!empty($roomImage)) {
+                $roomImage = getImagePath($roomImage);
+            }
+
+            return response()->json([
+                'success' => true,
+                'image' => $roomImage,
+                'room_id' => $id,
+                'room_name' => $room->name ?? ''
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching room image: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+

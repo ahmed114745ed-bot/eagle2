@@ -536,7 +536,7 @@ Route::group(
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
             ->name('admin.ajax.moments-reels');
-
+         Route::get('/expenses', [ReportController::class, 'expenses']);
             Route::get('/due-salary', [ReportController::class, 'dueSalary'])
     ->name('admin.manager.due-salary');
         Route::resource('charges-reports', 'ChargeReportController');
@@ -608,6 +608,7 @@ Route::group(
         Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
         Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
         Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);

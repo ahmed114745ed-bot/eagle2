@@ -76,6 +76,15 @@ class RemainingDiamondHistoryController extends MainController
             });
         });
 
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'user.country',
+            'user.senderLevel',
+            'user.receiverLevel',
+        ]);
+
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'))
             ->display(function ($name) {
