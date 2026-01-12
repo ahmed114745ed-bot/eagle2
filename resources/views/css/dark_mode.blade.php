@@ -246,7 +246,7 @@
                 document.documentElement.classList.toggle('dark-mode', isDarkMode);
             } else {
                 // No user preference, fall back to global setting
-                const darkModeSetting = '{{ \App\Models\Setting::where("key", "dark_mode")->value("value") ?? "0" }}';
+                const darkModeSetting = '{{ \Illuminate\Support\Facades\Cache::remember("setting_dark_mode", 300, fn() => \App\Models\Setting::where("key", "dark_mode")->value("value")) ?? "0" }}';
 
                 if (darkModeSetting === '1' || darkModeSetting === 1) {
                     document.documentElement.classList.add('dark-mode');
