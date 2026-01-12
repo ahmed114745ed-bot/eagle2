@@ -26,22 +26,48 @@ class RoomCupReportsController extends AdminController
     protected function grid()
     {
         $grid = new Grid(new RoomCupReward());
-        $grid->model()
-            ->with([
-                'gift:id,current_total,room_id',
-                'gift.room:id,id,room_name,room_cover,uid',
-                'user:id,id,name,uuid,special_id',
-                // 'user.packs:id,user_id,type,is_used,target_id,expire',
-                // 'user.packs.ware:id',
-                'user.profile:id,user_id,avatar',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-                'gift.room.owner:id,id,name,uuid,special_id',
-               // 'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
-               // 'gift.room.owner.packs.ware:id',
-                'gift.room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        // $grid->model()
+        // ->with([
+        //     'gift:id,current_total,room_id',
+        //     'gift.room:id,id,room_name,room_cover,uid',
+        //     'user:id,id,name,uuid,special_id',
+        //     // 'user.packs:id,user_id,type,is_used,target_id,expire',
+        //     // 'user.packs.ware:id',
+        //     'user.profile:id,user_id,avatar',
+        //     'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        //     'gift.room.owner:id,id,name,uuid,special_id',
+        //    // 'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
+        //    // 'gift.room.owner.packs.ware:id',
+        //     'gift.room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
 
-                'gift.room.owner.profile:id,user_id,avatar',
-            ])
+        //     'gift.room.owner.profile:id,user_id,avatar',
+        // ])
+
+        $grid->model()->with([
+            'gift:id,current_total,room_id',
+
+            'gift.room:id,room_name,room_cover,uid',
+            'gift.room.owner:id,name,uuid,special_id',
+
+            'user:id,name,uuid,special_id',
+
+            // Load packs ONLY ONCE per user
+            'user.packs' => fn($q) =>
+            $q->whereIn('type', [25])
+                ->where('is_used', true)
+                ->with('ware:id,value'),
+
+            'user.profile:id,user_id,avatar',
+
+            // reuse same structure for owner
+            'gift.room.owner.packs' => fn($q) =>
+            $q->whereIn('type', [25])
+                ->where('is_used', true)
+                ->with('ware:id,value'),
+
+            'gift.room.owner.profile:id,user_id,avatar',
+        ])
+
             ->orderBy('created_at', 'desc');
 
 
