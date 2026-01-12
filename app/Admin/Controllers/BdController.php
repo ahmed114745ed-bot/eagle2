@@ -111,13 +111,15 @@ class BdController extends MainController
                 $query->where('parent_id', @$superAdmin->id);
             })
 
-            ->with(['bdSalaries', 
-            'appUser.packs',
-             'creator', 
-             'appUser.profile', 
-             'parent.appUser.packs',
-             'agencies',
-              'createdBy'])
+            ->with([
+                'bdSalaries',
+                'appUser.packs',
+                'creator',
+                'appUser.profile',
+                'parent.appUser.packs',
+                'createdBy.agencies',
+                'createdBy'
+            ])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
