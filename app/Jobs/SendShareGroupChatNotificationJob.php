@@ -86,7 +86,7 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             }
 
             // Get room image from the room model
-            $roomImage = $room->final_room_image ?? $this->groupChatResource['image_url'] ?? '';
+            $roomImage = $room->room_cover ?? $this->groupChatResource['image_url'] ?? '';
 
             Log::info('SendShareGroupChatNotificationJob: Room image fetched', [
                 'room_id' => $roomId,
