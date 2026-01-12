@@ -471,23 +471,23 @@ class ReportController extends MainController
         $grid->column('expenses', __('expenses'))->display(fn($v) => round($v, 2));
 
 
-        $grid->column('total', __('salary'))->display(function () {
-            $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
-            $image = asset('images/dollar.jpg');
-            return "<div style='display: flex; align-items: center;'>
-                    <span>{$salary}</span>
-                    <img src='{$image}' alt='USD' width='20' height='20'>
-                </div>";
-        });
-
-        // $grid->column('total', __('salary'))->display(function ($v) {
-        //     $salary = round($v, 2);
+        // $grid->column('total', __('salary'))->display(function () {
+        //     $salary = $this->getSalaryWithOutCutAmountAgency(request('month'), request('year')) ?? 0;
         //     $image = asset('images/dollar.jpg');
         //     return "<div style='display: flex; align-items: center;'>
         //             <span>{$salary}</span>
         //             <img src='{$image}' alt='USD' width='20' height='20'>
         //         </div>";
         // });
+
+        $grid->column('total_salary', __('salary'))->display(function ($v) {
+            $salary = round($v, 2);
+            $image = asset('images/dollar.jpg');
+            return "<div style='display: flex; align-items: center;'>
+                    <span>{$salary}</span>
+                    <img src='{$image}' alt='USD' width='20' height='20'>
+                </div>";
+        });
 
         // $grid->column('hosts', __('dashboard.hosts'))->display(function () {
         //     return '<a href="?name=users&desc=' . $this->name . '&aid=' . $this->id . '">' . $this->users_count . '</a>';
