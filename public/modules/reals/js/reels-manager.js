@@ -17,7 +17,7 @@ function reelsManager() {
         offset: 0,
         reelsLoaded: false,
         currentVideoIndex: 0,
-        loadedVideos: new Set([0, 1, 2]),
+        loadedVideos: new Set([0]),
         videoProgress: {},
         videoDurations: {},
         videoStates: {},
@@ -29,9 +29,21 @@ function reelsManager() {
         editingReel: null,
         showDeleteModal: false,
         deletingReel: null,
+        scrollRAF: null,
+        videoCache: new Map(),
+        isMobile: window.innerWidth <= 768,
+        preloadQueue: [],
+        isPreloading: false,
+        loadedReelIds: new Set(),
+        isAutoLoading: false,
+        batchCache: [],
         
         init() {
             this.isGlobalMuted = false;
+            this.isMobile = window.innerWidth <= 768;
+            
+            // تهيئة التخزين المؤقت
+            this.initCache();
             
             this.$nextTick(() => {
                 if (window.requestIdleCallback) {
@@ -45,21 +57,37 @@ function reelsManager() {
         loadInitialData() {
             const reelsData = window.initialReelsData || [];
             
-            this.allReels = reelsData.map(reel => {
-                return {
-                    ...reel,
-                    thumbnailLoaded: Boolean(reel.thumbnail_url)
-                };
+            // فلترة البيانات الأولية لتجنب أي تكرار
+            const uniqueReels = [];
+            const seenIds = new Set();
+            
+            reelsData.forEach(reel => {
+                if (!seenIds.has(reel.id)) {
+                    seenIds.add(reel.id);
+                    this.loadedReelIds.add(reel.id);
+                    uniqueReels.push({
+                        ...reel,
+                        thumbnailLoaded: Boolean(reel.thumbnail_url)
+                    });
+                }
             });
-            this.visibleReels = this.allReels;
+            
+            this.allReels = uniqueReels;
+            
+            // تحميل سريع لأول فيديوهين على الموبايل
+            const initialCount = this.isMobile ? 2 : 3;
+            this.visibleReels = this.allReels.slice(0, initialCount);
             this.filteredReels = this.allReels.slice(0, 6);
             this.reelsLoaded = true;
 
             this.offset = this.allReels.length;
-            this.hasMore = this.allReels.length >= 10;
+            this.hasMore = true; // دائماً true للتحميل العشوائي
             
-            // Load first video only
+            // تحميل أول فيديو فقط
             this.loadedVideos.add(0);
+            if (this.isMobile && this.allReels.length > 1) {
+                this.loadedVideos.add(1); // تحميل الثاني أيضاً
+            }
             
             this.isMobileSidebarOpen = false;
             
@@ -68,22 +96,28 @@ function reelsManager() {
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
                 
+                // تحميل مسبق لأول فيديوهين فوراً
+                if (this.isMobile) {
+                    this.preloadFirstVideos();
+                }
+                
                 this.refreshVisibleReelsCounts();
-
                 this.captureMissingThumbnails(this.filteredReels.slice(0, 6));
                 
+                // تحميل batch إضافي في الخلفية
                 setTimeout(() => {
-                    if (this.filteredReels.length < this.allReels.length) {
-                        const nextBatch = this.allReels.slice(6, 15);
-                        this.filteredReels = [...this.filteredReels, ...nextBatch];
-                        this.captureMissingThumbnails(nextBatch);
-                        this.refreshVisibleReelsCounts();
+                    this.preloadNextBatch();
+                    
+                    // بدء التحميل المسبق للباقي
+                    if (this.isMobile) {
+                        this.startBackgroundPreload();
                     }
-                }, 500);
+                }, 1000);
                 
+                // تقليل تردد التحديث لتحسين الأداء
                 setInterval(() => {
                     this.refreshVisibleReelsCounts();
-                }, 30000);
+                }, 60000);
             });
         },
         
@@ -119,14 +153,220 @@ function reelsManager() {
             const video = event.target;
             this.markVideoReady(reelId);
             
+            // تطبيق حالة mute من الإعدادات العامة
             video.muted = this.isGlobalMuted;
 
-            // إيقاف أي تشغيل تلقائي للمعاينة
-            video.pause();
+            // عدم إيقاف الفيديو إذا كان يشتغل
+            // السماح بالتشغيل بدون تدخل
+            
+            // تحميل مسبق للفيديو التالي
+            const currentIndex = this.visibleReels.findIndex(r => r.id === reelId);
+            if (currentIndex >= 0 && currentIndex < this.visibleReels.length - 1) {
+                const nextReel = this.visibleReels[currentIndex + 1];
+                const nextVideo = document.getElementById('video-' + nextReel.id);
+                if (nextVideo && !nextVideo.src) {
+                    nextVideo.preload = 'metadata';
+                }
+            }
         },
+        
+        // ==================== دوال التخزين المؤقت ====================
+        
+        initCache() {
+            // تهيئة التخزين المؤقت
+            try {
+                const cached = localStorage.getItem('reels_cache_meta');
+                if (cached) {
+                    const meta = JSON.parse(cached);
+                    // التحقق من صلاحية الكاش (24 ساعة)
+                    if (Date.now() - meta.timestamp < 24 * 60 * 60 * 1000) {
+                        console.log('✅ تم العثور على بيانات مخزنة صالحة');
+                    } else {
+                        localStorage.removeItem('reels_cache_meta');
+                    }
+                }
+            } catch (e) {
+                console.log('تعذر الوصول للتخزين المؤقت:', e);
+            }
+        },
+        
+        async preloadFirstVideos() {
+            // تحميل مسبق لأول فيديوهين على الموبايل
+            console.log('🚀 بدء التحميل المسبق للفيديوهات الأولى...');
+            const startTime = performance.now();
+            
+            const videosToPreload = this.visibleReels.slice(0, 2);
+            
+            for (const reel of videosToPreload) {
+                const video = document.getElementById('video-' + reel.id);
+                if (video && video.src) {
+                    // إجبار بدء التحميل
+                    video.preload = 'auto';
+                    video.load();
+                    
+                    // حفظ في الكاش
+                    this.videoCache.set(reel.id, {
+                        url: reel.video_url,
+                        loadedAt: Date.now(),
+                        element: video
+                    });
+                }
+            }
+            
+            const endTime = performance.now();
+            console.log(`✅ تم التحميل المسبق لـ ${videosToPreload.length} فيديو في ${(endTime - startTime).toFixed(2)}ms`);
+        },
+        
+        startBackgroundPreload() {
+            // بدء التحميل في الخلفية للفيديوهات المتبقية
+            if (this.isPreloading) return;
+            
+            this.isPreloading = true;
+            console.log('📦 بدء التحميل في الخلفية...');
+            console.log(`📊 إجمالي الفيديوهات: ${this.visibleReels.length}`);
+            
+            // إضافة الفيديوهات للطابور (بدءاً من الفيديو الثالث)
+            this.preloadQueue = this.visibleReels.slice(2).map(r => r.id);
+            console.log(`📋 عدد الفيديوهات في الطابور: ${this.preloadQueue.length}`);
+            
+            // تحميل تدريجي
+            this.processPreloadQueue();
+        },
+        
+        async processPreloadQueue() {
+            if (this.preloadQueue.length === 0) {
+                this.isPreloading = false;
+                console.log('✅ انتهى التحميل في الخلفية');
+                
+                // حفظ metadata في localStorage
+                try {
+                    localStorage.setItem('reels_cache_meta', JSON.stringify({
+                        timestamp: Date.now(),
+                        count: this.videoCache.size
+                    }));
+                } catch (e) {
+                    console.log('تعذر حفظ metadata');
+                }
+                
+                return;
+            }
+            
+            // تحميل فيديو واحد في كل مرة لعدم إثقال الشبكة
+            const reelId = this.preloadQueue.shift();
+            const reel = this.visibleReels.find(r => r.id === reelId);
+            
+            if (reel) {
+                const video = document.getElementById('video-' + reel.id);
+                if (video && video.src && !this.videoCache.has(reel.id)) {
+                    // استخدام preload='metadata' للتوفير
+                    video.preload = 'metadata';
+                    
+                    // الانتظار حتى يتم تحميل الـ metadata
+                    video.addEventListener('loadedmetadata', () => {
+                        this.videoCache.set(reel.id, {
+                            url: reel.video_url,
+                            loadedAt: Date.now(),
+                            duration: video.duration
+                        });
+                    }, { once: true });
+                    
+                    video.load();
+                }
+            }
+            
+            // تأخير ذكي: 1.5 ثانية على الموبايل، 1 ثانية على الديسكتوب
+            const delay = this.isMobile ? 1500 : 1000;
+            
+            setTimeout(() => {
+                if (window.requestIdleCallback) {
+                    requestIdleCallback(() => this.processPreloadQueue());
+                } else {
+                    this.processPreloadQueue();
+                }
+            }, delay);
+        },
+        
+        getCachedVideo(reelId) {
+            return this.videoCache.get(reelId);
+        },
+        
+        clearOldCache() {
+            // تنظيف الكاش القديم (أكثر من 5 دقائق)
+            const now = Date.now();
+            const maxAge = 5 * 60 * 1000; // 5 دقائق
+            let clearedCount = 0;
+            
+            for (const [id, data] of this.videoCache.entries()) {
+                if (now - data.loadedAt > maxAge) {
+                    this.videoCache.delete(id);
+                    clearedCount++;
+                }
+            }
+            
+            if (clearedCount > 0) {
+                console.log(`🧹 تم تنظيف ${clearedCount} فيديو من الكاش`);
+            }
+            
+            // تنظيف localStorage أيضاً إذا كان ممتلئاً
+            try {
+                const usage = new Blob([localStorage.getItem('reels_cache_meta') || '']).size;
+                if (usage > 50000) { // 50KB
+                    localStorage.removeItem('reels_cache_meta');
+                    console.log('🧹 تم تنظيف localStorage');
+                }
+            } catch (e) {
+                // تجاهل الأخطاء
+            }
+        },
+        
+        async preloadNextBatch() {
+            // تحميل batch إضافي في الخلفية
+            if (this.batchCache.length > 0 || this.isAutoLoading) {
+                return;
+            }
+            
+            this.isAutoLoading = true;
+            console.log('📦 تحميل batch جديد في الخلفية...');
+            
+            try {
+                const excludeIds = Array.from(this.loadedReelIds);
+                
+                const response = await fetch(`/admin/view/reels/load-more?limit=10`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        exclude_ids: excludeIds
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.reels && data.reels.length > 0) {
+                    // فلترة العناصر المكررة
+                    const newReels = data.reels.filter(reel => !this.loadedReelIds.has(reel.id));
+                    
+                    this.batchCache = newReels.map(reel => ({
+                        ...reel,
+                        thumbnailLoaded: Boolean(reel.thumbnail_url)
+                    }));
+                    
+                    console.log(`✅ تم تخزين ${this.batchCache.length} فيديو في الكاش (تم تجاهل ${data.reels.length - newReels.length} مكرر)`);
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل batch:', error);
+            } finally {
+                this.isAutoLoading = false;
+            }
+        },
+        
+        // ==================== نهاية دوال التخزين المؤقت ====================
         
         shouldLoadVideo(index) {
             const currentIndex = this.currentVideoIndex;
+            // تحميل الفيديو الحالي والمجاور
             return Math.abs(index - currentIndex) <= 2 || this.loadedVideos.has(index);
         },
         
@@ -161,15 +401,19 @@ function reelsManager() {
             let scrollTimeout;
             let lastScrollTop = 0;
             
+            // تحسين الأداء باستخدام passive listener
             container.addEventListener('scroll', () => {
+                const scrollTop = container.scrollTop;
+                
+                // استدعاء handleScroll مباشرة للتفاعل السريع
+                if (Math.abs(scrollTop - lastScrollTop) > 100) {
+                    this.handleScroll();
+                    lastScrollTop = scrollTop;
+                }
+                
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
-                    const scrollTop = container.scrollTop;
-                    
-                    if (Math.abs(scrollTop - lastScrollTop) > 50) {
-                        this.handleScroll();
-                        lastScrollTop = scrollTop;
-                    }
+                    this.handleScroll();
                     
                     if (this.loading || !this.hasMore) return;
                     
@@ -177,27 +421,52 @@ function reelsManager() {
                     const clientHeight = container.clientHeight;
                     const scrollPercentage = ((scrollTop + clientHeight) / scrollHeight) * 100;
                     
-                    if (scrollPercentage >= 70) {
+                    // تحميل أقل تكراراً
+                    if (scrollPercentage >= 80) {
                         this.loadMoreReels();
                     }
                 }, 150);
             }, { passive: true });
+            
+            // تنظيف الكاش القديم كل دقيقة
+            if (this.isMobile) {
+                setInterval(() => {
+                    this.clearOldCache();
+                }, 60000);
+            }
         },
         
         async loadMoreReels() {
-            if (this.loading || !this.hasMore) {
+            if (this.loading || !this.hasMore || this.isAutoLoading) {
                 return;
             }
             
             this.loading = true;
             
             try {
-                const response = await fetch(`/admin/view/reels/load-more?offset=${this.offset}&limit=20`);
+                const excludeIds = Array.from(this.loadedReelIds);
+                
+                const response = await fetch(`/admin/view/reels/load-more?limit=20`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({
+                        exclude_ids: excludeIds,
+                        seed: window.randomSeed || null
+                    })
+                });
+                
                 const data = await response.json();
                 
                 if (data.reels && data.reels.length > 0) {
+                    // فلترة العناصر المكررة من كل من allReels و loadedReelIds
                     const existingIds = new Set(this.allReels.map(r => r.id));
-                    const newReels = data.reels.filter(reel => !existingIds.has(reel.id));
+                    const newReels = data.reels.filter(reel => {
+                        // التحقق من loadedReelIds أيضاً لضمان عدم التكرار
+                        return !existingIds.has(reel.id) && !this.loadedReelIds.has(reel.id);
+                    });
                     
                     if (newReels.length > 0) {
                         const normalized = newReels.map(reel => ({
@@ -205,25 +474,41 @@ function reelsManager() {
                             thumbnailLoaded: Boolean(reel.thumbnail_url)
                         }));
 
+                        // إضافة العناصر الجديدة فقط
+                        const visibleReelsIds = new Set(this.visibleReels.map(r => r.id));
+                        const filteredReelsIds = new Set(this.filteredReels.map(r => r.id));
+                        
                         normalized.forEach(item => {
+                            // إضافة إلى allReels
                             this.allReels.push(item);
-                            this.visibleReels.push(item);
-                            if (!this.searchQuery) {
+                            this.loadedReelIds.add(item.id);
+                            
+                            // إضافة إلى visibleReels فقط إذا لم يكن موجوداً
+                            if (!visibleReelsIds.has(item.id)) {
+                                this.visibleReels.push(item);
+                                visibleReelsIds.add(item.id);
+                            }
+                            
+                            // إضافة إلى filteredReels فقط إذا لم يكن موجوداً ولا يوجد بحث
+                            if (!this.searchQuery && !filteredReelsIds.has(item.id)) {
                                 this.filteredReels.push(item);
+                                filteredReelsIds.add(item.id);
                             }
                         });
-                        this.captureMissingThumbnails(this.filteredReels.slice(-newReels.length));
+                        
+                        this.captureMissingThumbnails(normalized);
                         
                         if (this.searchQuery) {
                             this.filterReels();
                         }
+                        
+                        console.log(`✅ تم تحميل ${newReels.length} ريل جديد (تم تجاهل ${data.reels.length - newReels.length} مكرر)`);
+                    } else {
+                        console.log(`⚠️ جميع الريلز المستلمة (${data.reels.length}) كانت مكررة`);
                     }
                     
-                    this.offset += data.reels.length;
-                    
-                    if (data.reels.length < 20) {
-                        this.hasMore = false;
-                    }
+                    this.offset += newReels.length; // عد العناصر الجديدة فقط
+                    this.hasMore = data.has_more !== false;
                 } else {
                     this.hasMore = false;
                 }
@@ -235,24 +520,70 @@ function reelsManager() {
         },
         
         playFirstVideo() {
-            // لا تشغيل تلقائي عند الفتح؛ فقط عيّن أول ريل كاختيار مبدئي
             this.selectedReelId = this.visibleReels[0]?.id;
             this.selectedReel = this.visibleReels[0] || null;
+            
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    const firstVideo = document.getElementById('video-' + this.selectedReelId);
+                    if (firstVideo) {
+                        const cached = this.getCachedVideo(this.selectedReelId);
+                        if (cached && cached.element) {
+                            console.log('⚡ تشغيل من الكاش');
+                        }
+                        
+                        if (firstVideo.readyState >= 2) {
+                            firstVideo.play().catch(err => {
+                                console.log('تشغيل تلقائي معطل:', err);
+                            });
+                        }
+                    }
+                }, 300); 
+            });
         },
         
         handleScroll() {
             const container = this.$refs.reelsContainer;
+            if (!container) return;
+            
             const scrollTop = container.scrollTop;
             const screenHeight = window.innerHeight;
             
             const newIndex = Math.round(scrollTop / screenHeight);
             
             if (newIndex !== this.currentVideoIndex) {
+                const oldIndex = this.currentVideoIndex;
                 this.currentVideoIndex = newIndex;
                 
-                for (let i = newIndex - 1; i <= newIndex + 2; i++) {
+                for (let i = newIndex - 1; i <= newIndex + 1; i++) {
                     if (i >= 0 && i < this.visibleReels.length) {
                         this.loadedVideos.add(i);
+                    }
+                }
+                
+                if (oldIndex !== newIndex && oldIndex >= 0 && oldIndex < this.visibleReels.length) {
+                    const oldVideo = document.getElementById('video-' + this.visibleReels[oldIndex]?.id);
+                    if (oldVideo && !oldVideo.paused) {
+                        oldVideo.pause();
+                        oldVideo.currentTime = 0;
+                    }
+                }
+                
+                if (newIndex >= 0 && newIndex < this.visibleReels.length) {
+                    const newVideo = document.getElementById('video-' + this.visibleReels[newIndex]?.id);
+                    if (newVideo && newVideo.paused && newVideo.readyState >= 2) {
+                        newVideo.play().catch(() => {});
+                    }
+                }
+                
+                if (newIndex >= 0 && newIndex < this.visibleReels.length) {
+                    this.selectedReelId = this.visibleReels[newIndex]?.id;
+                    this.selectedReel = this.visibleReels[newIndex];
+                    
+                    const remaining = this.visibleReels.length - newIndex;
+                    if (remaining <= 3 && this.hasMore && !this.loading) {
+                        console.log('🚀 تحميل تلقائي: متبقي', remaining, 'فيديوهات');
+                        this.loadMoreReels();
                     }
                 }
                 
@@ -260,78 +591,36 @@ function reelsManager() {
                 farVideos.forEach(i => {
                     const video = document.getElementById('video-' + this.visibleReels[i]?.id);
                     if (video) {
-                        video.src = '';
+                        video.pause();
+                        video.removeAttribute('src');
                         video.load();
                     }
                     this.loadedVideos.delete(i);
                     delete this.videoReadyStates[this.visibleReels[i]?.id];
                 });
             }
-            
-            const videos = container.querySelectorAll('video');
-            let activeVideo = null;
-            
-            videos.forEach((video, idx) => {
-                const rect = video.getBoundingClientRect();
-                const isVisible = rect.top >= -100 && rect.bottom <= screenHeight + 100;
-                
-                if (isVisible) {
-                    const reelId = parseInt(video.id.replace('video-', ''));
-                    
-                    if (this.selectedReelId !== reelId) {
-                        this.selectedReelId = reelId;
-                        this.selectedReel = this.visibleReels.find(r => r.id === reelId);
-                        
-                        const currentIndex = this.visibleReels.findIndex(r => r.id === reelId);
-                        const remaining = this.visibleReels.length - currentIndex;
-                        
-                        if (remaining <= 10 && this.hasMore && !this.loading) {
-                            this.loadMoreReels();
-                        }
-                    }
-                    
-                    const isInCenter = rect.top >= -50 && rect.bottom <= screenHeight + 50;
-                    if (isInCenter) {
-                        activeVideo = video;
-                        // أثناء التمرير، شغّل الفيديو الظاهر فقط
-                        if (this.scrollingToSelection && reelId !== this.selectedReelId) {
-                            video.pause();
-                        } else {
-                            if (video.src) {
-                                video.muted = this.isGlobalMuted;
-                            }
-                            if (video.paused && video.src) {
-                                video.play().catch(() => {});
-                            }
-                        }
-                    } else {
-                        if (!video.paused) {
-                            video.pause();
-                        }
-                    }
-                } else {
-                    if (!video.paused) {
-                        video.pause();
-                    }
-                }
-            });
-            
-            if (activeVideo) {
-                videos.forEach(v => {
-                    if (v !== activeVideo && !v.paused) {
-                        v.pause();
-                    }
-                });
-            }
+        },
+        
+        updateVisibleVideos(container, screenHeight) {
         },
         
         togglePlay(event) {
+            event.stopPropagation();
             const video = event.target;
+            
             if (video.paused) {
-                video.play();
+                video.play().catch(err => {
+                    console.log('تعذر تشغيل الفيديو:', err);
+                });
             } else {
                 video.pause();
             }
+        },
+        
+        onVideoEnded(event) {
+            const video = event.target;
+            video.currentTime = 0;
+            video.play().catch(() => {});
         },
 
         async captureMissingThumbnails(reels) {
@@ -348,7 +637,6 @@ function reelsManager() {
                 return;
             }
 
-            // Avoid double work for the same reel
             if (this.thumbnailGenerating[reel.id]) {
                 return;
             }

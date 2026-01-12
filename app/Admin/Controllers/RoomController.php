@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        $grid->header(fn() => $this->buildTabsHeader($filterType));
+            $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -344,7 +344,7 @@ class RoomController extends MainController
         (SELECT GROUP_CONCAT(user_id)
          FROM room_visitors
          WHERE room_visitors.room_id = rooms.id) AS visitor_ids
-    ")
+     ")
             )
 
             ->with([
@@ -352,7 +352,13 @@ class RoomController extends MainController
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
+
                 ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
+                'microphones' => function ($q) {
+                    $q->orderBy('position');
+                },
+                'microphones.user:id,name',
+                'microphones.user.profile:id,user_id,avatar',
 
             ])
             ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
@@ -555,7 +561,7 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        $grid->model()->collection(function (Collection $collection) {
+        $grid->model()->with('microphones')->collection(function (Collection $collection) {
             // collect all microphone user IDs from the current page rows
             $allIds = $collection->flatMap(function ($row) {
                 return array_filter(explode(',', (string) $row->microphone));
@@ -565,7 +571,7 @@ class RoomController extends MainController
             $users = collect();
             if (!empty($allIds)) {
                 $users = User::select(['id', 'name'])
-                    ->with('profile:id,user_id,avatar')
+                    //->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
                     ->keyBy('id');
@@ -605,14 +611,14 @@ class RoomController extends MainController
                 $name = substr($name, 0, 50) . ' ...';
             }
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                    <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                        <div>
+                            <span style='cursor: pointer;'>$name</span><br>
+                            <span style='cursor: pointer;'>ID: $id</span>
+                        </div>
                     </div>
-                </div>
-            ";
+                ";
         });
 
         $grid->column('owner_id', __('room owner'))->display(function ($name) {
@@ -657,14 +663,14 @@ class RoomController extends MainController
                 $id   = e($user->id);
 
                 $html .= <<<HTML
-            <div class="image-wrapper" onclick="window.location.href='{$id}'">
-                <img src="{$url}" title="{$name}"
-                style="width: 40px; height: 40px; border-radius: 50%;
-                        object-fit: cover; border: 2px solid white;
-                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                        transition: transform 0.3s ease;"/>
-            </div>
-        HTML;
+                <div class="image-wrapper" onclick="window.location.href='{$id}'">
+                    <img src="{$url}" title="{$name}"
+                    style="width: 40px; height: 40px; border-radius: 50%;
+                            object-fit: cover; border: 2px solid white;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+                            transition: transform 0.3s ease;"/>
+                </div>
+             HTML;
             }
 
             $html .= '</div>';
@@ -673,59 +679,142 @@ class RoomController extends MainController
             static $appended = false;
             if (!$appended) {
                 $html .= '
-        <style>
+              <style>
 
 
 
-            .image-container {
-                display: flex;
-                justify-content: start;
-                align-items: center;
-                gap: -10px; /* Overlap the images slightly */
-                padding: 8px 0;
-                overflow-y: overlay;
-                width: 218px;
-                padding-right: 16px;
-            }
-            .image-wrapper {
-                display: inline-block;
-                position: relative;
-                margin-right: -12px;
-            }
-            .image-wrapper img {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid #fff;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                cursor: pointer;
-            }
-            .image-wrapper img:hover {
-                transform: scale(1.2);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            }
-        </style>';
+                .image-container {
+                    display: flex;
+                    justify-content: start;
+                    align-items: center;
+                    gap: -10px; /* Overlap the images slightly */
+                    padding: 8px 0;
+                    overflow-y: overlay;
+                    width: 218px;
+                    padding-right: 16px;
+                }
+                .image-wrapper {
+                    display: inline-block;
+                    position: relative;
+                    margin-right: -12px;
+                }
+                .image-wrapper img {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #fff;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    cursor: pointer;
+                }
+                .image-wrapper img:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                }
+                </style>';
                 $appended = true;
             }
 
             return $html;
         });
 
+
+
+
+
         Admin::style('
-    .dropdown-backdrop {
-        position: absolute !important;
+        .dropdown-backdrop {
+            position: absolute !important;
 
+        }
+        html.ltr .dropdown-menu {
+
+            right: 38px !important;
+        }
+
+    ');
     }
-    html.ltr .dropdown-menu {
 
-        right: 38px !important;
+
+
+
+
+
+
+
+    public function getRoomMicrophones($roomId)
+    {
+        $room = Room::find($roomId);
+        if (!$room) return response()->json([]);
+
+        $users = collect(explode(',', $room->microphone))
+            ->filter()
+            ->map(function ($id) {
+                return (int) $id;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        if (empty($users)) return response()->json([]);
+
+        $profiles = User::with('profile:id,user_id,avatar')
+            ->whereIn('id', $users)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar' => $user->profile?->avatar ? getImagePath($user->profile->avatar) : null,
+                ];
+            })
+            ->values();
+
+        return response()->json($profiles);
     }
 
-');
-    }
+    // New batched endpoint to fetch microphones for multiple rooms at once
+    public function getRoomsMicrophones(Request $request)
+    {
+        $roomsParam = $request->get('rooms');
+        if (!$roomsParam) return response()->json([]);
 
+        $roomIds = is_array($roomsParam) ? $roomsParam : explode(',', $roomsParam);
+        $roomIds = array_filter(array_map('intval', $roomIds));
+        if (empty($roomIds)) return response()->json([]);
+
+        // fetch microphone rows for all requested rooms in one query
+        $micRows = \DB::table('room_microphones')
+            ->whereIn('room_id', $roomIds)
+            ->orderBy('position')
+            ->get(['room_id', 'user_id', 'position']);
+
+        $userIds = collect($micRows)->pluck('user_id')->filter()->unique()->values()->all();
+
+        $users = [];
+        if (!empty($userIds)) {
+            $users = User::with('profile:id,user_id,avatar')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->keyBy('id');
+        }
+
+        $result = [];
+        foreach ($micRows as $row) {
+            if (!$row->user_id) continue;
+            $u = $users->get($row->user_id);
+            if (!$u) continue;
+            $result[$row->room_id][] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->profile?->avatar ? getImagePath($u->profile->avatar) : null,
+                'position' => $row->position,
+            ];
+        }
+
+        return response()->json($result);
+    }
 
 
 

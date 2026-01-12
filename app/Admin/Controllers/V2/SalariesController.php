@@ -150,7 +150,7 @@ class SalariesController extends MainController
         $grid->column('total', __('salary'))->default(0);
         if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
             $grid->column('pay', __('pay'))->display(function () {
-                return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
+                return (new PaySalariesAction($this->id, 'user', ))->render();
             });
         }
         $grid->tools(function (Grid\Tools $tools) {
@@ -195,7 +195,7 @@ class SalariesController extends MainController
         //            return (new SalariesAction($this->id, 'agency'))->render();
         //        });
         $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'agency', $this->salary))->render();
+            return (new PaySalariesAction($this->id, 'agency', ))->render();
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
