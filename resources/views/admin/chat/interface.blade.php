@@ -2,6 +2,19 @@
 
 <div class="chat-wrapper">
     <div class="chat-container">
+        <!-- New Message Notification (shown at top when scrolled up) -->
+        <div class="new-message-notification" id="newMessageNotification" onclick="scrollToLatestMessage()">
+            <i class="fa fa-comment-dots"></i>
+            <span>{{ __('New message received') }}</span>
+            <span class="message-count" id="notificationCount">1</span>
+        </div>
+
+        <!-- Scroll to Latest Button (shown when not at bottom) -->
+        <button class="scroll-to-latest" id="scrollToLatestBtn" onclick="scrollToLatestMessage()">
+            <i class="fa fa-chevron-down"></i>
+            <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
+        </button>
+
         <!-- Header -->
         <div class="chat-header">
             <a href="{{ route('admin.group-chat.index') }}" class="back-btn">
@@ -94,15 +107,6 @@
 
         <!-- Chat Messages -->
         <div class="chat-messages" id="chatMessages">
-{{--            <div class="load-more-container" id="loadMoreContainer" style="display: none;">--}}
-{{--                <button class="load-more-btn" id="loadMoreBtn" onclick="loadMoreMessages()">--}}
-{{--                    <i class="fa fa-arrow-up"></i> Load More Messages--}}
-{{--                </button>--}}
-{{--            </div>--}}
-{{--            <div class="loading-indicator" id="loadingIndicator">--}}
-{{--                <i class="fa fa-spinner"></i>--}}
-{{--                <p>{{ __('Loading messages...') }}</p>--}}
-{{--            </div>--}}
         </div>
 
         <!-- Message Input -->
@@ -143,8 +147,9 @@
     </div>
 </div>
 
+<script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script>
-    // Translations
+    // ==================== TRANSLATIONS ====================
     const translations = {
         loadingMessages: "{{ __('Loading messages...') }}",
         failedToLoadMessages: "{{ __('Failed to load messages') }}",
@@ -170,10 +175,11 @@
         userName: "{{ __('User Name') }}",
         uuid: "{{ __('UUID') }}",
         dateFrom: "{{ __('Date From') }}",
-        dateTo: "{{ __('Date To') }}"
+        dateTo: "{{ __('Date To') }}",
+        newMessage: "{{ __('new message') }}"
     };
 
-    // Configuration
+    // ==================== CONFIGURATION ====================
     const csrfToken = '{{ csrf_token() }}';
     const adminAppId = {{ $adminAppId ?? 0 }};
     const canSendMessages = {{ $canSendMessages ? 'true' : 'false' }};
@@ -181,8 +187,10 @@
     const storeRoute = '{{ route("admin.chat.store") }}';
     const updateRoute = '{{ route("admin.chat.update") }}';
     const deleteRouteBase = '{{ route("admin.chat.delete", "") }}';
+    const pusherKey = '{{ config("broadcasting.connections.pusher.key") }}';
+    const pusherCluster = '{{ config("broadcasting.connections.pusher.options.cluster") }}';
 
-    // State variables
+    // ==================== STATE VARIABLES ====================
     let currentPage = 1;
     let lastPage = 1;
     let isLoading = false;
@@ -191,6 +199,12 @@
     let hasMoreMessages = true;
     let loadedMessageIds = new Set();
     let replyingTo = null;
+    let newMessageCount = 0;
+    let unreadCount = 0;
+    let isUserScrolledUp = false;
+    let pusher = null;
+    let channel = null;
+    let newMessageIds = [];
 
     // Filter state
     let activeFilters = {
@@ -202,9 +216,10 @@
     };
 
     const SCROLL_THRESHOLD = 100;
+    const SCROLL_BOTTOM_THRESHOLD = 150;
     let scrollDebounceTimer = null;
 
-    // DOM Elements
+    // ==================== DOM ELEMENTS ====================
     const chatContainer = document.getElementById('chatMessages');
     const filterPanel = document.getElementById('filterPanel');
     const filterToggleIcon = document.getElementById('filterToggleIcon');
@@ -213,10 +228,8 @@
     const filterBadgesContainer = document.getElementById('filterBadges');
 
     // ==================== FILTER FUNCTIONS ====================
-
     function toggleFilterPanel() {
         const toggle = document.querySelector('.filter-toggle');
-
         if (filterPanel.style.display === 'none') {
             filterPanel.style.display = 'block';
             toggle.classList.add('active');
@@ -227,27 +240,20 @@
     }
 
     function applyFilters() {
-        // Get filter values
         const userId = document.getElementById('userIdFilter').value.trim();
         const userName = document.getElementById('userNameFilter').value.trim();
         const uuid = document.getElementById('uuidFilter').value.trim();
         const dateFrom = document.getElementById('dateFromFilter').value;
         const dateTo = document.getElementById('dateToFilter').value;
 
-        // Update active filters
         activeFilters.user_id = userId || null;
         activeFilters.user_name = userName || null;
         activeFilters.uuid = uuid || null;
         activeFilters.date_from = dateFrom || null;
         activeFilters.date_to = dateTo || null;
 
-        // Check if any filter is applied
         const hasFilters = Object.values(activeFilters).some(v => v !== null);
-
-        // Update UI
         updateFilterUI(hasFilters);
-
-        // Reset and reload messages
         resetAndReload();
 
         if (hasFilters) {
@@ -256,43 +262,26 @@
     }
 
     function clearFilters() {
-        // Check if any filter is active
         const hasFilters = Object.values(activeFilters).some(v => v !== null);
-
         if (!hasFilters) {
             toastr.info(translations.noFiltersApplied);
             return;
         }
 
-        // Clear filter values
         document.getElementById('userIdFilter').value = '';
         document.getElementById('userNameFilter').value = '';
         document.getElementById('uuidFilter').value = '';
         document.getElementById('dateFromFilter').value = '';
         document.getElementById('dateToFilter').value = '';
 
-        // Reset active filters
-        activeFilters = {
-            user_id: null,
-            user_name: null,
-            uuid: null,
-            date_from: null,
-            date_to: null
-        };
-
-        // Update UI
+        activeFilters = { user_id: null, user_name: null, uuid: null, date_from: null, date_to: null };
         updateFilterUI(false);
-
-        // Reset and reload messages
         resetAndReload();
-
         toastr.info(translations.filtersCleared);
     }
 
     function removeFilter(filterKey) {
         activeFilters[filterKey] = null;
-
-        // Clear corresponding input
         const inputMap = {
             user_id: 'userIdFilter',
             user_name: 'userNameFilter',
@@ -300,30 +289,18 @@
             date_from: 'dateFromFilter',
             date_to: 'dateToFilter'
         };
-
         const inputId = inputMap[filterKey];
-        if (inputId) {
-            document.getElementById(inputId).value = '';
-        }
+        if (inputId) document.getElementById(inputId).value = '';
 
-        // Check if any filter remains
         const hasFilters = Object.values(activeFilters).some(v => v !== null);
         updateFilterUI(hasFilters);
-
-        // Reload messages
         resetAndReload();
     }
 
     function updateFilterUI(hasFilters) {
-        // Show/hide clear button
         clearFilterBtn.style.display = hasFilters ? 'inline-flex' : 'none';
-
-        // Show/hide active filters badges
         activeFiltersContainer.style.display = hasFilters ? 'flex' : 'none';
-
-        if (hasFilters) {
-            renderFilterBadges();
-        }
+        if (hasFilters) renderFilterBadges();
     }
 
     function renderFilterBadges() {
@@ -334,62 +311,171 @@
             date_from: translations.dateFrom,
             date_to: translations.dateTo
         };
-
         let badgesHtml = '';
-
         Object.entries(activeFilters).forEach(([key, value]) => {
             if (value !== null) {
-                badgesHtml += `
-                    <span class="filter-badge">
-                        ${labelMap[key]}: ${value}
-                        <i class="fa fa-times badge-remove" onclick="removeFilter('${key}')"></i>
-                    </span>
-                `;
+                badgesHtml += `<span class="filter-badge">${labelMap[key]}: ${value}<i class="fa fa-times badge-remove" onclick="removeFilter('${key}')"></i></span>`;
             }
         });
-
         filterBadgesContainer.innerHTML = badgesHtml;
     }
 
     function buildFilterQueryString() {
         const params = new URLSearchParams();
-
         if (activeFilters.user_id) params.append('user_id', activeFilters.user_id);
         if (activeFilters.user_name) params.append('user_name', activeFilters.user_name);
         if (activeFilters.uuid) params.append('uuid', activeFilters.uuid);
         if (activeFilters.date_from) params.append('date_from', activeFilters.date_from);
         if (activeFilters.date_to) params.append('date_to', activeFilters.date_to);
-
         return params.toString();
     }
 
-    // ==================== SCROLL HANDLER ====================
+    function hasActiveFilters() {
+        return Object.values(activeFilters).some(v => v !== null);
+    }
 
+    function messageMatchesFilters(message) {
+        if (activeFilters.user_id && message.user_id != activeFilters.user_id) return false;
+        if (activeFilters.user_name && !message.user_name?.toLowerCase().includes(activeFilters.user_name.toLowerCase())) return false;
+        if (activeFilters.uuid && message.user_uuid && !message.user_uuid.toLowerCase().includes(activeFilters.uuid.toLowerCase())) return false;
+        return true;
+    }
+
+    // ==================== SCROLL & NOTIFICATION SYSTEM ====================
+    function isUserNearBottom() {
+        const threshold = SCROLL_BOTTOM_THRESHOLD;
+        return (chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight) < threshold;
+    }
+
+    function updateScrollState() {
+        const nearBottom = isUserNearBottom();
+        isUserScrolledUp = !nearBottom;
+
+        const scrollBtn = document.getElementById('scrollToLatestBtn');
+        const unreadBadge = document.getElementById('unreadBadge');
+
+        if (isUserScrolledUp) {
+            scrollBtn.style.display = 'flex';
+            if (unreadCount > 0) {
+                unreadBadge.style.display = 'flex';
+                unreadBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            }
+        } else {
+            scrollBtn.style.display = 'none';
+            resetNotifications();
+        }
+    }
+
+    function showNewMessageNotification(message) {
+        newMessageCount++;
+        unreadCount++;
+
+        const notification = document.getElementById('newMessageNotification');
+        const countBadge = document.getElementById('notificationCount');
+        const unreadBadge = document.getElementById('unreadBadge');
+
+        countBadge.textContent = newMessageCount > 99 ? '99+' : newMessageCount;
+        notification.style.display = 'flex';
+
+        if (document.getElementById('scrollToLatestBtn').style.display === 'flex') {
+            unreadBadge.style.display = 'flex';
+            unreadBadge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+        }
+
+        clearTimeout(window.notificationTimeout);
+        window.notificationTimeout = setTimeout(() => {
+            notification.style.display = 'none';
+        }, 5000);
+    }
+
+    function resetNotifications() {
+        newMessageCount = 0;
+        unreadCount = 0;
+
+        const notification = document.getElementById('newMessageNotification');
+        const unreadBadge = document.getElementById('unreadBadge');
+
+        if (notification) notification.style.display = 'none';
+        if (unreadBadge) unreadBadge.style.display = 'none';
+
+        clearTimeout(window.notificationTimeout);
+
+        // Highlight all new messages when user scrolls to bottom naturally
+        if (newMessageIds.length > 0) {
+            highlightAllNewMessages();
+        }
+    }
+
+    function highlightMessage(messageId) {
+        const msgElement = chatContainer.querySelector(`[data-id="${messageId}"]`);
+        if (msgElement) {
+            msgElement.classList.add('highlighted');
+            setTimeout(() => msgElement.classList.remove('highlighted'), 2000);
+        }
+    }
+
+    function highlightAllNewMessages() {
+        if (newMessageIds.length === 0) return;
+
+        // Highlight each message with a slight delay for visual effect
+        newMessageIds.forEach((messageId, index) => {
+            setTimeout(() => {
+                highlightMessage(messageId);
+            }, index * 150); // 150ms delay between each highlight
+        });
+
+        // Clear the array after highlighting
+        newMessageIds = [];
+    }
+
+    function scrollToLatestMessage() {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+
+        // Hide notification and scroll button
+        const notification = document.getElementById('newMessageNotification');
+        if (notification) notification.style.display = 'none';
+        document.getElementById('scrollToLatestBtn').style.display = 'none';
+
+        // Reset counts
+        newMessageCount = 0;
+        unreadCount = 0;
+        const unreadBadge = document.getElementById('unreadBadge');
+        if (unreadBadge) unreadBadge.style.display = 'none';
+
+        clearTimeout(window.notificationTimeout);
+
+        // Highlight ALL new messages after scroll completes
+        setTimeout(() => {
+            highlightAllNewMessages();
+        }, 500);
+    }
+
+    function smoothScrollToBottom() {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
+    }
+
+    // ==================== SCROLL HANDLER ====================
     function handleScroll() {
         if (scrollDebounceTimer) clearTimeout(scrollDebounceTimer);
-
         scrollDebounceTimer = setTimeout(() => {
             if (chatContainer.scrollTop <= SCROLL_THRESHOLD && !isLoading && hasMoreMessages) {
                 loadMoreMessages();
             }
-        }, 300);
+            updateScrollState();
+        }, 100);
     }
 
     chatContainer.addEventListener('scroll', handleScroll);
 
     // ==================== MESSAGE LOADING ====================
-
     function loadMessages() {
         if (isLoading) return;
-
         isLoading = true;
         showTopLoader();
 
         let url = `${messagesRoute}?page=1`;
         const filterQuery = buildFilterQueryString();
-        if (filterQuery) {
-            url += `&${filterQuery}`;
-        }
+        if (filterQuery) url += `&${filterQuery}`;
 
         fetch(url)
             .then(res => res.json())
@@ -416,6 +502,7 @@
                         setTimeout(() => {
                             chatContainer.scrollTop = chatContainer.scrollHeight;
                             initialLoad = false;
+                            updateScrollState();
                         }, 100);
                     }
                 }
@@ -440,19 +527,14 @@
 
         let url = `${messagesRoute}?page=${nextPage}`;
         const filterQuery = buildFilterQueryString();
-        if (filterQuery) {
-            url += `&${filterQuery}`;
-        }
+        if (filterQuery) url += `&${filterQuery}`;
 
         fetch(url)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     const olderMessages = data.messages || [];
-
-                    const sortedOlderMessages = [...olderMessages].sort((a, b) =>
-                        new Date(a.created_at) - new Date(b.created_at)
-                    );
+                    const sortedOlderMessages = [...olderMessages].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
                     let htmlToInsert = '';
                     sortedOlderMessages.forEach(msg => {
@@ -466,16 +548,14 @@
                     if (anchorElement && htmlToInsert) {
                         anchorElement.insertAdjacentHTML('beforebegin', htmlToInsert);
                         anchorElement.scrollIntoView({ block: 'start', behavior: 'instant' });
-                        chatContainer.scrollTop -= 100;
+                        chatContainer.scrollTop -= 220;
                     }
 
                     currentPage = nextPage;
                     hasMoreMessages = currentPage < lastPage;
 
                     const scrollUpIndicator = document.getElementById('scrollUpIndicator');
-                    if (!hasMoreMessages && scrollUpIndicator) {
-                        scrollUpIndicator.remove();
-                    }
+                    if (!hasMoreMessages && scrollUpIndicator) scrollUpIndicator.remove();
 
                     hideTopLoader();
                 }
@@ -490,7 +570,6 @@
     }
 
     // ==================== LOADER FUNCTIONS ====================
-
     function showTopLoader() {
         let loader = document.getElementById('topLoader');
         if (!loader) {
@@ -509,7 +588,6 @@
     }
 
     // ==================== RESET & REFRESH ====================
-
     function resetAndReload() {
         currentPage = 1;
         lastPage = 1;
@@ -519,6 +597,7 @@
         hasMoreMessages = true;
         isLoading = false;
         chatContainer.innerHTML = '';
+        resetNotifications();
         loadMessages();
     }
 
@@ -528,7 +607,6 @@
     }
 
     // ==================== RENDER MESSAGES ====================
-
     function renderMessages() {
         chatContainer.querySelectorAll('.message-wrapper, .scroll-up-indicator').forEach(el => el.remove());
 
@@ -553,22 +631,20 @@
         const isAdmin = message.user_id == adminAppId;
         const messageClass = isAdmin ? 'sent-message' : 'received-message';
         const time = new Date(message.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        const avatarUrl = message.user_avatar || '{{ asset("images/default-avatar.png") }}';
+        const avatarUrl = message.user_avatar || '{{ asset("images/businessman-icon.jpg") }}';
         const userName = message.user_name || translations.user;
         const userInitial = userName.charAt(0).toUpperCase();
 
-        // Check if message is share_room
         let messageContent = '';
         let isShareRoom = false;
         let roomImage = '';
         let shareRoomText = '';
-        
+
         if (message.text && message.text.startsWith('share_room:')) {
             isShareRoom = true;
             const parts = message.text.split(':');
-            const roomId = parts[3] || ''; // Get room ID from position 3
-            
-            // Get translated message based on locale
+            const roomId = parts[3] || '';
+
             const locale = '{{ app()->getLocale() }}';
             const translations_share = {
                 'ar': 'مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا',
@@ -577,13 +653,9 @@
                 'hi': 'नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है'
             };
             shareRoomText = translations_share[locale] || translations_share['en'];
-            
-            // Fetch room image from database using room ID
+
             if (roomId) {
-                // Use a placeholder initially and fetch the image
                 roomImage = 'loading';
-                
-                // Fetch room data asynchronously
                 fetch(`/admin/rooms/${roomId}/image`)
                     .then(response => response.json())
                     .then(data => {
@@ -597,10 +669,6 @@
                     })
                     .catch(error => {
                         console.error('Error fetching room image:', error);
-                        const imgElement = document.querySelector(`[data-id="${message.id}"] .room-share-image`);
-                        if (imgElement) {
-                            imgElement.style.display = 'none';
-                        }
                     });
             }
         }
@@ -632,7 +700,6 @@
     </div>
 </div>`;
 
-        // Build message content based on type
         if (isShareRoom) {
             messageContent = `
                 <div class="share-room-content">
@@ -683,7 +750,6 @@
     }
 
     // ==================== ACTION MENU ====================
-
     function toggleActionMenu(event, messageId) {
         event.stopPropagation();
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
@@ -709,12 +775,7 @@
         }
     });
 
-    chatContainer.addEventListener('scroll', () => {
-        document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
-    });
-
     // ==================== REPLY FUNCTIONS ====================
-
     function setReply(messageId, userName, messageText) {
         replyingTo = messageId;
         document.getElementById('replyToId').value = messageId;
@@ -743,7 +804,6 @@
     }
 
     // ==================== UTILITY FUNCTIONS ====================
-
     function escapeHtml(text) {
         if (!text) return '';
         const div = document.createElement('div');
@@ -752,7 +812,6 @@
     }
 
     // ==================== SEND MESSAGE ====================
-
     function sendMessage() {
         if (!canSendMessages) {
             toastr.error("{{ __('You cannot send messages. Your account is not linked to an app user.') }}");
@@ -771,10 +830,7 @@
 
         fetch(storeRoute, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
             body: JSON.stringify(payload)
         })
             .then(res => res.json())
@@ -782,12 +838,16 @@
                 if (data.success) {
                     input.value = '';
                     cancelReply();
+
                     if (!loadedMessageIds.has(data.message.id)) {
                         allMessages.push(data.message);
                         loadedMessageIds.add(data.message.id);
+                        const messageHtml = createMessageElement(data.message);
+                        chatContainer.insertAdjacentHTML('beforeend', messageHtml);
                     }
-                    renderMessages();
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                    smoothScrollToBottom();
+                    resetNotifications();
                     toastr.success(translations.messageSentSuccessfully);
                 } else {
                     toastr.error(data.error || translations.failedToSendMessage);
@@ -800,7 +860,6 @@
     }
 
     // ==================== EDIT MESSAGE ====================
-
     function editMessage(id, text) {
         document.getElementById('editMessageId').value = id;
         document.getElementById('editMessageText').value = text.replace(/\\'/g, "'").replace(/\\"/g, '"');
@@ -823,10 +882,7 @@
 
         fetch(updateRoute, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken
-            },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
             body: JSON.stringify({ id, text })
         })
             .then(res => res.json())
@@ -850,17 +906,13 @@
     }
 
     // ==================== DELETE MESSAGE ====================
-
     function deleteMessage(id) {
         document.querySelectorAll('.action-menu.show').forEach(m => m.classList.remove('show', 'open-up', 'open-down'));
-
         if (!confirm(translations.confirmDeleteMessage)) return;
 
         fetch(`${deleteRouteBase}/${id}`, {
             method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
+            headers: { 'X-CSRF-TOKEN': csrfToken }
         })
             .then(res => res.json())
             .then(data => {
@@ -879,19 +931,116 @@
             });
     }
 
-    // ==================== EVENT LISTENERS ====================
+    // ==================== PUSHER REAL-TIME MESSAGING ====================
+    function initializePusher() {
+        if (!pusherKey) {
+            console.warn('Pusher key not configured');
+            return;
+        }
 
-    // Send message on Enter key
+        pusher = new Pusher(pusherKey, { cluster: pusherCluster, encrypted: true });
+        channel = pusher.subscribe('group-chat');
+
+        channel.bind('getGroupChatBloc', function(data) {
+            handleIncomingPusherMessage(data);
+        });
+
+        pusher.connection.bind('connected', function() {
+            console.log('Pusher connected');
+            updateConnectionStatus(true);
+        });
+
+        pusher.connection.bind('disconnected', function() {
+            console.log('Pusher disconnected');
+            updateConnectionStatus(false);
+        });
+    }
+
+    function handleIncomingPusherMessage(pusherData) {
+        console.log('Received Pusher message:', pusherData);
+
+        let avatarUrl = '{{ asset("images/businessman-icon.jpg") }}';
+        if (pusherData.profile?.image) {
+            if (pusherData.profile.image.startsWith('http')) {
+                avatarUrl = pusherData.profile.image;
+            } else {
+                avatarUrl = '{{ url("storage") }}/' + pusherData.profile.image;
+            }
+        }
+
+        const message = {
+            id: pusherData.message_id,
+            text: pusherData.group_message || '',
+            user_id: pusherData.id,
+            user_name: pusherData.name || 'User',
+            user_uuid: pusherData.uuid,
+            user_avatar: avatarUrl,
+            image: pusherData.group_image || null,
+            parent_id: pusherData.replay?.id || null,
+            parent: pusherData.replay ? {
+                id: pusherData.replay.id,
+                text: pusherData.replay.text || pusherData.replay.group_message || '',
+                user_name: pusherData.replay.name || pusherData.replay.user_name || 'User'
+            } : null,
+            created_at: pusherData.created_at,
+            updated_at: pusherData.created_at
+        };
+
+        if (loadedMessageIds.has(message.id)) {
+            console.log('Message already exists, skipping:', message.id);
+            return;
+        }
+
+        if (hasActiveFilters() && !messageMatchesFilters(message)) {
+            console.log('Message does not match active filters');
+            return;
+        }
+
+        loadedMessageIds.add(message.id);
+        allMessages.push(message);
+        appendNewMessage(message);
+    }
+
+    function appendNewMessage(message) {
+        const messageHtml = createMessageElement(message);
+        const wasNearBottom = isUserNearBottom();
+
+        chatContainer.insertAdjacentHTML('beforeend', messageHtml);
+
+        const isOwnMessage = message.user_id == adminAppId;
+
+        if (wasNearBottom) {
+            smoothScrollToBottom();
+            // Highlight just this message since user is at bottom
+            highlightMessage(message.id);
+        } else if (!isOwnMessage) {
+            // User is scrolled up, track this message ID for later highlighting
+            newMessageIds.push(message.id);
+            showNewMessageNotification(message);
+        }
+
+        updateScrollState();
+    }
+
+    function updateConnectionStatus(connected) {
+        const statusElement = document.querySelector('.status');
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="status-dot" style="background-color: ${connected ? '#4CAF50' : '#f44336'};"></span>
+                ${connected ? '{{ __("Connected") }}' : '{{ __("Disconnected") }}'}
+            `;
+        }
+    }
+
+    // ==================== EVENT LISTENERS ====================
     document.getElementById('messageInput').addEventListener('keypress', e => {
         if (e.key === 'Enter') sendMessage();
     });
 
-    // Close modal on backdrop click
     document.getElementById('editModal').addEventListener('click', e => {
         if (e.target === e.currentTarget) closeEditModal();
     });
 
-    // Apply filter on Enter key in filter inputs
     document.getElementById('userIdFilter').addEventListener('keypress', e => {
         if (e.key === 'Enter') applyFilters();
     });
@@ -904,7 +1053,15 @@
         if (e.key === 'Enter') applyFilters();
     });
 
-    // ==================== INITIALIZE ====================
+    window.addEventListener('beforeunload', function() {
+        if (pusher) pusher.disconnect();
+    });
 
+    // ==================== INITIALIZE ====================
     loadMessages();
+    initializePusher();
+
+    setTimeout(() => {
+        updateScrollState();
+    }, 1000);
 </script>
