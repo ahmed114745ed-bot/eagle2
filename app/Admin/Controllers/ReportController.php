@@ -454,7 +454,11 @@ class ReportController extends MainController
         //     return @$this->getTotalTargetAgency(request('month'), request('year')) ?? 0;
         // });
 
-        $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+        //  $grid->column('target', __('target'))->display(fn($v) => floor($v ?? 0));
+        $grid->column('target', __('target'))->display(function ($v) {
+            $value = is_array($v) ? ($v['target'] ?? 0) : $v;
+            return floor((float) $value);
+        });
         // $grid->column('net_salary', __('Net Salary'))->display(function () {
         //     return @$this->getTotalNetSallaryAgency(request('month'), request('year')) ?? 0;
         // });
