@@ -392,7 +392,7 @@ class ReportController extends MainController
                 fn($j) => $j->on('agency_salary_table.agency_id', '=', 'agencies.id')
             )
             ->when($countryID, fn($q) => $q->where('agencies.country_id', $countryID))
-            ->with(['owner.profile'])
+          //  ->with(['owner.profile'])
 
             ->select([
                 'agencies.*',
