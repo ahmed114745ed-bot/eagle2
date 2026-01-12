@@ -616,7 +616,6 @@
                             <i class="fas fa-chevron-right"></i>
                         </button>
                         <div class="lightbox-media"></div>
-                        <div class="lightbox-counter"></div>
                     </div>
                 </div>
             `);
@@ -668,7 +667,7 @@
             `<img src="${mediaPath}" alt="Moment">`;
         
         lightbox.find('.lightbox-media').html(mediaHtml);
-        lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
+        // lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
         
         // إخفاء أزرار التنقل إذا كانت صورة واحدة فقط
         if (media.length === 1) {
