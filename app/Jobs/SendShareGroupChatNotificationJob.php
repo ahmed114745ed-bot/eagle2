@@ -98,12 +98,14 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             $userLang = $this->user->lan ?? 'en';
             $translatedMessage = __('share_room_message', [], $userLang);
 
+            // Build full URL using getImagePath helper function
             if (!empty($roomImage)) {
                 $roomImage = getImagePath($roomImage);
             }
             
-            Log::info('SendShareGroupChatNotificationJob: Room image URL', [
-                'room_image' => $roomImage
+            Log::info('SendShareGroupChatNotificationJob: Room image URL prepared for Firebase', [
+                'room_image' => $roomImage,
+                'is_valid_url' => filter_var($roomImage, FILTER_VALIDATE_URL) !== false
             ]);
 
             $notificationsIdsChunks = User::withoutAppends()->where('notification_id', '!=', null)
