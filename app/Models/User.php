@@ -1584,6 +1584,11 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
+        // Skip pack check if packs relation is not loaded to avoid N+1 queries
+        if (!$this->relationLoaded('packs')) {
+            return $value;
+        }
+        
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }

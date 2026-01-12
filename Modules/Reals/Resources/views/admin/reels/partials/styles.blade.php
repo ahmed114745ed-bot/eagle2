@@ -172,6 +172,9 @@
             top: 50px;
         }
 
+        .Overlay-top{
+            top: 70px !important;
+        }
         /* Smaller padding on mobile */
         .interactions-panel > div[class*="p-"] {
             padding: 0.75rem !important;
@@ -234,7 +237,9 @@
             /* margin-top: 50px; */
             flex-direction: column-reverse;
         }
-
+   .Overlay-top{
+            top: 70px !important;
+        }
         .reels-sidebar {
             display: none;
         }
@@ -397,7 +402,9 @@
         .reels-main-container {
             height: calc(100vh - 65px);
         }
-        
+        .Overlay-top{
+            top: 70px !important;
+        }
         .reels-video-container {
             height: calc(100vh - 65px);
         }
