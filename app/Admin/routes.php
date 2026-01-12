@@ -305,6 +305,7 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
         Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
         Route::resource('live-rooms', 'LiveRoomController');
 
