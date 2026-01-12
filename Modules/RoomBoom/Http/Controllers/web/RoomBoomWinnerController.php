@@ -33,7 +33,6 @@ class RoomBoomWinnerController extends MainController
             'reward.ware',
             'boom.roomBoomLevel',
             'boom.totalRoomGift.room',
-             'boom.totalRoomGift.room.country',
             'user',
             'user.profile',
             'user.country',
