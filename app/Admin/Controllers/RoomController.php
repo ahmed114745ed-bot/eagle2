@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-        $grid->header(fn() => $this->buildTabsHeader($filterType));
+       $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -555,33 +555,33 @@ class RoomController extends MainController
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
         // Preload users for this page only
-        $grid->model()->collection(function (Collection $collection) {
-            // collect all microphone user IDs from the current page rows
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
+        // $grid->model()->collection(function (Collection $collection) {
+        //     // collect all microphone user IDs from the current page rows
+        //     $allIds = $collection->flatMap(function ($row) {
+        //         return array_filter(explode(',', (string) $row->microphone));
+        //     })->unique()->values()->all();
 
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                    ->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
+        //     // fetch all needed users once
+        //     $users = collect();
+        //     if (!empty($allIds)) {
+        //         $users = User::select(['id', 'name'])
+        //             ->with('profile:id,user_id,avatar')
+        //             ->whereIn('id', $allIds)
+        //             ->get()
+        //             ->keyBy('id');
+        //     }
 
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
+        //     // attach a ready-to-use collection on each row
+        //     $collection->each(function ($row) use ($users) {
+        //         $ids = array_filter(explode(',', (string) $row->microphone));
+        //         $row->microphone_users = collect($ids)
+        //             ->map(fn($id) => $users->get($id))
+        //             ->filter()
+        //             ->values();
+        //     });
 
-            return $collection; // IMPORTANT: return the collection
-        });
+        //     return $collection; // IMPORTANT: return the collection
+        // });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
@@ -664,7 +664,7 @@ class RoomController extends MainController
                         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                         transition: transform 0.3s ease;"/>
             </div>
-        HTML;
+         HTML;
             }
 
             $html .= '</div>';
@@ -673,7 +673,7 @@ class RoomController extends MainController
             static $appended = false;
             if (!$appended) {
                 $html .= '
-        <style>
+          <style>
 
 
 
@@ -706,7 +706,7 @@ class RoomController extends MainController
                 transform: scale(1.2);
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             }
-        </style>';
+            </style>';
                 $appended = true;
             }
 
