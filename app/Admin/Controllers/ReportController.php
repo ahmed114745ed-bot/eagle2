@@ -106,6 +106,7 @@ class ReportController extends MainController
             )
 
             ->with([
+                'latestTarget',
                 'profile',
                 'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'targets',
@@ -130,34 +131,38 @@ class ReportController extends MainController
             $filter->expand();
             $filter->disableIdFilter();
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('id', __('ID'));
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('uuid', __('Unique ID'));
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->equal('agency_id', __('agency'))
                     ->select(Common::by_agency_filter());
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if (!empty($this->input)) {
-                        $query->whereHas('userSallary', fn($q) =>
-                        $q->where('year', $this->input)
+                        $query->whereHas(
+                            'userSallary',
+                            fn($q) =>
+                            $q->where('year', $this->input)
                         );
                     }
                 }, __('Year'), 'year')->integer();
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if (!empty($this->input)) {
-                        $query->whereHas('userSallary', fn($q) =>
-                        $q->where('month', $this->input)
+                        $query->whereHas(
+                            'userSallary',
+                            fn($q) =>
+                            $q->where('month', $this->input)
                         );
                     }
                 }, __('Month'), 'month')->integer();
@@ -206,10 +211,14 @@ class ReportController extends MainController
                     <img src='{$image}' alt='USD' width='20' height='20'>
                 </div>";
         });
-        $grid->column('target', __('target'))->display(function () {
-            // return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
-            $lastTargetFromRelation = optional($this->targets()->orderByDesc('id')->first())->target_id ?? 0;
-            return $lastTargetFromRelation;
+        // $grid->column('target', __('target'))->display(function () {
+        //     // return @$this->getTotalSallary(request('month'), request('year')) ?? 0;
+        //     $lastTargetFromRelation = optional($this->targets()->orderByDesc('id')->first())->target_id ?? 0;
+        //     return $lastTargetFromRelation;
+        // });
+
+        $grid->column('target', __('Target'))->display(function () {
+            return $this->latestTarget->target_id ?? 0;
         });
         $grid->column('expenses', __('expenses'))->display(function () {
             return @$this->getTotalCutAmount(request('month'), request('year')) ?? 0;
