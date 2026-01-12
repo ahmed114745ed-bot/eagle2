@@ -433,7 +433,6 @@ function reelsManager() {
             this.loading = true;
             
             try {
-                // تحضير IDs المستبعدة
                 const excludeIds = Array.from(this.loadedReelIds);
                 
                 const response = await fetch(`/admin/view/reels/load-more?limit=20`, {
@@ -443,7 +442,8 @@ function reelsManager() {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
                     body: JSON.stringify({
-                        exclude_ids: excludeIds
+                        exclude_ids: excludeIds,
+                        seed: window.randomSeed || null
                     })
                 });
                 
@@ -463,7 +463,6 @@ function reelsManager() {
                             this.allReels.push(item);
                             this.loadedReelIds.add(item.id);
                             
-                            // إضافة 3 فيديوهات فقط للعرض في كل مرة
                             if (this.visibleReels.length < this.allReels.length) {
                                 this.visibleReels.push(item);
                             }
@@ -493,16 +492,13 @@ function reelsManager() {
         },
         
         playFirstVideo() {
-            // تعيين أول ريل كاختيار مبدئي
             this.selectedReelId = this.visibleReels[0]?.id;
             this.selectedReel = this.visibleReels[0] || null;
             
-            // تشغيل الفيديو الأول بعد التحميل (مع استخدام الكاش)
             this.$nextTick(() => {
                 setTimeout(() => {
                     const firstVideo = document.getElementById('video-' + this.selectedReelId);
                     if (firstVideo) {
-                        // التحقق من الكاش أولاً
                         const cached = this.getCachedVideo(this.selectedReelId);
                         if (cached && cached.element) {
                             console.log('⚡ تشغيل من الكاش');
@@ -514,7 +510,7 @@ function reelsManager() {
                             });
                         }
                     }
-                }, 300); // تقليل التأخير من 500 إلى 300
+                }, 300); 
             });
         },
         
@@ -531,14 +527,12 @@ function reelsManager() {
                 const oldIndex = this.currentVideoIndex;
                 this.currentVideoIndex = newIndex;
                 
-                // تحميل الفيديو الحالي والمجاور
                 for (let i = newIndex - 1; i <= newIndex + 1; i++) {
                     if (i >= 0 && i < this.visibleReels.length) {
                         this.loadedVideos.add(i);
                     }
                 }
                 
-                // إيقاف الفيديو القديم فقط عند تغيير الفيديو
                 if (oldIndex !== newIndex && oldIndex >= 0 && oldIndex < this.visibleReels.length) {
                     const oldVideo = document.getElementById('video-' + this.visibleReels[oldIndex]?.id);
                     if (oldVideo && !oldVideo.paused) {
@@ -547,7 +541,6 @@ function reelsManager() {
                     }
                 }
                 
-                // تشغيل الفيديو الجديد
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     const newVideo = document.getElementById('video-' + this.visibleReels[newIndex]?.id);
                     if (newVideo && newVideo.paused && newVideo.readyState >= 2) {
@@ -555,12 +548,10 @@ function reelsManager() {
                     }
                 }
                 
-                // تحديث الريل المحدد
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     this.selectedReelId = this.visibleReels[newIndex]?.id;
                     this.selectedReel = this.visibleReels[newIndex];
                     
-                    // تحميل تلقائي عند الوصول للفيديو قبل الأخير بـ 3
                     const remaining = this.visibleReels.length - newIndex;
                     if (remaining <= 3 && this.hasMore && !this.loading) {
                         console.log('🚀 تحميل تلقائي: متبقي', remaining, 'فيديوهات');
@@ -568,7 +559,6 @@ function reelsManager() {
                     }
                 }
                 
-                // تنظيف الفيديوهات البعيدة جداً
                 const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 5);
                 farVideos.forEach(i => {
                     const video = document.getElementById('video-' + this.visibleReels[i]?.id);
@@ -584,7 +574,6 @@ function reelsManager() {
         },
         
         updateVisibleVideos(container, screenHeight) {
-            // لا نفعل شيء - الآن handleScroll يتولى كل شيء
         },
         
         togglePlay(event) {
@@ -601,7 +590,6 @@ function reelsManager() {
         },
         
         onVideoEnded(event) {
-            // إعادة تشغيل الفيديو تلقائياً (loop)
             const video = event.target;
             video.currentTime = 0;
             video.play().catch(() => {});
@@ -621,7 +609,6 @@ function reelsManager() {
                 return;
             }
 
-            // Avoid double work for the same reel
             if (this.thumbnailGenerating[reel.id]) {
                 return;
             }
