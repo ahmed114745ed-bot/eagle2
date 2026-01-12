@@ -27,7 +27,11 @@ class Admin extends Administrator
 
     public function getAgencyIdAttribute()
     {
-        return @$this->agency->id;
+        return \Illuminate\Support\Facades\Cache::remember(
+            "admin_agency_id_{$this->id}",
+            300,
+            fn() => @$this->agency?->id
+        );
     }
 
     public function getImgAttribute()
