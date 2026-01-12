@@ -608,6 +608,7 @@ Route::group(
         Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
         Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
         Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);

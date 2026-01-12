@@ -557,6 +557,54 @@
         const userName = message.user_name || translations.user;
         const userInitial = userName.charAt(0).toUpperCase();
 
+        // Check if message is share_room
+        let messageContent = '';
+        let isShareRoom = false;
+        let roomImage = '';
+        let shareRoomText = '';
+        
+        if (message.text && message.text.startsWith('share_room:')) {
+            isShareRoom = true;
+            const parts = message.text.split(':');
+            const roomId = parts[3] || ''; // Get room ID from position 3
+            
+            // Get translated message based on locale
+            const locale = '{{ app()->getLocale() }}';
+            const translations_share = {
+                'ar': 'مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا',
+                'en': 'Hello, come and join me in this room, it\'s really fun',
+                'tr': 'Merhaba, gel ve benimle bu odaya katıl, gerçekten çok eğlenceli',
+                'hi': 'नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है'
+            };
+            shareRoomText = translations_share[locale] || translations_share['en'];
+            
+            // Fetch room image from database using room ID
+            if (roomId) {
+                // Use a placeholder initially and fetch the image
+                roomImage = 'loading';
+                
+                // Fetch room data asynchronously
+                fetch(`/admin/rooms/${roomId}/image`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.image) {
+                            const imgElement = document.querySelector(`[data-id="${message.id}"] .room-share-image`);
+                            if (imgElement) {
+                                imgElement.src = data.image;
+                                imgElement.style.display = 'block';
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching room image:', error);
+                        const imgElement = document.querySelector(`[data-id="${message.id}"] .room-share-image`);
+                        if (imgElement) {
+                            imgElement.style.display = 'none';
+                        }
+                    });
+            }
+        }
+
         let replyHtml = '';
         if (message.parent) {
             replyHtml = `
@@ -584,6 +632,17 @@
     </div>
 </div>`;
 
+        // Build message content based on type
+        if (isShareRoom) {
+            messageContent = `
+                <div class="share-room-content">
+                    <img src="{{ asset('images/loading.gif') }}" alt="Room" class="room-share-image" style="max-width: 100%; border-radius: 8px; margin-bottom: 8px; display: ${roomImage === 'loading' ? 'block' : 'none'};">
+                    <p class="share-room-text">${shareRoomText}</p>
+                </div>`;
+        } else {
+            messageContent = `<p>${escapeHtml(message.text)}</p>`;
+        }
+
         if (isAdmin) {
             return `
                 <div class="message-wrapper ${messageClass}" data-id="${message.id}">
@@ -591,7 +650,7 @@
                     <div class="message-content">
                         <div class="message-bubble">
                             ${replyHtml}
-                            <p>${escapeHtml(message.text)}</p>
+                            ${messageContent}
                             <div class="message-footer">
                                 <span class="message-time">${time}</span>
                                 <i class="fa fa-check-double"></i>
@@ -614,7 +673,7 @@
                         <div class="message-bubble">
                             ${replyHtml}
                             <p class="user-name-label">${userName}</p>
-                            <p>${escapeHtml(message.text)}</p>
+                            ${messageContent}
                             <span class="message-time">${time}</span>
                         </div>
                     </div>

@@ -62,52 +62,23 @@ class SendShareGroupChatNotificationJob implements ShouldQueue
             
             $roomId = $parts[3] ?? null;
 
-            Log::info('SendShareGroupChatNotificationJob: Processing share room', [
-                'room_id' => $roomId,
-                'parts_count' => count($parts),
-                'full_text' => $this->text
-            ]);
-
             if (!$roomId) {
-                Log::error('SendShareGroupChatNotificationJob: Room ID not found in text', [
-                    'text' => $this->text,
-                    'parts' => $parts
-                ]);
                 return;
             }
-
-            // Fetch room from database to get the image
             $room = Room::find($roomId);
             
             if (!$room) {
-                Log::error('SendShareGroupChatNotificationJob: Room not found in database', [
-                    'room_id' => $roomId
-                ]);
                 return;
             }
 
-            // Get room image from the room model
             $roomImage = $room->room_cover ?? $room->final_room_image ?? $this->groupChatResource['image_url'] ?? '';
-
-            Log::info('SendShareGroupChatNotificationJob: Room image fetched', [
-                'room_id' => $roomId,
-                'room_image' => $roomImage,
-                'room_name' => $room->name ?? 'N/A'
-            ]);
-
             $userLang = $this->user->lan ?? 'en';
             $translatedMessage = __('share_room_message', [], $userLang);
 
-            // Build full URL using getImagePath helper function
             if (!empty($roomImage)) {
                 $roomImage = getImagePath($roomImage);
             }
             
-            Log::info('SendShareGroupChatNotificationJob: Room image URL prepared for Firebase', [
-                'room_image' => $roomImage,
-                'is_valid_url' => filter_var($roomImage, FILTER_VALIDATE_URL) !== false
-            ]);
-
             $notificationsIdsChunks = User::withoutAppends()->where('notification_id', '!=', null)
                 ->select(['id', 'notification_id', 'lan'])
                 ->orderByDesc('online')
