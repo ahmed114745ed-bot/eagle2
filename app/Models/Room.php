@@ -108,13 +108,31 @@ class Room extends Model
         return $this->hasMany(RoomMicrophone::class);
     }
 
+    // public function getLangAttribute()
+    // {
+    //     if (self::$withoutAppends) {
+    //         return;
+    //     }
+
+    //     return @$this->owner->country->language;
+    // }
+
     public function getLangAttribute()
     {
         if (self::$withoutAppends) {
-            return;
+            return null;
         }
 
-        return @$this->owner->country->language;
+        // prevent lazy loading
+        if (! $this->relationLoaded('owner')) {
+            return null;
+        }
+
+        if (! $this->owner || ! $this->owner->relationLoaded('country')) {
+            return null;
+        }
+
+        return $this->owner->country->language ?? null;
     }
 
     public function getCountryAttribute()
