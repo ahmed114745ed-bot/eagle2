@@ -271,14 +271,17 @@
             },
             success: function(response) {
                 if (response.success && response.data) {
-                    // تخزين البيانات المحملة
+                    // تخزين البيانات المحملة بدون تكرار
                     if (append) {
-                        allMomentsLoaded = allMomentsLoaded.concat(response.data);
+                        // الحصول على IDs الموجودة لتجنب التكرار
+                        const existingIds = new Set(allMomentsLoaded.map(m => m.id));
+                        const newMoments = response.data.filter(m => !existingIds.has(m.id));
+                        allMomentsLoaded = allMomentsLoaded.concat(newMoments);
                     } else {
                         allMomentsLoaded = response.data;
                     }
                     
-                    // عرض أول 10 عناصر فقط
+                    // عرض العناصر
                     renderInitialMoments(append);
                     
                     if (response.pagination) {
@@ -319,9 +322,16 @@
             return;
         }
 
-        // عرض أول INITIAL_LOAD عناصر
-        const momentsToShow = allMomentsLoaded.slice(0, INITIAL_LOAD);
-        currentlyVisibleCount = momentsToShow.length;
+        let momentsToShow;
+        if (append) {
+            // عند الإضافة، أضف فقط العناصر الجديدة
+            momentsToShow = allMomentsLoaded.slice(currentlyVisibleCount);
+        } else {
+            // عند التحميل الأول، اعرض أول INITIAL_LOAD عناصر
+            momentsToShow = allMomentsLoaded.slice(0, INITIAL_LOAD);
+        }
+        
+        if (momentsToShow.length === 0) return;
         
         let html = '';
         momentsToShow.forEach(moment => {
@@ -333,6 +343,8 @@
         } else {
             feed.html(html);
         }
+        
+        currentlyVisibleCount += momentsToShow.length;
         
         // مراقبة العناصر المرئية
         setTimeout(() => {
@@ -384,6 +396,11 @@
     }
 
     function renderMomentCard(moment) {
+        if ($(`.moment-post[data-moment-id="${moment.id}"]`).length > 0) {
+            console.log(`Moment ${moment.id} already exists in DOM, skipping...`);
+            return '';
+        }
+        
         const user = moment.user || {};
         const avatar = getUserAvatar(user);
         const userName = user.name || 'Unknown User';
@@ -391,7 +408,6 @@
         const userId = moment.user_id;
         const userUrl = adminUserUrl + userId;
         
-        // فلترة الميديا وإزالة الفارغة
         const images = moment.images || [];
         const allMedia = images.length > 0 ? images : (moment.img ? [{image: moment.img}] : []);
         const validMedia = allMedia.filter(media => media && media.image && media.image.trim() !== '');
@@ -470,11 +486,9 @@
         const textAlign = textDir === 'rtl' ? 'right' : 'left';
         const escapedDesc = escapeHtml(description);
         
-        // حساب عدد الأسطر التقريبي بناءً على طول النص
-        const estimatedLines = Math.ceil(escapedDesc.length / 60); // تقريبا 60 حرف للسطر
+        const estimatedLines = Math.ceil(escapedDesc.length / 60); 
         const needsSeeMore = estimatedLines > 2;
         
-        // اختيار اللغة المناسبة
         let lang = 'en';
         if (textDir === 'rtl') {
             lang = 'ar';
@@ -616,7 +630,6 @@
                             <i class="fas fa-chevron-right"></i>
                         </button>
                         <div class="lightbox-media"></div>
-                        <div class="lightbox-counter"></div>
                     </div>
                 </div>
             `);
@@ -668,7 +681,7 @@
             `<img src="${mediaPath}" alt="Moment">`;
         
         lightbox.find('.lightbox-media').html(mediaHtml);
-        lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
+        // lightbox.find('.lightbox-counter').text(`${index + 1} / ${media.length}`);
         
         // إخفاء أزرار التنقل إذا كانت صورة واحدة فقط
         if (media.length === 1) {

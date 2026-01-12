@@ -57,14 +57,22 @@ function reelsManager() {
         loadInitialData() {
             const reelsData = window.initialReelsData || [];
             
-            this.allReels = reelsData.map(reel => {
-                // حفظ IDs لتجنب التكرار
-                this.loadedReelIds.add(reel.id);
-                return {
-                    ...reel,
-                    thumbnailLoaded: Boolean(reel.thumbnail_url)
-                };
+            // فلترة البيانات الأولية لتجنب أي تكرار
+            const uniqueReels = [];
+            const seenIds = new Set();
+            
+            reelsData.forEach(reel => {
+                if (!seenIds.has(reel.id)) {
+                    seenIds.add(reel.id);
+                    this.loadedReelIds.add(reel.id);
+                    uniqueReels.push({
+                        ...reel,
+                        thumbnailLoaded: Boolean(reel.thumbnail_url)
+                    });
+                }
             });
+            
+            this.allReels = uniqueReels;
             
             // تحميل سريع لأول فيديوهين على الموبايل
             const initialCount = this.isMobile ? 2 : 3;
@@ -337,12 +345,15 @@ function reelsManager() {
                 const data = await response.json();
                 
                 if (data.reels && data.reels.length > 0) {
-                    this.batchCache = data.reels.map(reel => ({
+                    // فلترة العناصر المكررة
+                    const newReels = data.reels.filter(reel => !this.loadedReelIds.has(reel.id));
+                    
+                    this.batchCache = newReels.map(reel => ({
                         ...reel,
                         thumbnailLoaded: Boolean(reel.thumbnail_url)
                     }));
                     
-                    console.log(`✅ تم تخزين ${this.batchCache.length} فيديو في الكاش`);
+                    console.log(`✅ تم تخزين ${this.batchCache.length} فيديو في الكاش (تم تجاهل ${data.reels.length - newReels.length} مكرر)`);
                 }
             } catch (error) {
                 console.error('خطأ في تحميل batch:', error);
@@ -433,7 +444,6 @@ function reelsManager() {
             this.loading = true;
             
             try {
-                // تحضير IDs المستبعدة
                 const excludeIds = Array.from(this.loadedReelIds);
                 
                 const response = await fetch(`/admin/view/reels/load-more?limit=20`, {
@@ -443,15 +453,20 @@ function reelsManager() {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     },
                     body: JSON.stringify({
-                        exclude_ids: excludeIds
+                        exclude_ids: excludeIds,
+                        seed: window.randomSeed || null
                     })
                 });
                 
                 const data = await response.json();
                 
                 if (data.reels && data.reels.length > 0) {
+                    // فلترة العناصر المكررة من كل من allReels و loadedReelIds
                     const existingIds = new Set(this.allReels.map(r => r.id));
-                    const newReels = data.reels.filter(reel => !existingIds.has(reel.id));
+                    const newReels = data.reels.filter(reel => {
+                        // التحقق من loadedReelIds أيضاً لضمان عدم التكرار
+                        return !existingIds.has(reel.id) && !this.loadedReelIds.has(reel.id);
+                    });
                     
                     if (newReels.length > 0) {
                         const normalized = newReels.map(reel => ({
@@ -459,28 +474,40 @@ function reelsManager() {
                             thumbnailLoaded: Boolean(reel.thumbnail_url)
                         }));
 
+                        // إضافة العناصر الجديدة فقط
+                        const visibleReelsIds = new Set(this.visibleReels.map(r => r.id));
+                        const filteredReelsIds = new Set(this.filteredReels.map(r => r.id));
+                        
                         normalized.forEach(item => {
+                            // إضافة إلى allReels
                             this.allReels.push(item);
                             this.loadedReelIds.add(item.id);
                             
-                            // إضافة 3 فيديوهات فقط للعرض في كل مرة
-                            if (this.visibleReels.length < this.allReels.length) {
+                            // إضافة إلى visibleReels فقط إذا لم يكن موجوداً
+                            if (!visibleReelsIds.has(item.id)) {
                                 this.visibleReels.push(item);
+                                visibleReelsIds.add(item.id);
                             }
-                            if (!this.searchQuery) {
+                            
+                            // إضافة إلى filteredReels فقط إذا لم يكن موجوداً ولا يوجد بحث
+                            if (!this.searchQuery && !filteredReelsIds.has(item.id)) {
                                 this.filteredReels.push(item);
+                                filteredReelsIds.add(item.id);
                             }
                         });
-                        this.captureMissingThumbnails(this.filteredReels.slice(-newReels.length));
+                        
+                        this.captureMissingThumbnails(normalized);
                         
                         if (this.searchQuery) {
                             this.filterReels();
                         }
                         
-                        console.log(`✅ تم تحميل ${newReels.length} ريل جديد`);
+                        console.log(`✅ تم تحميل ${newReels.length} ريل جديد (تم تجاهل ${data.reels.length - newReels.length} مكرر)`);
+                    } else {
+                        console.log(`⚠️ جميع الريلز المستلمة (${data.reels.length}) كانت مكررة`);
                     }
                     
-                    this.offset += data.reels.length;
+                    this.offset += newReels.length; // عد العناصر الجديدة فقط
                     this.hasMore = data.has_more !== false;
                 } else {
                     this.hasMore = false;
@@ -493,16 +520,13 @@ function reelsManager() {
         },
         
         playFirstVideo() {
-            // تعيين أول ريل كاختيار مبدئي
             this.selectedReelId = this.visibleReels[0]?.id;
             this.selectedReel = this.visibleReels[0] || null;
             
-            // تشغيل الفيديو الأول بعد التحميل (مع استخدام الكاش)
             this.$nextTick(() => {
                 setTimeout(() => {
                     const firstVideo = document.getElementById('video-' + this.selectedReelId);
                     if (firstVideo) {
-                        // التحقق من الكاش أولاً
                         const cached = this.getCachedVideo(this.selectedReelId);
                         if (cached && cached.element) {
                             console.log('⚡ تشغيل من الكاش');
@@ -514,7 +538,7 @@ function reelsManager() {
                             });
                         }
                     }
-                }, 300); // تقليل التأخير من 500 إلى 300
+                }, 300); 
             });
         },
         
@@ -531,14 +555,12 @@ function reelsManager() {
                 const oldIndex = this.currentVideoIndex;
                 this.currentVideoIndex = newIndex;
                 
-                // تحميل الفيديو الحالي والمجاور
                 for (let i = newIndex - 1; i <= newIndex + 1; i++) {
                     if (i >= 0 && i < this.visibleReels.length) {
                         this.loadedVideos.add(i);
                     }
                 }
                 
-                // إيقاف الفيديو القديم فقط عند تغيير الفيديو
                 if (oldIndex !== newIndex && oldIndex >= 0 && oldIndex < this.visibleReels.length) {
                     const oldVideo = document.getElementById('video-' + this.visibleReels[oldIndex]?.id);
                     if (oldVideo && !oldVideo.paused) {
@@ -547,7 +569,6 @@ function reelsManager() {
                     }
                 }
                 
-                // تشغيل الفيديو الجديد
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     const newVideo = document.getElementById('video-' + this.visibleReels[newIndex]?.id);
                     if (newVideo && newVideo.paused && newVideo.readyState >= 2) {
@@ -555,12 +576,10 @@ function reelsManager() {
                     }
                 }
                 
-                // تحديث الريل المحدد
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     this.selectedReelId = this.visibleReels[newIndex]?.id;
                     this.selectedReel = this.visibleReels[newIndex];
                     
-                    // تحميل تلقائي عند الوصول للفيديو قبل الأخير بـ 3
                     const remaining = this.visibleReels.length - newIndex;
                     if (remaining <= 3 && this.hasMore && !this.loading) {
                         console.log('🚀 تحميل تلقائي: متبقي', remaining, 'فيديوهات');
@@ -568,7 +587,6 @@ function reelsManager() {
                     }
                 }
                 
-                // تنظيف الفيديوهات البعيدة جداً
                 const farVideos = Array.from(this.loadedVideos).filter(i => Math.abs(i - newIndex) > 5);
                 farVideos.forEach(i => {
                     const video = document.getElementById('video-' + this.visibleReels[i]?.id);
@@ -584,7 +602,6 @@ function reelsManager() {
         },
         
         updateVisibleVideos(container, screenHeight) {
-            // لا نفعل شيء - الآن handleScroll يتولى كل شيء
         },
         
         togglePlay(event) {
@@ -601,7 +618,6 @@ function reelsManager() {
         },
         
         onVideoEnded(event) {
-            // إعادة تشغيل الفيديو تلقائياً (loop)
             const video = event.target;
             video.currentTime = 0;
             video.play().catch(() => {});
@@ -621,7 +637,6 @@ function reelsManager() {
                 return;
             }
 
-            // Avoid double work for the same reel
             if (this.thumbnailGenerating[reel.id]) {
                 return;
             }

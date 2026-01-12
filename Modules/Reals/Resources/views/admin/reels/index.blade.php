@@ -1024,6 +1024,7 @@
 <!-- Reels Data -->
 <script>
     window.initialReelsData = @json($reels);
+    window.randomSeed = {{ $seed ?? 'null' }};
 </script>
 
 <!-- Reels Manager Script -->
