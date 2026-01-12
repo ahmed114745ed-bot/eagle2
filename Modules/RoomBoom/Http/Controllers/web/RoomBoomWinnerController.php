@@ -27,7 +27,13 @@ class RoomBoomWinnerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new RoomBoomWinner());
-        $grid->model()->with(['reward.gift', 'reward.ware', 'boom.roomBoomLevel']);
+        $grid->model()->with([
+            'reward',
+            'reward.gift',
+            'reward.ware',
+            'boom.roomBoomLevel',
+            'boom.totalRoomGift.room'
+        ]);
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('user_id', __('user'))->display(function ($name) {
@@ -36,7 +42,7 @@ class RoomBoomWinnerController extends MainController
                 return __('No User');
             }
 
-            return app(UserService::class)->adminUserAvatar($user,withoutLevels: true);
+            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
         $grid->column('room_info', __('Room'))->display(function () {
             $room   = @$this->boom->totalRoomGift->room;
@@ -159,7 +165,7 @@ class RoomBoomWinnerController extends MainController
             });
         });
 
-            if (method_exists($this, 'extendGrid')) {
+        if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
         }
 
@@ -173,5 +179,4 @@ class RoomBoomWinnerController extends MainController
 
         return $grid;
     }
-
 }
