@@ -66,7 +66,7 @@ class UserAchievementLevelController extends MainController
         });
         $grid->model()->with([
             'user',
-             'user.profile',
+            'user.profile',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'achievementLevel',
             'achievement',
@@ -116,16 +116,31 @@ class UserAchievementLevelController extends MainController
 
             return "custom";
         });
+        // $grid->column('custom_image', __('custom_image'))->display(function ($value) {
+        //     if ($value != null) {
+        //         $image = $value;
+        //     } else {
+        //         $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift', function ($q) {
+        //             $q->select('img');
+        //         })->first()->gift->img ?? null;
+        //     }
+        //     $value = getDriverUrl() . '/' . $image;
+        //     return "<img src='$value' width='80' height='80'>";
+        // });
+
         $grid->column('custom_image', __('custom_image'))->display(function ($value) {
             if ($value != null) {
                 $image = $value;
             } else {
-                $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift', function ($q) {
-                    $q->select('img');
-                })->first()->gift->img ?? null;
+                // استخدم البيانات المحملة مسبقًا بدون استعلام جديد
+                $image = $this->achievementLevel?->valid_image
+                    ?? $this->giftAchievement?->gift?->img
+                    ?? null;
             }
-            $value = getDriverUrl() . '/' . $image;
-            return "<img src='$value' width='80' height='80'>";
+
+            $value = $image ? getDriverUrl() . '/' . $image : null;
+
+            return $value ? "<img src='$value' width='80' height='80'>" : '-';
         });
 
         $states = [
