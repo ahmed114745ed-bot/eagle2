@@ -4074,5 +4074,8 @@
     "moment_viewer.randomOrder": "रैंडम क्रम",
     "moment_viewer.refresh": "ताज़ा करें",
     "moment_viewer.loadMore": "और लोड करें",
-    "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है"
+    "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है",
+    "Area manager": "क्षेत्र प्रणाली",
+  "SuperAdmin": "देश प्रणाली",
+  "Group chat": "चैट"
   }

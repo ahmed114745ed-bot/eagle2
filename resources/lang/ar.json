@@ -5155,5 +5155,9 @@
     "moment_viewer.randomOrder": "ترتيب عشوائي",
     "moment_viewer.refresh": "تحديث",
     "moment_viewer.loadMore": "تحميل المزيد",
-    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
+    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا",
+    "Area manager": "نظام المناطق",
+  "SuperAdmin": "نظام الدول",
+  "Group chat": "الدردشة"
+    
 }

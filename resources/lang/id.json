@@ -3103,7 +3103,10 @@
 "Delete wallet fields": "Hapus bidang dompet",
 "Edit wallet fields": "Edit bidang dompet",
 "Show wallet fields": "Tampilkan bidang dompet",
-"accounts number": "Jumlah akun"
+"accounts number": "Jumlah akun",
+"Area manager": "Sistem Wilayah",
+  "SuperAdmin": "Sistem Negara",
+  "Group chat": "Obrolan"
 
 
 
