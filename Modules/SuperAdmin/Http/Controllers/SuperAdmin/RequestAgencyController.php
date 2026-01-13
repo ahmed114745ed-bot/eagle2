@@ -74,7 +74,6 @@ class RequestAgencyController extends AdminController
 
     protected function grid()
     {
-        dd(123);
         $grid = new Grid(new Agency());
         $grid->model()
             ->with([
