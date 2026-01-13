@@ -95,6 +95,12 @@ class AgencyJoinRequestController extends MainController
 
 
         $grid->model()
+            ->with([
+                'user',
+                'agency',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID))
@@ -121,6 +127,7 @@ class AgencyJoinRequestController extends MainController
         $grid->id(__('ID'));
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
+                $name = $this->user->name ?? '';
                 $uid = @$this->user->uuid;
                 $path = @$this->user?->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -145,7 +152,8 @@ class AgencyJoinRequestController extends MainController
             ";
             });
         $grid->column('agency.name', __('Agency'))
-            ->display(function ($name) {
+            ->display(function () {
+                $name = $this->agency->name ?? '';
                 $path = @$this->agency->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
