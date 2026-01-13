@@ -318,6 +318,9 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
+        // Gift Categories Cache Clear (for Octane compatibility)
+        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])->name('gift-categories.clear-cache');
+        
         // Gift Categories Sortable Route (for Octane compatibility)
         Route::post('gift-categories/sort-update', [\App\Admin\Controllers\GiftCategoryController::class, 'sortUpdate'])->name('gift-categories.sort-update');
         

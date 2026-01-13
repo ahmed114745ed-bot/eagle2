@@ -85,6 +85,37 @@ class GiftCategoryController extends MainController
     }
     
     /**
+     * Clear cache for Octane (called from JavaScript before sorting)
+     */
+    public function clearCache()
+    {
+        try {
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
+            }
+            
+            \Log::info('GiftCategory cache cleared for sorting');
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Cache cleared'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
      * Handle sort update from grid-sortable extension (dedicated route)
      */
     public function sortUpdate()
@@ -187,26 +218,49 @@ class GiftCategoryController extends MainController
             $(document).ready(function() {
                 console.log("Octane sortable fix initialized");
                 
+                // Clear cache when user starts dragging (before save)
+                $(".grid-sortable tbody").on("sortstart", function(event, ui) {
+                    console.log("Sort started - clearing cache...");
+                    
+                    // Send request to clear cache
+                    $.ajax({
+                        url: "/admin/gift-categories/clear-cache",
+                        method: "POST",
+                        data: { _token: LA.token },
+                        async: false // Synchronous to ensure cache is cleared before sort
+                    });
+                });
+                
                 // Intercept the save order button click
                 $(document).on("click", ".grid-save-order", function(e) {
                     console.log("Save order button clicked");
                     
                     var $btn = $(this);
-                    var originalText = $btn.text();
+                    
+                    // Clear cache before saving
+                    $.ajax({
+                        url: "/admin/gift-categories/clear-cache",
+                        method: "POST",
+                        data: { _token: LA.token },
+                        async: false,
+                        success: function() {
+                            console.log("Cache cleared before save");
+                        }
+                    });
                     
                     // Let the default handler run, then reload
                     setTimeout(function() {
-                        console.log("Checking for success notification...");
+                        console.log("Waiting for save to complete...");
                         
                         // Force reload after successful save (Octane fix)
                         setTimeout(function() {
                             console.log("Reloading page for fresh data...");
-                            location.reload();
-                        }, 1500);
+                            location.reload(true); // Force reload from server
+                        }, 2000);
                     }, 500);
                 });
                 
-                console.log("Save order handler attached");
+                console.log("Octane sortable handlers attached");
             });
             </script>
             ');
