@@ -251,12 +251,12 @@
     //         if (correctBtn) correctBtn.classList.add("active");
     //     }
     // }
-document.addEventListener("DOMContentLoaded", function () {
+function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
 
-    function getQueryParam(name) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(name);
-    }
+document.addEventListener("DOMContentLoaded", function () {
 
     const activeTab = getQueryParam("tab") || "brandSettings";
     showSection(activeTab);
@@ -276,7 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function showSection(sectionId) {
+// Define functions in global scope for inline onclick handlers
+window.showSection = function(sectionId) {
     // Show/hide sections
     document.querySelectorAll('.settings-section').forEach(section => {
         section.classList.remove('active');
@@ -284,9 +285,34 @@ function showSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) section.classList.add('active');
 
-    // Update hidden input (if needed)
+    // Update all forms with current tab information
     document.querySelectorAll('input[name="current_tab"]').forEach(input => {
         input.value = sectionId;
+    });
+
+    // Add current_tab as hidden input to all forms in settings (including both settings-form and no-background-form)
+    document.querySelectorAll('.settings-form, .no-background-form, form[action*="admin"]').forEach(form => {
+        let tabInput = form.querySelector('input[name="current_tab"]');
+        if (!tabInput) {
+            tabInput = document.createElement('input');
+            tabInput.type = 'hidden';
+            tabInput.name = 'current_tab';
+            form.appendChild(tabInput);
+        }
+        tabInput.value = sectionId;
+
+        // Add inner tab type if exists
+        if (sectionId === 'workSettings') {
+            let typeInput = form.querySelector('input[name="inner_tab_type"]');
+            const currentType = getQueryParam('type') || 'Experience';
+            if (!typeInput) {
+                typeInput = document.createElement('input');
+                typeInput.type = 'hidden';
+                typeInput.name = 'inner_tab_type';
+                form.appendChild(typeInput);
+            }
+            typeInput.value = currentType;
+        }
     });
 
     // Update URL without reloading
@@ -316,58 +342,70 @@ function showSection(sectionId) {
 }
 
 
-    function changeInnerTab(type) {
-        const url = new URL(window.location);
-        url.searchParams.set("firsttab", "workSettings");
-        url.searchParams.set("type", type);
-        window.history.pushState({}, "", url);
+window.changeInnerTab = function(type) {
+    const url = new URL(window.location);
+    url.searchParams.set("tab", "workSettings");
+    url.searchParams.set("type", type);
+    window.history.pushState({}, "", url);
 
         document.querySelectorAll(".inner-settings-menu button").forEach(btn =>
             btn.classList.remove("active")
         );
-        document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')"]`)
+        document.querySelector(`.inner-settings-menu button[onclick="changeInnerTab('${type}')']`)
             ?.classList.add("active");
 
-        showInnerContent(type);
-    }
-
-    function showInnerContent(type) {
-        document.querySelectorAll(".inner-tab-content").forEach(content => {
-            content.style.display = "none";
+        // Update all forms in workSettings with inner tab type
+        document.querySelectorAll('#workSettings .settings-form').forEach(form => {
+            let typeInput = form.querySelector('input[name="inner_tab_type"]');
+            if (!typeInput) {
+                typeInput = document.createElement('input');
+                typeInput.type = 'hidden';
+                typeInput.name = 'inner_tab_type';
+                form.appendChild(typeInput);
+            }
+            typeInput.value = type;
         });
 
-        const section = document.getElementById(type + "_tab");
-        if (section) section.style.display = "block";
-    }
+    showInnerContent(type);
+}
 
-    function openFullScreen(imgElement) {
-        var modal = document.getElementById("imageModal");
-        var modalImg = document.getElementById("fullImage");
+window.showInnerContent = function(type) {
+    document.querySelectorAll(".inner-tab-content").forEach(content => {
+        content.style.display = "none";
+    });
 
-        modal.style.display = "block";
-        modalImg.src = imgElement.src;
-    }
+    const section = document.getElementById(type + "_tab");
+    if (section) section.style.display = "block";
+}
 
-    function closeFullScreen() {
-        document.getElementById("imageModal").style.display = "none";
-    }
+window.openFullScreen = function(imgElement) {
+    var modal = document.getElementById("imageModal");
+    var modalImg = document.getElementById("fullImage");
 
-    function toggleBackgroundInput() {
-        const type = document.getElementById("background_type").value;
-        document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
-        document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
-        document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
-    }
+    modal.style.display = "block";
+    modalImg.src = imgElement.src;
+}
 
-    function toggleBrandBackgroundInput() {
-        const type = document.getElementById("brand_background_type").value;
-        document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
-        document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
-    }
+window.closeFullScreen = function() {
+    document.getElementById("imageModal").style.display = "none";
+}
 
-    async function updateBackgroundValue() {
-        const type = document.getElementById("background_type").value;
-        const hiddenInput = document.getElementById("app_background");
+window.toggleBackgroundInput = function() {
+    const type = document.getElementById("background_type").value;
+    document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
+    document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
+    document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
+}
+
+window.toggleBrandBackgroundInput = function() {
+    const type = document.getElementById("brand_background_type").value;
+    document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
+    document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
+}
+
+window.updateBackgroundValue = async function() {
+    const type = document.getElementById("background_type").value;
+    const hiddenInput = document.getElementById("app_background");
 
         if (type === "color") {
             hiddenInput.value = document.getElementById("background_color").value;
@@ -586,6 +624,19 @@ function showSection(sectionId) {
             placeholder: "{{ __('Select a country') }}",
             allowClear: true,
             width: '100%'
+        });
+
+        $('.settings-form').on('submit', function(e) {
+            const btn = $(this).find('.btn-save');
+            const originalText = btn.html();
+            
+            btn.prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin"></i> {{ __("Saving...") }}');
+            
+            setTimeout(() => {
+                btn.prop('disabled', false);
+                btn.html(originalText);
+            }, 5000);
         });
     });
 </script>

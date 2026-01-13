@@ -146,6 +146,12 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
+        
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
+        Cache::flush();
+        Artisan::call('config:cache');
+        
         admin_success('Saved Successfully');
         return Redirect::back();
     }
@@ -154,7 +160,9 @@ class ConfigController extends Controller
     {
         Cache::forget('pusher_config');
 
-        $keys = array_keys($request->all());
+        $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
+        $keys = array_diff(array_keys($request->all()), $excludeKeys);
+        
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
 
@@ -162,32 +170,32 @@ class ConfigController extends Controller
                 $config->value = $request->input($key);
             } else {
                 $config = new Config();
-                $config->name = $key;  // Set name first
+                $config->name = $key;
                 $config->value = $request->input($key);
             }
 
             $config->save();
+            Cache::forget($key);
+            Cache::forever($key, $request->input($key));
         }
 
+        // Clear pusher config cache for Octane
         Cache::forget('pusher_config');
-
+        Cache::forget('all_configs');
+        Cache::flush();
         Artisan::call('config:cache');
 
-        // Log::info('updateConfigAgoraZego completed and cache refreshed');
-
-        $redirectTo = $request->input('redirect_to');
-        if ($redirectTo) {
-            Log::info('updateConfigAgoraZego redirecting to provided redirect_to', [
-                'redirect_to' => $redirectTo,
-            ]);
-            return Redirect::to($redirectTo);
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        } elseif ($request->has('redirect_to')) {
+            return Redirect::to($request->redirect_to);
         }
 
-        $redirectBack = Redirect::back();
-        // Log::info('updateConfigAgoraZego redirecting back', [
-        //     'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
-        // ]);
-
-        return $redirectBack;
+        return redirect($redirectUrl);
     }
 }
