@@ -147,8 +147,12 @@ class ConfigController extends Controller
             }
         }
         
-        // Reload Octane workers to apply changes immediately
-        Artisan::call('octane:reload');
+        // Reload Octane workers or fallback to config:cache
+        try {
+            Artisan::call('octane:reload');
+        } catch (\Exception $e) {
+            Artisan::call('config:cache');
+        }
         
         admin_success('Saved Successfully');
         return Redirect::back();
@@ -181,8 +185,12 @@ class ConfigController extends Controller
         Artisan::call('config:cache');
         Artisan::call('cache:clear');
         
-        // Reload Octane workers to apply changes immediately
-        Artisan::call('octane:reload');
+        // Reload Octane workers or skip if not available
+        try {
+            Artisan::call('octane:reload');
+        } catch (\Exception $e) {
+            // Octane not available, config:cache already called above
+        }
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         
