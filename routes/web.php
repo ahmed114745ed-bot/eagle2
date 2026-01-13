@@ -1108,3 +1108,12 @@ Route::get('/run-lucky-gift-unit-test', function () {
 
     return response('<pre>'.e($output).'</pre>');
 });
+
+Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
+    Debugbar::info('Viewport:', $request->all());
+    return response()->json(['ok' => true]);
+});
+
+Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
+    dd("branch tested");
+});

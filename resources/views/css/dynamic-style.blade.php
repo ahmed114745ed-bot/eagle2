@@ -25,9 +25,10 @@
     /* .col-sm-8 {
     width: 80.66666667%;
 } */
-    /* .col-sm-2 {
-    width: 5.66666667%;
-} */
+
+    .col-sm-2 {
+        width: auto;
+    }
 
     .rtl label {
         margin: 0 !important;
@@ -772,6 +773,49 @@ html.ltr .dropdown-menu {
         background-color: var(--box-background-color) !important;
         color: var(--inverse-box-color) !important;
 
+    /* LTR override */
+    html.ltr .dropdown-menu {
+        text-align: left;
+        left: auto;
+        /* right: 38px; */
+        float: left;
+    }
+
+    .navbar-nav > .notifications-menu > .dropdown-menu,
+    .navbar-nav > .messages-menu > .dropdown-menu,
+    .navbar-nav > .tasks-menu > .dropdown-menu {
+        width: auto !important;
+    }
+
+    .slimScrollDiv {
+        height: auto !important;
+    }
+
+    .navbar-nav > .notifications-menu > .dropdown-menu > li .menu,
+    .navbar-nav > .messages-menu > .dropdown-menu > li .menu,
+    .navbar-nav > .tasks-menu > .dropdown-menu > li .menu {
+        height: auto !important;
+    }
+
+    .rtl .column-reward .rtlSvga {
+        direction: ltr !important;
+    }
+
+    select > option {
+        background-color: var(--white) !important;
+        color: black !important;
+    }
+
+    /*.sort-select option:checked,*/
+    /*.sort-select option:focus,*/
+    /*.sort-select option:active {*/
+    /*    background-color: var(--primary-color) !important;*/
+    /*    color: white;*/
+    /*}*/
+
+    #target_type:focus option:checked {
+        background: var(--primary-color) !important;
+        color: white !important;
     }
 
     .slider {
@@ -1007,7 +1051,7 @@ html.ltr .dropdown-menu {
     .rtl .box-header .form-horizontal .row {
         display: block !important;
         direction: rtl !important;
-        margin-bottom: 10px;
+        /*margin-bottom: 10px;*/
     }
 
     .ltr .form-horizontal .row {
@@ -1152,6 +1196,7 @@ html.ltr .dropdown-menu {
 
     button {
         background: var(--primary-color);
+        color: var(--text-secondary-color);
         padding: 10px;
         border: none;
         cursor: pointer;
@@ -1236,7 +1281,8 @@ html.ltr .dropdown-menu {
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        padding: 10px;
+        padding-bottom: 0 !important;
+        background: transparent !important;
     }
 
     .pagination-info {
@@ -1571,7 +1617,6 @@ html.ltr .dropdown-menu {
     .form-horizontal + .box-footer,
     .form-horizontal .box-footer {
         display: grid !important;
-        padding: 16px 24px !important;
         direction: rtl !important;
     }
 
@@ -1582,7 +1627,7 @@ html.ltr .dropdown-menu {
 
     .form-horizontal + .box-footer .col-md-8,
     .form-horizontal .box-footer .col-md-8 {
-        float: none !important;
+        /*float: none !important;*/
         width: auto !important;
         display: flex !important;
         align-items: center !important;
@@ -1647,7 +1692,7 @@ html.ltr .dropdown-menu {
     .fields-group > .form-group {
         display: flex;
         align-items: center;
-        gap: 35px;
+        /*gap: 35px;*/
         margin-bottom: 0;
     }
 
@@ -1672,11 +1717,11 @@ html.ltr .dropdown-menu {
         transition: all 0.3s ease;
     }
 
-    .fields-group .input-group.input-group-sm:has(#to_date) {
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
         position: absolute !important;
     }
 
-    .fields-group .input-group.input-group-sm:has(#from_date) {
+    .fields-group .input-group.input-group-sm:has(.bootstrap-datetimepicker-widget) {
         position: absolute !important;
     }
 
@@ -2246,12 +2291,15 @@ html.ltr .dropdown-menu {
         z-index: 99999 !important;
     }
 
-    .input-group:has(input.sort) .input-group-btn:first-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort) .input-group-btn:last-child > .btn {
+    .input-group:has(input.sort) .input-group-btn > .btn,
+    .input-group:has(input.sort_num) .input-group-btn > .btn,
+    .input-group:has(input.expire) .input-group-btn > .btn,
+    .input-group:has(input.price) .input-group-btn > .btn,
+    .input-group:has(input.level) .input-group-btn > .btn,
+    .input-group:has(input.num) .input-group-btn > .btn,
+    .input-group:has(input.exp) .input-group-btn > .btn,
+    .input-group:has(input.t_length) .input-group-btn > .btn,
+    .input-group:has(input.priority) .input-group-btn > .btn {
         height: 34px;
         padding: 0 10px !important;
     }
@@ -2307,5 +2355,118 @@ html.ltr .dropdown-menu {
 
     .select2-container--default .select2-selection--multiple .select2-selection__choice {
         background: var(--primary-color) !important;
+    }
+
+    /* Label on input border */
+    .box-header .form-group,
+    .filter-box .form-group {
+        position: relative !important;
+        margin-top: 12px !important;
+    }
+
+    .box-header .form-group .control-label,
+    .box-header .form-group > label,
+    .filter-box .form-group .control-label,
+    .filter-box .form-group > label {
+        position: absolute !important;
+        top: -35% !important;
+        left: 40px !important;
+        background: white !important;
+        padding: 0 6px !important;
+        font-size: 12px !important;
+        z-index: 10 !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    /* RTL */
+    .rtl .box-header .form-group .control-label,
+    .rtl .filter-box .form-group .control-label {
+        left: auto !important;
+        right: 25px !important;
+    }
+
+    .box-header .form-group .form-control,
+    .filter-box .form-group .form-control,
+    .box-header .form-group .select2-container,
+    .filter-box .form-group .select2-container {
+        min-width: 280px !important;
+        width: 100% !important;
+    }
+
+    .box-header .form-group {
+        width: 45% !important;
+        display: inline-block !important;
+        margin-left: 5% !important;
+    }
+
+    .rtl .box-header .form-group {
+        margin-right: 5% !important;
+    }
+
+    /* Responsive fixes for smaller screens */
+    @media (max-width: 768px) {
+        .box-header .form-group {
+            width: 100% !important;
+            display: block !important;
+            margin-right: 0 !important;
+            margin-bottom: 20px !important;
+        }
+
+        .box-header .form-group .control-label,
+        .box-header .form-group > label,
+        .filter-box .form-group .control-label,
+        .filter-box .form-group > label {
+            left: 15px !important;
+            top: -10px !important;
+            font-size: 11px !important;
+            max-width: calc(100% - 30px) !important;
+        }
+
+        /* RTL responsive */
+        .rtl .box-header .form-group .control-label,
+        .rtl .filter-box .form-group .control-label {
+            left: auto !important;
+            right: 15px !important;
+        }
+
+        .box-header .form-group .form-control,
+        .filter-box .form-group .form-control,
+        .box-header .form-group .select2-container,
+        .filter-box .form-group .select2-container {
+            min-width: 100% !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .box-header .form-group .control-label,
+        .box-header .form-group > label,
+        .filter-box .form-group .control-label,
+        .filter-box .form-group > label {
+            font-size: 10px !important;
+            top: -8px !important;
+        }
+    }
+
+    .settings-sidebar {
+        width: 250px;
+        min-height: 400px;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .settings-sidebar h2 {
+        text-align: center;
+        color: var(--primary-color);
+    }
+
+    .new-form {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        border: 1px solid #eaeaea;
     }
 </style>

@@ -7,6 +7,7 @@
             <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0">{{ __('lucky phonix') }}</h4>
@@ -27,6 +28,7 @@
             <div class="col-md-6 mb-3 ms-0 me-auto">
                 <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
                     <div class="card p-3 shadow" style="height: 495px;">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h4 class="m-0">{{ __('Zynga') }}</h4>

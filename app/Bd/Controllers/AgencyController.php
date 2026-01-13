@@ -544,7 +544,6 @@ class AgencyController extends MainController
                 flex-wrap: wrap;
                 align-items: center;
                 justify-content: space-between;
-                padding: 10px;
             }
 
             .pagination-info {

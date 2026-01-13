@@ -196,6 +196,11 @@ class User extends Authenticatable
         });
     }
 
+    public function latestTarget()
+    {
+        return $this->hasOne(UserTarget::class)->latestOfMany();
+    }
+
     public function cpsAsTwo()
     {
         return $this->hasMany(Cp::class, 'user_two_id');
@@ -1004,7 +1009,12 @@ class User extends Authenticatable
 
     public function nowRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+    }
+
+    public function nowAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
     }
     public function myroom()
     {
@@ -1264,6 +1274,12 @@ class User extends Authenticatable
     public function admenUsersAPP()
     {
         return $this->hanMany(AdminUser::class);
+    }
+
+    public function latestUserSallary()
+    {
+        // Laravel 8+ supports latestOfMany
+        return $this->hasOne(UserSallary::class)->latestOfMany();
     }
 
     public function getUserDiamondAttribute()
@@ -1553,6 +1569,11 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
+        // Skip pack check if packs relation is not loaded to avoid N+1 queries
+        if (!$this->relationLoaded('packs')) {
+            return $value;
+        }
+        
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
@@ -2286,7 +2307,14 @@ class User extends Authenticatable
 
     public function nowRoomOwner()
     {
-        return $this->belongsTo(User::class, 'now_room_uid');
+        return $this->hasOneThrough(
+            User::class,
+            Room::class,
+            'id',
+            'id',
+            'now_room_uid',
+            'uid'
+        );
     }
 
 

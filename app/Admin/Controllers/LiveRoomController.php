@@ -324,7 +324,7 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-       $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
         $grid->model()
             ->where('is_live', 1)
@@ -524,9 +524,12 @@ class LiveRoomController extends MainController
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
-                $countries = Cache::rememberForever('filter_countries_list', function () {
-                    return \App\Models\Country::query()->pluck('name', 'id');
-                });
+                
+                    $locale = app()->getLocale(); // 'ar', 'en', etc.
+                    $column = $locale === 'ar' ? 'name' : 'e_name';
+
+                    $countries =\App\Models\Country::query()->pluck($column, 'id');
+                
 
                 $filter->where(function ($query) {
                     if ($this->input) {

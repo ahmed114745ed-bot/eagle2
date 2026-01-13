@@ -109,7 +109,8 @@ class GiftController extends MainController
         }
 
         $grid->model()
-            ->with('vip')
+            ->with(['vip',
+            'category'])
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             ->orderBy('use_count', 'desc')
@@ -449,5 +450,14 @@ class GiftController extends MainController
 
 
         return $form;
+    }
+
+    public function luckyGiftSettings(Content $content)
+    {
+        if (!Admin::user()->can('*')) {
+            Permission::check('browse-' . 'lucky-gift-setting');
+        }
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins','host_lucky_gift'])->pluck('value', 'key')->toArray();
+        return $content->view('lucky_gift', compact('config'));
     }
 }

@@ -58,7 +58,12 @@ class HostDiamondController extends MainController
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
-            ->with(['receiver.profile', 'agency']) // assuming these are relationships
+            ->with([
+                'receiver:id,uuid,original_uuid,name,country_id',
+                'receiver.profile:id,user_id,avatar',
+                'receiver.country:id,name,e_name,flag',
+                'agency:id,name,img'
+            ])
             ->where('agency_id', '!=', 0)
             ->groupBy('receiver_id', 'agency_id')
             ->when(! request('from_date'), fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()))
