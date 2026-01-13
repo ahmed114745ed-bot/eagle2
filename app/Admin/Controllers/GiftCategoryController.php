@@ -200,7 +200,7 @@ class GiftCategoryController extends MainController
         $grid->sortable();
         
         $grid->column('id', __('Id'))->width(50);
-        $grid->column('sort', __('Order'))->width(80)->editable();
+        // $grid->column('sort', __('Order'))->width(80)->editable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
             return $value[$locale] ?? ($value['en'] ?? '');
@@ -216,24 +216,30 @@ class GiftCategoryController extends MainController
             $tools->append('
             <script>
             $(document).ready(function() {
-                console.log("Octane sortable fix initialized");
+                console.log("🚀 Octane sortable fix initialized");
                 
                 // Clear cache when user starts dragging (before save)
                 $(".grid-sortable tbody").on("sortstart", function(event, ui) {
-                    console.log("Sort started - clearing cache...");
+                    console.log("⚡ Sort started - clearing Octane cache...");
                     
                     // Send request to clear cache
                     $.ajax({
                         url: "/admin/gift-categories/clear-cache",
                         method: "POST",
                         data: { _token: LA.token },
-                        async: false // Synchronous to ensure cache is cleared before sort
+                        async: false, // Synchronous to ensure cache is cleared before sort
+                        success: function(response) {
+                            console.log("✅ Cache cleared before drag:", response);
+                        },
+                        error: function(xhr) {
+                            console.error("❌ Failed to clear cache:", xhr);
+                        }
                     });
                 });
                 
                 // Intercept the save order button click
                 $(document).on("click", ".grid-save-order", function(e) {
-                    console.log("Save order button clicked");
+                    console.log("💾 Save order button clicked");
                     
                     var $btn = $(this);
                     
@@ -243,24 +249,27 @@ class GiftCategoryController extends MainController
                         method: "POST",
                         data: { _token: LA.token },
                         async: false,
-                        success: function() {
-                            console.log("Cache cleared before save");
+                        success: function(response) {
+                            console.log("✅ Cache cleared before save:", response);
+                        },
+                        error: function(xhr) {
+                            console.error("❌ Failed to clear cache:", xhr);
                         }
                     });
                     
                     // Let the default handler run, then reload
                     setTimeout(function() {
-                        console.log("Waiting for save to complete...");
+                        console.log("⏳ Waiting for save to complete...");
                         
                         // Force reload after successful save (Octane fix)
                         setTimeout(function() {
-                            console.log("Reloading page for fresh data...");
-                            location.reload(true); // Force reload from server
+                            console.log("🔄 Reloading page for fresh data from database...");
+                            location.reload(true); // Force reload from server, not cache
                         }, 2000);
                     }, 500);
                 });
                 
-                console.log("Octane sortable handlers attached");
+                console.log("✅ Octane sortable handlers attached successfully");
             });
             </script>
             ');
