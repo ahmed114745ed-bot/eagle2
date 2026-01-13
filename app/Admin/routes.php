@@ -21,6 +21,7 @@ use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\PoliceController;
+use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
@@ -304,6 +305,8 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
+        Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
         Route::resource('live-rooms', 'LiveRoomController');
 
 
@@ -533,6 +536,11 @@ Route::group(
         Route::get('filter-rooms', [FilterController::class, 'rooms'])->name('filter-rooms');
 
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
+        Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
+            ->name('admin.ajax.moments-reels');
+         Route::get('/expenses', [ReportController::class, 'expenses']);
+            Route::get('/due-salary', [ReportController::class, 'dueSalary'])
+    ->name('admin.manager.due-salary');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries')->middleware('web-agency-feature');
@@ -595,7 +603,15 @@ Route::group(
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
+
         Route::resource('/group-chat', 'GroupChatController');
+        Route::get('chat/view', [GroupChatController::class, 'chatView'])->name('chat.view');
+        Route::get('chat/messages', [GroupChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
+        Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
+        Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
+
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
@@ -612,7 +628,7 @@ Route::group(
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
         Route::resource('super-package-rewards', SuperPackageController::class);
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
-         Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
+        Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
 
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);

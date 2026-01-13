@@ -9,20 +9,6 @@
     }
 
     /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: #222;
-        min-height: 400px;
-        align-self: flex-start;
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .settings-sidebar h2 {
-        text-align: center;
-        color: var(--primary-color);
-    }
-
     .settings-menu button {
         display: block;
         width: 100%;
@@ -55,12 +41,6 @@
     }
 
     /* تنسيق النماذج */
-    form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
-    }
-
     label {
         display: block;
         margin: 10px 0 5px;
@@ -440,7 +420,7 @@
             <div class="settings-menu">
                 <button onclick="showSection('PercentageTarget')"
                     style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('group chat setting') }}</button>
-                
+
             </div>
         </div>
 
@@ -448,7 +428,7 @@
             <div id="PercentageTarget" class="settings-section active">
 
 
-                <form id="target-percentage-form" action="{{ url('admin/update-configs-group-chat') }}" method="POST">
+                <form id="target-percentage-form" class="new-form" action="{{ url('admin/update-configs-group-chat') }}" method="POST">
                     @csrf
                     @php
                         $errorMessage = $errors ? $errors->first('msg') : null;
@@ -469,18 +449,18 @@
                 </form>
             </div>
 
-           
-            
-            
 
-          
-      
+
+
+
+
+
 
 
 
         <script>
 
-            
+
             function previewImage(input, previewId) {
                 const preview = document.getElementById(previewId);
                 const file = input.files[0];
@@ -595,7 +575,7 @@
                 document.getElementById("imageModal").style.display = "none";
             }
 
-            
+
 
             $(document).on('change', '#stopCharge,#stopInviteCode,#stopTransferSalary,#stopGiftCheckbox', function () {
 

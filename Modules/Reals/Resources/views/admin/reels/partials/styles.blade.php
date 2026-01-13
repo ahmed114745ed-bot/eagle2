@@ -56,6 +56,9 @@
         position: relative;
         width: 380px;
         flex-shrink: 0;
+        /* تحسين الأداء */
+        will-change: transform;
+        transform: translateZ(0);
     }
 
     /* Video container */
@@ -64,6 +67,11 @@
         flex: 1;
         min-width: 0;
         transition: flex 0.2s ease-in-out;
+        /* تحسينات الأداء على الموبايل */
+        -webkit-overflow-scrolling: touch;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
     }
 
     .video-item-height {
@@ -71,6 +79,9 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
+        /* تحسين الرسوم المتحركة */
+        will-change: transform;
+        transform: translateZ(0);
     }
 
     /* Interactions Panel - Part of flex layout when open */
@@ -145,6 +156,11 @@
 
         .interactions-panel.show {
             transform: translateX(0);
+            min-width: 330px !important;
+        }
+        .video-container{
+         top: -10px !important;
+        height: 91% !important;
         }
     }
 
@@ -153,10 +169,12 @@
         .interactions-panel {
             max-width: 100vw;
             width: 100vw;
-            top: 106px;
-
+            top: 50px;
         }
 
+        .Overlay-top{
+            top: 70px !important;
+        }
         /* Smaller padding on mobile */
         .interactions-panel > div[class*="p-"] {
             padding: 0.75rem !important;
@@ -215,17 +233,20 @@
     /* Mobile & Small Tablets */
     @media (max-width: 768px) {
         .reels-main-container {
-            height: 100vh;
+            height: calc(100vh - 65px);
+            /* margin-top: 50px; */
             flex-direction: column-reverse;
         }
-
+   .Overlay-top{
+            top: 70px !important;
+        }
         .reels-sidebar {
             display: none;
         }
 
         .reels-video-container {
             width: 100%;
-            height: 100vh;
+            height: calc(100vh - 65px);
         }
 
         /* Hide desktop sidebar on mobile */
@@ -260,8 +281,8 @@
         /* Mobile Toggle Button */
         .mobile-reels-toggle {
             position: fixed;
-            bottom: 234px;
-            right: 20px;
+            bottom: 338px;
+            right: 9px;
             width: 56px;
             height: 56px;
             background: var(--primary-gradient);
@@ -271,21 +292,14 @@
             justify-content: center;
             color: white;
             font-size: 22px;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5), 0 0 0 0 rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.5);
             z-index: 998;
             cursor: pointer;
             transition: all 0.3s ease;
-            animation: pulse-button 2s ease-in-out infinite;
             border: 3px solid white;
-        }
-
-        @keyframes pulse-button {
-            0%, 100% {
-                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-            }
-            50% {
-                box-shadow: 0 4px 30px rgba(102, 126, 234, 0.8), 0 0 0 8px rgba(102, 126, 234, 0.2);
-            }
+            /* تقليل animation لتحسين الأداء */
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         .mobile-reels-toggle:active {
@@ -314,10 +328,9 @@
         }
     }
 
-    /* User Profile Overlay */
-    @media (max-width: 768px) {
+        /* User Profile Overlay */
         .absolute.top-4 {
-            top: 0.5rem;
+            top: 60px;
             right: 0.5rem;
             left: 0.5rem;
         }
@@ -328,7 +341,7 @@
         }
 
         .absolute.top-4 .text-lg {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .absolute.top-4 .text-sm {
@@ -360,8 +373,7 @@
         /* Interaction Buttons */
         .absolute.left-4.bottom-24 {
             left: 0.5rem;
-            bottom: 13.5rem;
-
+            bottom: 6rem;
         }
 
         .w-14.h-14 {
@@ -387,6 +399,16 @@
 
     /* Extra Small Mobile */
     @media (max-width: 480px) {
+        .reels-main-container {
+            height: calc(100vh - 65px);
+        }
+        .Overlay-top{
+            top: 70px !important;
+        }
+        .reels-video-container {
+            height: calc(100vh - 65px);
+        }
+        
         .absolute.top-4 .w-12.h-12 {
             width: 2rem;
             height: 2rem;
@@ -401,9 +423,9 @@
         }
 
         .w-14.h-14 {
-            width: 4.75rem;
-            height: 4.75rem;
-            margin: 12px 2px;
+            width: 3.5rem;
+            height: 3.5rem;
+            margin: 8px 2px;
         }
 
         .w-10.h-10 {
@@ -434,9 +456,16 @@
 
     /* Skeleton Loader Styles */
     .skeleton {
-        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-        background-size: 200% 100%;
-        animation: loading 1.5s ease-in-out infinite;
+        background: #e0e0e0;
+    }
+    
+    /* Skeleton animation فقط على الديسكتوب */
+    @media (min-width: 769px) {
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s ease-in-out infinite;
+        }
     }
 
     /* User Avatar Styles */
@@ -485,21 +514,39 @@
         content-visibility: auto;
         contain-intrinsic-height: 100vh;
     }
-
-    /* Fade in animation */
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    
+    /* تحسين أداء الفيديو */
+    video {
+        will-change: transform;
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
     }
 
-    .fade-in {
-        animation: fadeIn 0.3s ease-out;
+    /* Fade in animation - معطل على الموبايل */
+    @media (min-width: 769px) {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .fade-in {
+            /* لا animation على الموبايل */
+            animation: none;
+        }
     }
 
     /* Alpine cloak */

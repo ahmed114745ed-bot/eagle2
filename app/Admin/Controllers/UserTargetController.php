@@ -71,9 +71,16 @@ class UserTargetController extends MainController
     {
 
         $grid = new Grid(new UserSallary);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
+            ->with([
+                'user',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'agency'
+
+            ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
@@ -92,7 +99,7 @@ class UserTargetController extends MainController
         });
         $grid->column('id', __('id'));
         $grid->column('user_id', __('user'))->display(function ($name) {
-            $name =@$this->user->name ?? '';
+            $name = @$this->user->name ?? '';
             $uid = @$this->user->uuid;
             if (request()->filled('_export_')) {
                 return "{$name} (UUID: {$uid})";
@@ -150,30 +157,30 @@ class UserTargetController extends MainController
             return $month . '/' . $this->year;
         });
 
-        $grid->column('hours',__ ('hours'))->display(function ($hours) {
+        $grid->column('hours', __('hours'))->display(function ($hours) {
             return $hours;
-//            return explode('/', $hours)[1] ?? 0;
+            //            return explode('/', $hours)[1] ?? 0;
         });
-        $grid->column('days',__ ('days'))->display(function ($days) {
+        $grid->column('days', __('days'))->display(function ($days) {
             return $days;
-//            return explode('/', $days)[1] ?? 0;
+            //            return explode('/', $days)[1] ?? 0;
         });
 
-//        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
-//            return explode('/', $diamond)[1] ?? 0;
-//        });
+        //        $grid->column('target_diamonds',__ ('target diamonds'))->display(function ($diamond) {
+        //            return explode('/', $diamond)[1] ?? 0;
+        //        });
 
-//        $grid->column('hours', __('user hours'))->display(function ($hours) {
-//            return explode('/', $hours)[0] ?? 0;
-//        });
-//        $grid->column('days', __('user days'))->display(function ($days) {
-//            return explode('/', $days)[0] ?? 0;
-//        });
+        //        $grid->column('hours', __('user hours'))->display(function ($hours) {
+        //            return explode('/', $hours)[0] ?? 0;
+        //        });
+        //        $grid->column('days', __('user days'))->display(function ($days) {
+        //            return explode('/', $days)[0] ?? 0;
+        //        });
         $grid->column('diamond', __('user diamonds'))->display(function ($diamond) {
             if (request()->filled('_export_')) {
                 return $diamond;
             }
-//            $usd = explode('/', $diamond)[0] ?? 0;
+            //            $usd = explode('/', $diamond)[0] ?? 0;
             $image = asset('images/diamond.jpg'); // Adjust path as needed
             return "<div style='display: flex; align-items: center; '>
 
