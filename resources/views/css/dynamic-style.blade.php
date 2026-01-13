@@ -1452,7 +1452,7 @@
     html.ltr .dropdown-menu {
         text-align: left;
         left: auto;
-        /*right: 38px;*/
+        /* right: 38px; */
         float: left;
     }
 
@@ -1480,6 +1480,13 @@
         background-color: var(--white) !important;
         color: black !important;
     }
+
+    /*.sort-select option:checked,*/
+    /*.sort-select option:focus,*/
+    /*.sort-select option:active {*/
+    /*    background-color: var(--primary-color) !important;*/
+    /*    color: white;*/
+    /*}*/
 
     #target_type:focus option:checked {
         background: var(--primary-color) !important;
@@ -2932,22 +2939,15 @@
         z-index: 99999 !important;
     }
 
-    .input-group:has(input.sort) .input-group-btn:first-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort) .input-group-btn:last-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort_num) .input-group-btn:first-child > .btn {
-        height: 34px;
-        padding: 0 10px !important;
-    }
-
-    .input-group:has(input.sort_num) .input-group-btn:last-child > .btn {
+    .input-group:has(input.sort) .input-group-btn > .btn,
+    .input-group:has(input.sort_num) .input-group-btn > .btn,
+    .input-group:has(input.expire) .input-group-btn > .btn,
+    .input-group:has(input.price) .input-group-btn > .btn,
+    .input-group:has(input.level) .input-group-btn > .btn,
+    .input-group:has(input.num) .input-group-btn > .btn,
+    .input-group:has(input.exp) .input-group-btn > .btn,
+    .input-group:has(input.t_length) .input-group-btn > .btn,
+    .input-group:has(input.priority) .input-group-btn > .btn {
         height: 34px;
         padding: 0 10px !important;
     }
@@ -3102,7 +3102,7 @@
         width: 250px;
         min-height: 400px;
         padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     }
 
     .settings-sidebar h2 {
@@ -3114,8 +3114,13 @@
         background: #ffffff;
         border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         border: 1px solid #eaeaea;
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     }
 </style>
 

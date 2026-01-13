@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GroupChat extends Model
 {
@@ -26,5 +27,10 @@ class GroupChat extends Model
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    public function replies(): HasMany
+    {
+        return $this->hasMany(GroupChat::class, 'parent_id');
     }
 }

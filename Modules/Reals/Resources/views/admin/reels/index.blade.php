@@ -1,4 +1,10 @@
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -19,26 +25,51 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // إظهار navbar على الشاشات الصغيرة فقط
             const nav = document.querySelector('.navbar');
-            if (nav && !nav.classList.contains('navbar-hidden')) {
-                nav.classList.add('navbar-hidden');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (nav) {
+                if (isMobile) {
+                    // إظهار navbar على الموبايل
+                    nav.classList.remove('navbar-hidden');
+                    nav.style.display = '';
+                } else {
+                    // إخفاء navbar على الديسكتوب
+                    if (!nav.classList.contains('navbar-hidden')) {
+                        nav.classList.add('navbar-hidden');
+                    }
+                }
             }
 
             const updateAppClassMargin = () => {
                 const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                const isMobile = window.innerWidth <= 768;
+                
                 document.querySelectorAll('.app-class').forEach(el => {
-                    el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    if (isMobile) {
+                        el.style.setProperty('margin-top', '50px', 'important');
+                    } else {
+                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    }
                 });
             };
 
-            // Initial state: navbar hidden, zero top margin
             updateAppClassMargin();
-
-            // Toggle margin when navbar hides/shows (e.g., on scroll)
-            window.addEventListener('scroll', () => {
-                // If nav is unhidden elsewhere, respect that by restoring margin
+            
+            // تحديث عند تغيير حجم الشاشة
+            window.addEventListener('resize', () => {
+                const isMobile = window.innerWidth <= 768;
+                if (nav) {
+                    if (isMobile) {
+                        nav.classList.remove('navbar-hidden');
+                        nav.style.display = '';
+                    } else {
+                        nav.classList.add('navbar-hidden');
+                    }
+                }
                 updateAppClassMargin();
-            });
+            }, { passive: true });
         });
     </script>
     <style>
@@ -58,9 +89,56 @@
         }
     </style>
 
+    <!-- مؤشر التحميل المسبق للموبايل -->
+    <style>
+        .preload-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .preload-indicator .spinner {
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
 <div class="reels-main-container flex"
      :class="{'panel-open': showInteractionPanel}"
      x-data="reelsManager()" x-cloak>
+     
+    <!-- مؤشر التحميل في الخلفية -->
+    <div x-show="isPreloading && isMobile" 
+         class="preload-indicator"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-90"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="spinner"></div>
+        <span>جاري التحميل في الخلفية...</span>
+    </div>
+    
     <!-- Mobile Overlay Background -->
     <div class="mobile-sidebar-overlay"
          :class="{ 'active': isMobileSidebarOpen }"
@@ -231,7 +309,8 @@
     </div>
 
     <!-- Main Video Player (Center) -->
-    <div class="reels-video-container  overflow-y-auto snap-y snap-mandatory scroll-smooth"
+    <div class="reels-video-container overflow-y-auto snap-y snap-mandatory"
+         style="-webkit-overflow-scrolling: touch; scroll-behavior: smooth;"
          x-ref="reelsContainer"
          @scroll.passive="handleScroll()">
         <template x-for="(reel, index) in (visibleReels || [])" :key="reel.id">
@@ -240,7 +319,7 @@
                  :data-index="index">
                 <div class="w-full max-w-2xl h-full relative">
                     <!-- Video Container -->
-                    <div class="relative h-full bg-black flex items-center justify-center">
+                    <div class="video-container relative h-full bg-black flex items-center justify-center">
                         <!-- Skeleton Loader while video loading -->
                         <template x-if="!shouldLoadVideo(index)">
                             <div class="w-full h-full flex items-center justify-center bg-gray-900 dark:bg-gray-950">
@@ -267,17 +346,20 @@
                                        class="w-full h-full object-contain"
                                        x-show="isVideoReady(reel.id)"
                                        loop
-                                       muted
-                                        preload="metadata"
-                                        :poster="reel.thumbnail_url || null"
+                                       :muted="isGlobalMuted"
+                                       :preload="index === currentVideoIndex ? 'auto' : 'metadata'"
+                                       :poster="reel.thumbnail_url || null"
                                        playsinline
+                                       webkit-playsinline
                                        x-ref="video"
-                                       @click="togglePlay($event)"
+                                       @click.stop="togglePlay($event)"
+                                       @touchstart.stop
                                        @loadedmetadata="updateProgress($event); onVideoLoaded($event, reel.id)"
                                        @canplay="markVideoReady(reel.id)"
                                        @timeupdate.throttle.500ms="updateProgress($event)"
                                        @play="updateProgress($event)"
-                                       @pause="updateProgress($event)">
+                                       @pause="updateProgress($event)"
+                                       @ended="onVideoEnded($event)">
                                 </video>
                             </div>
                         </template>
@@ -825,9 +907,9 @@
             class="md:hidden fixed top-16 right-3 z-[60] group">
         <div class="relative">
             <!-- Main Button -->
-            <div class="w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110" style="background: var(--primary-gradient);">
+            <!-- <div class="w-14 h-14 rounded-2xl shadow-xl flex items-center justify-center transform transition-all duration-300 group-hover:scale-110" style="background: var(--primary-gradient);">
                 <i class="fas fa-film text-white text-xl"></i>
-            </div>
+            </div> -->
             <!-- Counter Badge -->
             <div class="absolute -top-1 -left-1 min-w-[24px] h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
                 <span class="text-white text-xs font-bold px-1.5" x-text="filteredReels.length"></span>
@@ -850,7 +932,7 @@
     </div>
 
     <!-- Mobile Sidebar Overlay -->
-    <div class="md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
+    <div class="Overlay-top md:hidden fixed top-0 right-0 bottom-0 w-full sm:w-[90%] max-w-[400px] shadow-2xl transform transition-transform duration-300 z-[56] overflow-y-auto"
          style="background-color: var(--box-background-color);"
          :class="isMobileSidebarOpen ? 'translate-x-0' : 'translate-x-full'"
          x-show="isMobileSidebarOpen"
@@ -942,6 +1024,7 @@
 <!-- Reels Data -->
 <script>
     window.initialReelsData = @json($reels);
+    window.randomSeed = {{ $seed ?? 'null' }};
 </script>
 
 <!-- Reels Manager Script -->

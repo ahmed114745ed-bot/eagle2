@@ -2,19 +2,16 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\PaySalariesAction;
-use App\Admin\Actions\SalariesAction;
-use App\Models\Agency;
-use App\Models\SalaryTrx;
 use App\Models\User;
-use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
-use Exception;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use function request;
+use App\Models\Agency;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Row;
+use App\Models\AgencySallary;
+use Encore\Admin\Widgets\Box;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SallariesController extends MainController
 {
@@ -47,17 +44,53 @@ class SallariesController extends MainController
     protected function users()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
+        $month = request('month');
+        $year  = request('year');
 
-        $model =
-            //$grid->model()->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
-            $grid->model()
-                ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-                ->where('agency_id', '!=', 0);
+        $grid->model()
+            ->with([
+                'profile',
+                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
+            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->where('agency_id', '!=', 0)
 
-        // $model->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'), DB::raw('SUM(user_sallaries.sallary) AS salary'), DB::raw('SUM(user_sallaries.cut_amount) AS withdrawal'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+            ->leftJoin('user_sallaries as us', function ($join) use ($month, $year) {
+                $join->on('us.user_id', '=', 'users.id')
+                    ->where('us.is_paid', 0)->orderByDesc('id');
+
+                if ($month && $year) {
+                    $join->where('us.year', $year)
+                        ->where('us.month', $month);
+                }
+            })
+
+            ->selectRaw('
+        users.id,
+        users.name,
+        users.uuid,
+        users.country_id,
+        users.agency_id,
+        users.online,
+        users.created_at,
+        users.updated_at,
+        COALESCE(SUM(us.sallary),0) AS sallary,
+        COALESCE(SUM(us.cut_amount),0) AS withdrawal,
+        COALESCE(SUM(us.sallary - us.cut_amount),0) AS total
+    ')
+            ->groupBy(
+                'users.id',
+                'users.name',
+                'users.uuid',
+                'users.country_id',
+                'users.agency_id',
+                'users.online',
+                'users.created_at',
+                'users.updated_at'
+            );
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
@@ -103,36 +136,62 @@ class SallariesController extends MainController
                 </div>
             ";
         });;
-        $grid->column('total', __('net salary'))
-            ->display(function () {
-                $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
-                $image = asset('images/dollar.jpg'); // Adjust path as needed
-                $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
-                return "<div style='display: flex; align-items: center; '>
+        // $grid->column('total', __('net salary'))
+        //     ->display(function () {
+        //         $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
+        //         $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //         $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
+        //         return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-            })->default(0);
-        $grid->column('salary', __('salary'))->display(function () {
-            $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        //     })->default(0);
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
-        $grid->column('withdrawal', __('withdrawal'))->display(function () {
-            $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
+        $grid->column('total', __('net salary'))->display(function ($v) {
+            $v = truncateAndTrim($v) ?? 0;
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
+        // $grid->column('salary', __('salary'))->display(function () {
+        //     $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
 
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        // })->default(0);
+        $grid->column('sallary', __('salary'))->display(function ($v) {
+            $v = truncateAndTrim($v) ?? 0;
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
+        // $grid->column('withdrawal', __('withdrawal'))->display(function () {
+        //     $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
+
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        // })->default(0);
+
+        $grid->column('withdrawal', __('withdrawal'))->display(function ($v) {
+            $v = truncateAndTrim($v) ?? 0;
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
 
         $grid->tools(function (Grid\Tools $tools) {
             //  $tools->append('<a href="' . url('admin/wallet-export-users?uuid=' . request('uuid')) . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
@@ -147,23 +206,39 @@ class SallariesController extends MainController
     protected function agencies()
     {
         $grid = new Grid(new Agency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID));
+        //     $grid->model()->when($countryID, fn($q) => $q->where('country_id', $countryID));
 
+        $month = request('month');
+        $year  = request('year');
+
+        $agencySalarySub = AgencySallary::query()
+            ->selectRaw('
+        agency_id,
+        SUM(sallary) AS salary,
+        SUM(cut_amount) AS withdrawal,
+        SUM(sallary - cut_amount) AS total
+    ')
+            ->when(
+                $month && $year,
+                fn($q) =>
+                $q->where('year', $year)
+                    ->where('month', $month)
+            )
+            ->groupBy('agency_id');
+        $grid->model()
+            ->when($countryID, fn($q) => $q->where('agencies.country_id', $countryID))
+            ->leftJoinSub($agencySalarySub, 'asum', 'asum.agency_id', '=', 'agencies.id')
+            ->select([
+                'agencies.*',
+                DB::raw('COALESCE(asum.salary, 0) AS sallary'),
+                DB::raw('COALESCE(asum.withdrawal, 0) AS withdrawal'),
+                DB::raw('COALESCE(asum.total, 0) AS total'),
+            ]);
         $grid->disableRowSelector();
 
 
-        // $model = $grid->model()
-        //     ->LeftJoin('agency_sallaries', 'agencies.id', '=', 'agency_sallaries.agency_id')
-        //     ->select('agencies.id', 'agencies.name', DB::raw('SUM(agency_sallaries.sallary - agency_sallaries.cut_amount) AS total', DB::raw('SUM(agency_sallaries.sallary) AS salary'), DB::raw('SUM(agency_sallaries.cut_amount) AS withdrawal')))
-        //     //            ->where('agencies.id', request('id'))
-        //     ->orderByRaw('total desc')
-        //     ->groupBy('agencies.id', 'agencies.name');
-
-        // if (request('salary_only') == 1) {
-        //     $model->having('total', '>', 0);
-        // }
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
@@ -216,36 +291,64 @@ class SallariesController extends MainController
                     </a>
                 ";
             });
-        $grid->column('total', __('net salary'))
-            ->display(function () {
-                $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
-                $image = asset('images/dollar.jpg'); // Adjust path as needed
-                $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
-                return "<div style='display: flex; align-items: center; '>
+        // $grid->column('total', __('net salary'))
+        //     ->display(function () {
+        //         $usd =   @$this->sumNetSalary(request('month'), request('year')) ?? 0;
+        //         $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //         $usd = rtrim(rtrim(number_format($usd, 10, '.', ''), '0'), '.');
+        //         return "<div style='display: flex; align-items: center; '>
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-            })->default(0);
-        $grid->column('salary', __('salary'))->display(function () {
-            $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        //     })->default(0);
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
-        $grid->column('withdrawal', __('withdrawal'))->display(function () {
-            $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
+        $grid->column('total', __('net salary'))->display(function ($v) {
+            $v = truncateAndTrim($v) ?? 0;
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
+        // $grid->column('salary', __('salary'))->display(function () {
+        //     $usd =   @$this->sumSalary(request('month'), request('year')) ?? 0;
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
 
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            return "<div style='display: flex; align-items: center; '>
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        // })->default(0);
 
-                        <span>{$usd}</span>
-                          <img src='{$image}' alt='USD' width='20' height='20'>
-                    </div>";
-        })->default(0);
+        $grid->column('sallary', __('salary'))->display(function ($v) {
+            $v = truncateAndTrim($v) ?? 0;
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
+
+        // $grid->column('withdrawal', __('withdrawal'))->display(function () {
+        //     $usd =   @$this->sumCutAmount(request('month'), request('year')) ?? 0;
+
+        //     $image = asset('images/dollar.jpg'); // Adjust path as needed
+        //     return "<div style='display: flex; align-items: center; '>
+
+        //                 <span>{$usd}</span>
+        //                   <img src='{$image}' alt='USD' width='20' height='20'>
+        //             </div>";
+        // })->default(0);
+
+        $grid->column('withdrawal', __('withdrawal'))->display(function ($v) {
+            $v = floor($v ?? 0);
+            $img = asset('images/dollar.jpg');
+            return "<div style='display:flex;align-items:center'>
+              <span>{$v}</span>
+              <img src='{$img}' width='20'>
+            </div>";
+        });
 
 
         $grid->tools(function (Grid\Tools $tools) {

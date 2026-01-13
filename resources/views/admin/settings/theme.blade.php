@@ -1,7 +1,7 @@
 <div id="themeSettings" class="theme-settings settings-section">
     <h3>{{ __('Theme settings') }}</h3>
     <form id="themeSettingsForm" action="{{ route('admin.app.settings.update') }}" method="POST"
-          enctype="multipart/form-data">
+          enctype="multipart/form-data" class="settings-form">
         @csrf
         <input type="hidden" name="current_tab" value="">
 
@@ -230,11 +230,11 @@
 
         <div class="action-buttons"
              style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; gap: 10px;">
-            <button type="submit" class="btn btn-primary">
-                {{ __('Save') }}
+            <button type="submit" class="btn btn-primary btn-save">
+                <i class="fas fa-save"></i> {{ __('Save') }}
             </button>
             <button type="button" id="resetColors" class="btn btn-info">
-                {{ __('Reset Colors') }}
+                <i class="fas fa-undo"></i> {{ __('Reset Colors') }}
             </button>
         </div>
     </form>
