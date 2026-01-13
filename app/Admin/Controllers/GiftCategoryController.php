@@ -75,6 +75,11 @@ class GiftCategoryController extends MainController
         // Clear cache before update
         Cache::tags(['gift_categories'])->flush();
         
+        // Handle sortable requests (from grid-sortable extension)
+        if (request()->has('_sort')) {
+            return $this->handleSortUpdate();
+        }
+        
         $response = parent::update($id);
         
         // Ensure fresh data from database for Octane
@@ -82,6 +87,78 @@ class GiftCategoryController extends MainController
         Cache::tags(['gift_categories'])->flush();
         
         return $response;
+    }
+    
+    /**
+     * Handle sort update from grid-sortable extension
+     */
+    protected function handleSortUpdate()
+    {
+        $sorts = request()->input('_sort');
+        
+        \Log::info('GiftCategory Sort Update Request', [
+            'data' => $sorts,
+            'request_all' => request()->all()
+        ]);
+        
+        if (empty($sorts)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No sort data provided'
+            ]);
+        }
+        
+        try {
+            // Clear cache before updating
+            Cache::tags(['gift_categories'])->flush();
+            
+            // Disable events temporarily for bulk update
+            \DB::beginTransaction();
+            
+            $updated = 0;
+            foreach ($sorts as $sort) {
+                $result = \DB::table('gift_categories')
+                    ->where('id', $sort['id'])
+                    ->update([
+                        'sort' => $sort['sort'],
+                        'updated_at' => now()
+                    ]);
+                $updated += $result;
+            }
+            
+            \DB::commit();
+            
+            \Log::info('GiftCategory Sort Update Success', [
+                'updated_count' => $updated,
+                'total_items' => count($sorts)
+            ]);
+            
+            // Clear cache after updating
+            Cache::tags(['gift_categories'])->flush();
+            
+            // Force Octane to clear its state
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'تم تحديث الترتيب بنجاح'
+            ]);
+            
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            
+            \Log::error('GiftCategory Sort Update Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to update sort order: ' . $e->getMessage()
+            ]);
+        }
     }
     
     /**
@@ -97,7 +174,7 @@ class GiftCategoryController extends MainController
         $grid->sortable('sort');
         
         $grid->column('id', __('Id'))->width(50);
-        $grid->column('sort', __('Order'))->width(80)->sortable();
+        $grid->column('sort', __('Order'))->width(80)->editable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
 
@@ -113,16 +190,80 @@ class GiftCategoryController extends MainController
         // Disable row selector to prevent issues with sortable
         $grid->disableRowSelector();
         
-        // Add custom JS to handle Octane cache clearing
+        // Add custom JS to handle Octane cache clearing and force refresh
         $grid->tools(function ($tools) {
-            $tools->append('<style>
+            $tools->append('
+            <style>
                 .grid-sortable-handle {
                     cursor: grab !important;
                 }
                 .grid-sortable-handle:active {
                     cursor: grabbing !important;
                 }
-            </style>');
+            </style>
+            <script>
+            $(function() {
+                // Override the sortable update callback
+                var originalSortableOptions = {};
+                
+                // Wait for grid to be ready
+                setTimeout(function() {
+                    var sortableTable = $(".grid-sortable tbody");
+                    
+                    if (sortableTable.length && sortableTable.sortable("instance")) {
+                        // Get current options
+                        originalSortableOptions = sortableTable.sortable("option");
+                        
+                        // Override update callback
+                        sortableTable.sortable("option", "update", function(event, ui) {
+                            var data = [];
+                            sortableTable.find("tr").each(function(index) {
+                                var id = $(this).data("id") || $(this).find("td:first").text();
+                                data.push({
+                                    id: id,
+                                    sort: index + 1
+                                });
+                            });
+                            
+                            // Send AJAX request with cache busting
+                            $.ajax({
+                                url: window.location.pathname,
+                                method: "POST",
+                                data: {
+                                    _token: LA.token,
+                                    _sort: data,
+                                    _method: "PUT",
+                                    _octane_cache_bust: Date.now()
+                                },
+                                success: function(response) {
+                                    if (response.status) {
+                                        toastr.success(response.message || "تم تحديث الترتيب بنجاح");
+                                        
+                                        // Force reload to get fresh data from database
+                                        setTimeout(function() {
+                                            $.pjax.reload({container:"#pjax-container", timeout: 2000});
+                                        }, 500);
+                                    } else {
+                                        toastr.error(response.message || "فشل تحديث الترتيب");
+                                        // Revert the UI
+                                        $.pjax.reload({container:"#pjax-container"});
+                                    }
+                                },
+                                error: function(xhr) {
+                                    toastr.error("حدث خطأ أثناء التحديث");
+                                    console.error(xhr);
+                                    // Revert the UI
+                                    $.pjax.reload({container:"#pjax-container"});
+                                }
+                            });
+                        });
+                        
+                        console.log("Grid sortable override applied for Octane compatibility");
+                    }
+                }, 1000);
+            });
+            </script>
+            ');
         });
         
         return $grid;

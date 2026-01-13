@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Models\GiftCategory;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class GiftCategoryObserver
 {
@@ -14,7 +13,7 @@ class GiftCategoryObserver
     public function updating(GiftCategory $giftCategory): void
     {
         // Clear any cache related to gift categories
-        Cache::tags(['gift_categories'])->flush();
+        $this->clearCache();
     }
 
     /**
@@ -22,14 +21,8 @@ class GiftCategoryObserver
      */
     public function updated(GiftCategory $giftCategory): void
     {
-        // Force DB to reflect changes immediately
-        Cache::tags(['gift_categories'])->flush();
-        
-        // Verify sort is saved to database
-        DB::statement('UPDATE gift_categories SET updated_at = ? WHERE id = ?', [
-            now(),
-            $giftCategory->id
-        ]);
+        // Clear cache after update
+        $this->clearCache();
     }
 
     /**
@@ -48,7 +41,7 @@ class GiftCategoryObserver
      */
     public function created(GiftCategory $giftCategory): void
     {
-        Cache::tags(['gift_categories'])->flush();
+        $this->clearCache();
     }
 
     /**
@@ -56,6 +49,23 @@ class GiftCategoryObserver
      */
     public function deleted(GiftCategory $giftCategory): void
     {
-        Cache::tags(['gift_categories'])->flush();
+        $this->clearCache();
+    }
+    
+    /**
+     * Clear all related caches
+     */
+    protected function clearCache(): void
+    {
+        try {
+            Cache::tags(['gift_categories', 'admin_data'])->flush();
+            
+            // Force opcache clear if available (for Octane)
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+        } catch (\Exception $e) {
+            \Log::warning('Failed to clear cache in GiftCategoryObserver: ' . $e->getMessage());
+        }
     }
 }
