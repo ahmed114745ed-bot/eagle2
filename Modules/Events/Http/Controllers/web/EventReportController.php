@@ -292,6 +292,14 @@ class EventReportController extends MainController
         $grid = new Grid(new UserChargeEvent());
 
         $grid->model()
+        ->with([
+            'user',
+            'user.profile',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'ChargeEvents',
+            'ChargeEvents.ware',
+             'ChargeEvents.vip',
+        ])
             ->whereHas('rewardCharge')
             ->with(['user', 'rewardCharge']);
 
