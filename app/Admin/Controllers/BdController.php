@@ -118,7 +118,8 @@ class BdController extends MainController
                 'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'bdSalaries',
                 'parent',
-                'createdBy'
+                'createdBy',
+                'createdBy.agency'
             ])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
