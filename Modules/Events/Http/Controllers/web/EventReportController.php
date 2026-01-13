@@ -301,6 +301,7 @@ class EventReportController extends MainController
                 'rewardCharges.ware',
                 'rewardCharges.vip',
             ])
+
             ->whereHas('rewardCharge')
             ->with(['user', 'rewardCharge']);
 
