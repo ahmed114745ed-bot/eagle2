@@ -39,10 +39,10 @@ class SettingController extends MainController
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::with('settings')->uniqueTypes()->orderByDesc('status')->get();
-        $pusher_app_id =  config('broadcasting.connections.pusher.app_id');
-        $pusher_app_key = config('broadcasting.connections.pusher.key');
-        $pusher_app_secret = config('broadcasting.connections.pusher.secret');
-        $pusher_app_cluster = config('broadcasting.connections.pusher.options.cluster');
+        $pusher_app_id = Common::getConf('pusher_app_id');
+        $pusher_app_key = Common::getConf('pusher_app_key');
+        $pusher_app_secret = Common::getConf('pusher_app_secret');
+        $pusher_app_cluster = Common::getConf('pusher_app_cluster');
         $firebase_api_key = Common::getConf('firebase_api_key');
         $firebase_auth_domain = Common::getConf('firebase_auth_domain');
         $firebase_database_url = Common::getConf('firebase_database_url');
