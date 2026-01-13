@@ -62,6 +62,7 @@ class SettingController extends MainController
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
                 'chargeTabType',
+                'zego_token',
                 'pusher_app_key',
                 'pusher_app_id',
                 'pusher_app_cluster',
