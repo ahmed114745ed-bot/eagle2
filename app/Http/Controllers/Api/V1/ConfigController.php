@@ -159,10 +159,6 @@ class ConfigController extends Controller
     public function updateConfigAgoraZego(Request $request)
     {
         Cache::forget('pusher_config');
-        if (file_exists(base_path('bootstrap/cache/config.php'))) {
-            unlink(base_path('bootstrap/cache/config.php'));
-        }
-        Artisan::call('config:clear');
 
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
