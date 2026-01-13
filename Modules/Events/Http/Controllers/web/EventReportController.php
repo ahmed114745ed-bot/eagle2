@@ -56,7 +56,7 @@ class EventReportController extends MainController
             'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'reward',
             'reward.ware',
-            'reward.ware'
+            'reward.vip'
 
         ])->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
@@ -138,7 +138,7 @@ class EventReportController extends MainController
             'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'reward',
             'reward.ware',
-            'reward.ware'
+            'reward.vip'
 
         ]);
         $grid->column('id', __('ID'));
@@ -217,7 +217,7 @@ class EventReportController extends MainController
             'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'reward',
             'reward.ware',
-            'reward.ware'
+            'reward.vip'
         ])->where('type', 'event_period');
         $grid->column('id', __('ID'));
         $grid->column('winner.name', __('name'))->display(function ($name) {
