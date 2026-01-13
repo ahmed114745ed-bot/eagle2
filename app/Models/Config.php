@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
-use Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -27,7 +26,8 @@ class Config extends Model
             $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
-                Artisan::call('config:cache');
+                // Note: Octane will pick up the new config from database on next request
+                // via RefreshPusherConfigListener
             }
         });
     }

@@ -532,7 +532,7 @@ if (!function_exists('adjustColor')) {
 if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
-        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
+        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
             //            if (!isSubdomain()) {
             //                return null;
             //            }

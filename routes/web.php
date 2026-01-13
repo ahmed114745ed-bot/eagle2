@@ -1172,3 +1172,87 @@ Route::get('/octane-reload', function () {
         ], 500);
     }
 });
+
+// Auto Deploy Route - Git Pull + Composer + Octane Reload
+// Works with GitHub Webhooks OR manual calls
+Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
+    
+    // Check GitHub signature OR custom token
+    $githubSignature = $request->header('X-Hub-Signature-256');
+    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
+    
+    $authorized = false;
+    
+    // GitHub Webhook verification
+    if ($githubSignature) {
+        $payload = $request->getContent();
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
+        $authorized = hash_equals($expectedSignature, $githubSignature);
+    }
+    
+    // Custom token verification
+    if (!$authorized && $customToken === $secret) {
+        $authorized = true;
+    }
+    
+    if (!$authorized) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    $output = [];
+    
+    try {
+        // 1. Git Pull
+        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
+        
+        // 2. Composer Install (production)
+        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
+        
+        // 3. Clear Caches
+        \Artisan::call('config:cache');
+        $output['config_cache'] = \Artisan::output();
+        
+        \Artisan::call('route:cache');
+        $output['route_cache'] = \Artisan::output();
+        
+        \Artisan::call('view:cache');
+        $output['view_cache'] = \Artisan::output();
+        
+        // 4. Octane Reload
+        \Artisan::call('octane:reload');
+        $output['octane_reload'] = \Artisan::output();
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deployment completed successfully',
+            'output' => $output,
+            'time' => now()->toDateTimeString(),
+        ], 200);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'output' => $output,
+        ], 500);
+    }
+})->name('deploy.webhook');
+
+// Simple reload without git (for manual use)
+Route::get('/quick-reload/{token}', function ($token) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
+    
+    if ($token !== $secret) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    \Artisan::call('octane:reload');
+    \Artisan::call('cache:clear');
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Octane reloaded & cache cleared',
+        'time' => now()->toDateTimeString(),
+    ]);
+});

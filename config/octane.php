@@ -77,6 +77,7 @@ return [
             FlushSessionState::class,
             FlushLocaleState::class,
             FlushQueuedCookies::class,
+            \App\Listeners\RefreshPusherConfigListener::class, // ⭐ تحديث Pusher config من الـ database
         ],
 
         RequestTerminated::class => [
