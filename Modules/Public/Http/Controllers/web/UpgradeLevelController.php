@@ -22,7 +22,6 @@ class UpgradeLevelController extends MainController
 
     public function ovipConfig(Request $request)
     {
-        // استثناء البارامترات الخاصة بالتاب
         $data = $request->except('_token', 'test_calco', 'current_tab', 'inner_tab_type');
         $Keys = [
             'exp_sender_percentage',
@@ -33,12 +32,10 @@ class UpgradeLevelController extends MainController
         ];
         
         foreach ($data as $key => $value) {
-            // مسح الكاش القديم أولاً
             Cache::forget($key);
             
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
             
-            // حفظ القيمة الجديدة في الكاش
             Cache::rememberForever($key, fn() => $value);
             
             if (in_array($key, $Keys)) {
@@ -60,20 +57,16 @@ class UpgradeLevelController extends MainController
 
     public function exchange(Request $request)
     {
-        // استثناء البارامترات الخاصة بالتاب
         $data = $request->except('_token', 'test_calco', 'current_tab', 'inner_tab_type');
         
         foreach ($data as $key => $value) {
-            // مسح الكاش القديم أولاً
             Cache::forget($key);
             
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             
-            // حفظ القيمة الجديدة في الكاش
             Cache::rememberForever($key, fn() => $value);
         }
         
-        // بناء رابط الرجوع مع التاب الصحيح
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
