@@ -261,15 +261,8 @@ class SettingsController extends Controller
             Language::where('code', $request->default_language)->update(['is_default'=> 1]);
         }
         
-        // Clear cache to sync with all Octane workers
-        \Artisan::call('cache:clear');
-        
-        // Reload Octane workers or fallback to config:cache
-        try {
-            \Artisan::call('octane:reload');
-        } catch (\Exception $e) {
-            \Artisan::call('config:cache');
-        }
+        // Clear all cache for Octane compatibility
+        Cache::flush();
         
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
@@ -376,15 +369,8 @@ class SettingsController extends Controller
             Cache::put($key, $value);
         }
         
-        // Clear cache to sync with all Octane workers
-        \Artisan::call('cache:clear');
-        
-        // Reload Octane workers or fallback to config:cache
-        try {
-            \Artisan::call('octane:reload');
-        } catch (\Exception $e) {
-            \Artisan::call('config:cache');
-        }
+        // Clear all cache for Octane compatibility
+        Cache::flush();
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

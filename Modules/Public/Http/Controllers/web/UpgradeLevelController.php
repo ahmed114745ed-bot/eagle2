@@ -33,24 +33,16 @@ class UpgradeLevelController extends MainController
         
         foreach ($data as $key => $value) {
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
-            Cache::forever($key, $value);
-            
+            // Use Cache::put for Octane compatibility
+            Cache::put($key, $value, now()->addYear());
+
             if (in_array($key, $Keys)) {
                 Cache::forget('exp_percentages');
             }
         }
         
-        // Clear cache to sync with all Octane workers
-        \Artisan::call('cache:clear');
-        
-        // Reload Octane workers or fallback to config:cache
-        try {
-            \Artisan::call('octane:reload');
-        } catch (\Exception $e) {
-            \Artisan::call('config:cache');
-        }
-        
-        // بناء رابط الرجوع مع التاب الصحيح
+        // Clear all cache for Octane compatibility
+        Cache::flush();
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
@@ -68,18 +60,12 @@ class UpgradeLevelController extends MainController
         
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            Cache::forever($key, $value);
+            // Use Cache::put for Octane compatibility
+            Cache::put($key, $value, now()->addYear());
         }
         
-        // Clear cache to sync with all Octane workers
-        \Artisan::call('cache:clear');
-        
-        // Reload Octane workers or fallback to config:cache
-        try {
-            \Artisan::call('octane:reload');
-        } catch (\Exception $e) {
-            \Artisan::call('config:cache');
-        }
+        // Clear all cache for Octane compatibility
+        Cache::flush();
         
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
