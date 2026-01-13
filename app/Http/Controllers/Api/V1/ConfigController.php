@@ -175,6 +175,9 @@ class ConfigController extends Controller
 
         Cache::forget('pusher_config');
         Artisan::call('config:cache');
+        
+        // Clear cache to sync with all Octane workers
+        Artisan::call('cache:clear');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         

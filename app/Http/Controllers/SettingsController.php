@@ -260,6 +260,10 @@ class SettingsController extends Controller
 
             Language::where('code', $request->default_language)->update(['is_default'=> 1]);
         }
+        
+        // Clear cache to sync with all Octane workers
+        \Artisan::call('cache:clear');
+        
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
@@ -364,6 +368,9 @@ class SettingsController extends Controller
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
             Cache::put($key, $value);
         }
+        
+        // Clear cache to sync with all Octane workers
+        \Artisan::call('cache:clear');
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

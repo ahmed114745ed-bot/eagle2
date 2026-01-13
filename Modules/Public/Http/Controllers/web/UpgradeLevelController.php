@@ -32,16 +32,16 @@ class UpgradeLevelController extends MainController
         ];
         
         foreach ($data as $key => $value) {
-            Cache::forget($key);
-            
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
-            
-            Cache::rememberForever($key, fn() => $value);
+            Cache::forever($key, $value);
             
             if (in_array($key, $Keys)) {
                 Cache::forget('exp_percentages');
             }
         }
+        
+        // Clear cache to sync with all Octane workers
+        \Artisan::call('cache:clear');
         
         // بناء رابط الرجوع مع التاب الصحيح
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
@@ -60,12 +60,12 @@ class UpgradeLevelController extends MainController
         $data = $request->except('_token', 'test_calco', 'current_tab', 'inner_tab_type');
         
         foreach ($data as $key => $value) {
-            Cache::forget($key);
-            
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            
-            Cache::rememberForever($key, fn() => $value);
+            Cache::forever($key, $value);
         }
+        
+        // Clear cache to sync with all Octane workers
+        \Artisan::call('cache:clear');
         
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {

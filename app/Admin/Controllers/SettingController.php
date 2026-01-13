@@ -111,9 +111,11 @@ class SettingController extends MainController
             
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                Cache::forget($key);
-                Cache::rememberForever($key, fn() => $value);
+                Cache::forever($key, $value);
             }
+
+            // Clear cache to sync with all Octane workers
+            \Artisan::call('cache:clear');
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');
             
@@ -139,8 +141,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forget('room_cup');
-            Cache::rememberForever('room_cup', fn() => $request->value);
+            Cache::forever('room_cup', $request->value);
+            \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -156,8 +158,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forget('room_boom');
-            Cache::rememberForever('room_boom', fn() => $request->value);
+            Cache::forever('room_boom', $request->value);
+            \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -173,8 +175,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forget('remaining_diamonds_action');
-            Cache::rememberForever('remaining_diamonds_action', fn() => $request->value);
+            Cache::forever('remaining_diamonds_action', $request->value);
+            \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -190,8 +192,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forget('host_level_action');
-            Cache::rememberForever('host_level_action', fn() => $request->value);
+            Cache::forever('host_level_action', $request->value);
+            \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
@@ -208,8 +210,8 @@ class SettingController extends MainController
                 ['value' => $request->value]
             );
 
-            Cache::forget('pk_live_action');
-            Cache::rememberForever('pk_live_action', fn() => $request->value);
+            Cache::forever('pk_live_action', $request->value);
+            \Artisan::call('cache:clear');
 
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
