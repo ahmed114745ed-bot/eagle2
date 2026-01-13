@@ -130,8 +130,10 @@ return [
         'auth.driver',
         'session',
         'session.store',
-	'request',
-	'Illuminate\Http\Response',
+        'request',
+        'Illuminate\Http\Response',
+        // ⭐ Flush Broadcast Manager لتحديث Pusher config بدون restart
+        'Illuminate\Broadcasting\BroadcastManager',
     ],
 
     /*
