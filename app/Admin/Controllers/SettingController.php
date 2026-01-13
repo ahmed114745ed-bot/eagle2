@@ -105,34 +105,44 @@ class SettingController extends MainController
 
     public function saveSettings(Request $request)
     {
+        try {
+            $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
+            
+            foreach ($data as $key => $value) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                Cache::forget($key);
+                Cache::rememberForever($key, fn() => $value);
+            }
 
-        $data = $request->except('_token');
-        foreach ($data as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            $redirectUrl = url(config('admin.route.prefix') . '/settings');
+            
+            if ($request->has('current_tab')) {
+                $redirectUrl .= '?tab=' . $request->current_tab;
+                if ($request->has('inner_tab_type')) {
+                    $redirectUrl .= '&type=' . $request->inner_tab_type;
+                }
+            }
+
+            return redirect($redirectUrl)->with('success', 'تم تحديث الإعدادات بنجاح!');
+        } catch (Exception $exception) {
+            return back()->with('error', $exception->getMessage());
         }
-
-        return back()->with('success', 'تم تحديث الإعدادات بنجاح!');
     }
 
 
-    public function updateRoomCup(Request $request)
+    public function updateRoomCup(Request $request): JsonResponse
     {
         try {
-            $setting = Setting::where('key', 'room_cup')->first();
-            if ($setting) {
-                $setting->value = $request->value;
-                $setting->save();
-            } else {
-                Setting::create([
-                    'key' => 'room_cup',
-                    'value' => $request->value
-                ]);
+            Setting::updateOrCreate(
+                ['key' => 'room_cup'],
+                ['value' => $request->value]
+            );
 
-            }
-            Cache::put('room_cup', $request->value);
+            Cache::forget('room_cup');
+            Cache::rememberForever('room_cup', fn() => $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
@@ -140,11 +150,14 @@ class SettingController extends MainController
     public function updateRoomBoom(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'room_boom'], [
-                'key' => 'room_boom',
-                'value' => $request->value
-            ]);
-            Cache::put('room_boom', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'room_boom'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('room_boom');
+            Cache::rememberForever('room_boom', fn() => $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -154,11 +167,14 @@ class SettingController extends MainController
     public function updateRemainingDiamonds(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'remaining_diamonds_action'], [
-                'key' => 'remaining_diamonds_action',
-                'value' => $request->value
-            ]);
-            Cache::put('remaining_diamonds_action', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'remaining_diamonds_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('remaining_diamonds_action');
+            Cache::rememberForever('remaining_diamonds_action', fn() => $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -168,11 +184,32 @@ class SettingController extends MainController
     public function updateHostLevel(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'host_level_action'], [
-                'key' => 'host_level_action',
-                'value' => $request->value
-            ]);
-            Cache::put('host_level_action', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'host_level_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('host_level_action');
+            Cache::rememberForever('host_level_action', fn() => $request->value);
+
+            return Common::apiResponse(true, 'created successfully');
+        } catch (Exception $exception) {
+            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+        }
+    }
+
+
+    public function updatePkLive(Request $request): JsonResponse
+    {
+        try {
+            Setting::updateOrCreate(
+                ['key' => 'pk_live_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forget('pk_live_action');
+            Cache::rememberForever('pk_live_action', fn() => $request->value);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);

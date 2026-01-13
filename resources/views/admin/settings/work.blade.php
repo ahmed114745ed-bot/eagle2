@@ -39,21 +39,26 @@
                                         </div>
                                     </div>
 
-                                    @php $sender = Vip::where('type',2)->count(); @endphp
-                                    @if ($sender == 0)
-                                        <div class="col-md-12"><a href="/admin/vips">{{ __('Go to Settings') }}</a>
-                                        </div>
-                                    @endif
+            <div class="exp-cards-grid">
+                <!-- Wealth Card -->
+                <div class="exp-card">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon wealth">
+                                <i class="fas fa-gem"></i>
+                            </div>
+                            <h5>{{ __('wealth') }}</h5>
+                        </div>
 
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="wealth_gift_price">{{ __('gift price') }}</label>
-                                            <input type="text" id="wealth_gift_price" name="test_calco"
-                                                   value="{{ $settings['wealth_gift_price'] ?? '' }}"
-                                                   placeholder="{{ __('wealth_gift_price') }}" class="form-control">
-                                            <span id="exp_result" class="fw-bold ms-2"></span>
-                                        </div>
-                                    </div>
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('EXP Rate') }}</label>
+                                <input type="text" name="exp_sender_percentage"
+                                       value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                <small class="text-muted">1 coin = X EXP</small>
+                            </div>
 
                                     <script>
                                         document.addEventListener('DOMContentLoaded', function () {
@@ -94,28 +99,33 @@
                                     <h4 class="m-0">{{ __('attraction') }}</h4>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="attraction_exp">{{ __('attraction') }}</label>
-                                        <input type="text" id="attraction_exp" name="exp_received_percentage"
-                                               value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
-                                               placeholder="{{ __('Enter Exp') }}" class="form-control">
-                                        <span class="form-text text-muted">1 Diamond = X EXP</span>
-                                    </div>
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                                    <div class="col-md-12">
-                                        <label>{{ __('gift price') }}</label>
-                                        <input type="text" id="attraction_gift_price" name="test_calco"
-                                               value="{{ $settings['attraction_gift_price'] ?? '' }}"
-                                               placeholder="{{ __('attraction_gift_price') }}" class="form-control">
-                                        <span id="attraction_exp_result" class="fw-bold ms-2"></span>
-                                    </div>
+                <!-- Attraction Card -->
+                <div class="exp-card">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon attraction">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h5>{{ __('attraction') }}</h5>
+                        </div>
 
-                                    @php $receiver = Vip::where('type',1)->count(); @endphp
-                                    @if ($receiver == 0)
-                                        <div class="col-md-12"><a href="/admin/vips">{{ __('Go to Settings') }}</a>
-                                        </div>
-                                    @endif
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('EXP Rate') }}</label>
+                                <input type="text" name="exp_received_percentage"
+                                       value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                <small class="text-muted">1 Diamond = X EXP</small>
+                            </div>
 
                                     <div class="col-12 d-flex gap-3 mt-3">
                                         <button class="btn btn-primary">{{ __('Save') }}</button>
@@ -133,28 +143,33 @@
                                     <h4 class="m-0">{{ __('charge') }}</h4>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="charge_exp">{{ __('charge') }}</label>
-                                        <input type="text" id="charge_exp" name="exp_charge_percentage"
-                                               value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                               placeholder="{{ __('Enter Exp') }}" class="form-control">
-                                    </div>
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                                    <div class="col-md-12">
-                                        <label for="charge_gift_price">{{ __('coins') }}</label>
-                                        <input type="text" id="charge_gift_price" name="test_calco"
-                                               value="{{ $settings['charge_gift_price'] ?? '' }}"
-                                               placeholder="{{ __('charge_gift_price') }}" class="form-control">
-                                        <span id="charge_exp_result" class="fw-bold ms-2"></span>
-                                    </div>
+                <!-- Charge Card -->
+                <div class="exp-card">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon charge">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h5>{{ __('charge') }}</h5>
+                        </div>
 
-                                    @php $charger = Vip::where('type',5)->count(); @endphp
-                                    @if ($charger == 0)
-                                        <div class="col-md-12">
-                                            <a href="/admin/vips">{{ __('Go to Settings') }}</a>
-                                        </div>
-                                    @endif
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('EXP Rate') }}</label>
+                                <input type="text" name="exp_charge_percentage"
+                                       value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                <small class="text-muted">1 charge = X EXP</small>
+                            </div>
 
                                     <div class="col-12 d-flex gap-3 mt-3">
                                         <button class="btn btn-primary">{{ __('Save') }}</button>
@@ -172,27 +187,33 @@
                                     <h4 class="m-0">{{ __('Rooms') }}</h4>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="rooms_exp">{{ __('Rooms') }}</label>
-                                        <input type="text" id="rooms_exp" name="exp_room_percentage"
-                                               value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
-                                               placeholder="{{ __('Enter Exp') }}" class="form-control">
-                                    </div>
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                                    <div class="col-md-12">
-                                        <label>{{ __('gift price') }}</label>
-                                        <input type="text" id="rooms_gift_price" name="test_calco"
-                                               value="{{ $settings['rooms_gift_price'] ?? '' }}"
-                                               placeholder="{{ __('rooms_gift_price') }}" class="form-control">
-                                        <span id="rooms_exp_result" class="fw-bold ms-2"></span>
-                                    </div>
+                <!-- Rooms Card -->
+                <div class="exp-card">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon rooms">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                            <h5>{{ __('Rooms') }}</h5>
+                        </div>
 
-                                    @php $rooms = Vip::where('type',4)->count(); @endphp
-                                    @if ($rooms == 0)
-                                        <div class="col-md-12"><a href="/admin/vips">{{ __('Go to Settings') }}</a>
-                                        </div>
-                                    @endif
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('EXP Rate') }}</label>
+                                <input type="text" name="exp_room_percentage"
+                                       value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                <small class="text-muted">1 room action = X EXP</small>
+                            </div>
 
                                     <div class="col-12 d-flex gap-3 mt-3">
                                         <button class="btn btn-primary">{{ __('Save') }}</button>
@@ -210,36 +231,54 @@
                                     <h4 class="m-0">{{ __('cp') }}</h4>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <label for="cp_exp">{{ __('cp') }}</label>
-                                        <input type="text" id="cp_exp" name="exp_cp_percentage"
-                                               value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
-                                               placeholder="{{ __('Enter Exp') }}" class="form-control">
-                                    </div>
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                                    <div class="col-md-12">
-                                        <label>{{ __('gift price') }}</label>
-                                        <input type="text" id="cp_gift_price" name="test_calco"
-                                               value="{{ $settings['cp_gift_price'] ?? '' }}"
-                                               placeholder="cp_gift_price" class="form-control">
-                                        <span id="cp_exp_result" class="fw-bold ms-2"></span>
-                                    </div>
+                <!-- CP Card -->
+                <div class="exp-card">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon cp">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5>{{ __('cp') }}</h5>
+                        </div>
 
-                                    @php $cp = Vip::where('type',3)->count(); @endphp
-                                    @if ($cp == 0)
-                                        <div class="col-md-12">
-                                            <a href="/admin/vips">{{ __('Go to Settings') }}</a>
-                                        </div>
-                                    @endif
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('EXP Rate') }}</label>
+                                <input type="text" name="exp_cp_percentage"
+                                       value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
+                                <small class="text-muted">1 CP action = X EXP</small>
+                            </div>
 
                                     <div class="col-12 d-flex gap-3 mt-3">
                                         <button class="btn btn-primary">{{ __('Save') }}</button>
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+
+                            @php $cp = Vip::where('type',3)->count(); @endphp
+                            @if ($cp == 0)
+                                <div class="alert-link">
+                                    <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -269,22 +308,25 @@
                                         <span class="exp_result fw-bold ms-2"></span>
                                     </div>
 
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', function () {
-                                            document.querySelectorAll('.coin-calculator').forEach(container => {
-                                                const userInput = container.querySelector('.user_coin_input');
-                                                const rate = container.querySelector('.exchange_rate');
-                                                const resultSpan = container.querySelector('.exp_result');
+            <div class="exp-cards-grid single-card">
+                <div class="exp-card">
+                    <form action="{{ route('admin.exchange-coins') }}" method="POST" enctype="multipart/form-data" class="settings-form">
+                        @csrf
+                        <div class="exp-card-header">
+                            <div class="exp-card-icon diamond">
+                                <i class="fas fa-diamond"></i>
+                            </div>
+                            <h5>{{ __('Diamond Exchange') }}</h5>
+                        </div>
 
-                                                function calc() {
-                                                    const val = parseFloat(userInput.value);
-                                                    const rateX = parseFloat(rate.value);
-                                                    if (!isNaN(val) && !isNaN(rateX)) {
-                                                        resultSpan.textContent = `= ${(rateX / 100) * val} coin`;
-                                                    } else {
-                                                        resultSpan.textContent = '';
-                                                    }
-                                                }
+                        <div class="exp-card-body">
+                            <div class="form-group">
+                                <label>{{ __('Exchange Rate') }}</label>
+                                <input type="text" id="coin_exp" name="exchange_coin_percentage"
+                                       value="{{ $settings['exchange_coin_percentage'] ?? 1 }}"
+                                       placeholder="{{ __('Enter rate') }}" class="form-control" required>
+                                <small class="text-muted">1 diamond = X coin</small>
+                            </div>
 
                                                 userInput.addEventListener('input', calc);
                                                 calc();
@@ -297,8 +339,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+
+                        <div class="exp-card-footer">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
+                                <i class="fas fa-save"></i> {{ __('Save') }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
