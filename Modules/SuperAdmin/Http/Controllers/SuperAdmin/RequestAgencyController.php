@@ -97,7 +97,8 @@ class RequestAgencyController extends AdminController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'))->display(function ($name) {
+        $grid->column('owner.name', trans('name'))->display(function () {
+            $name = $this->owner->name;
             $uid = @$this->owner->uuid;
             $path = @$this?->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
