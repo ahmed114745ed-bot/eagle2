@@ -75,6 +75,11 @@ class GiftCategoryController extends MainController
         // Clear ALL caches before update (Octane fix)
         Cache::flush();
         
+        // Handle sortable requests (from grid-sortable extension)
+        if (request()->has('_sort')) {
+            return $this->handleSortUpdate();
+        }
+        
         $response = parent::update($id);
         
         // Force fresh data from database for Octane
