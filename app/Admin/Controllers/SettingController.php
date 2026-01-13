@@ -39,10 +39,10 @@ class SettingController extends MainController
         $gamesLibrary = Common::getConfig('games_library');
         $brand_images = BrandImage::all();
         $paymentCoins = PaymentCoin::with('settings')->uniqueTypes()->orderByDesc('status')->get();
-        $pusher_app_id =  config('broadcasting.connections.pusher.app_id');
-        $pusher_app_key = config('broadcasting.connections.pusher.key');
-        $pusher_app_secret = config('broadcasting.connections.pusher.secret');
-        $pusher_app_cluster = config('broadcasting.connections.pusher.options.cluster');
+        $pusher_app_id = Common::getConf('pusher_app_id');
+        $pusher_app_key = Common::getConf('pusher_app_key');
+        $pusher_app_secret = Common::getConf('pusher_app_secret');
+        $pusher_app_cluster = Common::getConf('pusher_app_cluster');
         $firebase_api_key = Common::getConf('firebase_api_key');
         $firebase_auth_domain = Common::getConf('firebase_auth_domain');
         $firebase_database_url = Common::getConf('firebase_database_url');
@@ -106,33 +106,49 @@ class SettingController extends MainController
 
     public function saveSettings(Request $request)
     {
+        try {
+            $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
+            
+            foreach ($data as $key => $value) {
+                Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+                // Clear old cache first, then set new value
+                Cache::forget($key);
+                Cache::put($key, $value, now()->addYear());
+            }
 
-        $data = $request->except('_token');
-        foreach ($data as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            // Clear all settings cache for Octane
+            Cache::forget('all_settings');
+            Cache::flush();
+
+            $redirectUrl = url(config('admin.route.prefix') . '/settings');
+            
+            if ($request->has('current_tab')) {
+                $redirectUrl .= '?tab=' . $request->current_tab;
+                if ($request->has('inner_tab_type')) {
+                    $redirectUrl .= '&type=' . $request->inner_tab_type;
+                }
+            }
+
+            return redirect($redirectUrl)->with('success', 'تم تحديث الإعدادات بنجاح!');
+        } catch (Exception $exception) {
+            return back()->with('error', $exception->getMessage());
         }
-
-        return back()->with('success', 'تم تحديث الإعدادات بنجاح!');
     }
 
 
-    public function updateRoomCup(Request $request)
+    public function updateRoomCup(Request $request): JsonResponse
     {
         try {
-            $setting = Setting::where('key', 'room_cup')->first();
-            if ($setting) {
-                $setting->value = $request->value;
-                $setting->save();
-            } else {
-                Setting::create([
-                    'key' => 'room_cup',
-                    'value' => $request->value
-                ]);
-            }
-            Cache::put('room_cup', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'room_cup'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('room_cup', $request->value);
+            \Artisan::call('cache:clear');
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
@@ -140,11 +156,14 @@ class SettingController extends MainController
     public function updateRoomBoom(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'room_boom'], [
-                'key' => 'room_boom',
-                'value' => $request->value
-            ]);
-            Cache::put('room_boom', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'room_boom'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('room_boom', $request->value);
+            \Artisan::call('cache:clear');
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -154,11 +173,14 @@ class SettingController extends MainController
     public function updateRemainingDiamonds(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'remaining_diamonds_action'], [
-                'key' => 'remaining_diamonds_action',
-                'value' => $request->value
-            ]);
-            Cache::put('remaining_diamonds_action', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'remaining_diamonds_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('remaining_diamonds_action', $request->value);
+            \Artisan::call('cache:clear');
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -168,11 +190,14 @@ class SettingController extends MainController
     public function updateHostLevel(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'host_level_action'], [
-                'key' => 'host_level_action',
-                'value' => $request->value
-            ]);
-            Cache::put('host_level_action', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'host_level_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('host_level_action', $request->value);
+            \Artisan::call('cache:clear');
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -183,11 +208,14 @@ class SettingController extends MainController
     public function updatePkLive(Request $request): JsonResponse
     {
         try {
-            Setting::updateOrCreate(['key' => 'pk_live_action'], [
-                'key' => 'pk_live_action',
-                'value' => $request->value
-            ]);
-            Cache::put('pk_live_action', $request->value);
+            Setting::updateOrCreate(
+                ['key' => 'pk_live_action'],
+                ['value' => $request->value]
+            );
+
+            Cache::forever('pk_live_action', $request->value);
+            \Artisan::call('cache:clear');
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
