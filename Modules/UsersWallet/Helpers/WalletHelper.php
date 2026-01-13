@@ -76,7 +76,6 @@ class WalletHelper
         ]);
     }
 
-
     /**
      * @throws Exception
      */
@@ -114,6 +113,4 @@ class WalletHelper
 
         return $userWithdrawal;
     }
-
-
 }
