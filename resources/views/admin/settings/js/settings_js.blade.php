@@ -276,7 +276,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function showSection(sectionId) {
+// Define functions in global scope for inline onclick handlers
+window.showSection = function(sectionId) {
     // Show/hide sections
     document.querySelectorAll('.settings-section').forEach(section => {
         section.classList.remove('active');
@@ -341,11 +342,11 @@ function showSection(sectionId) {
 }
 
 
-    function changeInnerTab(type) {
-        const url = new URL(window.location);
-        url.searchParams.set("tab", "workSettings");
-        url.searchParams.set("type", type);
-        window.history.pushState({}, "", url);
+window.changeInnerTab = function(type) {
+    const url = new URL(window.location);
+    url.searchParams.set("tab", "workSettings");
+    url.searchParams.set("type", type);
+    window.history.pushState({}, "", url);
 
         document.querySelectorAll(".inner-settings-menu button").forEach(btn =>
             btn.classList.remove("active")
@@ -365,46 +366,46 @@ function showSection(sectionId) {
             typeInput.value = type;
         });
 
-        showInnerContent(type);
-    }
+    showInnerContent(type);
+}
 
-    function showInnerContent(type) {
-        document.querySelectorAll(".inner-tab-content").forEach(content => {
-            content.style.display = "none";
-        });
+window.showInnerContent = function(type) {
+    document.querySelectorAll(".inner-tab-content").forEach(content => {
+        content.style.display = "none";
+    });
 
-        const section = document.getElementById(type + "_tab");
-        if (section) section.style.display = "block";
-    }
+    const section = document.getElementById(type + "_tab");
+    if (section) section.style.display = "block";
+}
 
-    function openFullScreen(imgElement) {
-        var modal = document.getElementById("imageModal");
-        var modalImg = document.getElementById("fullImage");
+window.openFullScreen = function(imgElement) {
+    var modal = document.getElementById("imageModal");
+    var modalImg = document.getElementById("fullImage");
 
-        modal.style.display = "block";
-        modalImg.src = imgElement.src;
-    }
+    modal.style.display = "block";
+    modalImg.src = imgElement.src;
+}
 
-    function closeFullScreen() {
-        document.getElementById("imageModal").style.display = "none";
-    }
+window.closeFullScreen = function() {
+    document.getElementById("imageModal").style.display = "none";
+}
 
-    function toggleBackgroundInput() {
-        const type = document.getElementById("background_type").value;
-        document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
-        document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
-        document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
-    }
+window.toggleBackgroundInput = function() {
+    const type = document.getElementById("background_type").value;
+    document.getElementById("background_color_group").style.display = type === "color" ? "block" : "none";
+    document.getElementById("background_image_group").style.display = type === "image" ? "block" : "none";
+    document.getElementById("gradient_group").style.display = type === "gradient" ? "block" : "none";
+}
 
-    function toggleBrandBackgroundInput() {
-        const type = document.getElementById("brand_background_type").value;
-        document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
-        document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
-    }
+window.toggleBrandBackgroundInput = function() {
+    const type = document.getElementById("brand_background_type").value;
+    document.getElementById("brand_background_color_group").style.display = type === "color" ? "block" : "none";
+    document.getElementById("brand_background_image_group").style.display = type === "image" ? "block" : "none";
+}
 
-    async function updateBackgroundValue() {
-        const type = document.getElementById("background_type").value;
-        const hiddenInput = document.getElementById("app_background");
+window.updateBackgroundValue = async function() {
+    const type = document.getElementById("background_type").value;
+    const hiddenInput = document.getElementById("app_background");
 
         if (type === "color") {
             hiddenInput.value = document.getElementById("background_color").value;
