@@ -132,8 +132,6 @@ return [
         'session.store',
         'request',
         'Illuminate\Http\Response',
-        // ⭐ Flush Broadcast Manager لتحديث Pusher config بدون restart
-        'Illuminate\Broadcasting\BroadcastManager',
     ],
 
     /*

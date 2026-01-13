@@ -26,8 +26,8 @@ class Config extends Model
             $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
-                // Note: Octane will pick up the new config from database on next request
-                // via RefreshPusherConfigListener
+                // Set flag to trigger BroadcastManager flush on next request
+                Cache::put('pusher_config_changed', true, 60 * 5); // 5 minutes TTL
             }
         });
     }
