@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use App\Models\GiftCategory;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
 
 class GiftCategoryController extends MainController
@@ -65,6 +66,24 @@ class GiftCategoryController extends MainController
             ->title(trans('Gift Categories'))
             ->body($this->form()));
     }
+    
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update($id)
+    {
+        // Clear cache before update
+        Cache::tags(['gift_categories'])->flush();
+        
+        $response = parent::update($id);
+        
+        // Ensure fresh data from database for Octane
+        GiftCategory::query()->whereKey($id)->first()?->refresh();
+        Cache::tags(['gift_categories'])->flush();
+        
+        return $response;
+    }
+    
     /**
      * Make a grid builder.
      *
@@ -73,9 +92,12 @@ class GiftCategoryController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GiftCategory());
-        $grid->sortable();
-        $grid->model()->orderBy('sort', 'asc');
-        $grid->column('id', __('Id'));
+        
+        // Enable sortable with proper Octane handling
+        $grid->sortable('sort');
+        
+        $grid->column('id', __('Id'))->width(50);
+        $grid->column('sort', __('Order'))->width(80)->sortable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
 
@@ -87,6 +109,22 @@ class GiftCategoryController extends MainController
         $this->extendGrid($grid);
 
         $grid->disableExport();
+        
+        // Disable row selector to prevent issues with sortable
+        $grid->disableRowSelector();
+        
+        // Add custom JS to handle Octane cache clearing
+        $grid->tools(function ($tools) {
+            $tools->append('<style>
+                .grid-sortable-handle {
+                    cursor: grab !important;
+                }
+                .grid-sortable-handle:active {
+                    cursor: grabbing !important;
+                }
+            </style>');
+        });
+        
         return $grid;
     }
 
@@ -101,6 +139,7 @@ class GiftCategoryController extends MainController
         $show = new Show(GiftCategory::findOrFail($id));
 
         $show->field('id', __('Id'));
+        $show->field('sort', __('Sort'));
         $show->field('title', __('Title'));
         $show->field('type', __('Type'));
         $show->field('created_at', __('Created at'));
@@ -131,6 +170,7 @@ class GiftCategoryController extends MainController
             'cp'         => __('CP'),
             'vip'        => __('VIP'),
         ])->required();
+        
         $form->number('sort', __('sort'))
             ->rules('required|integer|min:1')      // minimum value 1
             ->required();
@@ -139,6 +179,9 @@ class GiftCategoryController extends MainController
         $form->saving(function (Form $form) {
             $titles = request()->input('title', []);
             $form->model()->title = $titles;
+            
+            // Clear cache when saving
+            Cache::tags(['gift_categories'])->flush();
         });
 
         return $form;
