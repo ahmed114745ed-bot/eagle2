@@ -66,10 +66,6 @@ class MilestoneRewardController
             $grid->model()->where('milestone_id', $milestoneId);
         }
 
-         $grid->model()->with([
-           'reward',
-         ]);
-
         $grid->column('id', __('ID'))->sortable();
         if (!request()->filled('_export_')) {
             $grid->column('type', __('Type'))->label();
