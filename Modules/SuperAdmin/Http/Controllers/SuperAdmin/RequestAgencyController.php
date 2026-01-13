@@ -76,6 +76,15 @@ class RequestAgencyController extends AdminController
     {
         $grid = new Grid(new Agency());
         $grid->model()
+            ->with([
+                'owner',
+                'owner.profile',
+                'additionalInfo',
+                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'additionalInfo.user',
+                'additionalInfo.user.profile',
+                'additionalInfo.user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ])
             ->where('bd_id', Auth::user()->id)
             ->where('status', 0)->orderByDesc("id")
             ->whereHas('additionalInfo', function ($query) {
@@ -174,7 +183,8 @@ class RequestAgencyController extends AdminController
                     </div>";
         });
         $grid->column('additionalInfo.host', __('host'));
-        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
+        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function () {
+            $name = $this->additionalInfo->user->name ?? '';
             $uid = @$this->additionalInfo->user->uuid;
             $path = @$this?->additionalInfo->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
