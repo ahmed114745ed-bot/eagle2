@@ -65,20 +65,21 @@ class ChargeAgencyController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->model()
-        ->with([
-            'agency',
-            'agency.owner',
-            // 'agency.owner.profile',
-            // 'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])
+            ->with([
+                'agency',
+                'agency.owner',
+                'agency.owner.profile',
+                'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
             ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
             ->whereHas('agency');
 
         $grid->id(__('ID'));
-        $grid->column('agency.name', __('Agency'))->display(function ($name) {
+        $grid->column('agency.name', __('Agency'))->display(function () {
             if (! $this->agency) {
                 return;
             }
+            $name = $this->agency->name ?? '';
             $cacheKey = "agency_image_{$this->agency->id}";
             $image = Cache::remember($cacheKey, 3600, function () {
                 $path = @$this->agency->img;
@@ -109,6 +110,7 @@ class ChargeAgencyController extends MainController
             if (! $this->agency) {
                 return;
             }
+            $name = $this->agency->owner->name ?? '';
             $uid = @$this->agency->owner->uuid;
             $path = @$this->agency->owner->profile?->avatar;
             $defaultImage = asset('images/businessman-icon.jpg');
