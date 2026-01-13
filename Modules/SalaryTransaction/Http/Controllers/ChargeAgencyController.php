@@ -68,9 +68,7 @@ class ChargeAgencyController extends MainController
             'agency',
             'agency.owner',
             'agency.owner.profile',
-
-            'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-
+           // 'agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
             ->whereHas('agency');
