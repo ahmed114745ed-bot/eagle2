@@ -99,7 +99,9 @@ class AgencyJoinRequestController extends MainController
                 'user',
                 'agency',
                 'user.profile',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'changeStatusAdminAdmin', // eager load Admin
+                'changeStatusAdminUser',
             ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
@@ -202,8 +204,8 @@ class AgencyJoinRequestController extends MainController
         });
         $grid->column('change_status_admin_id', __('Change Status Admin'))
             ->display(function () {
-                $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
-
+                //$admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+                $admin = $this->changeStatusAdminAdmin ?? $this->changeStatusAdminUser;
                 if (!$admin) {
                     return '-';
                 }
