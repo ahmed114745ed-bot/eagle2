@@ -15,16 +15,22 @@ class OctaneGridSortableController extends Controller
     {
         $sorts = $request->get('_sort');
         
-        Log::info('Octane Grid Sortable Request', [
-            'sorts' => $sorts,
+        Log::info('Octane Grid Sortable Request - RAW', [
+            'sorts_raw' => $sorts,
             'model' => $request->get('_model')
         ]);
 
-        $sorts = collect($sorts)
-            ->pluck('key')
-            ->combine(
-                collect($sorts)->pluck('sort')->sort()
-            );
+        // IMPORTANT: Don't sort the values! They come in the correct order from drag & drop
+        // Just map key => sort value based on the array ORDER (index position)
+        $sortMapping = collect($sorts)->mapWithKeys(function ($item, $index) {
+            // $index is the NEW position after drag (0-based)
+            // We need to convert it to 1-based sort value
+            return [$item['key'] => $index + 1];
+        });
+
+        Log::info('Octane Grid Sortable - Mapping', [
+            'mapping' => $sortMapping->toArray()
+        ]);
 
         $status     = true;
         $message    = trans('admin.save_succeeded');
@@ -45,7 +51,7 @@ class OctaneGridSortableController extends Controller
             // Force fresh query from database (bypass Octane cache)
             $models = $modelClass::whereIn(
                 (new $modelClass)->getKeyName(), 
-                $sorts->keys()->toArray()
+                $sortMapping->keys()->toArray()
             )->get();
 
             foreach ($models as $model) {
@@ -55,7 +61,7 @@ class OctaneGridSortableController extends Controller
                 DB::table($model->getTable())
                     ->where($model->getKeyName(), $model->getKey())
                     ->update([
-                        $column => $sorts->get($model->getKey()),
+                        $column => $sortMapping->get($model->getKey()),
                         'updated_at' => now()
                     ]);
             }
@@ -78,7 +84,7 @@ class OctaneGridSortableController extends Controller
             
             Log::info('Octane Grid Sortable Success', [
                 'updated_count' => $models->count(),
-                'updates' => $sorts->toArray()
+                'final_mapping' => $sortMapping->toArray()
             ]);
             
         } catch (Exception $exception) {
