@@ -112,13 +112,14 @@ class BdController extends MainController
             })
 
             ->with([
-                'bdSalaries',
-                'appUser.packs',
-                'creator',
+                'appUser',
                 'appUser.profile',
-                'parent.appUser.packs',
-                'createdBy.agencies',
-                'createdBy'
+                'country',
+                'appUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'bdSalaries',
+                'parent',
+                'createdBy',
+                'createdBy.agency'
             ])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
