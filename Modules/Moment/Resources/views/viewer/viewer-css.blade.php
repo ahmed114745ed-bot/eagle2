@@ -742,7 +742,6 @@
         cursor: pointer;
         font-size: 15px;
         font-weight: 600;
-        color: var(--text-secondary);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -884,7 +883,6 @@
 
     .like-uuid {
         font-size: 13px;
-        color: var(--text-secondary);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -940,7 +938,6 @@
 
     .empty-state i {
         font-size: 64px;
-        color: var(--text-secondary);
         margin-bottom: 16px;
     }
 
@@ -953,7 +950,6 @@
 
     .empty-state p {
         font-size: 15px;
-        color: var(--text-secondary);
         margin-bottom: 20px;
     }
 
@@ -1499,7 +1495,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-secondary);
         font-size: 20px;
         transition: all 0.2s;
     }
@@ -1773,14 +1768,13 @@
 
     .modal-empty i {
         font-size: 64px;
-        color: var(--text-secondary);
         margin-bottom: 16px;
         opacity: 0.5;
     }
 
     .modal-empty p {
         font-size: 16px;
-        color: var(--text-secondary);
+        opacity: 0.5;
         margin: 0;
     }
 
