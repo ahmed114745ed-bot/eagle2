@@ -96,6 +96,9 @@
     .dark-mode .refresh-btn,
     .dark-mode .action-menu-item:hover,
     .dark-mode select > option,
+    .dark-mode .viewer-header,
+    .dark-mode .moment-post,
+    .dark-mode .side-modal-content,
         /*.dark-mode .box-footer {*/
     .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;
