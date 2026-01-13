@@ -75,11 +75,6 @@ class GiftCategoryController extends MainController
         // Clear ALL caches before update (Octane fix)
         Cache::flush();
         
-        // Handle sortable requests (from grid-sortable extension)
-        if (request()->has('_sort')) {
-            return $this->handleSortUpdate();
-        }
-        
         $response = parent::update($id);
         
         // Force fresh data from database for Octane
@@ -234,14 +229,11 @@ class GiftCategoryController extends MainController
         $grid->column('sort', __('Sort Order'))->width(80)->sortable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
-
-            // $value is already an array because of casts
             return $value[$locale] ?? ($value['en'] ?? '');
         });
         $grid->column('type', __('type'));
 
         $this->extendGrid($grid);
-
         $grid->disableExport();
         $grid->disableRowSelector();
         

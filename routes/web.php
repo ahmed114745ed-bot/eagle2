@@ -299,6 +299,10 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Override Grid Sortable Route for Octane compatibility (outside admin group)
+Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
+    ->middleware(['web', 'admin'])
+    ->name('laravel-admin-grid-sortable');
 
 Route::group(
     [
