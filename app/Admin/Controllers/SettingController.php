@@ -111,11 +111,13 @@ class SettingController extends MainController
             
             foreach ($data as $key => $value) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                // Use Cache::put for Octane compatibility (1 year TTL)
+                // Clear old cache first, then set new value
+                Cache::forget($key);
                 Cache::put($key, $value, now()->addYear());
             }
 
-            // Clear settings cache for Octane
+            // Clear all settings cache for Octane
+            Cache::forget('all_settings');
             Cache::flush();
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');

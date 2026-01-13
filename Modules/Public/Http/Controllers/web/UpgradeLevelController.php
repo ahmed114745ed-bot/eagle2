@@ -33,7 +33,8 @@ class UpgradeLevelController extends MainController
         
         foreach ($data as $key => $value) {
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
-            // Use Cache::put for Octane compatibility
+            // Clear old cache first, then set new value
+            Cache::forget($key);
             Cache::put($key, $value, now()->addYear());
 
             if (in_array($key, $Keys)) {
@@ -41,7 +42,8 @@ class UpgradeLevelController extends MainController
             }
         }
         
-        // Clear all cache for Octane compatibility
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
         Cache::flush();
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {
@@ -60,11 +62,13 @@ class UpgradeLevelController extends MainController
         
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            // Use Cache::put for Octane compatibility
+            // Clear old cache first
+            Cache::forget($key);
             Cache::put($key, $value, now()->addYear());
         }
         
-        // Clear all cache for Octane compatibility
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
         Cache::flush();
         
         $redirectUrl = url(config('admin.route.prefix') . '/settings');

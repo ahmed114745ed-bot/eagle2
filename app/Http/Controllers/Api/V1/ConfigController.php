@@ -147,7 +147,8 @@ class ConfigController extends Controller
             }
         }
         
-        // Clear all cache for Octane compatibility
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
         
@@ -180,6 +181,7 @@ class ConfigController extends Controller
 
         // Clear pusher config cache for Octane
         Cache::forget('pusher_config');
+        Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
 

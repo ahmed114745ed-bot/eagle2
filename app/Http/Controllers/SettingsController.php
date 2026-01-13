@@ -230,6 +230,8 @@ class SettingsController extends Controller
 
 
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            // Clear old cache first
+            Cache::forget($key);
             Cache::put($key, $value);
 
             // //  $key = str_contains($key, 'color') ? 'colors_updated_at' : $key.'_updated_at';
@@ -261,7 +263,9 @@ class SettingsController extends Controller
             Language::where('code', $request->default_language)->update(['is_default'=> 1]);
         }
         
-        // Clear all cache for Octane compatibility
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_settings');
+        Cache::forget('all_configs');
         Cache::flush();
         
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
@@ -366,10 +370,13 @@ class SettingsController extends Controller
                 }
             }
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            // Clear old cache first
+            Cache::forget($key);
             Cache::put($key, $value);
         }
         
-        // Clear all cache for Octane compatibility
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_settings');
         Cache::flush();
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
