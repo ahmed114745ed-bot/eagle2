@@ -89,7 +89,7 @@ class ConfigController extends Controller
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
 
-   
+
 
     public function index()
     {
@@ -146,12 +146,12 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
-        
+
         // Clear all cache including rememberForever keys
         Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
-        
+
         admin_success('Saved Successfully');
         return Redirect::back();
     }
@@ -159,10 +159,14 @@ class ConfigController extends Controller
     public function updateConfigAgoraZego(Request $request)
     {
         Cache::forget('pusher_config');
+        if (file_exists(base_path('bootstrap/cache/config.php'))) {
+            unlink(base_path('bootstrap/cache/config.php'));
+        }
+        Artisan::call('config:clear');
 
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
-        
+
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
 
@@ -186,7 +190,7 @@ class ConfigController extends Controller
         Artisan::call('config:cache');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
-        
+
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
             if ($request->has('inner_tab_type')) {

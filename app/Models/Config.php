@@ -27,6 +27,10 @@ class Config extends Model
             $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
+                if (file_exists(base_path('bootstrap/cache/config.php'))) {
+                    unlink(base_path('bootstrap/cache/config.php'));
+                }
+                Artisan::call('config:clear');
                 Artisan::call('config:cache');
             }
         });
