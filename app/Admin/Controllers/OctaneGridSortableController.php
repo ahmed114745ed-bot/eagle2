@@ -31,34 +31,54 @@ class OctaneGridSortableController extends Controller
         $modelClass = $request->get('_model');
 
         try {
-            // Clear cache before update (Octane compatibility)
+            // CRITICAL: Clear all caches BEFORE reading from database (Octane fix)
             Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            // Clear model cache if using any
+            if (method_exists($modelClass, 'flushCache')) {
+                $modelClass::flushCache();
+            }
             
             DB::beginTransaction();
             
-            /** @var \Illuminate\Database\Eloquent\Collection $models */
-            $models = $modelClass::find($sorts->keys());
+            // Force fresh query from database (bypass Octane cache)
+            $models = $modelClass::whereIn(
+                (new $modelClass)->getKeyName(), 
+                $sorts->keys()->toArray()
+            )->get();
 
             foreach ($models as $model) {
                 $column = data_get($model->sortable, 'order_column_name', 'order');
 
-                $model->{$column} = $sorts->get($model->getKey());
-                $model->timestamps = false; // Disable timestamps for sort updates
-                $model->save();
+                // Direct DB update to bypass Eloquent events and Octane cache
+                DB::table($model->getTable())
+                    ->where($model->getKeyName(), $model->getKey())
+                    ->update([
+                        $column => $sorts->get($model->getKey()),
+                        'updated_at' => now()
+                    ]);
             }
             
             DB::commit();
             
-            // Clear cache after update (Octane compatibility)
+            // CRITICAL: Clear all caches AFTER update (Octane fix)
             Cache::flush();
+            \Artisan::call('cache:clear');
             
-            // Clear opcache if available
+            // Clear opcache if available (for Octane)
             if (function_exists('opcache_reset')) {
-                opcache_reset();
+                @opcache_reset();
+            }
+            
+            // Clear PHP realpath cache (for Octane)
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
             }
             
             Log::info('Octane Grid Sortable Success', [
-                'updated_count' => $models->count()
+                'updated_count' => $models->count(),
+                'updates' => $sorts->toArray()
             ]);
             
         } catch (Exception $exception) {
