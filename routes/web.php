@@ -299,6 +299,27 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Test Pusher Config (for debugging Octane cache issues)
+Route::get('/test-pusher-config', function () {
+    $pusherConfig = getPusherConfig();
+    $laravelConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    return response()->json([
+        'from_helper_function' => $pusherConfig,
+        'from_laravel_config' => $laravelConfig,
+        'cache_info' => [
+            'environment' => app()->environment(),
+            'cache_driver' => config('cache.default'),
+        ],
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 // Override Grid Sortable Route for Octane compatibility (outside admin group)
 Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
     ->middleware(['web', 'admin'])
