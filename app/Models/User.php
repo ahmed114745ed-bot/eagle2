@@ -1588,7 +1588,7 @@ class User extends Authenticatable
         if (!$this->relationLoaded('packs')) {
             return $value;
         }
-        
+
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
@@ -2389,5 +2389,10 @@ class User extends Authenticatable
     public function userWallet()
     {
         return $this->hasOne(UserWallet::class);
+    }
+
+    public function getUserWalletBalanceAttribute()
+    {
+        return $this->userWallet->balance - $this->userWallet->cut_amount - $this->userWallet->pending_amount;
     }
 }

@@ -50,7 +50,15 @@ class EventReportController extends MainController
     protected function weekly_star()
     {
         $grid = new Grid(new WinnerReward());
-        $grid->model()->where('type', 'weekly_star')->orWhere('type', null);
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reward',
+            'reward.ware',
+            'reward.vip'
+
+        ])->where('type', 'weekly_star')->orWhere('type', null);
         $grid->column('id', __('ID'));
 
         $grid->column('winner.name', __('name'))->display(function ($name) {
@@ -123,6 +131,16 @@ class EventReportController extends MainController
     {
         $grid = new Grid(new RewardWinnerPk());
 
+
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reward',
+            'reward.ware',
+            'reward.vip'
+
+        ]);
         $grid->column('id', __('ID'));
         $grid->column('winner.name', __('name'))->display(function ($name) {
             $name =  $this->winner?->name ?? '';
@@ -193,7 +211,14 @@ class EventReportController extends MainController
     protected function event_period()
     {
         $grid = new Grid(new WinnerReward());
-        $grid->model()->where('type', 'event_period');
+        $grid->model()->with([
+            'winner',
+            'winner.profile',
+            'winner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reward',
+            'reward.ware',
+            'reward.vip'
+        ])->where('type', 'event_period');
         $grid->column('id', __('ID'));
         $grid->column('winner.name', __('name'))->display(function ($name) {
             $name =  $this->winner?->name ?? '';
@@ -267,6 +292,15 @@ class EventReportController extends MainController
         $grid = new Grid(new UserChargeEvent());
 
         $grid->model()
+            ->with([
+                'user',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'rewardCharges',
+                'ChargeEvents',
+                'rewardCharges.ware',
+                'rewardCharges.vip',
+            ])
             ->whereHas('rewardCharge')
             ->with(['user', 'rewardCharge']);
 
