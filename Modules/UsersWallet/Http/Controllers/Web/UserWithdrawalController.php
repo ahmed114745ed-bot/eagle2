@@ -390,7 +390,7 @@ class UserWithdrawalController extends MainController
         $walletLog->update([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
-            'amount' => -$withdrawal->amount,
+            'amount' => $withdrawal->amount,
             'operation' => 'add',
             'type' => 'user',
             'before_amount' => $available,
