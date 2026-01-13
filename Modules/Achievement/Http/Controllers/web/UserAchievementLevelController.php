@@ -71,6 +71,7 @@ class UserAchievementLevelController extends MainController
             'achievementLevel',
             'achievement',
             'giftAchievement',
+            'giftAchievement.gift'
 
         ])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
