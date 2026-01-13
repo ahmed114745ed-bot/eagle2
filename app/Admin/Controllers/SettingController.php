@@ -51,9 +51,9 @@ class SettingController extends MainController
         $zego_filter_enabled = Common::getConf('zego_filter_enabled');
         $is_auto_preview = Common::getConf('is_auto_preview');
         $countries = Country::select(['id', 'name', 'e_name'])->get();
-         $languages = Language::select(['id', 'name', 'code'])->get();
-         $chargeTabType = request()->get('type', 'Experience');
-
+        $languages = Language::select(['id', 'name', 'code'])->get();
+        $chargeTabType = request()->get('type', 'Experience');
+        $zego_token = Common::getConf('zego_token') ?? '';
 
         $supabase_service_role_key = Common::getConf('supabase_service_role_key');
         return parent::index($content
@@ -62,6 +62,7 @@ class SettingController extends MainController
             ->body(view('admin.settings_new', compact([
                 'pusher_app_secret',
                 'chargeTabType',
+                'zego_token',
                 'pusher_app_key',
                 'pusher_app_id',
                 'pusher_app_cluster',
