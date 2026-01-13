@@ -707,6 +707,7 @@
                     <p class="share-room-text">${shareRoomText}</p>
                 </div>`;
         } else {
+
             messageContent = `<p>${escapeHtml(message.text)}</p>`;
         }
 
