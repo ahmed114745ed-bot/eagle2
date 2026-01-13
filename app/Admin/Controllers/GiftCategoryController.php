@@ -75,11 +75,6 @@ class GiftCategoryController extends MainController
         // Clear cache before update
         Cache::tags(['gift_categories'])->flush();
         
-        // Handle sortable requests (from grid-sortable extension)
-        if (request()->has('_sort')) {
-            return $this->handleSortUpdate();
-        }
-        
         $response = parent::update($id);
         
         // Ensure fresh data from database for Octane
@@ -90,9 +85,9 @@ class GiftCategoryController extends MainController
     }
     
     /**
-     * Handle sort update from grid-sortable extension
+     * Handle sort update from grid-sortable extension (dedicated route)
      */
-    protected function handleSortUpdate()
+    public function sortUpdate()
     {
         $sorts = request()->input('_sort');
         
@@ -156,7 +151,7 @@ class GiftCategoryController extends MainController
             
             return response()->json([
                 'status' => false,
-                'message' => 'Failed to update sort order: ' . $e->getMessage()
+                'message' => 'فشل تحديث الترتيب: ' . $e->getMessage()
             ]);
         }
     }
@@ -170,97 +165,48 @@ class GiftCategoryController extends MainController
     {
         $grid = new Grid(new GiftCategory());
         
-        // Enable sortable with proper Octane handling
-        $grid->sortable('sort');
+        // Enable sortable - Laravel Admin Extension will handle everything
+        $grid->sortable();
         
         $grid->column('id', __('Id'))->width(50);
         $grid->column('sort', __('Order'))->width(80)->editable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
-
-            // $value is already an array because of casts
             return $value[$locale] ?? ($value['en'] ?? '');
         });
         $grid->column('type', __('type'));
 
         $this->extendGrid($grid);
-
         $grid->disableExport();
-        
-        // Disable row selector to prevent issues with sortable
         $grid->disableRowSelector();
         
-        // Add custom JS to handle Octane cache clearing and force refresh
+        // Add JavaScript to force reload after sort for Octane compatibility
         $grid->tools(function ($tools) {
             $tools->append('
-            <style>
-                .grid-sortable-handle {
-                    cursor: grab !important;
-                }
-                .grid-sortable-handle:active {
-                    cursor: grabbing !important;
-                }
-            </style>
             <script>
-            $(function() {
-                // Override the sortable update callback
-                var originalSortableOptions = {};
+            $(document).ready(function() {
+                console.log("Octane sortable fix initialized");
                 
-                // Wait for grid to be ready
-                setTimeout(function() {
-                    var sortableTable = $(".grid-sortable tbody");
+                // Intercept the save order button click
+                $(document).on("click", ".grid-save-order", function(e) {
+                    console.log("Save order button clicked");
                     
-                    if (sortableTable.length && sortableTable.sortable("instance")) {
-                        // Get current options
-                        originalSortableOptions = sortableTable.sortable("option");
+                    var $btn = $(this);
+                    var originalText = $btn.text();
+                    
+                    // Let the default handler run, then reload
+                    setTimeout(function() {
+                        console.log("Checking for success notification...");
                         
-                        // Override update callback
-                        sortableTable.sortable("option", "update", function(event, ui) {
-                            var data = [];
-                            sortableTable.find("tr").each(function(index) {
-                                var id = $(this).data("id") || $(this).find("td:first").text();
-                                data.push({
-                                    id: id,
-                                    sort: index + 1
-                                });
-                            });
-                            
-                            // Send AJAX request with cache busting
-                            $.ajax({
-                                url: window.location.pathname,
-                                method: "POST",
-                                data: {
-                                    _token: LA.token,
-                                    _sort: data,
-                                    _method: "PUT",
-                                    _octane_cache_bust: Date.now()
-                                },
-                                success: function(response) {
-                                    if (response.status) {
-                                        toastr.success(response.message || "تم تحديث الترتيب بنجاح");
-                                        
-                                        // Force reload to get fresh data from database
-                                        setTimeout(function() {
-                                            $.pjax.reload({container:"#pjax-container", timeout: 2000});
-                                        }, 500);
-                                    } else {
-                                        toastr.error(response.message || "فشل تحديث الترتيب");
-                                        // Revert the UI
-                                        $.pjax.reload({container:"#pjax-container"});
-                                    }
-                                },
-                                error: function(xhr) {
-                                    toastr.error("حدث خطأ أثناء التحديث");
-                                    console.error(xhr);
-                                    // Revert the UI
-                                    $.pjax.reload({container:"#pjax-container"});
-                                }
-                            });
-                        });
-                        
-                        console.log("Grid sortable override applied for Octane compatibility");
-                    }
-                }, 1000);
+                        // Force reload after successful save (Octane fix)
+                        setTimeout(function() {
+                            console.log("Reloading page for fresh data...");
+                            location.reload();
+                        }, 1500);
+                    }, 500);
+                });
+                
+                console.log("Save order handler attached");
             });
             </script>
             ');
