@@ -3,9 +3,9 @@
 
     <div class="row">
         <div class="col-md-6 mb-3 ms-0 me-auto">
-            <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+            <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4 settings-form">
                 @csrf
-                <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
+                <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                 <div class="card p-3 shadow" style="height: 450px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('pusher') }}</h4>
@@ -47,15 +47,17 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                        <i class="fas fa-save"></i> {{ __('save') }}
+                    </button>
                 </div>
             </form>
         </div>
 
         <div class="col-md-6 mb-3 ms-0 me-auto">
-            <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4">
+            <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="mb-4 settings-form">
                 @csrf
-                <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
+                <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                 <div class="card p-3 shadow" style="height: 450px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('firebase') }}</h4>
@@ -94,15 +96,17 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                        <i class="fas fa-save"></i> {{ __('save') }}
+                    </button>
                 </div>
             </form>
         </div>
 
         <div class="col-md-6 mb-3 ms-0 me-auto card-top">
-            <form action="{{ route('admin.update-agora-zego') }}" method="POST">
+            <form action="{{ route('admin.update-agora-zego') }}" method="POST" class="settings-form">
                 @csrf
-                <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
+                <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                 <div class="card p-3 shadow" style="height: 450px;">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('supabase') }}</h4>
@@ -141,7 +145,9 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-5 btn-save">{{ __('save') }}</button>
+                    <button type="submit" class="btn btn-primary mt-5 btn-save">
+                        <i class="fas fa-save"></i> {{ __('save') }}
+                    </button>
                 </div>
             </form>
         </div>

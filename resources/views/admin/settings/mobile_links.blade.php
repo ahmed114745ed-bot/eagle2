@@ -2,12 +2,11 @@
     <h3>{{ __('Mobile App Links') }}</h3>
     <p class="section-subtitle">{{ __('Configure download links for different platforms') }}</p>
 
-    <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data" class="settings-form">
         @csrf
         <input type="hidden" name="current_tab" value="">
 
         <div class="mobile-links-grid">
-            <!-- Android Card -->
             <div class="link-card">
                 <div class="link-card-icon android">
                     <i class="fab fa-android"></i>
@@ -18,7 +17,7 @@
                         <small>Google Play Store</small>
                     </div>
                     <div class="link-card-input">
-                        <input type="text" name="android_link"
+                        <input type="url" name="android_link"
                                value="{{ $settings['android_link'] ?? '' }}"
                                placeholder="{{ __('Enter link') }}"
                                class="form-control">
@@ -26,7 +25,6 @@
                 </div>
             </div>
 
-            <!-- iOS Card -->
             <div class="link-card">
                 <div class="link-card-icon ios">
                     <i class="fab fa-apple"></i>
@@ -37,7 +35,7 @@
                         <small>App Store</small>
                     </div>
                     <div class="link-card-input">
-                        <input type="text" name="ios_link"
+                        <input type="url" name="ios_link"
                                value="{{ $settings['ios_link'] ?? '' }}"
                                placeholder="{{ __('Enter link') }}"
                                class="form-control">
@@ -45,7 +43,6 @@
                 </div>
             </div>
 
-            <!-- Huawei Card -->
             <div class="link-card">
                 <div class="link-card-icon huawei">
                     <i class="fas fa-mobile-alt"></i>
@@ -56,7 +53,7 @@
                         <small>AppGallery</small>
                     </div>
                     <div class="link-card-input">
-                        <input type="text" name="huawei_link"
+                        <input type="url" name="huawei_link"
                                value="{{ $settings['huawei_link'] ?? '' }}"
                                placeholder="{{ __('Enter link') }}"
                                class="form-control">
@@ -65,9 +62,8 @@
             </div>
         </div>
 
-        <!-- Save Button -->
-        <div class="action-buttons mt-3" style="margin-top:10px">
-            <button type="submit" class="btn btn-primary w-100">
+        <div class="action-buttons mt-4">
+            <button type="submit" class="btn btn-primary w-100 btn-save">
                 <i class="fas fa-save"></i> {{ __('Save All Links') }}
             </button>
         </div>

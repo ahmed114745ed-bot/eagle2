@@ -96,7 +96,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token');
+        $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
 
         if (
             ($request->has('shipping_coins') && !is_null($request->shipping_coins) && $request->shipping_coins != cache()->get('shipping_coins')) ||
@@ -262,7 +262,16 @@ class SettingsController extends Controller
         }
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
-        return back();
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        }
+
+        return redirect($redirectUrl);
     }
 
     public function settingGift(Request $request)
@@ -296,7 +305,7 @@ class SettingsController extends Controller
         if (!Admin::user()->can('*')) {
             Permission::check('edit-' . $this->permission_name);
         }
-        $data = $request->except('_token');
+        $data = $request->except(['_token', 'current_tab', 'inner_tab_type']);
 
 
         if ($request->background_type === 'color') {
@@ -358,7 +367,16 @@ class SettingsController extends Controller
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
-        return back();
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        }
+
+        return redirect($redirectUrl);
     }
     public function store_notification_templates(Request $request)
     {
