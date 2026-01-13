@@ -15,26 +15,33 @@ class OctaneGridSortableController extends Controller
     {
         $sorts = $request->get('_sort');
         
-        Log::info('Octane Grid Sortable Request - RAW', [
+        Log::info('🔍 Octane Grid Sortable - RAW Request', [
             'sorts_raw' => $sorts,
             'model' => $request->get('_model')
         ]);
 
-        // IMPORTANT: Don't sort the values! They come in the correct order from drag & drop
-        // Just map key => sort value based on the array ORDER (index position)
+        // Get the column name from the first model
+        $modelClass = $request->get('_model');
+        $tempModel = new $modelClass;
+        $column = data_get($tempModel->sortable, 'order_column_name', 'order');
+        
+        Log::info('📋 Sort column detected', [
+            'column' => $column,
+            'sortable_config' => $tempModel->sortable
+        ]);
+
+        // IMPORTANT: The array comes in the NEW order after drag & drop
+        // Map each item to its new position (1-based index)
         $sortMapping = collect($sorts)->mapWithKeys(function ($item, $index) {
-            // $index is the NEW position after drag (0-based)
-            // We need to convert it to 1-based sort value
             return [$item['key'] => $index + 1];
         });
 
-        Log::info('Octane Grid Sortable - Mapping', [
+        Log::info('🗺️ Sort Mapping Created', [
             'mapping' => $sortMapping->toArray()
         ]);
 
         $status     = true;
         $message    = trans('admin.save_succeeded');
-        $modelClass = $request->get('_model');
 
         try {
             // CRITICAL: Clear all caches BEFORE reading from database (Octane fix)
@@ -50,18 +57,30 @@ class OctaneGridSortableController extends Controller
             
             // Force fresh query from database (bypass Octane cache)
             $models = $modelClass::whereIn(
-                (new $modelClass)->getKeyName(), 
+                $tempModel->getKeyName(), 
                 $sortMapping->keys()->toArray()
             )->get();
+            
+            Log::info('📦 Models fetched from DB', [
+                'count' => $models->count(),
+                'ids' => $models->pluck($tempModel->getKeyName())->toArray()
+            ]);
 
             foreach ($models as $model) {
-                $column = data_get($model->sortable, 'order_column_name', 'order');
-
+                $newSortValue = $sortMapping->get($model->getKey());
+                
+                Log::info('💾 Updating model', [
+                    'id' => $model->getKey(),
+                    'old_sort' => $model->{$column},
+                    'new_sort' => $newSortValue,
+                    'column' => $column
+                ]);
+                
                 // Direct DB update to bypass Eloquent events and Octane cache
                 DB::table($model->getTable())
                     ->where($model->getKeyName(), $model->getKey())
                     ->update([
-                        $column => $sortMapping->get($model->getKey()),
+                        $column => $newSortValue,
                         'updated_at' => now()
                     ]);
             }
@@ -82,7 +101,7 @@ class OctaneGridSortableController extends Controller
                 clearstatcache(true);
             }
             
-            Log::info('Octane Grid Sortable Success', [
+            Log::info('✅ Octane Grid Sortable Success', [
                 'updated_count' => $models->count(),
                 'final_mapping' => $sortMapping->toArray()
             ]);
@@ -93,7 +112,7 @@ class OctaneGridSortableController extends Controller
             $status  = false;
             $message = $exception->getMessage();
             
-            Log::error('Octane Grid Sortable Failed', [
+            Log::error('❌ Octane Grid Sortable Failed', [
                 'error' => $exception->getMessage(),
                 'trace' => $exception->getTraceAsString()
             ]);
