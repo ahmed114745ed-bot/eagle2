@@ -110,7 +110,7 @@ class RequestAgencyController extends MainController
         });
         $grid->column('id', __('Id'));
         $grid->column('owner.name', trans('name'))->display(function () {
-             $name = $this->owner->name;
+            $name = $this->owner->name;
             $uid = @$this->owner->uuid;
             $path = @$this?->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -196,7 +196,8 @@ class RequestAgencyController extends MainController
                     </div>";
         });
         $grid->column('additionalInfo.host', __('host'));
-        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
+        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function () {
+            $name = $this->additionalInfo->user->name ?? '';
             $uid = @$this->additionalInfo->user->uuid;
             $path = @$this?->additionalInfo->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
