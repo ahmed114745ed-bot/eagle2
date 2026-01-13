@@ -292,27 +292,16 @@ class EventReportController extends MainController
         $grid = new Grid(new UserChargeEvent());
 
         $grid->model()
-            // ->with([
-            //     'user',
-            //     'user.profile',
-            //     'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            //     'rewardCharges',
-            //     'ChargeEvents',
-            //     'rewardCharges.ware',
-            //     'rewardCharges.vip',
-            // ])
             ->with([
-                'user:id,name,uuid,profile_id',
-                'user.profile:id,user_id,avatar',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])
-                    ->where('is_used', true)
-                    ->with('ware:id,name,img2,show_img,value'),
-                'ChargeEvents:id,tile,value',
-                'rewardCharges' => fn($q) => $q->with([
-                    'ware:id,name,img2,show_img',
-                    'vip:id,name,img'
-                ])->select('id', 'charge_event_id', 'type', 'target', 'ware_id', 'vip_id')
+                'user',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'rewardCharges',
+                'ChargeEvents',
+                'rewardCharges.ware',
+                'rewardCharges.vip',
             ])
+
             ->whereHas('rewardCharge')
             ->with(['user', 'rewardCharge']);
 
