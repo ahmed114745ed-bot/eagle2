@@ -263,6 +263,7 @@ class SettingsController extends Controller
         
         // Clear cache to sync with all Octane workers
         \Artisan::call('cache:clear');
+        \Artisan::call('octane:reload');
         
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
@@ -371,6 +372,7 @@ class SettingsController extends Controller
         
         // Clear cache to sync with all Octane workers
         \Artisan::call('cache:clear');
+        \Artisan::call('octane:reload');
 
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 

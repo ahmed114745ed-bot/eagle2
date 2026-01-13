@@ -42,6 +42,7 @@ class UpgradeLevelController extends MainController
         
         // Clear cache to sync with all Octane workers
         \Artisan::call('cache:clear');
+        \Artisan::call('octane:reload');
         
         // بناء رابط الرجوع مع التاب الصحيح
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
@@ -66,6 +67,7 @@ class UpgradeLevelController extends MainController
         
         // Clear cache to sync with all Octane workers
         \Artisan::call('cache:clear');
+        \Artisan::call('octane:reload');
         
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         if ($request->has('current_tab')) {

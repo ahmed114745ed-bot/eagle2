@@ -116,6 +116,7 @@ class SettingController extends MainController
 
             // Clear cache to sync with all Octane workers
             \Artisan::call('cache:clear');
+            \Artisan::call('octane:reload');
 
             $redirectUrl = url(config('admin.route.prefix') . '/settings');
             

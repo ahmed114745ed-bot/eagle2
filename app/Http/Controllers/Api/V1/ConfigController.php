@@ -146,6 +146,10 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
+        
+        // Reload Octane workers to apply changes immediately
+        Artisan::call('octane:reload');
+        
         admin_success('Saved Successfully');
         return Redirect::back();
     }
@@ -175,9 +179,10 @@ class ConfigController extends Controller
 
         Cache::forget('pusher_config');
         Artisan::call('config:cache');
-        
-        // Clear cache to sync with all Octane workers
         Artisan::call('cache:clear');
+        
+        // Reload Octane workers to apply changes immediately
+        Artisan::call('octane:reload');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         
