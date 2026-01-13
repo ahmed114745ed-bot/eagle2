@@ -379,7 +379,7 @@ class AgencyController extends MainController
         $grid = new Grid(new Agency);
         $grid->model()
             ->with([
-                'createdBy',
+                'creator',
                 'country',
                 'owner',
                 'owner.profile',
@@ -534,7 +534,7 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $creator = $this->createdBy;
+            $creator = $this->creator;
             return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
         });
         // --- Actions ---
