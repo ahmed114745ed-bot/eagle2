@@ -296,6 +296,7 @@ class EventReportController extends MainController
                 'user',
                 'user.profile',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'rewardCharges',
                 'ChargeEvents',
                 'rewardCharges.ware',
                 'rewardCharges.vip',
