@@ -94,42 +94,15 @@ class CountryController extends MainController
             $filter->equal('e_name', __('name'));
         });
 
-        // $grid->header(function () use ($filterType) {
-        //     $locale = App::getLocale();
-
-        //     $tabs = ['all' => __('All')];
-        //     $categories = CountryCategory::orderBy('id')->get();
-        //     foreach ($categories as $category) {
-        //         $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-        //         $tabs[$category->id] = $title;
-        //     }
-
-        //     $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-        //     foreach ($tabs as $key => $label) {
-        //         $active = $filterType == $key ? 'active' : '';
-        //         $url = request()->fullUrlWithQuery(['filter' => $key]);
-        //         $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-        //     }
-        //     $html .= '</ul></div>';
-
-        //     return $html;
-        // });
-
         $grid->header(function () use ($filterType) {
             $locale = App::getLocale();
 
-            // Static cache for categories
-            static $categoriesCache = null;
-            if (!$categoriesCache) {
-                $categoriesCache = CountryCategory::orderBy('id')->get()
-                    ->mapWithKeys(function ($category) use ($locale) {
-                        $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-                        return [$category->id => $title];
-                    })
-                    ->toArray();
+            $tabs = ['all' => __('All')];
+            $categories = CountryCategory::orderBy('id')->get();
+            foreach ($categories as $category) {
+                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+                $tabs[$category->id] = $title;
             }
-
-            $tabs = ['all' => __('All')] + $categoriesCache;
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
@@ -142,7 +115,6 @@ class CountryController extends MainController
             return $html;
         });
 
-
         $grid->id(__('ID'));
         $grid->column('e_name', __('name'))->display(function ($value) {
             return __("countries.$value");
@@ -154,7 +126,7 @@ class CountryController extends MainController
         }
         $this->extendGrid($grid);
         $grid->disableExport();
-        $permission    = $this->permission_name;
+         $permission    = $this->permission_name;
         $grid->actions(function ($actions)  use ($permission) {
             $actions->disableView();
             $actions->disableDelete();
@@ -164,8 +136,8 @@ class CountryController extends MainController
         });
         $grid->disableCreateButton();
 
-
-
+       
+       
 
 
         $grid->batchActions(function ($batch) use ($permission) {
