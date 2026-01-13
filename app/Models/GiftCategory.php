@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class GiftCategory extends Model
+class GiftCategory extends Model implements Sortable
 {
-    use HasFactory, TimestampsWithTimezone;
+    use HasFactory, TimestampsWithTimezone, SortableTrait;
     protected $guarded = [];
     protected $casts = [
         'title' => 'array',
