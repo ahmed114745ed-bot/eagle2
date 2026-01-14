@@ -173,8 +173,10 @@ class PusherConfigObserver
      * When Pusher credentials change in DB, queue workers continue
      * using old credentials until restarted.
      * 
-     * This method signals all queue workers to restart gracefully
-     * after completing their current job.
+     * This method:
+     * 1. Sets a cache flag for RefreshPusherConfigBeforeJob
+     * 2. Signals queue:restart (graceful)
+     * 3. Optionally calls supervisorctl restart (force)
      */
     private function restartQueueWorkers(array $meta): void
     {
@@ -197,10 +199,68 @@ class PusherConfigObserver
             // Also set a cache flag so we can track when restart was requested
             Cache::put('queue_restart_requested_at', $meta['timestamp'], 3600);
             
+            // ⭐ FORCE: Also restart via supervisorctl for immediate effect
+            // This ensures workers restart even if cache check fails
+            $this->restartSupervisorWorkers();
+            
         } catch (\Exception $e) {
             Log::error('queue_workers_restart_failed', [
                 'error' => $e->getMessage(),
                 'timestamp' => $meta['timestamp'],
+            ]);
+        }
+    }
+    
+    /**
+     * Restart Queue Workers via Supervisor
+     * Uses shell command to restart all queue worker processes
+     */
+    private function restartSupervisorWorkers(): void
+    {
+        try {
+            // Get supervisor group name from config or use default
+            $supervisorGroup = config('queue.supervisor_group', 'laravel-worker:*');
+            
+            // Method 1: Use supervisorctl (requires sudo without password for www-data)
+            // Add to /etc/sudoers: www-data ALL=(ALL) NOPASSWD: /usr/bin/supervisorctl
+            $commands = [
+                // Try specific group first
+                "sudo /usr/bin/supervisorctl restart {$supervisorGroup} 2>&1",
+                // Fallback: restart all
+                "sudo /usr/bin/supervisorctl restart all 2>&1",
+            ];
+            
+            $output = null;
+            $success = false;
+            
+            foreach ($commands as $command) {
+                $output = shell_exec($command);
+                if ($output !== null && !str_contains($output, 'error') && !str_contains($output, 'refused')) {
+                    $success = true;
+                    break;
+                }
+            }
+            
+            if ($success) {
+                Log::info('supervisor_workers_restarted', [
+                    'output' => trim($output ?? ''),
+                    'timestamp' => now()->toDateTimeString(),
+                ]);
+            } else {
+                // Fallback: Create a signal file for cron-based restart
+                $signalFile = storage_path('framework/restart_queue_workers');
+                file_put_contents($signalFile, now()->toDateTimeString());
+                
+                Log::warning('supervisor_restart_fallback', [
+                    'reason' => 'supervisorctl failed or not available',
+                    'output' => trim($output ?? 'no output'),
+                    'signal_file_created' => $signalFile,
+                ]);
+            }
+            
+        } catch (\Exception $e) {
+            Log::error('supervisor_restart_error', [
+                'error' => $e->getMessage(),
             ]);
         }
     }
