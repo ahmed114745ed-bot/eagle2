@@ -822,7 +822,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
-                                    <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>
+                                    <div class="modal-comment-time" dir="${commentDir}" title="${fullDateTime}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${timeAgo}</div>
                                 </div>
                             `;
                         });

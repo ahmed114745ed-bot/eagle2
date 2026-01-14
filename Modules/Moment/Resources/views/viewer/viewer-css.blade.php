@@ -1568,6 +1568,11 @@
         flex: 1;
         min-width: 0;
         position: relative;
+        width: 100%;
+    }
+
+    [dir="rtl"] .modal-user-header {
+        flex-direction: row-reverse;
     }
 
     .modal-user-avatar {
@@ -1726,12 +1731,14 @@
     }
 
     .modal-comment-text {
+        display: inline;
         margin-top: 12px;
         margin-left: 70px;
+        margin-right: 6px;
         font-size: 15px;
         line-height: 1.4;
         word-wrap: break-word;
-        white-space: pre-wrap;
+        white-space: normal;
         unicode-bidi: plaintext;
     }
 
@@ -1739,31 +1746,43 @@
         text-align: right !important;
         direction: rtl;
         margin-left: 0;
-        margin-right: 70px;
+        margin-right: 76px;
     }
 
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
         margin-left: 70px;
-        margin-right: 0;
+        margin-right: 6px;
     }
 
     /* RTL Support for Comment Text */
     [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
         margin-left: 0;
-        margin-right: 70px;
+        margin-right: 76px;
     }
 
     .modal-comment-time {
-        margin-top: 6px;
-        margin-left: 70px;
+        display: inline;
+        margin-top: 12px;
+        margin-left: 0;
         font-size: 12px;
+        color: var(--text-secondary-color);
+        white-space: nowrap;
     }
 
     .modal-comment-time[dir="rtl"] {
         margin-left: 0;
-        margin-right: 70px;
+        margin-right: 0;
+        text-align: right !important;
+        direction: rtl;
+    }
+
+    .modal-comment-time[dir="ltr"] {
+        text-align: left !important;
+        direction: ltr;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     /* RTL Support for Comment Time */
@@ -2021,7 +2040,6 @@
     }
 
     .user-list-item:hover {
-        background: #f8f9ff;
         border-color: var(--primary-color);
     }
 
@@ -2131,5 +2149,22 @@
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .users-sidebar {
+            display: none !important;
+        }
+
+        .viewer-main-content {
+            width: 100% !important;
+            flex: 1 !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .users-sidebar {
+            display: none !important;
+        }
     }
 </style>
