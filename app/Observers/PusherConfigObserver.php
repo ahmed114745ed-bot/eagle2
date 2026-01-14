@@ -64,6 +64,8 @@ class PusherConfigObserver
             OctaneBroadcasterService::rebuildBroadcaster();
             // Clear Octane in-memory cache
             Cache::store('octane')->clear();
+            // Log timestamp of rebuild
+            Cache::put('octane_broadcaster_rebuilt_at', now()->toDateTimeString(), 60 * 60);
         }
 
         // 4. Log the change

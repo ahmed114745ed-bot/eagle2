@@ -1287,10 +1287,15 @@ Route::get('/debug/pusher-config', function () {
     $dbKeys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
     $fromDatabase = \App\Models\Config::whereIn('name', $dbKeys)->pluck('value', 'name')->toArray();
 
+    // من helper function (يقرأ من DB)
+    $fromHelper = getPusherConfig();
+
+    // من Cache
     $fromCache = Cache::get('pusher_config');
 
+    // من Config Runtime (محدثة عبر Observer)
     $fromConfig = [
-        'key' => Config::get('broadcasting.connections.pusher.key'),
+        'key' => Config::get( 'broadcasting.connections.pusher.key'),
         'secret' => Config::get('broadcasting.connections.pusher.secret'),
         'app_id' => Config::get('broadcasting.connections.pusher.app_id'),
         'cluster' => Config::get('broadcasting.connections.pusher.options.cluster'),

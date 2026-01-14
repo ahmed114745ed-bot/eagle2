@@ -80,6 +80,28 @@ class OctaneBroadcasterService
     }
 
     /**
+     * Update Laravel runtime config from DB values so Config::get() reflects changes
+     */
+    public static function updateRuntimeConfigFromDb(): void
+    {
+        try {
+            $pusherConfig = getPusherConfig();
+
+            \Illuminate\Support\Facades\Config::set([
+                'broadcasting.connections.pusher.key' => $pusherConfig['app_key'],
+                'broadcasting.connections.pusher.secret' => $pusherConfig['app_secret'],
+                'broadcasting.connections.pusher.app_id' => $pusherConfig['app_id'],
+                'broadcasting.connections.pusher.options.cluster' => $pusherConfig['app_cluster'],
+            ]);
+
+            \Illuminate\Support\Facades\Cache::put('octane_broadcaster_rebuilt_at', now()->toDateTimeString(), 60 * 60);
+            logger('OctaneBroadcasterService: Runtime config updated from DB');
+        } catch (\Throwable $e) {
+            logger('OctaneBroadcasterService updateRuntimeConfigFromDb error: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Check if running in Octane environment
      */
     public static function isOctane(): bool
