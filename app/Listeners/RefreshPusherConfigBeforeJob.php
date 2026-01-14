@@ -39,6 +39,12 @@ class RefreshPusherConfigBeforeJob
      */
     public function handle(JobProcessing $event): void
     {
+        // ⭐ Debug: Log every call to confirm listener is working
+        Log::debug('RefreshPusherConfigBeforeJob.handle called', [
+            'job' => $event->job->resolveName() ?? 'unknown',
+            'pid' => getmypid(),
+        ]);
+        
         try {
             $now = time();
             
