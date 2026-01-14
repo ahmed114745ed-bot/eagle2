@@ -1565,7 +1565,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         position: relative;
     }
