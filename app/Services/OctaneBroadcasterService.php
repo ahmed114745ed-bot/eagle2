@@ -84,6 +84,14 @@ class OctaneBroadcasterService
      */
     public static function isOctane(): bool
     {
-        return app()->runningInOctane();
+        try {
+            if (method_exists(app(), 'runningInOctane')) {
+                return app()->runningInOctane();
+            }
+            
+            return class_exists('Laravel\Octane\Octane');
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

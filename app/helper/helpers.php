@@ -551,6 +551,18 @@ if (!function_exists('refreshOctaneBroadcaster')) {
         \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
     }
 }
+
+if (!function_exists('isRunningOctane')) {
+    /**
+     * Check if application is running with Octane
+     * Safe method that works across all Laravel/Octane versions
+     */
+    function isRunningOctane(): bool
+    {
+        return \App\Services\OctaneBroadcasterService::isOctane();
+    }
+}
+
 if (!function_exists('nameRoute')) {
     function nameRoute(string $name): string
     {

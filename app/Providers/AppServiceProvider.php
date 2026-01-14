@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
 
         // Register custom event dispatcher for Octane broadcaster refresh
-        if ($this->app->runningInOctane()) {
+        if (\App\Services\OctaneBroadcasterService::isOctane()) {
             $this->app->singleton('events', \App\Services\OctaneEventDispatcher::class);
         }
 

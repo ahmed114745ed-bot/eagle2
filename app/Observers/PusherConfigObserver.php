@@ -60,7 +60,7 @@ class PusherConfigObserver
         $this->updateLaravelConfigRuntime();
 
         // 3. Rebuild broadcaster with fresh credentials
-        if (app()->runningInOctane()) {
+        if (OctaneBroadcasterService::isOctane()) {
             OctaneBroadcasterService::rebuildBroadcaster();
             // Clear Octane in-memory cache
             Cache::store('octane')->clear();
