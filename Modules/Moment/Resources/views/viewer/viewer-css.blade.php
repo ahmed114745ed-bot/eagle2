@@ -2148,4 +2148,17 @@
             display: none !important;
         }
     }
+    /* Fix SweetAlert2 appearing behind modal */
+    .swal2-container {
+        z-index: 99999 !important;
+    }
+
+    .swal2-popup {
+        z-index: 99999 !important;
+    }
+
+    /* Ensure the backdrop is also above the modal */
+    .swal2-container.swal2-backdrop-show {
+        z-index: 99999 !important;
+    }
 </style>
