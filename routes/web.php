@@ -1176,26 +1176,9 @@ Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
     dd("branch tested");
 });
 
-Route::get('/octane-reload', function () {
-    try {
-        \Artisan::call('octane:reload');
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Octane reloaded successfully',
-            'output' => \Artisan::output(),
-            'time' => now()->toDateTimeString(),
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 'error',
-            'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-            'trace' => $e->getTraceAsString(),
-        ], 500);
-    }
+Route::get('/octane', function () {
+    Cache::store('octane')->flush();
+    return 'Octane Swoole memory cache cleared!';
 });
 
 // Auto Deploy Route - Git Pull + Composer + Octane Reload

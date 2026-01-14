@@ -532,26 +532,16 @@ if (!function_exists('adjustColor')) {
 if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
-        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
-            //            if (!isSubdomain()) {
-            //                return null;
-            //            }
-
-            $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
-            $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');
-
-            $appId = !empty($configs->get('pusher_app_id')) ? $configs->get('pusher_app_id') : Config::get('broadcasting.pusher-default.app_id');
-            $appKey = !empty($configs->get('pusher_app_key')) ? $configs->get('pusher_app_key') : Config::get('broadcasting.pusher-default.key');
-            $appSecret = !empty($configs->get('pusher_app_secret')) ? $configs->get('pusher_app_secret') : Config::get('broadcasting.pusher-default.secret');
-            $appCluster = !empty($configs->get('pusher_app_cluster')) ? $configs->get('pusher_app_cluster') : Config::get('broadcasting.pusher-default.options.cluster');
-
+        // return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
+            $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+            $configs = \App\Models\Config::whereIn('name', $keys)->pluck('value', 'name');
             return [
-                'app_id' => $appId,
-                'app_key' => $appKey,
-                'app_secret' => $appSecret,
-                'app_cluster' => $appCluster,
+                'app_id' => $configs->get('pusher_app_id'),
+                'app_key' => $configs->get('pusher_app_key'),
+                'app_secret' => $configs->get('pusher_app_secret'),
+                'app_cluster' => $configs->get('pusher_app_cluster'),
             ];
-        });
+        // });
     }
 }
 if (!function_exists('nameRoute')) {

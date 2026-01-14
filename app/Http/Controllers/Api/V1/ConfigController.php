@@ -184,7 +184,7 @@ class ConfigController extends Controller
         Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
-
+        Cache::store('octane')->flush();
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         
         if ($request->has('current_tab')) {
