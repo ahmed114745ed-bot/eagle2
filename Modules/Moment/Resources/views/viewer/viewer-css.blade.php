@@ -1589,7 +1589,7 @@
     }
 
     .modal-user-info {
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         max-width: 200px;
         overflow: hidden;
@@ -1745,7 +1745,7 @@
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        margin-left: 70px;
+        /*margin-left: 70px;*/
         margin-right: 0;
     }
 
