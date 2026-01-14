@@ -22,6 +22,7 @@ use App\Models\AdminNotification;
 use App\Facades\CustomNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
@@ -1178,8 +1179,26 @@ Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
 
 Route::get('/octane', function () {
     Cache::store('octane')->flush();
+    Cache::store('octane')->clear();
+
     return 'Octane Swoole memory cache cleared!';
 });
+
+// Secure route to flush Octane in-memory cache (Solution 2)
+Route::get('/sys/flush-octane', function () {
+    Cache::store('octane')->clear();
+    return response()->json(['status' => 'Octane Memory Cache Cleared']);
+})->middleware('auth.basic');
+
+// Optional: create a signal file to trigger cache flush via TickReceived listener (Solution 3)
+Route::get('/sys/signal-flush', function () {
+    $triggerFile = storage_path('framework/cache_flush_signal');
+    if (!file_exists(dirname($triggerFile))) {
+        @mkdir(dirname($triggerFile), 0775, true);
+    }
+    @touch($triggerFile);
+    return response()->json(['status' => 'Signal file created']);
+})->middleware('auth.basic');
 
 // Auto Deploy Route - Git Pull + Composer + Octane Reload
 // Works with GitHub Webhooks OR manual calls
