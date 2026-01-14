@@ -30,8 +30,9 @@ class RefreshPusherConfigBeforeJob
     
     /**
      * Check interval in seconds (to reduce DB queries)
+     * Set to 0 to check on EVERY job (more reliable but slightly slower)
      */
-    private const CHECK_INTERVAL = 5;
+    private const CHECK_INTERVAL = 0;
 
     /**
      * Handle the event.
@@ -44,8 +45,8 @@ class RefreshPusherConfigBeforeJob
             // Check for force update flag (set by PusherConfigObserver)
             $forceUpdate = Cache::has('pusher_config_changed');
             
-            // Skip if we checked recently AND no force update
-            if (!$forceUpdate && self::$lastCheckTime && ($now - self::$lastCheckTime) < self::CHECK_INTERVAL) {
+            // Skip if we checked recently AND no force update AND interval > 0
+            if (!$forceUpdate && self::CHECK_INTERVAL > 0 && self::$lastCheckTime && ($now - self::$lastCheckTime) < self::CHECK_INTERVAL) {
                 return;
             }
             
@@ -64,6 +65,8 @@ class RefreshPusherConfigBeforeJob
             // Update if forced OR if config actually changed
             if ($forceUpdate || self::$lastConfigHash !== $currentHash) {
                 $this->applyFreshConfig($freshConfig);
+                
+                $wasChanged = self::$lastConfigHash !== null && self::$lastConfigHash !== $currentHash;
                 self::$lastConfigHash = $currentHash;
                 
                 // ⭐ IMPORTANT: Clear the force update flag after applying
@@ -75,8 +78,10 @@ class RefreshPusherConfigBeforeJob
                 Log::info('Queue: Pusher config refreshed before job', [
                     'job' => $event->job->resolveName(),
                     'forced' => $forceUpdate,
+                    'config_changed' => $wasChanged,
                     'pid' => getmypid(),
                     'queue' => $event->job->getQueue(),
+                    'app_id' => $freshConfig['app_id'],
                 ]);
             }
             

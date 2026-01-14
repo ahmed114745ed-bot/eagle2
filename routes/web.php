@@ -1445,6 +1445,194 @@ Route::get('/debug/queue-pusher-status', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+// ⭐ Force refresh Pusher config and restart all workers
+Route::get('/debug/force-pusher-refresh', function () {
+    $timestamp = now()->toDateTimeString();
+    
+    // 1. Clear all caches
+    Cache::forget('pusher_config');
+    Cache::forget('all_configs');
+    
+    // 2. Set flag for queue workers
+    Cache::put('pusher_config_changed', $timestamp, 3600);
+    
+    // 3. Purge broadcaster
+    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    
+    // 4. Restart queue workers
+    Artisan::call('queue:restart');
+    $queueRestartOutput = Artisan::output();
+    
+    // 5. Reload Octane (if running)
+    $octaneReloadOutput = '';
+    try {
+        Artisan::call('octane:reload');
+        $octaneReloadOutput = Artisan::output();
+    } catch (\Throwable $e) {
+        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
+    }
+    
+    // 6. Get fresh config to verify
+    $freshConfig = getPusherConfig();
+    
+    Log::info('force_pusher_refresh_executed', [
+        'timestamp' => $timestamp,
+        'user_ip' => request()->ip(),
+    ]);
+    
+    return response()->json([
+        'success' => true,
+        'message' => '🔄 Pusher config refresh triggered!',
+        'actions_taken' => [
+            '1_cache_cleared' => true,
+            '2_flag_set' => Cache::has('pusher_config_changed'),
+            '3_broadcaster_purged' => true,
+            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
+            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
+        ],
+        'fresh_config' => [
+            'app_id' => $freshConfig['app_id'],
+            'app_cluster' => $freshConfig['app_cluster'],
+        ],
+        'next_steps' => [
+            'Supervisor will restart queue workers automatically',
+            'Octane workers will reload automatically',
+            'New broadcasts will use fresh DB config',
+        ],
+        'timestamp' => $timestamp,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+// ⭐ Test broadcast from Queue (to verify Queue workers use correct config)
+Route::get('/debug/test-queue-broadcast', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Dispatch a job that will broadcast
+    // This tests if Queue workers are using the correct Pusher config
+    dispatch(function () use ($dbConfig) {
+        $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver('pusher');
+        
+        // Get actual config from broadcaster
+        $actualConfig = null;
+        try {
+            $reflection = new \ReflectionClass($broadcaster);
+            $pusherProperty = $reflection->getProperty('pusher');
+            $pusherProperty->setAccessible(true);
+            $pusherInstance = $pusherProperty->getValue($broadcaster);
+            
+            if ($pusherInstance) {
+                $pusherReflection = new \ReflectionClass($pusherInstance);
+                $settingsProperty = $pusherReflection->getProperty('settings');
+                $settingsProperty->setAccessible(true);
+                $settings = $settingsProperty->getValue($pusherInstance);
+                
+                $actualConfig = [
+                    'auth_key' => $settings['auth_key'] ?? null,
+                    'app_id' => $settings['app_id'] ?? null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            $actualConfig = ['error' => $e->getMessage()];
+        }
+        
+        $isMatch = ($actualConfig['auth_key'] ?? '') === ($dbConfig['app_key'] ?? '');
+        
+        Log::info('Queue Worker Broadcaster Test', [
+            'pid' => getmypid(),
+            'db_app_key' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            'broadcaster_key' => substr($actualConfig['auth_key'] ?? '', 0, 10) . '...',
+            'match' => $isMatch ? '✅ MATCH' : '❌ MISMATCH',
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+    })->onQueue('default');
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Queue job dispatched! Check logs for result.',
+        'expected_db_config' => [
+            'app_id' => $dbConfig['app_id'],
+            'app_key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+        ],
+        'check_logs' => 'tail -f storage/logs/laravel.log | grep "Queue Worker Broadcaster Test"',
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+// ⭐ Test GiftBannerEvent broadcast (via Queue)
+Route::get('/debug/test-gift-banner', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Create test gift data
+    $testGift = [
+        'id' => rand(1000, 9999),
+        'name' => 'Test Gift 🎁',
+        'sender' => [
+            'id' => 1,
+            'name' => 'Test Sender',
+        ],
+        'receiver' => [
+            'id' => 2,
+            'name' => 'Test Receiver',
+        ],
+        'count' => 1,
+        'timestamp' => now()->toDateTimeString(),
+        'debug_info' => [
+            'pusher_app_id' => $dbConfig['app_id'],
+            'pusher_cluster' => $dbConfig['app_cluster'],
+        ],
+    ];
+    
+    try {
+        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
+        event(new \App\Events\GiftBannerEvent($testGift));
+        
+        Log::info('GiftBannerEvent dispatched', [
+            'gift_id' => $testGift['id'],
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
+            'event' => [
+                'class' => \App\Events\GiftBannerEvent::class,
+                'channel' => 'gift_banner',
+                'broadcast_as' => 'gift_banner',
+                'queue' => 'heavyProcessing (or similar)',
+            ],
+            'test_data' => $testGift,
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            ],
+            'next_steps' => [
+                '1. Check Pusher Debug Console for the event',
+                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
+                '3. If not received, run: /debug/force-pusher-refresh',
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Throwable $e) {
+        Log::error('GiftBannerEvent failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
 Route::get('/test-pusher-config', function () {
     $pusherConfig = getPusherConfig();
     $laravelConfig = [
