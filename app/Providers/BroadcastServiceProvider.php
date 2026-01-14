@@ -63,3 +63,5 @@ class BroadcastServiceProvider extends ServiceProvider
         );
 
         return new PusherBroadcaster($pusher);
+    }
+}
