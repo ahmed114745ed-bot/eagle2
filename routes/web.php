@@ -1504,41 +1504,59 @@ Route::get('/debug/force-pusher-refresh', function () {
 });
 
 // ⭐ Debug: Check if RefreshPusherConfigBeforeJob listener is registered
+// NOTE: Laravel wraps listeners in Closures, so we test by actually dispatching a job
 Route::get('/debug/check-queue-listeners', function () {
     $dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
     
     $jobProcessingListeners = [];
+    $listenerCount = 0;
     try {
         // Get listeners for JobProcessing event
         $listeners = $dispatcher->getListeners(\Illuminate\Queue\Events\JobProcessing::class);
+        $listenerCount = count($listeners);
         foreach ($listeners as $index => $listener) {
             if (is_array($listener)) {
                 $jobProcessingListeners[] = get_class($listener[0]) . '@' . $listener[1];
-            } elseif (is_object($listener)) {
+            } elseif (is_object($listener) && !($listener instanceof \Closure)) {
                 $jobProcessingListeners[] = get_class($listener);
             } elseif (is_string($listener)) {
                 $jobProcessingListeners[] = $listener;
             } else {
-                $jobProcessingListeners[] = 'Closure #' . $index;
+                $jobProcessingListeners[] = 'Closure_' . $index;
             }
         }
     } catch (\Throwable $e) {
         $jobProcessingListeners = ['Error: ' . $e->getMessage()];
     }
     
-    $hasRefreshListener = in_array(
-        \App\Listeners\RefreshPusherConfigBeforeJob::class,
-        $jobProcessingListeners
-    ) || str_contains(implode(',', $jobProcessingListeners), 'RefreshPusherConfigBeforeJob');
+    // Check if EventServiceProvider has our listener in boot()
+    $eventServiceProviderHasListener = false;
+    try {
+        $espPath = app_path('Providers/EventServiceProvider.php');
+        if (file_exists($espPath)) {
+            $content = file_get_contents($espPath);
+            $eventServiceProviderHasListener = str_contains($content, 'RefreshPusherConfigBeforeJob');
+        }
+    } catch (\Throwable $e) {
+        // ignore
+    }
+    
+    // Since Laravel wraps in Closures, we check if:
+    // 1. There are Closures registered (our listener is one of them)
+    // 2. EventServiceProvider contains our listener code
+    $likelyRegistered = $listenerCount > 0 && $eventServiceProviderHasListener;
     
     return response()->json([
         'success' => true,
+        'JobProcessing_listeners_count' => $listenerCount,
         'JobProcessing_listeners' => $jobProcessingListeners,
-        'RefreshPusherConfigBeforeJob_registered' => $hasRefreshListener ? '✅ YES' : '❌ NO',
-        'recommendation' => $hasRefreshListener 
-            ? 'Listener is registered. Queue workers should auto-refresh config.'
-            : '⚠️ Listener NOT registered! Check EventServiceProvider.',
-        'event_service_provider_path' => 'app/Providers/EventServiceProvider.php',
+        'EventServiceProvider_has_code' => $eventServiceProviderHasListener ? '✅ YES' : '❌ NO',
+        'likely_registered' => $likelyRegistered ? '✅ LIKELY YES' : '⚠️ CHECK NEEDED',
+        'how_to_verify' => [
+            '1. Run' => 'curl /debug/test-queue-broadcast',
+            '2. Check logs' => 'tail -f storage/logs/laravel.log | grep "RefreshPusherConfig"',
+            '3. Look for' => 'RefreshPusherConfigBeforeJob.handle called',
+        ],
         'timestamp' => now()->toDateTimeString(),
     ], 200, [], JSON_PRETTY_PRINT);
 });
