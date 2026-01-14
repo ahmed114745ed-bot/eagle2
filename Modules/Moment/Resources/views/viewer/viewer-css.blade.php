@@ -1074,6 +1074,11 @@
             padding: 12px 16px !important;
         }
 
+        .moments-feed {
+            margin: 0 8px 12px !important;
+            padding: 12px 16px !important;
+        }
+
         .viewer-title {
             font-size: 18px;
         }
@@ -1202,6 +1207,11 @@
         }
 
         .viewer-header {
+            margin: 0 4px 8px !important;
+            padding: 10px 12px !important;
+        }
+
+        .moments-feed {
             margin: 0 4px 8px !important;
             padding: 10px 12px !important;
         }
