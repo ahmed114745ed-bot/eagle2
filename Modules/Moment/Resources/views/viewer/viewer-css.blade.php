@@ -1071,7 +1071,6 @@
 
         .viewer-header {
             margin: 0 8px 12px !important;
-            padding: 12px 16px !important;
         }
 
         .moments-feed {
@@ -1213,7 +1212,6 @@
 
         .moments-feed {
             margin: 0 4px 8px !important;
-            padding: 10px 12px !important;
         }
 
         .viewer-title {
