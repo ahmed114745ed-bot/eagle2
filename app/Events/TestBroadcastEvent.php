@@ -6,11 +6,11 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow; // ⭐ Changed to ShouldBroadcastNow
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TestBroadcastEvent implements ShouldBroadcast
+class TestBroadcastEvent implements ShouldBroadcastNow // ⭐ Immediate broadcast - no queue
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
