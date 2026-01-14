@@ -19,7 +19,7 @@ class BroadcastServiceProvider extends ServiceProvider
         // Don't load config in boot() for Octane compatibility
         // Instead, load it dynamically per request using middleware
         
-        Broadcast::routes(['middleware' => ['auth:sanctum', 'octane.pusher.config']]);
+        Broadcast::routes(['middleware' => ['auth:sanctum', 'octane.pusher.config2']]);
         require base_path('routes/channels.php');
     
         // $config = getPusherConfig();

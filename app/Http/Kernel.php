@@ -100,6 +100,7 @@ class Kernel extends HttpKernel
         'verify.gamecoin.signature' => \App\Http\Middleware\VerifyGameCoinSignature::class,
         'verify.game.userInformation.signature' => \App\Http\Middleware\VerifyGameLeaderCCUserInformationMiddleWare::class,
         'octane.pusher.config' => \App\Http\Middleware\OctanePusherConfig::class,
+        'octane.pusher.config2' => \App\Http\Middleware\OctanePusherConfigv2::class,
         'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
 
         // 'verify.game.signature' => \App\Http\Middleware\VerifyGameLeaderCCMiddleWare::class,
