@@ -1321,6 +1321,66 @@ Route::get('/debug/pusher-config', function () {
         'exp_percentages' => Cache::get('exp_percentages'),
     ];
 
+    // Extra debug meta and broadcaster diagnostics
+    $meta = [
+        'pid' => getmypid(),
+        'hostname' => @gethostname(),
+        'octane' => method_exists(app(), 'runningInOctane') ? app()->runningInOctane() : null,
+        'cache_default' => config('cache.default'),
+        'config_cached' => file_exists(base_path('bootstrap/cache/config.php')),
+        'request_ip' => request()->ip(),
+        'url' => request()->fullUrl(),
+        'timestamp' => now()->toDateTimeString(),
+    ];
+
+    $broadcastDriverClass = null;
+    try {
+        $bm = app(\Illuminate\Broadcasting\BroadcastManager::class);
+        $driver = $bm->driver('pusher');
+        $broadcastDriverClass = is_object($driver) ? get_class($driver) : null;
+    } catch (\Throwable $e) {
+        $broadcastDriverClass = 'unavailable: ' . $e->getMessage();
+    }
+
+    // Safe masking for secrets in logs
+    $mask = function ($value) {
+        if (!is_string($value) || $value === '') return $value;
+        $len = strlen($value);
+        if ($len <= 8) return str_repeat('*', max(0, $len - 2)) . substr($value, -2);
+        return substr($value, 0, 4) . str_repeat('*', $len - 8) . substr($value, -4);
+    };
+
+    // Log a compact snapshot for tracing stale values
+    Log::info('debug.pusher-config.snapshot', [
+        'meta' => $meta,
+        'from_database' => [
+            'pusher_app_id' => $fromDatabase['pusher_app_id'] ?? null,
+            'pusher_app_key' => $mask($fromDatabase['pusher_app_key'] ?? null),
+            'pusher_app_secret' => $mask($fromDatabase['pusher_app_secret'] ?? null),
+            'pusher_app_cluster' => $fromDatabase['pusher_app_cluster'] ?? null,
+        ],
+        'from_config_runtime' => [
+            'key' => $mask($fromConfig['key'] ?? null),
+            'secret' => $mask($fromConfig['secret'] ?? null),
+            'app_id' => $fromConfig['app_id'] ?? null,
+            'cluster' => $fromConfig['cluster'] ?? null,
+        ],
+        'from_default' => [
+            'key' => $mask($fromDefault['key'] ?? null),
+            'secret' => $mask($fromDefault['secret'] ?? null),
+            'app_id' => $fromDefault['app_id'] ?? null,
+            'cluster' => $fromDefault['cluster'] ?? null,
+        ],
+        'from_env' => [
+            'key' => $mask($fromEnv['key'] ?? null),
+            'secret' => $mask($fromEnv['secret'] ?? null),
+            'app_id' => $fromEnv['app_id'] ?? null,
+            'cluster' => $fromEnv['cluster'] ?? null,
+        ],
+        'broadcast_driver_class' => $broadcastDriverClass,
+        'cache_info' => $cacheInfo,
+    ]);
+
     return response()->json([
         'from_database' => $fromDatabase,
         'from_cache' => $fromCache,
@@ -1328,6 +1388,61 @@ Route::get('/debug/pusher-config', function () {
         'from_config_default' => $fromDefault,
         'from_env' => $fromEnv,
         'cache_info' => $cacheInfo,
-        'config_cached' => file_exists(base_path('bootstrap/cache/config.php')),
+        'config_cached' => $meta['config_cached'],
+        'broadcast_driver_class' => $broadcastDriverClass,
+        'debug_meta' => $meta,
     ], 200, [], JSON_PRETTY_PRINT);
 });
+Route::get('/test-pusher-config', function () {
+    $pusherConfig = getPusherConfig();
+    $laravelConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    // Add logging to compare helper vs runtime config
+    $meta = [
+        'pid' => getmypid(),
+        'hostname' => @gethostname(),
+        'octane' => method_exists(app(), 'runningInOctane') ? app()->runningInOctane() : null,
+        'cache_default' => config('cache.default'),
+        'timestamp' => now()->toDateTimeString(),
+    ];
+
+    $mask = function ($value) {
+        if (!is_string($value) || $value === '') return $value;
+        $len = strlen($value);
+        if ($len <= 8) return str_repeat('*', max(0, $len - 2)) . substr($value, -2);
+        return substr($value, 0, 4) . str_repeat('*', $len - 8) . substr($value, -4);
+    };
+
+    Log::info('debug.test-pusher-config.snapshot', [
+        'meta' => $meta,
+        'from_helper_function' => [
+            'app_id' => $pusherConfig['app_id'] ?? null,
+            'key' => $mask($pusherConfig['key'] ?? null),
+            'secret' => $mask($pusherConfig['secret'] ?? null),
+            'cluster' => $pusherConfig['cluster'] ?? null,
+        ],
+        'from_laravel_config' => [
+            'app_id' => $laravelConfig['app_id'] ?? null,
+            'key' => $mask($laravelConfig['key'] ?? null),
+            'secret' => $mask($laravelConfig['secret'] ?? null),
+            'cluster' => $laravelConfig['cluster'] ?? null,
+        ],
+    ]);
+
+    return response()->json([
+        'from_helper_function' => $pusherConfig,
+        'from_laravel_config' => $laravelConfig,
+        'cache_info' => [
+            'environment' => app()->environment(),
+            'cache_driver' => config('cache.default'),
+        ],
+        'timestamp' => $meta['timestamp'],
+        'debug_meta' => $meta,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
