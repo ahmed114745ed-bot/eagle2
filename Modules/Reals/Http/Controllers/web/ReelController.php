@@ -90,7 +90,7 @@ class ReelController extends MainController
         $grid->column('user.name', __('user'))->display(function () {
             $name = $this->user->name ?? '';
             $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
-            $avatarPath = @$this->user->avatar;
+            $avatarPath = @$this->user->profile->avatar;
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
 
