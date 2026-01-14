@@ -12,15 +12,33 @@ class BroadcastServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     * ⭐ MUST register broadcaster BEFORE boot() to ensure it's available early
+     * ⭐ Use afterResolving to register broadcaster when BroadcastManager is ready
      *
      * @return void
      */
     public function register()
     {
-        // ⭐ CRITICAL: Register broadcaster in register() NOT boot()
-        // This ensures it's available BEFORE any broadcasting happens
-        $this->registerDatabaseDrivenBroadcaster();
+        // ⭐ Register broadcaster extension when BroadcastManager is resolved
+        // This ensures proper dependency injection
+        $this->app->afterResolving(BroadcastManager::class, function (BroadcastManager $manager) {
+            $manager->extend('pusher', function ($app, $config) {
+                // ⭐ Return NEW broadcaster instance - reads fresh from DB every time
+                // Constructor calls getPusherConfig() which reads directly from database
+                try {
+                    Log::debug('BroadcastServiceProvider.creating_database_driven_broadcaster', [
+                        'pid' => getmypid(),
+                        'timestamp' => now()->toDateTimeString(),
+                    ]);
+                    return new DatabaseDrivenPusherBroadcaster();
+                } catch (\Throwable $e) {
+                    Log::error('BroadcastServiceProvider.broadcaster_creation_failed', [
+                        'error' => $e->getMessage(),
+                        'line' => $e->getLine(),
+                    ]);
+                    throw $e;
+                }
+            });
+        });
     }
 
     /**
@@ -32,32 +50,5 @@ class BroadcastServiceProvider extends ServiceProvider
     {
         Broadcast::routes(['middleware' => ['auth:sanctum', 'octane.pusher.config2']]);
         require base_path('routes/channels.php');
-    }
-
-    /**
-     * Register custom database-driven Pusher broadcaster
-     * ⭐ NO singleton - extend() called on EVERY app instance
-     * Octane flush ensures BroadcastManager is destroyed after each request
-     */
-    private function registerDatabaseDrivenBroadcaster()
-    {
-        // ⭐ Direct extend - NO singleton to avoid caching in Octane
-        $this->app->make(BroadcastManager::class)->extend('pusher', function ($app, $config) {
-            // ⭐ Return NEW broadcaster instance - reads fresh from DB every time
-            // Constructor calls getPusherConfig() which reads directly from database
-            try {
-                Log::debug('BroadcastServiceProvider.creating_database_driven_broadcaster', [
-                    'pid' => getmypid(),
-                    'timestamp' => now()->toDateTimeString(),
-                ]);
-                return new DatabaseDrivenPusherBroadcaster();
-            } catch (\Throwable $e) {
-                Log::error('BroadcastServiceProvider.broadcaster_creation_failed', [
-                    'error' => $e->getMessage(),
-                    'line' => $e->getLine(),
-                ]);
-                throw $e;
-            }
-        });
     }
 }
