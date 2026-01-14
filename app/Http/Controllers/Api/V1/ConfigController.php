@@ -175,22 +175,23 @@ class ConfigController extends Controller
             );
             
             $updatedKeys[] = $key;
+            // NO CACHING - Always read fresh from database
             Cache::forget($key);
-            Cache::forever($key, $value);
             
             if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
                 $hasPusherUpdate = true;
             }
         }
 
-        // Clear only Pusher-related cache, not all cache
+        // Clear all related caches - force fresh database reads
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
+        Cache::flush();
         
-        // Avoid global Cache::flush() - it breaks unrelated caches
-        // Artisan::call('config:cache');  // Skip this to avoid overwriting runtime updates
+        // Do NOT call config:cache - creates bootstrap/cache/config.php with stale values
+        // Runtime config is set directly below for Pusher
         
-        // Clear Octane in-memory cache only
+        // Clear Octane in-memory cache
         if (method_exists(Cache::store('octane'), 'flush')) {
             Cache::store('octane')->flush();
         }

@@ -1449,18 +1449,46 @@ Route::get('/test-pusher-config', function () {
 // Test broadcaster with database-driven config
 Route::get('/test-pusher-broadcast', function () {
     try {
-        
+        // ⭐ ALWAYS read fresh from database - this is the source of truth
         $dbConfig = getPusherConfig();
-        $broadcastConfig = [
+        
+        // ⚠️ WARNING: config() reads from bootstrap/cache/config.php (STALE VALUES)
+        // These values are NOT updated when you change Pusher settings in admin panel
+        $configCached = [
             'key' => config('broadcasting.connections.pusher.key'),
             'secret' => config('broadcasting.connections.pusher.secret'),
             'app_id' => config('broadcasting.connections.pusher.app_id'),
             'cluster' => config('broadcasting.connections.pusher.options.cluster'),
         ];
 
-        // Get broadcaster instance (will use DB config)
-        $broadcaster = app('broadcast')->driver('pusher');
+        // Get broadcaster instance - should use DB config via BroadcastServiceProvider override
+        $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver('pusher');
         $broadcasterClass = get_class($broadcaster);
+        
+        // Get the actual Pusher object from broadcaster to inspect its credentials
+        $pusherInstance = null;
+        $actualPusherConfig = null;
+        try {
+            $reflection = new \ReflectionClass($broadcaster);
+            $pusherProperty = $reflection->getProperty('pusher');
+            $pusherProperty->setAccessible(true);
+            $pusherInstance = $pusherProperty->getValue($broadcaster);
+            
+            if ($pusherInstance) {
+                $pusherReflection = new \ReflectionClass($pusherInstance);
+                $settingsProperty = $pusherReflection->getProperty('settings');
+                $settingsProperty->setAccessible(true);
+                $settings = $settingsProperty->getValue($pusherInstance);
+                
+                $actualPusherConfig = [
+                    'auth_key' => $settings['auth_key'] ?? null,
+                    'app_id' => $settings['app_id'] ?? null,
+                    'cluster' => $settings['cluster'] ?? null,
+                ];
+            }
+        } catch (\Throwable $e) {
+            $actualPusherConfig = 'Unable to read: ' . $e->getMessage();
+        }
 
         // Try to trigger broadcast event
         broadcast(new \App\Events\TestBroadcastEvent($dbConfig))->toOthers();
@@ -1468,16 +1496,30 @@ Route::get('/test-pusher-broadcast', function () {
         $result = [
             'success' => true,
             'message' => 'Event broadcasted successfully',
-            'from_database' => [
-                'app_id' => $dbConfig['app_id'],
-                'app_key' => $dbConfig['app_key'],
-                'app_secret' => $dbConfig['app_secret'],
-                'app_cluster' => $dbConfig['app_cluster'],
+            '🔥 COMPARISON' => [
+                'from_database_FRESH' => [
+                    'app_id' => $dbConfig['app_id'],
+                    'app_key' => substr($dbConfig['app_key'] ?? '', 0, 8) . '...',
+                    'app_secret' => substr($dbConfig['app_secret'] ?? '', 0, 8) . '...',
+                    'app_cluster' => $dbConfig['app_cluster'],
+                ],
+                'from_config_CACHED_STALE' => [
+                    'app_id' => $configCached['app_id'],
+                    'key' => substr($configCached['key'] ?? '', 0, 8) . '...',
+                    'secret' => substr($configCached['secret'] ?? '', 0, 8) . '...',
+                    'cluster' => $configCached['cluster'],
+                ],
+                'broadcaster_actual_instance' => $actualPusherConfig,
             ],
-            'from_config_runtime' => $broadcastConfig,
+            '✅ MATCH_STATUS' => [
+                'db_vs_config' => ($dbConfig['app_key'] === $configCached['key']) ? '✅ MATCH' : '❌ MISMATCH',
+                'db_vs_broadcaster' => ($actualPusherConfig && is_array($actualPusherConfig)) 
+                    ? (($dbConfig['app_key'] === $actualPusherConfig['auth_key']) ? '✅ MATCH' : '❌ MISMATCH')
+                    : 'UNKNOWN',
+            ],
             'broadcaster_class' => $broadcasterClass,
-            'broadcaster_used' => 'pusher',
             'timestamp' => now()->toDateTimeString(),
+            '⚠️ NOTE' => 'If db_vs_broadcaster is MISMATCH, BroadcastServiceProvider override is not working properly',
         ];
 
         Log::info('test_pusher_broadcast', $result);
