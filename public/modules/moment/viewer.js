@@ -434,7 +434,7 @@
                         <button class="menu-btn" onclick="toggleMenu(${moment.id}, event)">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div class="dropdown-menu" id="menu-${moment.id}">
+                        <div class="dropdown-menu different" id="menu-${moment.id}">
                             <button class="dropdown-item" onclick="editMoment(${moment.id}, event)">
                                 <i class="fas fa-edit"></i>
                                 <span>${texts.editDesc || 'Edit Description'}</span>
@@ -812,14 +812,14 @@
                             html += `
                                 <div class="modal-user-item">
                                     <div class="modal-user-header" onclick="window.open('${userUrl}', '_blank')">
+                                      <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                         <img src="${avatar}" alt="${escapeHtml(userName)}" class="modal-user-avatar" loading="lazy">
                                         <div class="modal-user-info">
                                             <div class="modal-user-name">${escapeHtml(userName)}</div>
                                             <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
                                         </div>
-                                        <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
                                     <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>

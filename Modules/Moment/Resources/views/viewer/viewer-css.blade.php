@@ -325,9 +325,9 @@
     }
 
     /* RTL Support for Dropdown */
-    html.rtl .dropdown-menu,
-    html[dir="rtl"] .dropdown-menu,
-    [dir="rtl"] .dropdown-menu {
+    html.rtl .dropdown-menu.different,
+    html[dir="rtl"] .dropdown-menu.different,
+    [dir="rtl"] .dropdown-menu.different {
         text-align: right;
         right: 0% !important;
         left: auto;
@@ -1070,8 +1070,12 @@
         }
 
         .viewer-header {
-            margin: 0 8px 12px;
-            padding: 12px 16px;
+            margin: 0 8px 12px !important;
+            padding: 12px 16px !important;
+        }
+
+        .moments-feed {
+            margin: 0 8px 12px !important;
         }
 
         .viewer-title {
@@ -1202,8 +1206,12 @@
         }
 
         .viewer-header {
-            margin: 0 4px 8px;
-            padding: 10px 12px;
+            margin: 0 4px 8px !important;
+            padding: 10px 12px !important;
+        }
+
+        .moments-feed {
+            margin: 0 4px 8px !important;
         }
 
         .viewer-title {
@@ -1557,7 +1565,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         position: relative;
     }
@@ -1581,7 +1589,7 @@
     }
 
     .modal-user-info {
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         max-width: 200px;
         overflow: hidden;
@@ -1719,7 +1727,7 @@
 
     .modal-comment-text {
         margin-top: 12px;
-        margin-left: 70px;
+        /*margin-left: 70px;*/
         font-size: 15px;
         line-height: 1.4;
         word-wrap: break-word;
@@ -1731,20 +1739,20 @@
         text-align: right !important;
         direction: rtl;
         margin-left: 0;
-        margin-right: 70px;
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        margin-left: 70px;
-        margin-right: 0;
+        /*margin-left: 70px;*/
+        /*margin-right: 0;*/
     }
 
     /* RTL Support for Comment Text */
     [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
-        margin-left: 0;
-        margin-right: 70px;
+        /*margin-left: 0;*/
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-time {
@@ -1860,13 +1868,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 56px;
+            /*margin-left: 56px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 56px;
+            /*margin-left: 0;*/
+            /*margin-right: 56px;*/
         }
 
         .modal-comment-time {
@@ -1894,13 +1902,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 52px;
+            /*margin-left: 52px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 52px;
+            /*margin-left: 0;*/
+            /*margin-right: 52px;*/
         }
 
         .modal-comment-time {
@@ -2013,7 +2021,6 @@
     }
 
     .user-list-item:hover {
-        background: #f8f9ff;
         border-color: var(--primary-color);
     }
 
@@ -2123,5 +2130,22 @@
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .users-sidebar {
+            display: none !important;
+        }
+
+        .viewer-main-content {
+            width: 100% !important;
+            flex: 1 !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .users-sidebar {
+            display: none !important;
+        }
     }
 </style>
