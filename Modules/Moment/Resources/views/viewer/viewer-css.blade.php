@@ -1536,20 +1536,17 @@
 
     .modal-user-item {
         display: flex;
-        align-items: center;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 4px;
         padding: 10px 16px;
         transition: background 0.15s ease;
         cursor: pointer;
-        gap: 12px;
-        min-height: 56px;
+        min-height: auto;
     }
 
-    /* ارتفاع أكبر للتعليقات الطويلة */
+    /* Comments section layout */
     .modal-user-item:has(.modal-comment-text) {
-        align-items: flex-start;
-        flex-wrap: wrap;
-        min-height: 70px;
+        gap: 4px;
     }
 
     .modal-user-item:hover {
@@ -1565,10 +1562,9 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        flex: 1;
+        width: 100%;
         min-width: 0;
         position: relative;
-        width: 100%;
     }
 
     [dir="rtl"] .modal-user-header {
@@ -1731,10 +1727,10 @@
     }
 
     .modal-comment-text {
-        display: inline;
-        margin-top: 12px;
+        display: block;
         margin-left: 70px;
-        margin-right: 6px;
+        margin-top: 0;
+        margin-bottom: 0;
         font-size: 15px;
         line-height: 1.4;
         word-wrap: break-word;
@@ -1746,43 +1742,47 @@
         text-align: right !important;
         direction: rtl;
         margin-left: 0;
-        margin-right: 76px;
+        margin-right: 70px;
     }
 
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
         margin-left: 70px;
-        margin-right: 6px;
+        margin-right: 0;
     }
 
     /* RTL Support for Comment Text */
     [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
         margin-left: 0;
-        margin-right: 76px;
+        margin-right: 70px;
     }
 
     .modal-comment-time {
-        display: inline;
-        margin-top: 12px;
-        margin-left: 0;
+        display: block;
+        margin-left: 70px;
+        margin-top: -22px;
+        padding-left: 6px;
         font-size: 12px;
         color: var(--text-secondary-color);
         white-space: nowrap;
+        float: right;
     }
 
     .modal-comment-time[dir="rtl"] {
         margin-left: 0;
-        margin-right: 0;
+        margin-right: 70px;
         text-align: right !important;
         direction: rtl;
+        float: left;
     }
 
     .modal-comment-time[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        margin-left: 0;
+        margin-left: 70px;
         margin-right: 0;
+        float: right;
     }
 
     /* RTL Support for Comment Time */
