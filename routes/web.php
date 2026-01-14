@@ -1490,13 +1490,56 @@ Route::get('/test-pusher-broadcast', function () {
             $actualPusherConfig = 'Unable to read: ' . $e->getMessage();
         }
 
-        // Try to trigger broadcast event
-        broadcast(new \App\Events\TestBroadcastEvent($dbConfig))->toOthers();
+        // ⭐ Try to trigger broadcast event and capture result
+        $broadcastResult = null;
+        $broadcastError = null;
+        $broadcastSuccess = false;
+        
+        try {
+            Log::info('broadcasting.event.start', [
+                'event' => 'TestBroadcastEvent',
+                'config_used' => [
+                    'app_id' => $dbConfig['app_id'],
+                    'cluster' => $dbConfig['app_cluster'],
+                ],
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+            
+            $pendingBroadcast = broadcast(new \App\Events\TestBroadcastEvent($dbConfig));
+            $broadcastResult = $pendingBroadcast->toOthers();
+            $broadcastSuccess = true;
+            
+            Log::info('broadcasting.event.success', [
+                'event' => 'TestBroadcastEvent',
+                'channel' => 'test-channel',
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+            
+        } catch (\Throwable $broadcastException) {
+            $broadcastError = [
+                'message' => $broadcastException->getMessage(),
+                'file' => $broadcastException->getFile(),
+                'line' => $broadcastException->getLine(),
+            ];
+            
+            Log::error('broadcasting.event.failed', [
+                'event' => 'TestBroadcastEvent',
+                'error' => $broadcastException->getMessage(),
+                'trace' => $broadcastException->getTraceAsString(),
+            ]);
+        }
 
         $result = [
             'success' => true,
             'message' => 'Event broadcasted successfully',
-            '🔥 COMPARISON' => [
+            '� BROADCAST_STATUS' => [
+                'broadcast_success' => $broadcastSuccess,
+                'broadcast_error' => $broadcastError,
+                'event_class' => \App\Events\TestBroadcastEvent::class,
+                'channel' => 'test-channel',
+                'event_name' => 'test.broadcast',
+            ],
+            '�🔥 COMPARISON' => [
                 'from_database_FRESH' => [
                     'app_id' => $dbConfig['app_id'],
                     'app_key' => substr($dbConfig['app_key'] ?? '', 0, 8) . '...',
