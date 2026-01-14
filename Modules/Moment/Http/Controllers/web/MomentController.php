@@ -121,6 +121,7 @@ class MomentController extends MainController
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
         $grid->column('img', __('Image'))->display(function () {
+            $id = $this->id;
             $galleries = $this->momentGallery;
 
             if ($galleries->isEmpty()) {
