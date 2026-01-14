@@ -66,6 +66,12 @@ class RefreshPusherConfigBeforeJob
                 $this->applyFreshConfig($freshConfig);
                 self::$lastConfigHash = $currentHash;
                 
+                // ⭐ IMPORTANT: Clear the force update flag after applying
+                // This prevents unnecessary purges on every subsequent job
+                if ($forceUpdate) {
+                    Cache::forget('pusher_config_changed');
+                }
+                
                 Log::info('Queue: Pusher config refreshed before job', [
                     'job' => $event->job->resolveName(),
                     'forced' => $forceUpdate,

@@ -179,6 +179,10 @@ class PusherConfigObserver
     private function restartQueueWorkers(array $meta): void
     {
         try {
+            // ⭐ CRITICAL: Set a flag in cache that RefreshPusherConfigBeforeJob checks
+            // This ensures queue workers will refresh on NEXT job even if restart fails
+            Cache::put('pusher_config_changed', $meta['timestamp'], 3600);
+            
             // Signal queue workers to restart after current job
             // This is graceful - workers finish current job then restart
             Artisan::call('queue:restart');
@@ -187,6 +191,7 @@ class PusherConfigObserver
                 'reason' => 'pusher_config_changed',
                 'timestamp' => $meta['timestamp'],
                 'triggered_by' => $meta['user_id'] ?? 'system',
+                'cache_driver' => config('cache.default'),
             ]);
             
             // Also set a cache flag so we can track when restart was requested

@@ -15,49 +15,37 @@ class OctaneBroadcasterService
     /**
      * Rebuild the Pusher broadcaster with fresh credentials from database
      * Call this before broadcasting events in Octane environment
+     * 
+     * ⭐ CRITICAL: This purges the cached driver FIRST, then when broadcast()
+     * is called, BroadcastManager will create a new instance using our
+     * DatabaseDrivenPusherBroadcaster which reads fresh from DB.
      */
     public static function rebuildBroadcaster(): void
     {
-        if (!app()->bound('broadcaster')) {
-            return;
-        }
-
         try {
-            // Get fresh Pusher credentials from database
-            $credentials = getPusherConfig();
-
-            if (!$credentials['app_id'] || !$credentials['app_key'] || !$credentials['app_secret']) {
-                return; // Invalid credentials, skip rebuild
-            }
-
-            // Create fresh Pusher instance
-            $pusher = new Pusher(
-                $credentials['app_key'],
-                $credentials['app_secret'],
-                $credentials['app_id'],
-                [
-                    'cluster' => $credentials['app_cluster'] ?? 'mt1',
-                    'useTLS' => true,
-                ]
-            );
-
             // Get the broadcast manager
             $broadcastManager = app('broadcast');
-
-            // Create new Pusher broadcaster
-            $broadcaster = new PusherBroadcaster($pusher);
-
-            // Replace the cached broadcaster in the manager
-            $broadcastManager->extend('pusher', function ($app) use ($broadcaster) {
-                return $broadcaster;
-            });
-
-            // Force re-resolution of the driver
+            
+            // ⭐ CRITICAL FIX: Purge the cached driver FIRST
+            // This forces BroadcastManager to create a NEW instance on next use
+            // The new instance will be DatabaseDrivenPusherBroadcaster which
+            // reads fresh credentials from database in its constructor
             if (method_exists($broadcastManager, 'purge')) {
                 $broadcastManager->purge('pusher');
             }
+            
+            // Also purge default driver if it's pusher
+            if (config('broadcasting.default') === 'pusher') {
+                $broadcastManager->purge(null);
+            }
+            
+            // Clear the config changed flag
+            \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
 
-            logger('OctaneBroadcasterService: Broadcaster rebuilt with fresh credentials');
+            logger('OctaneBroadcasterService: Broadcaster purged - will rebuild on next use', [
+                'pid' => getmypid(),
+                'timestamp' => now()->toDateTimeString(),
+            ]);
         } catch (\Exception $e) {
             logger('OctaneBroadcasterService Error: ' . $e->getMessage(), ['exception' => $e]);
         }
