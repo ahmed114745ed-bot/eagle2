@@ -7,6 +7,7 @@ use App\Services\OctaneBroadcasterService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config as LaravelConfig;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Observer for Config model
@@ -51,10 +52,37 @@ class PusherConfigObserver
             return;
         }
 
-        // 1. Clear all caches
+        $original = $config->getOriginal('value');
+        $new = $config->value;
+        if ($original === $new) {
+            // No effective change; avoid redundant rebuilds
+            return;
+        }
+
+        // Extra debug meta
+        $meta = [
+            'pid' => getmypid(),
+            'hostname' => @gethostname(),
+            'octane' => method_exists(app(), 'runningInOctane') ? app()->runningInOctane() : null,
+            'route' => optional(request())->route() ? request()->route()->getName() : null,
+            'url' => optional(request())->fullUrl(),
+            'user_id' => optional(auth())->id(),
+            'timestamp' => now()->toDateTimeString(),
+        ];
+
+        // Safe masking
+        $mask = function ($value) {
+            if (!is_string($value) || $value === '') return $value;
+            $len = strlen($value);
+            if ($len <= 8) return str_repeat('*', max(0, $len - 2)) . substr($value, -2);
+            return substr($value, 0, 4) . str_repeat('*', $len - 8) . substr($value, -4);
+        };
+
+        // 1. Clear relevant caches
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
-        Cache::flush();
+        // Avoid global Cache::flush() to keep unrelated caches; rely on targeted keys
+        Cache::put('pusher_config_changed', $meta['timestamp'], 300);
         
         // 2. Update Laravel config runtime
         $this->updateLaravelConfigRuntime();
@@ -65,11 +93,16 @@ class PusherConfigObserver
             // Clear Octane in-memory cache
             Cache::store('octane')->clear();
             // Log timestamp of rebuild
-            Cache::put('octane_broadcaster_rebuilt_at', now()->toDateTimeString(), 60 * 60);
+            Cache::put('octane_broadcaster_rebuilt_at', $meta['timestamp'], 60 * 60);
         }
 
-        // 4. Log the change
-        logger("Config updated: {$config->name} = {$config->value}");
+        // 4. Structured log with diff and meta
+        Log::info('pusher_config_change', [
+            'meta' => $meta,
+            'name' => $config->name,
+            'original' => $mask($original),
+            'new' => $mask($new),
+        ]);
     }
 
     /**
@@ -89,9 +122,9 @@ class PusherConfigObserver
                 'broadcasting.connections.pusher.options.cluster' => $pusherConfig['app_cluster'],
             ]);
 
-            logger('Pusher config updated in runtime');
+            Log::info('pusher_runtime_config_updated');
         } catch (\Exception $e) {
-            logger('Error updating Pusher config runtime: ' . $e->getMessage());
+            Log::error('pusher_runtime_config_update_error', ['message' => $e->getMessage()]);
         }
     }
 }

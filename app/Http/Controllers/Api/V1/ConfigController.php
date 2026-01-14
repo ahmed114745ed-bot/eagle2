@@ -161,7 +161,6 @@ class ConfigController extends Controller
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
         
-        // Observer سيتعامل مع التحديث التلقائي
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
 
