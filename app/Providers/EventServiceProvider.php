@@ -21,6 +21,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         TickReceived::class => [
             \App\Listeners\OctaneRefreshCacheListener::class,
+            \App\Listeners\OctaneBroadcasterRefreshListener::class,
         ],
     ];
 

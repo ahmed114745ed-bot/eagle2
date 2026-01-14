@@ -1178,7 +1178,6 @@ Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
 });
 
 Route::get('/octane', function () {
-    Cache::store('octane')->flush();
     Cache::store('octane')->clear();
 
     return 'Octane Swoole memory cache cleared!';

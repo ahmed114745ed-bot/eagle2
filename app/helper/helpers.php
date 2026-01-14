@@ -544,6 +544,13 @@ if (!function_exists('getPusherConfig')) {
         // });
     }
 }
+
+if (!function_exists('refreshOctaneBroadcaster')) {
+    function refreshOctaneBroadcaster()
+    {
+        \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    }
+}
 if (!function_exists('nameRoute')) {
     function nameRoute(string $name): string
     {

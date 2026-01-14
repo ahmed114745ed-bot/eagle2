@@ -158,11 +158,10 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-        Cache::forget('pusher_config');
-
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
         
+        // Observer سيتعامل مع التحديث التلقائي
         foreach ($keys as $key) {
             $config = Config::where('name', $key)->first();
 
@@ -174,12 +173,12 @@ class ConfigController extends Controller
                 $config->value = $request->input($key);
             }
 
+         
             $config->save();
             Cache::forget($key);
             Cache::forever($key, $request->input($key));
         }
 
-        // Clear pusher config cache for Octane
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
         Cache::flush();

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Observers\PusherConfigObserver;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -30,5 +31,8 @@ class Config extends Model
                 Cache::put('pusher_config_changed', true, 60 * 5); // 5 minutes TTL
             }
         });
+
+        // Register observer for automatic broadcaster refresh
+        static::observe(PusherConfigObserver::class);
     }
 }
