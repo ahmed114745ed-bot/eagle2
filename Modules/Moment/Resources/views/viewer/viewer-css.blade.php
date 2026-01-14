@@ -1745,7 +1745,7 @@
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        /*margin-left: 70px;*/
+        margin-left: 70px;
         margin-right: 0;
     }
 
