@@ -1727,7 +1727,7 @@
 
     .modal-comment-text {
         margin-top: 12px;
-        margin-left: 70px;
+        /*margin-left: 70px;*/
         font-size: 15px;
         line-height: 1.4;
         word-wrap: break-word;
@@ -1739,20 +1739,20 @@
         text-align: right !important;
         direction: rtl;
         margin-left: 0;
-        margin-right: 70px;
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        margin-left: 70px;
-        margin-right: 0;
+        /*margin-left: 70px;*/
+        /*margin-right: 0;*/
     }
 
     /* RTL Support for Comment Text */
     [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
-        margin-left: 0;
-        margin-right: 70px;
+        /*margin-left: 0;*/
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-time {
@@ -1868,13 +1868,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 56px;
+            /*margin-left: 56px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 56px;
+            /*margin-left: 0;*/
+            /*margin-right: 56px;*/
         }
 
         .modal-comment-time {
@@ -1902,13 +1902,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 52px;
+            /*margin-left: 52px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 52px;
+            /*margin-left: 0;*/
+            /*margin-right: 52px;*/
         }
 
         .modal-comment-time {
