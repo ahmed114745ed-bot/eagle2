@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config as LaravelConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
@@ -196,8 +197,28 @@ class ConfigController extends Controller
         
         // Force runtime config update for Pusher if needed
         if ($hasPusherUpdate) {
-            \App\Services\OctaneBroadcasterService::updateRuntimeConfigFromDb();
+            // Set runtime config DIRECTLY from request values to ensure no delay
+            $pusherMapping = [
+                'pusher_app_key' => 'broadcasting.connections.pusher.key',
+                'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
+                'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
+                'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
+            ];
+            
+            foreach ($pusherMapping as $key => $configKey) {
+                $value = $request->input($key);
+                if ($value !== null) {
+                    if ($key === 'pusher_app_cluster') {
+                        LaravelConfig::set($configKey, $value ?? 'mt1');
+                    } else {
+                        LaravelConfig::set($configKey, $value);
+                    }
+                }
+            }
+            
+            // Rebuild broadcaster with updated runtime config
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+            
             Log::info('pusher_config_force_updated', [
                 'source' => 'updateConfigAgoraZego',
                 'updated_keys' => $updatedKeys,
