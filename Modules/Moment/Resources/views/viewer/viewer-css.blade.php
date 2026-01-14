@@ -106,6 +106,11 @@
         margin-right: 0;
     }
 
+    .rtl .viewer-header {
+        margin-left: auto;
+        margin-right: 7%;
+    }
+
     .viewer-title {
         font-size: 20px;
         font-weight: 700;
@@ -135,16 +140,13 @@
         border: 1px solid var(--border-color);
         border-radius: 20px;
         font-size: 15px;
-        background: var(--bg-primary);
-        color: var(--text-primary);
         transition: all 0.2s;
     }
 
     .filter-input:focus,
     .search-input:focus {
         outline: none;
-        background: var(--bg-secondary);
-        border-color: var(--primary);
+        border-color: var(--primary-color);
     }
 
     .sort-select {
@@ -192,6 +194,11 @@
         z-index: auto;
         margin-left: 7%;
         margin-right: 0;
+    }
+
+    .rtl .moments-feed {
+        margin-left: auto;
+        margin-right: 7%;
     }
 
     /* Post Card - Facebook Style */
@@ -2067,7 +2074,6 @@
     .load-more-users-btn {
         width: 100%;
         padding: 8px;
-        background: #f0f0f0;
         border: none;
         border-radius: 8px;
         cursor: pointer;

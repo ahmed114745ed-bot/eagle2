@@ -1451,18 +1451,18 @@
     // Users List Variables
     let usersPage = 1, usersLastPage = 1, usersSearch = '', selectedUserId = null, usersLoading = false;
 
-    // Load users on page load
-    document.addEventListener('DOMContentLoaded', () => loadUsers(true));
-
     async function loadUsers(reset = false) {
         if (usersLoading) return;
         usersLoading = true;
 
+        const container = document.getElementById('usersListContainer');
+        const loadMoreBtn = document.getElementById('loadMoreUsersBtn');
+
         if (reset) {
             usersPage = 1;
-            document.getElementById('usersListContainer').innerHTML = '<div class="loading-container"><div class="spinner"></div></div>';
+            container.innerHTML = '<div class="loading-container"><div class="spinner"></div></div>';
         } else {
-            document.getElementById('usersLoadingMore').classList.add('visible');
+            document.getElementById('usersLoadingMore')?.classList.add('visible');
         }
 
         try {
@@ -1470,7 +1470,7 @@
             const data = await res.json();
 
             if (data.success) {
-                if (reset) document.getElementById('usersListContainer').innerHTML = '';
+                if (reset) container.innerHTML = '';
                 document.getElementById('usersTotalCount').textContent = `(${data.pagination.total})`;
                 usersLastPage = data.pagination.last_page;
 
@@ -1478,8 +1478,10 @@
                     const avatar = user.profile?.avatar
                         ? `${MomentViewerConfig.storageUrl}/${user.profile.avatar}`
                         : MomentViewerConfig.defaultAvatar;
-                    document.getElementById('usersListContainer').innerHTML += `
-                    <div class="user-list-item ${selectedUserId == user.id ? 'active' : ''}" onclick="selectUser(${user.id})">
+                    container.innerHTML += `
+                    <div class="user-list-item ${selectedUserId == user.id ? 'active' : ''}"
+                         data-user-id="${user.id}"
+                         onclick="selectUser(${user.id})">
                         <img src="${avatar}" class="user-list-avatar" onerror="this.src='${MomentViewerConfig.defaultAvatar}'">
                         <div class="user-list-info">
                             <div class="user-list-name">${user.name}</div>
@@ -1488,33 +1490,94 @@
                         <span class="user-list-count">${user.moments_count}</span>
                     </div>`;
                 });
+
+                if (loadMoreBtn) {
+                    loadMoreBtn.parentElement.style.display = usersPage < usersLastPage ? 'block' : 'none';
+                }
             }
         } catch (error) {
             console.error('Error loading users:', error);
         } finally {
             usersLoading = false;
-            document.getElementById('usersLoadingMore').classList.remove('visible');
+            document.getElementById('usersLoadingMore')?.classList.remove('visible');
         }
     }
-    function selectUser(userId) {
-        selectedUserId = userId;
-        document.getElementById('userIdFilter').value = userId;
-        document.getElementById('usersFilterInfo').classList.add('visible');
-        document.querySelectorAll('.user-list-item').forEach(el => el.classList.toggle('active', el.onclick.toString().includes(userId)));
-        loadMoments(true); // Your existing function
-    }
 
-    document.getElementById('clearFilterBtn')?.addEventListener('click', () => {
+// ✅ Fixed selectUser function
+    window.selectUser = function(userId) {
+        selectedUserId = userId;
+
+        // Update both DOM and JavaScript variable
+        document.getElementById('userIdFilter').value = userId;
+        userIdFilter = String(userId);  // Update the global variable
+
+        document.getElementById('usersFilterInfo').classList.add('visible');
+
+        // Update active state
+        document.querySelectorAll('.user-list-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.userId == userId);
+        });
+
+        // Reset and reload moments
+        currentPage = 1;
+        allMomentsLoaded = [];
+        currentlyVisibleCount = 0;
+        searchQuery = ''; // Clear search when filtering by user
+        document.getElementById('userSearch').value = '';
+
+        loadMoments(false);
+    };
+
+// ✅ Fixed clearFilter function
+    window.clearUserFilter = function() {
         selectedUserId = null;
+        userIdFilter = '';
         document.getElementById('userIdFilter').value = '';
         document.getElementById('usersFilterInfo').classList.remove('visible');
         document.querySelectorAll('.user-list-item').forEach(el => el.classList.remove('active'));
-        loadMoments(true);
-    });
 
-    document.getElementById('usersListSearch')?.addEventListener('input', e => {
-        clearTimeout(window.usersSearchTimeout);
-        window.usersSearchTimeout = setTimeout(() => { usersSearch = e.target.value; loadUsers(true); }, 500);
+        currentPage = 1;
+        allMomentsLoaded = [];
+        currentlyVisibleCount = 0;
+
+        loadMoments(false);
+    };
+
+// Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers(true);
+
+        // Scroll handler for infinite scroll
+        const usersContainer = document.getElementById('usersListContainer');
+        if (usersContainer) {
+            usersContainer.addEventListener('scroll', function() {
+                const distanceFromBottom = this.scrollHeight - (this.scrollTop + this.clientHeight);
+                if (distanceFromBottom < 100 && !usersLoading && usersPage < usersLastPage) {
+                    usersPage++;
+                    loadUsers(false);
+                }
+            });
+        }
+
+        // Load more button click
+        document.getElementById('loadMoreUsersBtn')?.addEventListener('click', () => {
+            if (!usersLoading && usersPage < usersLastPage) {
+                usersPage++;
+                loadUsers(false);
+            }
+        });
+
+        // Clear filter button
+        document.getElementById('clearFilterBtn')?.addEventListener('click', clearUserFilter);
+
+        // Users search
+        document.getElementById('usersListSearch')?.addEventListener('input', e => {
+            clearTimeout(window.usersSearchTimeout);
+            window.usersSearchTimeout = setTimeout(() => {
+                usersSearch = e.target.value;
+                loadUsers(true);
+            }, 500);
+        });
     });
 
 })(jQuery);

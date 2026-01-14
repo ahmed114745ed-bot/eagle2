@@ -43,11 +43,11 @@
 
     <div class="users-sidebar">
         <div class="users-sidebar-header">
-            <h3><i class="fas fa-users"></i> Users with Moments <span id="usersTotalCount"></span></h3>
+            <h3><i class="fas fa-users"></i>{{ __('Users with Moments') }}<span id="usersTotalCount"></span></h3>
         </div>
         <div class="users-search-box">
             <input type="text" id="usersListSearch" class="users-list-search"
-                   placeholder="{{ __('moment_viewer.searchUsers') ?? 'Search users...' }}">
+                   placeholder="{{ __('search by name, UUID or ID') ?? 'Search users...' }}">
         </div>
         <div class="users-filter-info" id="usersFilterInfo">
             <button id="clearFilterBtn" class="clear-filter-btn">

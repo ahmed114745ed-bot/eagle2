@@ -4474,5 +4474,7 @@
     "Area manager": "Bölgeler Sistemi",
     "SuperAdmin": "Ülkeler Sistemi",
     "withdrawal pending": "Çekim beklemede",
+    "search by name, UUID or ID": "İsim, UUID veya ID ile ara",
+    "Users with Moments": "Momentleri Olan Kullanıcılar",
     "Group chat": "Sohbet"
 }
