@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class MoveEmojiCategoryAction extends RowAction
 {
+    protected static $categories;
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
@@ -35,21 +36,20 @@ class MoveEmojiCategoryAction extends RowAction
     {
         $locale = app()->getLocale();
 
-        // Category select
-        $this->select('category_id', __('Select Category'))
-            ->options(function () use ($locale) {
-
-                $categories = [];
-                foreach (EmojiCategory::get() as $category) {
+        // Load categories once
+        if (!isset(self::$categories)) {
+            self::$categories = EmojiCategory::get()
+                ->mapWithKeys(function ($category) use ($locale) {
                     $title = $category->title[$locale]
                         ?? $category->title['en']
                         ?? reset($category->title);
 
-                    $categories[$category->id] = $title;
-                }
+                    return [$category->id => $title];
+                })->toArray();
+        }
 
-                return $categories;
-            })
+        $this->select('category_id', __('Select Category'))
+            ->options(self::$categories)
             ->required();
     }
 }

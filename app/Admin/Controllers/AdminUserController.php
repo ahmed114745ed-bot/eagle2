@@ -6,14 +6,11 @@ use App\Models\Admin;
 use App\Models\Agency;
 use App\Models\Agent;
 use App\Models\User;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
-use Modules\RoleRewards\Helpers\UserRewardHelper;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
-use function Doctrine\Common\Cache\Psr6\get;
 
 class AdminUserController extends EncorUsersController
 {

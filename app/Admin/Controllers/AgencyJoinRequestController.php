@@ -95,6 +95,14 @@ class AgencyJoinRequestController extends MainController
 
 
         $grid->model()
+            ->with([
+                'user',
+                'agency',
+                'user.profile',
+                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'changeStatusAdminAdmin', // eager load Admin
+                'changeStatusAdminUser',
+            ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID))
@@ -121,6 +129,7 @@ class AgencyJoinRequestController extends MainController
         $grid->id(__('ID'));
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
+                $name = $this->user->name ?? '';
                 $uid = @$this->user->uuid;
                 $path = @$this->user?->profile?->avatar;
                 $defaultImage = asset("images/businessman-icon.jpg");
@@ -145,7 +154,8 @@ class AgencyJoinRequestController extends MainController
             ";
             });
         $grid->column('agency.name', __('Agency'))
-            ->display(function ($name) {
+            ->display(function () {
+                $name = $this->agency->name ?? '';
                 $path = @$this->agency->img;
                 $defaultImage = asset("images/icon-agency.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
@@ -194,8 +204,8 @@ class AgencyJoinRequestController extends MainController
         });
         $grid->column('change_status_admin_id', __('Change Status Admin'))
             ->display(function () {
-                $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
-
+                //$admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
+                $admin = $this->changeStatusAdminAdmin ?? $this->changeStatusAdminUser;
                 if (!$admin) {
                     return '-';
                 }

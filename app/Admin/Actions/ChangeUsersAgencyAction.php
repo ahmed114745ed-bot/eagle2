@@ -20,6 +20,7 @@ use Illuminate\Validation\ValidationException;
 class ChangeUsersAgencyAction extends RowAction
 {
     public $name;
+    protected static $agencyOptions = null;
 
     public $id;
 
@@ -36,6 +37,7 @@ class ChangeUsersAgencyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
+
         $oldAgencyId = $request->old_agency_id;
         $newAgencyId = $request->new_agency_id;
 
@@ -64,7 +66,7 @@ class ChangeUsersAgencyAction extends RowAction
         foreach ($users as $user) {
 
             $this->handleUserSalaries($user);
-            $this->clearUserAgencyLogs($user ,$oldAgencyId);
+            $this->clearUserAgencyLogs($user, $oldAgencyId);
             $user->agency_id = $newAgencyId;
             $user->save();
 
@@ -94,11 +96,11 @@ class ChangeUsersAgencyAction extends RowAction
      */
     private function handleUserSalaries(User $user)
     {
-   
+
         $agencyId = $user->agency_id;
         $timezone = getTimezone();
-        $currentMonth = now( $timezone)->month;
-        $currentYear = now( $timezone)->year;
+        $currentMonth = now($timezone)->month;
+        $currentYear = now($timezone)->year;
 
         $userSalaries = UserSallary::query()
             ->where('user_id', $user->id)
@@ -107,43 +109,67 @@ class ChangeUsersAgencyAction extends RowAction
             ->where('year', $currentYear)
             ->where('is_finished', 0)
             ->first();
-         
+
         if (!$userSalaries) return;
-       
+
         if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
-          
+
             $userSalaries->update(['is_finished' => 1]);
         }
-    
     }
 
 
-    private function clearUserAgencyLogs(User $user,$agencyId)
+    private function clearUserAgencyLogs(User $user, $agencyId)
     {
         GiftLog::query()->where('receiver_id', $user->id)
-        ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
+            ->where('agency_id', $agencyId)->update(['is_finished' => 1]);
         AgencyUserJob::where(['user_id' => $user->id, 'agency_id' => $agencyId])->delete();
     }
 
     public function form()
     {
         $this->hidden('old_agency_id', __('id'))->value($this->id);
-        $this->select('new_agency_id', __('agency id'))->options(function ($value) {
-            $ops2 = [];
-            foreach (
-                Agency::where('id', '!=', $this->id)->where(function ($query) {
-                    $query->WhereDoesntHave('additionalInfo')->orWhereHas(
-                        'additionalInfo',
-                        function ($query) {
-                            $query->where('status', 1);
-                        }
-                    );
-                })->get() as $agency
-            ) {
-                $ops2[$agency->id] = $agency->id . '_' . $agency->name;
-            }
-            return $ops2;
-        });
+        // $this->select('new_agency_id', __('agency id'))->options(function ($value) {
+        //     $ops2 = [];
+        //     foreach (
+        //         Agency::where('id', '!=', $this->id)->where(function ($query) {
+        //             $query->WhereDoesntHave('additionalInfo')->orWhereHas(
+        //                 'additionalInfo',
+        //                 function ($query) {
+        //                     $query->where('status', 1);
+        //                 }
+        //             );
+        //         })->get() as $agency
+        //     ) {
+        //         $ops2[$agency->id] = $agency->id . '_' . $agency->name;
+        //     }
+        //     return $ops2;
+        // });
+
+        $this->select('new_agency_id', __('agency id'))
+            ->options(function () {
+                // 🔥 QUERY RUNS ONLY ONCE
+                if (self::$agencyOptions === null) {
+                    self::$agencyOptions = Agency::query()
+                        ->where('type', 1)
+                        ->where(function ($query) {
+                            $query->whereDoesntHave('additionalInfo')
+                                ->orWhereHas('additionalInfo', fn($q) => $q->where('status', 1));
+                        })
+                        ->select('id', 'name')
+                        ->get()
+                        ->mapWithKeys(fn($agency) => [
+                            $agency->id => $agency->id . '_' . $agency->name
+                        ])
+                        ->toArray();
+                }
+
+                // remove current agency from list
+                return collect(self::$agencyOptions)
+                    ->except([$this->id])
+                    ->toArray();
+            })
+            ->required();
     }
 
     public function html()
