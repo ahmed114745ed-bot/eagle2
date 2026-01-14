@@ -23,7 +23,7 @@ class BannerEvent implements ShouldBroadcast
         $this->data = $data;
         $this->channel = $data['messageContent']['event'];
 
-      
+  
     }
 
     public function broadcastOn()
