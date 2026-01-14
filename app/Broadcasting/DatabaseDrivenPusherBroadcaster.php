@@ -3,22 +3,27 @@
 namespace App\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Pusher\Pusher;
 
 /**
  * Custom Pusher Broadcaster that ALWAYS reads from database
- * Octane-compatible - no caching, fresh DB read every time
+ * Octane-compatible - checks for config changes on EVERY broadcast
  */
 class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
 {
     /**
+     * Track current config hash to detect changes
+     */
+    private static ?string $currentConfigHash = null;
+    
+    /**
      * Create a new broadcaster instance.
-     * ALWAYS reads fresh from database - bypasses all caches
      */
     public function __construct()
     {
-        // Read fresh from database every single time
+        // Read fresh from database
         $config = $this->getFreshConfigFromDatabase();
         
         // Create Pusher instance with DB config
@@ -32,14 +37,89 @@ class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
             ]
         );
         
+        // Store config hash
+        self::$currentConfigHash = $this->hashConfig($config);
+        
         // Call parent constructor with Pusher instance
         parent::__construct($pusher);
+    }
+    
+    /**
+     * Broadcast the given event - CHECKS FOR CONFIG CHANGES FIRST
+     * This is the key method that runs on EVERY broadcast
+     *
+     * @param  array  $channels
+     * @param  string  $event
+     * @param  array  $payload
+     * @return void
+     */
+    public function broadcast(array $channels, $event, array $payload = [])
+    {
+        // ⭐ CRITICAL: Check if config changed before broadcasting
+        $this->refreshPusherIfConfigChanged();
         
-        Log::debug('DatabaseDrivenPusherBroadcaster.created', [
-            'app_id' => $config['app_id'],
-            'cluster' => $config['app_cluster'],
-            'timestamp' => now()->toDateTimeString(),
-        ]);
+        return parent::broadcast($channels, $event, $payload);
+    }
+    
+    /**
+     * Check if Pusher config changed and rebuild if needed
+     */
+    private function refreshPusherIfConfigChanged(): void
+    {
+        try {
+            // Check for force update flag
+            $forceUpdate = Cache::has('pusher_config_changed');
+            
+            // Get fresh config
+            $freshConfig = $this->getFreshConfigFromDatabase();
+            $newHash = $this->hashConfig($freshConfig);
+            
+            // Rebuild if config changed or forced
+            if ($forceUpdate || self::$currentConfigHash !== $newHash) {
+                // Create new Pusher instance
+                $this->pusher = new Pusher(
+                    $freshConfig['app_key'],
+                    $freshConfig['app_secret'],
+                    $freshConfig['app_id'],
+                    [
+                        'cluster' => $freshConfig['app_cluster'] ?? 'mt1',
+                        'useTLS' => true,
+                    ]
+                );
+                
+                self::$currentConfigHash = $newHash;
+                
+                // Clear the flag after applying
+                if ($forceUpdate) {
+                    Cache::forget('pusher_config_changed');
+                }
+                
+                Log::info('DatabaseDrivenPusherBroadcaster.config_refreshed', [
+                    'app_id' => $freshConfig['app_id'],
+                    'cluster' => $freshConfig['app_cluster'],
+                    'forced' => $forceUpdate,
+                    'pid' => getmypid(),
+                    'timestamp' => now()->toDateTimeString(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('DatabaseDrivenPusherBroadcaster.refresh_error', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+    
+    /**
+     * Generate config hash for change detection
+     */
+    private function hashConfig(array $config): string
+    {
+        return md5(json_encode([
+            $config['app_key'] ?? '',
+            $config['app_secret'] ?? '',
+            $config['app_id'] ?? '',
+            $config['app_cluster'] ?? '',
+        ]));
     }
     
     /**
