@@ -77,7 +77,7 @@ return [
             FlushSessionState::class,
             FlushLocaleState::class,
             FlushQueuedCookies::class,
-            \App\Listeners\RefreshPusherConfigListener::class, // ⭐ تحديث Pusher config من الـ database
+            \App\Listeners\RefreshPusherConfigListener::class, // ⭐ تحديث Pusher config من الـ database مع كل request
         ],
 
         RequestTerminated::class => [
@@ -159,6 +159,8 @@ return [
         'request',
         'Illuminate\Http\Response',
         \Illuminate\Broadcasting\BroadcastManager::class,
+        // Config must NOT be flushed - runtime updates stay in memory
+        // 'config' removed intentionally
     ],
 
     /*

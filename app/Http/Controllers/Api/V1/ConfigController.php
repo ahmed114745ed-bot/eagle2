@@ -163,6 +163,7 @@ class ConfigController extends Controller
         
         // Batch updates to minimize observer triggers and cache churn
         $updatedKeys = [];
+        $hasPusherUpdate = false;
         
         foreach ($keys as $key) {
             $value = $request->input($key);
@@ -175,6 +176,10 @@ class ConfigController extends Controller
             $updatedKeys[] = $key;
             Cache::forget($key);
             Cache::forever($key, $value);
+            
+            if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
+                $hasPusherUpdate = true;
+            }
         }
 
         // Clear only Pusher-related cache, not all cache
@@ -189,8 +194,18 @@ class ConfigController extends Controller
             Cache::store('octane')->flush();
         }
         
-        // Ensure runtime config is updated for Pusher (Observer handles this)
-        // This log helps trace when config updates happen
+        // Force runtime config update for Pusher if needed
+        if ($hasPusherUpdate) {
+            \App\Services\OctaneBroadcasterService::updateRuntimeConfigFromDb();
+            \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+            Log::info('pusher_config_force_updated', [
+                'source' => 'updateConfigAgoraZego',
+                'updated_keys' => $updatedKeys,
+                'user_id' => auth()->id(),
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        }
+
         Log::info('updateConfigAgoraZego', [
             'updated_keys' => $updatedKeys,
             'user_id' => auth()->id(),

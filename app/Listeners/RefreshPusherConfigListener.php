@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use Illuminate\Support\Facades\Cache;
+use App\Services\OctaneBroadcasterService;
 use Illuminate\Support\Facades\Config;
 use Laravel\Octane\Events\RequestReceived;
 
@@ -12,36 +12,40 @@ class RefreshPusherConfigListener
      * Handle the event.
      * 
      * This listener refreshes the Pusher configuration from the database
-     * ONLY when the config has changed (detected via cache flag).
-     * This is more efficient than flushing BroadcastManager on every request.
+     * on EVERY request, ensuring that runtime config is always up-to-date.
+     * 
+     * This is executed as part of RequestReceived in Octane,
+     * so it runs before any controllers/middleware.
      */
     public function handle(RequestReceived $event): void
     {
         try {
-            // Check if Pusher config was changed
-            if (Cache::pull('pusher_config_changed')) {
-                // Flush the BroadcastManager to force recreation with new config
-                if ($event->app->resolved('Illuminate\Broadcasting\BroadcastManager')) {
-                    $event->app->forgetInstance('Illuminate\Broadcasting\BroadcastManager');
-                }
-                
-                // Get fresh config from database (cache was already cleared)
-                $config = getPusherConfig();
+            // Always read fresh Pusher config from database
+            $pusherConfig = getPusherConfig();
 
-                if (
-                    $config &&
-                    !empty($config['app_key']) &&
-                    !empty($config['app_secret']) &&
-                    !empty($config['app_id'])
-                ) {
-                    Config::set('broadcasting.connections.pusher.key', $config['app_key']);
-                    Config::set('broadcasting.connections.pusher.secret', $config['app_secret']);
-                    Config::set('broadcasting.connections.pusher.app_id', $config['app_id']);
-                    Config::set('broadcasting.connections.pusher.options.cluster', $config['app_cluster'] ?? 'mt1');
+            if (
+                $pusherConfig &&
+                !empty($pusherConfig['app_key']) &&
+                !empty($pusherConfig['app_secret']) &&
+                !empty($pusherConfig['app_id'])
+            ) {
+                // Update runtime config with fresh values from database
+                Config::set([
+                    'broadcasting.connections.pusher.key' => $pusherConfig['app_key'],
+                    'broadcasting.connections.pusher.secret' => $pusherConfig['app_secret'],
+                    'broadcasting.connections.pusher.app_id' => $pusherConfig['app_id'],
+                    'broadcasting.connections.pusher.options.cluster' => $pusherConfig['app_cluster'] ?? 'mt1',
+                ]);
+
+                // Rebuild broadcaster with fresh credentials if in Octane
+                if (OctaneBroadcasterService::isOctane()) {
+                    OctaneBroadcasterService::rebuildBroadcaster();
                 }
             }
         } catch (\Throwable $e) {
             // Silently fail - don't break the request
+            // Log only if needed: \Log::error('RefreshPusherConfigListener error', ['error' => $e->getMessage()]);
         }
     }
 }
+
