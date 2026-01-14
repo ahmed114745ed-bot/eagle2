@@ -99,11 +99,11 @@ class UserWithdrawalController extends MainController
 
             return <<<HTML
             <button class="btn btn-success btn-sm approve-btn" data-url="{$approveUrl}">
-                ✔ {$approveText}
+                ✔
             </button>
 
             <button class="btn btn-danger btn-sm reject-btn" data-url="{$rejectUrl}">
-                ✖ {$rejectText}
+                ✖
             </button>
         HTML;
         })->width(160);

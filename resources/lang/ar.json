@@ -5155,5 +5155,7 @@
     "Area manager": "نظام المناطق",
     "SuperAdmin": "نظام الدول",
     "withdrawal pending": "في انتظار السحب",
+    "search by name, UUID or ID": "ابحث بالاسم أو UUID أو ID",
+    "Users with Moments": "المستخدمون الذين لديهم لحظات",
     "Group chat": "الدردشة"
 }
