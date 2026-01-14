@@ -75,7 +75,15 @@ class ReportMomentController extends MainController
     {
         $grid = new Grid(new ReportMoment());
         $grid->model()->whereHas('moment')->orderByDesc('id');
-        $grid->model()->with(['moment' => fn($query) => $query->withExists(['likes', 'comments'])]);
+        $grid->model()->with([
+            'reporter',
+            'reporter.profile',
+            'reporter.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reportedUser',
+            'reportedUser.profile',
+            'reportedUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'moment' => fn($query) => $query->withExists(['likes', 'comments'])
+        ]);
 
         $grid->column('id', __('Id'));
 
@@ -86,7 +94,7 @@ class ReportMomentController extends MainController
             $name = $this->reporter->name;
             $uuid = $this->reporter->uuid;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->reporter->avatar;
+            $avatarPath = @$this->reporter->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
@@ -107,7 +115,7 @@ class ReportMomentController extends MainController
             $name = $this->reportedUser->name;
             $uuid = $this->reportedUser->uuid;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->reportedUser->avatar;
+            $avatarPath = @$this->reportedUser->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
@@ -120,11 +128,6 @@ class ReportMomentController extends MainController
                         </div>
                     </div>";
         });
-
-
-
-
-
 
         $grid->column('moment_id', __('View Moment'))->modal(__('moment'), function ($model) {
             return self::getRoomsShow($model->moment);
