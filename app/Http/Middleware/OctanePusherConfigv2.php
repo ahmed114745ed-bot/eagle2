@@ -13,7 +13,7 @@ class OctanePusherConfigv2
 {
     public function handle(Request $request, Closure $next)
     {
-        $config = getPusherConfig(); // نفس الفنكشن اللي كنت بتستخدمها
+        $config = getPusherConfig(); 
 
         if ($config) {
             Config::set('broadcasting.connections.pusher.key', $config['app_key'] ?? null);

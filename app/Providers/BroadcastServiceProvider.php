@@ -50,19 +50,19 @@ class BroadcastServiceProvider extends ServiceProvider
                 'app_cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
             ];
         }
-        
 
-        // Create fresh Pusher instance
-        $pusher = new Pusher(
-            $config['app_key'],
-            $config['app_secret'],
-            $config['app_id'],
-            [
-                'cluster' => $config['app_cluster'] ?? 'mt1',
-                'useTLS' => true,
-            ]
-        );
 
-        return new PusherBroadcaster($pusher);
+        // // Create fresh Pusher instance
+        // $pusher = new Pusher(
+        //     $config['app_key'],
+        //     $config['app_secret'],
+        //     $config['app_id'],
+        //     [
+        //         'cluster' => $config['app_cluster'] ?? 'mt1',
+        //         'useTLS' => true,
+        //     ]
+        // );
+
+        // return new PusherBroadcaster($pusher);
     }
 }
