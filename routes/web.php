@@ -1542,14 +1542,14 @@ Route::get('/test-pusher-broadcast', function () {
             '�🔥 COMPARISON' => [
                 'from_database_FRESH' => [
                     'app_id' => $dbConfig['app_id'],
-                    'app_key' => substr($dbConfig['app_key'] ?? '', 0, 8) . '...',
-                    'app_secret' => substr($dbConfig['app_secret'] ?? '', 0, 8) . '...',
+                    'app_key' => substr($dbConfig['app_key'] ?? '', 0, 100) . '...',
+                    'app_secret' => substr($dbConfig['app_secret'] ?? '', 0, 100) . '...',
                     'app_cluster' => $dbConfig['app_cluster'],
                 ],
                 'from_config_CACHED_STALE' => [
                     'app_id' => $configCached['app_id'],
-                    'key' => substr($configCached['key'] ?? '', 0, 8) . '...',
-                    'secret' => substr($configCached['secret'] ?? '', 0, 8) . '...',
+                    'key' => substr($configCached['key'] ?? '', 0, 100) . '...',
+                    'secret' => substr($configCached['secret'] ?? '', 0, 100) . '...',
                     'cluster' => $configCached['cluster'],
                 ],
                 'broadcaster_actual_instance' => $actualPusherConfig,
