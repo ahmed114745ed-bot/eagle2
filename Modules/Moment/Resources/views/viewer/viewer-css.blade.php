@@ -325,9 +325,9 @@
     }
 
     /* RTL Support for Dropdown */
-    html.rtl .dropdown-menu,
-    html[dir="rtl"] .dropdown-menu,
-    [dir="rtl"] .dropdown-menu {
+    html.rtl .dropdown-menu.different,
+    html[dir="rtl"] .dropdown-menu.different,
+    [dir="rtl"] .dropdown-menu.different {
         text-align: right;
         right: 0% !important;
         left: auto;
@@ -1070,8 +1070,8 @@
         }
 
         .viewer-header {
-            margin: 0 8px 12px;
-            padding: 12px 16px;
+            margin: 0 8px 12px !important;
+            padding: 12px 16px !important;
         }
 
         .viewer-title {
@@ -1202,8 +1202,8 @@
         }
 
         .viewer-header {
-            margin: 0 4px 8px;
-            padding: 10px 12px;
+            margin: 0 4px 8px !important;
+            padding: 10px 12px !important;
         }
 
         .viewer-title {

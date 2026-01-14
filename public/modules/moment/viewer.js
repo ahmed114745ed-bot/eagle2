@@ -434,7 +434,7 @@
                         <button class="menu-btn" onclick="toggleMenu(${moment.id}, event)">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div class="dropdown-menu" id="menu-${moment.id}">
+                        <div class="dropdown-menu different" id="menu-${moment.id}">
                             <button class="dropdown-item" onclick="editMoment(${moment.id}, event)">
                                 <i class="fas fa-edit"></i>
                                 <span>${texts.editDesc || 'Edit Description'}</span>
