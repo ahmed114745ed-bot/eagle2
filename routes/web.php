@@ -299,6 +299,10 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Override Grid Sortable Route for Octane compatibility (outside admin group)
+Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
+    ->middleware(['web', 'admin'])
+    ->name('laravel-admin-grid-sortable');
 
 Route::group(
     [
@@ -315,10 +319,8 @@ Route::group(
     ],
     function () {
         // Gift Categories Cache Clear (for Octane compatibility)
-        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])
-            ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
-            ->name('gift-categories.clear-cache');
-
+        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])->name('gift-categories.clear-cache');
+        
         // Gift Categories Sortable Route (for Octane compatibility)
         Route::post('gift-categories/sort-update', [\App\Admin\Controllers\GiftCategoryController::class, 'sortUpdate'])
             ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)

@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use App\Models\GiftCategory;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
 
 class GiftCategoryController extends MainController
@@ -228,14 +229,11 @@ class GiftCategoryController extends MainController
         $grid->column('sort', __('Sort Order'))->width(80)->sortable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
-
-            // $value is already an array because of casts
             return $value[$locale] ?? ($value['en'] ?? '');
         });
         $grid->column('type', __('type'));
 
         $this->extendGrid($grid);
-
         $grid->disableExport();
         $grid->disableRowSelector();
         
@@ -336,6 +334,7 @@ class GiftCategoryController extends MainController
         $show = new Show(GiftCategory::findOrFail($id));
 
         $show->field('id', __('Id'));
+        $show->field('sort', __('Sort'));
         $show->field('title', __('Title'));
         $show->field('type', __('Type'));
         $show->field('created_at', __('Created at'));
@@ -366,6 +365,7 @@ class GiftCategoryController extends MainController
             'cp'         => __('CP'),
             'vip'        => __('VIP'),
         ])->required();
+        
         $form->number('sort', __('sort'))
             ->rules('required|integer|min:1')      // minimum value 1
             ->required();
@@ -374,6 +374,9 @@ class GiftCategoryController extends MainController
         $form->saving(function (Form $form) {
             $titles = request()->input('title', []);
             $form->model()->title = $titles;
+            
+            // Clear cache when saving
+            Cache::tags(['gift_categories'])->flush();
         });
 
         return $form;
