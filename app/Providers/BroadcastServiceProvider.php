@@ -36,30 +36,28 @@ class BroadcastServiceProvider extends ServiceProvider
 
     /**
      * Register custom database-driven Pusher broadcaster
-     * Creates new instance on every call - no caching
+     * ⭐ NO singleton - extend() called on EVERY app instance
+     * Octane flush ensures BroadcastManager is destroyed after each request
      */
     private function registerDatabaseDrivenBroadcaster()
     {
-        // ⭐ Use singleton to ensure extend() is called once per app instance
-        $this->app->singleton('broadcast.pusher.extended', function () {
-            $this->app->make(BroadcastManager::class)->extend('pusher', function ($app, $config) {
-                // ⭐ Return custom broadcaster that reads from DB in constructor
-                // Fresh instance created every time - Octane flush ensures this
-                try {
-                    Log::debug('BroadcastServiceProvider.creating_database_driven_broadcaster');
-                    return new DatabaseDrivenPusherBroadcaster();
-                } catch (\Throwable $e) {
-                    Log::error('BroadcastServiceProvider.broadcaster_creation_failed', [
-                        'error' => $e->getMessage(),
-                        'line' => $e->getLine(),
-                    ]);
-                    throw $e;
-                }
-            });
-            return true;
+        // ⭐ Direct extend - NO singleton to avoid caching in Octane
+        $this->app->make(BroadcastManager::class)->extend('pusher', function ($app, $config) {
+            // ⭐ Return NEW broadcaster instance - reads fresh from DB every time
+            // Constructor calls getPusherConfig() which reads directly from database
+            try {
+                Log::debug('BroadcastServiceProvider.creating_database_driven_broadcaster', [
+                    'pid' => getmypid(),
+                    'timestamp' => now()->toDateTimeString(),
+                ]);
+                return new DatabaseDrivenPusherBroadcaster();
+            } catch (\Throwable $e) {
+                Log::error('BroadcastServiceProvider.broadcaster_creation_failed', [
+                    'error' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                ]);
+                throw $e;
+            }
         });
-        
-        // Resolve immediately to trigger registration
-        $this->app->make('broadcast.pusher.extended');
     }
 }

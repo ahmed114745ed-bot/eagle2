@@ -219,11 +219,18 @@ return [
     |--------------------------------------------------------------------------
     | Cache
     |--------------------------------------------------------------------------
+    |
+    | ⭐ Enabled for general app performance
+    | Broadcasting/Pusher config excluded via:
+    | - ForcePusherRefresh middleware (reads DB every request)
+    | - DatabaseDrivenPusherBroadcaster (reads DB on every broadcast)
+    | - BroadcastManager flush (destroyed after each request)
+    |
     */
 
     'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
+        'rows' => 1000,   // ⭐ Normal cache for app performance
+        'bytes' => 10000, // ⭐ Normal cache for app performance
     ],
 
 ];
