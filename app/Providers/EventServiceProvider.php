@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use Illuminate\Queue\Events\JobProcessing;
 use Laravel\Octane\Events\TickReceived;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -25,6 +26,11 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\PusherConfigUpdated::class => [
             \App\Listeners\UpdateBroadcasterConfig::class,
+        ],
+        // ⭐ Queue: Refresh Pusher config before each job processes
+        // This ensures broadcast jobs use fresh DB credentials
+        JobProcessing::class => [
+            \App\Listeners\RefreshPusherConfigBeforeJob::class,
         ],
     ];
 

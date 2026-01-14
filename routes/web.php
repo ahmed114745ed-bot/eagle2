@@ -1393,6 +1393,58 @@ Route::get('/debug/pusher-config', function () {
         'debug_meta' => $meta,
     ], 200, [], JSON_PRETTY_PRINT);
 });
+
+// Debug: Check Queue Workers status and Pusher config sync
+Route::get('/debug/queue-pusher-status', function () {
+    $dbConfig = getPusherConfig();
+    $runtimeConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    $mask = function ($value) {
+        if (!is_string($value) || $value === '') return $value;
+        $len = strlen($value);
+        if ($len <= 8) return str_repeat('*', max(0, $len - 2)) . substr($value, -2);
+        return substr($value, 0, 4) . str_repeat('*', $len - 8) . substr($value, -4);
+    };
+    
+    $dbKeyMasked = $mask($dbConfig['app_key'] ?? '');
+    $runtimeKeyMasked = $mask($runtimeConfig['key'] ?? '');
+    
+    $isInSync = ($dbConfig['app_key'] ?? '') === ($runtimeConfig['key'] ?? '')
+             && ($dbConfig['app_secret'] ?? '') === ($runtimeConfig['secret'] ?? '')
+             && ($dbConfig['app_id'] ?? '') === ($runtimeConfig['app_id'] ?? '');
+    
+    return response()->json([
+        'status' => $isInSync ? '✅ IN_SYNC' : '❌ OUT_OF_SYNC',
+        'database' => [
+            'app_id' => $dbConfig['app_id'] ?? null,
+            'app_key' => $dbKeyMasked,
+            'app_cluster' => $dbConfig['app_cluster'] ?? null,
+        ],
+        'runtime' => [
+            'app_id' => $runtimeConfig['app_id'] ?? null,
+            'key' => $runtimeKeyMasked,
+            'cluster' => $runtimeConfig['cluster'] ?? null,
+        ],
+        'queue_info' => [
+            'pusher_config_changed_flag' => Cache::has('pusher_config_changed'),
+            'queue_restart_requested_at' => Cache::get('queue_restart_requested_at'),
+            'octane_broadcaster_rebuilt_at' => Cache::get('octane_broadcaster_rebuilt_at'),
+        ],
+        'recommendation' => $isInSync 
+            ? 'Config is synchronized. No action needed.'
+            : 'Config out of sync! Run: php artisan queue:restart',
+        'meta' => [
+            'pid' => getmypid(),
+            'timestamp' => now()->toDateTimeString(),
+        ],
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 Route::get('/test-pusher-config', function () {
     $pusherConfig = getPusherConfig();
     $laravelConfig = [

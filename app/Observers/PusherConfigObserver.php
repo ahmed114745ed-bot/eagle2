@@ -110,6 +110,10 @@ class PusherConfigObserver
             }
         }
 
+        // 5. ⭐ CRITICAL: Restart Queue Workers to pick up new Pusher config
+        // Queue workers cache broadcaster instance and won't see DB changes without restart
+        $this->restartQueueWorkers($meta);
+
         // 4. Structured log with diff and meta
         Log::info('pusher_config_change', [
             'meta' => $meta,
@@ -159,6 +163,40 @@ class PusherConfigObserver
             ]);
         } catch (\Exception $e) {
             Log::error('pusher_worker_cache_clear_error', ['message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Restart Queue Workers to pick up new Pusher configuration
+     * 
+     * Queue workers cache the broadcaster instance at startup.
+     * When Pusher credentials change in DB, queue workers continue
+     * using old credentials until restarted.
+     * 
+     * This method signals all queue workers to restart gracefully
+     * after completing their current job.
+     */
+    private function restartQueueWorkers(array $meta): void
+    {
+        try {
+            // Signal queue workers to restart after current job
+            // This is graceful - workers finish current job then restart
+            Artisan::call('queue:restart');
+            
+            Log::info('queue_workers_restart_signaled', [
+                'reason' => 'pusher_config_changed',
+                'timestamp' => $meta['timestamp'],
+                'triggered_by' => $meta['user_id'] ?? 'system',
+            ]);
+            
+            // Also set a cache flag so we can track when restart was requested
+            Cache::put('queue_restart_requested_at', $meta['timestamp'], 3600);
+            
+        } catch (\Exception $e) {
+            Log::error('queue_workers_restart_failed', [
+                'error' => $e->getMessage(),
+                'timestamp' => $meta['timestamp'],
+            ]);
         }
     }
 }
