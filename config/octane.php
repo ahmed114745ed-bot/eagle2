@@ -117,8 +117,37 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Watch Configuration
     |--------------------------------------------------------------------------
     |
+    | Files to watch for changes and trigger worker reload
+    | Ignore config files to prevent reloading on config changes
+    |
+    */
+
+    'watch' => [
+        'paths' => [
+            base_path('app'),
+            base_path('bootstrap'),
+            base_path('database'),
+            base_path('public'),
+            base_path('resources'),
+            base_path('routes'),
+        ],
+
+        'ignore' => [
+            base_path('config'), 
+            base_path('storage'),
+            base_path('public/uploads'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Flush Services
+    |--------------------------------------------------------------------------
+    |
+    | Services to reset after each request
     |
     */
 
