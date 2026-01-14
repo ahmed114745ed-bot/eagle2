@@ -72,14 +72,17 @@ class GiftCategoryController extends MainController
      */
     public function update($id)
     {
-        // Clear cache before update
-        Cache::tags(['gift_categories'])->flush();
+        // Clear ALL caches before update (Octane fix)
+        Cache::flush();
         
         $response = parent::update($id);
         
-        // Ensure fresh data from database for Octane
-        GiftCategory::query()->whereKey($id)->first()?->refresh();
-        Cache::tags(['gift_categories'])->flush();
+        // Force fresh data from database for Octane
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
+        
+        Cache::flush();
         
         return $response;
     }
@@ -116,7 +119,7 @@ class GiftCategoryController extends MainController
     }
     
     /**
-     * Handle sort update from grid-sortable extension (dedicated route)
+     * Handle sort update from grid-sortable extension (for Octane compatibility)
      */
     public function sortUpdate()
     {
@@ -135,14 +138,20 @@ class GiftCategoryController extends MainController
         }
         
         try {
-            // Clear cache before updating
-            Cache::tags(['gift_categories'])->flush();
+            // Clear ALL caches before updating (Octane requirement)
+            Cache::flush();
+            \Artisan::call('cache:clear');
             
-            // Disable events temporarily for bulk update
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            // Use DB transaction for atomicity
             \DB::beginTransaction();
             
             $updated = 0;
             foreach ($sorts as $sort) {
+                // Use raw DB query to bypass Eloquent caching
                 $result = \DB::table('gift_categories')
                     ->where('id', $sort['id'])
                     ->update([
@@ -150,6 +159,8 @@ class GiftCategoryController extends MainController
                         'updated_at' => now()
                     ]);
                 $updated += $result;
+                
+                \Log::info('Updated item', ['id' => $sort['id'], 'sort' => $sort['sort']]);
             }
             
             \DB::commit();
@@ -159,17 +170,26 @@ class GiftCategoryController extends MainController
                 'total_items' => count($sorts)
             ]);
             
-            // Clear cache after updating
-            Cache::tags(['gift_categories'])->flush();
+            // Clear all caches after updating
+            Cache::flush();
+            \Artisan::call('cache:clear');
             
-            // Force Octane to clear its state
             if (function_exists('opcache_reset')) {
-                opcache_reset();
+                @opcache_reset();
+            }
+            
+            // Force PHP to clear stat cache
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
             }
             
             return response()->json([
                 'status' => true,
                 'message' => 'تم تحديث الترتيب بنجاح'
+            ])->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
             ]);
             
         } catch (\Exception $e) {
@@ -194,13 +214,19 @@ class GiftCategoryController extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new GiftCategory());
+        // Force fresh query from database (Octane fix)
+        $model = new GiftCategory();
         
-        // Enable sortable - Laravel Admin Extension will handle everything
+        $grid = new Grid($model);
+        
+        // Enable sortable with custom route
         $grid->sortable();
         
+        // Force the grid to always fetch fresh data
+        $grid->model()->orderBy('sort', 'asc');
+        
         $grid->column('id', __('Id'))->width(50);
-        // $grid->column('sort', __('Order'))->width(80)->editable();
+        $grid->column('sort', __('Sort Order'))->width(80)->sortable();
         $grid->column('title', __('title'))->display(function ($value) {
             $locale = App::getLocale();
             return $value[$locale] ?? ($value['en'] ?? '');
@@ -211,65 +237,84 @@ class GiftCategoryController extends MainController
         $grid->disableExport();
         $grid->disableRowSelector();
         
-        // Add JavaScript to force reload after sort for Octane compatibility
+        // Add JavaScript to fix Octane caching issues
         $grid->tools(function ($tools) {
             $tools->append('
             <script>
             $(document).ready(function() {
-                console.log("🚀 Octane sortable fix initialized");
+                console.log("🚀 Octane sortable fix v2 initialized");
                 
-                // Clear cache when user starts dragging (before save)
+                // Override the default save handler
+                var originalSaveOrder = window.saveOrder;
+                
+                // Clear cache before sorting starts
                 $(".grid-sortable tbody").on("sortstart", function(event, ui) {
-                    console.log("⚡ Sort started - clearing Octane cache...");
-                    
-                    // Send request to clear cache
+                    console.log("⚡ Sort started - clearing cache...");
                     $.ajax({
                         url: "/admin/gift-categories/clear-cache",
                         method: "POST",
                         data: { _token: LA.token },
-                        async: false, // Synchronous to ensure cache is cleared before sort
-                        success: function(response) {
-                            console.log("✅ Cache cleared before drag:", response);
-                        },
-                        error: function(xhr) {
-                            console.error("❌ Failed to clear cache:", xhr);
-                        }
+                        async: false
                     });
                 });
                 
-                // Intercept the save order button click
+                // Intercept save order button
                 $(document).on("click", ".grid-save-order", function(e) {
-                    console.log("💾 Save order button clicked");
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log("💾 Saving order with Octane fix...");
                     
                     var $btn = $(this);
+                    var sorts = [];
                     
-                    // Clear cache before saving
+                    // Collect sort data
+                    $(".grid-sortable tbody tr").each(function(index) {
+                        sorts.push({
+                            id: $(this).data("id"),
+                            sort: index + 1
+                        });
+                    });
+                    
+                    console.log("📊 Sort data:", sorts);
+                    
+                    // Send to custom endpoint with Octane fixes
                     $.ajax({
-                        url: "/admin/gift-categories/clear-cache",
+                        url: "/admin/gift-categories/sort-update",
                         method: "POST",
-                        data: { _token: LA.token },
-                        async: false,
+                        data: {
+                            _token: LA.token,
+                            _sort: sorts
+                        },
+                        cache: false,
+                        headers: {
+                            "Cache-Control": "no-cache, no-store, must-revalidate",
+                            "Pragma": "no-cache",
+                            "Expires": "0"
+                        },
                         success: function(response) {
-                            console.log("✅ Cache cleared before save:", response);
+                            console.log("✅ Sort saved:", response);
+                            
+                            $.pjax.reload("#pjax-container");
+                            
+                            toastr.success(response.message || "تم حفظ الترتيب بنجاح");
+                            
+                            // Force reload after 1 second to ensure fresh data
+                            setTimeout(function() {
+                                console.log("🔄 Force reloading...");
+                                location.reload(true);
+                            }, 1000);
                         },
                         error: function(xhr) {
-                            console.error("❌ Failed to clear cache:", xhr);
+                            console.error("❌ Sort failed:", xhr);
+                            toastr.error("فشل حفظ الترتيب");
                         }
                     });
                     
-                    // Let the default handler run, then reload
-                    setTimeout(function() {
-                        console.log("⏳ Waiting for save to complete...");
-                        
-                        // Force reload after successful save (Octane fix)
-                        setTimeout(function() {
-                            console.log("🔄 Reloading page for fresh data from database...");
-                            location.reload(true); // Force reload from server, not cache
-                        }, 2000);
-                    }, 500);
+                    return false;
                 });
                 
-                console.log("✅ Octane sortable handlers attached successfully");
+                console.log("✅ Octane handlers ready");
             });
             </script>
             ');
