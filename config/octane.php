@@ -159,7 +159,7 @@ return [
         'session.store',
         'request',
         'Illuminate\Http\Response',
-        \Illuminate\Broadcasting\BroadcastManager::class,
+        // \Illuminate\Broadcasting\BroadcastManager::class,
         // Config must NOT be flushed - runtime updates stay in memory
         // 'config' removed intentionally
     ],
