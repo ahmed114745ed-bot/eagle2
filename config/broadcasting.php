@@ -52,19 +52,16 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => function() {
-                return getPusherConfig()['app_key'] ?? env('PUSHER_APP_KEY');
-            },
-            'secret' => function() {
-                return getPusherConfig()['app_secret'] ?? env('PUSHER_APP_SECRET');
-            },
-            'app_id' => function() {
-                return getPusherConfig()['app_id'] ?? env('PUSHER_APP_ID');
-            },
+            // ⚠️ CRITICAL: Config files CANNOT contain Closures - they break config:cache
+            // These values will be overridden at runtime by:
+            // 1. OctanePusherConfig middleware (reads from DB via getPusherConfig())
+            // 2. BroadcastServiceProvider (extends 'pusher' driver to read from DB)
+            // These are fallback values only - actual values come from database
+            'key' => env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'cluster' => function() {
-                    return getPusherConfig()['app_cluster'] ?? env('PUSHER_APP_CLUSTER');
-                },
+                'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
                 'useTLS' => true,
             ],
         ],
