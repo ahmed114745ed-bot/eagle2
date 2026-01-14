@@ -13,6 +13,12 @@ class GiftCategory extends Model
     protected $casts = [
         'title' => 'array',
     ];
+    
+    // Disable caching for Octane compatibility
+    public $timestamps = true;
+    
+    // Prevent Octane from caching this model
+    protected static $unguarded = false;
 
     public $sortable = [
         'order_column_name' => 'sort',
