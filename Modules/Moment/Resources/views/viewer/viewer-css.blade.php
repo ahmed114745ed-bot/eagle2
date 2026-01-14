@@ -1071,11 +1071,11 @@
 
         .viewer-header {
             margin: 0 8px 12px !important;
+            padding: 12px 16px !important;
         }
 
         .moments-feed {
             margin: 0 8px 12px !important;
-            padding: 12px 16px !important;
         }
 
         .viewer-title {
