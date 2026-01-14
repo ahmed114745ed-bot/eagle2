@@ -21,7 +21,10 @@ class EventServiceProvider extends ServiceProvider
         ],
         TickReceived::class => [
             \App\Listeners\OctaneRefreshCacheListener::class,
-            \App\Listeners\OctaneBroadcasterRefreshListener::class,
+            // OctaneBroadcasterRefreshListener moved to config/octane.php
+        ],
+        \App\Events\PusherConfigUpdated::class => [
+            \App\Listeners\UpdateBroadcasterConfig::class,
         ],
     ];
 

@@ -95,7 +95,8 @@ return [
 
         TickReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
-            \App\Listeners\RefreshCacheListener::class, 
+            \App\Listeners\RefreshCacheListener::class,
+            \App\Listeners\OctaneBroadcasterRefreshListener::class, // تحديث Pusher في كل Workers
         ],
 
         WorkerStopping::class => [

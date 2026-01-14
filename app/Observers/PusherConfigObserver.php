@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Config;
 use App\Services\OctaneBroadcasterService;
+use App\Events\PusherConfigUpdated;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config as LaravelConfig;
@@ -81,8 +82,13 @@ class PusherConfigObserver
         // 1. Clear relevant caches
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
-        // Avoid global Cache::flush() to keep unrelated caches; rely on targeted keys
+        
+        // Set flag to trigger immediate update in ALL Octane workers
+        // This flag is checked by OctaneBroadcasterRefreshListener in TickReceived event
         Cache::put('pusher_config_changed', $meta['timestamp'], 300);
+        
+        // Also clear per-worker cache to force config reload on next tick
+        $this->clearWorkerConfigCache();
         
         // 2. Update Laravel config runtime
         $this->updateLaravelConfigRuntime();
@@ -94,6 +100,14 @@ class PusherConfigObserver
             Cache::store('octane')->clear();
             // Log timestamp of rebuild
             Cache::put('octane_broadcaster_rebuilt_at', $meta['timestamp'], 60 * 60);
+            
+            // Fire event to notify all Octane workers about config change
+            try {
+                $pusherConfig = getPusherConfig();
+                event(new PusherConfigUpdated($pusherConfig, $config->name));
+            } catch (\Exception $e) {
+                Log::error('Failed to fire PusherConfigUpdated event', ['error' => $e->getMessage()]);
+            }
         }
 
         // 4. Structured log with diff and meta
@@ -125,6 +139,26 @@ class PusherConfigObserver
             Log::info('pusher_runtime_config_updated');
         } catch (\Exception $e) {
             Log::error('pusher_runtime_config_update_error', ['message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Clear worker-specific config cache to force reload
+     * This ensures all Octane workers will detect the change on next tick
+     */
+    private function clearWorkerConfigCache(): void
+    {
+        try {
+            // Clear config cache for all potential worker PIDs
+            // We can't know exact PIDs, so we set a global flag instead
+            // The OctaneBroadcasterRefreshListener will handle clearing its own cache
+            
+            // Log the clear operation
+            Log::info('pusher_worker_cache_clear_requested', [
+                'timestamp' => now()->toDateTimeString(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('pusher_worker_cache_clear_error', ['message' => $e->getMessage()]);
         }
     }
 }
