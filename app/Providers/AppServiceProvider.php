@@ -102,6 +102,10 @@ class AppServiceProvider extends ServiceProvider
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
+        
+        // ⭐ CRITICAL: Register Queue Job listener for Pusher config refresh
+        // This ensures ALL queue jobs use fresh Pusher config from database
+        $this->registerQueuePusherConfigRefresh();
 
         // Load your custom settings
         $start = Common::getSettingValue('week_start') ?? 'monday';
@@ -114,6 +118,63 @@ class AppServiceProvider extends ServiceProvider
                 return htmlspecialchars_decode($value, ENT_QUOTES);
             });
         }
+    }
+    
+    /**
+     * Register Queue Job listener to refresh Pusher config before each job
+     * This is critical for ensuring broadcast events use fresh credentials
+     */
+    protected function registerQueuePusherConfigRefresh(): void
+    {
+        $this->app['events']->listen(
+            \Illuminate\Queue\Events\JobProcessing::class,
+            function ($event) {
+                static $lastConfigHash = null;
+                
+                try {
+                    // Check if Pusher config changed
+                    $forceUpdate = \Illuminate\Support\Facades\Cache::has('pusher_config_changed');
+                    
+                    // Get fresh config from DB
+                    $freshConfig = getPusherConfig();
+                    $currentHash = md5(json_encode([
+                        $freshConfig['app_key'] ?? '',
+                        $freshConfig['app_secret'] ?? '',
+                        $freshConfig['app_id'] ?? '',
+                    ]));
+                    
+                    // Update if changed or forced
+                    if ($forceUpdate || $lastConfigHash !== $currentHash) {
+                        // Update Laravel runtime config
+                        \Illuminate\Support\Facades\Config::set([
+                            'broadcasting.connections.pusher.key' => $freshConfig['app_key'],
+                            'broadcasting.connections.pusher.secret' => $freshConfig['app_secret'],
+                            'broadcasting.connections.pusher.app_id' => $freshConfig['app_id'],
+                            'broadcasting.connections.pusher.options.cluster' => $freshConfig['app_cluster'] ?? 'mt1',
+                        ]);
+                        
+                        // Purge cached broadcaster
+                        app('broadcast')->purge('pusher');
+                        
+                        $lastConfigHash = $currentHash;
+                        
+                        if ($forceUpdate) {
+                            \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
+                        }
+                        
+                        \Illuminate\Support\Facades\Log::info('Queue: Pusher config refreshed', [
+                            'job' => $event->job->resolveName() ?? 'unknown',
+                            'pid' => getmypid(),
+                            'forced' => $forceUpdate,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('Queue: Pusher config refresh failed', [
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        );
     }
 
     public function dashboardAdminConfig(): void
