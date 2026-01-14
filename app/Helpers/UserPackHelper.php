@@ -9,43 +9,45 @@ use Illuminate\Support\Facades\Log;
 class UserPackHelper
 {
 
-    public static function getColorName(User $user) : string
+    protected static array $wareCache = [];
+
+    public static function getColorName(User $user): string
     {
         return self::getPacks($user)
             ->where('type', 18)
-            ->where('is_used',1)
+            ->where('is_used', 1)
             ->first()?->ware?->color ?? '';
     }
 
-    public static function getFrameImage(User $user) : string
+    public static function getFrameImage(User $user): string
     {
         $ware = self::getFrameWare($user);
         return $ware?->img2 ?? ($ware?->img1 ?? '');
     }
 
-    public static function getFrameId(User $user) : string
+    public static function getFrameId(User $user): string
     {
         $ware = self::getFrameWare($user);
         return $ware?->id ?? 0;
     }
 
-    public static function getFrameType(User $user) : string
+    public static function getFrameType(User $user): string
     {
         $ware = self::getFrameWare($user);
         return $ware?->image_type ?? '';
     }
 
-    public static function getProfileFrameId(User $user) : string
+    public static function getProfileFrameId(User $user): string
     {
         $ware = self::getProfileFrameWare($user);
         return $ware?->id ?? 0;
     }
 
-    public static function getVipIcon(User $user) : string
+    public static function getVipIcon(User $user): string
     {
         return self::getPacks($user)
             ->where('type', 10)
-            ->where('is_used',1)
+            ->where('is_used', 1)
             ->first()?->ware?->show_img ?? '';
     }
 
@@ -69,14 +71,19 @@ class UserPackHelper
             ->first();
     }
 
-    public static function getIntroImage(User $user) : string
+    // public static function getIntroImage(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 6)
+    //         ->first()?->ware?->show_img ?? '';
+    // }
+
+    public static function getIntroImage(User $user): string
     {
-        return self::getPacks($user)
-            ->where('type', 6)
-            ->first()?->ware?->show_img ?? '';
+        return self::getWare($user, 6)?->show_img ?? '';
     }
 
-    public static function getIntroFile(User $user) : string
+    public static function getIntroFile(User $user): string
     {
         $intro = self::getWare($user, 6);
 
@@ -88,52 +95,77 @@ class UserPackHelper
             ? $intro->img1
             : ($intro->img2 ?? '');
     }
-    public static function getIntroId(User $user) : string
-    {
-        return self::getPacks($user)
-            ->where('type', 6)
-            ->first()?->ware?->id ?? '';
-    }
-    public static function getIntroType(User $user) : string
-    {
-        return self::getPacks($user)
-            ->where('type', 6)
-            ->where('is_used', true)
-            ->first()?->ware?->image_type ?? '';
-    }
+    // public static function getIntroId(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 6)
+    //         ->first()?->ware?->id ?? '';
+    // }
 
-
-    public static function getBubbleImage(User $user) : string
+    public static function getIntroId(User $user): string
     {
-        return self::getPacks($user)
-            ->where('type', 5)
-            ->first()?->ware?->show_img ?? '';
+        return self::getWare($user, 6)?->id ?? '';
     }
-    public static function getBubbleId(User $user) : string
+    // public static function getIntroType(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 6)
+    //         ->where('is_used', true)
+    //         ->first()?->ware?->image_type ?? '';
+    // }
+
+    public static function getIntroType(User $user): string
     {
-        return self::getPacks($user)
-            ->where('type', 5)
-            ->first()?->ware?->id ?? '';
+        return self::getWare($user, 6)?->image_type ?? '';
     }
 
 
-    public static function getWabbleId(User $user) : string
+    // public static function getBubbleImage(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 5)
+    //         ->first()?->ware?->show_img ?? '';
+    // }
+
+    public static function getBubbleImage(User $user): string
     {
-        return self::getPacks($user)
-            ->where('type', 12)
-            ->first()?->ware?->id ?? '';
+        return self::getWare($user, 5)?->show_img ?? '';
+    }
+    // public static function getBubbleId(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 5)
+    //         ->first()?->ware?->id ?? '';
+    // }
+
+    public static function getBubbleId(User $user): string
+    {
+        return self::getWare($user, 5)?->id ?? '';
     }
 
-    public static function hasAntBan(User $user) : bool
+
+    // public static function getWabbleId(User $user): string
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', 12)
+    //         ->first()?->ware?->id ?? '';
+    // }
+
+    public static function getWabbleId(User $user): string
+    {
+        return self::getWare($user, 12)?->id ?? '';
+    }
+
+    public static function hasAntBan(User $user): bool
     {
         return self::hasPack($user, 15);
     }
 
-    public static function hasHideOnlineTime(User $user) : bool
+    public static function hasHideOnlineTime(User $user): bool
     {
         return self::hasPack($user, 20);
     }
-    public static function hasHideCountry(User $user) : bool
+    public static function hasHideCountry(User $user): bool
     {
         return self::hasPack($user, 17);
     }
@@ -157,9 +189,18 @@ class UserPackHelper
      * @param User $user
      * @return \Illuminate\Database\Eloquent\Collection|mixed
      */
-    public static function getPacks(User $user): mixed
+    // public static function getPacks(User $user): mixed
+    // {
+    //     return $user->relationLoaded('packs') ? $user->packs : $user->packs();
+    // }
+
+    public static function getPacks(User $user)
     {
-        return $user->relationLoaded('packs') ? $user->packs : $user->packs();
+        if (!$user->relationLoaded('packs')) {
+            $user->load(['packs.ware']);
+        }
+
+        return $user->packs;
     }
 
     /**
@@ -167,12 +208,24 @@ class UserPackHelper
      * @param int $type
      * @return null
      */
+    // public static function getWare(User $user, int $type)
+    // {
+    //     return self::getPacks($user)
+    //         ->where('type', $type)
+    //         ->where('is_used', true)
+    //         ->first()?->ware;
+    // }
+
     public static function getWare(User $user, int $type)
     {
-        return self::getPacks($user)
-            ->where('type', $type)
-            ->where('is_used', true)
-            ->first()?->ware;
+        $key = $user->id . '_' . $type;
+
+        if (!array_key_exists($key, self::$wareCache)) {
+            self::$wareCache[$key] = self::getPacks($user)
+                ->firstWhere('type', $type)?->ware;
+        }
+
+        return self::$wareCache[$key];
     }
 
     /**
@@ -183,9 +236,7 @@ class UserPackHelper
     public static function hasPack(User $user, int $type): bool
     {
         return self::getPacks($user)
-                ->where('type', $type)
-                ->count() > 0;
+            ->where('type', $type)
+            ->count() > 0;
     }
-
-
 }
