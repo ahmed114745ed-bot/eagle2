@@ -23,10 +23,7 @@ class BannerEvent implements ShouldBroadcast
         $this->data = $data;
         $this->channel = $data['messageContent']['event'];
 
-        // \Log::info('🚀 BannerEvent constructed', [
-        //     'channel' => $this->channel,
-        //     'data' => $this->data,
-        // ]);
+      
     }
 
     public function broadcastOn()

@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config as LaravelConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
@@ -208,9 +209,9 @@ class ConfigController extends Controller
                 $value = $request->input($key);
                 if ($value !== null) {
                     if ($key === 'pusher_app_cluster') {
-                        Config::set($configKey, $value ?? 'mt1');
+                        LaravelConfig::set($configKey, $value ?? 'mt1');
                     } else {
-                        Config::set($configKey, $value);
+                        LaravelConfig::set($configKey, $value);
                     }
                 }
             }

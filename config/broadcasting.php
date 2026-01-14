@@ -52,25 +52,22 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
+            'key' => function() {
+                return getPusherConfig()['app_key'] ?? env('PUSHER_APP_KEY');
+            },
+            'secret' => function() {
+                return getPusherConfig()['app_secret'] ?? env('PUSHER_APP_SECRET');
+            },
+            'app_id' => function() {
+                return getPusherConfig()['app_id'] ?? env('PUSHER_APP_ID');
+            },
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'cluster' => function() {
+                    return getPusherConfig()['app_cluster'] ?? env('PUSHER_APP_CLUSTER');
+                },
                 'useTLS' => true,
             ],
         ],
-
-        // 'pusher' => [
-        //     'driver' => 'pusher',
-        //     'key' => getPusherConfig()['app_key'],
-        //     'secret' => getPusherConfig()['app_secret'],
-        //     'app_id' => getPusherConfig()['app_id'],
-        //     'options' => [
-        //         'cluster' => getPusherConfig()['app_cluster'],
-        //         'useTLS' => true,
-        //     ],
-        // ],
 
         'ably' => [
             'driver' => 'ably',
