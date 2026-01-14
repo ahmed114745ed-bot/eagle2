@@ -117,11 +117,8 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Flush Services
     |--------------------------------------------------------------------------
     |
-    | هذه الـ services يتم إعادة تحميلها مع كل request
-    | مهم جداً لتجنب مشاكل الـ state
     |
     */
 
@@ -132,6 +129,7 @@ return [
         'session.store',
         'request',
         'Illuminate\Http\Response',
+        \Illuminate\Broadcasting\BroadcastManager::class,
     ],
 
     /*

@@ -161,28 +161,42 @@ class ConfigController extends Controller
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
         
+        // Batch updates to minimize observer triggers and cache churn
+        $updatedKeys = [];
+        
         foreach ($keys as $key) {
-            $config = Config::where('name', $key)->first();
-
-            if ($config) {
-                $config->value = $request->input($key);
-            } else {
-                $config = new Config();
-                $config->name = $key;
-                $config->value = $request->input($key);
-            }
-
-         
-            $config->save();
+            $value = $request->input($key);
+            
+            Config::updateOrCreate(
+                ['name' => $key],
+                ['value' => $value]
+            );
+            
+            $updatedKeys[] = $key;
             Cache::forget($key);
-            Cache::forever($key, $request->input($key));
+            Cache::forever($key, $value);
         }
 
+        // Clear only Pusher-related cache, not all cache
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
-        Cache::flush();
-        Artisan::call('config:cache');
-        Cache::store('octane')->flush();
+        
+        // Avoid global Cache::flush() - it breaks unrelated caches
+        // Artisan::call('config:cache');  // Skip this to avoid overwriting runtime updates
+        
+        // Clear Octane in-memory cache only
+        if (method_exists(Cache::store('octane'), 'flush')) {
+            Cache::store('octane')->flush();
+        }
+        
+        // Ensure runtime config is updated for Pusher (Observer handles this)
+        // This log helps trace when config updates happen
+        Log::info('updateConfigAgoraZego', [
+            'updated_keys' => $updatedKeys,
+            'user_id' => auth()->id(),
+            'timestamp' => now()->toDateTimeString(),
+        ]);
+
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         
         if ($request->has('current_tab')) {
