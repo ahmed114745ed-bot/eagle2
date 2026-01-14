@@ -196,8 +196,28 @@ class ConfigController extends Controller
         
         // Force runtime config update for Pusher if needed
         if ($hasPusherUpdate) {
-            \App\Services\OctaneBroadcasterService::updateRuntimeConfigFromDb();
+            // Set runtime config DIRECTLY from request values to ensure no delay
+            $pusherMapping = [
+                'pusher_app_key' => 'broadcasting.connections.pusher.key',
+                'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
+                'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
+                'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
+            ];
+            
+            foreach ($pusherMapping as $key => $configKey) {
+                $value = $request->input($key);
+                if ($value !== null) {
+                    if ($key === 'pusher_app_cluster') {
+                        Config::set($configKey, $value ?? 'mt1');
+                    } else {
+                        Config::set($configKey, $value);
+                    }
+                }
+            }
+            
+            // Rebuild broadcaster with updated runtime config
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+            
             Log::info('pusher_config_force_updated', [
                 'source' => 'updateConfigAgoraZego',
                 'updated_keys' => $updatedKeys,

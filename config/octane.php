@@ -77,7 +77,8 @@ return [
             FlushSessionState::class,
             FlushLocaleState::class,
             FlushQueuedCookies::class,
-            \App\Listeners\RefreshPusherConfigListener::class, // ⭐ تحديث Pusher config من الـ database مع كل request
+            // Removed RefreshPusherConfigListener - endpoint handles this directly
+            // ConfigController::updateConfigAgoraZego() updates runtime config directly
         ],
 
         RequestTerminated::class => [
