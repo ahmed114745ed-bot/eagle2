@@ -59,7 +59,7 @@ class ReelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Real());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -74,7 +74,12 @@ class ReelController extends MainController
                 }, __('User'))->placeholder(__('Search by name or UUID'));
             });
         });
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->with([
+            'user',
+            'user.profile',
+            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+
+        ])->withCount(['likes', 'comments'])->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -90,7 +95,8 @@ class ReelController extends MainController
 
 
 
-        $grid->column('user.name', __('user'))->display(function ($name) {
+        $grid->column('user.name', __('user'))->display(function () {
+            $name = $this->user->name ?? '';
             $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
             $avatarPath = @$this->user->avatar;
             $userId = @$this->user->id;
@@ -114,10 +120,15 @@ class ReelController extends MainController
         });
 
 
-        $grid->column('comment_num', __('status'))->display(function ($commentNum) {
-            $like = count(@$this->likes);
-            $commentNum = count(@$this->comments);
-            return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
+        // $grid->column('comment_num', __('status'))->display(function ($commentNum) {
+        //     $like = count(@$this->likes);
+        //     $commentNum = count(@$this->comments);
+        //     return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
+        // });
+
+        $grid->column('comment_num', __('status'))->display(function () {
+            return "<span class='fa fa-comment'> {$this->comments_count}</span>
+            <span class='fa fa-thumbs-up'> {$this->likes_count}</span>";
         });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         $grid->column('video', __('video'))->display(function () {
