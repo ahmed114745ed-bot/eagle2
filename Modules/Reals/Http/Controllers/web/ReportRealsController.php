@@ -41,7 +41,15 @@ class ReportRealsController extends MainController
     protected function grid()
     {
         $grid = new Grid(new ReportReals());
-        $grid->model()->whereHas('reel')->orderByDesc('id');
+        $grid->model()->with([
+            'reel',
+            'reporter',
+            'reporter.profile',
+            'reporter.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'reportedUser',
+            'reportedUser.profile',
+            'reportedUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ])->whereHas('reel')->orderByDesc('id');
 
         $grid->column('id', __('ID'));
 
@@ -49,10 +57,10 @@ class ReportRealsController extends MainController
             $reporter = $this->reporter;
             if (!$reporter) return '-';
 
-            $name = $reporter->name;
+            $name = $reporter->name ?? '';
             $uuid = $reporter->uuid;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$reporter->avatar;
+            $avatarPath = @$reporter->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
@@ -72,11 +80,11 @@ class ReportRealsController extends MainController
             $reportedUser = $this->reportedUser;
             if (!$reportedUser) return '-';
 
-            $name = $reportedUser->name;
+            $name = $reportedUser->name ?? '';
             $uuid = $reportedUser->uuid;
 
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$reportedUser->avatar;
+            $avatarPath = @$reportedUser->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;

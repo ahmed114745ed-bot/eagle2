@@ -299,6 +299,10 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Override Grid Sortable Route for Octane compatibility (outside admin group)
+Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
+    ->middleware(['web', 'admin'])
+    ->name('laravel-admin-grid-sortable');
 
 Route::group(
     [
@@ -315,10 +319,8 @@ Route::group(
     ],
     function () {
         // Gift Categories Cache Clear (for Octane compatibility)
-        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])
-            ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
-            ->name('gift-categories.clear-cache');
-
+        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])->name('gift-categories.clear-cache');
+        
         // Gift Categories Sortable Route (for Octane compatibility)
         Route::post('gift-categories/sort-update', [\App\Admin\Controllers\GiftCategoryController::class, 'sortUpdate'])
             ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
@@ -1171,4 +1173,67 @@ Route::get('/octane-reload', function () {
             'trace' => $e->getTraceAsString(),
         ], 500);
     }
+});
+
+Route::get('/debug/pusher-config', function () {
+    $dbKeys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+    $fromDatabase = \App\Models\Config::whereIn('name', $dbKeys)->pluck('value', 'name')->toArray();
+
+    $fromCache = Cache::get('pusher_config');
+
+    $fromConfig = [
+        'key' => Config::get('broadcasting.connections.pusher.key'),
+        'secret' => Config::get('broadcasting.connections.pusher.secret'),
+        'app_id' => Config::get('broadcasting.connections.pusher.app_id'),
+        'cluster' => Config::get('broadcasting.connections.pusher.options.cluster'),
+    ];
+
+    $fromDefault = [
+        'key' => Config::get('broadcasting.pusher-default.key'),
+        'secret' => Config::get('broadcasting.pusher-default.secret'),
+        'app_id' => Config::get('broadcasting.pusher-default.app_id'),
+        'cluster' => Config::get('broadcasting.pusher-default.options.cluster'),
+    ];
+
+    $fromEnv = [
+        'key' => env('PUSHER_APP_KEY'),
+        'secret' => env('PUSHER_APP_SECRET'),
+        'app_id' => env('PUSHER_APP_ID'),
+        'cluster' => env('PUSHER_APP_CLUSTER'),
+    ];
+
+    $cacheInfo = [
+        'pusher_config_exists' => Cache::has('pusher_config'),
+        'exp_percentages_exists' => Cache::has('exp_percentages'),
+        'exp_percentages' => Cache::get('exp_percentages'),
+    ];
+
+    return response()->json([
+        'from_database' => $fromDatabase,
+        'from_cache' => $fromCache,
+        'from_config_runtime' => $fromConfig,
+        'from_config_default' => $fromDefault,
+        'from_env' => $fromEnv,
+        'cache_info' => $cacheInfo,
+        'config_cached' => file_exists(base_path('bootstrap/cache/config.php')),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+Route::get('/test-pusher-config', function () {
+    $pusherConfig = getPusherConfig();
+    $laravelConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    return response()->json([
+        'from_helper_function' => $pusherConfig,
+        'from_laravel_config' => $laravelConfig,
+        'cache_info' => [
+            'environment' => app()->environment(),
+            'cache_driver' => config('cache.default'),
+        ],
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
 });
