@@ -41,6 +41,11 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // ⭐ Explicitly register JobProcessing listener
+        // This ensures it works even if autodiscovery doesn't pick it up
+        Event::listen(
+            JobProcessing::class,
+            [\App\Listeners\RefreshPusherConfigBeforeJob::class, 'handle']
+        );
     }
 }

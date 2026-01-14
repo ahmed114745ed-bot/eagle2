@@ -1503,13 +1503,57 @@ Route::get('/debug/force-pusher-refresh', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
+// ⭐ Debug: Check if RefreshPusherConfigBeforeJob listener is registered
+Route::get('/debug/check-queue-listeners', function () {
+    $dispatcher = app(\Illuminate\Contracts\Events\Dispatcher::class);
+    
+    $jobProcessingListeners = [];
+    try {
+        // Get listeners for JobProcessing event
+        $listeners = $dispatcher->getListeners(\Illuminate\Queue\Events\JobProcessing::class);
+        foreach ($listeners as $index => $listener) {
+            if (is_array($listener)) {
+                $jobProcessingListeners[] = get_class($listener[0]) . '@' . $listener[1];
+            } elseif (is_object($listener)) {
+                $jobProcessingListeners[] = get_class($listener);
+            } elseif (is_string($listener)) {
+                $jobProcessingListeners[] = $listener;
+            } else {
+                $jobProcessingListeners[] = 'Closure #' . $index;
+            }
+        }
+    } catch (\Throwable $e) {
+        $jobProcessingListeners = ['Error: ' . $e->getMessage()];
+    }
+    
+    $hasRefreshListener = in_array(
+        \App\Listeners\RefreshPusherConfigBeforeJob::class,
+        $jobProcessingListeners
+    ) || str_contains(implode(',', $jobProcessingListeners), 'RefreshPusherConfigBeforeJob');
+    
+    return response()->json([
+        'success' => true,
+        'JobProcessing_listeners' => $jobProcessingListeners,
+        'RefreshPusherConfigBeforeJob_registered' => $hasRefreshListener ? '✅ YES' : '❌ NO',
+        'recommendation' => $hasRefreshListener 
+            ? 'Listener is registered. Queue workers should auto-refresh config.'
+            : '⚠️ Listener NOT registered! Check EventServiceProvider.',
+        'event_service_provider_path' => 'app/Providers/EventServiceProvider.php',
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 // ⭐ Test broadcast from Queue (to verify Queue workers use correct config)
+// This dispatches a job AND sends a real broadcast event from within the Queue Worker
 Route::get('/debug/test-queue-broadcast', function () {
     $dbConfig = getPusherConfig();
+    $testId = 'queue_test_' . time() . '_' . rand(1000, 9999);
     
-    // Dispatch a job that will broadcast
-    // This tests if Queue workers are using the correct Pusher config
-    dispatch(function () use ($dbConfig) {
+    // Dispatch a job that will:
+    // 1. Check broadcaster config
+    // 2. Send REAL broadcast event from Queue Worker
+    dispatch(function () use ($dbConfig, $testId) {
+        // Get broadcaster AFTER RefreshPusherConfigBeforeJob runs
         $broadcaster = app(\Illuminate\Broadcasting\BroadcastManager::class)->driver('pusher');
         
         // Get actual config from broadcaster
@@ -1537,23 +1581,47 @@ Route::get('/debug/test-queue-broadcast', function () {
         
         $isMatch = ($actualConfig['auth_key'] ?? '') === ($dbConfig['app_key'] ?? '');
         
+        // ⭐ SEND REAL BROADCAST from Queue Worker!
+        $broadcastSuccess = false;
+        $broadcastError = null;
+        try {
+            broadcast(new \App\Events\TestBroadcastEvent([
+                'test_id' => $testId,
+                'source' => 'queue_worker',
+                'pid' => getmypid(),
+                'config_match' => $isMatch,
+                'timestamp' => now()->toDateTimeString(),
+            ]))->toOthers();
+            $broadcastSuccess = true;
+        } catch (\Throwable $e) {
+            $broadcastError = $e->getMessage();
+        }
+        
         Log::info('Queue Worker Broadcaster Test', [
+            'test_id' => $testId,
             'pid' => getmypid(),
             'db_app_key' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
             'broadcaster_key' => substr($actualConfig['auth_key'] ?? '', 0, 10) . '...',
-            'match' => $isMatch ? '✅ MATCH' : '❌ MISMATCH',
+            'config_match' => $isMatch ? '✅ MATCH' : '❌ MISMATCH',
+            'broadcast_sent' => $broadcastSuccess ? '✅ SUCCESS' : '❌ FAILED',
+            'broadcast_error' => $broadcastError,
             'timestamp' => now()->toDateTimeString(),
         ]);
     })->onQueue('default');
     
     return response()->json([
         'success' => true,
-        'message' => 'Queue job dispatched! Check logs for result.',
+        'message' => 'Queue job dispatched! Check logs AND Pusher Debug Console.',
+        'test_id' => $testId,
         'expected_db_config' => [
             'app_id' => $dbConfig['app_id'],
             'app_key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
         ],
-        'check_logs' => 'tail -f storage/logs/laravel.log | grep "Queue Worker Broadcaster Test"',
+        'what_to_check' => [
+            '1. Logs' => 'tail -f storage/logs/laravel.log | grep "Queue Worker Broadcaster Test"',
+            '2. Pusher Debug Console' => 'Check for test.broadcast event on test-channel',
+            '3. Look for test_id' => $testId,
+        ],
         'timestamp' => now()->toDateTimeString(),
     ], 200, [], JSON_PRETTY_PRINT);
 });
