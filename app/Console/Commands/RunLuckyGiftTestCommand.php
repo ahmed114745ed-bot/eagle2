@@ -31,13 +31,6 @@ class RunLuckyGiftTestCommand extends Command
 
         $output = trim($process->getOutput() . $process->getErrorOutput());
 
-        \Log::info('PHPUnit Test Run: SendLuckyGift2FeatureTest', [
-            'command' => implode(' ', $command),
-            'is_successful' => $process->isSuccessful(),
-            'exit_code' => $process->getExitCode(),
-            'output' => $output,
-        ]);
-
         if ($process->isSuccessful()) {
             $this->info('✅ Test completed successfully!');
             return 1;

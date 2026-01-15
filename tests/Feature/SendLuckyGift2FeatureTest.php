@@ -173,6 +173,5 @@ class SendLuckyGift2FeatureTest extends TestCase
             'received_value' => $receiverGain,
         ];
 
-        Log::info('Lucky Gift Monthly Report', $report);
     }
 }

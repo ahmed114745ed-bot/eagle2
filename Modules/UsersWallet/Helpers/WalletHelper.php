@@ -60,10 +60,6 @@ class WalletHelper
         $before = $wallet?->balance ?? 0 ;
         $wallet->balance += $amount;
         $wallet->save();
-              \Log::info('addBalance data', [
-    'target_id' => $target_id,
-  
-]);
         WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
