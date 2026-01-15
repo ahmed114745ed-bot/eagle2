@@ -324,12 +324,6 @@ class LuckyGiftService
 
         $roomId   = $room->id;
 
-         \Log::info('🚀 Sending  room 19...', [
-                            'user_id'  => $userId,
-                            'owner_id' => $ownerId,
-                            'room_id'  => $room->id ?? null,
-                        ]);
-
         /// todo check visitors
 
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
@@ -468,11 +462,6 @@ class LuckyGiftService
         // $room->session      += (int)$gift->price * $number * $count * 0.1;
         $room->session      +=  $coinsForOwner;
         $room->save();
-
-         \Log::info('🚀 room session   19...', [
-                            'user_id'  => $userId,
-                          
-                        ]);
 
         // add session to response
         $responseData['session'] = $room->session_string;

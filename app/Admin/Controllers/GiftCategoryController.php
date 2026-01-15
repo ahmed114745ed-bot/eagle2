@@ -104,8 +104,6 @@ class GiftCategoryController extends MainController
                 clearstatcache(true);
             }
             
-            \Log::info('GiftCategory cache cleared for sorting');
-            
             return response()->json([
                 'status' => true,
                 'message' => 'Cache cleared'
@@ -124,11 +122,6 @@ class GiftCategoryController extends MainController
     public function sortUpdate()
     {
         $sorts = request()->input('_sort');
-        
-        \Log::info('GiftCategory Sort Update Request', [
-            'data' => $sorts,
-            'request_all' => request()->all()
-        ]);
         
         if (empty($sorts)) {
             return response()->json([
@@ -160,15 +153,9 @@ class GiftCategoryController extends MainController
                     ]);
                 $updated += $result;
                 
-                \Log::info('Updated item', ['id' => $sort['id'], 'sort' => $sort['sort']]);
             }
             
             \DB::commit();
-            
-            \Log::info('GiftCategory Sort Update Success', [
-                'updated_count' => $updated,
-                'total_items' => count($sorts)
-            ]);
             
             // Clear all caches after updating
             Cache::flush();

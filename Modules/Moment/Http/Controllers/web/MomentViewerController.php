@@ -393,11 +393,6 @@ class MomentViewerController extends MainController
         // مسح الـ seed القديم (للتوافق مع الإصدارات السابقة)
         $request->session()->forget('moment_random_seed');
 
-        \Log::info('Reset random seed', [
-            'keys_deleted' => $keysDeleted,
-            'remaining_keys' => array_keys($request->session()->all())
-        ]);
-
         return response()->json([
             'success' => true,
             'message' => __('Random order reset successfully'),

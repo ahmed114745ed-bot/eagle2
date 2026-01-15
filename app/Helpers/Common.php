@@ -1157,9 +1157,6 @@ class Common
             // Add room image to notification
             if ($roomImage && !empty($roomImage)) {
                 $payload['notification']['image'] = $roomImage;
-                Log::info('send_firebase_notification_with_room_image: Image added to notification', [
-                    'image' => $roomImage
-                ]);
             } else {
                 $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
                 Log::warning('send_firebase_notification_with_room_image: Using default image', [
@@ -1173,11 +1170,6 @@ class Common
             ];
 
             $projectId = env('FIREBASE_PROJECT_NAME');
-
-            Log::info('send_firebase_notification_with_room_image: Sending to Firebase', [
-                'has_notification_image' => isset($payload['notification']['image']),
-                'notification_image' => $payload['notification']['image'] ?? null
-            ]);
 
             $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
                 'message' => $payload
@@ -1645,12 +1637,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
-        Log::info(111111);
         $zegoClientId =  config('app.zego_client_id');
-        Log::info('secret key', [
-            'env client zego id' => $zegoClientId,
-        ]);
-
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
@@ -1659,14 +1646,8 @@ class Common
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
 
-        Log::info('ZEGO | zego config values', [
-            'zego_token' => $zego_token,
-            'sounZego' => $sounZego,
-            'vedioZego' => $vedioZego,
-        ]);
 
         if ((!$zego_token && !$zegoClientId) && ($sounZego === '3' && $vedioZego === '3')) {
-            Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
@@ -1684,27 +1665,16 @@ class Common
             // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
-            Log::info(66666666666);
             $zegoData = [
                 'zego_app_id'        => $data['app_id'] ?? '',
                 'zego_server_secret' => $data['server_secret'] ?? '',
                 'zego_app_sign'      => $data['app_sign'] ?? '',
             ];
-            Log::info('ZEGO | mapped zego data', [
-                'zegoData' => $zegoData,
-            ]);
-            Log::info('secret key', [
-                'zego_token' => $zegoClientId,
-            ]);
         }
 
 
         // If a key is provided, return that specific value
         if ($key) {
-            Log::info('ZEGO | keyyyyy', [
-                'zegoData' => $zegoData[$key],
-                'keyy' => $key,
-            ]);
             return $zegoData[$key] ?? null;
         }
 
