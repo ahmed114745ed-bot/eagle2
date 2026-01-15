@@ -77,6 +77,8 @@ return [
             FlushSessionState::class,
             FlushLocaleState::class,
             FlushQueuedCookies::class,
+            // Removed RefreshPusherConfigListener - endpoint handles this directly
+            // ConfigController::updateConfigAgoraZego() updates runtime config directly
         ],
 
         RequestTerminated::class => [
@@ -93,7 +95,8 @@ return [
 
         TickReceived::class => [
             ...Octane::prepareApplicationForNextOperation(),
-            \App\Listeners\RefreshCacheListener::class, 
+            \App\Listeners\RefreshCacheListener::class,
+            \App\Listeners\OctaneBroadcasterRefreshListener::class, // تحديث Pusher في كل Workers
         ],
 
         WorkerStopping::class => [
@@ -116,11 +119,37 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Watch Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Files to watch for changes and trigger worker reload
+    | Ignore config files to prevent reloading on config changes
+    |
+    */
+
+    'watch' => [
+        'paths' => [
+            base_path('app'),
+            base_path('bootstrap'),
+            base_path('database'),
+            base_path('public'),
+            base_path('resources'),
+            base_path('routes'),
+        ],
+
+        'ignore' => [
+            base_path('config'), 
+            base_path('storage'),
+            base_path('public/uploads'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Flush Services
     |--------------------------------------------------------------------------
     |
-    | هذه الـ services يتم إعادة تحميلها مع كل request
-    | مهم جداً لتجنب مشاكل الـ state
+    | Services to reset after each request
     |
     */
 
@@ -129,8 +158,9 @@ return [
         'auth.driver',
         'session',
         'session.store',
-	'request',
-	'Illuminate\Http\Response',
+        'request',
+        'Illuminate\Http\Response',
+        \Illuminate\Broadcasting\BroadcastManager::class,  // ⭐ CRITICAL: Force fresh broadcaster creation
     ],
 
     /*
@@ -188,11 +218,18 @@ return [
     |--------------------------------------------------------------------------
     | Cache
     |--------------------------------------------------------------------------
+    |
+    | ⭐ Enabled for general app performance
+    | Broadcasting/Pusher config excluded via:
+    | - ForcePusherRefresh middleware (reads DB every request)
+    | - DatabaseDrivenPusherBroadcaster (reads DB on every broadcast)
+    | - BroadcastManager flush (destroyed after each request)
+    |
     */
 
     'cache' => [
-        'rows' => 1000,
-        'bytes' => 10000,
+        'rows' => 1000,   // ⭐ Normal cache for app performance
+        'bytes' => 10000, // ⭐ Normal cache for app performance
     ],
 
 ];

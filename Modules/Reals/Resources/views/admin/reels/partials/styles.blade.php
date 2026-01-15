@@ -59,7 +59,6 @@
         /* تحسين الأداء */
         will-change: transform;
         transform: translateZ(0);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     /* Video container */
@@ -409,7 +408,7 @@
         .reels-video-container {
             height: calc(100vh - 65px);
         }
-
+        
         .absolute.top-4 .w-12.h-12 {
             width: 2rem;
             height: 2rem;
@@ -459,7 +458,7 @@
     .skeleton {
         background: #e0e0e0;
     }
-
+    
     /* Skeleton animation فقط على الديسكتوب */
     @media (min-width: 769px) {
         .skeleton {
@@ -515,7 +514,7 @@
         content-visibility: auto;
         contain-intrinsic-height: 100vh;
     }
-
+    
     /* تحسين أداء الفيديو */
     video {
         will-change: transform;
@@ -542,7 +541,7 @@
             animation: fadeIn 0.3s ease-out;
         }
     }
-
+    
     @media (max-width: 768px) {
         .fade-in {
             /* لا animation على الموبايل */

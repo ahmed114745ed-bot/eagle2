@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config as LaravelConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
@@ -158,32 +159,61 @@ class ConfigController extends Controller
 
     public function updateConfigAgoraZego(Request $request)
     {
-        Cache::forget('pusher_config');
-
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
         
+        $updatedKeys = [];
+        $hasPusherUpdate = false;
+        
         foreach ($keys as $key) {
-            $config = Config::where('name', $key)->first();
-
-            if ($config) {
-                $config->value = $request->input($key);
-            } else {
-                $config = new Config();
-                $config->name = $key;
-                $config->value = $request->input($key);
-            }
-
-            $config->save();
+            $value = $request->input($key);
+            
+            Config::updateOrCreate(
+                ['name' => $key],
+                ['value' => $value]
+            );
+            
+            $updatedKeys[] = $key;
             Cache::forget($key);
-            Cache::forever($key, $request->input($key));
+            
+            if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
+                $hasPusherUpdate = true;
+            }
         }
 
-        // Clear pusher config cache for Octane
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
         Cache::flush();
-        Artisan::call('config:cache');
+        
+        
+        if (method_exists(Cache::store('octane'), 'flush')) {
+            Cache::store('octane')->flush();
+        }
+        
+        if ($hasPusherUpdate) {
+            $pusherMapping = [
+                'pusher_app_key' => 'broadcasting.connections.pusher.key',
+                'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
+                'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
+                'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
+            ];
+            
+            foreach ($pusherMapping as $key => $configKey) {
+                $value = $request->input($key);
+                if ($value !== null) {
+                    if ($key === 'pusher_app_cluster') {
+                        LaravelConfig::set($configKey, $value ?? 'mt1');
+                    } else {
+                        LaravelConfig::set($configKey, $value);
+                    }
+                }
+            }
+            
+            \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+            
+        }
+
+
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         

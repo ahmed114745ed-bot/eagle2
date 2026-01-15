@@ -37,6 +37,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\OctaneCacheClearing::class,
+        \App\Http\Middleware\ForcePusherRefresh::class, 
+       // \App\Http\Middleware\OctanePusherConfig::class, 
     ];
 
     /**

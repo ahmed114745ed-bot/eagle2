@@ -10,7 +10,6 @@ use Encore\Admin\Form;
 
 class MoveGiftCategory extends RowAction
 {
-    protected static $categories;
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
@@ -25,7 +24,7 @@ class MoveGiftCategory extends RowAction
         if (!$newCategory) {
             return $this->response()->error('Please select category')->refresh();
         }
-
+    
         $gift->gift_category_id = $newCategory;
         $gift->save();
 
@@ -35,41 +34,23 @@ class MoveGiftCategory extends RowAction
     // Popup form
     public function form()
     {
-        // $locale = app()->getLocale();
-
-        // // Category select
-        // $this->select('category_id', __('Select Category'))
-        //     ->options(function () use ($locale) {
-
-        //         $categories = [];
-        //         foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
-        //             $title = $category->title[$locale]
-        //                 ?? $category->title['en']
-        //                 ?? reset($category->title);
-
-        //             $categories[$category->id] = $title;
-        //         }
-
-        //         return $categories;
-        //     })
-        //     ->required();
-
         $locale = app()->getLocale();
 
-        // Load categories once
-        if (!isset(self::$categories)) {
-            self::$categories = GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])
-                ->get()
-                ->mapWithKeys(function ($category) use ($locale) {
+        // Category select
+        $this->select('category_id', __('Select Category'))
+            ->options(function () use ($locale) {
+
+                $categories = [];
+                foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
                     $title = $category->title[$locale]
                         ?? $category->title['en']
                         ?? reset($category->title);
-                    return [$category->id => $title];
-                })->toArray();
-        }
 
-        $this->select('category_id', __('Select Category'))
-            ->options(self::$categories)
+                    $categories[$category->id] = $title;
+                }
+
+                return $categories;
+            })
             ->required();
     }
 }

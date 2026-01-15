@@ -40,7 +40,7 @@ class WalletHelper
             $agency = Agency::find($agencyId);
             if ($agency) {
                 $ownerId = $agency->app_owner_id;
-                $bdId    = @$agency?->bd?->app_id;
+                $bdId    = $agency->bd->app_id;
             }
         }
         if ($ownerId && $agency_diff != 0) {

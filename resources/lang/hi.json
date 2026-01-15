@@ -46,17 +46,6 @@
     "Winner Ranking": "विजेता रैंकिंग",
     "reward type": "इनाम का प्रकार",
     "charm": "आकर्षण",
-    "regions system": "क्षेत्र प्रणाली",
-  "countries system": "देश प्रणाली",
-  "chat": "चैट",
-  "charging system": "चार्जिंग प्रणाली",
-  "shipping agencies charge": "शिपिंग एजेंसियों का चार्ज",
-  "countries charge": "देशों का चार्ज",
-  "e_wallet": "ई-वॉलेट",
-  "hosts system": "होस्ट सिस्टम",
-  "registration forms": "पंजीकरण फ़ॉर्म",
-  "emojis": "इमोजी",
-  "addons": "ऐड-ऑन",
     "View Rewards": "इनाम देखें",
     "Ranking Rewards": "रैंकिंग पुरस्कार",
     "Status switch country": "स्थिति स्विच देश",
@@ -4074,8 +4063,5 @@
     "moment_viewer.randomOrder": "रैंडम क्रम",
     "moment_viewer.refresh": "ताज़ा करें",
     "moment_viewer.loadMore": "और लोड करें",
-    "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है",
-    "Area manager": "क्षेत्र प्रणाली",
-  "SuperAdmin": "देश प्रणाली",
-  "Group chat": "चैट"
+    "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है"
   }
