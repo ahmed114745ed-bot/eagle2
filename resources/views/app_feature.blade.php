@@ -462,6 +462,7 @@
                           method="POST"
                           enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="redirect" value="{{ route('admin.app-feature.index') }}">
                         @php
                             $errorMessage = $errors ? $errors->first('msg') : null;
                         @endphp
