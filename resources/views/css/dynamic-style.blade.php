@@ -1425,6 +1425,10 @@
         position: fixed;
     }
 
+    .table-responsive .grid-dropdown-menu {
+        position: absolute;
+    }
+
     .rtl .dropdown-menu {
         left: 7%;
     }
