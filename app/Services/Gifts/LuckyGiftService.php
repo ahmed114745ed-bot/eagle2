@@ -499,10 +499,7 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-       \Log::info('🚀 room responseData   19...', [
-                            'responseData'  => $responseData,
-                          
-                        ]);
+       
         return  $responseData;
     }
 
@@ -757,10 +754,7 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-       \Log::info('🚀 room responseData   19 V3...', [
-                            'responseData'  => $responseData,
-                          
-                        ]);
+     
         return  $responseData;
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
