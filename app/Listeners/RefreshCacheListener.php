@@ -13,6 +13,7 @@ class RefreshCacheListener
     {
         Cache::forget('all_configs');
         Cache::forget('all_settings');
+        Cache::forget('pusher_config'); // Refresh Pusher config
         
         CacheHelper::cacheConfig();
         CacheHelper::cacheSettings();

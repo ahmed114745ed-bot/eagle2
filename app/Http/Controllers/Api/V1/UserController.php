@@ -524,16 +524,6 @@ class UserController extends Controller
     public function my_store_all(Request $request)
     {
         $user = $request->user();
-        $user = $request->user()->load([
-            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'agency',
-            'totalUserSalary',
-            'ownerRoom',
-            'ownerRoom.roomSalary',
-            'monthlyDiamondReceive',
-            'userWallet',
-            'totalUserSalary'
-        ]);
         $user = $this->userService->myStore($user, $request);
         $data = new MyStoreResource($user);
         return Common::apiResponse(true, '', $data, 200);

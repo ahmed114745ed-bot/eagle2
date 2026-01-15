@@ -51,12 +51,8 @@ class ParentUsersController extends MainController
     protected function parents()
     {
         $grid = new Grid(new User());
-        $countryID = session('filter_country_id');
-        $grid->model()->with([
-            'profile',
-            'codeInvitationsEarn',
-            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])->withCount('codeInvitationsEarn')->when($countryID, function ($query) use ($countryID) {
+        $countryID =session('filter_country_id');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->where('country_id', $countryID);
             });
@@ -100,11 +96,9 @@ class ParentUsersController extends MainController
              </div>
          ";
         });
-        // $grid->column('user_count', __("user_count"))->display(function () {
-        //     return count($this->codeInvitations);
-        // });
-        $grid->column('user_count', __("user_count"))
-            ->display(fn() => $this->code_invitations_earn_count);
+        $grid->column('user_count', __("user_count"))->display(function () {
+            return count($this->codeInvitations);
+        });
         $grid->column('earn', __("user_earn"))->display(function () {
             return $this->codeInvitationsEarn->sum("parent_percentage");
         });

@@ -85,23 +85,13 @@ class RequestAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $countryID = session('filter_country_id');
+        $countryID =session('filter_country_id');
 
-        $grid->model()
-            ->with([
-                'owner',
-                'owner.profile',
-                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-                'additionalInfo',
-                'additionalInfo.user',
-                'additionalInfo.user.profile',
-                'additionalInfo.user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            ])
-            ->where('status', 0)
+        $grid->model()->where('status', 0)
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
-                $query->where('status', 0);
-            });
+            $query->where('status', 0);
+        });
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -109,8 +99,7 @@ class RequestAgencyController extends MainController
             });
         });
         $grid->column('id', __('Id'));
-        $grid->column('owner.name', trans('name'))->display(function () {
-            $name = $this->owner->name;
+        $grid->column('owner.name', trans('name'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this?->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -196,8 +185,7 @@ class RequestAgencyController extends MainController
                     </div>";
         });
         $grid->column('additionalInfo.host', __('host'));
-        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function () {
-            $name = $this->additionalInfo->user->name ?? '';
+        $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
             $uid = @$this->additionalInfo->user->uuid;
             $path = @$this?->additionalInfo->user->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -234,6 +222,7 @@ class RequestAgencyController extends MainController
             if (Admin::user()->can('browse-' . 'refuse-agency') || Admin::user()->can('*')) {
                 $actions->add(new RefuseAgencyAction($model->id));
             }
+
         });
         $grid->disableCreateButton();
 
