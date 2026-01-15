@@ -164,41 +164,18 @@ class MicService
             throw new Exception(__('This microphone is closed and cannot be accessed'));
         }
 
-        Log::info("Checking for existing microphone before update", [
-            'user_id' => $user->id,
-            'position' => $position,
-            'room_id' => $room->id,
-            'current_position_user_id' => $micSeat->user_id ?? null,
-        ]);
-
         $existingMic = $room->microphones()->where('user_id', $user->id)->first();
         if ($existingMic) {
-            Log::info("Found existing microphone for user - checking if same position", [
-                'user_id' => $user->id,
-                'old_position' => $existingMic->position,
-                'new_position' => $position,
-                'same_position' => $existingMic->position === $position,
-                'room_id' => $room->id,
-            ]);
 
-            // Only delete if it's a different position
             if ($existingMic->position !== $position) {
-                Log::info("Deleting existing microphone from different position", [
-                    'user_id' => $user->id,
-                    'old_position' => $existingMic->position,
-                    'new_position' => $position,
-                ]);
-
+        
                 CpRoomHistory::where("user_one_id", $user->id)
                     ->orWhere("user_two_id", $user->id)
                     ->delete();
 
                 $existingMic->delete();
             } else {
-                Log::info("User already on same position - no deletion needed", [
-                    'user_id' => $user->id,
-                    'position' => $position,
-                ]);
+            
             }
         }
 
@@ -206,14 +183,6 @@ class MicService
         $micSeat->update([
             'user_id' => $user->id,
             'status'  => $old_status,
-        ]);
-
-        Log::info("User moved to microphone position", [
-            'user_id' => $user->id,
-            'position' => $position,
-            'room_id' => $room->id,
-            'status' => $old_status,
-            'had_existing_mic' => $existingMic ? true : false,
         ]);
 
         $micString = $room->microphones()
