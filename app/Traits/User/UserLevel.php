@@ -2,7 +2,7 @@
 
 namespace App\Traits\User;
 
-use Illuminate\Support\Facades\Cache;
+use App\Models\User;
 use Modules\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Log;
 
@@ -38,15 +38,6 @@ trait UserLevel
         return $this->belongsTo(Vip::class, 'charge_level', 'level')
             ->where('type', 4);
     }
-
-    private static function senderVipLevels()
-    {
-        return Cache::rememberForever('sender_vip_levels', function () {
-            return Vip::where('type', 2)
-                ->orderBy('level')
-                ->get(['level', 'exp']);
-        });
-    }
     public function getNextSenderLevelInfoAttribute(): array
     {
         $currentLevel = $this->senderLevel;
@@ -58,14 +49,10 @@ trait UserLevel
             ];
         }
 
-        // $nextLevel = Vip::where('type', 2)
-        //     ->where('level', '>', $currentLevel->level)
-        //     ->orderBy('level')
-        //     ->first();
-
-        $levels = self::senderVipLevels();
-
-        $nextLevel = $levels->firstWhere('level', '>', $currentLevel->level);
+        $nextLevel = Vip::where('type', 2)
+            ->where('level', '>', $currentLevel->level)
+            ->orderBy('level')
+            ->first();
 
         if (!$nextLevel) {
             return [
@@ -85,7 +72,12 @@ trait UserLevel
 
         return [
             'next_level' => $nextLevel->level,
-            'remaining_exp_ratio' => round($remainingRatio, 2),
+            'remaining_exp_ratio' => round($remainingRatio, 2), 
         ];
     }
+
+
+
+
+
 }

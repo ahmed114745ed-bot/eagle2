@@ -19,6 +19,8 @@ class MangerSettingController extends MainController
     public $permission_name = 'updates_group_chat';
     public $permission_setting = 'agency-manger-setting';
 
+
+
     public function index1(Content $content)
     {
         $route = 'admin.update-config-group-chat';
@@ -106,6 +108,8 @@ class MangerSettingController extends MainController
             ->title(trans('Settings'))
             ->body(new HtmlString($form)));
     }
+
+
 
     public function index(Content $content)
     {

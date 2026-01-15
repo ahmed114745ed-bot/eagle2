@@ -137,14 +137,14 @@ class RoomResource extends JsonResource
 
     protected function owner()
     {
-        return new UserResource($this->owner);
+        return new UserResource(User::query()->find($this->uid));
     }
 
     protected function admins()
     {
         $ids = explode(',', $this->room_admin);
         $ids = $this->removeOwner($ids);
-        return UserResource::collection($this->admins);
+        return UserResource::collection(User::query()->whereIn('id', $ids)->get());
     }
 
 

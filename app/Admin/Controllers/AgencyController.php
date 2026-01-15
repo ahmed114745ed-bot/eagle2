@@ -274,7 +274,7 @@ class AgencyController extends MainController
             });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
-        $prefix = dashboardName();
+         $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -378,14 +378,6 @@ class AgencyController extends MainController
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->with([
-                'creator',
-                'country',
-                'owner',
-                'owner.profile',
-                'owner.country',
-                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            ])
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
@@ -459,8 +451,8 @@ class AgencyController extends MainController
         })->sortable();
 
         // --- Owner column ---
-        $grid->column('owner.name', trans('owner'))->display(function () {
-            $name = $this->owner->name ?? '';
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -534,8 +526,8 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $creator = $this->creator;
-            return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
+            $id = $creatorId;
+            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         // --- Actions ---
         $permission = $this->permission_name;

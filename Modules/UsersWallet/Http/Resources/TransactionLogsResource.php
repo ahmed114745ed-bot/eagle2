@@ -42,10 +42,6 @@ class TransactionLogsResource extends JsonResource
                 $title = __('withdraw', ['admin' => $this->admin ? $this->admin->name : '']);
                 break;
 
-            case 'withdrawal_pending':
-                $title = __('withdrawal pending');
-                break;
-
             default:
                 $title = '';
         }
@@ -59,7 +55,7 @@ class TransactionLogsResource extends JsonResource
             'type'          => $this->type,
             'before_amount' => $this->before_amount,
             'created_at'    => $this->created_at ? $this->created_at->format('Y-m-d H:i:s') : null,
-
+      
        ];
     }
 }

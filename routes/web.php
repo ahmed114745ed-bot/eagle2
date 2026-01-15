@@ -22,6 +22,7 @@ use App\Models\AdminNotification;
 use App\Facades\CustomNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
@@ -299,6 +300,27 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Test Pusher Config (for debugging Octane cache issues)
+Route::get('/test-pusher-config', function () {
+    $pusherConfig = getPusherConfig();
+    $laravelConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    return response()->json([
+        'from_helper_function' => $pusherConfig,
+        'from_laravel_config' => $laravelConfig,
+        'cache_info' => [
+            'environment' => app()->environment(),
+            'cache_driver' => config('cache.default'),
+        ],
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 // Override Grid Sortable Route for Octane compatibility (outside admin group)
 Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
     ->middleware(['web', 'admin'])
@@ -319,8 +341,10 @@ Route::group(
     ],
     function () {
         // Gift Categories Cache Clear (for Octane compatibility)
-        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])->name('gift-categories.clear-cache');
-        
+        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])
+            ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
+            ->name('gift-categories.clear-cache');
+
         // Gift Categories Sortable Route (for Octane compatibility)
         Route::post('gift-categories/sort-update', [\App\Admin\Controllers\GiftCategoryController::class, 'sortUpdate'])
             ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
@@ -1153,87 +1177,143 @@ Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
     dd("branch tested");
 });
 
-Route::get('/octane-reload', function () {
+Route::get('/octane', function () {
+    Cache::store('octane')->clear();
+
+    return 'Octane Swoole memory cache cleared!';
+});
+
+Route::get('/sys/flush-octane', function () {
+    Cache::store('octane')->clear();
+    return response()->json(['status' => 'Octane Memory Cache Cleared']);
+})->middleware('auth.basic');
+
+Route::get('/sys/signal-flush', function () {
+    $triggerFile = storage_path('framework/cache_flush_signal');
+    if (!file_exists(dirname($triggerFile))) {
+        @mkdir(dirname($triggerFile), 0775, true);
+    }
+    @touch($triggerFile);
+    return response()->json(['status' => 'Signal file created']);
+})->middleware('auth.basic');
+
+Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
+
+    $githubSignature = $request->header('X-Hub-Signature-256');
+    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
+
+    $authorized = false;
+
+    if ($githubSignature) {
+        $payload = $request->getContent();
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
+        $authorized = hash_equals($expectedSignature, $githubSignature);
+    }
+
+    if (!$authorized && $customToken === $secret) {
+        $authorized = true;
+    }
+
+    if (!$authorized) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $output = [];
+
     try {
+        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
+
+        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
+
+        \Artisan::call('config:cache');
+        $output['config_cache'] = \Artisan::output();
+
+        \Artisan::call('route:cache');
+        $output['route_cache'] = \Artisan::output();
+
+        \Artisan::call('view:cache');
+        $output['view_cache'] = \Artisan::output();
+
         \Artisan::call('octane:reload');
-        
+        $output['octane_reload'] = \Artisan::output();
+
         return response()->json([
             'status' => 'success',
-            'message' => 'Octane reloaded successfully',
-            'output' => \Artisan::output(),
+            'message' => 'Deployment completed successfully',
+            'output' => $output,
             'time' => now()->toDateTimeString(),
         ], 200);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
             'message' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile(),
-            'trace' => $e->getTraceAsString(),
+            'output' => $output,
         ], 500);
     }
-});
+})->name('deploy.webhook');
 
-Route::get('/debug/pusher-config', function () {
-    $dbKeys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
-    $fromDatabase = \App\Models\Config::whereIn('name', $dbKeys)->pluck('value', 'name')->toArray();
+Route::get('/quick-reload/{token}', function ($token) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
 
-    $fromCache = Cache::get('pusher_config');
+    if ($token !== $secret) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
 
-    $fromConfig = [
-        'key' => Config::get('broadcasting.connections.pusher.key'),
-        'secret' => Config::get('broadcasting.connections.pusher.secret'),
-        'app_id' => Config::get('broadcasting.connections.pusher.app_id'),
-        'cluster' => Config::get('broadcasting.connections.pusher.options.cluster'),
-    ];
-
-    $fromDefault = [
-        'key' => Config::get('broadcasting.pusher-default.key'),
-        'secret' => Config::get('broadcasting.pusher-default.secret'),
-        'app_id' => Config::get('broadcasting.pusher-default.app_id'),
-        'cluster' => Config::get('broadcasting.pusher-default.options.cluster'),
-    ];
-
-    $fromEnv = [
-        'key' => env('PUSHER_APP_KEY'),
-        'secret' => env('PUSHER_APP_SECRET'),
-        'app_id' => env('PUSHER_APP_ID'),
-        'cluster' => env('PUSHER_APP_CLUSTER'),
-    ];
-
-    $cacheInfo = [
-        'pusher_config_exists' => Cache::has('pusher_config'),
-        'exp_percentages_exists' => Cache::has('exp_percentages'),
-        'exp_percentages' => Cache::get('exp_percentages'),
-    ];
+    \Artisan::call('octane:reload');
+    \Artisan::call('cache:clear');
 
     return response()->json([
-        'from_database' => $fromDatabase,
-        'from_cache' => $fromCache,
-        'from_config_runtime' => $fromConfig,
-        'from_config_default' => $fromDefault,
-        'from_env' => $fromEnv,
-        'cache_info' => $cacheInfo,
-        'config_cached' => file_exists(base_path('bootstrap/cache/config.php')),
-    ], 200, [], JSON_PRETTY_PRINT);
+        'status' => 'success',
+        'message' => 'Octane reloaded & cache cleared',
+        'time' => now()->toDateTimeString(),
+    ]);
 });
-Route::get('/test-pusher-config', function () {
-    $pusherConfig = getPusherConfig();
-    $laravelConfig = [
-        'key' => config('broadcasting.connections.pusher.key'),
-        'secret' => config('broadcasting.connections.pusher.secret'),
-        'app_id' => config('broadcasting.connections.pusher.app_id'),
-        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-    ];
+
+
+
+Route::get('/debug/force-pusher-refresh', function () {
+    $timestamp = now()->toDateTimeString();
     
+    Cache::forget('pusher_config');
+    Cache::forget('all_configs');
+    
+    Cache::put('pusher_config_changed', $timestamp, 3600);
+    
+    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    
+    Artisan::call('queue:restart');
+    $queueRestartOutput = Artisan::output();
+    
+    $octaneReloadOutput = '';
+    try {
+        Artisan::call('octane:reload');
+        $octaneReloadOutput = Artisan::output();
+    } catch (\Throwable $e) {
+        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
+    }
+    
+    $freshConfig = getPusherConfig();
     return response()->json([
-        'from_helper_function' => $pusherConfig,
-        'from_laravel_config' => $laravelConfig,
-        'cache_info' => [
-            'environment' => app()->environment(),
-            'cache_driver' => config('cache.default'),
+        'success' => true,
+        'message' => '🔄 Pusher config refresh triggered!',
+        'actions_taken' => [
+            '1_cache_cleared' => true,
+            '2_flag_set' => Cache::has('pusher_config_changed'),
+            '3_broadcaster_purged' => true,
+            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
+            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
         ],
-        'timestamp' => now()->toDateTimeString(),
+        'fresh_config' => [
+            'app_id' => $freshConfig['app_id'],
+            'app_cluster' => $freshConfig['app_cluster'],
+        ],
+        'next_steps' => [
+            'Supervisor will restart queue workers automatically',
+            'Octane workers will reload automatically',
+            'New broadcasts will use fresh DB config',
+        ],
+        'timestamp' => $timestamp,
     ], 200, [], JSON_PRETTY_PRINT);
 });

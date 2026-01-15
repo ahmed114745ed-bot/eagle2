@@ -44,13 +44,12 @@ Route::group(
         Route::resource('moments', MomentController::class)->middleware('moment.allowed');
         Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
         Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
-
+        
         // 🎯 Moment Viewer Routes (Facebook-like Experience)
         Route::prefix('moment-viewer')->name('moment-viewer.')->middleware('moment.allowed')->group(function () {
             Route::get('/', [MomentViewerController::class, 'index'])->name('index');
             Route::get('/viewer.css', [MomentViewerController::class, 'getViewerCss'])->name('viewer-css');
             Route::get('/api/moments', [MomentViewerController::class, 'getMoments'])->name('api.moments');
-            Route::get('/api/users-with-moments', [MomentViewerController::class, 'getUsersWithMoments'])->name('api.users-with-moments');
             Route::get('/api/moment/{id}', [MomentViewerController::class, 'getMoment'])->name('api.moment');
             Route::get('/api/moment/{id}/likes', [MomentViewerController::class, 'getLikes'])->name('api.likes');
             Route::get('/api/moment/{id}/comments', [MomentViewerController::class, 'getComments'])->name('api.comments');

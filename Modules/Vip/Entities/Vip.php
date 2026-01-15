@@ -28,7 +28,7 @@ class Vip extends Model
 
     public static function getCached(): Collection
     {
-        return Cache::rememberForever('vips', fn() => self::all());
+        return Cache::rememberForever('vips', fn () => self::all());
     }
 
     public static function collectionBuilder(): VipCollectionBuilderService
@@ -40,19 +40,4 @@ class Vip extends Model
     {
         return $this->hasMany(GiftRoomLevel::class,'level_id');
     }*/
-
-    protected static function booted()
-    {
-        static::saved(function ($vip) {
-            if ($vip->type == 2) {
-                Cache::forget('sender_vip_levels');
-            }
-        });
-
-        static::deleted(function ($vip) {
-            if ($vip->type == 2) {
-                Cache::forget('sender_vip_levels');
-            }
-        });
-    }
 }
