@@ -998,6 +998,16 @@ class LuckyGiftService
             ->all();
 
         $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
+        
+        Log::info("Gift Response Data - Microphone Positions", [
+            'room_id' => $room->id,
+            'sender_id' => $user->id,
+            'receiver_ids' => $receiversIds,
+            'positions' => $positions,
+            'missing_receivers' => $missingReceivers,
+            'total_microphones' => $microphones->count(),
+        ]);
+        
         if (!empty($missingReceivers)) {
             $positions[] = -1;
         }
