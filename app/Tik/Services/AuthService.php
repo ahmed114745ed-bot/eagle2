@@ -43,7 +43,7 @@ class AuthService
                 'message' => 'Wrong number of segments in ID token',
                 'data' => null,
                 'paginates' => null
-            ], 400);
+            ], 422);
         }
         $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
             'id_token' => $id_token
