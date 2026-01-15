@@ -23,26 +23,16 @@ class OctaneBroadcasterService
     public static function rebuildBroadcaster(): void
     {
         try {
-            // Get the broadcast manager
             $broadcastManager = app('broadcast');
             
-            // ⭐ CRITICAL FIX: Purge the cached driver FIRST
-            // This forces BroadcastManager to create a NEW instance on next use
-            // The new instance will be DatabaseDrivenPusherBroadcaster which
-            // reads fresh credentials from database in its constructor
-            if (method_exists($broadcastManager, 'purge')) {
-                $broadcastManager->purge('pusher');
-            }
+            $reflection = new \ReflectionClass($broadcastManager);
+            $driversProperty = $reflection->getProperty('drivers');
+            $driversProperty->setAccessible(true);
+            $driversProperty->setValue($broadcastManager, []);
             
-            // Also purge default driver if it's pusher
-            if (config('broadcasting.default') === 'pusher') {
-                $broadcastManager->purge(null);
-            }
-            
-            // Clear the config changed flag
             \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
 
-            logger('OctaneBroadcasterService: Broadcaster purged - will rebuild on next use', [
+            logger('OctaneBroadcasterService: Broadcaster cache cleared - will rebuild on next use', [
                 'pid' => getmypid(),
                 'timestamp' => now()->toDateTimeString(),
             ]);
