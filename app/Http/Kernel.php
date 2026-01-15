@@ -37,8 +37,8 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\OctaneCacheClearing::class,
-        \App\Http\Middleware\ForcePusherRefresh::class, // ⭐ CRITICAL: Force fresh Pusher from DB
-        \App\Http\Middleware\OctanePusherConfig::class, // ⭐ Dynamic Pusher config for Octane
+        \App\Http\Middleware\ForcePusherRefresh::class, 
+        \App\Http\Middleware\OctanePusherConfig::class, 
     ];
 
     /**
@@ -100,7 +100,6 @@ class Kernel extends HttpKernel
         'verify.signature' => \App\Http\Middleware\VerifyGameSignature::class,
         'verify.gamecoin.signature' => \App\Http\Middleware\VerifyGameCoinSignature::class,
         'verify.game.userInformation.signature' => \App\Http\Middleware\VerifyGameLeaderCCUserInformationMiddleWare::class,
-        'octane.pusher.config' => \App\Http\Middleware\OctanePusherConfig::class,
         'octane.pusher.config2' => \App\Http\Middleware\OctanePusherConfigv2::class,
         'verify.game.signature' => \App\Http\Middleware\VerifyLeaderCCMiddleWare::class,
 

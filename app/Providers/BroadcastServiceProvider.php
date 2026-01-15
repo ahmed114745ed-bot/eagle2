@@ -18,17 +18,11 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // ⭐ Register broadcaster extension when BroadcastManager is resolved
-        // This ensures proper dependency injection
+     
         $this->app->afterResolving(BroadcastManager::class, function (BroadcastManager $manager) {
             $manager->extend('pusher', function ($app, $config) {
-                // ⭐ Return NEW broadcaster instance - reads fresh from DB every time
-                // Constructor calls getPusherConfig() which reads directly from database
                 try {
-                    Log::debug('BroadcastServiceProvider.creating_database_driven_broadcaster', [
-                        'pid' => getmypid(),
-                        'timestamp' => now()->toDateTimeString(),
-                    ]);
+                
                     return new DatabaseDrivenPusherBroadcaster();
                 } catch (\Throwable $e) {
                     Log::error('BroadcastServiceProvider.broadcaster_creation_failed', [

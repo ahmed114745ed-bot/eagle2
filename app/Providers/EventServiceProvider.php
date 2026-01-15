@@ -41,9 +41,6 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot();
         
-        // ⭐ CRITICAL: Register JobProcessing listener for Queue Workers
-        // This ensures Pusher config is refreshed before EVERY job
-        // Must use closure to guarantee execution
         Event::listen(JobProcessing::class, function (JobProcessing $event) {
             try {
                 $listener = app(RefreshPusherConfigBeforeJob::class);

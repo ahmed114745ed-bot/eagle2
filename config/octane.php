@@ -161,8 +161,6 @@ return [
         'request',
         'Illuminate\Http\Response',
         \Illuminate\Broadcasting\BroadcastManager::class,  // ⭐ CRITICAL: Force fresh broadcaster creation
-        // Config must NOT be flushed - runtime updates stay in memory
-        // 'config' removed intentionally
     ],
 
     /*

@@ -14,14 +14,12 @@ use Illuminate\Queue\SerializesModels;
 class GiftBannerEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    // use InteractsWithSockets;
 
     public $gift;
 
     public string $broadcastQueue;
 
     /**
-     * Create a new event instance.
      *
      * @param array $gift
      */

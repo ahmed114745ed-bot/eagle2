@@ -162,7 +162,6 @@ class ConfigController extends Controller
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
         
-        // Batch updates to minimize observer triggers and cache churn
         $updatedKeys = [];
         $hasPusherUpdate = false;
         
@@ -175,7 +174,6 @@ class ConfigController extends Controller
             );
             
             $updatedKeys[] = $key;
-            // NO CACHING - Always read fresh from database
             Cache::forget($key);
             
             if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
@@ -183,22 +181,16 @@ class ConfigController extends Controller
             }
         }
 
-        // Clear all related caches - force fresh database reads
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
         Cache::flush();
         
-        // Do NOT call config:cache - creates bootstrap/cache/config.php with stale values
-        // Runtime config is set directly below for Pusher
         
-        // Clear Octane in-memory cache
         if (method_exists(Cache::store('octane'), 'flush')) {
             Cache::store('octane')->flush();
         }
         
-        // Force runtime config update for Pusher if needed
         if ($hasPusherUpdate) {
-            // Set runtime config DIRECTLY from request values to ensure no delay
             $pusherMapping = [
                 'pusher_app_key' => 'broadcasting.connections.pusher.key',
                 'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
@@ -217,22 +209,11 @@ class ConfigController extends Controller
                 }
             }
             
-            // Rebuild broadcaster with updated runtime config
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
             
-            Log::info('pusher_config_force_updated', [
-                'source' => 'updateConfigAgoraZego',
-                'updated_keys' => $updatedKeys,
-                'user_id' => auth()->id(),
-                'timestamp' => now()->toDateTimeString(),
-            ]);
         }
 
-        Log::info('updateConfigAgoraZego', [
-            'updated_keys' => $updatedKeys,
-            'user_id' => auth()->id(),
-            'timestamp' => now()->toDateTimeString(),
-        ]);
+
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
         
