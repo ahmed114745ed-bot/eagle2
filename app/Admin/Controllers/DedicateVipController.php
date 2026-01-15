@@ -118,80 +118,21 @@ class DedicateVipController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableRowSelector();
-        Admin::style("
-    /* Remove horizontal scroll and padding from main containers */
-    .box-body {
-        overflow-x: hidden !important;
-        padding: 0 !important;
-    }
-
-    /* Fix the grid table */
-    .grid-table {
-        width: 100% !important;
-        margin: 0 !important;
-    }
-
-    /* Remove responsive table wrapper effects */
-    .table-responsive {
-        overflow-x: visible !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-    }
-
-    /* Fix main content area */
-    .content {
-        padding: 5px !important;
-    }
-
-    .content .box {
-        margin: 0 !important;
-    }
-
-    /* Fix row and container padding */
-    .row {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-    }
-
-    .col-md-12 {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-
-    /* Ensure table takes full width */
-    .table {
-        width: 100% !important;
-        table-layout: fixed;
-    }
-
-    /* Hide horizontal scrollbar */
-    body {
-        overflow-x: hidden;
-    }
-
-    .wrapper {
-        overflow-x: hidden;
-    }
-");
-
         Admin::script("
-    function removeTableResponsive() {
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
-            // Also remove any inline styles that might cause issues
-            $('.box-body').css('overflow-x', 'hidden');
-        }
-    }
+            function removeTableResponsive() {
+                if (window.innerWidth >= 1024) {
+                    $('.table-responsive').removeClass('table-responsive');
+                }
+            }
 
-    removeTableResponsive();
+            removeTableResponsive();
 
-    $(document).on('click', '.grid-expand', function() {
-        setTimeout(removeTableResponsive, 100);
-    });
+            $(document).on('click', '.grid-expand', function() {
+                setTimeout(removeTableResponsive, 100);
+            });
 
-    $(window).resize(removeTableResponsive);
-");
+            $(window).resize(removeTableResponsive);
+        ");
         return $grid;
     }
 }
