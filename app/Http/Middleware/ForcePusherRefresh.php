@@ -32,11 +32,7 @@ class ForcePusherRefresh
                 // This ensures next broadcast() call creates fresh instance
                 $this->clearBroadcastManagerDrivers();
                 
-                Log::debug('force_pusher_refresh.success', [
-                    'app_id' => $config['app_id'],
-                    'cluster' => $config['app_cluster'],
-                    'pid' => getmypid(),
-                ]);
+             
             }
             
         } catch (\Throwable $e) {
