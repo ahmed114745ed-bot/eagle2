@@ -164,14 +164,27 @@ class MicService
             throw new Exception(__('This microphone is closed and cannot be accessed'));
         }
 
+        Log::info("Checking for existing microphone before update", [
+            'user_id' => $user->id,
+            'position' => $position,
+            'room_id' => $room->id,
+            'current_position_user_id' => $micSeat->user_id ?? null,
+        ]);
+
         $existingMic = $room->microphones()->where('user_id', $user->id)->first();
         if ($existingMic) {
+            Log::info("Found existing microphone for user - will be removed", [
+                'user_id' => $user->id,
+                'old_position' => $existingMic->position,
+                'new_position' => $position,
+                'room_id' => $room->id,
+            ]);
+
             CpRoomHistory::where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id)
                 ->delete();
 
             $existingMic->delete();
-
         }
 
 
@@ -185,6 +198,7 @@ class MicService
             'position' => $position,
             'room_id' => $room->id,
             'status' => $old_status,
+            'had_existing_mic' => $existingMic ? true : false,
         ]);
 
         $micString = $room->microphones()
