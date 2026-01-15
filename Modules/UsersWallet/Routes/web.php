@@ -22,7 +22,7 @@ use Modules\UsersWallet\Http\Controllers\Web\WalletTemplateController;
 
 Route::group(
     [
-        'prefix' => config('admin.route.prefix'),
+        'prefix'     => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
@@ -34,12 +34,12 @@ Route::group(
     function () {
         Route::resource('wallet-withdrawal', UserWithdrawalController::class);
 
+        
+        Route::post('/wallet/withdrawals/{id}/approve', [UserWithdrawalController::class,'approve'])->name('withdrawals.approve');
+        Route::post('/wallet/withdrawals/{id}/reject', [UserWithdrawalController::class,'reject'])->name('withdrawals.reject');
 
-        Route::post('/wallet/withdrawals/{id}/approve', [UserWithdrawalController::class, 'approve'])->name('withdrawals.approve');
-        Route::post('/wallet/withdrawals/{id}/reject', [UserWithdrawalController::class, 'reject'])->name('withdrawals.reject');
 
-
-        Route::resource('wallet-templates', WalletTemplateController::class);
+                Route::resource('wallet-templates', WalletTemplateController::class);
 
         Route::prefix('wallet-fields/{wallet_template_id}')->group(function () {
             Route::get('/', [WalletFieldController::class, 'index'])->name('wallet-fields.index');
@@ -50,7 +50,7 @@ Route::group(
             Route::put('/{id}', [WalletFieldController::class, 'update'])->where('id', '[0-9]+')->name('wallet-fields.update');
             Route::delete('/{id}', [WalletFieldController::class, 'destroy'])->where('id', '[0-9]+')->name('wallet-fields.destroy');
         });
-
+    
     });
 
 

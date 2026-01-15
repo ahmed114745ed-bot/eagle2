@@ -4,7 +4,6 @@ namespace Modules\Moment\Http\Controllers\web;
 
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-use Illuminate\Http\JsonResponse;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentCommint;
 use Modules\Moment\Entities\MomentLikes;
@@ -43,7 +42,7 @@ class MomentViewerController extends MainController
     public function getViewerCss()
     {
         $css = view('moment::viewer.viewer-css')->render();
-
+        
         return response($css)
             ->header('Content-Type', 'text/css')
             ->header('Cache-Control', 'public, max-age=3600');
@@ -53,7 +52,7 @@ class MomentViewerController extends MainController
      * جلب قائمة الـ Moments بناءً على الترتيب المحدد
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getMoments(Request $request)
     {
@@ -100,7 +99,7 @@ class MomentViewerController extends MainController
                 // جلب عشوائي مباشر - بدون session
                 $query->inRandomOrder();
                 $moments = $query->paginate($perPage);
-
+                
                 return response()->json([
                     'success' => true,
                     'data' => $moments->items(),
@@ -112,7 +111,7 @@ class MomentViewerController extends MainController
                     ]
                 ]);
             }
-
+            
             // الترتيب العادي
             switch ($sortBy) {
                 case 'newest':
@@ -144,52 +143,11 @@ class MomentViewerController extends MainController
         }
     }
 
-    public function getUsersWithMoments(Request $request): JsonResponse
-    {
-        try {
-            $search = $request->get('search', '');
-            $perPage = $request->get('per_page', 20);
-            $countryId = session('filter_country_id');
-
-            $query = \App\Models\User::select(['id', 'uuid', 'name'])
-                ->withCount('moments')
-                ->having('moments_count', '>', 0)
-                ->with(['profile:id,user_id,avatar']);
-
-            if (!empty($search)) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('uuid', 'like', "%{$search}%")
-                        ->orWhere('id', $search);
-                });
-            }
-
-            if ($countryId) {
-                $query->where('country_id', $countryId);
-            }
-
-            $users = $query->orderByDesc('moments_count')->paginate($perPage);
-
-            return response()->json([
-                'success' => true,
-                'data' => $users->items(),
-                'pagination' => [
-                    'current_page' => $users->currentPage(),
-                    'last_page' => $users->lastPage(),
-                    'per_page' => $users->perPage(),
-                    'total' => $users->total(),
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
     /**
      * جلب تفاصيل Moment محدد
      *
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getMoment($id)
     {
@@ -225,13 +183,13 @@ class MomentViewerController extends MainController
      * جلب قائمة المستخدمين الذين قاموا بعمل Like
      *
      * @param int $momentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getLikes($momentId, Request $request)
     {
         $page = $request->get('page', 1);
         $perPage = $request->get('per_page', 20);
-
+        
         $likes = MomentLikes::where('moment_id', $momentId)
             ->with(['user' => fn($q) => $q->select(['id', 'uuid', 'name'])
                 ->with(['profile:id,user_id,avatar'])
@@ -255,13 +213,13 @@ class MomentViewerController extends MainController
      * جلب قائمة التعليقات
      *
      * @param int $momentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getComments($momentId, Request $request)
     {
         $page = $request->get('page', 1);
         $perPage = $request->get('per_page', 20);
-
+        
         $comments = MomentCommint::where('moment_id', $momentId)
             ->with(['user' => fn($q) => $q->select(['id', 'uuid', 'name'])
                 ->with(['profile:id,user_id,avatar'])
@@ -285,7 +243,7 @@ class MomentViewerController extends MainController
      * حذف تعليق
      *
      * @param int $commentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteComment($commentId)
     {
@@ -310,7 +268,7 @@ class MomentViewerController extends MainController
      *
      * @param int $momentId
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getGifts($momentId, Request $request)
     {
@@ -354,20 +312,20 @@ class MomentViewerController extends MainController
      *
      * @param Request $request
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateDescription(Request $request, $id)
     {
         try {
             $moment = Moment::findOrFail($id);
-
+            
             $request->validate([
                 'description' => 'nullable|string|max:5000'
             ]);
-
+            
             $moment->description = $request->input('description');
             $moment->save();
-
+            
             return response()->json([
                 'success' => true,
                 'message' => __('Description updated successfully'),
@@ -385,7 +343,7 @@ class MomentViewerController extends MainController
      * حذف Moment
      *
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteMoment($id)
     {
@@ -417,12 +375,12 @@ class MomentViewerController extends MainController
      * إعادة تعيين seed للترتيب العشوائي
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function resetRandomSeed(Request $request)
     {
         $keysDeleted = 0;
-
+        
         // مسح جميع الـ random IDs المخزنة في الـ session
         $sessionKeys = $request->session()->all();
         foreach ($sessionKeys as $key => $value) {
@@ -431,7 +389,7 @@ class MomentViewerController extends MainController
                 $keysDeleted++;
             }
         }
-
+        
         // مسح الـ seed القديم (للتوافق مع الإصدارات السابقة)
         $request->session()->forget('moment_random_seed');
 

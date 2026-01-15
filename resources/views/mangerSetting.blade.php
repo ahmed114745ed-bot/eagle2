@@ -10,12 +10,22 @@
 
     }
 
+    /* القائمة الجانبية */
+   
+
+
+
+
     /* محتوى الصفحة */
     .settings-content {
         flex-grow: 1;
+        padding: 20px;
+        background: var(--secondary-color) !important;
+        filter: brightness(0.85);
         color: var(--text-secondary-color) !important;
         border-top: 3px solid var(--second-alpha) !important;
         border-radius: 20px !important;
+        padding: 15px;
     }
 
     .settings-section {
@@ -117,9 +127,8 @@
         width: 200px;
 
     }
-
-    /* Tab styling */
-    .tab-buttons {
+        /* Tab styling */
+        .tab-buttons {
         display: flex;
         border-bottom: 1px solid #444;
         margin-bottom: 20px;
@@ -168,8 +177,7 @@
     .tab-content input[type="file"] {
         grid-column: 2;
     }
-
-    .settings-sidebar {
+.settings-sidebar {
         width: 250px;
         background: #222;
         min-height: 400px;
@@ -188,8 +196,9 @@
     }
 
 
-    /* Badge Upload Section Specific Styles */
-    .badge-upload-container {
+
+        /* Badge Upload Section Specific Styles */
+        .badge-upload-container {
         display: grid;
         width: 200%;
         grid-template-columns: repeat(2, 1fr);
@@ -255,7 +264,6 @@
         transition: background 0.3s;
         grid-column: 1 / -1; /* Span full width */
     }
-
     .settings-sidebar {
 
         background-color: var(--table-background-color);
@@ -272,7 +280,6 @@
         scrollbar-width: thin;
         /* تقليل عرض شريط التمرير */
     }
-
     .settings-menu {
         display: flex;
         gap: 4px;
@@ -285,8 +292,7 @@
         /* تقليل عرض شريط التمرير */
 
     }
-
-    .settings-menu button {
+     .settings-menu button {
         background-color: var(--box-background-color);
         border: none;
         padding: 10px 15px;
@@ -296,8 +302,7 @@
         color: var(--text-secondary-color) !important;
 
     }
-
-    .settings-menu button:hover {
+     .settings-menu button:hover {
         background: #ff9800;
     }
 
@@ -306,17 +311,24 @@
         background: #ffab40;
     }
 
-    .ltr .box-header .btn {
+    .ltr .box-header .btn{
         right: 18px;
         position: absolute;
         color: var(--text-secondary-color) !important;
+
+
     }
 
 
-    .rtl .box-header .btn {
+    .rtl .box-header .btn{
         left: 18px;
         position: absolute;
         color: var(--text-secondary-color) !important;
+
+    }
+    .grid-table{
+        background: var(--secondary-color) !important;
+
     }
 
     /* Responsive adjustments */
@@ -330,90 +342,88 @@
 
 <body>
 
-<div class="settings-sidebar">
+    <div class="settings-sidebar">
+      
+    </div>
+    <div class="all-page" style="width: 100%;">
+       
 
-</div>
-<div class="all-page" style="width: 100%;">
+        <div class="settings-content box grid-box"">
 
+            <div id="PaymentGateways" class="settings-section active">
+                <!-- <h3>{{ __('Payment Gateways') }}</h3> -->
 
-    <div class="settings-content box grid-box"
-    ">
+                <div class="table-responsive">
+                    <div class="box-header with-border" style="display: flex;">
+                    <div class="settings-menu">
+                        <button class="" onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
+                    </div>
+                  @if (Admin::user()->can('*') || Admin::user()->can('create-Payment-methods-for-shipping-agencies'))
 
-    <div id="PaymentGateways" class="settings-section active">
-        <!-- <h3>{{ __('Payment Gateways') }}</h3> -->
+                        <a  href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
+                            {{ __('Add') }}
+                        </a>
+                    @endif 
 
-        <div class="table-responsive">
-            <div class="box-header with-border" style="display: flex;">
-                <div class="settings-menu">
-                    <button class="" onclick="showSection('PaymentGateways')">{{ __('Payment Gateways') }}</button>
+                    </div>
+                    <table class="table  table-hover grid-table" >
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Photo') }}</th>
+                                <th>{{ __('Title') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($payment_gateways as $gateway)
+                            <tr>
+                                <td>{{ $gateway->id }}</td>
+                                <td>
+                                    <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}" style="width: 100px; height: 50px;">
+                                </td>
+                                <td>{{ $gateway->title }}</td>
+                                <td>
+                                    @if (Admin::user()->can('*') || Admin::user()->can('edit-Payment-methods-for-shipping-agencies'))
+                                        <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
+                                        class="btn btn-sm btn-primary">
+                                            {{ __('Edit') }}
+                                        </a>
+                                    @endif
+
+                                    @if (Admin::user()->can('*') || Admin::user()->can('delete-Payment-methods-for-shipping-agencies'))
+                                        <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure?')">
+                                            {{ __('Delete') }}
+                                        </a>
+                                    @endif
+
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                @if (Admin::user()->can('*') || Admin::user()->can('create-Payment-methods-for-shipping-agencies'))
 
-                    <a href="{{ route('admin.create-payment-gateway') }}" class="btn btn-success">
-                        {{ __('Add') }}
-                    </a>
-                @endif
 
             </div>
-            <table class="table  table-hover grid-table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>{{ __('Photo') }}</th>
-                    <th>{{ __('Title') }}</th>
-                    <th>{{ __('Actions') }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                @foreach($payment_gateways as $gateway)
-                    <tr>
-                        <td>{{ $gateway->id }}</td>
-                        <td>
-                            <img src="{{ getImagePath($gateway->photo) }}" alt="{{ $gateway->title }}"
-                                 style="width: 100px; height: 50px;">
-                        </td>
-                        <td>{{ $gateway->title }}</td>
-                        <td>
-                            @if (Admin::user()->can('*') || Admin::user()->can('edit-Payment-methods-for-shipping-agencies'))
-                                <a href="{{ route('admin.edit-payment-gateway', $gateway->id) }}"
-                                   class="btn btn-sm btn-primary">
-                                    {{ __('Edit') }}
-                                </a>
-                            @endif
 
-                            @if (Admin::user()->can('*') || Admin::user()->can('delete-Payment-methods-for-shipping-agencies'))
-                                <a href="{{ route('admin.delete-payment-gateway', $gateway->id) }}"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Are you sure?')">
-                                    {{ __('Delete') }}
-                                </a>
-                            @endif
-
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+        </div>
+        <div id="imageModal" class="modal" onclick="closeFullScreen()">
+            <span class="close">&times;</span>
+            <img class="modal-content" id="fullImage">
         </div>
 
-
-    </div>
-
-</div>
-<div id="imageModal" class="modal" onclick="closeFullScreen()">
-    <span class="close">&times;</span>
-    <img class="modal-content" id="fullImage">
-</div>
-
-<script>
-    function previewImage(input, previewId) {
+        <script>
+                function previewImage(input, previewId) {
         const preview = document.getElementById(previewId);
         const file = input.files[0];
 
         if (file) {
             const reader = new FileReader();
 
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 preview.src = e.target.result;
                 preview.style.display = 'block';
             }
@@ -429,111 +439,110 @@
         modal.style.display = "block";
         modalImg.src = imgElement.src;
     }
+            function openLanguageTab(evt, languageCode) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
 
-    function openLanguageTab(evt, languageCode) {
-        // Hide all tab contents
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
+                // Remove active class from all buttons
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
 
-        // Remove active class from all buttons
-        document.querySelectorAll('.tab-button').forEach(button => {
-            button.classList.remove('active');
-        });
+                // Show the current tab and mark button as active
+                document.getElementById(languageCode).classList.add('active');
+                evt.currentTarget.classList.add('active');
+            }
+        </script>
+        <!-- كود JavaScript -->
+        <script>
+            // function showSection(sectionId) {
+            //     //     document.querySelectorAll('.settings-section').forEach(section => {
+            //     //         section.classList.remove('active');
+            //     //     });
 
-        // Show the current tab and mark button as active
-        document.getElementById(languageCode).classList.add('active');
-        evt.currentTarget.classList.add('active');
-    }
-</script>
-<!-- كود JavaScript -->
-<script>
-    // function showSection(sectionId) {
-    //     //     document.querySelectorAll('.settings-section').forEach(section => {
-    //     //         section.classList.remove('active');
-    //     //     });
+            //     //     document.getElementById(sectionId).classList.add('active');
+            //     // }
 
-    //     //     document.getElementById(sectionId).classList.add('active');
-    //     // }
+            //     document.querySelectorAll('.settings-menu button').forEach(button => {
+            //         button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
+            //         button.style.color = ''; // إرجاع لون النص الافتراضي
+            //     });
 
-    //     document.querySelectorAll('.settings-menu button').forEach(button => {
-    //         button.style.backgroundColor = ''; // إرجاع اللون الافتراضي
-    //         button.style.color = ''; // إرجاع لون النص الافتراضي
-    //     });
+            //     // إخفاء جميع الأقسام
+            //     document.querySelectorAll('.settings-section').forEach(section => {
+            //         section.classList.remove('active');
+            //     });
 
-    //     // إخفاء جميع الأقسام
-    //     document.querySelectorAll('.settings-section').forEach(section => {
-    //         section.classList.remove('active');
-    //     });
+            //     // إظهار القسم المطلوب
+            //     document.getElementById(sectionId).classList.add('active');
 
-    //     // إظهار القسم المطلوب
-    //     document.getElementById(sectionId).classList.add('active');
+            //     // تحديد الزر المضغوط عليه
+            //     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
 
-    //     // تحديد الزر المضغوط عليه
-    //     const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-
-    //     // تعيين لون الزر من متغير CSS
-    //     activeButton.style.backgroundColor = 'var(--primary-color)';
-    //     activeButton.style.color = 'var(--text-secondary-color)';
-
-
-    // }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        // Function to get query parameter by name
-        function getQueryParam(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // Get the 'firsttab' parameter from URL or default to 'chargesSettings'
-        const activeTab = getQueryParam("firsttab") || "PaymentGateways";
-
-        // Show the selected tab
-        showSection(activeTab);
-    });
-
-    function showSection(sectionId) {
-        // Remove active class from all sections
-        document.querySelectorAll('.settings-section').forEach(section => {
-            section.classList.remove('active');
-        });
-
-        // Add active class to the selected section
-        document.getElementById(sectionId).classList.add('active');
-
-        // Reset button styles
-        document.querySelectorAll('.settings-menu button').forEach(button => {
-            button.style.backgroundColor = '';
-            button.style.color = '';
-        });
-
-        // Highlight the active button
-        const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
-        if (activeButton) {
-            activeButton.style.backgroundColor = 'var(--primary-color)';
-            activeButton.style.color = 'var(--text-secondary-color)';
-        }
-
-        // Update the URL with the selected tab without reloading
-        const url = new URL(window.location);
-        url.searchParams.set("firsttab", sectionId);
-        window.history.pushState({}, "", url);
-    }
-
-    function openFullScreen(imgElement) {
-        var modal = document.getElementById("imageModal");
-        var modalImg = document.getElementById("fullImage");
-
-        modal.style.display = "block";
-        modalImg.src = imgElement.src;
-    }
-
-    function closeFullScreen() {
-        document.getElementById("imageModal").style.display = "none";
-    }
-</script>
+            //     // تعيين لون الزر من متغير CSS
+            //     activeButton.style.backgroundColor = 'var(--primary-color)';
+            //     activeButton.style.color = 'var(--text-secondary-color)';
 
 
-</div>
+            // }
+
+            document.addEventListener("DOMContentLoaded", function() {
+                    // Function to get query parameter by name
+                    function getQueryParam(name) {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get(name);
+                    }
+
+                    // Get the 'firsttab' parameter from URL or default to 'chargesSettings'
+                    const activeTab = getQueryParam("firsttab") || "PaymentGateways";
+
+                    // Show the selected tab
+                    showSection(activeTab);
+                });
+
+            function showSection(sectionId) {
+                    // Remove active class from all sections
+                    document.querySelectorAll('.settings-section').forEach(section => {
+                        section.classList.remove('active');
+                    });
+
+                    // Add active class to the selected section
+                    document.getElementById(sectionId).classList.add('active');
+
+                    // Reset button styles
+                    document.querySelectorAll('.settings-menu button').forEach(button => {
+                        button.style.backgroundColor = '';
+                        button.style.color = '';
+                    });
+
+                    // Highlight the active button
+                    const activeButton = document.querySelector(`.settings-menu button[onclick="showSection('${sectionId}')"]`);
+                    if (activeButton) {
+                        activeButton.style.backgroundColor = 'var(--primary-color)';
+                        activeButton.style.color = 'var(--text-secondary-color)';
+                    }
+
+                    // Update the URL with the selected tab without reloading
+                    const url = new URL(window.location);
+                    url.searchParams.set("firsttab", sectionId);
+                    window.history.pushState({}, "", url);
+                }
+
+            function openFullScreen(imgElement) {
+                var modal = document.getElementById("imageModal");
+                var modalImg = document.getElementById("fullImage");
+
+                modal.style.display = "block";
+                modalImg.src = imgElement.src;
+            }
+
+            function closeFullScreen() {
+                document.getElementById("imageModal").style.display = "none";
+            }
+        </script>
+
+
+    </div>
 </body>

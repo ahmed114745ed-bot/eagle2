@@ -47,7 +47,7 @@ class MomentController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Moment());
-        $countryID = session('filter_country_id');
+        $countryID =session('filter_country_id');
         // 🔹 **إضافة الفلتر للبحث عن المستخدم بالاسم أو UUID**
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -64,12 +64,7 @@ class MomentController extends MainController
             });
         });
 
-        $grid->model()->with([
-            'momentGallery',
-            'user',
-            'user.profile',
-            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])->withCount(['likes', 'comments'])->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -84,11 +79,10 @@ class MomentController extends MainController
         });
 
         // 🔹 **عرض معلومات المستخدم**
-        $grid->column('user.name', __('User'))->display(function () {
-            $name = $this->user->name ?? '';
+        $grid->column('user.name', __('User'))->display(function ($name) {
             $uid = @$this->user->uuid;
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->user->profile->avatar;
+            $avatarPath = @$this->user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
             if (!isImageExists($avatar)) {
                 $avatar = $defaultImage;
@@ -106,23 +100,45 @@ class MomentController extends MainController
 
 
         // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
-        // $grid->column('comment_num', __('status'))->display(function () {
-        //     $likeCount = count(@$this->likes);
-        //     $commentCount = count(@$this->comments);
-        //     return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
-        // });
-
         $grid->column('comment_num', __('status'))->display(function () {
-            return "<span class='fa fa-comment'> {$this->comments_count}</span>
-            <span class='fa fa-thumbs-up'> {$this->likes_count}</span>";
+            $likeCount = count(@$this->likes);
+            $commentCount = count(@$this->comments);
+            return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
         });
 
         // 🔹 **عرض تاريخ الإنشاء**
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
 
+        // $grid->column('img', __('Image'))->display(function () {
+        //     $id = $this->id;
+        //     $galleries = MomentGallery::where('moment_id', $id)->get();
+
+        //     $html = '<div id="image-gallery-' . $id . '" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; padding: 20px;">';
+
+        //     foreach ($galleries as $image) {
+        //         $imgUrl = getDriverUrl() . '/' . $image->image;
+
+        //         $html .= '<div style="overflow: hidden; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+        //                     <img src="' . $imgUrl . '"
+        //                          style="width: 100%; height: 200px; object-fit: cover; cursor: pointer; transition: transform 0.3s ease;"
+        //                          data-original="' . $imgUrl . '"
+        //                          loading="lazy"
+        //                          class="gallery-image">
+        //                  </div>';
+        //     }
+
+        //     $html .= '</div>';
+
+        //     Admin::script("
+        //         new Viewer(document.getElementById('image-gallery-$id'));
+        //     ");
+
+        //     return $html;
+        // });
+
         $grid->column('img', __('Image'))->display(function () {
             $id = $this->id;
-            $galleries = $this->momentGallery;
+            $galleries = MomentGallery::where('moment_id', $id)->get();
 
             if ($galleries->isEmpty()) {
                 return 'No Image';
@@ -160,6 +176,51 @@ class MomentController extends MainController
         return $grid;
     }
 
+    // protected function grid()
+    // {
+    //     $grid = new Grid(new Moment());
+    //     $grid->filter(function (Grid\Filter $filter) {
+    //         $filter->expand();
+    //         $filter->disableIdFilter();
+    //         $filter->column('1/2', function ($filter) {
+    //             $filter->where(function ($query) {
+    //                 $input = $this->input;
+
+    //                 $query->whereHas('user', function ($query) use ($input) {
+    //                     $query->where('name', 'like', "%$input%")
+    //                     ->orWhere('uuid', 'like', "%$input%");
+    //                 });
+    //             }, __('User'))->placeholder(__('Search by name or UUID'));
+    //         });
+    //     });
+    //     $grid->model()->orderByDesc('created_at');
+    //     $grid->column('description', __('Description'));
+    //     $grid->column('user.name', __('user_id'))->display(function ($name) {
+    //         $uid = @$this->user->uuid;
+
+    //         return "$name <br>
+    //         <span style=\"color: #aaa; font-size: smaller;\">UID: $uid</span>";
+    //     });
+    //     $grid->column('comment_num', __('Stats'))->display(function ($commentNum) {
+    //         $like = count(@$this->likes);
+    //         $commentNum = count(@$this->comments);
+    //         return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
+    //     });
+    //     $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
+    //     $grid->column('img',__('Img'))->modal('show image' , function ($model, ) {
+    //         $img = $model->img;
+    //         if($img == null || $img == ''){
+    //             return 'No image founded';
+    //         }
+
+    //         $img = getDriverUrl().'/'.$img;
+    //         $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+
+    //         return (new WidgetsTable([''], [[$img]]));
+    //     });
+
+    //     return $grid;
+    // }
 
     /**
      * Make a show builder.
@@ -199,6 +260,8 @@ class MomentController extends MainController
 
         $form->number('user_id', __('User id'));
         $form->text('description', __('Description'));
+        // $form->number('comment_num', __('Comment num'));
+        // $form->number('like_num', __('Like num'));
         $form->image('img', __('Img'));
 
         return $form;
