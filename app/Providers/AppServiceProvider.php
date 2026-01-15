@@ -60,6 +60,7 @@ use Modules\RoomBoom\Entities\RoomBoomLevel;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 use Illuminate\Support\Str;
+use Illuminate\Broadcasting\BroadcastManager;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -153,20 +154,17 @@ class AppServiceProvider extends ServiceProvider
                             'broadcasting.connections.pusher.options.cluster' => $freshConfig['app_cluster'] ?? 'mt1',
                         ]);
                         
-                        // Purge cached broadcaster
-                        app('broadcast')->purge('pusher');
+                            $broadcastManager = app(BroadcastManager::class);
+                            $broadcastManager->forgetDrivers();
+                            $broadcastManager->driver('pusher');
+
+                            $lastConfigHash = $currentHash;
+
+                            if ($forceUpdate) {
+                                Cache::forget('pusher_config_changed');
+                            }
+                 
                         
-                        $lastConfigHash = $currentHash;
-                        
-                        if ($forceUpdate) {
-                            \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
-                        }
-                        
-                        \Illuminate\Support\Facades\Log::info('Queue: Pusher config refreshed', [
-                            'job' => $event->job->resolveName() ?? 'unknown',
-                            'pid' => getmypid(),
-                            'forced' => $forceUpdate,
-                        ]);
                     }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('Queue: Pusher config refresh failed', [
