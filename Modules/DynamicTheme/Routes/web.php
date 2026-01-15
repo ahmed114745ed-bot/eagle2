@@ -28,4 +28,9 @@ use Illuminate\Support\Facades\Route;
         Route::get('/theme-admin', function () {
             return view('dynamictheme::admin');
         });
+
+        // Child Customizer route
+        Route::get('/child-customizers', function () {
+            return view('dynamictheme::child-customizer');
+        });
 });

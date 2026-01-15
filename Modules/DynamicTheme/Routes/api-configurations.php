@@ -205,6 +205,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         
         // Batch update
         Route::post('batch-update', 'batchUpdate')->name('child-customizers.batch-update');
+        
+        // Drawing endpoints
+        Route::post('{id}/drawing', 'saveDrawing')->name('child-customizers.save-drawing');
+        Route::get('{id}/drawing', 'getDrawing')->name('child-customizers.get-drawing');
+        Route::get('config/{configId}/drawings', 'getConfigurationDrawings')->name('child-customizers.config-drawings');
+        Route::get('{id}/export-drawing', 'exportWithDrawing')->name('child-customizers.export-drawing');
+        Route::get('config/children', 'getConfigChildren')->name('child-customizers.config-children');
     });
 
     // ======================== UNIFIED CUSTOMIZER ENDPOINT (MAIN) ========================
@@ -227,4 +234,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Clone complete configuration to another widget
         Route::post('/complete/clone', 'cloneComplete')->name('customizers.complete.clone');
     });
-});
+});;

@@ -5,14 +5,8 @@ namespace Modules\DynamicTheme\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * ChildCustomizer - تخصيص شكل الأطفال (Children)
- * 
- * يسمح بتخصيص شكل وألوان الأطفال داخل الويدجت
- */
 class ChildCustomizer extends Model
 {
     use HasFactory, SoftDeletes;
@@ -22,37 +16,36 @@ class ChildCustomizer extends Model
         'theme_child_id',
         'shape_config',
         'color_config',
-        'gradient_config',
-        'background_config',
         'border_config',
         'shadow_config',
-        'animation_config',
-        'transition_config',
         'typography_config',
         'layout_config',
         'effects_config',
+        'animation_config',
         'position_config',
+        'drawing_data',
+        'drawing_metadata',
+        'is_visible',
+        'display_order',
         'name',
         'description',
         'is_active',
-        'order',
     ];
 
     protected $casts = [
         'shape_config' => 'array',
         'color_config' => 'array',
-        'gradient_config' => 'array',
-        'background_config' => 'array',
         'border_config' => 'array',
         'shadow_config' => 'array',
-        'animation_config' => 'array',
-        'transition_config' => 'array',
         'typography_config' => 'array',
         'layout_config' => 'array',
         'effects_config' => 'array',
+        'animation_config' => 'array',
         'position_config' => 'array',
+        'drawing_metadata' => 'array',
+        'is_visible' => 'boolean',
+        'display_order' => 'integer',
         'is_active' => 'boolean',
-        'order' => 'integer',
     ];
 
     /**
@@ -72,7 +65,7 @@ class ChildCustomizer extends Model
     }
 
     /**
-     * Generate CSS for this child customizer
+     * Generate CSS for child
      */
     public function generateCSS(): string
     {
@@ -80,8 +73,8 @@ class ChildCustomizer extends Model
 
         // Shape CSS
         if ($this->shape_config) {
-            if (isset($this->shape_config['border_radius'])) {
-                $css .= "border-radius: {$this->shape_config['border_radius']}px;";
+            if (isset($this->shape_config['borderRadius'])) {
+                $css .= "border-radius: {$this->shape_config['borderRadius']}px;";
             }
         }
 
@@ -98,14 +91,19 @@ class ChildCustomizer extends Model
         // Border CSS
         if ($this->border_config) {
             if (isset($this->border_config['width'])) {
-                $css .= "border: {$this->border_config['width']}px {$this->border_config['style'] ?? 'solid'} {$this->border_config['color']}};";
+                $style = $this->border_config['style'] ?? 'solid';
+                $css .= "border: {$this->border_config['width']}px {$style} {$this->border_config['color']};";
             }
         }
 
         // Shadow CSS
         if ($this->shadow_config) {
-            if (isset($this->shadow_config['box_shadow'])) {
-                $css .= "box-shadow: {$this->shadow_config['box_shadow']};";
+            if (isset($this->shadow_config['offsetX'])) {
+                $offsetX = $this->shadow_config['offsetX'];
+                $offsetY = $this->shadow_config['offsetY'] ?? 0;
+                $blur = $this->shadow_config['blur'] ?? 0;
+                $opacity = $this->shadow_config['opacity'] ?? 0.1;
+                $css .= "box-shadow: {$offsetX}px {$offsetY}px {$blur}px rgba(0,0,0,{$opacity});";
             }
         }
 
@@ -125,6 +123,13 @@ class ChildCustomizer extends Model
             }
         }
 
+        // Layout CSS
+        if ($this->layout_config) {
+            if (isset($this->layout_config['padding'])) {
+                $css .= "padding: {$this->layout_config['padding']}px;";
+            }
+        }
+
         // Effects CSS
         if ($this->effects_config) {
             if (isset($this->effects_config['opacity'])) {
@@ -134,14 +139,21 @@ class ChildCustomizer extends Model
 
         // Animation CSS
         if ($this->animation_config) {
-            if (isset($this->animation_config['name'])) {
-                $duration = $this->animation_config['duration'] ?? '1s';
-                $timing = $this->animation_config['timing_function'] ?? 'ease';
-                $css .= "animation: {$this->animation_config['name']} {$duration} {$timing};";
+            if (isset($this->animation_config['type'])) {
+                $duration = $this->animation_config['duration'] ?? 300;
+                $css .= "animation: {$this->animation_config['type']} {$duration}ms;";
             }
         }
 
         return $css;
+    }
+
+    /**
+     * Get visibility status
+     */
+    public function getVisibilityStatus(): string
+    {
+        return $this->is_visible ? 'visible' : 'hidden';
     }
 
     /**

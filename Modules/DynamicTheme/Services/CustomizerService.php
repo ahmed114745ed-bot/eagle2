@@ -5,6 +5,7 @@ namespace Modules\DynamicTheme\Services;
 use Modules\DynamicTheme\Entities\WidgetCustomizer;
 use Modules\DynamicTheme\Entities\ColorPreset;
 use Modules\DynamicTheme\Entities\WidgetDesignTemplate;
+use Modules\DynamicTheme\Entities\ChildCustomizer;
 use Modules\DynamicTheme\Entities\ConfigWidgetOverride;
 
 class CustomizerService
@@ -198,4 +199,219 @@ class CustomizerService
             $designData['name']
         );
     }
+
+    // ======================== CHILD CUSTOMIZER METHODS ========================
+
+    /**
+     * Create a child customizer
+     */
+    public static function createChildCustomizer(
+        int $themeChildId,
+        array $designConfig,
+        ?int $configThemeChildOverrideId = null
+    ): ChildCustomizer {
+        return ChildCustomizer::create([
+            'theme_child_id' => $themeChildId,
+            'config_theme_child_override_id' => $configThemeChildOverrideId,
+            'shape_config' => $designConfig['shape_config'] ?? [],
+            'color_config' => $designConfig['color_config'] ?? [],
+            'border_config' => $designConfig['border_config'] ?? [],
+            'shadow_config' => $designConfig['shadow_config'] ?? [],
+            'typography_config' => $designConfig['typography_config'] ?? [],
+            'layout_config' => $designConfig['layout_config'] ?? [],
+            'effects_config' => $designConfig['effects_config'] ?? [],
+            'animation_config' => $designConfig['animation_config'] ?? [],
+            'is_visible' => true,
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Update child customizer design
+     */
+    public static function updateChildDesign(
+        int $childCustomizerId,
+        array $designConfig
+    ): ChildCustomizer {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+
+        $child->update([
+            'shape_config' => $designConfig['shape_config'] ?? $child->shape_config,
+            'color_config' => $designConfig['color_config'] ?? $child->color_config,
+            'border_config' => $designConfig['border_config'] ?? $child->border_config,
+            'shadow_config' => $designConfig['shadow_config'] ?? $child->shadow_config,
+            'typography_config' => $designConfig['typography_config'] ?? $child->typography_config,
+            'layout_config' => $designConfig['layout_config'] ?? $child->layout_config,
+            'effects_config' => $designConfig['effects_config'] ?? $child->effects_config,
+            'animation_config' => $designConfig['animation_config'] ?? $child->animation_config,
+        ]);
+
+        return $child;
+    }
+
+    /**
+     * Apply color preset to child
+     */
+    public static function applyColorPresetToChild(int $childCustomizerId, int $presetId): ChildCustomizer
+    {
+        $preset = ColorPreset::findOrFail($presetId);
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+
+        $colorConfig = $child->color_config ?? [];
+        $colorConfig['primary'] = $preset->primary_color;
+        $colorConfig['secondary'] = $preset->secondary_color;
+        $colorConfig['accent'] = $preset->accent_color;
+        $colorConfig['text'] = $preset->text_color;
+
+        $child->update(['color_config' => $colorConfig]);
+        return $child;
+    }
+
+    /**
+     * Generate CSS for child customizer
+     */
+    public static function generateChildCSS(int $childCustomizerId): string
+    {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+        return $child->generateCSS();
+    }
+
+    /**
+     * Batch update children order
+     */
+    public static function batchUpdateChildrenOrder(array $childrenData): void
+    {
+        foreach ($childrenData as $data) {
+            ChildCustomizer::find($data['id'])?->update(['display_order' => $data['order']]);
+        }
+    }
+
+    /**
+     * Clone child customizer
+     */
+    public static function cloneChildCustomizer(int $childCustomizerId, ?string $newName = null): ChildCustomizer
+    {
+        $original = ChildCustomizer::findOrFail($childCustomizerId);
+        $clone = $original->replicate();
+
+        if ($newName) {
+            $clone->name = $newName;
+        } else {
+            $clone->name = $original->name . ' (Copy)';
+        }
+
+        $clone->save();
+        return $clone;
+    }
+
+    /**
+     * Export child customizer design
+     */
+    public static function exportChildDesign(int $childCustomizerId): array
+    {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+
+        return [
+            'name' => $child->name,
+            'description' => $child->description,
+            'design_config' => [
+                'shape_config' => $child->shape_config,
+                'color_config' => $child->color_config,
+                'border_config' => $child->border_config,
+                'shadow_config' => $child->shadow_config,
+                'typography_config' => $child->typography_config,
+                'layout_config' => $child->layout_config,
+                'effects_config' => $child->effects_config,
+                'animation_config' => $child->animation_config,
+            ],
+        ];
+    }
+
+    /**
+     * Import child design from export
+     */
+    public static function importChildDesign(int $themeChildId, array $designData, ?int $configOverrideId = null): ChildCustomizer
+    {
+        return self::createChildCustomizer(
+            $themeChildId,
+            $designData['design_config'],
+            $configOverrideId
+        );
+    }
+
+    /**
+     * Save drawing data for child customizer
+     */
+    public static function saveDrawing(int $childCustomizerId, string $drawingData, array $metadata = []): ChildCustomizer
+    {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+        
+        $child->update([
+            'drawing_data' => $drawingData,
+            'drawing_metadata' => $metadata,
+        ]);
+        
+        return $child;
+    }
+
+    /**
+     * Get drawing data for child customizer
+     */
+    public static function getDrawing(int $childCustomizerId): ?array
+    {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+        
+        return [
+            'drawing_data' => $child->drawing_data,
+            'drawing_metadata' => $child->drawing_metadata,
+            'child_info' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'config_widget_override_id' => $child->config_widget_override_id,
+            ]
+        ];
+    }
+
+    /**
+     * Get all drawings for a configuration
+     */
+    public static function getConfigurationDrawings(int $configWidgetOverrideId): array
+    {
+        return ChildCustomizer::where('config_widget_override_id', $configWidgetOverrideId)
+            ->where('drawing_data', '!=', null)
+            ->get()
+            ->map(fn($child) => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'drawing_data' => $child->drawing_data,
+                'drawing_metadata' => $child->drawing_metadata,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Export child with drawing
+     */
+    public static function exportChildWithDrawing(int $childCustomizerId): array
+    {
+        $child = ChildCustomizer::findOrFail($childCustomizerId);
+        
+        return [
+            'child_info' => [
+                'id' => $child->id,
+                'name' => $child->name,
+                'description' => $child->description,
+                'shape_config' => $child->shape_config,
+                'color_config' => $child->color_config,
+                'border_config' => $child->border_config,
+                'shadow_config' => $child->shadow_config,
+            ],
+            'drawing' => [
+                'drawing_data' => $child->drawing_data,
+                'drawing_metadata' => $child->drawing_metadata,
+                'exported_at' => now()->toIso8601String(),
+            ]
+        ];
+    }
 }
+

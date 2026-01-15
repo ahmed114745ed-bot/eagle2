@@ -10,65 +10,43 @@ return new class extends Migration
     {
         Schema::create('child_customizers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('config_widget_override_id')
-                ->constrained('config_widget_overrides')
+            $table->foreignId('config_theme_child_override_id')
+                ->nullable()
+                ->constrained('config_theme_child_overrides')
                 ->onDelete('cascade');
             $table->foreignId('theme_child_id')
-                ->nullable()
                 ->constrained('theme_children')
-                ->onDelete('set null');
+                ->onDelete('cascade');
             
-            // تكوين الشكل
+            // تخصيص شكل الابن
             $table->json('shape_config')->nullable();
-            
-            // الألوان
             $table->json('color_config')->nullable();
-            
-            // الحدود والظلال
             $table->json('border_config')->nullable();
             $table->json('shadow_config')->nullable();
-            
-            // الخطوط والتباعد
             $table->json('typography_config')->nullable();
             $table->json('layout_config')->nullable();
-            
-            // المؤثرات
             $table->json('effects_config')->nullable();
             $table->json('animation_config')->nullable();
             
-            // معلومات إضافية
-            $table->string('child_key')->nullable();
-            $table->string('child_name')->nullable();
+            // الرؤية والترتيب
             $table->boolean('is_visible')->default(true);
-            $table->integer('order')->default(0);
+            $table->integer('display_order')->default(0);
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
             
             $table->timestamps();
             $table->softDeletes();
             
-            $table->index(['config_widget_override_id', 'theme_child_id']);
+            $table->index('config_theme_child_override_id');
+            $table->index('theme_child_id');
             $table->index('is_visible');
-        });
-
-        Schema::create('child_design_presets', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('configuration_id')
-                ->constrained('client_configurations')
-                ->onDelete('cascade');
-            
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->json('child_design')->comment('تصميم الأطفال');
-            $table->boolean('is_default')->default(false);
-            
-            $table->timestamps();
-            
-            $table->index(['configuration_id', 'is_default']);
+            $table->index('is_active');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('child_design_presets');
         Schema::dropIfExists('child_customizers');
     }
 };

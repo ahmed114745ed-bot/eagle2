@@ -66,6 +66,13 @@
                 </div>
 
                 <div class="mt-4 flex justify-end space-x-4">
+                    <a
+                        href="/admin/child-customizers"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                        🎨 Child Customizer
+                    </a>
+
                     <button
                         @click="saveConfiguration"
                         :disabled="!hasChanges || !selectedConfigId"
