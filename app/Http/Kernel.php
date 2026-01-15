@@ -38,7 +38,6 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\OctaneCacheClearing::class,
         \App\Http\Middleware\ForcePusherRefresh::class, 
-       // \App\Http\Middleware\OctanePusherConfig::class, 
     ];
 
     /**
