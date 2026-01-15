@@ -3102,7 +3102,7 @@
         width: 250px;
         min-height: 400px;
         padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     }
 
     .settings-sidebar h2 {
@@ -3114,8 +3114,16 @@
         background: #ffffff;
         border-radius: 16px;
         padding: 24px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid #eaeaea;
+    }
+    @media (max-width: 768px) {
+        .table-responsive td,
+        .table-responsive th {
+            white-space: nowrap !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+        }
     }
 </style>
 

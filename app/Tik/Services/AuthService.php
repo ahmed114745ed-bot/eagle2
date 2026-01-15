@@ -43,7 +43,7 @@ class AuthService
                 'message' => 'Wrong number of segments in ID token',
                 'data' => null,
                 'paginates' => null
-            ], 400);
+            ], 422);
         }
         $googleResponse = Http::get('https://oauth2.googleapis.com/tokeninfo', [
             'id_token' => $id_token
@@ -160,18 +160,18 @@ class AuthService
      */
     public function loginWithGoogle($request)
     {
-        if (!$request['id_token']) throw new \Exception('google id token missing');
+        if (!$request['id_token']) return Common::apiResponse(false, 'google id token missing', [], 422);
         $client = new Google_Client();
         $payload = $client->verifyIdToken($request['id_token']);
         if (!$payload) {
-            throw new \Exception('Google ID Token not found or invalid');
+            return Common::apiResponse(false, 'Google ID Token not found or invalid', [], 422);
         }
         // $google_id = $payload['sub'];
 
         $google_id = $request['google_id'] ?? null;
 
         if (!$google_id) {
-            throw new \Exception('Google ID not found in token or request');
+            return Common::apiResponse(false, 'Google ID not found in token or request', [], 422);
         }
         
         $user = $this->userRepository->findByGoogleId($request['google_id']);
@@ -191,9 +191,8 @@ class AuthService
 
                 ];
             } else {
-            
                 $email =    $this->userRepository->findByEmail($request['email']);
-                if ($email) throw new \Exception('you used this email before');
+                if ($email) return Common::apiResponse(false, 'you used this email before', [], 422);
                 $country = $this->countryRepository->findByPhoneCode('101');
                 $data = [
                     'name' => $request['name'],
@@ -224,10 +223,8 @@ class AuthService
 
                 $user = $this->userRepository->create($data);
                 $is_new = true;
-          
-
                 try {
-                     $this->storeImage($request, $data, $user);
+                    $this->storeImage($request, $data, $user);
                 } catch (\Exception $e) {
                     logger()->error('Failed to store user image', [
                         'user_id' => $user->id ?? null,
@@ -235,28 +232,23 @@ class AuthService
                     ]);
                 }
 
-                    $tags = request('tags');
-                    if ($tags && is_array($tags)) {
-                        try {
-                            $user->tags()->attach($tags);
-                        } catch (\Exception $e) {
-                            logger()->error('Failed to attach user tags', [
-                                'user_id' => $user->id ?? null,
-                                'tags' => $tags,
-                                'error' => $e->getMessage()
-                            ]);
-                        }
+                $tags = request('tags');
+                if ($tags && is_array($tags)) {
+                    try {
+                        $user->tags()->attach($tags);
+                    } catch (\Exception $e) {
+                        logger()->error('Failed to attach user tags', [
+                            'user_id' => $user->id ?? null,
+                            'tags' => $tags,
+                            'error' => $e->getMessage()
+                        ]);
                     }
-
-
+                }
             }
         }
         $user->save();
-          
         $device_token = $request['device_token'] ?? null;
         $this->rule($user, '', $device_token, $request);
-        // $this->rule($user, '', @$request['device_token'], $request);
-
         $token = $user->createToken('api_token')->plainTextToken;
         $this->userRepository->updateIsLogout($user, 0, $is_new);
         return [$user, $token, []];

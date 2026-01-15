@@ -355,6 +355,5 @@ class RecalculateWalletsSeeder extends Seeder
             throw new \Exception('RecalculateWalletsSeeder verification failed: wallets do not match sums.');
         }
 
-        Log::info('RecalculateWalletsSeeder completed successfully. Wallets rebuilt and verified.');
     }
 }

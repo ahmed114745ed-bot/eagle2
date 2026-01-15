@@ -256,7 +256,8 @@
                 <button onclick="showSection('PaidRoom')">{{ __('Paid Room') }}</button>
                 <button onclick="showSection('custom_background_settings')">{{ __('Custom Background settings') }}</button>
                 <button onclick="showSection('additional_settings')">{{ __('Additional settings') }}</button>
-                 <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
+                <button onclick="showSection('admin_settings')">{{ __('Admin settings') }}</button>
+                <button onclick="showSection('show_room')">{{ __('show rooms') }}</button>
             </div>
         </div>
 
@@ -404,6 +405,26 @@
                         {{ __('This is the default number of admins allowed per room.') }}
                     </small>
                     <br>
+                    <button type="submit">{{ __('save') }}</button>
+                </div>
+            </form>
+        </div>
+
+          <div id="show_room" class="settings-section">
+            <h3>{{ __('show rooms') }}</h3>
+            <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST">
+                <div class="form">
+                    @csrf
+                   <span class="toggle-label">{{ __('room in home screen layer') }}</span>
+                         <input type="hidden" name="show_room" value="0">
+                            <label class="switch">
+                                <input type="checkbox"
+                                    name="show_room"
+                                    value="1"
+                                    @checked((bool) ($settings['show_room'] ?? false))>
+                                <span class="slider round"></span>
+                            </label>
+                     <br><br>
                     <button type="submit">{{ __('save') }}</button>
                 </div>
             </form>

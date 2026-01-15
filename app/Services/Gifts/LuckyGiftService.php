@@ -324,12 +324,6 @@ class LuckyGiftService
 
         $roomId   = $room->id;
 
-         \Log::info('🚀 Sending  room 19...', [
-                            'user_id'  => $userId,
-                            'owner_id' => $ownerId,
-                            'room_id'  => $room->id ?? null,
-                        ]);
-
         /// todo check visitors
 
         [$ownerWallet, $appWallet]      = $this->getCoreWallets();
@@ -469,11 +463,6 @@ class LuckyGiftService
         $room->session      +=  $coinsForOwner;
         $room->save();
 
-         \Log::info('🚀 room session   19...', [
-                            'user_id'  => $userId,
-                          
-                        ]);
-
         // add session to response
         $responseData['session'] = $room->session_string;
 
@@ -510,10 +499,10 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-       \Log::info('🚀 room responseData   19...', [
-                            'responseData'  => $responseData,
+    //    \Log::info('🚀 room responseData   19...', [
+    //                         'responseData'  => $responseData,
                           
-                        ]);
+    //                     ]);
         return  $responseData;
     }
 
@@ -768,10 +757,10 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-       \Log::info('🚀 room responseData   19 V3...', [
-                            'responseData'  => $responseData,
+    //    \Log::info('🚀 room responseData   19 V3...', [
+    //                         'responseData'  => $responseData,
                           
-                        ]);
+    //                     ]);
         return  $responseData;
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)

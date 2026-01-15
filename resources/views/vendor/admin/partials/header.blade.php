@@ -25,6 +25,36 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+<script>
+    // Setup CSRF token for all AJAX requests (required for Octane)
+    (function() {
+        var token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            window.Laravel = { csrfToken: token.content };
+            
+            // Setup jQuery AJAX defaults
+            if (typeof $ !== 'undefined') {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': token.content
+                    }
+                });
+            }
+            
+            // Also setup when jQuery loads later
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof $ !== 'undefined' || typeof jQuery !== 'undefined') {
+                    ($ || jQuery).ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                }
+            });
+        }
+    })();
+</script>
+
 <style>
     :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};

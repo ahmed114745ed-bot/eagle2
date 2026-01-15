@@ -26,11 +26,32 @@ class RoomResource extends JsonResource
             }
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
-        $have_luck_box = $this->boxUse->where("is_closed",0);
+        $have_luck_box = $this->boxUse->where("is_closed", 0);
         $isHideCountry = $this?->owner?->getPackWithTypeV2(13);
 
         if ($this->owner->relationLoaded('chatRoomsAsUser') || $this->owner->relationLoaded('chatRoomsAsUser2')) {
             $chatRoom = $this->owner->chatRoomsAsUser->first() ?? $this->owner->chatRoomsAsUser2->first();
+        }
+
+        $agency_joined = $this->owner->agency;
+      // dd($agency_joined);
+        if ($agency_joined) {
+
+
+            $owner = $agency_joined->app_owner_id == $this->owner->id
+                ? new \stdClass()
+                : new ShortUserResource($agency_joined->owner);
+
+            $agency_joined = [
+                'id' => $agency_joined->id,
+                'name' => $agency_joined->name,
+                'status' => $agency_joined->status,
+                'image' => $agency_joined->img,
+                'owner' => $owner,
+
+            ];
+        } else {
+            $agency_joined = (object)[];
         }
 
         /**@var Room $this*/
@@ -52,11 +73,11 @@ class RoomResource extends JsonResource
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,
             'name' => $this->room_name ?: '',
             "mode" => $this->mode,
-            //            'visitors_count' => $this->count_room_socket,
+            'agency' => $agency_joined,
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
-//            'class' => $this->myClass ?: new \stdClass(),
-//            'type' => $this->myType ?: new \stdClass(),
+            //            'class' => $this->myClass ?: new \stdClass(),
+            //            'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,
             'session' => $this->session_string,
             'giftPrice' => $this->session_string,
@@ -119,7 +140,7 @@ class RoomResource extends JsonResource
             $data = array_merge($data, [
                 'room_users' => Common::get_room_users_2($this->owner()?->id, $request->user()->id),
                 'background' => $this->final_room_image ?: $this->room_background,
-//                'mics' => $this->microphone ? explode(',', $this->microphone) : [],
+                //                'mics' => $this->microphone ? explode(',', $this->microphone) : [],
                 'mics' => $micString ? explode(',', $micString) : [],
                 'is_mics_free' => $this->free_mic ?: 0,
                 'owner' => $this->owner(),
@@ -131,7 +152,7 @@ class RoomResource extends JsonResource
                 'created_at' => $this->created_at,
             ]);
         }
-        return $data ;
+        return $data;
     }
 
 

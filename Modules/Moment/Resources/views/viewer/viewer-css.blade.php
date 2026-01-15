@@ -296,7 +296,7 @@ html[dir="rtl"] body {
 }
 
 .menu-btn:hover {
-    background: black;
+    background: var(--bg-primary);
 }
 
 .post-menu {
@@ -372,7 +372,7 @@ html[dir="rtl"] .dropdown-item,
 }
 
 .dropdown-item:hover {
-    background: var(--primary-color);
+    background: var(--bg-primary);
 }
 
 .dropdown-item.delete-item {

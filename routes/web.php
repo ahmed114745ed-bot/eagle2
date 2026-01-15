@@ -22,6 +22,7 @@ use App\Models\AdminNotification;
 use App\Facades\CustomNotification;
 use App\Enums\AdminNotificationType;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Database\Seeders\FlagSyrianSeeder;
 use Modules\Vip\Entities\VipPrivilege;
@@ -299,6 +300,31 @@ Route::get('delete-account', function () {
 
 Route::get('/', [WelcomeController::class, 'index']);
 
+// Test Pusher Config (for debugging Octane cache issues)
+Route::get('/test-pusher-config', function () {
+    $pusherConfig = getPusherConfig();
+    $laravelConfig = [
+        'key' => config('broadcasting.connections.pusher.key'),
+        'secret' => config('broadcasting.connections.pusher.secret'),
+        'app_id' => config('broadcasting.connections.pusher.app_id'),
+        'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+    ];
+    
+    return response()->json([
+        'from_helper_function' => $pusherConfig,
+        'from_laravel_config' => $laravelConfig,
+        'cache_info' => [
+            'environment' => app()->environment(),
+            'cache_driver' => config('cache.default'),
+        ],
+        'timestamp' => now()->toDateTimeString(),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+// Override Grid Sortable Route for Octane compatibility (outside admin group)
+Route::post('admin/_grid-sortable_', [\App\Admin\Controllers\OctaneGridSortableController::class, 'sort'])
+    ->middleware(['web', 'admin'])
+    ->name('laravel-admin-grid-sortable');
 
 Route::group(
     [
@@ -314,6 +340,16 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
+        // Gift Categories Cache Clear (for Octane compatibility)
+        Route::post('gift-categories/clear-cache', [\App\Admin\Controllers\GiftCategoryController::class, 'clearCache'])
+            ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
+            ->name('gift-categories.clear-cache');
+
+        // Gift Categories Sortable Route (for Octane compatibility)
+        Route::post('gift-categories/sort-update', [\App\Admin\Controllers\GiftCategoryController::class, 'sortUpdate'])
+            ->middleware(\App\Http\Middleware\DisableOctaneCaching::class)
+            ->name('gift-categories.sort-update');
+
         Route::get('create-payment-gateways', [MangerSettingController::class, 'createPaymentGateway'])->name('create-payment-gateway');
         Route::post('store-payment-gateways', [MangerSettingController::class, 'storePaymentGateway'])->name('store-payment-gateway');
         Route::put('update-payment-gateways/{id}', [MangerSettingController::class, 'UpdatePaymentGateway'])->name('update-payment-gateway');
@@ -1140,3 +1176,275 @@ Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
 Route::get('/test-branch', function (\Illuminate\Http\Request $request) {
     dd("branch tested");
 });
+
+Route::get('/octane', function () {
+    Cache::store('octane')->clear();
+
+    return 'Octane Swoole memory cache cleared!';
+});
+
+Route::get('/sys/flush-octane', function () {
+    Cache::store('octane')->clear();
+    return response()->json(['status' => 'Octane Memory Cache Cleared']);
+})->middleware('auth.basic');
+
+Route::get('/sys/signal-flush', function () {
+    $triggerFile = storage_path('framework/cache_flush_signal');
+    if (!file_exists(dirname($triggerFile))) {
+        @mkdir(dirname($triggerFile), 0775, true);
+    }
+    @touch($triggerFile);
+    return response()->json(['status' => 'Signal file created']);
+})->middleware('auth.basic');
+
+Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
+
+    $githubSignature = $request->header('X-Hub-Signature-256');
+    $customToken = $request->header('X-Deploy-Token') ?? $request->input('token');
+
+    $authorized = false;
+
+    if ($githubSignature) {
+        $payload = $request->getContent();
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $secret);
+        $authorized = hash_equals($expectedSignature, $githubSignature);
+    }
+
+    if (!$authorized && $customToken === $secret) {
+        $authorized = true;
+    }
+
+    if (!$authorized) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $output = [];
+
+    try {
+        $output['git_pull'] = shell_exec('cd ' . base_path() . ' && git pull 2>&1');
+
+        $output['composer'] = shell_exec('cd ' . base_path() . ' && composer install --no-dev --optimize-autoloader 2>&1');
+
+        \Artisan::call('config:cache');
+        $output['config_cache'] = \Artisan::output();
+
+        \Artisan::call('route:cache');
+        $output['route_cache'] = \Artisan::output();
+
+        \Artisan::call('view:cache');
+        $output['view_cache'] = \Artisan::output();
+
+        \Artisan::call('octane:reload');
+        $output['octane_reload'] = \Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deployment completed successfully',
+            'output' => $output,
+            'time' => now()->toDateTimeString(),
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'output' => $output,
+        ], 500);
+    }
+})->name('deploy.webhook');
+
+Route::get('/quick-reload/{token}', function ($token) {
+    $secret = config('app.deploy_secret', 'your-secret-token-here');
+
+    if ($token !== $secret) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    \Artisan::call('octane:reload');
+    \Artisan::call('cache:clear');
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Octane reloaded & cache cleared',
+        'time' => now()->toDateTimeString(),
+    ]);
+});
+
+
+
+Route::get('/debug/force-pusher-refresh', function () {
+    $timestamp = now()->toDateTimeString();
+    
+    Cache::forget('pusher_config');
+    Cache::forget('all_configs');
+    
+    Cache::put('pusher_config_changed', $timestamp, 3600);
+    
+    \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    
+    Artisan::call('queue:restart');
+    $queueRestartOutput = Artisan::output();
+    
+    $octaneReloadOutput = '';
+    try {
+        Artisan::call('octane:reload');
+        $octaneReloadOutput = Artisan::output();
+    } catch (\Throwable $e) {
+        $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
+    }
+    
+    $freshConfig = getPusherConfig();
+    return response()->json([
+        'success' => true,
+        'message' => '🔄 Pusher config refresh triggered!',
+        'actions_taken' => [
+            '1_cache_cleared' => true,
+            '2_flag_set' => Cache::has('pusher_config_changed'),
+            '3_broadcaster_purged' => true,
+            '4_queue_restart' => trim($queueRestartOutput) ?: 'Signal sent',
+            '5_octane_reload' => trim($octaneReloadOutput) ?: 'Signal sent',
+        ],
+        'fresh_config' => [
+            'app_id' => $freshConfig['app_id'],
+            'app_cluster' => $freshConfig['app_cluster'],
+        ],
+        'next_steps' => [
+            'Supervisor will restart queue workers automatically',
+            'Octane workers will reload automatically',
+            'New broadcasts will use fresh DB config',
+        ],
+        'timestamp' => $timestamp,
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
+
+
+// ⭐ Test GiftBannerEvent broadcast (via Queue)
+Route::get('/debug/test-gift-banner', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Create test gift data
+    $testGift = [
+        'id' => rand(1000, 9999),
+        'name' => 'Test Gift 🎁',
+        'sender' => [
+            'id' => 1,
+            'name' => 'Test Sender',
+        ],
+        'receiver' => [
+            'id' => 2,
+            'name' => 'Test Receiver',
+        ],
+        'count' => 1,
+        'timestamp' => now()->toDateTimeString(),
+        'debug_info' => [
+            'pusher_app_id' => $dbConfig['app_id'],
+            'pusher_cluster' => $dbConfig['app_cluster'],
+        ],
+    ];
+    
+    try {
+        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
+        event(new \App\Events\GiftBannerEvent($testGift));
+        
+        return response()->json([
+            'success' => true,
+            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
+            'event' => [
+                'class' => \App\Events\GiftBannerEvent::class,
+                'channel' => 'gift_banner',
+                'broadcast_as' => 'gift_banner',
+                'queue' => 'heavyProcessing (or similar)',
+            ],
+            'test_data' => $testGift,
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            ],
+            'next_steps' => [
+                '1. Check Pusher Debug Console for the event',
+                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
+                '3. If not received, run: /debug/force-pusher-refresh',
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Throwable $e) {
+        Log::error('GiftBannerEvent failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
+// ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
+Route::get('/debug/test-user-online', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Get a test user (first user or create mock)
+    $userId = request()->get('user_id', 1);
+    $user = \App\Models\User::find($userId);
+    
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'error' => "User with ID {$userId} not found",
+            'hint' => 'Add ?user_id=123 to specify a different user',
+        ], 404, [], JSON_PRETTY_PRINT);
+    }
+    
+    try {
+        // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
+        event(new \App\Events\UserOnline($user));
+        
+        return response()->json([
+            'success' => true,
+            'message' => '👤 UserOnline event dispatched to Queue!',
+            'event' => [
+                'class' => \App\Events\UserOnline::class,
+                'channel' => 'presence-enter-user-room',
+                'channel_type' => 'PresenceChannel',
+            ],
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid ?? null,
+            ],
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            ],
+            'next_steps' => [
+                '1. Check Pusher Debug Console for the event',
+                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i "UserOnline"',
+                '3. If not received, run: /debug/force-pusher-refresh',
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Throwable $e) {
+        Log::error('UserOnline failed', [
+            'error' => $e->getMessage(),
+            'user_id' => $user->id,
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
