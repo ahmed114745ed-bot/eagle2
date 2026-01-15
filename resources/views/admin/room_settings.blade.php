@@ -424,7 +424,7 @@
                                     @checked((bool) ($settings['show_room'] ?? false))>
                                 <span class="slider round"></span>
                             </label>
-                    <br>
+                     <br><br>
                     <button type="submit">{{ __('save') }}</button>
                 </div>
             </form>
