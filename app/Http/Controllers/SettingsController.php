@@ -262,16 +262,16 @@ class SettingsController extends Controller
 
             Language::where('code', $request->default_language)->update(['is_default'=> 1]);
         }
-        
+
         // Clear all cache including rememberForever keys
         Cache::forget('all_settings');
         Cache::forget('all_configs');
         Cache::flush();
-        
+
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
-        
+
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
             if ($request->has('inner_tab_type')) {
@@ -279,7 +279,9 @@ class SettingsController extends Controller
             }
         }
 
-        return redirect($redirectUrl);
+        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
+        return redirect()->back();
+//        return redirect($redirectUrl);
     }
 
     public function settingGift(Request $request)
@@ -374,7 +376,7 @@ class SettingsController extends Controller
             Cache::forget($key);
             Cache::put($key, $value);
         }
-        
+
         // Clear all cache including rememberForever keys
         Cache::forget('all_settings');
         Cache::flush();
@@ -382,7 +384,7 @@ class SettingsController extends Controller
         admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
-        
+
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
             if ($request->has('inner_tab_type')) {
