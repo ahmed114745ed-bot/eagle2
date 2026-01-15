@@ -118,24 +118,34 @@ class DedicateVipController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableRowSelector();
-        Admin::script("
-    function removeTableResponsive() {
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
+        Admin::style("
+        html, body, .wrapper, .content-wrapper, .content, .box, .box-body {
+            overflow-x: hidden !important;
         }
-    }
+        .table-responsive {
+            overflow: visible !important;
+            border: none !important;
+        }
+        .content {
+            padding: 5px !important;
+        }
+        .box-body {
+            padding: 0 !important;
+        }
+    ");
 
-    // Run on page load
-    removeTableResponsive();
-
-    // Run when expand is clicked (for dynamically loaded content)
-    $(document).on('click', '.grid-expand', function() {
-        setTimeout(removeTableResponsive, 100);
-    });
-
-    // Run on window resize
-    $(window).resize(removeTableResponsive);
-");
+        Admin::script("
+        function removeTableResponsive() {
+            if (window.innerWidth >= 1024) {
+                $('.table-responsive').removeClass('table-responsive');
+            }
+        }
+        removeTableResponsive();
+        $(document).on('click', '.grid-expand', function() {
+            setTimeout(removeTableResponsive, 100);
+        });
+        $(window).resize(removeTableResponsive);
+    ");
         return $grid;
     }
 }
