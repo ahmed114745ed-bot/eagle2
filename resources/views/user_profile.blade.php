@@ -19,7 +19,6 @@
         }
 
         .filter-container {
-            background: #ffffff;
             border-radius: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             padding: 20px;
@@ -1027,6 +1026,11 @@
             color: #333;
             font-weight: 500;
         }
+
+        .row {
+            margin: 0;
+        }
+
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
@@ -1528,9 +1532,9 @@
                                         <div class="filter-group">
                                             <label class="form-label">السنة</label>
                                             <div class="input-group input-group-sm">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-pencil"></i>
-                                                </div>
+{{--                                                <div class="input-group-addon">--}}
+{{--                                                    <i class="fa fa-pencil"></i>--}}
+{{--                                                </div>--}}
                                                 <input type="text" class="form-control year" placeholder="السنة"
                                                        name="year"
                                                        value="{{ request('year') }}" style="text-align: right;">
@@ -1539,9 +1543,9 @@
                                         <div class="filter-group">
                                             <label class="form-label">الشهر</label>
                                             <div class="input-group input-group-sm">
-                                                <div class="input-group-addon">
-                                                    <i class="fa fa-pencil"></i>
-                                                </div>
+{{--                                                <div class="input-group-addon">--}}
+{{--                                                    <i class="fa fa-pencil"></i>--}}
+{{--                                                </div>--}}
                                                 <input type="text" class="form-control month"
                                                        placeholder="الشهر"
                                                        name="month" value="{{ request('month') }}"
@@ -1728,9 +1732,7 @@
                 </h4>
             </div>
 
-
             <div class="card">
-
                 <div class="card mb-4">
                     <div class="card-body">
                         <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
@@ -1740,7 +1742,6 @@
                                 <div class="col-md-6">
                                     <div class="box-body">
                                         <div class="fields-group">
-
                                             <div class="form-group">
                                                 <label class="col-sm-2 control-label">{{__("year")}}</label>
                                                 <div class="col-sm-8">
@@ -1798,40 +1799,40 @@
                         </form>
                     </div>
                 </div>
-                <div class="box-body">
+                <div class="table-responsive"
+                    <div class="box-body">
+                        <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Type') }}</th>
+                                <!-- <th>{{ __('Type') }}</th> -->
+                                <th>{{ __('Amount') }}</th>
+                                <th>{{ __('amount before') }}</th>
+                                <th>{{ __('amount after') }}</th>
+                                <th>{{ __('Created at') }}</th>
+                            </tr>
+                            </thead>
 
+                            @if($walletLogs && $walletLogs->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($walletLogs as $index => $log)
+                                    <tr>
+                                        <td>{{ $walletLogs->firstItem() + $index }}</td>
+                                        <td>{{ __("wallet." . $log->operation) }}</td>
 
-                    <table class="table table-bordered table-hover align-middle data-table" id="walletLogs">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('Type') }}</th>
-                            <!-- <th>{{ __('Type') }}</th> -->
-                            <th>{{ __('Amount') }}</th>
-                            <th>{{ __('amount before') }}</th>
-                            <th>{{ __('amount after') }}</th>
-                            <th>{{ __('Created at') }}</th>
-                        </tr>
-                        </thead>
+                                        <!-- <td>{{ $log->type }}</td> -->
+                                        <td>{{ number_format($log->amount, 2) }}</td>
+                                        <td>{{ number_format($log->before_amount, 2) }}</td>
+                                        <td>{{ number_format($log->after_amount, 2) }}</td>
+                                        <td>{{ $log->created_at }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
 
-                        @if($walletLogs && $walletLogs->count())
-                            <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($walletLogs as $index => $log)
-                                <tr>
-                                    <td>{{ $walletLogs->firstItem() + $index }}</td>
-                                    <td>{{ __("wallet." . $log->operation) }}</td>
-
-                                    <!-- <td>{{ $log->type }}</td> -->
-                                    <td>{{ number_format($log->amount, 2) }}</td>
-                                    <td>{{ number_format($log->before_amount, 2) }}</td>
-                                    <td>{{ number_format($log->after_amount, 2) }}</td>
-                                    <td>{{ $log->created_at }}</td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        @endif
-
-                    </table>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1926,7 +1927,8 @@
 
             <div class="pagination-wrapper">
                 {{ $badges?->appends([
-                     'type'        => $type,
+                    'tab'         => 'badges',
+                    'type'        => $type,
                     'badges_page' => $badges?->currentPage(),
                 ])->links('vendor.pagination.default') }}
             </div>

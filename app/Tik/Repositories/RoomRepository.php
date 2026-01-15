@@ -546,6 +546,7 @@ class RoomRepository extends AbstractRepository
                 'owner.country',
                 'owner.eligiblePacks.ware',
                 'owner.profile',
+                'owner.specialId.ware',
                 'owner.medals.achievementLevel.achievement',
                 'boxUse',
                 'taskStream',

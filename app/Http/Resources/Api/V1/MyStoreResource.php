@@ -26,10 +26,10 @@ class MyStoreResource extends JsonResource
      */
     public function toArray($request)
     {
-          
+
         $agency_owner = $this->agency;
-        $salary       =round( $this->salary,2);
-        $sallary      = $salary; 
+        $salary       = round($this->salary, 2);
+        $sallary      = $salary;
         $userSalary   = $sallary;
 
         if (($this->type_user == 2 || $this->type_user == 4)) {
@@ -44,7 +44,7 @@ class MyStoreResource extends JsonResource
             return $roomSalary->salary - $roomSalary->cut_amount;
         });
 
-        $diamonds = (in_array($this->type_user, [0,3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
+        $diamonds = (in_array($this->type_user, [0, 3])) ? $this->exchange_diamonds : $this->monthly_diamond_received;
 
         $data = [
 
@@ -54,7 +54,7 @@ class MyStoreResource extends JsonResource
                 'coins' => (string)$this->di,
                 'diamonds' =>  (string)$diamonds,
                 'silver_coins' => (string)$this->gold,
-                'usd' => (double)$sallary,
+                'usd' => (float)$sallary,
                 'user_usd' => (string) truncateAndTrim($userSalary) ?? '',
                 'user_usd_new' => (string) (isset($userSalary) ? round($userSalary, 0) : ''),
                 'host_usd' => (string) @$hostSalary ?? '',
@@ -62,7 +62,8 @@ class MyStoreResource extends JsonResource
                 'room_salary' => (string) $roomSalary ?? '',
                 'paid' =>  $paid ?? 0,
                 'wallet_balance' =>  $this->salary ?? 0,
-            ], 
+                'wallet_user_balance' => $this->user_wallet_balance ?? 0,
+            ],
 
         ];
 

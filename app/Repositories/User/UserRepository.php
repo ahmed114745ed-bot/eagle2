@@ -533,16 +533,25 @@ class UserRepository extends Repository
         //        $authUserId = auth()->id();
         return User::with([
             'packs',
-            //            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
-            //                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
-            //                ->where('is_used', 1)
-            //                ->with(['ware']),
+            'packs' => fn($q) => $q->whereIn('type', [4, 5, 6, 25, 13, 18, 15, 20, 10, 12, 17, 28])
+                ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+                ->where('is_used', 1)
+                ->with(['ware']),
+            'images',
+            'specialId',
+            'specialId.ware',
+            'wallet',
+            'country',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
+            'UserVip.OVip',
             'receiverLevel:id,img,level,exp',
             'senderLevel:id,img,level',
             'chargeLevel:id,img,level',
+            'ownerAudioRoom',
+            'agencyJoinRequest',
             'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
             'profile',
+            'family',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
             'shippingAgency:id,app_owner_id,name,img',
             //            'chatRoomsAsUser' => function ($q) use ($authUserId) {
