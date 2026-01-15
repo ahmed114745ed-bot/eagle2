@@ -34,21 +34,11 @@ class RoomResource extends JsonResource
         }
 
         $agency_joined = $this->owner->agency;
-      // dd($agency_joined);
         if ($agency_joined) {
-
-
-            $owner = $agency_joined->app_owner_id == $this->owner->id
-                ? new \stdClass()
-                : new ShortUserResource($agency_joined->owner);
 
             $agency_joined = [
                 'id' => $agency_joined->id,
                 'name' => $agency_joined->name,
-                'status' => $agency_joined->status,
-                'image' => $agency_joined->img,
-                'owner' => $owner,
-
             ];
         } else {
             $agency_joined = (object)[];
