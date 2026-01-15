@@ -131,13 +131,13 @@ class ConfiguredScreenResource extends JsonResource
                     'is_visible' => $override->is_visible,
                     'selected_theme_id' => $override->selected_theme_id,
                     'selected_child_theme_id' => $override->selected_theme_id,
-                    'settings' => $settings,
+                    'settings' => $settings ?? [],
                     'theme' => $theme ? [
                         'id' => $theme->id,
                         'theme_name' => $theme->theme_name,
                         'theme_key' => $theme->theme_key,
                         'is_default' => $theme->is_default,
-                        'children' => $children,
+                        'children' => $children ?? [],
                         // 'assets' => $themeAssets,
                     ] : null,
                 ];
@@ -149,7 +149,7 @@ class ConfiguredScreenResource extends JsonResource
             'screen_key' => $screen->screen_key,
             'screen_name' => $screen->screen_name,
             'display_order' => $screenOverride->display_order ?? $screen->display_order ?? 0,
-            'widgets' => $widgets,
+            'widgets' => $widgets ?? [],
         ];
     }
 }

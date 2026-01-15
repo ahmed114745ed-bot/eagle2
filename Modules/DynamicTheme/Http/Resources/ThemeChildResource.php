@@ -21,7 +21,7 @@ class ThemeChildResource extends JsonResource
             'action' => $this->action,
             'position' => $this->position,
      
-            'assets' => ThemeChildAssetResource::collection($this->whenLoaded('assets')),
+            'assets' => ThemeChildAssetResource::collection($this->whenLoaded('assets')) ?? [],
         ];
     }
 }

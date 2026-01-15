@@ -18,7 +18,7 @@ class WidgetThemeV2Resource extends JsonResource
             'description' => $this->description,
             'is_default' => (bool) $this->is_default,
             'is_active' => (bool) $this->is_active,
-            'children' => ThemeChildResource::collection($this->whenLoaded('children')),
+            'children' => ThemeChildResource::collection($this->whenLoaded('children')) ?? [],
         ];
     }
 }

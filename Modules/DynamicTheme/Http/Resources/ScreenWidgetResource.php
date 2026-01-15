@@ -22,7 +22,7 @@ class ScreenWidgetResource extends JsonResource
             'order' => $this->order,
             'min_app_version' => $this->min_app_version,
             'is_positioned' => $this->is_positioned,
-            'theme' => $this->theme ? new WidgetThemeV2Resource($this->theme) : null
+            'theme' => $this->theme ? new WidgetThemeV2Resource($this->theme) : []
         ];
 
         // Add position for positioned widgets
