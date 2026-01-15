@@ -415,7 +415,7 @@
             <form action="{{ route('admin.room-settings.store') }}" class="new-form" method="POST">
                 <div class="form">
                     @csrf
-                   <span class="toggle-label">{{ __(' room in home screen layer') }}</span>
+                   <span class="toggle-label">{{ __('room in home screen layer') }}</span>
                          <input type="hidden" name="show_room" value="0">
                             <label class="switch">
                                 <input type="checkbox"
@@ -424,7 +424,7 @@
                                     @checked((bool) ($settings['show_room'] ?? false))>
                                 <span class="slider round"></span>
                             </label>
-                    <br>
+                     <br><br>
                     <button type="submit">{{ __('save') }}</button>
                 </div>
             </form>
