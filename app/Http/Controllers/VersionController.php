@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
+use Database\Seeders\config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -109,6 +110,7 @@ class VersionController extends Controller
             intval($settings['host_level_action'] ?? 0) === 1
                 && intval($settings['host_level_enabled'] ?? 0) === 1,
             "is_share_with_friends" => (bool)($settings['share_room_with_friends'] ?? true),
+            'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
 
         ];
 
