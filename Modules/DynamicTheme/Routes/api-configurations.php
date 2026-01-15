@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\DynamicTheme\Http\Controllers\ConfigurationController;
 use Modules\DynamicTheme\Http\Controllers\ConfigurationOverrideController;
+use Modules\DynamicTheme\Http\Controllers\Api\WidgetCustomizerController;
 
 /**
  * Configuration Management Routes
@@ -110,5 +111,120 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('update-visibility', 'bulkUpdateVisibility')->name('bulk.update-visibility');
             Route::post('reorder', 'bulkReorder')->name('bulk.reorder');
         });
+    });
+
+    // ======================== WIDGET CUSTOMIZER ROUTES ========================
+    
+    
+    Route::prefix('customizers')->controller(WidgetCustomizerController::class)->group(function () {
+        // Get all customizers for a widget override
+        Route::get('widget-override/{configWidgetOverrideId}', 'indexByWidgetOverride')
+            ->name('customizers.index-by-widget');
+        
+        // CRUD operations
+        Route::get('{id}', 'show')->name('customizers.show');
+        Route::post('/', 'store')->name('customizers.store');
+        Route::put('{id}', 'update')->name('customizers.update');
+        Route::delete('{id}', 'destroy')->name('customizers.destroy');
+        
+        // Generate CSS
+        Route::get('{id}/css', 'generateCSS')->name('customizers.css');
+        
+        // Clone customizer
+        Route::post('{id}/clone', 'clone')->name('customizers.clone');
+    });
+
+    // ======================== COLOR PRESET ROUTES ========================
+    
+    use Modules\DynamicTheme\Http\Controllers\Api\ColorPresetController;
+    
+    Route::prefix('color-presets')->controller(ColorPresetController::class)->group(function () {
+        // Get all presets for a configuration
+        Route::get('configuration/{configurationId}', 'indexByConfiguration')
+            ->name('color-presets.index-by-config');
+        
+        // CRUD operations
+        Route::get('{id}', 'show')->name('color-presets.show');
+        Route::post('/', 'store')->name('color-presets.store');
+        Route::put('{id}', 'update')->name('color-presets.update');
+        Route::delete('{id}', 'destroy')->name('color-presets.destroy');
+        
+        // Get default preset
+        Route::get('configuration/{configurationId}/default', 'getDefault')
+            ->name('color-presets.default');
+        
+        // Export/Import
+        Route::get('configuration/{configurationId}/export', 'export')
+            ->name('color-presets.export');
+        Route::post('import', 'import')->name('color-presets.import');
+    });
+
+    // ======================== DESIGN TEMPLATE ROUTES ========================
+    
+    use Modules\DynamicTheme\Http\Controllers\Api\DesignTemplateController;
+    
+    Route::prefix('design-templates')->controller(DesignTemplateController::class)->group(function () {
+        // Get all templates for a configuration
+        Route::get('configuration/{configurationId}', 'indexByConfiguration')
+            ->name('design-templates.index-by-config');
+        
+        // Get public templates
+        Route::get('public/list', 'getPublic')->name('design-templates.public');
+        
+        // CRUD operations
+        Route::get('{id}', 'show')->name('design-templates.show');
+        Route::post('/', 'store')->name('design-templates.store');
+        Route::put('{id}', 'update')->name('design-templates.update');
+        Route::delete('{id}', 'destroy')->name('design-templates.destroy');
+        
+        // Export/Import
+        Route::get('{id}/export', 'export')->name('design-templates.export');
+        Route::post('import', 'import')->name('design-templates.import');
+        
+        // Duplicate template
+        Route::post('{id}/duplicate', 'duplicate')->name('design-templates.duplicate');
+    });
+
+    // ======================== CHILD CUSTOMIZER ROUTES ========================
+    
+    use Modules\DynamicTheme\Http\Controllers\Api\ChildCustomizerController;
+    
+    Route::prefix('child-customizers')->controller(ChildCustomizerController::class)->group(function () {
+        // Get all children for a widget override
+        Route::get('widget-override/{configWidgetOverrideId}', 'indexByWidgetOverride')
+            ->name('child-customizers.index-by-widget');
+        
+        // CRUD operations
+        Route::get('{id}', 'show')->name('child-customizers.show');
+        Route::post('/', 'store')->name('child-customizers.store');
+        Route::put('{id}', 'update')->name('child-customizers.update');
+        Route::delete('{id}', 'destroy')->name('child-customizers.destroy');
+        
+        // Generate CSS
+        Route::get('{id}/generate-css', 'generateCSS')->name('child-customizers.generate-css');
+        
+        // Batch update
+        Route::post('batch-update', 'batchUpdate')->name('child-customizers.batch-update');
+    });
+
+    // ======================== UNIFIED CUSTOMIZER ENDPOINT (MAIN) ========================
+    
+    use Modules\DynamicTheme\Http\Controllers\Api\UnifiedCustomizerEndpointController;
+    
+    Route::prefix('configurations/{configId}/widgets/{widgetOverrideId}')->controller(UnifiedCustomizerEndpointController::class)->group(function () {
+        // Get complete customization (widget + children + presets + templates + CSS)
+        Route::get('/complete', 'getComplete')->name('customizers.complete');
+        
+        // Save complete configuration at once
+        Route::post('/complete', 'saveComplete')->name('customizers.complete.save');
+        
+        // Export complete configuration
+        Route::get('/complete/export', 'exportComplete')->name('customizers.complete.export');
+        
+        // Import complete configuration
+        Route::post('/complete/import', 'importComplete')->name('customizers.complete.import');
+        
+        // Clone complete configuration to another widget
+        Route::post('/complete/clone', 'cloneComplete')->name('customizers.complete.clone');
     });
 });
