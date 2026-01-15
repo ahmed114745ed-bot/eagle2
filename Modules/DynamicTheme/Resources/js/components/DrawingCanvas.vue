@@ -369,88 +369,155 @@ export default {
 };
 </script>
 
-<style scoped lang="postcss">
+<style scoped>
 .drawing-canvas-container {
-  @apply bg-gray-50 rounded-lg shadow-lg p-6;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
 }
 
 .drawing-header {
-  @apply mb-6 bg-white rounded-lg p-4 shadow;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .drawing-header h2 {
-  @apply text-2xl font-bold text-gray-800 mb-4;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
 }
 
 .tool-options {
-  @apply flex flex-wrap gap-4 items-center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
 }
 
 .tool-section {
-  @apply flex items-center gap-2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .tool-section label {
-  @apply font-semibold text-gray-700 text-sm;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
 }
 
 .tool-select,
 .color-picker {
-  @apply border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  focus: ring 2px #3b82f6;
 }
 
 .size-slider,
 .opacity-slider {
-  @apply w-24;
+  width: 6rem;
 }
 
 .action-buttons {
-  @apply flex flex-wrap gap-2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .btn {
-  @apply px-3 py-2 rounded font-semibold text-sm cursor-pointer transition-colors;
+  padding: 0.75rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  background-color: #2563eb;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
 }
 
 .btn-success {
-  @apply bg-green-600 text-white hover:bg-green-700;
+  background-color: #16a34a;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #15803d;
 }
 
 .btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700;
+  background-color: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
 }
 
 .btn-warning {
-  @apply bg-yellow-600 text-white hover:bg-yellow-700;
+  background-color: #ca8a04;
+  color: white;
+}
+
+.btn-warning:hover {
+  background-color: #a16207;
 }
 
 .btn-info {
-  @apply bg-cyan-600 text-white hover:bg-cyan-700;
+  background-color: #06b6d4;
+  color: white;
+}
+
+.btn-info:hover {
+  background-color: #0891b2;
 }
 
 .canvas-wrapper {
-  @apply mb-6 bg-white rounded-lg shadow-md overflow-hidden;
+  margin-bottom: 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .drawing-canvas {
-  @apply border-2 border-dashed border-gray-300 cursor-crosshair w-full block;
+  border: 2px dashed #d1d5db;
+  cursor: crosshair;
+  width: 100%;
   display: block;
   max-width: 100%;
 }
 
 .info-panel {
-  @apply bg-white rounded-lg shadow p-4 grid grid-cols-3 gap-4;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
 }
 
 .info-item {
-  @apply text-sm text-gray-700;
+  font-size: 0.875rem;
+  color: #374151;
 }
 
 .info-item strong {
-  @apply text-gray-900 font-semibold;
+  color: #111827;
+  font-weight: 600;
 }
 </style>

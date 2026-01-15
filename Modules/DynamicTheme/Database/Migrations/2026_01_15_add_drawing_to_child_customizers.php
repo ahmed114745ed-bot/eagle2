@@ -11,11 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('child_customizers', function (Blueprint $table) {
-            // Add drawing columns
-            $table->longText('drawing_data')->nullable()->comment('Drawing image data (base64)');
-            $table->json('drawing_metadata')->nullable()->comment('Drawing metadata (width, height, steps, etc)');
-        });
+        // Check if table exists first
+        if (Schema::hasTable('child_customizers')) {
+            Schema::table('child_customizers', function (Blueprint $table) {
+                // Add only if columns don't exist
+                if (!Schema::hasColumn('child_customizers', 'drawing_data')) {
+                    $table->longText('drawing_data')->nullable()->comment('Drawing image data (base64)');
+                }
+                if (!Schema::hasColumn('child_customizers', 'drawing_metadata')) {
+                    $table->json('drawing_metadata')->nullable()->comment('Drawing metadata (width, height, steps, etc)');
+                }
+            });
+        }
     }
 
     /**
