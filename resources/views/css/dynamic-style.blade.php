@@ -3110,13 +3110,6 @@
         color: var(--primary-color);
     }
 
-    .table td,
-    .table th {
-        white-space: normal !important;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-    }
-
     .new-form {
         background: #ffffff;
         border-radius: 16px;
