@@ -56,33 +56,14 @@ class UserRelationsResource extends JsonResource
             $chatRoom = $this->chatRoomsAsUser->first() ?? $this->chatRoomsAsUser2->first();
         }
 
-//        $user = User::where('id', @$this->id)->first();
         $data         = [
             'id'             => @$this->id,
-//            'uuid'           => @$this->uuid,
             'name'           => @$this->name ?: '',
-//            'followers' => @$this->follower,
-//            'following' => @$this->following,
-//            'friends' => @$this->friend,
-
-//            'id_image'             => @$this->specialId?->ware?->show_img ?? '',
-//            'special_id'          =>  @$this->specialId?->ware?->id ?? 0,
             'profile'        => [
                 'image'  => @$this->profile->avatar,
-//                'age'    => Carbon::parse(@$this->profile->birthday)->age,
-//                'gender' => @$this->profile->gender ?? 1,
-//                'country'=> @$this->profile->country?:'',
             ],
-//            'country'              => !$isHideCountry ? (new CountryResource(@$this->country) ?? (object)[]) : (object)[],
             'frame'          => $frameAbility ? (@$this->ware->img2 ?: @$this->ware->img1) : '',
             'frame_id'       => @$this->dress_1,
-//            'now_room'             =>  new NowRoomResource($this),
-                        // [
-            //     'is_in_room'      => @$this->now_room_uid != 0,
-            //     'uid'             => @$this->now_room_uid,
-            //     'is_mine'         => @$this->id == $this->now_room_uid,
-            //     'password_status' => $pass_status
-            // ]
             'vip'            => [
                 'level' => @$this->UserVip->level,
                  'img' => Common::ovip_center_rank_img_v2($this),
@@ -93,22 +74,8 @@ class UserRelationsResource extends JsonResource
                 'sender_level'  =>@$this->total_sender_level ?? 0,
                 'reciver_level' =>@$this->total_received_level ?? 0
             ],
-//            'online_time'    => @$this->online_time ? date("Y-m-d H:i:s", @$this->online_time) : '',
-//            'has_color_name' => count(@$this->followPacks->where('type', 18)) > 0,
-//            'is_followed'            => Follow::where(['followed_user_id' => $request->user()->id ,"user_id" => @$this->id])->first() != null ? true : false,
-//            'is_follow'      => $isFollow,
             'is_followed'          => $this->followedByAuthUser !== null,
             'is_follow'            => $this->followerByAuthUser !== null,
-//            "is_gold_id" => (bool)$this->is_gold_id,
-//            'type_user'            => intval(@$this->type_user) ?: 0, // both
-//            "manger_type"          =>new MangerTypeResource(@$this->manager),
-//            "multi_images"          => $this->images?->select("img"),
-//            "statistic"     => [
-//                "visitors" => count(@$this->profileVisits),
-//                "licked" => count(@$this->likes),
-//                "followers" => count(@$this->followers),
-//                "bio" => @$this->bio,
-//            ],
             'image_color'          => @$this->color_image,
             'color_name'   => common::wareUserVipColorV2($this, 18) ?? '',
             'chat_id' => $chatRoom->id ?? null,
