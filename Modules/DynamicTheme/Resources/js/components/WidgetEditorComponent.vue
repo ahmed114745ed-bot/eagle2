@@ -139,6 +139,16 @@
         </button>
       </div>
 
+      <!-- Child Customizer Section -->
+      <div class="lg:col-span-3 mt-6">
+        <ChildCustomizerComponent
+          :config-widget-override-id="configWidgetOverrideId"
+          @updated="onChildUpdated"
+          @deleted="onChildDeleted"
+        />
+      </div>
+    </div>
+
       <!-- Main Content Area -->
       <div class="lg:col-span-2">
         <!-- Editor View -->
@@ -233,6 +243,7 @@
 import ColorPickerComponent from './ColorPickerComponent.vue';
 import VisualBuilderComponent from './VisualBuilderComponent.vue';
 import StylePreviewComponent from './StylePreviewComponent.vue';
+import ChildCustomizerComponent from './ChildCustomizerComponent.vue';
 
 export default {
   name: 'WidgetEditorComponent',
@@ -240,6 +251,7 @@ export default {
     ColorPickerComponent,
     VisualBuilderComponent,
     StylePreviewComponent,
+    ChildCustomizerComponent,
   },
   props: {
     configWidgetOverrideId: {
@@ -464,6 +476,14 @@ export default {
       setTimeout(() => {
         this.notifications = this.notifications.filter(n => n.id !== id);
       }, 3000);
+    },
+    onChildUpdated() {
+      this.showNotification('تم تحديث الطفل بنجاح', 'success');
+      this.$emit('child-updated');
+    },
+    onChildDeleted() {
+      this.showNotification('تم حذف الطفل بنجاح', 'success');
+      this.$emit('child-deleted');
     },
   },
 };

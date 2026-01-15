@@ -1,42 +1,42 @@
 {
   "Modules/DynamicTheme/Resources/css/app.css": {
-    "file": "assets/app-DNRCuf0M.css",
+    "file": "assets/app-DGYbC2T_.css",
     "src": "Modules/DynamicTheme/Resources/css/app.css",
     "isEntry": true
   },
   "Modules/DynamicTheme/Resources/js/admin.js": {
-    "file": "assets/admin-CelPnphe.js",
+    "file": "assets/admin-FNNGRBj7.js",
     "name": "admin",
     "src": "Modules/DynamicTheme/Resources/js/admin.js",
     "isEntry": true,
     "imports": [
-      "_NotificationToast-CMMZahZZ.js"
+      "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
-      "assets/app-DNRCuf0M.css"
+      "assets/app-DGYbC2T_.css"
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
-    "file": "assets/app-Buxe71cR.js",
+    "file": "assets/app-CxJt3fcG.js",
     "name": "app",
     "src": "Modules/DynamicTheme/Resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_NotificationToast-CMMZahZZ.js"
+      "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
-      "assets/app-DbyvIEGH.css"
+      "assets/app-BWM7HMgh.css"
     ]
   },
   "_NotificationToast-!~{004}~.js": {
-    "file": "assets/NotificationToast-EFwtlYcG.css",
+    "file": "assets/NotificationToast-D5ZeL8XF.css",
     "src": "_NotificationToast-!~{004}~.js"
   },
-  "_NotificationToast-CMMZahZZ.js": {
-    "file": "assets/NotificationToast-CMMZahZZ.js",
+  "_NotificationToast-CaonYhPK.js": {
+    "file": "assets/NotificationToast-CaonYhPK.js",
     "name": "NotificationToast",
     "css": [
-      "assets/NotificationToast-EFwtlYcG.css"
+      "assets/NotificationToast-D5ZeL8XF.css"
     ]
   }
 }
