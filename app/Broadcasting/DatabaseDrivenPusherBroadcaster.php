@@ -93,14 +93,6 @@ class DatabaseDrivenPusherBroadcaster extends PusherBroadcaster
                 if ($forceUpdate) {
                     Cache::forget('pusher_config_changed');
                 }
-                
-                Log::info('DatabaseDrivenPusherBroadcaster.config_refreshed', [
-                    'app_id' => $freshConfig['app_id'],
-                    'cluster' => $freshConfig['app_cluster'],
-                    'forced' => $forceUpdate,
-                    'pid' => getmypid(),
-                    'timestamp' => now()->toDateTimeString(),
-                ]);
             }
         } catch (\Throwable $e) {
             Log::error('DatabaseDrivenPusherBroadcaster.refresh_error', [

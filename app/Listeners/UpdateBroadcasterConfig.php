@@ -22,11 +22,6 @@ class UpdateBroadcasterConfig
             OctaneBroadcasterService::updateRuntimeConfigFromDb();
             OctaneBroadcasterService::rebuildBroadcaster();
 
-            Log::info('Broadcaster updated via PusherConfigUpdated event', [
-                'pid' => getmypid(),
-                'changed_key' => $event->changedKey,
-                'timestamp' => $event->timestamp,
-            ]);
         } catch (\Throwable $e) {
             Log::error('Failed to update broadcaster via event', [
                 'error' => $e->getMessage(),

@@ -26,9 +26,6 @@ class VerifyPayPalWebhook extends PayPalService
             return is_array($value) ? $value[0] : $value;
         }, $headers);
 
-        // Log the headers for debugging
-        LogHelper::info('PayPal Webhook Headers', $headers);
-
         // Get the JSON payload as array
         $payload = $request->json()->all();
 
@@ -42,14 +39,8 @@ class VerifyPayPalWebhook extends PayPalService
             'webhook_event'     => $payload,
         ];
 
-        // Log the verification data for debugging
-        LogHelper::info('PayPal Webhook Verification Data', $verificationData);
-
         $response = Http::withToken(app(PayPalService::class)->getAccessToken())
             ->post(config('paypal.base_url') . '/v1/notifications/verify-webhook-signature', $verificationData);
-
-        // Log the response for debugging
-        LogHelper::info('PayPal Webhook Verification Response', $response->json());
 
         if ($response->json('verification_status') !== 'SUCCESS') {
             return response()->json(['status' => 'unauthorized'], 401);

@@ -462,6 +462,7 @@
                           method="POST"
                           enctype="multipart/form-data">
                         @csrf
+                        <input type="hidden" name="redirect" value="{{ route('admin.app-feature.index') }}">
                         @php
                             $errorMessage = $errors ? $errors->first('msg') : null;
                         @endphp
@@ -779,7 +780,7 @@
                     <div class="feature-status">
                         {{ $shareRoom ? __('Enabled') : __('Disabled') }}
                     </div>
-                    <div class="feature-label">{{ __('Share Room') }}</div>
+                    <div class="feature-label">{{ __('share room') }}</div>
                 </div>
                 <div class="feature-body">
                     <form id="shareRoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"

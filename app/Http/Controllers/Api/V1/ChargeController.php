@@ -320,7 +320,6 @@ class ChargeController extends Controller
 
         $count = $request->amount;
         $userUuid = $request->id;
-        log::info('user uuid' . $userUuid);
         // if ($user->transfer_salary == 1) {
         //     return Common::apiResponse(0, __('api.freez_charge'), 404);
         // }
