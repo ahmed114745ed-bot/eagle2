@@ -162,11 +162,6 @@ class AppServiceProvider extends ServiceProvider
                             \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
                         }
                         
-                        \Illuminate\Support\Facades\Log::info('Queue: Pusher config refreshed', [
-                            'job' => $event->job->resolveName() ?? 'unknown',
-                            'pid' => getmypid(),
-                            'forced' => $forceUpdate,
-                        ]);
                     }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('Queue: Pusher config refresh failed', [

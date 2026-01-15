@@ -36,9 +36,6 @@ class FirebaseAuthController extends Controller
 
         $customToken = $this->firebase->createCustomToken(Auth::user()->firebase_uuid);
         $data = ['firebase_token' => $customToken,];
-        Log::info('Firebase token generated successfully', [
-            'firebase_token' => $customToken,
-        ]);
         return Common::apiResponse(1, 'done',  $data, 200);
         // return response()->json([
         //     'firebase_token' => $customToken,

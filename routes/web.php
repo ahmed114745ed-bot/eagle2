@@ -1347,15 +1347,6 @@ Route::get('/debug/test-gift-banner', function () {
         // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
         event(new \App\Events\GiftBannerEvent($testGift));
         
-        Log::info('GiftBannerEvent dispatched', [
-            'gift_id' => $testGift['id'],
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ]);
-        
         return response()->json([
             'success' => true,
             'message' => '🎁 GiftBannerEvent dispatched to Queue!',
@@ -1413,17 +1404,6 @@ Route::get('/debug/test-user-online', function () {
     try {
         // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
         event(new \App\Events\UserOnline($user));
-        
-        Log::info('UserOnline dispatched', [
-            'user_id' => $user->id,
-            'user_name' => $user->name,
-            'channel' => 'presence-enter-user-room',
-            'pusher_config' => [
-                'app_id' => $dbConfig['app_id'],
-                'cluster' => $dbConfig['app_cluster'],
-            ],
-            'timestamp' => now()->toDateTimeString(),
-        ]);
         
         return response()->json([
             'success' => true,

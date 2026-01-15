@@ -42,8 +42,6 @@ class GroupChatController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('GroupChatController@store', ['request' => $request->all()]);
-        
         $validator = Validator::make($request->all(), [
             'image' => 'sometimes|image|mimes:jpeg,png,gif,bmp,tiff,webp',
             'image_url' => 'sometimes|string|max:255',

@@ -59,7 +59,6 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego2(Request $request)
     {
-        \Log::info('🚀 log out room update zego');
         return $this->enteranceRoomService->updateRoomCountFromZego2($request);
     }
 
