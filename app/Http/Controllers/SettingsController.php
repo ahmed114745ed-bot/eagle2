@@ -279,7 +279,7 @@ class SettingsController extends Controller
             }
         }
 
-        admin_toastr('تم تحديث الإعدادات بنجاح!', 'success');
+        admin_toastr(__('Settings updated successfully!'), 'success');
         return redirect()->back();
 //        return redirect($redirectUrl);
     }
