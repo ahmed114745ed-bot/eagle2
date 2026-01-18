@@ -33,6 +33,7 @@
     },
     "dependencies": {
         "firebase": "^10.0.0",
-        "jquery": "^3.7.1"
+        "jquery": "^3.7.1",
+        "vue-draggable-next": "^2.3.0"
     }
 }

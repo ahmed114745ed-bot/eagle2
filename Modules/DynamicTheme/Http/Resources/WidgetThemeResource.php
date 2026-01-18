@@ -22,6 +22,7 @@ class WidgetThemeResource extends JsonResource
             'preview_image' => $this->preview_image,
             'is_default' => $this->is_default,
             'assets' => ThemeAssetResource::collection($this->whenLoaded('assets')),
+            'children' => ThemeChildResource::collection($this->whenLoaded('children')),
         ];
     }
 }

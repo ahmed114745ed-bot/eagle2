@@ -35,7 +35,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import ChildCustomizerComponentV2 from '@/components/ChildCustomizerComponentV2.vue'
+import ChildCustomizerComponentV2 from '../components/ChildCustomizerComponentV2.vue'
 
 export default {
   name: 'ChildCustomizerPage',

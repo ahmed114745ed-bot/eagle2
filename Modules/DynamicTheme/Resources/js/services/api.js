@@ -165,6 +165,22 @@ export const assetsApi = {
     delete: (id) => api.delete(`/dashboard/assets/${id}`),
 };
 
+// ==================== Visual Designer API ====================
+
+export const designerApi = {
+    // Update child position/size
+    updateChildPosition: (childId, data) => 
+        api.put(`/dashboard/theme-children/${childId}/position`, data),
+    
+    // Update asset position/size
+    updateAssetPosition: (assetId, data) => 
+        api.put(`/dashboard/theme-assets/${assetId}/position`, data),
+    
+    // Batch update positions
+    batchUpdatePositions: (data) => 
+        api.post('/dashboard/designer/batch-update-positions', data),
+};
+
 // ==================== Configurations API ====================
 
 export const configurationsApi = {
@@ -224,6 +240,7 @@ export const dashboardApi = {
     importExport: importExportApi,
     assets: assetsApi,
     configurations: configurationsApi,
+    designer: designerApi,
 };
 
 export default api;

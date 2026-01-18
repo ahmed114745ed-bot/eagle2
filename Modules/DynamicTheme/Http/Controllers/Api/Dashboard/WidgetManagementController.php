@@ -178,7 +178,7 @@ class WidgetManagementController extends Controller
         }
 
         $themes = WidgetTheme::where('widget_id', $widgetId)
-            ->with('assets')
+            ->with(['assets', 'children.assets', 'children.theme.assets'])
             ->get();
 
         return response()->json([

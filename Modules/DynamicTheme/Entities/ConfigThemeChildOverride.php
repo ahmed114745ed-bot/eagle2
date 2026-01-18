@@ -28,11 +28,41 @@ class ConfigThemeChildOverride extends Model
         'action',
         'position',
         'config_widget_override_id',
+        // Designer fields
+        'width',
+        'height',
+        'x',
+        'y',
+        'rotation',
+        'scale',
+        'opacity',
+        'z_index',
+        'background_color',
+        'border_width',
+        'border_style',
+        'border_color',
+        'border_radius_tl',
+        'border_radius_tr',
+        'border_radius_bl',
+        'border_radius_br',
     ];
 
     protected $casts = [
         'is_visible' => 'boolean',
         'order' => 'integer',
+        'width' => 'integer',
+        'height' => 'integer',
+        'x' => 'integer',
+        'y' => 'integer',
+        'rotation' => 'float',
+        'scale' => 'float',
+        'opacity' => 'float',
+        'z_index' => 'integer',
+        'border_width' => 'integer',
+        'border_radius_tl' => 'integer',
+        'border_radius_tr' => 'integer',
+        'border_radius_bl' => 'integer',
+        'border_radius_br' => 'integer',
     ];
 
     /**

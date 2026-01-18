@@ -97,6 +97,11 @@ Route::prefix('dashboard')->group(function () {
 
     Route::get('/widgets-parents', [WidgetController::class, 'parents']);
 
+    // Visual Designer Position Updates
+    Route::put('/theme-children/{id}/position', [AdminThemeController::class, 'updateChildPosition']);
+    Route::put('/theme-assets/{id}/position', [AdminThemeController::class, 'updateAssetPosition']);
+    Route::post('/designer/batch-update-positions', [AdminThemeController::class, 'batchUpdatePositions']);
+
      //children
     Route::post('/theme-children', [AdminThemeController::class, 'theme_children']);
     Route::put('/theme-children/{id}', [AdminThemeController::class, 'UpdateThemeChild']);

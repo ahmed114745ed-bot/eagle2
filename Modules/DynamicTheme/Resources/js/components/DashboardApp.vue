@@ -66,12 +66,7 @@
                 </div>
 
                 <div class="mt-4 flex justify-end space-x-4">
-                    <a
-                        href="/admin/child-customizers"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                    >
-                        🎨 Child Customizer
-                    </a>
+                  
 
                     <button
                         @click="saveConfiguration"
@@ -127,7 +122,36 @@
                         @add-widget="addWidget"
                         @toggle-widget-visibility="toggleWidgetVisibility"
                     />
-                    <div v-else class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                    
+                    <!-- Widget Visual Designer Button -->
+                    <div v-if="editingWidget && editingWidget.settings" class="mt-8">
+                        <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl p-6 border border-indigo-200 shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                                        <span class="text-3xl">🎨</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-800">المصمم المرئي</h3>
+                                        <p class="text-gray-600 text-sm">صمم واجهة الـ Widget بشكل مرئي تفاعلي</p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">{{ (editingWidget.settings.children || []).length }} أطفال</span>
+                                            <span class="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full">{{ editingWidgetThemes.length }} ثيمات</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button 
+                                    @click="openVisualDesigner"
+                                    class="px-8 py-4 rounded-xl font-bold text-lg transition-all bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white hover:from-purple-700 hover:via-indigo-700 hover:to-blue-700 shadow-xl hover:shadow-2xl hover:scale-105 flex items-center gap-3"
+                                >
+                                    <span class="text-2xl">✨</span>
+                                    فتح المصمم المرئي
+                                    <span class="text-2xl">→</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="!selectedScreen" class="bg-white rounded-lg shadow p-8 text-center text-gray-500">
                         <p class="text-lg">Select a screen to start editing</p>
                     </div>
                 </div>
@@ -247,6 +271,17 @@
             :type="notification?.type || 'info'"
             @close="notification = null"
         />
+        
+        <!-- Visual Designer Modal -->
+        <VisualDesigner
+            v-if="showVisualDesigner"
+            ref="visualDesignerRef"
+            :widget="editingWidget"
+            :themes="editingWidgetThemes"
+            :configurationId="selectedConfigId"
+            @close="closeVisualDesigner"
+            @save="onVisualDesignerSave"
+        />
     </div>
 </template>
 
@@ -258,6 +293,7 @@ import ScreenBuilder from './ScreenBuilder.vue';
 import WidgetSettings from './WidgetSettings.vue';
 import PreviewModal from './PreviewModal.vue';
 import NotificationToast from './NotificationToast.vue';
+import VisualDesigner from './VisualDesigner.vue';
 import { screensApi, widgetsApi, screenWidgetsApi, configurationsApi } from '../services/api';
 
 export default {
@@ -269,8 +305,13 @@ export default {
         WidgetSettings,
         PreviewModal,
         NotificationToast,
+        VisualDesigner,
     },
     setup() {
+        // Visual Designer State
+        const showVisualDesigner = ref(false);
+        const visualDesignerRef = ref(null);
+        
         // Configuration State
         const configurations = ref([]);
         const selectedConfigId = ref(null);
@@ -673,7 +714,33 @@ export default {
             if (!settings.children && Array.isArray(w.theme_child_overrides)) {
                 settings.children = w.theme_child_overrides.map((c) => ({
                     theme_child_id: c.theme_child_id ?? c.id,
-                    is_visible: c.is_visible,
+                    is_visible: c.is_visible ?? true,
+                    width: c.width,
+                    height: c.height,
+                    x: c.x,
+                    y: c.y,
+                    rotation: c.rotation,
+                    scale: c.scale,
+                    opacity: c.opacity,
+                    padding: c.padding,
+                    margin: c.margin,
+                    gap: c.gap,
+                    // Preserve assets from theme_child_overrides if present
+                    assets: Array.isArray(c.assets) ? c.assets.map(asset => ({
+                        id: asset.id,
+                        asset_key: asset.asset_key || asset.name,
+                        name: asset.name || asset.asset_key,
+                        file_url: asset.file_url || asset.url,
+                        url: asset.file_url || asset.url,
+                        width: asset.width,
+                        height: asset.height,
+                        x: asset.x,
+                        y: asset.y,
+                        opacity: asset.opacity,
+                        z_index: asset.z_index,
+                        is_visible: asset.is_visible ?? true,
+                        scale: asset.scale,
+                    })) : [],
                 }));
             }
 
@@ -888,22 +955,66 @@ const fillMissingSelectedThemeIds = () => {
             // sync widgets from the currently loaded screen (currentWidgets)
             (currentWidgets.value || []).forEach(w => {
                 const existing = widgetOverrides.value.find(wo => parseInt(wo.screen_widget_id) === parseInt(w.id));
+                // --- تخزين خصائص الأطفال مع جميع الخصائص المتقدمة ---
+                let children = [];
+                if (w.settings && Array.isArray(w.settings.children)) {
+                    children = w.settings.children.map(child => ({
+                        theme_child_id: child.theme_child_id,
+                        is_visible: child.is_visible,
+                        // الحجم
+                        width: child.width,
+                        height: child.height,
+                        // الموقع
+                        x: child.x,
+                        y: child.y,
+                        // الهوامش
+                        margin_top: child.margin_top,
+                        margin_bottom: child.margin_bottom,
+                        margin_left: child.margin_left,
+                        margin_right: child.margin_right,
+                        padding: child.padding,
+                        // التحويلات
+                        rotation: child.rotation,
+                        scale: child.scale,
+                        opacity: child.opacity,
+                        z_index: child.z_index,
+                        // الأصول (assets)
+                        assets: Array.isArray(child.assets) ? child.assets.map(asset => ({
+                            id: asset.id,
+                            asset_key: asset.asset_key,
+                            name: asset.name,
+                            is_visible: asset.is_visible,
+                            width: asset.width,
+                            height: asset.height,
+                            x: asset.x,
+                            y: asset.y,
+                            opacity: asset.opacity,
+                            scale: asset.scale,
+                        })) : []
+                    }));
+                }
                 if (existing) {
                     existing.is_visible = !!w.is_visible;
                     existing.display_order = w.display_order ?? 0;
                     existing.selected_theme_id = (w.selected_theme_id != null) ? parseInt(w.selected_theme_id) : existing.selected_theme_id ?? w.widget_theme_id ?? null;
                     existing.selected_child_theme_id = (w.selected_child_theme_id != null) ? parseInt(w.selected_child_theme_id) : existing.selected_child_theme_id ?? null;
                     existing.screen_id = existing.screen_id ?? (w.screen_id != null ? parseInt(w.screen_id) : (selectedScreen.value ? parseInt(selectedScreen.value.id) : null));
-                    if (w.settings != null) {
-                        existing.settings = { ...w.settings };
-                    } else {
-                        existing.settings = existing.settings || {};
-                    }
+                    existing.settings = { ...w.settings };
                     if (existing.selected_theme_id != null) {
                         existing.settings.theme_id = parseInt(existing.selected_theme_id);
                     }
+                    if (children.length) {
+                        existing.settings.children = children;
+                    }
                 } else {
                     const resolvedScreenId = w.screen_id != null ? parseInt(w.screen_id) : (selectedScreen.value ? parseInt(selectedScreen.value.id) : null);
+                    const payloadSettings = w.settings ? { ...w.settings } : {};
+                    if (w.selected_theme_id ?? w.widget_theme_id ?? null) {
+                        payloadSettings.theme_id = parseInt(w.selected_theme_id ?? w.widget_theme_id);
+                    }
+                    if (children.length) {
+                        payloadSettings.children = children;
+                    }
                     widgetOverrides.value.push({
                         screen_widget_id: parseInt(w.id),
                         screen_id: resolvedScreenId,
@@ -911,14 +1022,7 @@ const fillMissingSelectedThemeIds = () => {
                         display_order: w.display_order ?? 0,
                         selected_theme_id: w.selected_theme_id ?? w.widget_theme_id ?? null,
                         selected_child_theme_id: w.selected_child_theme_id ?? null,
-                        settings: (() => {
-                            const payloadSettings = w.settings ? { ...w.settings } : {};
-                            const themeId = w.selected_theme_id ?? w.widget_theme_id ?? null;
-                            if (themeId != null) {
-                                payloadSettings.theme_id = parseInt(themeId);
-                            }
-                            return payloadSettings;
-                        })(),
+                        settings: payloadSettings,
                     });
                 }
             });
@@ -1313,22 +1417,121 @@ const fillMissingSelectedThemeIds = () => {
         const editingWidgetThemes = ref([]);
 
         const editWidget = async (widget) => {
-            editingWidget.value = widget;
             // remember editing widget per-config
             if (selectedConfigId.value && widget?.id) {
                 ensureConfigUiState(selectedConfigId.value);
                 perConfigEditingWidget.value[selectedConfigId.value] = widget.id;
             }
 
+            // Ensure widget has settings object
+            widget.settings = widget.settings || {};
+            widget.settings.children = widget.settings.children || [];
+
             try {
                 // fetch themes using widget_key (safer for screen widget ids)
                 const themes = await fetchThemesForWidget(widget);
                 editingWidgetThemes.value = themes || [];
                 console.log('themes for widget:', editingWidgetThemes.value);
-                // If current config has a selected theme/child for this widget, no extra action needed:
-                // currentWidgets / widgetOverrides already include selected_theme_id/selected_child_theme_id and will be reflected in `editingWidget`
+                
+                // Merge theme children with their assets into settings.children
+                const selectedThemeId = widget.selected_theme_id ?? widget.settings?.theme_id ?? widget.widget_theme_id;
+                console.log('🎯 [editWidget] selectedThemeId:', selectedThemeId);
+                console.log('🎯 [editWidget] widget.settings before merge:', JSON.stringify(widget.settings));
+                console.log('🎯 [editWidget] editingWidgetThemes.value.length:', editingWidgetThemes.value.length);
+                console.log('🎯 [editWidget] editingWidgetThemes.value:', editingWidgetThemes.value);
+                if (selectedThemeId && editingWidgetThemes.value.length > 0) {
+                    console.log('🎯 [editWidget] Searching for theme with id:', selectedThemeId, 'type:', typeof selectedThemeId);
+                    editingWidgetThemes.value.forEach((t, i) => {
+                        console.log(`🎯 [editWidget] Theme ${i}: id=${t.id} (type: ${typeof t.id}), has children: ${!!t.children}, children count: ${t.children?.length || 0}`);
+                    });
+                    const selectedTheme = editingWidgetThemes.value.find(t => parseInt(t.id) === parseInt(selectedThemeId));
+                    console.log('🎯 [editWidget] selectedTheme:', selectedTheme);
+                    console.log('🎯 [editWidget] selectedTheme.children:', selectedTheme?.children);
+                    if (selectedTheme && Array.isArray(selectedTheme.children)) {
+                        // Ensure widget has settings.children
+                        widget.settings = widget.settings || {};
+                        widget.settings.children = widget.settings.children || [];
+                        
+                        // Merge theme children with assets
+                        const existingChildrenMap = {};
+                        widget.settings.children.forEach(c => {
+                            existingChildrenMap[c.theme_child_id] = c;
+                        });
+                        
+                        // Create merged children list from theme children
+                        const mergedChildren = selectedTheme.children.map(themeChild => {
+                            const existingOverride = existingChildrenMap[themeChild.id];
+                            // Get assets from theme child or from child's theme
+                            let assets = [];
+                            console.log('🔍 [editWidget] themeChild:', themeChild.id, themeChild);
+                            console.log('🔍 [editWidget] themeChild.theme:', themeChild.theme);
+                            console.log('🔍 [editWidget] themeChild.theme?.assets:', themeChild.theme?.assets);
+                            console.log('🔍 [editWidget] themeChild.assets:', themeChild.assets);
+                            if (themeChild.theme && Array.isArray(themeChild.theme.assets)) {
+                                assets = themeChild.theme.assets;
+                                console.log('✅ [editWidget] Using themeChild.theme.assets:', assets.length);
+                            } else if (Array.isArray(themeChild.assets)) {
+                                assets = themeChild.assets;
+                                console.log('✅ [editWidget] Using themeChild.assets:', assets.length);
+                            } else {
+                                console.log('❌ [editWidget] No assets found for child:', themeChild.id);
+                            }
+                            
+                            return {
+                                theme_child_id: themeChild.id,
+                                name: themeChild.name || themeChild.child_key || `Child ${themeChild.id}`,
+                                child_key: themeChild.child_key,
+                                is_visible: existingOverride?.is_visible ?? true,
+                                width: existingOverride?.width ?? themeChild.width ?? 300,
+                                height: existingOverride?.height ?? themeChild.height ?? 200,
+                                x: existingOverride?.x ?? themeChild.x ?? 0,
+                                y: existingOverride?.y ?? themeChild.y ?? 0,
+                                rotation: existingOverride?.rotation ?? themeChild.rotation ?? 0,
+                                scale: existingOverride?.scale ?? themeChild.scale ?? 1,
+                                opacity: existingOverride?.opacity ?? themeChild.opacity ?? 1,
+                                padding: existingOverride?.padding ?? themeChild.padding ?? '0',
+                                margin: existingOverride?.margin ?? themeChild.margin ?? '0',
+                                gap: existingOverride?.gap ?? themeChild.gap ?? 0,
+                                // Merge assets - keep override values if they exist
+                                assets: assets.map(asset => {
+                                    const existingAsset = (existingOverride?.assets || []).find(a => 
+                                        a.id === asset.id || a.asset_key === asset.asset_key
+                                    );
+                                    return {
+                                        id: asset.id,
+                                        asset_key: asset.asset_key || asset.name || asset.asset_label,
+                                        name: asset.name || asset.asset_label || asset.asset_key,
+                                        file_url: asset.file_url || asset.url || asset.default_url,
+                                        url: asset.file_url || asset.url || asset.default_url,
+                                        width: existingAsset?.width ?? asset.width ?? 80,
+                                        height: existingAsset?.height ?? asset.height ?? 80,
+                                        x: existingAsset?.x ?? asset.x ?? 0,
+                                        y: existingAsset?.y ?? asset.y ?? 0,
+                                        opacity: existingAsset?.opacity ?? asset.opacity ?? 1,
+                                        z_index: existingAsset?.z_index ?? asset.z_index ?? 0,
+                                        is_visible: existingAsset?.is_visible ?? asset.is_visible ?? true,
+                                        scale: existingAsset?.scale ?? asset.scale ?? 1,
+                                    };
+                                })
+                            };
+                        });
+                        
+                        widget.settings.children = mergedChildren;
+                        console.log('✅ [editWidget] Merged children with assets:', mergedChildren);
+                        mergedChildren.forEach((c, i) => {
+                            console.log(`✅ [editWidget] Child ${i} (${c.theme_child_id}): ${c.assets?.length || 0} assets`);
+                        });
+                    }
+                }
+                
+                // Set editingWidget AFTER merging assets so Vue detects the complete data
+                const finalWidget = { ...widget, settings: { ...widget.settings } };
+                console.log('🚀 [editWidget] Final editingWidget:', finalWidget);
+                console.log('🚀 [editWidget] Final children:', finalWidget.settings?.children);
+                editingWidget.value = finalWidget;
             } catch (error) {
                 editingWidgetThemes.value = [];
+                editingWidget.value = widget;
             }
         };
 
@@ -1475,22 +1678,37 @@ const fillMissingSelectedThemeIds = () => {
 
                 console.log('editingWidget:', widget);
 
+                // Try using widget.id (screen widget id) first - this is what has themes associated
+                // Then fall back to widget definition id if needed
                 const widgetDef = availableWidgets.value.find(w => w.widget_key === widget.widget_key);
-                if (!widgetDef) return [];
+                const widgetIdToUse = widget.id || widgetDef?.id;
+                
+                if (!widgetIdToUse) return [];
 
                 console.log('widgetDef:', widgetDef);
+                console.log('🎯 Using widget ID for themes:', widgetIdToUse, '(widget.id:', widget.id, ', widgetDef.id:', widgetDef?.id, ')');
 
                 try {
-                    const response = await widgetsApi.getThemes(widgetDef.id);
-                    const themes = response.data.data || [];
+                    // First try with widget.id (screen widget id)
+                    let response = await widgetsApi.getThemes(widget.id);
+                    let themes = response.data.data || [];
+                    
+                    console.log('themes from widget.id:', widget.id, '→', themes.length, 'themes');
+                    
+                    // If empty and we have a different widgetDef.id, try that
+                    if (themes.length === 0 && widgetDef && widgetDef.id !== widget.id) {
+                        console.log('🔄 No themes found, trying widgetDef.id:', widgetDef.id);
+                        response = await widgetsApi.getThemes(widgetDef.id);
+                        themes = response.data.data || [];
+                        console.log('themes from widgetDef.id:', widgetDef.id, '→', themes.length, 'themes');
+                    }
 
                     // store per-config
-                    if (selectedConfigId.value) {
+                    if (selectedConfigId.value && widgetDef) {
                         await ensureConfigWidgets(selectedConfigId.value);
                         perConfigWidgetThemes.value[selectedConfigId.value][widgetDef.id] = themes;
                     }
 
-                    console.log('themes widgetDef.id from API:', widgetDef.id);
                     console.log('themes returned from API:', themes);
                     console.log('response returned from API:', response);
 
@@ -1567,6 +1785,50 @@ const fillMissingSelectedThemeIds = () => {
              fetchThemesForWidget,
              // filtered library for selected screen
              filteredAvailableWidgets,
+             // Children update handler
+             onChildrenUpdated: (updatedChildren) => {
+                 if (editingWidget.value && editingWidget.value.settings) {
+                     editingWidget.value.settings.children = updatedChildren;
+                     hasChanges.value = true;
+                 }
+             },
+             
+             // Visual Designer
+             showVisualDesigner,
+             visualDesignerRef,
+             openVisualDesigner: () => {
+                 showVisualDesigner.value = true;
+                 setTimeout(() => {
+                     if (visualDesignerRef.value) {
+                         visualDesignerRef.value.open();
+                     }
+                 }, 100);
+             },
+             closeVisualDesigner: () => {
+                 showVisualDesigner.value = false;
+             },
+             onVisualDesignerSave: async (designData) => {
+                 if (editingWidget.value && editingWidget.value.settings) {
+                     editingWidget.value.settings.theme_id = designData.theme_id;
+                     editingWidget.value.settings.children = designData.children;
+                     hasChanges.value = true;
+                     
+                     // Auto save to configuration
+                     try {
+                         if (selectedConfigId.value && editingWidget.value.id) {
+                             await configurationsApi.update(selectedConfigId.value, {
+                                 widget_overrides: [{
+                                     screen_widget_id: editingWidget.value.id,
+                                     settings: editingWidget.value.settings,
+                                 }]
+                             });
+                             console.log('✅ Configuration auto-saved');
+                         }
+                     } catch (error) {
+                         console.error('Failed to auto-save configuration:', error);
+                     }
+                 }
+             },
         };
     },
 };

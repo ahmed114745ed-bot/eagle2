@@ -78,6 +78,23 @@ class ConfiguredScreenResource extends JsonResource
                                     'file_url' => $resolvedFileUrl,
                                     'default_url' => $assetOverride->asset?->default_url,
                                     'is_visible' => $assetOverride->is_visible !== false,
+                                    // Designer/Layout properties
+                                    'width' => $assetOverride->width ?? $assetOverride->asset?->width ?? 80,
+                                    'height' => $assetOverride->height ?? $assetOverride->asset?->height ?? 80,
+                                    'x' => $assetOverride->x ?? $assetOverride->asset?->x ?? 0,
+                                    'y' => $assetOverride->y ?? $assetOverride->asset?->y ?? 0,
+                                    'opacity' => $assetOverride->opacity ?? $assetOverride->asset?->opacity ?? 1,
+                                    'z_index' => $assetOverride->z_index ?? $assetOverride->asset?->z_index ?? 0,
+                                    'rotation' => $assetOverride->rotation ?? $assetOverride->asset?->rotation ?? 0,
+                                    'scale' => $assetOverride->scale ?? $assetOverride->asset?->scale ?? 1,
+                                    // Border properties
+                                    'border_width' => $assetOverride->border_width ?? $assetOverride->asset?->border_width ?? 0,
+                                    'border_style' => $assetOverride->border_style ?? $assetOverride->asset?->border_style ?? 'solid',
+                                    'border_color' => $assetOverride->border_color ?? $assetOverride->asset?->border_color ?? 'transparent',
+                                    'border_radius_tl' => $assetOverride->border_radius_tl ?? $assetOverride->asset?->border_radius_tl ?? 0,
+                                    'border_radius_tr' => $assetOverride->border_radius_tr ?? $assetOverride->asset?->border_radius_tr ?? 0,
+                                    'border_radius_bl' => $assetOverride->border_radius_bl ?? $assetOverride->asset?->border_radius_bl ?? 0,
+                                    'border_radius_br' => $assetOverride->border_radius_br ?? $assetOverride->asset?->border_radius_br ?? 0,
                                 ];
                             })
                             ->values();
@@ -91,6 +108,24 @@ class ConfiguredScreenResource extends JsonResource
                             'order' => $childOverride->order,
                             'action' => $childOverride->action,
                             'position' => $childOverride->position,
+                            // Designer/Layout properties
+                            'width' => $childOverride->width ?? $childOverride->themeChild?->width ?? 300,
+                            'height' => $childOverride->height ?? $childOverride->themeChild?->height ?? 200,
+                            'x' => $childOverride->x ?? $childOverride->themeChild?->x ?? 0,
+                            'y' => $childOverride->y ?? $childOverride->themeChild?->y ?? 0,
+                            'rotation' => $childOverride->rotation ?? $childOverride->themeChild?->rotation ?? 0,
+                            'scale' => $childOverride->scale ?? $childOverride->themeChild?->scale ?? 1,
+                            'opacity' => $childOverride->opacity ?? $childOverride->themeChild?->opacity ?? 1,
+                            'z_index' => $childOverride->z_index ?? $childOverride->themeChild?->z_index ?? 0,
+                            // Background & Border properties
+                            'background_color' => $childOverride->background_color ?? $childOverride->themeChild?->background_color ?? 'transparent',
+                            'border_width' => $childOverride->border_width ?? $childOverride->themeChild?->border_width ?? 0,
+                            'border_style' => $childOverride->border_style ?? $childOverride->themeChild?->border_style ?? 'solid',
+                            'border_color' => $childOverride->border_color ?? $childOverride->themeChild?->border_color ?? 'transparent',
+                            'border_radius_tl' => $childOverride->border_radius_tl ?? $childOverride->themeChild?->border_radius_tl ?? 0,
+                            'border_radius_tr' => $childOverride->border_radius_tr ?? $childOverride->themeChild?->border_radius_tr ?? 0,
+                            'border_radius_bl' => $childOverride->border_radius_bl ?? $childOverride->themeChild?->border_radius_bl ?? 0,
+                            'border_radius_br' => $childOverride->border_radius_br ?? $childOverride->themeChild?->border_radius_br ?? 0,
                             'assets' => $childAssets,
                         ];
                     })

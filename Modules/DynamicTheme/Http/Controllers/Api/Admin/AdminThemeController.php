@@ -9,8 +9,12 @@ use Modules\DynamicTheme\Entities\Screen;
 use Modules\DynamicTheme\Entities\ScreenWidget;
 use Modules\DynamicTheme\Entities\ThemeChild;
 use Modules\DynamicTheme\Entities\WidgetTheme;
+use Modules\DynamicTheme\Entities\Widget;
 use Modules\DynamicTheme\Entities\ThemeAsset;
 use Modules\DynamicTheme\Entities\LibraryAsset;
+use Modules\DynamicTheme\Http\Resources\WidgetThemeResource;
+use Modules\DynamicTheme\Http\Resources\ThemeChildResource;
+use Modules\DynamicTheme\Http\Resources\ThemeChildAssetResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -29,31 +33,166 @@ class AdminThemeController extends Controller
             ->orderBy('theme_name')
             ->get();
 
-        return response()->json([
-            'data' => $themes
-        ]);
+        return WidgetThemeResource::collection($themes);
     }
 
 
-       public function getByWidget($widgetId)
+    public function getByWidget($widgetId)
     {
         $configurationId = request()->query('configuration_id');
         
-        $screenWidget =ScreenWidget::where('id', $widgetId)->first();
-        if (!$screenWidget) {
-            return response()->json([
-                'data' => []
-            ]);
+        // First try as screen_widget.id
+        $screenWidget = ScreenWidget::find($widgetId);
+        $actualWidgetId = $screenWidget?->widget_id;
+        
+        // If not found, try as widget.id directly
+        if (!$actualWidgetId) {
+            $widgetExists = Widget::find($widgetId);
+            if ($widgetExists) {
+                $actualWidgetId = $widgetId;
+            }
         }
-        $themes = WidgetTheme::where('widget_id', $screenWidget->widget_id)
+        
+        if (!$actualWidgetId) {
+            return response()->json(['data' => []]);
+        }
+        
+        $themes = WidgetTheme::where('widget_id', $actualWidgetId)
                                 ->with(['widget', 'children.assets'])
                                 ->orderBy('widget_id')
                                 ->orderBy('theme_name')
                                 ->get();
+                                
+        return WidgetThemeResource::collection($themes);
+    }
+    
+    /**
+     * Update position/size of a theme child (for visual designer)
+     */
+    public function updateChildPosition(Request $request, $childId): JsonResponse
+    {
+        $child = ThemeChild::findOrFail($childId);
+        
+        $validated = $request->validate([
+            'width' => 'nullable|integer|min:10',
+            'height' => 'nullable|integer|min:10',
+            'x' => 'nullable|integer|min:0',
+            'y' => 'nullable|integer|min:0',
+            'rotation' => 'nullable|numeric',
+            'scale' => 'nullable|numeric|min:0.1|max:10',
+            'opacity' => 'nullable|numeric|min:0|max:1',
+            'z_index' => 'nullable|integer',
+        ]);
+        
+        $child->update($validated);
+        
         return response()->json([
-            'data' => $themes
+            'message' => 'Child position updated',
+            'data' => new ThemeChildResource($child->load('assets'))
         ]);
     }
+    
+    /**
+     * Update position/size of a theme asset (for visual designer)
+     */
+    public function updateAssetPosition(Request $request, $assetId): JsonResponse
+    {
+        $asset = ThemeAsset::findOrFail($assetId);
+        
+        $validated = $request->validate([
+            'width' => 'nullable|integer|min:10',
+            'height' => 'nullable|integer|min:10',
+            'x' => 'nullable|integer|min:0',
+            'y' => 'nullable|integer|min:0',
+            'rotation' => 'nullable|numeric',
+            'scale' => 'nullable|numeric|min:0.1|max:10',
+            'opacity' => 'nullable|numeric|min:0|max:1',
+            'z_index' => 'nullable|integer',
+        ]);
+        
+        $asset->update($validated);
+        
+        return response()->json([
+            'message' => 'Asset position updated',
+            'data' => new ThemeChildAssetResource($asset)
+        ]);
+    }
+    
+    /**
+     * Batch update positions for multiple children and assets
+     */
+    public function batchUpdatePositions(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'children' => 'nullable|array',
+            'children.*.id' => 'required|integer|exists:theme_children,id',
+            'children.*.width' => 'nullable|integer|min:10',
+            'children.*.height' => 'nullable|integer|min:10',
+            'children.*.x' => 'nullable|integer|min:0',
+            'children.*.y' => 'nullable|integer|min:0',
+            'children.*.rotation' => 'nullable|numeric',
+            'children.*.scale' => 'nullable|numeric|min:0.1|max:5',
+            'children.*.opacity' => 'nullable|numeric|min:0|max:1',
+            'children.*.z_index' => 'nullable|integer|min:0',
+            'children.*.background_color' => 'nullable|string',
+            'children.*.border_width' => 'nullable|integer|min:0',
+            'children.*.border_style' => 'nullable|string|in:solid,dashed,dotted,double,groove,ridge,none',
+            'children.*.border_color' => 'nullable|string',
+            'children.*.border_radius_tl' => 'nullable|integer|min:0',
+            'children.*.border_radius_tr' => 'nullable|integer|min:0',
+            'children.*.border_radius_bl' => 'nullable|integer|min:0',
+            'children.*.border_radius_br' => 'nullable|integer|min:0',
+            'assets' => 'nullable|array',
+            'assets.*.id' => 'required|integer|exists:theme_assets,id',
+            'assets.*.width' => 'nullable|integer|min:10',
+            'assets.*.height' => 'nullable|integer|min:10',
+            'assets.*.x' => 'nullable|integer|min:0',
+            'assets.*.y' => 'nullable|integer|min:0',
+            'assets.*.rotation' => 'nullable|numeric',
+            'assets.*.scale' => 'nullable|numeric|min:0.1|max:5',
+            'assets.*.opacity' => 'nullable|numeric|min:0|max:1',
+            'assets.*.z_index' => 'nullable|integer|min:0',
+            'assets.*.border_width' => 'nullable|integer|min:0',
+            'assets.*.border_style' => 'nullable|string|in:solid,dashed,dotted,double,groove,ridge,none',
+            'assets.*.border_color' => 'nullable|string',
+            'assets.*.border_radius_tl' => 'nullable|integer|min:0',
+            'assets.*.border_radius_tr' => 'nullable|integer|min:0',
+            'assets.*.border_radius_bl' => 'nullable|integer|min:0',
+            'assets.*.border_radius_br' => 'nullable|integer|min:0',
+        ]);
+        
+        $updatedChildren = 0;
+        $updatedAssets = 0;
+        
+        if (!empty($validated['children'])) {
+            foreach ($validated['children'] as $childData) {
+                $child = ThemeChild::find($childData['id']);
+                if ($child) {
+                    unset($childData['id']);
+                    $child->update($childData);
+                    $updatedChildren++;
+                }
+            }
+        }
+        
+        if (!empty($validated['assets'])) {
+            foreach ($validated['assets'] as $assetData) {
+                $asset = ThemeAsset::find($assetData['id']);
+                if ($asset) {
+                    unset($assetData['id']);
+                    $asset->update($assetData);
+                    $updatedAssets++;
+                }
+            }
+        }
+        
+        return response()->json([
+            'message' => "Updated {$updatedChildren} children and {$updatedAssets} assets",
+            'updated_children' => $updatedChildren,
+            'updated_assets' => $updatedAssets,
+        ]);
+    }
+    
     /**
      * Store a newly created theme.
      */

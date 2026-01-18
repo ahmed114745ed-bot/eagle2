@@ -30,10 +30,39 @@ class ConfigChildAssetOverride extends Model
         'file_path',
         'config_theme_child_override_id',
         'is_visible',
+        // Designer fields
+        'width',
+        'height',
+        'x',
+        'y',
+        'rotation',
+        'scale',
+        'opacity',
+        'z_index',
+        'border_width',
+        'border_style',
+        'border_color',
+        'border_radius_tl',
+        'border_radius_tr',
+        'border_radius_bl',
+        'border_radius_br',
     ];
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'width' => 'integer',
+        'height' => 'integer',
+        'x' => 'integer',
+        'y' => 'integer',
+        'rotation' => 'float',
+        'scale' => 'float',
+        'opacity' => 'float',
+        'z_index' => 'integer',
+        'border_width' => 'integer',
+        'border_radius_tl' => 'integer',
+        'border_radius_tr' => 'integer',
+        'border_radius_bl' => 'integer',
+        'border_radius_br' => 'integer',
     ];
 
     protected $appends = ['file_url'];

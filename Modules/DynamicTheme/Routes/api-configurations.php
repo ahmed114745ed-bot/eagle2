@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Modules\DynamicTheme\Http\Controllers\ConfigurationController;
 use Modules\DynamicTheme\Http\Controllers\ConfigurationOverrideController;
 use Modules\DynamicTheme\Http\Controllers\Api\WidgetCustomizerController;
+use Modules\DynamicTheme\Http\Controllers\Api\DesignTemplateController;
+use Modules\DynamicTheme\Http\Controllers\Api\ChildCustomizerController;
+use Modules\DynamicTheme\Http\Controllers\Api\UnifiedCustomizerEndpointController;
 
 /**
  * Configuration Management Routes
@@ -136,7 +139,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ======================== COLOR PRESET ROUTES ========================
     
-    use Modules\DynamicTheme\Http\Controllers\Api\ColorPresetController;
     
     Route::prefix('color-presets')->controller(ColorPresetController::class)->group(function () {
         // Get all presets for a configuration
@@ -161,7 +163,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ======================== DESIGN TEMPLATE ROUTES ========================
     
-    use Modules\DynamicTheme\Http\Controllers\Api\DesignTemplateController;
     
     Route::prefix('design-templates')->controller(DesignTemplateController::class)->group(function () {
         // Get all templates for a configuration
@@ -187,7 +188,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ======================== CHILD CUSTOMIZER ROUTES ========================
     
-    use Modules\DynamicTheme\Http\Controllers\Api\ChildCustomizerController;
     
     Route::prefix('child-customizers')->controller(ChildCustomizerController::class)->group(function () {
         // Get all children for a widget override
@@ -216,7 +216,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // ======================== UNIFIED CUSTOMIZER ENDPOINT (MAIN) ========================
     
-    use Modules\DynamicTheme\Http\Controllers\Api\UnifiedCustomizerEndpointController;
     
     Route::prefix('configurations/{configId}/widgets/{widgetOverrideId}')->controller(UnifiedCustomizerEndpointController::class)->group(function () {
         // Get complete customization (widget + children + presets + templates + CSS)

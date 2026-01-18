@@ -1,7 +1,7 @@
 <template>
   <div class="child-customizer-wrapper">
     <!-- Configuration Info Header -->
-    <div class="config-header bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-r">
+    <div class="config-header bg-blue-50 border-l-4 p-4 mb-6 rounded-r">
       <div class="grid grid-cols-2 gap-4">
         <div>
           <span class="text-sm text-gray-600">📍 Configuration الحالية:</span>
@@ -33,7 +33,7 @@
             v-for="child in configChildren"
             :key="child.id"
             @click="selectChild(child)"
-            class="child-item p-3 bg-white border-2 rounded cursor-pointer hover:border-purple-400 transition-all"
+            class="child-item p-3 border-2 rounded cursor-pointer hover:border-purple-400 transition-all"
             :class="{ 'border-purple-500 bg-purple-50': selectedChild?.id === child.id, 'border-gray-200': selectedChild?.id !== child.id }"
           >
             <div class="flex justify-between items-start">
@@ -163,7 +163,7 @@
 
     <!-- Add Child Modal -->
     <div v-if="showAddChildForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+      <div class="rounded-lg p-4 max-w-md w-full mx-4">
         <h3 class="text-xl font-bold text-gray-800 mb-4">إضافة عنصر فرعي جديد</h3>
 
         <div class="space-y-4">
@@ -340,25 +340,27 @@ export default {
 };
 </script>
 
-<style scoped lang="postcss">
-.child-customizer-wrapper {
-  @apply p-6 bg-gray-50 rounded-lg;
-}
+<style scoped>
+/* استبدلنا @apply بـ CSS عادية لتجنب أخطاء Tailwind */
 
 .config-header {
-  @apply border-l-4 border-blue-500;
+  border-left-width: 4px;
 }
 
 .children-panel,
 .editor-panel {
-  @apply bg-white rounded-lg shadow-md p-4;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  padding: 1rem;
 }
 
 .child-item {
-  @apply transition-all duration-200;
+  transition: all 0.2s;
 }
 
 .drawing-section {
-  @apply bg-white rounded-lg p-4 shadow-md;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
 }
 </style>
