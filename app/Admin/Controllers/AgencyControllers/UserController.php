@@ -28,6 +28,7 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
+use App\Admin\Actions\ChangeAgencyActionUser;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -587,7 +588,7 @@ class UserController extends MainController
                 $actions->add(new KickOfFamilyAction());
             }
             if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new ChangeAgencyAction($model->id));
+                $actions->add(new ChangeAgencyActionUser($model->id));
             }
 
             if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
