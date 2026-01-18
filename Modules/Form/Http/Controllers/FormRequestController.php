@@ -420,6 +420,8 @@ class FormRequestController extends MainController
             'country_id' => $owner->country_id,
         ]);
         $request->update(['status' => 'approved']);
+        $owner->type_user = 2;
+        $owner->save();
 
         // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
         return response()->json([
@@ -486,7 +488,7 @@ class FormRequestController extends MainController
                 'message' => __('user is country manager'),
             ], 400);
         }
-        
+
         if ($this->checkUserAlreadyOwnsEntity($owner, ShippingAgency::class)) {
 
             return response()->json([

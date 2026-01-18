@@ -38,6 +38,7 @@ use App\Exports\AgencyChargeTransactions;
 use App\Http\Controllers\TestsController;
 use App\Admin\Controllers\EmojiController;
 use App\Http\Controllers\PayPalController;
+use App\Admin\Controllers\AgencyController;
 use App\Admin\Controllers\ExportController;
 use App\Http\Controllers\WelcomeController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
@@ -53,7 +54,6 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
-use App\Admin\Controllers\AppearChargerAgencyController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -242,6 +242,8 @@ Route::get('/clear_clear', function () {
     return "Cleared!";
 });
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
+Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
+Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
 
 Route::get('/seed', function () {
 
@@ -309,7 +311,7 @@ Route::get('/test-pusher-config', function () {
         'app_id' => config('broadcasting.connections.pusher.app_id'),
         'cluster' => config('broadcasting.connections.pusher.options.cluster'),
     ];
-    
+
     return response()->json([
         'from_helper_function' => $pusherConfig,
         'from_laravel_config' => $laravelConfig,
@@ -1129,13 +1131,14 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
+use App\Admin\Controllers\AppearChargerAgencyController;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
-$phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
+    $phpunitPath = base_path('vendor/phpunit/phpunit/phpunit');
 
     $process = new Process([
         $phpunitPath,
@@ -1165,7 +1168,7 @@ Route::get('/run-lucky-gift-unit-test', function () {
 
     $output = $process->getOutput() . $process->getErrorOutput();
 
-    return response('<pre>'.e($output).'</pre>');
+    return response('<pre>' . e($output) . '</pre>');
 });
 
 Route::post('/__debugbar/screen', function (\Illuminate\Http\Request $request) {
@@ -1244,7 +1247,6 @@ Route::post('/deploy-webhook', function (\Illuminate\Http\Request $request) {
             'output' => $output,
             'time' => now()->toDateTimeString(),
         ], 200);
-
     } catch (\Exception $e) {
         return response()->json([
             'status' => 'error',
@@ -1275,17 +1277,17 @@ Route::get('/quick-reload/{token}', function ($token) {
 
 Route::get('/debug/force-pusher-refresh', function () {
     $timestamp = now()->toDateTimeString();
-    
+
     Cache::forget('pusher_config');
     Cache::forget('all_configs');
-    
+
     Cache::put('pusher_config_changed', $timestamp, 3600);
-    
+
     \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-    
+
     Artisan::call('queue:restart');
     $queueRestartOutput = Artisan::output();
-    
+
     $octaneReloadOutput = '';
     try {
         Artisan::call('octane:reload');
@@ -1293,7 +1295,7 @@ Route::get('/debug/force-pusher-refresh', function () {
     } catch (\Throwable $e) {
         $octaneReloadOutput = 'Not running or error: ' . $e->getMessage();
     }
-    
+
     $freshConfig = getPusherConfig();
     return response()->json([
         'success' => true,
@@ -1323,7 +1325,7 @@ Route::get('/debug/force-pusher-refresh', function () {
 // ⭐ Test GiftBannerEvent broadcast (via Queue)
 Route::get('/debug/test-gift-banner', function () {
     $dbConfig = getPusherConfig();
-    
+
     // Create test gift data
     $testGift = [
         'id' => rand(1000, 9999),
@@ -1343,11 +1345,11 @@ Route::get('/debug/test-gift-banner', function () {
             'pusher_cluster' => $dbConfig['app_cluster'],
         ],
     ];
-    
+
     try {
         // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
         event(new \App\Events\GiftBannerEvent($testGift));
-        
+
         return response()->json([
             'success' => true,
             'message' => '🎁 GiftBannerEvent dispatched to Queue!',
@@ -1370,13 +1372,12 @@ Route::get('/debug/test-gift-banner', function () {
             ],
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
-        
     } catch (\Throwable $e) {
         Log::error('GiftBannerEvent failed', [
             'error' => $e->getMessage(),
             'trace' => $e->getTraceAsString(),
         ]);
-        
+
         return response()->json([
             'success' => false,
             'error' => $e->getMessage(),
@@ -1386,14 +1387,15 @@ Route::get('/debug/test-gift-banner', function () {
     }
 });
 
+
 // ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
 Route::get('/debug/test-user-online', function () {
     $dbConfig = getPusherConfig();
-    
+
     // Get a test user (first user or create mock)
     $userId = request()->get('user_id', 1);
     $user = \App\Models\User::find($userId);
-    
+
     if (!$user) {
         return response()->json([
             'success' => false,
@@ -1401,11 +1403,11 @@ Route::get('/debug/test-user-online', function () {
             'hint' => 'Add ?user_id=123 to specify a different user',
         ], 404, [], JSON_PRETTY_PRINT);
     }
-    
+
     try {
         // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
         event(new \App\Events\UserOnline($user));
-        
+
         return response()->json([
             'success' => true,
             'message' => '👤 UserOnline event dispatched to Queue!',
@@ -1431,14 +1433,13 @@ Route::get('/debug/test-user-online', function () {
             ],
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
-        
     } catch (\Throwable $e) {
         Log::error('UserOnline failed', [
             'error' => $e->getMessage(),
             'user_id' => $user->id,
             'trace' => $e->getTraceAsString(),
         ]);
-        
+
         return response()->json([
             'success' => false,
             'error' => $e->getMessage(),
@@ -1447,4 +1448,3 @@ Route::get('/debug/test-user-online', function () {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 });
-

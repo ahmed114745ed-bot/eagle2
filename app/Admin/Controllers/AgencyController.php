@@ -274,7 +274,7 @@ class AgencyController extends MainController
             });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
-         $prefix = dashboardName();
+        $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -1223,5 +1223,36 @@ class AgencyController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         return $grid;
+    }
+
+
+    public function usersAgency()
+    {
+        $agencyOwnerIds = Agency::pluck('app_owner_id')->toArray();
+
+        $users = User::whereIn('id', $agencyOwnerIds)
+            ->where('type_user', 0)
+            ->get();
+
+        return response()->json([
+            'Owner_count'    => $users->count(),        // how many users
+            'Owners_user_ids' => $users->pluck('id'),    // list of user IDs
+        ]);
+    }
+
+    public function UpdateTypeUserAgency()
+    {
+        $query = User::whereIn('id', Agency::select('app_owner_id'))
+            ->where('type_user', 0);
+
+        $userIds = $query->pluck('id');   
+        $count   = $userIds->count();
+
+        $query->update(['type_user' => 2]); 
+
+        return response()->json([
+            'count'    => $count,
+            'user_ids' => $userIds,
+        ]);
     }
 }
