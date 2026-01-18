@@ -863,8 +863,6 @@ class AllStatisticController extends MainController
                     'date' => $w->created_at->format('Y-m-d')
                 ];
             });
-        \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
-
 
         $topUsers = \DB::table('charges')
             ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))

@@ -10,11 +10,12 @@ use App\Models\Follow;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
 use App\Models\ShippingAgency;
-use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
 use App\Http\Resources\Api\V1\UserDataRoomResource;
@@ -459,6 +460,7 @@ class UserRepository extends Repository
 
     public function searchInHostAgency($key, $page, $perPage)
     {
+
         return Agency::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')

@@ -23,10 +23,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
-class ChangeAgencyAction extends RowAction
+class ChangeAgencyActionUser extends RowAction
 {
     public $name;
-
     public $id;
 
     public function __construct($id = 0)
@@ -67,13 +66,13 @@ class ChangeAgencyAction extends RowAction
         
                 UsersJoinedAgency::create([
                     'user_id'   => $user->id,
-                    'agency_id' => $request->agency_ids,
+                    'agency_id' => $request->agency_id,
                     'type'      => 2,
                     'join_date' => now(),
                     'status'    => 'Joined',
                 ]);
         
-                $user->agency_id = $request->agency_ids;
+                $user->agency_id = $request->agency_id;
                 $user->save();
     
         
@@ -140,7 +139,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_ids', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
+        $this->select('agency_id', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
     }
 
     public function html()

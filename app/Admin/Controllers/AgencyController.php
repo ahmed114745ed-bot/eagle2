@@ -804,6 +804,23 @@ class AgencyController extends MainController
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
 
+            $currentAgencyId = $form->model()->id ?? null;
+
+            if ($appOwnerId) {
+                $existingAgency = Agency::where('app_owner_id', $appOwnerId)
+                    ->when($currentAgencyId, function ($query) use ($currentAgencyId) {
+                        $query->where('id', '!=', $currentAgencyId);
+                    })
+                    ->first();
+
+                if ($existingAgency) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already an owner of agency: ') . $existingAgency->name],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+            }
+
             if (!$form->bd_id && !$form->model()->bd_id) {
                 $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
 

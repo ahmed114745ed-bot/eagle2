@@ -42,22 +42,12 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
         $start = microtime(true);
         $api_access_key = Common::getPublicGoogleAccessToken();
         $projectId = env('FIREBASE_PROJECT_NAME');
-        Log::info('Firebase project ID', [
-            'projectId' => $projectId
-        ]);
 
         $client = new Client([
             'headers'  => [
                 'Authorization' => 'Bearer ' . $api_access_key,
                 'Content-Type' => 'application/json',
             ]
-        ]);
-
-        Log::info('SendFirebaseNotificationIndividualUserJob started', [
-            'tokens_count' => count($this->tokens),
-            'min' => $this->min,
-            'max' => $this->max,
-            'dataType' => $this->dataType,
         ]);
 
         $users = User::select(['id', 'notification_id', 'lan'])
@@ -67,7 +57,6 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
             ->get();
 
         if (!$users->count()) {
-            Log::warning('No users found for Firebase notification', ['tokens' => $this->tokens]);
             return;
         }
 
@@ -83,13 +72,6 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
             $lang = $user->lan ?? 'en';
             $body = __('api.rankingRewardLevel', ['level' => $currentLevel], $lang);
-
-            // Log sending official message
-            Log::info('Sending official message', [
-                'user_id' => $user->id,
-                'level' => $currentLevel,
-                'body' => $body
-            ]);
 
             Common::sendOfficialMessage(
                 $user->id,
@@ -158,11 +140,6 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
                 $payload['notification']['image'] = $this->data['image'];
             }
 
-            Log::info('Dispatching Firebase async message', [
-                'token' => $token,
-                'payload' => $payload
-            ]);
-
             $promises[$token] = $client->postAsync(
                 "https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send",
                 ['json' => ['message' => $payload]]
@@ -171,7 +148,6 @@ class SendFirebaseNotificationIndividualUserJob implements ShouldQueue
 
         try {
             Utils::unwrap($promises);
-            Log::info('All Firebase notifications sent successfully', ['count' => count($promises)]);
         } catch (\Throwable $e) {
             Log::error('Error sending Firebase notifications', [
                 'message' => $e->getMessage(),

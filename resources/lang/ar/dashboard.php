@@ -9,7 +9,6 @@ return [
     'login.rights'          => '  ٢٠٢٣. جميع الحقوق محفوظة © ',
     'login.language.switch' => 'Switch to',
     'login.language.lang' => 'English',
-    'login.titleAreaManager' => 'تسجيل الدخول إلى لوحة تحكم مدير المنطقة',
     'confirm_enable_frozen_wallet'  => 'هل أنت متأكد أنك تريد تفعيل المحفظة المجمدة؟',
     'confirm_disable_frozen_wallet' => 'هل أنت متأكد أنك تريد تعطيل المحفظة المجمدة؟',
     'login' => [
@@ -28,6 +27,18 @@ return [
         'reset' => 'إعادة تعيين كلمة المرور',
         'or' => 'أو',
         'loading' => 'جاري تسجيل الدخول...'
+    ],
+    'login_agency' => [
+        'title' => 'تسجيل دخول مدير الوكالات',
+        'subtitle' => 'إدارة الوكالات والمضيفين والأداء',
+    ],
+    'login_area' => [
+        'title' => 'تسجيل دخول مدير المنطقة',
+        'subtitle' => 'إدارة عدة دول والعمليات الإقليمية',
+    ],
+    'login_country' => [
+        'title' => 'تسجيل دخول مدير الدولة',
+        'subtitle' => 'التحكم في التقارير والإعدادات على مستوى الدولة',
     ],
 
     'online'                => 'متصل',

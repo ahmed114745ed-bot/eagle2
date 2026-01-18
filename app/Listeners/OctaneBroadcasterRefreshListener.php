@@ -93,12 +93,6 @@ class OctaneBroadcasterRefreshListener
                 3600 // 1 hour
             );
 
-            Log::info('Pusher config refreshed in Octane worker', [
-                'pid' => getmypid(),
-                'hostname' => gethostname(),
-                'forced' => $forced,
-                'timestamp' => now()->toDateTimeString(),
-            ]);
         } catch (\Throwable $e) {
             Log::error('Failed to refresh Pusher config', [
                 'error' => $e->getMessage(),

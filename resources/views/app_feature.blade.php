@@ -1,113 +1,364 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
     body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #121212;
+        background: var(--gradient-primary);
+        min-height: 100vh;
+    }
+
+    .page-header {
+        padding: 40px 0;
+    }
+
+    .page-title {
+        font-size: 32px;
+        font-weight: 700;
         display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
     }
 
-    /* محتوى الصفحة */
-    .settings-content {
-        flex-grow: 1;
-        padding: 20px;
-    }
-
-    .settings-section {
-        display: none;
-    }
-
-    .active {
-        display: block;
-    }
-
-    /* تنسيق النماذج */
-    form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
-    }
-
-    label {
-        display: block;
-        margin: 10px 0 5px;
-    }
-
-    input,
-    select {
-        width: 100%;
-        padding: 10px;
+    .breadcrumb-custom {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
         margin-bottom: 15px;
-        background: #333;
-        border: 1px solid #444;
+    }
+
+    .breadcrumb-custom span {
+        font-weight: 600;
+    }
+
+    /* Stats Overview */
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        backdrop-filter: blur(10px);
+        border: 1px solid #eaeaea;
+        border-radius: 16px;
+        padding: 25px 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        gap: 8px;
+    }
+
+    .dark-mode .stat-card {
+        background: var(--dark-secondry-color);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .stat-label {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .stat-change {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #4ade80 !important;
+        margin-top: 5px;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 25px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .dark-mode .feature-card {
+        background: var(--dark-secondry-color);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-header {
+        padding: 30px;
+        background: var(--gradient-primary);
         color: white;
+        position: relative;
+        overflow: hidden;
     }
 
-    button {
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    .all-page {
-        display: inline-flex;
-    }
-
-    .wrapper {
-        width: 100%;
-    }
-
-    .settings-content {
-        width: 869px;
-    }
-
-    .form {
-        width: 400px;
-        margin: auto;
-    }
-
-    /* تصميم النافذة */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        padding-top: 50px;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-    }
-
-    /* الصورة داخل النافذة */
-    .modal-content {
-        margin: auto;
-        display: block;
-        width: 80%;
-        max-width: 700px;
-    }
-
-    /* زر الإغلاق */
-    .close {
+    .feature-header::before {
+        content: '';
         position: absolute;
-        top: 15px;
-        right: 35px;
-        color: white;
-        font-size: 40px;
-        font-weight: bold;
-        cursor: pointer;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: pulse 3s ease-in-out infinite;
     }
 
-    img {
-        width: 201px;
-        display: block;
-        height: 99px;
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-name {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-status {
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-label {
+        font-size: 13px;
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+
+    .feature-body {
+        padding: 25px 30px;
+    }
+
+    .feature-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 20px;
     }
 
-    button {
-        width: 200px;
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .info-label {
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .feature-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .btn-feature {
+        flex: 1;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: var(--gradient-primary);
+        color: var(--text-secondary-color);
+    }
+
+    .btn-feature:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px var(--secondary-color);
+        text-decoration: none;
+    }
+
+    .dark-mode .btn-feature:hover {
+        box-shadow: 0 6px 20px var(--dark-secondry-color);
+    }
+
+    .feature-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 2;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .rtl .feature-badge {
+        left: 15px;
+        right: auto;
+    }
+
+    .feature-update-time {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        font-size: 13px;
+        z-index: 1;
+    }
+
+    /* Modal Styling */
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+
+    .modal {
+        z-index: 1050 !important;
+    }
+
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: var(--gradient-primary);
+        border: none;
+        padding: 25px 30px;
+    }
+
+    .modal-title {
+        font-weight: 700;
+        font-size: 20px;
+    }
+
+    .modal-body {
+        padding: 30px;
+    }
+
+    .modal-footer {
+        border: none;
+        padding: 20px 30px;
+    }
+
+    .btn-success-custom {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success-custom:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+    }
+
+    .btn-secondary-custom {
+        background: #e2e8f0;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #cbd5e1;
+    }
+
+    /* Toast Notifications */
+    #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 99999;
+    }
+
+    .alert {
+        border-radius: 12px;
+        padding: 15px 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+    .dark-mode #to_wallet_id option {
+        background: var(--dark-secondry-color) !important;
+    }
+
+    .dark-mode #to_wallet_id option:hover,
+    .dark-mode #to_wallet_id option:focus,
+    .dark-mode #to_wallet_id option:checked {
+        background: var(--primary-color) !important;
+        color: #ffffff !important;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .features-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-overview {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Toggle Switch Styling */
@@ -187,359 +438,382 @@
         color: #888;
         font-style: italic;
     }
-
-    @media (max-width: 576px) {
-    }
-
-    @media (max-width: 768px) {
-        .all-page {
-            display: block;
-        }
-
-        .settings-content {
-            width: 100%;
-        }
-
-        .form {
-            width: auto;
-        }
-    }
-
-    @media (max-width: 992px) {
-    }
-
-    @media (max-width: 1200px) {
-    }
-
-    @media (max-width: 1400px) {
-    }
 </style>
 
 <body>
-<div class="all-page">
-    <div class="settings-sidebar">
-        <h2>{{ __('Settings') }}</h2>
-        <div class="settings-menu">
-            <button onclick="showSection('AppFeature')"
-                    style="background: var(--primary-color) !important; color: var(--text-secondary-color) !important;">
-                {{ __('Agency Feature') }}
-            </button>
-            <button onclick="showSection('ReelSettings')"
-                    style="text-align: right;">
-                {{ __('Reel Settings') }}
-            </button>
-            <button onclick="showSection('YouTubeSettings')"
-                    style="text-align: right;">
-                {{ __('YouTube Settings') }}
-            </button>
-            <button onclick="showSection('LiveSettings')"
-                    style="text-align: right;">
-                {{ __('Live Settings') }}
-            </button>
-            </button>
-            <button onclick="showSection('RoomCupSetting')"
-                    style="text-align: right;">
-                {{ __('room cup setting') }}
-            </button>
-
-            <button onclick="showSection('MomentStatus')"
-                    style="text-align: right;">
-                {{ __('Moment Status') }}
-            </button>
-
-            <button onclick="showSection('hostLevel')"
-                    style="text-align: right;">
-                {{ __('host level') }}
-            </button>
-
-            <button onclick="showSection('shareRoom')"
-                    style="text-align: right;">
-                {{ __('share room') }}
-            </button>
-        </div>
-    </div>
-
-    <div class="settings-content">
-        <div id="AppFeature" class="settings-section active">
-            <h2>{{ __('Agency Feature') }}</h2>
-            <form id="agencyFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
-                  method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
-                            onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
-                                document.getElementById('agencyFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="host_agency" id="host_agency_value"
-                               value="{{ $hostAgencyStatus ? '1' : '0' }}">
+<div class="container-fluid" style="padding: 0;">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-building"></i>
                     </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
-                        </div>
+                    <div class="feature-name">
+                        {{ __('Agency Feature') }}
                     </div>
+                    <div class="feature-status">
+                        {{ $hostAgencyStatus ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Agency') }}</div>
                 </div>
-            </form>
-        </div>
+                <div class="feature-body">
+                    <form id="agencyFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
+                          method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="redirect" value="{{ route('admin.app-feature.index') }}">
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
 
-        <div id="ReelSettings" class="settings-section">
-            <h2>{{ __('Reel Settings') }}</h2>
-            <form id="reelFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable Reel Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="reel_toggle" {{ $reelSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_reel_value').value = this.checked ? '1' : '0';
-                                document.getElementById('reelFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="reel_status" id="host_reel_value"
-                               value="{{ $reelSettings ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable Agency Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="agency_toggle" {{ $hostAgencyStatus ? 'checked' : '' }}
+                                onchange="document.getElementById('host_agency_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('agencyFeatureForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="host_agency" id="host_agency_value"
+                                   value="{{ $hostAgencyStatus ? '1' : '0' }}">
                         </div>
-                    </div>
-                </div>
-            </form>
-        </div>
 
-        <div id="YouTubeSettings" class="settings-section">
-            <h2>{{ __('YouTube Settings') }}</h2>
-            <form id="YouTubeFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
-                  method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable youtube Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="youtube_toggle" {{ $youtubeSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_youtube_value').value = this.checked ? '1' : '0';
-                                document.getElementById('YouTubeFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="youtube_status" id="host_youtube_value"
-                               value="{{ $youtubeSettings ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div id="LiveSettings" class="settings-section">
-            <h2>{{ __('Live Settings') }}</h2>
-            <form id="liveFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable live Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="live_toggle" {{ $liveSettings ? 'checked' : '' }}
-                            onchange="document.getElementById('host_live_value').value = this.checked ? '1' : '0';
-                                document.getElementById('liveFeatureForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="live_status" id="host_live_value"
-                               value="{{ $liveSettings ? '1' : '0' }}">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-film"></i>
                     </div>
+                    <div class="feature-name">
+                        {{ __('Reel Settings') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $reelSettings ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Reel') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="reelFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
 
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable Reel Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="reel_toggle" {{ $reelSettings ? 'checked' : '' }}
+                                onchange="document.getElementById('host_reel_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('reelFeatureForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="reel_status" id="host_reel_value"
+                                   value="{{ $reelSettings ? '1' : '0' }}">
                         </div>
-                    </div>
-                </div>
-            </form>
-        </div>
 
-        <div id="RoomCupSetting" class="settings-section">
-            <h2>{{ __('room cup setting') }}</h2>
-            <form id="roomCupForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable room cup Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="room_cup_toggle" {{ $roomCupSetting ? 'checked' : '' }}
-                            onchange="document.getElementById('room_cup_value').value = this.checked ? '1' : '0';
-                                document.getElementById('roomCupForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="room_cup_setting" id="room_cup_value"
-                               value="{{ $roomCupSetting ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div id="MomentStatus" class="settings-section">
-            <h2>{{ __('Moment Status') }}</h2>
-            <form id="momentStatusForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable moment status Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="moment_status_toggle" {{ $momentStatus ? 'checked' : '' }}
-                            onchange="document.getElementById('moment_status_value').value = this.checked ? '1' : '0';
-                                document.getElementById('momentStatusForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="moment_status" id="moment_status_value"
-                               value="{{ $momentStatus ? '1' : '0' }}">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fab fa-youtube"></i>
                     </div>
+                    <div class="feature-name">
+                        {{ __('YouTube Settings') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $youtubeSettings ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('YouTube') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="YouTubeFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}"
+                          method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
 
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable youtube Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="youtube_toggle" {{ $youtubeSettings ? 'checked' : '' }}
+                                onchange="document.getElementById('host_youtube_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('YouTubeFeatureForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="youtube_status" id="host_youtube_value"
+                                   value="{{ $youtubeSettings ? '1' : '0' }}">
                         </div>
-                    </div>
-                </div>
-            </form>
-        </div>
 
-        <div id="hostLevel" class="settings-section">
-            <h2>{{ __('host level') }}</h2>
-            <form id="hostLevelForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable host level Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="host_level_toggle" {{ $hostLevel ? 'checked' : '' }}
-                            onchange="document.getElementById('host_level_value').value = this.checked ? '1' : '0';
-                                document.getElementById('hostLevelForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="host_level_enabled" id="host_level_value"
-                               value="{{ $hostLevel ? '1' : '0' }}">
-                    </div>
-
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <div id="shareRoom" class="settings-section">
-            <h2>{{ __('share room') }}</h2>
-            <form id="shareRoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                  enctype="multipart/form-data">
-                @csrf
-                @php
-                    $errorMessage = $errors ? $errors->first('msg') : null;
-                @endphp
-                @if ($errorMessage)
-                    <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                @endif
-
-                <div class="form">
-                    <div class="feature-toggle-container">
-                        <span class="toggle-label">{{ __('Enable share room Feature') }}</span>
-                        <label class="switch">
-                            <input type="checkbox" id="share_room_toggle" {{ $shareRoom ? 'checked' : '' }}
-                            onchange="document.getElementById('share_room_value').value = this.checked ? '1' : '0';
-                                            document.getElementById('shareRoomForm').submit();">
-                            <span class="slider round"></span>
-                        </label>
-                        <input type="hidden" name="share_room_with_friends" id="share_room_value"
-                               value="{{ $shareRoom ? '1' : '0' }}">
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-broadcast-tower"></i>
                     </div>
+                    <div class="feature-name">
+                        {{ __('Live Settings') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $liveSettings ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Live') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="liveFeatureForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
 
-                    <div class="feature-description-container">
-                        <h4>{{ __('Feature Description') }}</h4>
-                        <div id="feature-description-content" class="external-content">
-                            <div class="loading">{{ __('Loading feature description...') }}</div>
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable live Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="live_toggle" {{ $liveSettings ? 'checked' : '' }}
+                                onchange="document.getElementById('host_live_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('liveFeatureForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="live_status" id="host_live_value"
+                                   value="{{ $liveSettings ? '1' : '0' }}">
                         </div>
-                    </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="feature-name">
+                        {{ __('room cup setting') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $roomCupSetting ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Room Cup') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="roomCupForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
+
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable room cup Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="room_cup_toggle" {{ $roomCupSetting ? 'checked' : '' }}
+                                onchange="document.getElementById('room_cup_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('roomCupForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="room_cup_setting" id="room_cup_value"
+                                   value="{{ $roomCupSetting ? '1' : '0' }}">
+                        </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="feature-name">
+                        {{ __('Moment Status') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $momentStatus ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Moment') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="momentStatusForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
+
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable moment status Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="moment_status_toggle" {{ $momentStatus ? 'checked' : '' }}
+                                onchange="document.getElementById('moment_status_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('momentStatusForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="moment_status" id="moment_status_value"
+                                   value="{{ $momentStatus ? '1' : '0' }}">
+                        </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="feature-name">
+                        {{ __('host level') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $hostLevel ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('Host Level') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="hostLevelForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
+
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable host level Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="host_level_toggle" {{ $hostLevel ? 'checked' : '' }}
+                                onchange="document.getElementById('host_level_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('hostLevelForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="host_level_enabled" id="host_level_value"
+                                   value="{{ $hostLevel ? '1' : '0' }}">
+                        </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-share"></i>
+                    </div>
+                    <div class="feature-name">
+                        {{ __('share room') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $shareRoom ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('share room') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="shareRoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
+
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('Enable share room Feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="share_room_toggle" {{ $shareRoom ? 'checked' : '' }}
+                                onchange="document.getElementById('share_room_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('shareRoomForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="share_room_with_friends" id="share_room_value"
+                                   value="{{ $shareRoom ? '1' : '0' }}">
+                        </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

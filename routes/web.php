@@ -1317,3 +1317,134 @@ Route::get('/debug/force-pusher-refresh', function () {
         'timestamp' => $timestamp,
     ], 200, [], JSON_PRETTY_PRINT);
 });
+
+
+
+// ⭐ Test GiftBannerEvent broadcast (via Queue)
+Route::get('/debug/test-gift-banner', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Create test gift data
+    $testGift = [
+        'id' => rand(1000, 9999),
+        'name' => 'Test Gift 🎁',
+        'sender' => [
+            'id' => 1,
+            'name' => 'Test Sender',
+        ],
+        'receiver' => [
+            'id' => 2,
+            'name' => 'Test Receiver',
+        ],
+        'count' => 1,
+        'timestamp' => now()->toDateTimeString(),
+        'debug_info' => [
+            'pusher_app_id' => $dbConfig['app_id'],
+            'pusher_cluster' => $dbConfig['app_cluster'],
+        ],
+    ];
+    
+    try {
+        // Dispatch GiftBannerEvent (goes through Queue because it implements ShouldBroadcast)
+        event(new \App\Events\GiftBannerEvent($testGift));
+        
+        return response()->json([
+            'success' => true,
+            'message' => '🎁 GiftBannerEvent dispatched to Queue!',
+            'event' => [
+                'class' => \App\Events\GiftBannerEvent::class,
+                'channel' => 'gift_banner',
+                'broadcast_as' => 'gift_banner',
+                'queue' => 'heavyProcessing (or similar)',
+            ],
+            'test_data' => $testGift,
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            ],
+            'next_steps' => [
+                '1. Check Pusher Debug Console for the event',
+                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i gift',
+                '3. If not received, run: /debug/force-pusher-refresh',
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Throwable $e) {
+        Log::error('GiftBannerEvent failed', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
+// ⭐ Test UserOnline broadcast (via Queue - PresenceChannel)
+Route::get('/debug/test-user-online', function () {
+    $dbConfig = getPusherConfig();
+    
+    // Get a test user (first user or create mock)
+    $userId = request()->get('user_id', 1);
+    $user = \App\Models\User::find($userId);
+    
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'error' => "User with ID {$userId} not found",
+            'hint' => 'Add ?user_id=123 to specify a different user',
+        ], 404, [], JSON_PRETTY_PRINT);
+    }
+    
+    try {
+        // Dispatch UserOnline event (goes through Queue because it implements ShouldBroadcast)
+        event(new \App\Events\UserOnline($user));
+        
+        return response()->json([
+            'success' => true,
+            'message' => '👤 UserOnline event dispatched to Queue!',
+            'event' => [
+                'class' => \App\Events\UserOnline::class,
+                'channel' => 'presence-enter-user-room',
+                'channel_type' => 'PresenceChannel',
+            ],
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'uuid' => $user->uuid ?? null,
+            ],
+            'pusher_config' => [
+                'app_id' => $dbConfig['app_id'],
+                'cluster' => $dbConfig['app_cluster'],
+                'key_preview' => substr($dbConfig['app_key'] ?? '', 0, 10) . '...',
+            ],
+            'next_steps' => [
+                '1. Check Pusher Debug Console for the event',
+                '2. Or check logs: tail -f storage/logs/laravel.log | grep -i "UserOnline"',
+                '3. If not received, run: /debug/force-pusher-refresh',
+            ],
+            'timestamp' => now()->toDateTimeString(),
+        ], 200, [], JSON_PRETTY_PRINT);
+        
+    } catch (\Throwable $e) {
+        Log::error('UserOnline failed', [
+            'error' => $e->getMessage(),
+            'user_id' => $user->id,
+            'trace' => $e->getTraceAsString(),
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+});
+
