@@ -487,17 +487,17 @@ class UserController extends MainController
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            // $filter->column(1 / 2, function ($filter) {
-            //     $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
 
-            //     $filter->column(1 / 2, function ($filter) {
-            //         $filter->where(function ($query) {
-            //             $input = $this->input;
-            //             $query->where('name', 'like', "%$input%")
-            //                 ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
-            //         }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
-            //     });
-            // });
+                $filter->column(1 / 2, function ($filter) {
+                    $filter->where(function ($query) {
+                        $input = $this->input;
+                        $query->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
+                    }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+                });
+            });
         });
         $grid->column('id', __('Id'));
         if ($haveCoins) {
