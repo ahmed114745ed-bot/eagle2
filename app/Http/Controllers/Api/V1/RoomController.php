@@ -218,9 +218,9 @@ class RoomController extends Controller
             ->first();
 
         $collections = [
-            'charisma'          => $this->roomCharisma($room->id ),
+            'charisma'          => $this->roomCharisma($room->id),
             'achievements'      => $this->achievementLevels($owner_id),
-            'boxes'             => BoxUseResource::collection($this->getBoxes($room ->id, Auth::id())),
+            'boxes'             => BoxUseResource::collection($this->getBoxes($room->id, Auth::id())),
             'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
@@ -263,7 +263,7 @@ class RoomController extends Controller
     {
         $request['show'] = true;
         $room = $this->roomService->findRoom($id);
-//        $room->load('microphones');
+        //        $room->load('microphones');
         if (!$room) {
             return Common::apiResponse(0, 'not found', null, 404);
         }
@@ -1918,14 +1918,22 @@ class RoomController extends Controller
             $updatedIds = [];
             $userToRemove = $request->user_id;
 
-            foreach ($ids as $entry) {
-                $parts = explode('#', $entry);
-                $id = $parts[0] ?? null;
+            // foreach ($ids as $entry) {
+            //     $parts = explode('#', $entry);
+            //     $id = $parts[0] ?? null;
 
-                if ($id != $userToRemove)   return   Common::apiResponse(0, 'this user not in black list', 400);
+            //     if ($id != $userToRemove)   return   Common::apiResponse(0, 'this user not in black list', 400);
+            // }
+
+            $ids = array_filter(explode(',', $room->room_black));
+            $userToRemove = (string) $request->user_id;
+
+            if (!in_array($userToRemove, $ids)) {
+                return Common::apiResponse(0, 'this user not in black list', 400);
             }
+            $ids = array_values(array_filter($ids, fn($id) => $id != $userToRemove));
 
-            $room->room_black = implode(',', $updatedIds);
+            $room->room_black = implode(',', $ids);
             $room->save();
             return   Common::apiResponse(true, 'block removed', 200);
         } catch (Exception $e) {
