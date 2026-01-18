@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Tik\Repositories;
+namespace Modules\Moment\Repositories;
 
-use App\Models\Interest;
+use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
 
@@ -21,7 +21,7 @@ class MomentsRepository extends AbstractRepository
             $query->where('id', $id);
         })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->paginate($perPage, ['*'], 'page', $page);
     }
- 
+
     public function find($id)
     {
         return $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])->find($id);
@@ -62,5 +62,5 @@ class MomentsRepository extends AbstractRepository
     }
 
 
-    
+
 }

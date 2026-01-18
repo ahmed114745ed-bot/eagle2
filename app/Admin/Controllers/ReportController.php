@@ -18,6 +18,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
 use App\Admin\Controllers\MainController;
+use Nwidart\Modules\Facades\Module;
 
 class ReportController extends MainController
 {
@@ -126,8 +127,8 @@ class ReportController extends MainController
                 DB::raw('COALESCE(diamond_table.diamonds,0) as diamonds'),
                 DB::raw('COALESCE(salary_table.cut_sum,0) as expenses'),
                 DB::raw('COALESCE(salary_table.total_salary,0) as total'),
-                DB::raw('(SELECT year FROM user_sallaries 
-              WHERE user_sallaries.user_id = users.id 
+                DB::raw('(SELECT year FROM user_sallaries
+              WHERE user_sallaries.user_id = users.id
               ORDER BY id DESC LIMIT 1) as latest_salary_year')
             ]);
 
@@ -328,37 +329,102 @@ class ReportController extends MainController
         //     HTML;
         // });
 
-        $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+//        $grid->column('moments_and_reels', __('Moments & Reels'))->display(function () {
+//            $userId = $this->id;
+//            $month  = request('month', now()->month);
+//            $year   = request('year', now()->year);
+//
+//            return <<<HTML
+//                <div
+//                    class="moments-reels"
+//                    data-user="{$userId}"
+//                    data-month="{$month}"
+//                    data-year="{$year}"
+//                    style="cursor:pointer;color:#3c8dbc"
+//                >
+//                    <i class="fa fa-spinner fa-spin"></i> Loading...
+//                </div>
+//            HTML;
+//        });
+//
+//        Admin::script(<<<JS
+//        $('.moments-reels').each(function () {
+//            let el = $(this);
+//
+//            $.get('/admin/moments-reels', {
+//                user_id: el.data('user'),
+//                month: el.data('month'),
+//                year: el.data('year')
+//            }, function (res) {
+//                el.html(res.html);
+//            });
+//        });
+//        JS);
+
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $grid->column('moments', __('Moments'))->display(function () {
+                $userId = $this->id;
+                $month  = request('month', now()->month);
+                $year   = request('year', now()->year);
+
+                return <<<HTML
+                <div
+                    class="moments-data"
+                    data-user="{$userId}"
+                    data-month="{$month}"
+                    data-year="{$year}"
+                    style="cursor:pointer;color:#3c8dbc"
+                >
+                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                </div>
+            HTML;
+            });
+        }
+
+        $grid->column('reels', __('Reels'))->display(function () {
             $userId = $this->id;
             $month  = request('month', now()->month);
             $year   = request('year', now()->year);
 
             return <<<HTML
-        <div
-            class="moments-reels"
-            data-user="{$userId}"
-            data-month="{$month}"
-            data-year="{$year}"
-            style="cursor:pointer;color:#3c8dbc"
-        >
-            <i class="fa fa-spinner fa-spin"></i> Loading...
-        </div>
-    HTML;
+                <div
+                    class="reels-data"
+                    data-user="{$userId}"
+                    data-month="{$month}"
+                    data-year="{$year}"
+                    style="cursor:pointer;color:#3c8dbc"
+                >
+                    <i class="fa fa-spinner fa-spin"></i> Loading...
+                </div>
+            HTML;
         });
 
         Admin::script(<<<JS
-        $('.moments-reels').each(function () {
-            let el = $(this);
-
-            $.get('/admin/moments-reels', {
-                user_id: el.data('user'),
-                month: el.data('month'),
-                year: el.data('year')
-            }, function (res) {
-                el.html(res.html);
+            $('.moments-data').each(function () {
+                let el = $(this);
+                $.get('/admin/moments-reels', {
+                    user_id: el.data('user'),
+                    month: el.data('month'),
+                    year: el.data('year'),
+                    type: 'moments'
+                }, function (res) {
+                    el.html(res.html);
+                });
             });
-        });
+
+            $('.reels-data').each(function () {
+                let el = $(this);
+                $.get('/admin/moments-reels', {
+                    user_id: el.data('user'),
+                    month: el.data('month'),
+                    year: el.data('year'),
+                    type: 'reels'
+                }, function (res) {
+                    el.html(res.html);
+                });
+            });
         JS);
+
         $grid->column('agency', __('agency'))->display(function () {
             $name = @$this->agency->name ?? '';
             $path = @$this->agency->img;
@@ -615,26 +681,26 @@ class ReportController extends MainController
             $image = asset('images/dollar.jpg');
 
             return <<<HTML
-<div class="due-salary"
-     data-url="{$url}"
-     style="display:flex;align-items:center;gap:6px;">
-    <span class="salary-value">...</span>
-    <img src="{$image}" alt="USD" width="20" height="20">
-</div>
-HTML;
+                <div class="due-salary"
+                     data-url="{$url}"
+                     style="display:flex;align-items:center;gap:6px;">
+                    <span class="salary-value">...</span>
+                    <img src="{$image}" alt="USD" width="20" height="20">
+                </div>
+                HTML;
         });
         Admin::script(<<<JS
-document.querySelectorAll('.due-salary').forEach(el => {
-    fetch(el.dataset.url)
-        .then(res => res.json())
-        .then(data => {
-            el.querySelector('.salary-value').innerText = data.salary;
-        })
-        .catch(() => {
-            el.querySelector('.salary-value').innerText = '0';
-        });
-});
-JS);
+            document.querySelectorAll('.due-salary').forEach(el => {
+                fetch(el.dataset.url)
+                    .then(res => res.json())
+                    .then(data => {
+                        el.querySelector('.salary-value').innerText = data.salary;
+                    })
+                    .catch(() => {
+                        el.querySelector('.salary-value').innerText = '0';
+                    });
+            });
+            JS);
         $grid->export(function ($export) {
             $export->filename('report');
             $export->column('uuid', function ($value, $original) {
@@ -652,15 +718,40 @@ JS);
         return $grid;
     }
 
-
-
+//    public function momentsReels(Request $request)
+//    {
+//        $userId = $request->user_id;
+//        $month  = $request->month;
+//        $year   = $request->year;
+//        //  dd( $userId,$month, $year);
+//        $salary = UserSallary::query()
+//            ->where('user_id', $userId)
+//            ->where('month', $month)
+//            ->where('year', $year)
+//            ->first();
+//
+//        if (!$salary || empty($salary->extras)) {
+//            return response()->json([
+//                'html' => '<span style="color:#aaa">No Data</span>'
+//            ]);
+//        }
+//
+//        $extras = json_decode($salary->extras, true);
+//
+//        return response()->json([
+//            'html' => view('moments-reels', [
+//                'extras' => $extras
+//            ])->render()
+//        ]);
+//    }
 
     public function momentsReels(Request $request)
     {
         $userId = $request->user_id;
         $month  = $request->month;
         $year   = $request->year;
-        //  dd( $userId,$month, $year);
+        $type   = $request->type;
+
         $salary = UserSallary::query()
             ->where('user_id', $userId)
             ->where('month', $month)
@@ -675,11 +766,39 @@ JS);
 
         $extras = json_decode($salary->extras, true);
 
-        return response()->json([
-            'html' => view('moments-reels', [
-                'extras' => $extras
-            ])->render()
-        ]);
+        if ($type === 'moments') {
+            $data = $extras['moment'] ?? null;
+            $label = __('Moments');
+        } else {
+            $data = $extras['reel'] ?? null;
+            $label = __('Reels');
+        }
+
+        if (!$data) {
+            return response()->json([
+                'html' => '<span style="color:#aaa">No Data</span>'
+            ]);
+        }
+
+        $upload = $data['upload'] ?? '-';
+        $likes = $data['likes'] ?? '-';
+        $comments = $data['comments'] ?? '-';
+
+        $labelUploads = __('Uploads:');
+        $labelLikes = __('Likes:');
+        $labelComments = __('Comments:');
+
+        $html = <<<HTML
+            <div style="line-height: 1.6;">
+                <ul style="margin: 0; padding-left: 15px; list-style: none;">
+                    <li><b>{$labelUploads}</b> {$upload}</li>
+                    <li><b>{$labelLikes}</b> {$likes}</li>
+                    <li><b>{$labelComments}</b> {$comments}</li>
+                </ul>
+            </div>
+        HTML;
+
+        return response()->json(['html' => $html]);
     }
 
     public function dueSalary(Request $request)

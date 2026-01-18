@@ -3,7 +3,6 @@
 namespace Modules\Moment\Entities;
 
 use App\Models\Gift;
-use App\Models\MomentGallery;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;

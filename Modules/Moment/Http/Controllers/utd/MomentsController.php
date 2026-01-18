@@ -1,23 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Modules\Moment\Http\Controllers\utd;
 
+use App\Helpers\Common;
+use App\Http\Controllers\Controller;
 use App\Models\Config;
 use Exception;
-use App\Helpers\Common;
-use App\Models\ImageColor;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\MomentResource;
-use App\Tik\Services\MomentsService;
 use Illuminate\Support\Facades\Validator;
-use Modules\Moment\Entities\MomentCommint;
-use Modules\Moment\Entities\MomentLikes;
+use Modules\Moment\Http\Services\MomentsService;
 use Modules\Moment\Transformers\MomentDashboardResource;
+use Modules\Moment\Transformers\utd\MomentResource;
 
 class MomentsController extends Controller
 {
-
     public function __construct(private MomentsService $MomentsService) {}
 
     public function all(Request $request)
@@ -113,7 +109,6 @@ class MomentsController extends Controller
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
-
 
     public function config(Request $request)
     {

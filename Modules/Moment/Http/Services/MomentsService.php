@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Modules\Moment\Http\Services;
 
-use Exception;
 use App\Helpers\Common;
-use Illuminate\Support\Facades\DB;
-use App\Tik\Repositories\MomentsRepository;
+use Modules\Moment\Repositories\MomentsRepository;
 
 
 class MomentsService

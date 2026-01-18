@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories;
+namespace Modules\Moment\Database\factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Modules\Moment\Entities\Moment;

@@ -2,44 +2,43 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\MomentGallery;
-use Carbon\Carbon;
+use App\Admin\Actions\ChangeAgencyAction;
+use App\Admin\Actions\DeletePackAction;
+use App\Admin\Actions\DeleteUserVipAction;
+use App\Admin\Actions\EditPackExpireAction;
+use App\Admin\Actions\KickOfAgencyAction;
+use App\Admin\Actions\KickOfFamilyAction;
+use App\Admin\Forms\ProfileForm;
+use App\Admin\Selectable\ImageColors;
+use App\Admin\Widgets\InfoBox;
+use App\Facades\UserHandling;
+use App\Helpers\Common;
+use App\Models\Agency;
+use App\Models\Country;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use App\Models\Agency;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\Country;
-use Modules\Vip\Entities\UserVip;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
-use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
-use App\Admin\Widgets\InfoBox;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
-use App\Admin\Widgets\Table as TableWidget;
-use Illuminate\Validation\Rule;
-use App\Admin\Forms\ProfileForm;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use App\Admin\Selectable\ImageColors;
-use App\Admin\Actions\DeletePackAction;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Actions\ChangeAgencyAction;
-use App\Admin\Actions\KickOfAgencyAction;
-use App\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
-use Encore\Admin\Auth\Permission;
+use Illuminate\Validation\Rule;
+use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Moment\Entities\Moment;
+use Modules\Moment\Entities\MomentGallery;
 use Modules\Reals\Entities\Real;
 use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Vip\Entities\UserVip;
+
 // use Encore\Admin\Actions\Response;
 
 class FreeUserController extends MainController

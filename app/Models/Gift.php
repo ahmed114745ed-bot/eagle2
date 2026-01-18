@@ -27,6 +27,9 @@ class Gift extends Model
 
     public function moments()
     {
+        if (! class_exists(Moment::class)){
+            return $this->belongsToMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
         return $this->belongsToMany(Moment::class, 'moment_user_gifts')->withPivot('num', 'created_at', 'updated_at')->withTimestamps();
     }
 
@@ -53,7 +56,7 @@ class Gift extends Model
     public function canPassToCp($cpEnableAllGifts)
     {
         if ($cpEnableAllGifts) {
-            return true; 
+            return true;
         }
         return $this->category && $this->category->type === 'cp';
     }

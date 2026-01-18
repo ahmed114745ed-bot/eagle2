@@ -2,8 +2,10 @@
 
 namespace Modules\Moment\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Modules\Moment\Http\Middleware\CheckAllowedMoment;
 
 class MomentServiceProvider extends ServiceProvider
 {
@@ -22,8 +24,9 @@ class MomentServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(Router $router)
     {
+        $router->aliasMiddleware('moment.allowed',CheckAllowedMoment::class);
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();

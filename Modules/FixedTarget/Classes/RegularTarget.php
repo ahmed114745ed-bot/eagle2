@@ -7,6 +7,7 @@ use App\Models\Target;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Interfaces\TargetInterface;
+use Nwidart\Modules\Facades\Module;
 
 class RegularTarget implements TargetInterface
 {
@@ -18,13 +19,11 @@ class RegularTarget implements TargetInterface
 
     public function calculateUsdFromTarget(Model $target, float $hours, int $days, array $extra): float
     {
-       
         $targetReel =  explode(',', $target->reel);
-        $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
         $per = common::getDiamondsPercentage();
-       
+
         if ($target->hours <= $hours) {
             $per += (((int) Common::getSettingsValue('hours')) ?? 0) / 100;
         }
@@ -37,11 +36,14 @@ class RegularTarget implements TargetInterface
         }
         // logger('days Achieved:', [$per]);
 
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $targetMoment = explode(',', $target->moment);
+            if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
-        if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
-
-            $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
+                $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
+            }
         }
+
         // logger('targetMoment Achieved:', [$per]);
 
         if (((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0))) {
@@ -61,7 +63,6 @@ class RegularTarget implements TargetInterface
     public function calculatePercentageAchieved(Model $target, float $hours, int $days, array $extra): float
     {
         $targetReel =  explode(',', $target->reel);
-        $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
         $per = common::getDiamondsPercentage();
@@ -80,10 +81,11 @@ class RegularTarget implements TargetInterface
 
         // logger('days Achieved:', [$per]);
 
-        if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
-
-            $per += (((int) Common::getSettingsValue('moments')) ?? 0) / 100;
-
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $targetMoment = explode(',', $target->moment);
+            if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
+                $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
+            }
         }
         // logger('targetMoment Achieved:', [$per]);
 

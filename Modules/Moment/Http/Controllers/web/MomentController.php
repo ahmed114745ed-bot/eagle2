@@ -2,15 +2,15 @@
 
 namespace Modules\Moment\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\MomentGallery;
-use Encore\Admin\Widgets\Box;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Modules\Moment\Entities\Moment;
-use App\Admin\Controllers\MainController;
+use Modules\Moment\Entities\MomentGallery;
 
 class MomentController extends MainController
 {
@@ -42,7 +42,6 @@ class MomentController extends MainController
 
         return $form;
     }
-
 
     protected function grid()
     {

@@ -37,7 +37,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\OctaneCacheClearing::class,
-        \App\Http\Middleware\ForcePusherRefresh::class, 
+        \App\Http\Middleware\ForcePusherRefresh::class,
     ];
 
     /**
@@ -129,10 +129,8 @@ class Kernel extends HttpKernel
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
         'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
         'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
-         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
-
+        'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
-        'moment.allowed' => \Modules\Moment\Http\Middleware\CheckAllowedMoment::class,
     ];
 }

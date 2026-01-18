@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Modules\Moment\Http\Controllers\utd;
 
-use Exception;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Modules\Moment\Entities\ReportMoment;
 use Modules\Moment\Http\Services\MomentService;
-use App\Tik\Services\RequestBackgroundImagService;
 
 class ReportMomentController extends Controller
 {
     public function __construct(public MomentService $momentService) {}
-
 
     public function all(Request $request)
     {
@@ -96,7 +94,5 @@ class ReportMomentController extends Controller
     public function destroyDash($moment_id, $id)
     {
      return  $this->momentService->deleteMomentAndReport($moment_id, $id);
-
-       
     }
 }

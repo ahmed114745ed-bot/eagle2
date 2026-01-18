@@ -1,13 +1,10 @@
 <?php
 
-namespace Database\Seeders;
+namespace Modules\Moment\Database\Seeders;
 
 use App\Models\MomentGallery;
 use Illuminate\Database\Seeder;
 use Modules\Moment\Entities\Moment;
-use Modules\Moment\Entities\MomentLikes;
-use Modules\Moment\Entities\MomentCommint;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class MomentSeeder extends Seeder
 {
@@ -48,7 +45,7 @@ class MomentSeeder extends Seeder
                     'image' => $moment->img,
                 ]);
             }
-           
+
 
         }
 

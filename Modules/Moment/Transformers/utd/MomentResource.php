@@ -1,11 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Modules\Moment\Transformers\utd;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Moment\Entities\MomentCommint;
-use Modules\Moment\Entities\MomentLikes;
 
 class MomentResource extends JsonResource
 {

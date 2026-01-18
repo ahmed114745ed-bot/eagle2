@@ -2,45 +2,45 @@
 
 namespace App\Models;
 
-use DB;
 use App\Helpers\Common;
-use App\Traits\FollowTrait;
-use Modules\CP\Entities\Cp;
-use Modules\Vip\Entities\Vip;
-use App\Traits\User\UserLevel;
-use Modules\Vip\Entities\OVip;
 use App\Helpers\UserPackHelper;
-use Modules\Reals\Entities\Real;
-use Laravel\Sanctum\HasApiTokens;
-use Modules\Badge\Entities\Badge;
-use Modules\Vip\Entities\UserVip;
-use App\Traits\PaymentGetWayTrait;
-use Modules\Moment\Entities\Moment;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Config as ConfigModel;
-use Modules\Badge\Entities\UserBadge;
+use App\Traits\DynamicAchievementTrait;
+use App\Traits\FollowTrait;
+use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Support\Facades\Config;
-use Modules\Chat\Traits\ChatUserTrait;
-use App\Traits\MomentRelationshipTrait;
-use Illuminate\Support\Facades\Storage;
-use Modules\SpecialId\Traits\SpecialId;
-use Illuminate\Notifications\Notifiable;
+use App\Traits\User\UserLevel;
+use DB;
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Moment\Entities\MomentUserGift;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\AgencyApp\Entities\AdditionalInfo;
-use Modules\HostLevel\Entities\HostLevelWinner;
-use Modules\Reals\Traits\RealRelationshipTrait;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use App\Traits\DynamicAchievementTrait;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Sanctum\HasApiTokens;
+use Modules\AgencyApp\Entities\AdditionalInfo;
+use Modules\Badge\Entities\Badge;
+use Modules\Badge\Entities\UserBadge;
+use Modules\Chat\Traits\ChatUserTrait;
+use Modules\CP\Entities\Cp;
+use Modules\HostLevel\Entities\HostLevelWinner;
+use Modules\Moment\Entities\Moment;
+use Modules\Moment\Entities\MomentUserGift;
+use Modules\Moment\Traits\MomentRelationshipTrait;
+use Modules\Reals\Entities\Real;
+use Modules\Reals\Traits\RealRelationshipTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
+use Modules\SpecialId\Traits\SpecialId;
 use Modules\UsersWallet\Entities\UserWallet;
+use Modules\Vip\Entities\OVip;
+use Modules\Vip\Entities\UserVip;
+use Modules\Vip\Entities\Vip;
 
 /**
  * @method static withoutAppends()
@@ -1264,6 +1264,9 @@ class User extends Authenticatable
 
     public function moments()
     {
+        if (! class_exists(Moment::class)){
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
         return $this->hasMany(Moment::class, 'user_id');
     }
 
@@ -1588,7 +1591,7 @@ class User extends Authenticatable
         if (!$this->relationLoaded('packs')) {
             return $value;
         }
-        
+
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }

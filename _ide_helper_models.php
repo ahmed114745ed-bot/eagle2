@@ -13,7 +13,7 @@
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $image
@@ -38,7 +38,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $username
@@ -93,7 +93,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $parent_id
@@ -127,7 +127,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $username
@@ -222,7 +222,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $type 1 = Host Agency, 2 = Shipping
@@ -331,7 +331,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -362,7 +362,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $dash_id
@@ -383,7 +383,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $admin_id
@@ -406,7 +406,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $agency_manger_id
@@ -427,7 +427,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -483,7 +483,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -516,7 +516,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -541,7 +541,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $dash_id
@@ -562,7 +562,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $username
@@ -603,7 +603,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -644,7 +644,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -669,7 +669,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $bd_id
@@ -707,7 +707,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $img
@@ -732,7 +732,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -757,7 +757,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $uid
@@ -801,7 +801,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $room_id
@@ -826,7 +826,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name_ar
@@ -853,7 +853,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $sort
@@ -896,7 +896,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $username
@@ -946,7 +946,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id البادئ
@@ -972,7 +972,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -991,7 +991,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $agencies_ids
@@ -1014,7 +1014,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -1045,7 +1045,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $action_user_id
@@ -1110,7 +1110,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $charge_id
@@ -1139,7 +1139,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float|null $usd
@@ -1166,7 +1166,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -1192,7 +1192,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -1219,7 +1219,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $phone
@@ -1242,7 +1242,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float|null $usd
@@ -1286,7 +1286,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -1319,7 +1319,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float|null $paid_usd
@@ -1361,7 +1361,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $coins
@@ -1382,7 +1382,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -1397,7 +1397,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $color
@@ -1418,7 +1418,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $author_id
@@ -1445,7 +1445,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float $amount
@@ -1466,7 +1466,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -1497,7 +1497,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -1510,7 +1510,7 @@ namespace App\Models{
 
 namespace App\Models\Conversation{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $first_user_id
@@ -1539,7 +1539,7 @@ namespace App\Models\Conversation{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -1560,7 +1560,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $from_wallet
@@ -1586,7 +1586,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -1608,7 +1608,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -1649,7 +1649,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $cp_relation_id
@@ -1685,7 +1685,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -1713,7 +1713,7 @@ namespace App\Models{
 
 namespace App\Models\DashboardModels{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $ware_id
@@ -1734,7 +1734,7 @@ namespace App\Models\DashboardModels{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -1755,7 +1755,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $action_mode
@@ -1780,7 +1780,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $pid parent class id
@@ -1813,7 +1813,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid
@@ -1839,7 +1839,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $diamonds
@@ -1864,7 +1864,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -1894,7 +1894,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $is_success
@@ -1965,7 +1965,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $sort
@@ -1996,7 +1996,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $family_id
@@ -2024,7 +2024,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -2059,7 +2059,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -2072,7 +2072,7 @@ namespace App\Models{
 
 namespace App\Models\File{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $conversation_id
@@ -2103,7 +2103,7 @@ namespace App\Models\File{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $role_id
  * @property int $menu_id
@@ -2122,7 +2122,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -2150,7 +2150,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -2183,7 +2183,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $value
@@ -2204,7 +2204,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $balance
@@ -2226,7 +2226,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name اسم الهدية
@@ -2287,7 +2287,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 1 جوهرة 2 هدية
@@ -2369,7 +2369,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $type
@@ -2399,7 +2399,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $skill_apply_id user skill id
@@ -2478,7 +2478,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $text
@@ -2507,7 +2507,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -2537,7 +2537,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $img
@@ -2578,7 +2578,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -2611,7 +2611,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -2634,7 +2634,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $sort
@@ -2657,7 +2657,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -2679,7 +2679,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $ip
@@ -2702,7 +2702,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $kicked_user_id
@@ -2727,7 +2727,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -2752,7 +2752,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid
@@ -2777,7 +2777,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $author_id
@@ -2800,7 +2800,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid room uid
@@ -2829,7 +2829,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $gift_id
@@ -2855,7 +2855,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name_ar
@@ -2882,7 +2882,7 @@ namespace App\Models{
 
 namespace App\Models\Message{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $conversation_id
@@ -2913,7 +2913,7 @@ namespace App\Models\Message{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $roomowner_id room ouner
@@ -2937,7 +2937,7 @@ namespace App\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_id
@@ -2968,7 +2968,7 @@ namespace App\Models\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_number
@@ -2991,7 +2991,7 @@ namespace App\Models\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_id
@@ -3016,7 +3016,7 @@ namespace App\Models\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3043,7 +3043,7 @@ namespace App\Models\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -3056,7 +3056,7 @@ namespace App\Models\Models{
 
 namespace App\Models\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3077,28 +3077,28 @@ namespace App\Models\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $moment_id
  * @property string $image
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery query()
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery whereImage($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery whereMomentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|MomentGallery whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery query()
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery whereMomentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\Modules\Moment\Entities\MomentGallery whereUpdatedAt($value)
  */
 	class MomentGallery extends \Eloquent {}
 }
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid
@@ -3131,7 +3131,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3155,7 +3155,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -3176,7 +3176,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $key
@@ -3197,7 +3197,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $notification_id
@@ -3223,7 +3223,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $payment_id
@@ -3262,7 +3262,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $off_id official message id
@@ -3287,7 +3287,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -3312,7 +3312,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -3348,7 +3348,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -3384,7 +3384,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3415,7 +3415,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -3484,7 +3484,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -3515,7 +3515,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type
@@ -3542,7 +3542,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -3573,7 +3573,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -3596,7 +3596,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $ref_code
@@ -3625,7 +3625,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -3638,7 +3638,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $payment_withdraw_type_id
@@ -3666,7 +3666,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -3697,7 +3697,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -3726,7 +3726,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $team_1_boss
@@ -3790,7 +3790,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid room owner id
@@ -3813,7 +3813,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -3838,7 +3838,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $username
@@ -3892,7 +3892,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3929,7 +3929,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3950,7 +3950,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -3973,7 +3973,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -3986,7 +3986,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -4007,7 +4007,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $question
@@ -4030,7 +4030,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $type type: video, audio
@@ -4053,7 +4053,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -4084,7 +4084,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -4121,7 +4121,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $record_room_game_round_id
@@ -4144,7 +4144,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $record_room_game_id
@@ -4167,7 +4167,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $record_room_game_id
@@ -4193,7 +4193,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $type
@@ -4224,7 +4224,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $created_by
@@ -4261,7 +4261,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -4296,7 +4296,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $admin_id
@@ -4333,7 +4333,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -4362,7 +4362,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name_en
@@ -4387,7 +4387,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @method static withoutAppends()
  * @property int $id
@@ -4567,7 +4567,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $parent_id
@@ -4607,7 +4607,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -4628,7 +4628,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $coins
@@ -4651,7 +4651,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -4676,7 +4676,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $from_user_id
@@ -4702,7 +4702,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -4734,7 +4734,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $coins
@@ -4755,7 +4755,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -4779,7 +4779,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int|null $id
  * @property string|null $numid
@@ -4875,7 +4875,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -4898,7 +4898,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 0=user 1=agency
@@ -4937,7 +4937,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 1Official popular search 2User search history
@@ -4962,7 +4962,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $server_name
@@ -5003,7 +5003,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -5017,7 +5017,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $key
@@ -5044,7 +5044,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -5067,7 +5067,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $type 1 = Host Agency, 2 = Shipping
@@ -5175,7 +5175,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float|null $coin
@@ -5198,7 +5198,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property float|null $coins
@@ -5227,7 +5227,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id 0 is background
@@ -5262,7 +5262,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @method static \Illuminate\Database\Eloquent\Builder|SuperBoomRule newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SuperBoomRule newQuery()
@@ -5273,7 +5273,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -5294,7 +5294,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $tag_id
@@ -5317,7 +5317,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $level
@@ -5366,7 +5366,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $type 1 novice task 2 daily tasks
@@ -5397,7 +5397,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $user_id
@@ -5429,7 +5429,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $uid Homeo wner ID
@@ -5452,7 +5452,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -5473,7 +5473,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $img صورة التأهيل
@@ -5516,7 +5516,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $admin_id معرف حساب المسؤول
@@ -5543,7 +5543,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @method static withoutAppends()
  * @property int $id
@@ -6022,7 +6022,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -6044,7 +6044,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6074,7 +6074,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6112,7 +6112,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -6125,7 +6125,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id معرف المستخدم
@@ -6150,7 +6150,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $parent_id
@@ -6176,7 +6176,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $game_id
@@ -6217,7 +6217,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $gift_id
@@ -6242,7 +6242,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -6267,7 +6267,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6292,7 +6292,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6315,7 +6315,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -6338,7 +6338,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6360,7 +6360,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6386,7 +6386,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6462,7 +6462,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -6491,7 +6491,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6555,7 +6555,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6576,7 +6576,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -6609,7 +6609,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6632,7 +6632,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6661,7 +6661,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $union_id guild id
@@ -6708,7 +6708,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $union_id guild id
@@ -6737,7 +6737,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6766,7 +6766,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -6803,7 +6803,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -6843,7 +6843,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 3vip5 guardian cp
@@ -6874,7 +6874,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -6907,7 +6907,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -6921,7 +6921,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $get_type Obtaining method 1 vip level automatic acquisition 2 activity 3 treasure box 4 purchase 5 background modification 6 limited time purchase 7 treasure box point exchange 8 cp level unlock 104 not for sale
@@ -7008,7 +7008,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $logo
@@ -7029,7 +7029,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $uuid
@@ -7066,7 +7066,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -7097,7 +7097,7 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * 
+ *
  *
  * @property int $o_vip_id
  * @property int $o_vip_privilege_id
@@ -7114,7 +7114,7 @@ namespace App\Models{
 
 namespace Modules\Achievement\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property \Modules\Achievement\Enums\AchievementType $type
@@ -7152,7 +7152,7 @@ namespace Modules\Achievement\Entities{
 
 namespace Modules\Achievement\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $achievement_id
@@ -7189,7 +7189,7 @@ namespace Modules\Achievement\Entities{
 
 namespace Modules\Achievement\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $achievement_id
@@ -7215,7 +7215,7 @@ namespace Modules\Achievement\Entities{
 
 namespace Modules\Achievement\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $achievement_id
@@ -7253,7 +7253,7 @@ namespace Modules\Achievement\Entities{
 
 namespace Modules\Achievement\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $achievement_level_id
@@ -7299,7 +7299,7 @@ namespace Modules\Achievement\Entities{
 
 namespace Modules\AgencyApp\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -7342,7 +7342,7 @@ namespace Modules\AgencyApp\Entities{
 
 namespace Modules\AgencyApp\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -7370,7 +7370,7 @@ namespace Modules\AgencyApp\Entities{
 
 namespace Modules\AgencyApp\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -7395,7 +7395,7 @@ namespace Modules\AgencyApp\Entities{
 
 namespace Modules\AgencyApp\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -7423,7 +7423,7 @@ namespace Modules\AgencyApp\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $cp_relation_id
@@ -7461,7 +7461,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $cp_relation_id
@@ -7492,7 +7492,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $vip_id
@@ -7527,7 +7527,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $cp_id
@@ -7548,7 +7548,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $title
@@ -7581,7 +7581,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -7608,7 +7608,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $winner_id
@@ -7629,7 +7629,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -7652,7 +7652,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $weekly_cp_id
@@ -7689,7 +7689,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\CP\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $weekly_cp_id
@@ -7721,7 +7721,7 @@ namespace Modules\CP\Entities{
 
 namespace Modules\Charizma\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -7744,7 +7744,7 @@ namespace Modules\Charizma\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $blocker_id
@@ -7765,7 +7765,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property-read mixed $created_at
  * @property-read mixed $updated_at
@@ -7778,7 +7778,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $chat_room_id
@@ -7827,7 +7827,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -7862,7 +7862,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $chat_room_id
@@ -7894,7 +7894,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $message_id
@@ -7917,7 +7917,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -7938,7 +7938,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\Chat\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $chat_room_id
@@ -7967,7 +7967,7 @@ namespace Modules\Chat\Entities{
 
 namespace Modules\DailyPrize\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type
@@ -8000,7 +8000,7 @@ namespace Modules\DailyPrize\Entities{
 
 namespace Modules\DailyPrize\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8023,7 +8023,7 @@ namespace Modules\DailyPrize\Entities{
 
 namespace Modules\DailyPrize\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type
@@ -8042,7 +8042,7 @@ namespace Modules\DailyPrize\Entities{
 
 namespace Modules\DailyPrize\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8065,7 +8065,7 @@ namespace Modules\DailyPrize\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $tile
@@ -8091,7 +8091,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $type
@@ -8122,7 +8122,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $admin_id
@@ -8165,7 +8165,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $pk_event_id
@@ -8203,7 +8203,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $pk_event_id
@@ -8234,7 +8234,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $weekly_star_id
@@ -8270,7 +8270,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $charge_event_id
@@ -8301,7 +8301,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $pk_winner_id
@@ -8324,7 +8324,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $charge_event_id
@@ -8352,7 +8352,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $admin_id
@@ -8409,7 +8409,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $weekly_star_id
@@ -8432,7 +8432,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $weekly_star_id
@@ -8459,7 +8459,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\Events\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $winner_id
@@ -8486,7 +8486,7 @@ namespace Modules\Events\Entities{
 
 namespace Modules\FixedTarget\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $diamonds
@@ -8521,7 +8521,7 @@ namespace Modules\FixedTarget\Entities{
 
 namespace Modules\FixedTarget\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8543,7 +8543,7 @@ namespace Modules\FixedTarget\Entities{
 
 namespace Modules\LuckyBox\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 0=local 1=global
@@ -8576,7 +8576,7 @@ namespace Modules\LuckyBox\Entities{
 
 namespace Modules\LuckyBox\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $box_id
@@ -8632,7 +8632,7 @@ namespace Modules\LuckyBox\Entities{
 
 namespace Modules\LuckyBox\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8653,7 +8653,7 @@ namespace Modules\LuckyBox\Entities{
 
 namespace Modules\LuckyBox\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $box_uses_id
@@ -8688,7 +8688,7 @@ namespace Modules\LuckyBox\Entities{
 
 namespace Modules\LuckyBox\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $user_id
@@ -8725,7 +8725,7 @@ namespace Modules\LuckyBox\Entities{
 
 namespace Modules\Moment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8739,7 +8739,7 @@ namespace Modules\Moment\Entities{
  * @property-read int|null $comments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Gift> $gifts
  * @property-read int|null $gifts_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MomentGallery> $images
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\MomentGallery> $images
  * @property-read int|null $images_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\MomentLikes> $likes
  * @property-read int|null $likes_count
@@ -8762,7 +8762,7 @@ namespace Modules\Moment\Entities{
 
 namespace Modules\Moment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $moment_id
@@ -8786,7 +8786,7 @@ namespace Modules\Moment\Entities{
 
 namespace Modules\Moment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $moment_id
@@ -8815,7 +8815,7 @@ namespace Modules\Moment\Entities{
 
 namespace Modules\Moment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $moment_id
@@ -8841,7 +8841,7 @@ namespace Modules\Moment\Entities{
 
 namespace Modules\Moment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $moment_id
@@ -8871,7 +8871,7 @@ namespace Modules\Moment\Entities{
 
 namespace Modules\Payment\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8900,7 +8900,7 @@ namespace Modules\Payment\Entities{
 
 namespace Modules\Public\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -8927,7 +8927,7 @@ namespace Modules\Public\Entities{
 
 namespace Modules\Public\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $level_interval_id
@@ -8959,7 +8959,7 @@ namespace Modules\Public\Entities{
 
 namespace Modules\Public\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -8982,7 +8982,7 @@ namespace Modules\Public\Entities{
 
 namespace Modules\Public\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9014,7 +9014,7 @@ namespace Modules\Public\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9056,7 +9056,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $real_id
@@ -9077,7 +9077,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $real_id
@@ -9101,7 +9101,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $real_id
@@ -9123,7 +9123,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $real_id
@@ -9147,7 +9147,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9174,7 +9174,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $real_id
@@ -9202,7 +9202,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\Reals\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $name
@@ -9219,7 +9219,7 @@ namespace Modules\Reals\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $total_room_gift_id
@@ -9252,7 +9252,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @property-read \Modules\RoomBoom\Entities\RoomBoomLevel|null $level
  * @property-read \App\Models\Room|null $room
@@ -9266,7 +9266,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $level
@@ -9293,7 +9293,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_boom_level_id
@@ -9326,7 +9326,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @method static \Illuminate\Database\Eloquent\Builder|SuperBoomRule newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|SuperBoomRule newQuery()
@@ -9337,7 +9337,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\RoomBoom\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $room_id
@@ -9360,7 +9360,7 @@ namespace Modules\RoomBoom\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $request_id
@@ -9384,7 +9384,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -9413,7 +9413,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $agency_id
@@ -9452,7 +9452,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $agency_id
@@ -9472,7 +9472,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $country_id
@@ -9492,7 +9492,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9517,7 +9517,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SalaryTransaction\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $agency_id
@@ -9563,7 +9563,7 @@ namespace Modules\SalaryTransaction\Entities{
 
 namespace Modules\SpecialId\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $status 1=>used 0=>unused
@@ -9588,7 +9588,7 @@ namespace Modules\SpecialId\Entities{
 
 namespace Modules\SpecialId\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $title
@@ -9611,7 +9611,7 @@ namespace Modules\SpecialId\Entities{
 
 namespace Modules\SpecialId\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9632,7 +9632,7 @@ namespace Modules\SpecialId\Entities{
 
 namespace Modules\SwitchAccount\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $parent_user_id
@@ -9663,7 +9663,7 @@ namespace Modules\SwitchAccount\Entities{
 
 namespace Modules\SwitchAccount\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9687,7 +9687,7 @@ namespace Modules\SwitchAccount\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_id
@@ -9719,7 +9719,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_number
@@ -9744,7 +9744,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $day_id
@@ -9771,7 +9771,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9799,7 +9799,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9826,7 +9826,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\Tasks\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $user_id
@@ -9847,7 +9847,7 @@ namespace Modules\Tasks\Entities{
 
 namespace Modules\TribeReward\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $agency_id
@@ -9880,7 +9880,7 @@ namespace Modules\TribeReward\Entities{
 
 namespace Modules\TribeReward\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $start_date
@@ -9903,7 +9903,7 @@ namespace Modules\TribeReward\Entities{
 
 namespace Modules\TribeReward\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $tribe_top_id
@@ -9933,7 +9933,7 @@ namespace Modules\TribeReward\Entities{
 
 namespace Modules\TribeReward\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $tribe_period_id
@@ -9958,7 +9958,7 @@ namespace Modules\TribeReward\Entities{
 
 namespace Modules\Vip\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $sort
@@ -9996,7 +9996,7 @@ namespace Modules\Vip\Entities{
 
 namespace Modules\Vip\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int|null $type 0=buy ,1= send
@@ -10057,7 +10057,7 @@ namespace Modules\Vip\Entities{
 
 namespace Modules\Vip\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property int $type 1 نجمة شارب 2 ذهبي حاد 3 كبار الشخصيات
@@ -10094,7 +10094,7 @@ namespace Modules\Vip\Entities{
 
 namespace Modules\Vip\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string|null $name
@@ -10127,7 +10127,7 @@ namespace Modules\Vip\Entities{
 
 namespace Modules\WhatsappAuth\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $text_ar
@@ -10150,7 +10150,7 @@ namespace Modules\WhatsappAuth\Entities{
 
 namespace Modules\WhatsappAuth\Entities{
 /**
- * 
+ *
  *
  * @property int $id
  * @property string $uuid

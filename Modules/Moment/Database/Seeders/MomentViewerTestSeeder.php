@@ -2,14 +2,14 @@
 
 namespace Modules\Moment\Database\Seeders;
 
+use App\Models\User;
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentCommint;
+use Modules\Moment\Entities\MomentGallery;
 use Modules\Moment\Entities\MomentLikes;
-use App\Models\User;
-use App\Models\MomentGallery;
-use Faker\Factory as Faker;
 
 class MomentViewerTestSeeder extends Seeder
 {
@@ -24,7 +24,7 @@ class MomentViewerTestSeeder extends Seeder
 
         // جلب بعض المستخدمين الموجودين
         $users = User::take(20)->get();
-        
+
         if ($users->isEmpty()) {
             $this->command->error('No users found! Please create users first.');
             return;
@@ -39,7 +39,7 @@ class MomentViewerTestSeeder extends Seeder
         // إنشاء 30 moment تجريبية
         for ($i = 1; $i <= 30; $i++) {
             $user = $users->random();
-            
+
             $moment = Moment::create([
                 'user_id' => $user->id,
                 'description' => $faker->paragraph(rand(1, 3)),

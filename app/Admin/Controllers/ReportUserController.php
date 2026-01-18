@@ -10,6 +10,7 @@ use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Nwidart\Modules\Facades\Module;
 
 class ReportUserController extends MainController
 {
@@ -168,13 +169,15 @@ class ReportUserController extends MainController
                 }
                 return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
             });
-            $grid->column(__('moment_count'))->display(function () {
-                $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->count();
-                if (request()->filled('_export_')) {
-                    return $count;
-                }
-                return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
-            });
+            if (Module::has('Moment') && Module::isEnabled('Moment')) {
+                $grid->column(__('moment_count'))->display(function () {
+                    $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at', request()->month)->whereYear('created_at', request()->year)->count();
+                    if (request()->filled('_export_')) {
+                        return $count;
+                    }
+                    return "<span style='color:yellow; font-weight: bold;'>{$count}</span>";
+                });
+            }
             $grid->column(__('total_hours'))->display(function () {
                 $count =  request()->year == null && request()->month == null ? $this->liveTime()->sum("hours") : $this->liveTime()->whereMonth('created_at',  request()->month)->whereYear('created_at', request()->year)->sum("hours");
                 if (request()->filled('_export_')) {
