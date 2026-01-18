@@ -396,6 +396,13 @@ class FormRequestController extends MainController
                 'message' => __('user_not_found')
             ], 404);
         }
+        if ($owner->is_super_admin || $owner->is_sub_super_admin) {
+            return response()->json([
+                'success' => false,
+                'key' => 'user_is_super_admin',
+                'message' => __('user is country manager'),
+            ], 400);
+        }
 
         if ($this->checkUserAlreadyOwnsEntity($owner, Agency::class)) {
             return response()->json([
@@ -472,6 +479,14 @@ class FormRequestController extends MainController
             ], 404);
         }
 
+        if ($owner->is_super_admin || $owner->is_sub_super_admin) {
+            return response()->json([
+                'success' => false,
+                'key' => 'user_is_super_admin',
+                'message' => __('user is country manager'),
+            ], 400);
+        }
+        
         if ($this->checkUserAlreadyOwnsEntity($owner, ShippingAgency::class)) {
 
             return response()->json([
