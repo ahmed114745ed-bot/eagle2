@@ -34,7 +34,7 @@ use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Modules\Achievement\Http\Traits\AchievementUser;
+use App\Traits\DynamicAchievementTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,7 +47,7 @@ use Modules\UsersWallet\Entities\UserWallet;
  */
 class User extends Authenticatable
 {
-    use AchievementUser, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
+    use DynamicAchievementTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods

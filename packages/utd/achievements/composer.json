@@ -1,0 +1,33 @@
+{
+    "name": "utd/achievements",
+    "description": "Achievement System Package with License Support",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0",
+        "encore/laravel-admin": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Achievements\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Achievements\\AchievementsServiceProvider"
+            ],
+            "aliases": {
+                "Achievement": "Utd\\Achievements\\Facades\\Achievement"
+            }
+        }
+    },
+    "minimum-stability": "stable"
+}

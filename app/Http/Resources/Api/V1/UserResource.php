@@ -25,6 +25,11 @@ class UserResource extends JsonResource
         }
 
         $data = [
+            // ========================================
+            // Achievement Data (Conditional)
+            // ========================================
+            'achievements' => $this->getAchievementsData(),
+            'medals_count' => $this->getMedalsCount(),
             'id'                   => $this->id,
             'uuid'                 => $this->uuid,
             'special_color'        => $this->color_id ?? '',
@@ -105,6 +110,21 @@ class UserResource extends JsonResource
         }
 
         return $data;
+    }
+
+    /**
+     * Get achievements data safely
+     */
+    private function getAchievementsData(): array
+    {
+        $service = app(\App\Contracts\AchievementContract::class);
+        return $service->getUserAchievements($this->id, 3);
+    }
+
+    private function getMedalsCount(): int
+    {
+        $service = app(\App\Contracts\AchievementContract::class);
+        return count($service->getEnabledMedals($this->id));
     }
 
     private function formatAgency()
