@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio']))
+            {{-- @if (in_array(env('APP_NAME'), ['Eagle', 'Lumio'])) --}}
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="is_new_theme_enabled">{{ __('New Theme Enabled') }}</label>
@@ -130,7 +130,7 @@
                                data-bootstrap-switch {{ data_get($settings, 'is_new_theme_enabled') ? 'checked' : '' }}>
                     </div>
                 </div>
-            @endif
+            {{-- @endif --}}
         </div>
 
         <div class="col-12 d-flex gap-3 mt-4">
