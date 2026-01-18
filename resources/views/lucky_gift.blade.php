@@ -3,24 +3,27 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #121212;
-        color: white;
         display: flex;
     }
 
     /* القائمة الجانبية */
-    .settings-sidebar {
-        width: 250px;
-        background: #222;
-        min-height: 400px;
-
-        padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    .settings-menu button {
+        display: block;
+        width: 100%;
+        text-align: right;
+        padding: 15px;
+        color: black;
+        background: white;
+        border: none;
+        margin-bottom: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     }
 
-    .settings-sidebar h2 {
-        text-align: center;
-        color: #ff9800;
+    .settings-menu button:hover {
+        background: var(--primary-color);
+        color: var(--text-secondary-color);
     }
 
     .settings-menu button {
@@ -52,13 +55,6 @@
 
     .active {
         display: block;
-    }
-
-    /* تنسيق النماذج */
-    form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
     }
 
     label {
@@ -154,6 +150,7 @@
             <h2>{{ __('Settings') }}</h2>
             <div class="settings-menu">
                 <button onclick="showSection('VipSettings')" style="background: var(--primary-color); color: var(--text-secondary-color);">{{ __('Luck gift Settings') }}</button>
+                <button onclick="showSection('number_comment')">{{ __('lucky gift coins') }}</button>
             </div>
         </div>
 
@@ -161,7 +158,7 @@
             <div id="VipSettings" class="settings-section active">
                 <h3>{{ __('Luck gift Settings') }}</h3>
 
-                <form action="{{ route('admin.lucky.gift.settings.update') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.lucky.gift.settings.update') }}" class="new-form" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     {{-- Show global errors --}}
@@ -183,41 +180,87 @@
                         <!-- Wallet Lucky Box -->
                         <div class="form-group">
                             <label for="app_wallet_lucky_gift">{{ __('application wallet percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="app_wallet_lucky_gift" 
-                                name="app_wallet_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="app_wallet_lucky_gift"
+                                name="app_wallet_lucky_gift"
+                                min="1"
+                                value="{{ $config['app_wallet_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter the wallet lucky gift value') }}" required />
                                  <small class="form-text text-muted">{{ __('App owner profit') }}</small>
-       
+
                         </div>
 
                         <div class="form-group">
                             <label for="owner_lucky_gift">{{ __('owner percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="owner_lucky_gift" 
-                                name="owner_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['owner_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="owner_lucky_gift"
+                                name="owner_lucky_gift"
+                                min="1"
+                                value="{{ $config['owner_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}"  required/>
                                 <small class="form-text text-muted">{{ __('owner gift') }}</small>
                         </div>
 
-                        
+
                         <div class="form-group">
                             <label for="host_lucky_gift">{{ __('host percentage from the lucky gift') }}</label>
-                            <input type="number" 
-                                id="host_lucky_gift" 
-                                name="host_lucky_gift" 
-                                min="1" 
-                                value="{{ $config['host_lucky_gift'] ?? 0 }}" 
-                                class="form-control" 
+                            <input type="number"
+                                id="host_lucky_gift"
+                                name="host_lucky_gift"
+                                min="1"
+                                value="{{ $config['host_lucky_gift'] ?? 0 }}"
+                                class="form-control"
                                 placeholder="{{ __('Enter  value') }}" required />
                         </div>
-                        
+
+
+                        <!-- Submit Button -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+             <div id="number_comment" class="settings-section active">
+
+
+                <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    {{-- Show global errors --}}
+                    @if($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    {{-- Show specific error
+                    @error('gift_percentage')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror --}}
+                    <div class="form">
+                        <!-- Wallet Lucky Box -->
+                        <div class="form-group">
+                            <label for="number_comments">{{ __('lucky gift coins') }}</label>
+                            <input type="number"
+                                id="lucky_gift_coins"
+                                name="lucky_gift_coins"
+                                min="1"
+                                value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
+                                class="form-control"
+                                placeholder="{{ __('Enter the lucky gift coins value') }}" required />
+                                 <small class="form-text text-muted">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</small>
+
+
+                        </div>
 
                         <!-- Submit Button -->
                         <div class="form-group">

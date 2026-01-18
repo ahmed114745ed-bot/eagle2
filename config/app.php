@@ -4,35 +4,38 @@ return [
 
     'google_cloud_file' => env('GOOGLE_CLOUD_KEY_FILE'),
     'google_cloud_storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
-    'cache'=>env ('CACHE_ENABLE','disabled'),
+    'cache' => env('CACHE_ENABLE', 'disabled'),
+
+    // Deploy webhook secret
+    'deploy_secret' => env('DEPLOY_SECRET', 'change-this-secret-token'),
 
     'agora_app_id' => env('AGORA_APP_ID'),
     'agora_certificate' => env('AGORA_APP_CERTIFICATE'),
     'payment_url' => env('PAYMENT_URL'),
     'node_server_name' => env('NODE_SERVER_NAME'),
 
-    'owner_timezone' => env('OWNER_TIMEZONE','-03:00'),
-
-    'baishun_app_id' => env('BAISHUN_APP_Id',"4280702746"),
-    'baishun_app_key' => env('BAISHUN_APP_KEY',"LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
-    'baishun_server_url' => env('BAISHUN_SERVER_URL','https://mesh-channels-test.jieyou.shop'),
-    'baishun_channel'      => env('BAISHUN_CHANNEL',''),
-    'baishun_gsp'      => env('BAISHUN_GSP','201'),
+    'owner_timezone' => env('OWNER_TIMEZONE', '-03:00'),
+    'zego_client_id' => env('ZEGO_CLIENT_ID'),
+    'baishun_app_id' => env('BAISHUN_APP_Id', "4280702746"),
+    'baishun_app_key' => env('BAISHUN_APP_KEY', "LzfGx3f3ZKQSYxMNRqdRTOmfd0Jb59DF"),
+    'baishun_server_url' => env('BAISHUN_SERVER_URL', 'https://mesh-channels-test.jieyou.shop'),
+    'baishun_channel'      => env('BAISHUN_CHANNEL', ''),
+    'baishun_gsp'      => env('BAISHUN_GSP', '201'),
 
     'balance_user_name'     => env('BALANCE_USER_NAME', 'superAdmin'),
     'balance_password'      => env('BALANCE_PASSWORD', '12345678'),
     'one_coins'             => env('ONE_COINS'),
 
-    'appLogo' => env('APP_LOGO','https://demo.24hourworx.com/assets/images/BG2.jpg'),
+    'appLogo' => env('APP_LOGO', 'https://demo.24hourworx.com/assets/images/BG2.jpg'),
 
     // fairbase
-    'fileName' => env('FILE_NAME','firebase_credentials.json'),
-    'projectName' => env('FIREBASE_PROJECT_NAME',''),
-    'senderId' => env('SENDER_ID','hola-chat-5554d'),
-    'zego_credential' => env('ZEGOENCRYPTtkEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
-    'utd_secret_key' => env('UTDSECRTKEY','7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
-    'utd_client_id' => env('UTDCLIENTID','3030'),
-    'google_client_id' => env('GOOGLE_CLIENT_ID','790444932875-co6ri5d8e3m59ktv73h7eana2gfqbv34.apps.googleusercontent.com'),
+    'fileName' => env('FILE_NAME', 'firebase_credentials.json'),
+    'projectName' => env('FIREBASE_PROJECT_NAME', ''),
+    'senderId' => env('SENDER_ID', 'hola-chat-5554d'),
+    'zego_credential' => env('ZEGOENCRYPTtkEY', '7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
+    'utd_secret_key' => env('UTDSECRTKEY', '7b5d61e6f4a8c2d3e9b7a6f8e1c3d2f4'),
+    'utd_client_id' => env('UTDCLIENTID', '3030'),
+    'google_client_id' => env('GOOGLE_CLIENT_ID', '790444932875-co6ri5d8e3m59ktv73h7eana2gfqbv34.apps.googleusercontent.com'),
 
 
     /*
@@ -64,9 +67,9 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
-    'api_prefix' =>env('API_PREFIX',''),
+    'api_prefix' => env('API_PREFIX', ''),
 
-    'app_origin_name'=>env('APP_ORIGIN_NAME', 'r-star'),
+    'app_origin_name' => env('APP_ORIGIN_NAME', 'r-star'),
 
 
 
@@ -226,9 +229,9 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-//        App\Providers\TelescopeServiceProvider::class,
+        //        App\Providers\TelescopeServiceProvider::class,
         App\Providers\ConfigServiceProvider::class,
-//        App\Providers\ChatServiceProvider::class,
+        //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
 
@@ -275,7 +278,7 @@ return [
         'Queue' => Illuminate\Support\Facades\Queue::class,
         'RateLimiter' => Illuminate\Support\Facades\RateLimiter::class,
         'Redirect' => Illuminate\Support\Facades\Redirect::class,
-         'Redis' => Illuminate\Support\Facades\Redis::class,
+        'Redis' => Illuminate\Support\Facades\Redis::class,
         'Request' => Illuminate\Support\Facades\Request::class,
         'Response' => Illuminate\Support\Facades\Response::class,
         'Route' => Illuminate\Support\Facades\Route::class,

@@ -21,16 +21,19 @@ use App\Admin\Controllers\BannerController;
 use App\Admin\Controllers\CustomController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\PoliceController;
+use App\Admin\Controllers\ReportController;
 use App\Admin\Controllers\TargetController;
 use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\BanTypeController;
+use App\Admin\Controllers\CountryController;
 use App\Admin\Controllers\RoleControllerNew;
 use App\Admin\Controllers\RoomMicController;
 use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\SettingController;
 use App\Admin\Controllers\WareTabController;
 use App\Admin\Controllers\WareVipController;
+use App\Admin\Controllers\BanRoomsController;
 use App\Admin\Controllers\BdSelectController;
 use App\Admin\Controllers\LanguageController;
 use App\Admin\Controllers\LinkViewController;
@@ -86,11 +89,13 @@ use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\CoinGameUserAllController;
+use App\Admin\Controllers\CountryCategoryController;
 use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\GroupChatSettingController;
 use App\Admin\Controllers\PusherStatisticsController;
+use App\Admin\Controllers\SuperAdminRewardController;
 use App\Admin\Controllers\UserChargeReportController;
 use App\Admin\Controllers\AdminAgencyMangerController;
 use App\Admin\Controllers\CustomZegoMessageController;
@@ -116,12 +121,14 @@ use App\Admin\Controllers\AgencyControllers\UserController;
 use App\Admin\Controllers\NotificationsTemplatesController;
 use App\Admin\Controllers\RemainingDiamondHistoryController;
 use App\Admin\Controllers\RemainingDiamondSettingController;
+use App\Admin\Controllers\SuperAdminRewardControllerHistory;
 use App\Admin\Controllers\ShippingAgencyPaymentCoinController;
 use App\Admin\Controllers\UserController as UsersAppController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use App\Admin\Controllers\AgencyControllers\HostDiamondController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
+
 
 Route::group(
     [
@@ -281,6 +288,7 @@ Route::group(
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
 
         Route::resource('free-users', 'FreeUserController');
+        Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
         Route::resource('family-users', 'UserFamilyController');
         Route::post('send-request-invite-code', 'UserController@request_invite_code');
@@ -297,6 +305,8 @@ Route::group(
                 'index' => 'rooms'
             ]
         ]);
+        Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
+        Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
         Route::resource('live-rooms', 'LiveRoomController');
 
 
@@ -336,6 +346,7 @@ Route::group(
         Route::resource('configs', 'ConfigController');
         Route::resource('categories', 'RoomCategoryController');
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
+        Route::resource('country-categories', CountryCategoryController::class);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
         Route::get('country-request-history', [CountryRequestHistoryController::class, 'index']);
         Route::get('country-requests/{id}/accept', [ChangeCountryRequestController::class, 'accept']);
@@ -449,8 +460,7 @@ Route::group(
         Route::resource('server-country', ServerCountryController::class);
         Route::resource('room-gift-targets', RoomGiftTargetController::class);
 
-        //--------------------
-        // Route::get('/', 'HomeController@infoBox')->name('home');
+
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
         Route::resource('manger-types', 'MangerTypeController');
@@ -462,10 +472,6 @@ Route::group(
         Route::resource('special-id-requests', 'SpecialIdRequestController');
         Route::resource('family_levels', 'FamilyLevelController');
         Route::resource('silver', 'SilverController');
-
-        // Route::resource('coins/{paymentGatwayId}', 'CoinController')->only(['create', 'store', 'destroy']);
-        // Route::get('coins/{paymentGatwayId}/{id}/edit', 'CoinController@edit');
-        // Route::put('coins/{paymentGatwayId}/{id}', 'CoinController@update');
 
         Route::prefix('coins/{paymentGatwayId}')->group(function () {
             Route::get('/', [CoinController::class, 'index'])->name('coins.index');
@@ -499,6 +505,14 @@ Route::group(
             Route::get('top-users-visits', [AllStatisticController::class, 'topUsersVisits'])->name('top-users-visits');
             Route::get('users-online-stats', [AllStatisticController::class, 'onlineStats'])->name('users.online.stats');
         });
+        Route::get('/dashboard/finance', [AllStatisticController::class, 'financeIndex']);
+        Route::prefix('dashboard')->group(function () {
+            Route::get('/finance/cards', [AllStatisticController::class, 'financeCards']);
+            Route::get('/finance/tables', [AllStatisticController::class, 'financeTables']);
+            Route::get('/finance/chart', [AllStatisticController::class, 'financeChartIndex']);
+            Route::get('wallet-logs/ajax', [AllStatisticController::class, 'ajaxWalletLogs'])->name('wallet-logs.ajax');
+        });
+
 
         Route::resource('coin-logs-reports', CoinLogReportsController::class);
 
@@ -522,6 +536,11 @@ Route::group(
         Route::get('filter-rooms', [FilterController::class, 'rooms'])->name('filter-rooms');
 
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
+        Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
+            ->name('admin.ajax.moments-reels');
+         Route::get('/expenses', [ReportController::class, 'expenses']);
+            Route::get('/due-salary', [ReportController::class, 'dueSalary'])
+    ->name('admin.manager.due-salary');
         Route::resource('charges-reports', 'ChargeReportController');
         Route::get('charge-reports/{agency_id}', [ChargeReportController::class, 'showChargeReports']);
         Route::resource('sallaries', 'SallariesController')->name('index', 'sallaries')->middleware('web-agency-feature');
@@ -577,14 +596,22 @@ Route::group(
         Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
         Route::get('/vips_dedicate', 'DedicateVipController@index');
-        Route::resource('/bans', 'BanController');
+        Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
-        Route::resource('/bans-rooms', 'BanRoomsController');
+        Route::get('/bans-rooms', [BanRoomsController::class, 'index']);
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
         Route::resource('/request-background-image', 'RequestBackgroundImageController');
+
         Route::resource('/group-chat', 'GroupChatController');
+        Route::get('chat/view', [GroupChatController::class, 'chatView'])->name('chat.view');
+        Route::get('chat/messages', [GroupChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
+        Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
+        Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
+
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
@@ -600,6 +627,11 @@ Route::group(
         Route::resource('charge-agencies', AppearChargerAgencyController::class);
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
         Route::resource('super-package-rewards', SuperPackageController::class);
+        Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
+        Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
+
+        Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
+        Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
         //    dd( Admin::menu(function ($menu) {
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])

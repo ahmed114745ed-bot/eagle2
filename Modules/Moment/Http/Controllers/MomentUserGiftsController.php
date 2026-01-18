@@ -2,6 +2,8 @@
 
 namespace Modules\Moment\Http\Controllers;
 
+use App\Enums\UserDiamondLogType;
+use App\Helpers\UserDiamondLogHelper;
 use DB;
 use App\Models\Gift;
 use App\Models\User;
@@ -111,6 +113,15 @@ class MomentUserGiftsController extends Controller
         $price = $number * $gift->price;
         $updateUserWhenSendGift->update($price, $receivedUsers);
 
+           UserDiamondLogHelper::logByType(
+            $receivedUsers->id,
+            $price,
+            $receivedUsers->monthly_diamond_received,
+            UserDiamondLogType::MOMENT,
+            $user->id,
+
+
+        );
         return Common::apiResponse(1, "  {$number} x ارسل هدية  " . " قيمتها {$gift->price} " . " الى {$to}");
     }
 

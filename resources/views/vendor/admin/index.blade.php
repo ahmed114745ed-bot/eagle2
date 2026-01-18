@@ -10,7 +10,6 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="manifest" href="{{ route('manifest.json') }}">
-
 {{--    <link rel="shortcut icon" href="{{ getAppLogo() }}" type="image/png">--}}
 {{--    <link rel="shortcut icon" href="{{ asset('images/favicon/android-chrome-512x512.png') }}" type="image/png">--}}
 
@@ -22,14 +21,19 @@
 
     <script src="{{ Admin::jQuery() }}"></script>
     {!! Admin::headerJs() !!}
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
 
 </head>
 
 <body class="hold-transition {{config('admin.skin')}} {{join(' ', config('admin.layout'))}}">
+
+<script>
+    (function() {
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.body.classList.add('sidebar-collapse');
+        }
+        document.documentElement.classList.remove('sidebar-collapse-init');
+    })();
+</script>
 
 @if($alert = config('admin.top_alert'))
     <div style="text-align: center;padding: 5px;font-size: 12px;background-color: #ffffd5;color: #ff0000;">
@@ -45,7 +49,7 @@
 
     <div class="content-wrapper" id="pjax-container">
         {!! Admin::style() !!}
-        <div id="app">
+        <div id="app" class="app-class" style="margin-top: 7%;">
         @yield('content')
         </div>
         {!! Admin::script() !!}
@@ -72,7 +76,6 @@
         sidebar.classList.toggle("active");
     });
 
-    // إغلاق القائمة عند الضغط خارجها
     document.addEventListener("click", function (event) {
         if (!sidebar.contains(event.target) && !toggleBtn.contains(event.target)) {
             sidebar.classList.remove("active");

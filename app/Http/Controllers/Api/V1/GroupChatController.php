@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\GroupChatService;
 use App\Jobs\SendNotificationsToAllUsers;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\GroupChatResource;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -71,9 +72,35 @@ class GroupChatController extends Controller
         try {
             event(new \Modules\Chat\Events\GroupChat($resourceData));
         } catch (\Throwable $th) {
-           // return $th->getMessage();
+           Log::error('GroupChatController: Failed to fire GroupChat event', [
+               'error' => $th->getMessage(),
+               'user_id' => $user->id
+           ]);
         }
-        dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+
+        try {
+
+
+            switch ($request->message_type) {
+                case 'reel':
+                case 'share_room':
+                case 'room':
+                    dispatchJobToQueue(new \App\Jobs\SendShareGroupChatNotificationJob($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+ 
+                    break;
+            
+                default:
+                    dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
+                    break;
+            }
+        } catch (\Throwable $th) {
+            Log::error('GroupChatController: Failed to dispatch notification job', [
+                'error' => $th->getMessage(),
+                'trace' => $th->getTraceAsString(),
+                'user_id' => $user->id,
+                'message_type' => $request->message_type
+            ]);
+        }
 
         return Common::apiResponse(1, 'created done', $resourceData, 201);
     }

@@ -431,10 +431,10 @@ class AgencyController extends MainController
                     ? e($this->country->name)
                     : e($this->country->e_name);
 
-                $flagHtml = "<img src='{$flagPath}' 
-                         class='flag-image' 
-                         alt='flag Image' 
-                         title='{$flagTitle}' 
+                $flagHtml = "<img src='{$flagPath}'
+                         class='flag-image'
+                         alt='flag Image'
+                         title='{$flagTitle}'
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
             }
             $profileUrl = route('admin.agency.profile', ['id' => $this->id]);
@@ -468,10 +468,10 @@ class AgencyController extends MainController
                     ? e($this->owner->country->name)
                     : e($this->owner->country->e_name);
 
-                $flagHtml = "<img src='{$flagPath}' 
-                         class='flag-image' 
-                         alt='flag Image' 
-                         title='{$flagTitle}' 
+                $flagHtml = "<img src='{$flagPath}'
+                         class='flag-image'
+                         alt='flag Image'
+                         title='{$flagTitle}'
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
             }
 
@@ -481,7 +481,7 @@ class AgencyController extends MainController
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
-                       <a href='{$showUrl}' 
+                       <a href='{$showUrl}'
                         style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 5px;'>
                             <span style='text-decoration: underline; cursor: pointer;'>{$name}</span>
                             {$flagHtml}
@@ -569,7 +569,6 @@ class AgencyController extends MainController
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            padding: 10px;
         }
         .pagination-info {
             margin: 5px 0;
@@ -701,7 +700,7 @@ class AgencyController extends MainController
 
         if (!$form->isEditing()) {
             $form->row(function ($row) {
-                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name');
+                $row->width(12)->select('bd_id', __('bd id'))->options($this->bdOptions())->ajax('/api/search/users-bd2', 'id', 'name')->rules('required');
                 $row->width(12)->select('app_owner_id', __('app owner id'))->options($this->ownerOptions())->ajax('/api/search/users3', 'id', 'name')->rules('required');
                 $row->width(12)->hidden('agency_manger_id', __('app manger id'));
                 $row->width(12)->text('name', __('agency name'))->rules('required');
@@ -804,6 +803,23 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
+
+            $currentAgencyId = $form->model()->id ?? null;
+
+            if ($appOwnerId) {
+                $existingAgency = Agency::where('app_owner_id', $appOwnerId)
+                    ->when($currentAgencyId, function ($query) use ($currentAgencyId) {
+                        $query->where('id', '!=', $currentAgencyId);
+                    })
+                    ->first();
+
+                if ($existingAgency) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already an owner of agency: ') . $existingAgency->name],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+            }
 
             if (!$form->bd_id && !$form->model()->bd_id) {
                 $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();

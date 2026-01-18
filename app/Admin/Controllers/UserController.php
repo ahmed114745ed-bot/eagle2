@@ -197,8 +197,7 @@ class UserController extends MainController
         if (request()->messages == 'month') {
             $grid->model()->whereHas(
                 'chatMessages',
-                fn($q) =>
-                $q->whereMonth('created_at', now()->month)
+                fn($q) => $q->whereMonth('created_at', now()->month)
                     ->whereYear('created_at', now()->year)
             );
         }
@@ -266,7 +265,7 @@ class UserController extends MainController
             ->display(function ($name) {
 
                 $user = $this;
-                if (! $user) {
+                if (!$user) {
                     return __('No User');
                 }
                 return app(UserService::class)->adminUserAvatar($user);
@@ -276,25 +275,20 @@ class UserController extends MainController
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 
 
-
         $grid->column('agency_id', __('Agency'))
             ->display(function () {
                 $agency = $this->agency;
-                if (! $agency) {
+                if (!$agency) {
                     return '';
                 }
 
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
 
-        Admin::style('tr{background-color:var(--table-background-color);}.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
+        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {
                 max-width: 90%;
-            }
-
-            .modal {
-                top: 5%;
             }
 
             .modal-body {
@@ -310,8 +304,8 @@ class UserController extends MainController
 
         $grid->column('versions', __('versions'))->modal(__('versions'), function () {
             $data = [
-                ['iOS',     $this->ios_version],
-                ['Huawei',  $this->huawei_version],
+                ['iOS', $this->ios_version],
+                ['Huawei', $this->huawei_version],
                 ['Android', $this->android_version],
             ];
 
@@ -322,65 +316,33 @@ class UserController extends MainController
         });
         $permission = $this->permission_name;
 
-
-        // $grid->column('bd_action', __('BD Action'))->display(function () {
-        //     if ($this->is_bd == 1) {
-        //         $btn  = '<button type="button" class="btn btn-danger btn-sm remove-bd-btn" ';
-        //         $btn .= 'data-id="' . $this->id . '" data-url="' . route('users.remove', $this->id) . '">';
-        //         $btn .= __('Remove BD') . '</button>';
-        //         return $btn;
-        //     }
-        //     return '';
-        // });
-
-        // Admin::script(<<<'JS'
-        //     $(document).on('click', '.remove-bd-btn', function (e) {
-        //         e.preventDefault();
-        //         let btn = $(this);
-        //         let url = btn.data('url');
-
-        //         Swal.fire({
-        //             title: 'هل أنت متأكد؟',
-        //             text: "لن تستطيع التراجع بعد الحذف!",
-        //             showCancelButton: true,
-        //             confirmButtonColor: '#d33',
-        //             cancelButtonColor: '#3085d6',
-        //             confirmButtonText: 'نعم، احذف',
-        //             cancelButtonText: 'إلغاء'
-        //         }).then((result) => {
-        //             if (result.value) {
-        //                 let form = $('<form>', {
-        //                     'method': 'POST',
-        //                     'action': url
-        //                 }).append($('<input>', {
-        //                     'type': 'hidden',
-        //                     'name': '_token',
-        //                     'value': LA.token
-        //                 })).append($('<input>', {
-        //                     'type': 'hidden',
-        //                     'name': '_method',
-        //                     'value': 'POST'
-        //                 }));
-        //                 form.appendTo('body').submit();
-        //             }
-        //         });
-        //     });
-        // JS);
-
-
-
         Admin::script("
-                    $(document).on('click', '.show-same-device-modal', function() {
-                        console.log('here');
-                        var userId = $(this).data('user-id');
-                        $('#sameDeviceUsersModal .modal-body').html('Loading...');
-                        $('#sameDeviceUsersModal').modal('show');
-                        $.get('/admin/users/' + userId + '/same-device-users-table', function(html) {
-                            $('#sameDeviceUsersModal .modal-body').html(html);
-                        });
-                    });
-        ");
+            // Initial modal open
+            $(document).on('click', '.show-same-device-modal', function() {
+                var userId = $(this).data('user-id');
+                loadSameDeviceUsers(userId, 1);
+            });
 
+            // Pagination click
+            $(document).on('click', '.ajax-pagination', function(e) {
+                e.preventDefault();
+                var userId = $(this).data('user-id');
+                var page = $(this).data('page');
+
+                if (!$(this).parent().hasClass('disabled') && !$(this).parent().hasClass('active')) {
+                    loadSameDeviceUsers(userId, page);
+                }
+            });
+
+            function loadSameDeviceUsers(userId, page) {
+                $('#sameDeviceUsersModal .modal-body').html('<div class=\"text-center\"><i class=\"fa fa-spinner fa-spin fa-2x\"></i></div>');
+                $('#sameDeviceUsersModal').modal('show');
+
+                $.get('/admin/users/' + userId + '/same-device-users-table', { page: page }, function(html) {
+                    $('#sameDeviceUsersModal .modal-body').html(html);
+                });
+            }
+        ");
 
 
         $grid->actions(function ($actions) use ($permission) {
@@ -412,15 +374,15 @@ class UserController extends MainController
                 $actions->disableDelete();
             }
 
-            if (! Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('delete-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
 
 
-            if (! Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('edit-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableEdit();
             }
-            if (! Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
+            if (!Admin::user()->can('show-' . $permission) && !Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
@@ -457,55 +419,6 @@ class UserController extends MainController
     }
 
 
-
-    public function showAdditionalInfo($id, Content $content)
-    {
-        return $content
-            ->row(function (Row $row) {
-                $row->column(12, $this->showColSearch());
-            })
-            ->row(
-                function ($row) use ($id) {
-                    $user = User::find($id);
-                    if ($user) {
-                        $user->flowers = 0;
-                        $user->save();
-                    }
-                    $type = $user->type_user;
-                    switch ($type) {
-                        case 0:
-                            $userType = __("User");
-                            break;
-                        case 1:
-                            $userType = __("Host");
-                            break;
-                        case 2:
-                            $userType = __("Host Agent");
-                            break;
-                        case 3:
-                            $userType = __("Shipping Agent");
-                            break;
-                        case 4:
-                            $userType = __("Resort & Shipping Agent");
-                            break;
-                        case 5:
-                            $userType = __("Admin");
-                            break;
-                        default:
-                            $userType = $type; // Keep the original value if no match is found
-                            break;
-                    }
-
-                    $row->column(2, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
-                    $row->column(2, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
-                    $row->column(2, new InfoBox(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
-                    $row->column(2, new InfoBox(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
-                }
-            );
-    }
-
     protected function showColSearch()
     {
         $form = new Box();
@@ -524,147 +437,229 @@ class UserController extends MainController
         return $this->form()->update($id);
     }
 
+
+
     public function show($id, Content $content)
     {
-        $timezone = Common::timeZone();
-        $month = request('month'); // e.g., "5" for May
-        $year = request('year');
-        $start = request('start_at');
-        $end = request('end_at');
-        $tab = request('tab') ?? 'salary';
-        $joinDate = request('join_date');
-        $user = User::with('profile')->find($id);
-        $type = request('type') ?? 4;
-        $agencyId = request('agency_id');
+        $timezone   = Common::timeZone();
+        $month      = request('month');
+        $year       = request('year');
+        $start      = request('start_at');
+        $end        = request('end_at');
+        $joinDate   = request('join_date');
+        $type       = request('type', 4);
+        $agencyId   = request('agency_id');
+        $chargeTabType = request('type', 'receiver');
+        $giftType   = request('gift_type', 'receiver');
+        $packs = null;
+        $types = collect();
+        $currentType = null;
+        $userVips = $hasVip = null;
+        $salaries = null;
+        $charges = null;
+        $giftSLogs = $diamonds = null;
+        $userJoinAgencies = null;
+        $usersCoins = null;
+        $badges = null;
+        $walletLogs = null;
 
-        $userJoinAgencies = UsersJoinedAgency::where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
-            $query->whereDate('join_date', $joinDate);
-        })->paginate(10, ['*'], 'user_agency_page');
+        // Decide active tab early so we only eager load what we need
+        $activeTab = request('tab', 'packs');
 
-        $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
-            $q->select('id', 'show_img');
-        }])->orderByDesc('is_used')->latest()->paginate(10, ['*'], 'pack_page');
+        /* =========================
+     | USER (ONE QUERY ONLY) — conditional eager loading + select
+     ========================= */
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'di']);
 
-        $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
-        $hasVip = UserVip::where('user_id', $id)
-            ->where('is_used', 1)
-            ->exists();
+        $with = [
+            'profile:id,user_id,avatar',
+            'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
+            'senderLevel:id,level,type,img',
+            'receiverLevel:id,level,type,img',
+        ];
 
-        $salaries = UserSallary::where('user_id', $id)
-            ->with('agency')
-            ->when(isset($year), function ($query) use ($year) {
-                $query->where('year', $year);
-            })->when(isset($month), function ($query) use ($month) {
-                $query->where('month', $month);
-            })->orderByDesc('id')->paginate(10, ['*'], 'salary_page');
-
-        $typeMap = PACK_USER;
-
-        $types =  collect($typeMap);
-        $userPackTypes = Pack::where('user_id', $id)->pluck('type')->unique()->toArray();
-        // $userPackTypes = $this->typesByLevel($id);
-        $currentType = request()->get('type', $types->keys()->first());
-        if ($userPackTypes) {
-            $types = collect($typeMap)->filter(function ($name, $key) use ($userPackTypes) {
-                return in_array($key, $userPackTypes);
-            });
-        } else {
-            $types = $types;
+        // Only load packs when viewing packs tab
+        if ($activeTab === 'packs') {
+            $with['packs'] = function ($q) {
+                $q->where('type', 25)
+                    ->where('is_used', true)
+                    ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+                    ->with('ware:id,value');
+            };
         }
-        $chargeTabType = request()->get('type', 'receiver');
-        $giftType = request()->get('gift_type', 'receiver');
 
-        $charges = Charge::query()
-            ->when($chargeTabType == 'receiver', function ($q) use ($id) {
-                $q->where('user_id', $id)->where('user_type', 'user');
-            })
-            ->when($chargeTabType == 'charger', function ($q) use ($id) {
-                $q->where('charger_id', $id)->where('charger_type', 'user');
-            })
-            ->with(Common::chargerRelationsQuery())
-            ->orderByDesc('id')
-            ->paginate(10, ['*'], 'charges_page');
+        $user = $userQuery->with($with)->findOrFail($id);
 
+        // Avoid duplicate wallet calls
+        $availableBalance = $curantBalance = wallet_available_by_user($id);
+        /* =========================
+        | USER IMAGE
+        ========================= */
+        $defaultImage = asset('images/businessman-icon.jpg');
+        $avatar = optional($user->profile)->avatar;
+        $user->display_image = isImageExists(getImagePath($avatar)) ? getImagePath($avatar) : $defaultImage;
+        // $activeTab already set above
+        switch ($activeTab) {
 
-        $giftSLogs = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
-            $q->where('receiver_id', $id);
-        })->when($giftType == 'sender', function ($q) use ($id) {
-            $q->where('sender_id', $id);
-        })->with('receiver', 'sender', 'gift', 'room', 'agency')->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
-            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
-            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+            case 'packs':
+                $types = collect(PACK_USER);
+                $packBase = Pack::with(['userVip.admin:id,name,avatar', 'admin:id,name,avatar', 'userVip', 'sender', 'ware:id,show_img'])
+                    ->where('user_id', $id)
+                    ->whereHas('ware')
+                    ->whereNull('deleted_at');
 
-            $query->whereBetween('created_at', [$startUtc, $endUtc]);
-        })->when(isset($agencyId), function ($query) use ($agencyId) {
-            $query->where('agency_id', $agencyId);
-        })->orderByDesc('id')->paginate(10, ['*'], 'gift_page');
+                $packs = (clone $packBase)
+                    ->where('type', request('type', 4))
+                    ->orderByDesc('is_used')
+                    ->latest()
+                    ->paginate(10, ['*'], 'pack_page');
 
-        $diamonds = GiftLog::when($giftType == 'receiver', function ($q) use ($id) {
-            $q->where('receiver_id', $id);
-        })->when($giftType == 'sender', function ($q) use ($id) {
-            $q->where('sender_id', $id);
-        })->when(isset($start) && isset($end), function ($query) use ($start, $end, $timezone) {
-            $startUtc = Carbon::parse($start, $timezone)->startOfDay()->timezone('UTC');
-            $endUtc   = Carbon::parse($end, $timezone)->endOfDay()->timezone('UTC');
+                $userPackTypes = (clone $packBase)->pluck('type')->unique()->toArray();
+                $types = $types->filter(fn($_, $key) => in_array($key, $userPackTypes));
+                $currentType = request('type', $types->keys()->first());
+                break;
 
-            $query->whereBetween('created_at', [$startUtc, $endUtc]);
-        })->when(isset($agencyId), function ($query) use ($agencyId) {
-            $query->where('agency_id', $agencyId);
-        })->selectRaw('SUM(giftPrice) AS total')->value('total');
+            case 'vips':
+                $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
+                $hasVip = $userVips->contains('is_used', 1);
+                break;
 
-        $userJoinAgencies = UsersJoinedAgency::with(['kickedByApp', 'kickedByAdmin'])->where('user_id', $id)->with('agency')->when(isset($joinDate), function ($query) use ($joinDate) {
-            $query->whereDate('join_date', $joinDate);
-        })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');
+            case 'salary':
+                $year = request('year');
+                $month = request('month');
+                $salaries = UserSallary::with('agency:id,name')
+                    ->where('user_id', $id)
+                    ->when($year, fn($q) => $q->where('year', $year))
+                    ->when($month, fn($q) => $q->where('month', $month))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'salary_page');
+                break;
 
-        \DB::enableQueryLog(); // Before the query
+            case 'charge':
+                $chargeTabType = request('type', 'receiver');
+                $charges = Charge::with(Common::chargerRelationsQuery())
+                    ->when($chargeTabType === 'receiver', fn($q) => $q->where('user_id', $id)->where('user_type', 'user'))
+                    ->when($chargeTabType === 'charger', fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user'))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'charges_page');
+                break;
 
-        $usersCoins = UserCoinLog::where('user_id', $id)
-            ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
-            ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
-            ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
-            ->orderByDesc('id')->paginate(10, ['*'], 'coins_page');
+            case 'gift-log':
+                $giftType = request('gift_type', 'receiver');
+                $start = request('start_at');
+                $end = request('end_at');
+                $agencyId = request('agency_id');
+                $timezone = Common::timeZone();
 
+                $giftBaseQuery = GiftLog::query()
+                    ->when($giftType === 'receiver', fn($q) => $q->where('receiver_id', $id))
+                    ->when($giftType === 'sender', fn($q) => $q->where('sender_id', $id))
+                    ->when($start && $end, fn($q) => $q->whereBetween('created_at', [
+                        Carbon::parse($start, $timezone)->startOfDay()->utc(),
+                        Carbon::parse($end, $timezone)->endOfDay()->utc(),
+                    ]))
+                    ->when($agencyId, fn($q) => $q->where('agency_id', $agencyId));
 
-        $userBadges = UserBadge::where('user_id', $id)->active()->with("badge")->get();
+                $giftSLogs = (clone $giftBaseQuery)
+                    ->with([
+                        'receiver:id,name,uuid,special_id',
+                        'sender:id,name,uuid,special_id',
+                        // 'sender.packs' => function ($q) {
+                        //     $q->whereIn('type', [25])
+                        //         ->where('is_used', true)
+                        //         ->with('ware:id,value');
+                        // },
+                        // 'receiver.packs' => function ($q) {
+                        //     $q->whereIn('type', [25])
+                        //         ->where('is_used', true)
+                        //         ->with('ware:id,value');
+                        // },
+                        // 'receiver.profile',
+                        // 'sender.profile',
+                        'gift:id,name,price',
+                        'room:id,room_name',
+                        'agency:id,name',
+                    ])
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'gift_page');
+
+                $diamonds = (clone $giftBaseQuery)->sum('giftPrice');
+                break;
+
+            case 'user-agency':
+                $joinDate = request('join_date');
+                $userJoinAgencies = UsersJoinedAgency::with(['agency:id,name,type', 'kickedByApp:id,name', 'kickedByAdmin:id,name'])
+                    ->where('user_id', $id)
+                    ->when($joinDate, fn($q) => $q->whereDate('join_date', $joinDate))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'user_agency_page');
+                break;
+
+            case 'user-coins':
+                $usersCoins = UserCoinLog::where('user_id', $id)
+                    ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
+                    ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
+                    ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))
+                    ->orderByDesc('id')
+                    ->paginate(10, ['*'], 'coins_page');
+                break;
+
+            case 'badges':
+                $badges = UserBadge::with('admin:id,name')
+                    ->where('user_id', $id)
+                    ->orderByRaw("CASE WHEN expire = 0 THEN 0 WHEN expire >= ? THEN 0 ELSE 1 END", [now()->timestamp])
+                    ->orderByDesc('expire')
+                    ->paginate(10, ['*'], 'badges_page');
+                break;
+
+            case 'wallet_logs':
+                $year = request('year');
+                $month = request('month');
+                $walletLogs = WalletLog::where('user_id', $id)
+                    ->when($year, fn($q) => $q->whereYear('created_at', $year))
+                    ->when($month, fn($q) => $q->whereMonth('created_at', $month))
+                    ->orderByDesc('id')
+                    ->paginate(20, ['*'], 'wallet_logs_page')
+                    ->appends(['tab' => 'wallet_logs', 'year' => $year, 'month' => $month]);
+                break;
+        }
         $countries = $this->countries();
-        $badges = UserBadge::where('user_id', $id)->with('admin')
-            ->orderByRaw("
-                    CASE
-                        WHEN expire = 0 THEN 0
-                        WHEN expire >= ? THEN 0
-                        ELSE 1
-                    END
-                ", [now()->timestamp])
-            ->orderByDesc('expire')
-            ->paginate(10, ['*'], 'badges_page');
-        
-        $curantBalance = wallet_available_by_user($id);
-        $availableBalance = wallet_available_by_user($id);
-        
-        $walletLogs = WalletLog::where('user_id', $user->id)
-            ->when(request('year'), function ($q) {
-                $q->whereYear('created_at', request('year'));
-            })
-            ->when(request('month'), function ($q) {
-                $q->whereMonth('created_at', request('month'));
-            })
-            ->orderByDesc('id')
-            ->paginate(20, ['*'], 'wallet_logs_page')
-            ->appends([
-                'tab'   => 'wallet_logs',
-                'year'  => request('year'),
-                'month' => request('month'),
-            ]);
-     
-       
-        $data = compact('user', 'packs', 'type', 'userVips', 'salaries', 'userJoinAgencies', 'types', 'currentType', 'timezone', 'charges', 'tab', 'chargeTabType', 'giftSLogs', 'giftType', 'diamonds', 'hasVip', 'usersCoins', 'badges', 'countries' ,'availableBalance','curantBalance','walletLogs');
-        return  parent::show($id, $content->title(__('user profile'))
-            ->view('user_profile', $data));
+
+        /* =========================
+     | VIEW
+     ========================= */
+        $data = compact(
+            'user',
+            'countries',
+            'packs',
+            'types',
+            'giftType',
+            'currentType',
+            'userVips',
+            'chargeTabType',
+            'hasVip',
+            'salaries',
+            'charges',
+            'giftSLogs',
+            'diamonds',
+            'userJoinAgencies',
+            'usersCoins',
+            'badges',
+            'type',
+            'walletLogs',
+            'activeTab',
+            'availableBalance',
+            'curantBalance'
+        );
+
+        return parent::show($id, $content->title(__('user profile'))->view('user_profile', $data));
     }
+
+
 
     public function countries()
     {
-        $ops       = [null => __('no country')];
+        $ops = [null => __('no country')];
         $countries = Country::all();
         foreach ($countries as $country) {
             $ops[$country->id] = App::isLocale('en') ? $country->e_name : $country->name;
@@ -697,7 +692,6 @@ class UserController extends MainController
     }
 
 
-
     /**
      * Make a form builder.
      *
@@ -709,12 +703,12 @@ class UserController extends MainController
         $this->disableFormTools($form);
 
         if ($form->isEditing()) {
-            $userId           = request()->route('user');
-            $user             = User::findOrFail($userId);
-            $oldDiValue       = $user->getOriginal('di');
+            $userId = request()->route('user');
+            $user = User::findOrFail($userId);
+            $oldDiValue = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
         } else {
-            $oldDiValue       = null;
+            $oldDiValue = null;
             $oldDiamoundValue = null;
         }
 
@@ -743,8 +737,6 @@ class UserController extends MainController
                     }
                 ]);
         }
-
-        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
 
         // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
@@ -781,14 +773,34 @@ class UserController extends MainController
                     $(document).ready(function() {
                         $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
                     });
-                    JS
+                JS
             );
         }
 
-
+        $form->html('<div class="full-column-width">');
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
         })->useTable()->disableCreate()->disableDelete();
+        $form->html('</div>');
+
+        Admin::style('
+            .has-many-images .has-many-images-forms {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 20px !important;
+            }
+
+            .has-many-images .form-group {
+                margin-bottom: 0 !important;
+            }
+
+            .has-many-images .file-preview-image {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                border-radius: 8px !important;
+            }
+        ');
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
@@ -821,10 +833,10 @@ class UserController extends MainController
 
 
         $form->select('country_id', trans('country'))->options(function () {
-            $ops       = [null => __('no country')];
+            $ops = [null => __('no country')];
             $countries = Country::all();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
+                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
             }
             return $ops;
         });
@@ -843,10 +855,12 @@ class UserController extends MainController
         </script>');
         }
 
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'))->setElementName('full-column-width');
+
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
-            $model     = $form->model();
-            $user_id   = $model->id;
+            $model = $form->model();
+            $user_id = $model->id;
             $form->model()->uuid = $form->original_uuid;
             // $user = User::find($user_id);
             // $originalProfile = $user->profile;
@@ -905,7 +919,6 @@ class UserController extends MainController
 
         return $form;
     }
-
 
 
     public function request_invite_code(Request $request)
@@ -1002,7 +1015,6 @@ class UserController extends MainController
     }
 
 
-
     public function updateUsers(Request $request)
     {
         $user = User::find($request->id);
@@ -1033,7 +1045,7 @@ class UserController extends MainController
 
         ];
         if ($request->hasFile('image')) {
-            $dataUserProfile['avatar']  = Common::upload('images', $request->file('image'));
+            $dataUserProfile['avatar'] = Common::upload('images', $request->file('image'));
         }
         if ($profileUser) {
 
@@ -1047,10 +1059,21 @@ class UserController extends MainController
 
     // app/Admin/Controllers/UsersAppController.php
 
-    public function ajaxSameDeviceUsersTable($id)
+    public function ajaxSameDeviceUsersTable($id, Request $request)
     {
-        $user = User::with(['sameDeviceUsers.profile'])->findOrFail($id);
-        $users = $user->sameDeviceUsers;
+        $user = User::findOrFail($id);
+        $perPage = 10;
+        $page = $request->get('page', 1);
+
+        if (empty($user->device_token)) {
+            return '<div class="alert alert-warning text-center">
+            This user has no device identifier.
+        </div>';
+        }
+
+        $users = User::with('profile')
+            ->where('device_token', $user->device_token)
+            ->paginate($perPage, ['*'], 'page', $page);
 
         $rows = $users->map(function ($user) {
             $path = $user->profile?->avatar;
@@ -1083,10 +1106,50 @@ class UserController extends MainController
         });
 
         $table = new Table([__('Name'), __('phone'), __('created_at')], $rows->toArray());
+        $pagination = $this->buildAjaxPagination($users, $id);
         // Return just table's HTML (your AJAX will inject this)
-        return $table->render();
+        return $table->render() . $pagination;
     }
 
+    private function buildAjaxPagination($paginator, $userId)
+    {
+        if ($paginator->lastPage() <= 1) {
+            return '';
+        }
+
+        $currentPage = $paginator->currentPage();
+        $lastPage = $paginator->lastPage();
+
+        $html = '<nav aria-label="Page navigation" style="margin-top: 15px;">';
+        $html .= '<ul class="pagination justify-content-center">';
+
+        // Previous button
+        $prevDisabled = $currentPage == 1 ? 'disabled' : '';
+        $prevPage = $currentPage - 1;
+        $html .= "<li class='page-item {$prevDisabled}'>";
+        $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$prevPage}'>&laquo;</a>";
+        $html .= "</li>";
+
+        // Page numbers
+        for ($i = 1; $i <= $lastPage; $i++) {
+            $active = $i == $currentPage ? 'active' : '';
+            $html .= "<li class='page-item {$active}'>";
+            $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$i}'>{$i}</a>";
+            $html .= "</li>";
+        }
+
+        // Next button
+        $nextDisabled = $currentPage == $lastPage ? 'disabled' : '';
+        $nextPage = $currentPage + 1;
+        $html .= "<li class='page-item {$nextDisabled}'>";
+        $html .= "<a class='page-link ajax-pagination' href='#' data-user-id='{$userId}' data-page='{$nextPage}'>&raquo;</a>";
+        $html .= "</li>";
+
+        $html .= '</ul>';
+        $html .= '</nav>';
+
+        return $html;
+    }
 
     public function removeBD($id)
     {

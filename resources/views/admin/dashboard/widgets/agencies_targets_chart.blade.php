@@ -21,17 +21,23 @@
 @endphp
 
 <script>
-$(document).ready(function () {
+function loadAgenciesTargetsChart() {
+    const canvas = document.getElementById("agenciesTargetsChart");
+    if (!canvas) return;
+
+    // Check if chart already exists
+    if (window.agenciesTargetsChartInstance) {
+        window.agenciesTargetsChartInstance.destroy();
+    }
+
     $.ajax({
         url: "{{ url($prefix . '/statistics/agency-target') }}",
         type: "GET",
         dataType: "json",
         success: function (response) {
-            const ctxTargets = document
-                .getElementById("agenciesTargetsChart")
-                .getContext("2d");
+            const ctxTargets = canvas.getContext("2d");
 
-            new Chart(ctxTargets, {
+            window.agenciesTargetsChartInstance = new Chart(ctxTargets, {
                 type: 'bar',
                 data: {
                     labels: response.labels,
@@ -47,6 +53,7 @@ $(document).ready(function () {
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     indexAxis: 'y',
                     plugins: {
                         legend: { display: false },
@@ -73,6 +80,9 @@ $(document).ready(function () {
             console.error("Error loading chart data:", error);
         }
     });
-});
+}
+
+// Load immediately - no DOM waiting, no multiple event listeners
+loadAgenciesTargetsChart();
 </script>
 

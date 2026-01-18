@@ -3,8 +3,10 @@
 namespace Modules\UsersWallet\Services;
 
 use App\Helpers\Common;
+use App\Helpers\UserDiamondLogHelper;
 use App\Models\Setting;
 use App\Enums\UserCoinLogType;
+use App\Enums\UserDiamondLogType;
 use App\Helpers\UserCoinLogHelper;
 use Modules\UsersWallet\Repositories\Eloquent\ExchangeLogRepository;
 use Modules\UsersWallet\Repositories\Eloquent\ExchangeRepository;
@@ -50,6 +52,14 @@ class ExchangeService
         ];
 
         $this->exchangeLogRepository->create($data);
+        UserDiamondLogHelper::logByType(
+            $user->id,
+            -abs($ex->diamonds),
+            $user->exchange_diamonds,
+            UserDiamondLogType::EXCHANGE,
+            $user->id,
+            $ex->value
+        );
         $user->exchange_diamonds -= $ex->diamonds;
 
         if ($user->exchange_diamonds <= 0) {
@@ -65,6 +75,8 @@ class ExchangeService
                 UserCoinLogType::EXCHANGE,
             );
 
+
+
             $user->di += $ex->value;
         } elseif ($ex->type == 1) {
             $user->gold +=  $ex->value;
@@ -75,8 +87,9 @@ class ExchangeService
 
     public function createExchange($user, $diamonds, $exValue)
     {
-        if (!in_array($user->type_user, [0, 3])) throw new \Exception(__('you are host you can not exchange diamonds'));
-        if ($user->exchange_diamonds < $diamonds) throw new \Exception(__('balance low'));
+         if (!in_array($user->type_user, [0, 3])) throw new \Exception(__('you are host you can not exchange diamonds'));
+
+        if ($user->exchange_diamonds < $diamonds) throw new \Exception('balance low');
         //  if (!ctype_digit($exValue)) throw new \Exception(__('you should exchange number of diamond'));
 
         $setting = Common::getSettingValue('exchange_coin_percentage') ?? 1;
@@ -94,6 +107,15 @@ class ExchangeService
         ];
 
         $this->exchangeLogRepository->create($data);
+        UserDiamondLogHelper::logByType(
+            $user->id,
+            -abs($diamonds),
+            $user->exchange_diamonds,
+            UserDiamondLogType::EXCHANGE,
+            $user->id,
+            $exValue
+        );
+
         $user->exchange_diamonds -= $diamonds;
 
         if ($user->exchange_diamonds <= 0) {
@@ -106,7 +128,9 @@ class ExchangeService
             $exValue,
             $amountBefore,
             UserCoinLogType::EXCHANGE,
+             -abs($diamonds),
         );
+
 
         $user->di += $exValue;
 

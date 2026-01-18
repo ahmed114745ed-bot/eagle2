@@ -26,9 +26,6 @@ class VerifyPayPalWebhook extends PayPalService
             return is_array($value) ? $value[0] : $value;
         }, $headers);
 
-        // Log the headers for debugging
-        LogHelper::info('PayPal Webhook Headers', $headers);
-
         // Get the JSON payload as array
         $payload = $request->json()->all();
 

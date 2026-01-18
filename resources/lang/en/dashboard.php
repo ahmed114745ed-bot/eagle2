@@ -5,12 +5,40 @@ return [
     'login.titleBD'           => ' BD Dashboard Access',
     'login.titleSuperAdmin'  => ' country manager Dashboard Access',
     'login.titleAreaManager'  => ' Area Manager Dashboard Access',
+
     'login.remember'        => 'Remember me',
     'login.rights'          => ' © 2023. All rights reserved',
     'login.language.switch' => 'الانتقال إلى',
     'login.language.lang'   => 'اللغة العربية',
-    'login.titleAreaManager' => 'Login area manger dashboard',
-
+    'login' => [
+        'title' => 'Dashboard Access',
+        'subtitle' => 'Sign in to access your dashboard',
+        'features' => [
+            'secure' => 'Secure, encrypted login',
+            'fast' => 'Fast access to all features',
+            'global' => 'Manage everything from anywhere',
+        ],
+        'form_title' => 'Sign in',
+        'form_subtitle' => 'Enter your details to continue',
+        'username_placeholder' => 'Enter your username',
+        'remember' => 'Remember me',
+        'forgot' => 'Forgot password?',
+        'reset' => 'Reset your password',
+        'or' => 'OR',
+        'loading' => 'Signing in...'
+    ],
+    'login_agency' => [
+        'title' => 'Agency Manager Login',
+        'subtitle' => 'Manage agencies, hosts, and performance',
+    ],
+    'login_area' => [
+        'title' => 'Area Manager Login',
+        'subtitle' => 'Manage multiple countries and regional operations',
+    ],
+    'login_country' => [
+        'title' => 'Country Manager Login',
+        'subtitle' => 'Control country-level reports and settings',
+    ],
     'online'                => 'Online',
     'login'                 => 'Login',
     'logout'                => 'Logout',

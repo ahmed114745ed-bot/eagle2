@@ -202,8 +202,10 @@ class RoomRepository extends AbstractRepository
                 'myType',
                 'roomVisitors',
                 'boxUse',
+                'owner.agency.owner',
                 'owner' => [
                     'enabledMedals',
+                    'agency',
                     //                    'enabledMedals:id,achievement_level_id,user_id,is_enable',
                     'country',
                     'color_image',

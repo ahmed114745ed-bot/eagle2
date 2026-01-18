@@ -152,12 +152,10 @@ class GiftLogService
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
-            Log::info("CP Check: cpId={$cpId?->id}, cpEnableAllGifts={$cpEnableAllGifts}, giftId={$gift->id}, giftCategoryType={$gift->category?->type}");
 
             if ($cpId != null) {
                  if ($cpEnableAllGifts || ($gift->category && $gift->category->type === 'cp')) {
                     try {
-                         Log::info("Processing CP gift for user {$user->id} to receivers: " . implode(',', $receivedUsers->pluck('id')->toArray()));
 
                         $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     } catch (\Exception $e) {
@@ -183,7 +181,7 @@ class GiftLogService
 
             $price = ceil($realPrice);
 
-            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
+            $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType, type: $type);
 
 //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
             $settings = CacheHelper::cacheSettings();

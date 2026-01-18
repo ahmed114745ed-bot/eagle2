@@ -12,7 +12,6 @@
 :root {
         --primary-color: {{ config('themes.primaryColor') }};
         --secondary-color: {{ config('themes.secondaryColor') }};
-        --green-color: {{ config('themes.greenColor') }};
         --text-primary-color: {{ config('themes.textPrimaryColor') }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') }};
         --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -957,7 +956,7 @@
                     </div> -->
                 </div>
             </div>
-            <a class="btn btn-success btn-back" 
+            <a class="btn btn-success btn-back"
                 href="{{ url('download-charge-agency/' . $agency?->id) . '?' . http_build_query(request()->all()) }}">
                     {{ __('Export to Excel') }}
                 </a>
@@ -965,7 +964,7 @@
                 {{ __('Go Back') }} <i class="fas fa-arrow-left"></i>
             </button>
 
-      
+
 
         </div>
 

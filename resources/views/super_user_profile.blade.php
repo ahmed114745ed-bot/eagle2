@@ -1,156 +1,865 @@
 @php use App\Helpers\Common;use Carbon\Carbon; @endphp
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <style>
+<style>
 
 
-        :root {
-            --primary-color: {{ config('themes.primaryColor') }};
-            --secondary-color: {{ config('themes.secondaryColor') }};
-            --green-color: {{ config('themes.greenColor') }};
-            --text-primary-color: {{ config('themes.textPrimaryColor') }};
-            --text-secondary-color: {{ config('themes.textSecondaryColor') }};
-            --box-background-color: {{ config('themes.boxBackgroundColor') }};
-            --table-background-color: {{ config('themes.tableBackGroundColor')}}
-             --background-image:{{ config('themes.backgroundImage') }};
-            --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
-            --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
-            --primary-hover-alpha: {{ config('themes.primaryColor')}}33;
-            --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
-            --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
+    :root {
+        --primary-color: {{ config('themes.primaryColor') }};
+        --secondary-color: {{ config('themes.secondaryColor') }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') }};
+        --table-background-color: {{ config('themes.tableBackGroundColor')}}
+               --background-image:{{ config('themes.backgroundImage') }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) }});
+        --second-alpha: {{ adjustColor(config('themes.boxBackgroundColor'), -30, -30, -30) }}55;
+        --scroll-second-color: {{ config('themes.boxBackgroundColor') }}cc;
+        --scroll-first-color: {{ adjustColor(config('themes.primaryColor'), 40, 40, 40) }}33;
 
 
-            --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
-            --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
-            --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-            --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
-        }
+        --inverse-color: {{getLighterColor(config('themes.primaryColor'))}};
+        --inverse-box-color: {{adjustTextColor(config('themes.boxBackgroundColor'))}};
+        --success-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+        --primary-button: linear-gradient(90deg, {{adjustColor(config('themes.primaryColor'))}} 0%, {{config('themes.primaryColor')}} 100%);
+    }
 
-        .filter-container {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-            margin-bottom: 24px;
-        }
+    .filter-container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
 
+    .filter-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-end;
+    }
+
+    .filter-group {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 12px;
+        margin-left: auto;
+    }
+
+    .form-floating {
+        position: relative;
+    }
+
+    .form-select {
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        padding: 12px 16px;
+        font-size: 14px;
+        background-color: #f9f9f9;
+    }
+
+    .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
+        background-color: #ffffff;
+    }
+
+    .form-label {
+        color: #000000;
+        transition: all 0.3s ease;
+    }
+
+    .btn-filter {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 48px;
+    }
+
+    .btn-filter:hover {
+        background-color: var(--primary-hover-color);
+        transform: translateY(-1px);
+    }
+
+    .btn-reset {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        height: 48px;
+    }
+
+    .btn-reset:hover {
+        background-color: #f1f3f5;
+        color: var(--danger-color);
+        border-color: var(--danger-light-color);
+    }
+
+    @media (max-width: 768px) {
         .filter-content {
-            display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 16px;
-            align-items: flex-end;
         }
 
         .filter-group {
-            flex: 1;
-            min-width: 200px;
+            width: 100%;
         }
 
         .filter-actions {
-            display: flex;
+            width: 100%;
+            justify-content: flex-end;
+            margin-left: 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .filter-actions {
+            flex-direction: column;
             gap: 12px;
-            margin-left: auto;
         }
 
-        .form-floating {
-            position: relative;
+        .btn-filter, .btn-reset {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 57px;
+        color: white;
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+
+    .stat-icon.bg-blue {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    }
+
+    .stat-icon.bg-green {
+        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-top: 5px;
+    }
+
+    .section-box {
+        background: var(--secondary-color);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+
+    .section-header h4 {
+        margin: 0;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .section-header .text-yellow {
+        color: #f39c12;
+    }
+
+    .section-header .text-red {
+        color: #e74c3c;
+    }
+
+
+    .number-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #ecf0f1;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .number-badge.warning {
+        background: #fef9e7;
+        color: #f39c12;
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 0;
+        color: #95a5a6;
+    }
+
+    .empty-state i {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .empty-table {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #95a5a6;
+        background: white;
+        border-radius: 8px;
+        margin: 15px 0;
+    }
+
+    .empty-table i {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .empty-table p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .agency-profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        /* background: var(--secondary-color); */
+        /* filter: brightness(0.85); */
+
+    }
+
+    .agency-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .agency-avatar .logo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .agency-info {
+        flex: 1;
+    }
+
+    .agency-name {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .agency-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+    }
+
+    .meta-label {
+        font-weight: 600;
+        color: #7f8c8d;
+    }
+
+    .meta-value {
+        color: #34495e;
+    }
+
+    .meta-uuid {
+        color: #95a5a6;
+        font-size: 0.9em;
+    }
+
+    .agency-stats {
+        display: flex;
+        gap: 15px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        text-align: center;
+        min-width: 200px;
+
+    }
+
+    .stat-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #3498db;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #7f8c8d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .ltr .btn-back {
+        position: absolute;
+        top: 5px;
+        right: 20px;
+        background: #ecf0f1;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        color: #7f8c8d;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .rtl .btn-back {
+        position: absolute;
+        top: 5px;
+        left: 20px;
+        background: #ecf0f1;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        color: #7f8c8d;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-back:hover {
+        background: #d6e0e3;
+        color: #34495e;
+    }
+
+    .notice-section {
+        background: #fff8e1;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        border-radius: 0 6px 6px 0;
+        margin-bottom: 25px;
+    }
+
+    .notice-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: #ff9800;
+        font-weight: 600;
+    }
+
+    .notice-content {
+        color: #5d4037;
+        line-height: 1.5;
+    }
+
+    .top-performers-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .top-performers-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .performers-card {
+        background: var(--secondary-color);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        /* filter: brightness(0.5); */
+
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .stats-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #2c3e50;
+    }
+
+    .section-badge {
+        background: #3498db;
+        color: white;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .avatar-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 15px;
+    }
+
+    .avatar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s;
+    }
+
+    .avatar-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .avatar-img-container {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        margin-bottom: 8px;
+    }
+
+    .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .avatar-badge {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        background: #e74c3c;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+        border: 2px solid white;
+    }
+
+    .avatar-badge.admin {
+        background: #27ae60;
+    }
+
+    .avatar-name {
+        font-size: 12px;
+        text-align: center;
+        max-width: 80px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-scroll-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-pills {
+        display: inline-flex;
+        padding: 10px 0;
+    }
+
+    .nav-pills li {
+        display: inline-block;
+    }
+
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        border-top-color: var(--primary-color);
+    }
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+        color: #fff;
+        background-color: var(--primary-color);
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 0;
+        color: #95a5a6;
+    }
+
+    .empty-state i {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .agency-tabs {
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+    .tab-btn {
+        padding: 12px 20px;
+        background: none;
+        border: none;
+        border-bottom: 3px solid transparent;
+        font-weight: 600;
+
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+
+    .tab-btn.active {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+
+    .tab-btn:hover:not(.active) {
+        color: #34495e;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #2c3e50;
+    }
+
+    .count-badge {
+        background: #ecf0f1;
+        color: #7f8c8d;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--secondary-color);
+    }
+
+
+    .table-section {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--secondary-color);
+    }
+
+    .data-table th {
+        /* text-align: left; */
+        padding: 12px 15px;
+        background: var(--secondary-color);
+
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table td {
+        padding: 12px 15px;
+        border-bottom: 1px solid #eee;
+        vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-info strong {
+        font-size: 14px;
+    }
+
+    .user-info small {
+        font-size: 11px;
+        color: #95a5a6;
+    }
+
+    .role-badge {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+    }
+
+    .role-badge.owner {
+        background: #9b59b6;
+    }
+
+    .role-badge.admin {
+        background: #27ae60;
+    }
+
+    .btn-action {
+        padding: 5px 10px;
+        background: #3498db;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-action:hover {
+        background: #2980b9;
+    }
+
+    .empty-table {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #95a5a6;
+    }
+
+    .empty-table i {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .empty-table p {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .user-avatar,
+    .supporter-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .supporters-avatars {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .user-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .target-card-section-1 {
+        /* display: inline-flex; */
+        width: 100%;
+        padding-top: 26px;
+        margin-bottom: 35px;
+
+    }
+
+    .card-target-filter {
+        display: inline;
+        width: 34%;
+        left: 33px;
+        position: absolute;
+    }
+
+    .card-target-filter .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+
+    .card-target-filter button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+
+    .card-target-filter-phone {
+        width: 51%;
+        margin-bottom: 27px;
+        position: relative;
+    }
+
+    .card-target-filter-phone .form-group {
+        margin-bottom: 16px;
+        right: 20px;
+        position: relative;
+        top: 10px;
+    }
+
+    .card-target-filter-phone button {
+        position: relative;
+        left: -49px;
+        bottom: -29px;
+    }
+
+    .target-card-stat {
+        width: 50%;
+    }
+
+    .filter-form {
+        border-radius: 13px;
+        height: 165px;
+
+    }
+
+    .card-target-filter-phone {
+        /* display: none; */
+    }
+
+    .card-target-filter {
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .stats-row {
+            flex-direction: column;
+            width: 108%;
+
         }
 
-        .form-select {
-            height: 48px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s ease;
-            padding: 12px 16px;
-            font-size: 14px;
-            background-color: #f9f9f9;
+        .avatar-grid {
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
         }
 
-        .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1);
-            background-color: #ffffff;
+        .target-card-section-1 {
+            display: grid;
+            width: 100%;
+            padding-top: 26px;
+            margin-bottom: 35px;
         }
 
-        .form-label {
-            color: #000000;
-            transition: all 0.3s ease;
-        }
-
-        .btn-filter {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            height: 48px;
-        }
-
-        .btn-filter:hover {
-            background-color: var(--primary-hover-color);
-            transform: translateY(-1px);
-        }
-
-        .btn-reset {
-            background-color: #f8f9fa;
-            color: #6c757d;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            height: 48px;
-        }
-
-        .btn-reset:hover {
-            background-color: #f1f3f5;
-            color: var(--danger-color);
-            border-color: var(--danger-light-color);
-        }
-
-        @media (max-width: 768px) {
-            .filter-content {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .filter-group {
-                width: 100%;
-            }
-
-            .filter-actions {
-                width: 100%;
-                justify-content: flex-end;
-                margin-left: 0;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .filter-actions {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .btn-filter, .btn-reset {
-                width: 100%;
-                justify-content: center;
-            }
-        }
 
         .stat-icon {
             width: 50px;
@@ -159,948 +868,195 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 57px;
+            margin-right: 118px;
             color: white;
             font-size: 20px;
             margin-bottom: 6px;
-        }
-
-        .stat-icon.bg-blue {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-        }
-
-        .stat-icon.bg-green {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-        }
-
-        .stat-info {
-            flex: 1;
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-top: 5px;
-        }
-
-        .section-box {
-            background: var(--secondary-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-
-        .section-header h4 {
-            margin: 0;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-header .text-yellow {
-            color: #f39c12;
-        }
-
-        .section-header .text-red {
-            color: #e74c3c;
-        }
-
-
-        .number-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            background: #ecf0f1;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .number-badge.warning {
-            background: #fef9e7;
-            color: #f39c12;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 0;
-            color: #95a5a6;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .empty-table {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #95a5a6;
-            background: white;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .empty-table i {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .empty-table p {
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .agency-profile-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-            /* background: var(--secondary-color); */
-            /* filter: brightness(0.85); */
-
-        }
-
-        .agency-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 25px;
-            margin-bottom: 30px;
-            position: relative;
-            padding: 20px;
-            background: var(--secondary-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            /* filter: brightness(0.5); */
-
-        }
-
-        .agency-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .agency-avatar .logo-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .agency-info {
-            flex: 1;
-        }
-
-        .agency-name {
-            margin: 0 0 10px 0;
-            color: #2c3e50;
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .agency-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 14px;
-        }
-
-        .meta-label {
-            font-weight: 600;
-            color: #7f8c8d;
-        }
-
-        .meta-value {
-            color: #34495e;
-        }
-
-        .meta-uuid {
-            color: #95a5a6;
-            font-size: 0.9em;
-        }
-
-        .agency-stats {
-            display: flex;
-            gap: 15px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            min-width: 200px;
-
-        }
-
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #3498db;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #7f8c8d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .ltr .btn-back {
-            position: absolute;
-            top: 5px;
-            right: 20px;
-            background: #ecf0f1;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            color: #7f8c8d;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .rtl .btn-back {
-            position: absolute;
-            top: 5px;
-            left: 20px;
-            background: #ecf0f1;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            color: #7f8c8d;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-back:hover {
-            background: #d6e0e3;
-            color: #34495e;
-        }
-
-        .notice-section {
-            background: #fff8e1;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            border-radius: 0 6px 6px 0;
-            margin-bottom: 25px;
-        }
-
-        .notice-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            color: #ff9800;
-            font-weight: 600;
-        }
-
-        .notice-content {
-            color: #5d4037;
-            line-height: 1.5;
-        }
-
-        .top-performers-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .top-performers-section {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .performers-card {
-            background: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            /* filter: brightness(0.5); */
-
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            margin: 0;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #2c3e50;
-        }
-
-        .section-badge {
-            background: #3498db;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 15px;
-        }
-
-        .avatar-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s;
-        }
-
-        .avatar-item:hover {
-            transform: translateY(-3px);
-        }
-
-        .avatar-img-container {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            margin-bottom: 8px;
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .avatar-badge {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: bold;
-            border: 2px solid white;
-        }
-
-        .avatar-badge.admin {
-            background: #27ae60;
-        }
-
-        .avatar-name {
-            font-size: 12px;
-            text-align: center;
-            max-width: 80px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .nav-scroll-container {
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .nav-pills {
-            display: inline-flex;
-            padding: 10px 0;
-        }
-
-        .nav-pills li {
-            display: inline-block;
-        }
-
-
-        .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-            border-top-color: var(--primary-color);
-        }
-
-        .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
-            color: #fff;
-            background-color: var(--primary-color);
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 30px 0;
-            color: #95a5a6;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .agency-tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            font-weight: 600;
-
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-
-        .tab-btn:hover:not(.active) {
-            color: #34495e;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
-        }
-
-        .card-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--secondary-color);
-        }
-
-        .card-header h3 {
-            margin: 0;
-            font-size: 18px;
-            color: #2c3e50;
-        }
-
-        .count-badge {
-            background: #ecf0f1;
-            color: #7f8c8d;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--secondary-color);
-        }
-
-
-        .table-section {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--secondary-color);
-        }
-
-        .data-table th {
-            /* text-align: left; */
-            padding: 12px 15px;
-            background: var(--secondary-color);
-
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .data-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #eee;
-            vertical-align: middle;
-        }
-
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        .user-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-info strong {
-            font-size: 14px;
-        }
-
-        .user-info small {
-            font-size: 11px;
-            color: #95a5a6;
-        }
-
-        .role-badge {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .role-badge.owner {
-            background: #9b59b6;
-        }
-
-        .role-badge.admin {
-            background: #27ae60;
-        }
-
-        .btn-action {
-            padding: 5px 10px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-action:hover {
-            background: #2980b9;
-        }
-
-        .empty-table {
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #95a5a6;
-        }
-
-        .empty-table i {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .empty-table p {
-            margin: 0;
-            font-size: 14px;
-        }
-
-        .user-avatar,
-        .supporter-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .supporters-avatars {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .user-info-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
 
-        .pagination-wrapper {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: center;
-            border-top: 1px solid #eee;
-            background: var(--secondary-color);
         }
 
 
-        .target-card-section-1 {
-            /* display: inline-flex; */
-            width: 100%;
-            padding-top: 26px;
-            margin-bottom: 35px;
+        .target-card-stat {
+            width: 92%;
 
         }
 
         .card-target-filter {
-            display: inline;
-            width: 34%;
-            left: 33px;
-            position: absolute;
-        }
-
-        .card-target-filter .form-group {
-            margin-bottom: 16px;
-            right: 20px;
-            position: relative;
-            top: 10px;
-        }
-
-        .card-target-filter button {
-            position: relative;
-            left: -49px;
-            bottom: -29px;
+            display: none;
         }
 
         .card-target-filter-phone {
-            width: 51%;
-            margin-bottom: 27px;
+            display: block;
+            width: 100%;
+            left: 0px;
             position: relative;
+            margin-bottom: 31px;
+
         }
 
-        .card-target-filter-phone .form-group {
-            margin-bottom: 16px;
-            right: 20px;
-            position: relative;
-            top: 10px;
+        .card-target-filter-phone .col-md-7 {
+            float: none;
+        }
+
+        .card-target-filter-phone .form-control {
+            /* display: block; */
+            width: 89%;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: var(--text-secondary-color) !important;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid var(--primary-hover-alpha) !important;
+            border-radius: 4px;
+        }
+
+        .card-target-filter-phone .filter-form {
+            border-radius: 13px;
+            height: 238px;
+        }
+
+        .card-target-filter-phone .align-items-end {
+            display: grid;
         }
 
         .card-target-filter-phone button {
-            position: relative;
-            left: -49px;
-            bottom: -29px;
-        }
-
-        .target-card-stat {
-            width: 50%;
-        }
-
-        .filter-form {
-            border-radius: 13px;
-            height: 165px;
+            left: -224px;
 
         }
+    }
 
-        .card-target-filter-phone {
-            /* display: none; */
-        }
+    .date-flex-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        .card-target-filter {
-            display: none;
-        }
+    .date-flex-row span {
+        font-weight: 600;
+        white-space: nowrap;
+    }
 
-        @media (max-width: 768px) {
-            .stats-row {
-                flex-direction: column;
-                width: 108%;
+    .date-flex-row input[type="date"] {
+        flex-basis: 0;
+    }
 
-            }
+    .diamond-summary-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding: 20px;
+    }
 
-            .avatar-grid {
-                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-            }
+    .diamond-summary-box {
+        max-width: 600px;
+        width: 100%;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin: 0 auto; /* This also helps with centering */
+    }
 
-            .target-card-section-1 {
-                display: grid;
-                width: 100%;
-                padding-top: 26px;
-                margin-bottom: 35px;
-            }
+    .diamond-summary-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
 
+    .diamond-title {
+        font-size: 22px;
+        font-weight: bold;
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+    }
 
-            .stat-icon {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 118px;
-                color: white;
-                font-size: 20px;
-                margin-bottom: 6px;
+    .diamond-count {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+    }
 
-            }
+    .diamond-count span {
+        margin-right: 10px;
+    }
 
+    .diamond-icon-container {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        padding: 8px;
+        display: inline-flex;
+    }
 
-            .target-card-stat {
-                width: 92%;
+    .diamond-icon {
+        width: 32px;
+        height: 32px;
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+    }
 
-            }
+    .gift-log-form {
+        background-color: transparent !important;
+        filter: none !important;
+    }
 
-            .card-target-filter {
-                display: none;
-            }
+    .level-form {
+        background-color: transparent !important;
+        filter: none !important;
+        padding: 10px;
+    }
 
-            .card-target-filter-phone {
-                display: block;
-                width: 100%;
-                left: 0px;
-                position: relative;
-                margin-bottom: 31px;
+    .level-label {
+        padding: 10px;
+    }
 
-            }
+    /* .rtl .gift-log-form {
+        padding-right: 13%;
+    } */
+    .ltr .gift-log-form {
+        padding-left: 13%;
+    }
 
-            .card-target-filter-phone .col-md-7 {
-                float: none;
-            }
+    .card {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-top: 1px solid #dee2e6;
+    }
 
-            .card-target-filter-phone .form-control {
-                /* display: block; */
-                width: 89%;
-                padding: 6px 12px;
-                font-size: 14px;
-                line-height: 1.42857143;
-                color: var(--text-secondary-color) !important;
-                background-color: #fff;
-                background-image: none;
-                border: 1px solid var(--primary-hover-alpha) !important;
-                border-radius: 4px;
-            }
+    .card-header {
+        border-bottom: 1px solid #dee2e6;
+    }
 
-            .card-target-filter-phone .filter-form {
-                border-radius: 13px;
-                height: 238px;
-            }
+    .card-title {
+        color: #333;
+        font-weight: 500;
+    }
+</style>
 
-            .card-target-filter-phone .align-items-end {
-                display: grid;
-            }
+<div class="agency-profile-container" id="pjax-container">
+    {{-- Error Messages --}}
+    @if ($errors->any())
+        <div class="alert alert-danger mx-3 mt-3">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-            .card-target-filter-phone button {
-                left: -224px;
-
-            }
-        }
-
-        .date-flex-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .date-flex-row span {
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .date-flex-row input[type="date"] {
-            flex-basis: 0;
-        }
-
-        .diamond-summary-container {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            padding: 20px;
-        }
-
-        .diamond-summary-box {
-            max-width: 600px;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-color) 100%);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            margin: 0 auto; /* This also helps with centering */
-        }
-
-        .diamond-summary-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .diamond-title {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-        }
-
-        .diamond-count {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .diamond-count span {
-            margin-right: 10px;
-        }
-
-        .diamond-icon-container {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            padding: 8px;
-            display: inline-flex;
-        }
-
-        .diamond-icon {
-            width: 32px;
-            height: 32px;
-            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
-        }
-
-        .gift-log-form {
-            background-color: transparent !important;
-            filter: none !important;
-        }
-        .level-form {
-            background-color: transparent !important;
-            filter: none !important;
-            padding: 10px;
-        }
-        .level-label {
-            padding: 10px;
-        }
-        /* .rtl .gift-log-form {
-            padding-right: 13%;
-        } */
-        .ltr .gift-log-form {
-            padding-left: 13%;
-        }
-        .card {
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-top: 1px solid #dee2e6;
-        }
-
-        .card-header {
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .card-title {
-            color: #333;
-            font-weight: 500;
-        }
-        .table tbody tr:nth-child(even) {
-            background-color: var(--secondary-color) !important;
-            filter: brightness(0.95);
-        }
-    </style>
-
-</head>
-<body>
-
-<div class="agency-profile-container">
-     {{-- Error Messages --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger mx-3 mt-3">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    @if ($errors->has('msg'))
-                        <div class="alert alert-danger mx-3 mt-3">
-                            {{ $errors->first('msg') }}
-                        </div>
-                    @endif
+    @if ($errors->has('msg'))
+        <div class="alert alert-danger mx-3 mt-3">
+            {{ $errors->first('msg') }}
+        </div>
+    @endif
     <!-- Header Section -->
     <div class="agency-header">
         <div class="agency-avatar">
-            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}" alt="Agency Logo" class="logo-img">
+            <img src="{{getImagePath( @$user->profile->avatar ) ?? asset("images/businessman-icon.jpg") }}"
+                 alt="Agency Logo" class="logo-img">
         </div>
         <div class="agency-info">
             <h1 class="agency-name">{{ @$user?->name ?? ''}}</h1>
@@ -1166,57 +1122,60 @@
                 </div>
             </div>
             <div class="agency-meta">
-                 <div class="meta-item">
-                        <span class="meta-label">{{__('type')}}:</span>
-                        <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                   {!! @$user->userTypeBadge() !!}
-                    </div>
+                <div class="meta-item">
+                    <span class="meta-label">{{__('type')}}:</span>
+                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
+                    {!! @$user->userTypeBadge() !!}
+                </div>
 
             </div>
         </div>
         <div class="card p-3 bg-danger-subtle">
             <div class="d-flex justify-content-between align-items-center">
-            <a href="{{  route('superadmin.users') }}" class="btn btn-light">
+                <a href="{{  route('superadmin.users') }}" class="btn btn-light">
                     <i class="fas fa-arrow-left"></i> {{ __('Go Back') }}
-            </a>
-                     @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                </a>
+                @if (\Encore\Admin\Facades\Admin::user()->can('edit-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
 
-                        <button type="submit" class="btn btn-danger edit_user_item_model_btn">
-                            {{ __('edit') }}
-                        </button>
-                 @endif
+                    <button type="submit" class="btn btn-danger edit_user_item_model_btn">
+                        {{ __('edit') }}
+                    </button>
+                @endif
             </div>
         </div>
     </div>
 
 
     @php
-           $activeTab = request('tab', 'salary');
+        $activeTab = request('tab', 'salary');
 
     @endphp
         <!-- Navigation Tabs -->
     <div class="agency-tabs">
 
-          <a href="?tab=packs" class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
+        <a href="?tab=packs" data-pjax class="tab-btn" data-target="packs-tab">{{ __('packs') }}</a>
 
-        <a href="?tab=vips" class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}" data-target="vips-tab">{{ __('vips') }}</a>
+        <a href="?tab=vips" data-pjax class="tab-btn {{ $activeTab == 'vips' ? 'active' : '' }}"
+           data-target="vips-tab">{{ __('vips') }}</a>
 
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=level" class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
+            <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
         @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
-        <a href="?tab=charge" class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
+        <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
-           <a href="?tab=gift-log" class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
+        <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
-           <a href="?tab=user-agency" class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}" data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
-           @if ($user?->type_user != 1)
-            <a href="?tab=user-coins" class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}" data-target="user-coins-tab">{{ __('User Coins') }}</a>
-           @endif
+        <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
+           data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
+        @if ($user?->type_user != 1)
+            <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
+               data-target="user-coins-tab">{{ __('User Coins') }}</a>
+        @endif
 
 
     </div>
@@ -1251,8 +1210,8 @@
                     <ul class="nav nav-pills">
                         @foreach($types as $id => $name)
                             @php
-                             $defaultType = $types->keys()->first();
-                                $selectedType = request()->get('type', $defaultType); // Default to 1
+                                $defaultType = $types->keys()->first();
+                                   $selectedType = request()->get('type', $defaultType); // Default to 1
                             @endphp
                             <li class="{{ $selectedType == $id ? 'active' : '' }}">
                                 <a href="{{ request()->fullUrlWithQuery(['type' => $id]) }}" class="charge_action">
@@ -1283,7 +1242,7 @@
 
                             <tbody style="color: rgb(208, 115, 43);">
                             @foreach($packs as $index => $pack)
-                               @php
+                                @php
                                     $path = @$pack->ware?->show_img ?? '';
 
                                     $admin = null;
@@ -1309,17 +1268,17 @@
                                     <td>{{ $packs->firstItem() + $index }}</td>
                                     <td>
                                         @if ($admin)
-                                            <a href="{{ $url ?? '#' }}"  
-                                       style="display: inline-flex; align-items: center; text-decoration: none;">
-                                        <img src="{{ $image }}" width="30" height="30"
-                                             style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                        <span>{{ $name }} ({{ $uid }})</span>
-                                    </a>
+                                            <a href="{{ $url ?? '#' }}"
+                                               style="display: inline-flex; align-items: center; text-decoration: none;">
+                                                <img src="{{ $image }}" width="30" height="30"
+                                                     style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                <span>{{ $name }} ({{ $uid }})</span>
+                                            </a>
                                         @else
 
                                         @endif
 
-                                </td>
+                                    </td>
                                     <td>{{ $pack->getTypeGet() }}</td>
 
                                     <td>{{ $pack->getType() }}</td>
@@ -1330,15 +1289,15 @@
                                     </td>
                                     <td>{{ (!empty($pack->expire) && $pack->expire !== '0') ? \Carbon\Carbon::parse($pack->expire)->format('Y-m-d H:i:s') :(empty($userVip->expire)? __('not used'): '∞') }}</td>
                                     <!-- <td> -->
-                                        <!-- <div class="d-flex">
+                                    <!-- <div class="d-flex">
                                             <button class="btn btn-falcon-info w-100 me-3 edit_item_model_btn"
                                                     data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.free') }}
-                                            </button>
-                                            <!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
+                                    </button>
+<!-- <button class="btn btn-danger delete-btn" data-id="{{ @$pack->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div> -->
+                                    </button>
+                                </div> -->
                                     <!-- </td> -->
                                 </tr>
                             @endforeach
@@ -1398,9 +1357,9 @@
 
                                             <button class="btn btn-danger delete-vip-btn" data-id="{{ @$userVip->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button>
-                                        </div>
-                                    </td> -->
+                                    </button>
+                                </div>
+                            </td> -->
 
                                 </tr>
                             @endforeach
@@ -1432,7 +1391,8 @@
             <div class="box-body p-3">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form method="GET" action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" pjax-container="">
+                        <form method="GET" action="{{ url('bd/users/profile/' . $user->id) }}"
+                              class="form-horizontal gift-log-form" pjax-container="">
                             <input type="hidden" name="tab" value="salary">
                             <div class="row">
                                 <div class="col-md-6">
@@ -1446,7 +1406,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة" name="year"
+                                                        <input type="text" class="form-control year" placeholder="السنة"
+                                                               name="year"
                                                                value="{{ request('year') }}" style="text-align: right;">
                                                     </div>
                                                 </div>
@@ -1459,7 +1420,8 @@
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control month" placeholder="الشهر"
+                                                        <input type="text" class="form-control month"
+                                                               placeholder="الشهر"
                                                                name="month" value="{{ request('month') }}"
                                                                style="text-align: right;">
                                                     </div>
@@ -1557,7 +1519,8 @@
                                                     <div style="display: flex; flex-direction: column;">
                                                     <span
                                                         style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                        <span
+                                                            style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
                                                     </div>
                                                 </div>
                                             </a>
@@ -1627,14 +1590,16 @@
                                 <input type="hidden" name="id" class="item_id" value="{{ $user->id }}">
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Sender Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_sender_level }}" class="form-control "
-                                           id="total_sender_level" name="total_sender_level" >
+                                    <input type="number" min="0" value="{{ $user->total_sender_level }}"
+                                           class="form-control "
+                                           id="total_sender_level" name="total_sender_level">
                                 </div>
 
                                 <div class=" col-lg-6 form-Roles mb-3">
                                     <label class="form-label level-label"> {{ __('Received Level') }}</label>
-                                    <input type="number" min="0" value="{{ $user->total_received_level }}" class="form-control "
-                                           id="total_received_level" name="total_received_level" >
+                                    <input type="number" min="0" value="{{ $user->total_received_level }}"
+                                           class="form-control "
+                                           id="total_received_level" name="total_received_level">
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -1650,58 +1615,63 @@
     </div>
 
 
-<div class="tab-content" id="user-agency-tab" style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
-    <div class="card">
-        <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
-        </div>
-        <div class="box-body p-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
-                        <input type="hidden" name="tab" value="user-agency">
+    <div class="tab-content" id="user-agency-tab"
+         style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('Agency join logs') }}</h4>
+            </div>
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('bd/users/profile/' . $user->id) }}"
+                              class="form-horizontal user-agency-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="user-agency">
 
-                        <input type="hidden" name="user_agency_page" value="{{ request()->get('user_agency_page', 1) }}">
+                            <input type="hidden" name="user_agency_page"
+                                   value="{{ request()->get('user_agency_page', 1) }}">
 
-                        <div class="row mb-3" style="align-items: flex-end;">
-                            <!-- From Date -->
-                            <div class="col-md-4">
-                                <div class="date-flex-row">
-                                    <i class="fa fa-calendar"></i>
-                                    <span>{{ __('Join date') }}</span>
-                                    <input type="date" class="form-control" id="from_date" name="join_date" value="{{ request('join_date') }}">
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-4">
+                                    <div class="date-flex-row">
+                                        <i class="fa fa-calendar"></i>
+                                        <span>{{ __('Join date') }}</span>
+                                        <input type="date" class="form-control" id="from_date" name="join_date"
+                                               value="{{ request('join_date') }}">
+                                    </div>
+                                </div>
+
+                                <!-- Buttons -->
+                                <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{__('Search')}}
+                                    </button>
+                                    <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-agency') }}"
+                                       class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{__('Reset')}}
+                                    </a>
                                 </div>
                             </div>
-
-                            <!-- Buttons -->
-                            <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
-                                <button type="submit" class="btn btn-info btn-sm me-2">
-                                    <i class="fa fa-search"></i> {{__('Search')}}
-                                </button>
-                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-agency') }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{__('Reset')}}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <div class="table-responsive">
-                <div class="box-body ">
-                    <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
-                        <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('agency') }}</th>
-                            <th>{{ __('status') }}</th>
-                            <th>{{ __('kicked By') }}</th>
-                            <th>{{ __('kicked By status') }}</th>
-                            <th>{{ __('Join date') }}</th>
-                            <th>{{ __('Leave date') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="user-agency">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('agency') }}</th>
+                                <th>{{ __('status') }}</th>
+                                <th>{{ __('kicked By') }}</th>
+                                <th>{{ __('kicked By status') }}</th>
+                                <th>{{ __('Join date') }}</th>
+                                <th>{{ __('Leave date') }}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
                             @if($userJoinAgencies && $userJoinAgencies->count())
                                 @foreach($userJoinAgencies as $index => $userJoinAgency)
                                     @php
@@ -1727,37 +1697,37 @@
                                     @endphp
 
                                     @php
-                                       if ($userJoinAgency->status == 'kick off'){
-                                           if ($userJoinAgency->kicked_by_app){
-                                            $status = 'app';
-                                            $kickedBy = $userJoinAgency['kickedByApp'];
-                                            $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->uuid ?? '';
-                                            $kickedByPath = @$kickedBy->profile?->avatar;
-                                            $defaultImage = asset("images/businessman-icon.jpg");
-                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
-                                            if (!isImageExists($url)) {
-                                                $url = $defaultImage;
-                                            }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = url("bd/users/profile/" . ($kickedBy->id) ?? 0);
-                                        }
+                                        if ($userJoinAgency->status == 'kick off'){
+                                            if ($userJoinAgency->kicked_by_app){
+                                             $status = 'app';
+                                             $kickedBy = $userJoinAgency['kickedByApp'];
+                                             $kickedByName = $kickedBy->name ?? '';
+                                             $kickedByUuid = $kickedBy->uuid ?? '';
+                                             $kickedByPath = @$kickedBy->profile?->avatar;
+                                             $defaultImage = asset("images/businessman-icon.jpg");
+                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                             if (!isImageExists($url)) {
+                                                 $url = $defaultImage;
+                                             }
+                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByUrl = url("bd/users/profile/" . ($kickedBy->id) ?? 0);
+                                         }
 
-                                        if ($userJoinAgency->kicked_by_admin){
-                                            $status = 'admin';
-                                            $kickedBy = $userJoinAgency['kickedByAdmin'];
-                                            $kickedByName = $kickedBy->name ?? '';
-                                            $kickedByUuid = $kickedBy->id ?? '';
-                                            $kickedByPath = @$kickedBy?->avatar;
-                                            $defaultImage = asset("images/businessman-icon.jpg");
-                                            $url = getImagePath($kickedByPath) ?? $defaultImage;
-                                            if (!isImageExists($url)) {
-                                                $url = $defaultImage;
-                                            }
-                                            $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
-                                            $kickedByUrl = '#';
-                                        }
-                                    }
+                                         if ($userJoinAgency->kicked_by_admin){
+                                             $status = 'admin';
+                                             $kickedBy = $userJoinAgency['kickedByAdmin'];
+                                             $kickedByName = $kickedBy->name ?? '';
+                                             $kickedByUuid = $kickedBy->id ?? '';
+                                             $kickedByPath = @$kickedBy?->avatar;
+                                             $defaultImage = asset("images/businessman-icon.jpg");
+                                             $url = getImagePath($kickedByPath) ?? $defaultImage;
+                                             if (!isImageExists($url)) {
+                                                 $url = $defaultImage;
+                                             }
+                                             $kickedByImage = "<img src='{$url}' width='40' height='40' style='object-fit: cover; border-radius: 6px;'>";
+                                             $kickedByUrl = '#';
+                                         }
+                                     }
                                     @endphp
 
                                     <tr>
@@ -1767,8 +1737,10 @@
                                                 <div style="display: flex; align-items: center; gap: 10px;">
                                                     {!! $image !!}
                                                     <div style="display: flex; flex-direction: column;">
-                                                    <span style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
-                                                        <span style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
+                                                        <span
+                                                            style="text-decoration: underline; cursor: pointer;">{{ $name }}</span>
+                                                        <span
+                                                            style="font-size: smaller;">ID: {{ @$agency->id ?? 0 }}</span>
                                                     </div>
                                                 </div>
                                             </a>
@@ -1776,7 +1748,7 @@
                                         <td>{{ $userJoinAgency->status }}</td>
                                         <td>
                                             @if(!empty($kickedBy) && !empty($kickedBy->id))
-                                                <a href="{{ $kickedByUrl ?? '#' }}"  
+                                                <a href="{{ $kickedByUrl ?? '#' }}"
                                                    style="display: inline-flex; align-items: center; text-decoration: none;">
                                                     {!! $kickedByImage !!}
                                                     <span>{{ $kickedByName }} ({{ $kickedByUuid }})</span>
@@ -1793,136 +1765,143 @@
                                     <td colspan="5" class="text-center">{{ __('No agency join logs found') }}</td>
                                 </tr>
                             @endif
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
 
-                    @if($userJoinAgencies && $userJoinAgencies->count())
-                        <div class="pagination-container">
-                            {{ $userJoinAgencies->appends([
-                                'tab' => 'user-agency',
-                                'user_agency_page' => $userJoinAgencies?->currentPage(),
-                            ])->links('vendor.pagination.bootstrap-4') }}
-                        </div>
-                    @endif
+                        @if($userJoinAgencies && $userJoinAgencies->count())
+                            <div class="pagination-container">
+                                {{ $userJoinAgencies->appends([
+                                    'tab' => 'user-agency',
+                                    'user_agency_page' => $userJoinAgencies?->currentPage(),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 @if($activeTab == 'user-coins')
 
-<div class="tab-content" id="user-coins-tab" style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
-    <div class="card">
-    <div class="card-header">
-            <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
-        </div>
-        <div class="box-body p-3">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal user-agency-form" method="GET" pjax-container>
-                        <input type="hidden" name="tab" value="user-coins">
-                        <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
-
-                        <div class="row mb-3" style="align-items: flex-end;">
-                            <!-- From Date -->
-                            <div class="col-md-3">
-                                <label>{{ __('From Date') }}</label>
-                                <input type="date" class="form-control" name="from_date" value="{{ request('from_date') }}">
-                            </div>
-
-                            <!-- To Date -->
-                            <div class="col-md-3">
-                                <label>{{ __('To Date') }}</label>
-                                <input type="date" class="form-control" name="to_date" value="{{ request('to_date') }}">
-                            </div>
-
-                            <!-- Sub Type -->
-                            <div class="col-md-3">
-                                <label>{{ __('Sub Type') }}</label>
-                                <select name="sub_type" class="form-control">
-                                    <option value="">{{ __('All') }}</option>
-                                    @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
-                                        <option value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Search/Reset Buttons -->
-                            <div class="col-md-3 d-flex align-items-end justify-content-end" style="gap: 8px;top: 23px;">
-                                <button type="submit" class="btn btn-info btn-sm me-2">
-                                    <i class="fa fa-search"></i> {{ __('Search') }}
-                                </button>
-                                <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-coins') }}" class="btn btn-default btn-sm">
-                                    <i class="fa fa-undo"></i> {{ __('Reset') }}
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+    <div class="tab-content" id="user-coins-tab"
+         style="{{ request('tab') == 'user-coins' ? 'display: block;' : 'display: none;' }}">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title" style="text-align: left;">{{ __('Users Coins Logs') }}</h4>
             </div>
-        <div class="table-responsive">
-            <div class="box-body ">
-                <table class="table table-bordered table-hover align-middle data-table" id="vip">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>{{ __('type') }}</th>
-                            <th>{{ __('sub type') }}</th>
-                            <th>{{ __('Item Name') }}</th>
-                            <th>{{ __('balance before') }}</th>
-                            <th>{{ __('amount') }}</th>
-                            <th>{{ __('balance yet') }}</th>
-                            <th>{{ __('from date') }}</th>
-                            <th>{{ __('to date') }}</th>
-                            <!-- <th>{{ __('action') }}</th> -->
-                        </tr>
-                    </thead>
-                    @if($usersCoins && $usersCoins->count())
-                        <tbody style="color: rgb(208, 115, 43);">
-                            @foreach($usersCoins as $index => $coin)
-                                <tr>
-                                    <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
-                                    <td>{{ $coin->type }}</td>
-                                    <td>{{ @$coin->sub_type ?? 0 }}</td>
-                                    <td>{{ @$coin->item_name ?? '' }}</td>
-                                    <td>{{ @$coin->amount_before ?? 0 }}</td>
-                                    <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
-                                        {{ $coin->amount ?? 0 }}
-                                    </td>
-                                    <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
-                                    <td>{{ @$coin->from_date ?? 0 }}</td>
-                                    <td>{{ @$coin->to_date ?? 0 }}</td>
-                                    <!-- <td>
-                                        <div class="d-flex"> -->
-                                            <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
+            <div class="box-body p-3">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <form action="{{ url('bd/users/profile/' . $user->id) }}"
+                              class="form-horizontal user-agency-form" method="GET" pjax-container>
+                            <input type="hidden" name="tab" value="user-coins">
+                            <input type="hidden" name="coins_page" value="{{ request()->get('coins_page', 1) }}">
+
+                            <div class="row mb-3" style="align-items: flex-end;">
+                                <!-- From Date -->
+                                <div class="col-md-3">
+                                    <label>{{ __('From Date') }}</label>
+                                    <input type="date" class="form-control" name="from_date"
+                                           value="{{ request('from_date') }}">
+                                </div>
+
+                                <!-- To Date -->
+                                <div class="col-md-3">
+                                    <label>{{ __('To Date') }}</label>
+                                    <input type="date" class="form-control" name="to_date"
+                                           value="{{ request('to_date') }}">
+                                </div>
+
+                                <!-- Sub Type -->
+                                <div class="col-md-3">
+                                    <label>{{ __('Sub Type') }}</label>
+                                    <select name="sub_type" class="form-control">
+                                        <option value="">{{ __('All') }}</option>
+                                        @foreach(\App\Helpers\Common::getCoinSubTypes() as $type)
+                                            <option
+                                                value="{{ $type }}" {{ request('sub_type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Search/Reset Buttons -->
+                                <div class="col-md-3 d-flex align-items-end justify-content-end"
+                                     style="gap: 8px;top: 23px;">
+                                    <button type="submit" class="btn btn-info btn-sm me-2">
+                                        <i class="fa fa-search"></i> {{ __('Search') }}
+                                    </button>
+                                    <a href="{{ url('bd/users/profile/' . $user->id. '?tab=user-coins') }}"
+                                       class="btn btn-default btn-sm">
+                                        <i class="fa fa-undo"></i> {{ __('Reset') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <div class="box-body ">
+                        <table class="table table-bordered table-hover align-middle data-table" id="vip">
+                            <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('type') }}</th>
+                                <th>{{ __('sub type') }}</th>
+                                <th>{{ __('Item Name') }}</th>
+                                <th>{{ __('balance before') }}</th>
+                                <th>{{ __('amount') }}</th>
+                                <th>{{ __('balance yet') }}</th>
+                                <th>{{ __('from date') }}</th>
+                                <th>{{ __('to date') }}</th>
+                                <!-- <th>{{ __('action') }}</th> -->
+                            </tr>
+                            </thead>
+                            @if($usersCoins && $usersCoins->count())
+                                <tbody style="color: rgb(208, 115, 43);">
+                                @foreach($usersCoins as $index => $coin)
+                                    <tr>
+                                        <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
+                                        <td>{{ $coin->type }}</td>
+                                        <td>{{ @$coin->sub_type ?? 0 }}</td>
+                                        <td>{{ @$coin->item_name ?? '' }}</td>
+                                        <td>{{ @$coin->amount_before ?? 0 }}</td>
+                                        <td class="{{ ($coin->amount ?? 0) < 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ $coin->amount ?? 0 }}
+                                        </td>
+                                        <td>{{ ($coin->amount_before ?? 0) + ($coin->amount ?? 0) }}</td>
+                                        <td>{{ @$coin->from_date ?? 0 }}</td>
+                                        <td>{{ @$coin->to_date ?? 0 }}</td>
+                                        <!-- <td>
+                                            <div class="d-flex"> -->
+                                        <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
                                                 {{ __('dashboard.delete') }}
-                                            </button> -->
+                                        </button> -->
                                         <!-- </div>
                                     </td> -->
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    @endif
-                </table>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            @endif
+                        </table>
 
-                @if($usersCoins)
-                    <div class="pagination-container">
-                        {{ $usersCoins->appends([
-                            'tab' => 'user-coins',
-                            'pack_page' => $packs?->currentPage(),
-                            'salary_page' => $salaries?->currentPage(),
-                            'gift_page' => $giftSLogs?->currentPage(),
-                            'coins_page' => $usersCoins?->currentPage(),
-                        ])->links('vendor.pagination.bootstrap-4') }}
+                        @if($usersCoins)
+                            <div class="pagination-container">
+                                {{ $usersCoins->appends([
+                                    'tab' => 'user-coins',
+                                    'pack_page' => $packs?->currentPage(),
+                                    'salary_page' => $salaries?->currentPage(),
+                                    'gift_page' => $giftSLogs?->currentPage(),
+                                    'coins_page' => $usersCoins?->currentPage(),
+                                ])->links('vendor.pagination.bootstrap-4') }}
+                            </div>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
         </div>
-      </div>
     </div>
-</div>
 @endif
 
 @if($activeTab == 'charge')
@@ -1988,7 +1967,7 @@
                             <tr>
                                 <td>{{ @$charge->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{  '#' }}"  
+                                    <a href="{{  '#' }}"
                                        style="display: inline-flex; align-items: center; text-decoration: none;">
                                         <img src="{{ getImagePath( $image) }}" width="30" height="30"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2054,7 +2033,8 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form" method="GET" pjax-container>
+                        <form action="{{ url('bd/users/profile/' . $user->id) }}" class="form-horizontal gift-log-form"
+                              method="GET" pjax-container>
                             <input type="hidden" name="tab" value="gift-log">
                             <input type="hidden" name="gift_type" value="{{ $giftType }}">
                             <input type="hidden" name="gift_page" value="{{ request()->get('gift_page', 1) }}">
@@ -2065,7 +2045,8 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('From Date') }}</span>
-                                        <input type="date" class="form-control" id="from_date" name="start_at" value="{{ request('start_at') }}">
+                                        <input type="date" class="form-control" id="from_date" name="start_at"
+                                               value="{{ request('start_at') }}">
                                     </div>
                                 </div>
                                 <!-- To Date -->
@@ -2073,33 +2054,35 @@
                                     <div class="date-flex-row">
                                         <i class="fa fa-calendar"></i>
                                         <span>{{ __('To Date') }}</span>
-                                        <input type="date" class="form-control" id="to_date" name="end_at" value="{{ request('end_at') }}">
+                                        <input type="date" class="form-control" id="to_date" name="end_at"
+                                               value="{{ request('end_at') }}">
                                     </div>
                                 </div>
                                 @if ($giftType == 'receiver')
                                     <div class="col-md-4">
-                                            <div class="date-flex-row">
-                                                <label for="agency_id">{{ __('Agency') }}</label>
-                                                <select class="form-control" id="agency_id" name="agency_id">
-                                                    @if(request('agency_id'))
-                                                        <option value="{{ request('agency_id') }}" selected>
-                                                            {{ \App\Models\Agency::find(request('agency_id'))?->name . ' - ' . request('agency_id') }}
-                                                        </option>
-                                                    @endif
-                                                </select>
-                                            </div>
+                                        <div class="date-flex-row">
+                                            <label for="agency_id">{{ __('Agency') }}</label>
+                                            <select class="form-control" id="agency_id" name="agency_id">
+                                                @if(request('agency_id'))
+                                                    <option value="{{ request('agency_id') }}" selected>
+                                                        {{ \App\Models\Agency::find(request('agency_id'))?->name . ' - ' . request('agency_id') }}
+                                                    </option>
+                                                @endif
+                                            </select>
                                         </div>
+                                    </div>
                                 @endif
-                                 <!-- Buttons -->
+                                <!-- Buttons -->
                                 <div class="col-md-4 d-flex align-items-end justify-content-end" style="gap: 8px;">
                                     <button type="submit" class="btn btn-info btn-sm me-2">
                                         <i class="fa fa-search"></i> {{__('Search')}}
                                     </button>
-                                    <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}" class="btn btn-default btn-sm">
+                                    <a href="{{ url('bd/users/profile/' . $user->id. '?'.'tab=gift-log&gift_type=' . $giftType) }}"
+                                       class="btn btn-default btn-sm">
                                         <i class="fa fa-undo"></i> {{__('Reset')}}
                                     </a>
                                 </div>
-                             </div>
+                            </div>
 
                         </form>
                     </div>
@@ -2118,7 +2101,6 @@
                         </div>
                     </div>
                 </div>
-
 
 
                 <!-- Table -->
@@ -2184,7 +2166,7 @@
                             <tr>
                                 <td>{{ @$giftSLog->id ?? 0 }}</td>
                                 <td>
-                                    <a href="{{ url('bd/users/profile/' . $id) }}"  
+                                    <a href="{{ url('bd/users/profile/' . $id) }}"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ $image }}" width="40" height="40"
                                              style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
@@ -2196,14 +2178,15 @@
                                 </td>
                                 <td>
                                     @if(!empty($giftSLog->room))
-                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"  
+                                        <a href="{{ url('bd/users/profile/' . $ownerRoom) }}"
                                            class="d-flex align-items-center text-decoration-none">
                                             <img src="{{ $url }}"
                                                  width="30" height="30"
                                                  style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                             <div>
                                                 <span>{{ $roomName }}</span><br>
-                                                <small class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
+                                                <small
+                                                    class="text-muted">Type: {{ $giftSLog->room->type ?? '-' }}</small>
                                             </div>
                                         </a>
                                     @endif
@@ -2241,7 +2224,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <a href="#" 
+                                    <a href="#"
                                        class="d-flex align-items-center text-decoration-none">
                                         <img src="{{ getImagePath($giftSLog->gift->img ??'') }}"
                                              width="30" height="30"
@@ -2252,7 +2235,7 @@
                                 @if($giftType == 'receiver')
                                     <td>
                                         @if ($giftSLog->agency_id)
-                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"  
+                                            <a href="{{ url('bd/agencies/profile/' . $agencyId) }}"
                                                class="d-flex align-items-center text-decoration-none">
                                                 <img src="{{ $agencyImage }}"
                                                      width="50" height="30"
@@ -2333,7 +2316,8 @@
                         </div>
                     </div>
                     <div class="modal-footer mt-3">
-                        <button class="btn btn-secondary close-modal-btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }} </button>
+                        <button class="btn btn-secondary close-modal-btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }} </button>
                         <button class="btn btn-primary add_country" type="submit">{{ __('save') }} </button>
                     </div>
                 </form>
@@ -2343,149 +2327,145 @@
 </div>
 
 
+<div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg mt-6" role="document">
+        <div class="modal-content border-0">
+            <div class="modal-content position-relative">
+                <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
+                    <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
+                <form action="" id="country_update_form" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-0">
 
-    <div class="modal fade" id="item_modal_update" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg mt-6" role="document">
-            <div class="modal-content border-0">
-                <div class="modal-content position-relative">
-                    <div class="position-absolute top-0 end-0 mt-2 me-2 z-index-1">
-                        <button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
-                                data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                        <div class="p-4">
+                            <div class="row flex-evenly">
+                                <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
 
-                    <form action="" id="country_update_form" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body p-0">
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('Name') }}</label>
+                                    <input type="text" name="name" class="form-control"
+                                           value="{{ old('name', $user->name ?? '') }}">
+                                </div>
 
-                            <div class="p-4">
-                                <div class="row flex-evenly">
-                                    <input type="hidden" name="id" value="{{ old('id', $user->id) }}">
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('uuid') }}</label>
+                                    <input type="text" name="uuid" class="form-control"
+                                           value="{{ old('uuid', $user->uuid ?? '') }}">
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('Name') }}</label>
-                                        <input type="text" name="name" class="form-control" value="{{ old('name', $user->name ?? '') }}" >
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('email') }}</label>
+                                    <input type="email" name="email" class="form-control"
+                                           value="{{ old('email', $user->email ?? '') }}">
+                                </div>
+
+                                <div class="col-lg-6 mb-3 form-group">
+                                    <label class="form-label">{{ __('phone') }}</label>
+                                    <input type="text" name="phone" class="form-control"
+                                           value="{{ old('phone', $user->phone ?? '') }}">
+                                </div>
+
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('Gender') }}</label>
+                                    <select class="form-select col-lg-6" name="gender">
+                                        <option value="">{{ __('Choose gender') }}</option>
+                                        <option
+                                            value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
+                                        <option
+                                            value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-6 form-group mb-3">
+                                    <label class="form-label">{{ __('image') }}</label>
+                                    <input class="form-control" name="image" accept="image/*" type="file"/>
+                                    <div class="mt-2">
+                                        <img
+                                            src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
+                                            class="rounded"
+                                            style="width: 100px; height: 100px"
+                                            id="img_edit"
+                                            alt="{{ $user->name ?? '' }}">
                                     </div>
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('uuid') }}</label>
-                                        <input type="text" name="uuid" class="form-control" value="{{ old('uuid', $user->uuid ?? '') }}" >
-                                    </div>
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('Country') }}</label>
+                                    <select class="form-select col-lg-6" name="country_id" id="country_id">
+                                        @foreach($countries as $id => $name)
+                                            <option
+                                                value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('email') }}</label>
-                                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email ?? '') }}">
-                                    </div>
-
-                                    <div class="col-lg-6 mb-3 form-group">
-                                        <label class="form-label">{{ __('phone') }}</label>
-                                        <input type="text" name="phone" class="form-control" value="{{ old('phone', $user->phone ?? '') }}" >
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('Gender') }}</label>
-                                        <select class="form-select col-lg-6" name="gender">
-                                            <option value="">{{ __('Choose gender') }}</option>
-                                            <option value="0" {{ old('gender', $user->profile->gender ?? '') == '0' ? 'selected' : '' }}>{{ __('female') }}</option>
-                                            <option value="1" {{ old('gender', $user->profile->gender ?? '') == '1' ? 'selected' : '' }}>{{ __('male') }}</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-lg-6 form-group mb-3">
-                                        <label class="form-label">{{ __('image') }}</label>
-                                        <input class="form-control" name="image" accept="image/*" type="file" />
-                                        <div class="mt-2">
-                                            <img src="{{ getImagePath($user->profile->avatar ?? '') ?? asset('images/default-avatar.png') }}"
-                                                class="rounded"
-                                                style="width: 100px; height: 100px"
-                                                id="img_edit"
-                                                alt="{{ $user->name ?? '' }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('Country') }}</label>
-                                        <select class="form-select col-lg-6" name="country_id" id="country_id">
-                                            @foreach($countries as $id => $name)
-                                                <option value="{{ $id }}" {{ old('country_id', $user->country_id ?? null) == $id ? 'selected' : '' }}>
-                                                    {{ $name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3 col-lg-12 form-group">
-                                        <label class="form-label">{{ __('bio') }}</label>
-                                        <textarea name="bio" id="" cols="30" rows="10" class="form-control" value="{{ old('bio', $user->bio ?? '') }}"></textarea>
-                                    </div>
+                                <div class="mb-3 col-lg-12 form-group">
+                                    <label class="form-label">{{ __('bio') }}</label>
+                                    <textarea name="bio" id="" cols="30" rows="10" class="form-control"
+                                              value="{{ old('bio', $user->bio ?? '') }}"></textarea>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary cancel_user_item_model_btn" type="button" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
-                            <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
-                        </div>
-                    </form>
-                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary cancel_user_item_model_btn" type="button"
+                                data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                        <button class="btn btn-primary" type="submit">{{ __('edit') }}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-
-
-<!-- jQuery أولاً -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
-
+</div>
 
 <script>
-
-
-
     $(document).ready(function () {
 
-     $(document).on('click', '.edit_user_item_model_btn', function() {
-                $('#item_modal_update').modal('show');
-       });
+        $(document).on('click', '.edit_user_item_model_btn', function () {
+            $('#item_modal_update').modal('show');
+        });
 
-       $(document).on('click', '.cancel_user_item_model_btn', function() {
+        $(document).on('click', '.cancel_user_item_model_btn', function () {
             $('#item_modal_update').modal('hide');
         });
-    $('#add_form').on('submit', function (e) {
-        e.preventDefault(); // prevent default form submit
+        $('#add_form').on('submit', function (e) {
+            e.preventDefault(); // prevent default form submit
 
-        let form = $(this);
-        let formData = form.serialize();
+            let form = $(this);
+            let formData = form.serialize();
 
-        $.ajax({
-            url: form.attr('action'),
-            method: 'POST',
-            data: formData,
-            success: function (response) {
-                // ✅ close modal
-                $('#Add_model').modal('hide');
+            $.ajax({
+                url: form.attr('action'),
+                method: 'POST',
+                data: formData,
+                success: function (response) {
+// ✅ close modal
+                    $('#Add_model').modal('hide');
 
-                $('#Add_model').modal('hide');
+                    $('#Add_model').modal('hide');
 
-            // ✅ Reload the page
-            location.reload();
+// ✅ Reload the page
+                    location.reload();
 
-            },
-            error: function (xhr) {
-                // show error message
-                let errors = xhr.responseJSON.errors;
-                let msg = '';
-                for (let key in errors) {
-                    msg += errors[key][0] + '\n';
+                },
+                error: function (xhr) {
+// show error message
+                    let errors = xhr.responseJSON.errors;
+                    let msg = '';
+                    for (let key in errors) {
+                        msg += errors[key][0] + '\n';
+                    }
+                    alert(msg || 'Something went wrong!');
                 }
-                alert(msg || 'Something went wrong!');
-            }
+            });
         });
     });
-});
 
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -2510,26 +2490,26 @@
             }
 
             tab.addEventListener('click', function (e) {
-                    e.preventDefault();
+                e.preventDefault();
 
-                    const currentUrl = new URL(window.location.href);
-                    const href = tab.getAttribute('href');
-                    const targetUrl = new URL(href, currentUrl.origin);
+                const currentUrl = new URL(window.location.href);
+                const href = tab.getAttribute('href');
+                const targetUrl = new URL(href, currentUrl.origin);
 
-                    // تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
-                    if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
-                        document.getElementById('tab-loading').style.display = 'block';
-                        allTabs.forEach(t => t.style.pointerEvents = 'none');
+// تحقق أن التنقل داخل نفس الصفحة + تغيير التابة فقط
+                if (currentUrl.pathname === targetUrl.pathname && targetUrl.searchParams.get('tab')) {
+                    document.getElementById('tab-loading').style.display = 'block';
+                    allTabs.forEach(t => t.style.pointerEvents = 'none');
 
-                        setTimeout(() => {
-                            window.location.href = href;
-                        }, 300);
-                    } else {
-                        // لا تعرض اللودر إذا الرابط خارج التابات
+                    setTimeout(() => {
                         window.location.href = href;
-                    }
-                });
+                    }, 300);
+                } else {
+// لا تعرض اللودر إذا الرابط خارج التابات
+                    window.location.href = href;
+                }
             });
+        });
 
 
         if (targetElement) {
@@ -2542,11 +2522,11 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active class from all buttons and content
+// Remove active class from all buttons and content
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            // Add active class to clicked button and corresponding content
+// Add active class to clicked button and corresponding content
             btn.classList.add('active');
             const target = btn.getAttribute('data-target');
             document.getElementById(target).classList.add('active');
@@ -2557,34 +2537,33 @@
     $(document).ready(function () {
 
 
-
-         $('#agency_id').select2({
-        placeholder: 'Select agency',
-        allowClear: true,
-        ajax: {
-            url: '/api/search/host-agency', // ✅ make sure this matches your route
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term, // search term
-                    page: params.page || 1
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.data.map(item => ({
-                        id: item.id,
-                        text: item.name
-                    })),
-                    pagination: {
-                        more: data.next_page_url !== null
-                    }
-                };
-            },
-            cache: true
-        }
-    });
+        $('#agency_id').select2({
+            placeholder: 'Select agency',
+            allowClear: true,
+            ajax: {
+                url: '/api/search/host-agency', // ✅ make sure this matches your route
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page || 1
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.data.map(item => ({
+                            id: item.id,
+                            text: item.name
+                        })),
+                        pagination: {
+                            more: data.next_page_url !== null
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
 
         console.log("Document ready");
 
@@ -2645,7 +2624,7 @@
         }
 
 
-        // قبول الطلب
+// قبول الطلب
         $('.accept-btn').click(function () {
             const id = $(this).data('id');
             console.log("Accept clicked, ID:", id);
@@ -2677,18 +2656,18 @@
         $(document).on('click', '.edit_item_model_btn', function () {
             let itemId = $(this).data('id');
 
-            // Clear the form
+// Clear the form
             $('#add_form')[0].reset();
 
-            // Set the hidden ID field
+// Set the hidden ID field
             $('.item_id').val(itemId);
 
-            // Open the modal
+// Open the modal
             $('#Add_model').modal('show');
         });
-            $(document).on('click', '.close-modal-btn', function () {
-                $('#Add_model').modal('hide');
-            });
+        $(document).on('click', '.close-modal-btn', function () {
+            $('#Add_model').modal('hide');
+        });
 
         $(document).on('click', '.delete-btn', function () {
             let itemId = $(this).data('id');
@@ -2761,7 +2740,7 @@
         });
 
 
-        // رفض الطلب
+// رفض الطلب
         $('.reject-btn').click(function () {
             const id = $(this).data('id');
             console.log("Reject clicked, ID:", id);
@@ -2790,7 +2769,7 @@
             });
         });
 
-        // ترقية إلى Admin
+// ترقية إلى Admin
         $('.make-admin-btn').click(function () {
             const id = $(this).data('id');
             console.log("Make admin clicked, ID:", id);
@@ -2817,6 +2796,47 @@
             });
         });
 
+// Function to handle tab switching
+        function handleTabSwitching() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedTab = urlParams.get('tab') || 'packs';
+
+            const allTabs = document.querySelectorAll('.tab-btn');
+            let targetElement = null;
+
+            allTabs.forEach(tab => {
+                const target = tab.getAttribute('data-target');
+                const content = document.getElementById(target);
+
+                if (!content) return; // ✅ prevent null error
+
+                if (target === selectedTab + '-tab') {
+                    tab.classList.add('active');
+                    content.classList.remove('d-none');
+                    content.style.display = 'block';
+                    targetElement = content;
+                } else {
+                    tab.classList.remove('active');
+                    content.classList.add('d-none');
+                    content.style.display = 'none';
+                }
+            });
+
+            if (targetElement) {
+                setTimeout(() => {
+                    targetElement.scrollIntoView({behavior: 'smooth'});
+                }, 300);
+            }
+        }
+
+// Handle tab switching on page load and PJAX content updates
+        $(document).on('pjax:end', function () {
+            handleTabSwitching();
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            handleTabSwitching();
+        });
 
     });
 

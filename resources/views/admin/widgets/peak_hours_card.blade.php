@@ -84,6 +84,7 @@
     $('#peak-filter').on('change', function () {
         loadPeakData($(this).val());
     });
-
-    loadPeakData();
+    $(document).on('pjax:end', function() {
+    loadPeakData(); 
+});
 </script>

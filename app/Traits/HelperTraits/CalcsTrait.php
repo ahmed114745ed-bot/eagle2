@@ -284,7 +284,7 @@ trait CalcsTrait
     public static function level_center_old($user_id)
     {
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
-        $user            = User::find($user_id);
+        $user            = User::with(['senderLevel', 'receiverLevel'])->find($user_id);
         $diamondReceived = $user->total_received_diamonds;
         $receivedNum        =  floor($diamondReceived  * $expPercentages['exp_received_percentage']);
         $diamondSend             = $user->total_sender_diamonds;
@@ -292,7 +292,8 @@ trait CalcsTrait
 
         $star_level      = $user->total_received_level;
 
-        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+        $firstVip_type1          = $user->receiverLevel;
+        // self::vipByLevelAndType($star_level, 1);
 
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
@@ -307,7 +308,8 @@ trait CalcsTrait
         $gold_level             = $user->total_sender_level;
 
 
-        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+        $firstVip_type2          = $user->senderLevel;
+        //  self::vipByLevelAndType($gold_level, 2);
         $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
 
         $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
@@ -456,7 +458,8 @@ trait CalcsTrait
 
         $star_level      = @$user->total_received_level;
 
-        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
+        $firstVip_type1          = $user->receiverLevel;
+        // self::vipByLevelAndType($star_level, 1);
 
         $star_level_img = !is_null($firstVip_type1) ? $firstVip_type1->img : '';
         $vipsData = DB::table('vips')->get()->groupBy('type');
@@ -466,7 +469,8 @@ trait CalcsTrait
 
         $gold_level             = @$user->total_sender_level;
 
-        $firstVip_type2          = self::vipByLevelAndType($gold_level, 2);
+        $firstVip_type2          = $user->senderLevel;
+        //self::vipByLevelAndType($gold_level, 2);
         $gold_level_img = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
 
         // $current_gold_num   = self::getCurrentLevel(2, $gold_level, 'exp');
@@ -1456,7 +1460,7 @@ trait CalcsTrait
         } else {
             $user = $user_id;
         }
-//        $user = User::find($user_id);
+        //        $user = User::find($user_id);
         if (!$user) {
             return [
                 'current_level'  =>  0,
@@ -1580,7 +1584,6 @@ trait CalcsTrait
             'receiver_img' => !is_null($firstVip_type1) ? $firstVip_type1->img : '',
             'sender_img'   => !is_null($firstVip_type2) ? $firstVip_type2->img : '',
         ];
-
     }
 
     public static function ovip_center_my_data($user_id)
@@ -1599,17 +1602,17 @@ trait CalcsTrait
         if (!$vip) return new stdClass();
 
         $vipIcon = Ware::where('level', $vip->level)
-                    ->where('type', 10)
-                    ->where('get_type', 1)
-                    ->first();
+            ->where('type', 10)
+            ->where('get_type', 1)
+            ->first();
 
         $hasColor = Common::hasInPack($user->id, 18, true);
 
         return [
             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
             'colored_name' => $hasColor
-                                ? Common::wareUserVip($user->id, 18, 'color') ?? ''
-                                : '',
+                ? Common::wareUserVip($user->id, 18, 'color') ?? ''
+                : '',
         ];
     }
 
@@ -1642,7 +1645,4 @@ trait CalcsTrait
                 : '',
         ];
     }
-
-
-
 }

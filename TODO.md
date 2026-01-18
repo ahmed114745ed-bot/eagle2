@@ -1,0 +1,7 @@
+- [x] Replace the <style> block in app_feature.blade.php with the <style> from index.blade.php, including the font-awesome link.
+- [x] Adapt the CSS classes for features: rename .wallets-grid to .features-grid, .wallet-card to .feature-card, .wallet-header to .feature-header, .wallet-body to .feature-body, etc.
+- [x] Restructure the HTML: Remove the sidebar, make content full-width in a .container, use .features-grid for grid layout of feature cards.
+- [x] For each feature section, make it a .feature-card with .feature-header (title) and .feature-body (form/toggle).
+- [x] Remove the active class from sections, show all features as cards.
+- [x] Keep all forms, toggles, scripts, and modals unchanged.
+- [x] Test the layout.

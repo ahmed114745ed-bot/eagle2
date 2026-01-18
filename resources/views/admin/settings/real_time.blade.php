@@ -6,12 +6,14 @@
             <div class="row mt-4">
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                 </form>
 
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 300px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                                 <div class="ribbon-banner-card">
@@ -51,10 +53,40 @@
                     </div>
                 </form>
 
+                           <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
+                                method="POST">
+                                @csrf
+                              <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
+                                <!-- Zego Fields -->
+                                <div class="col-md-6 mb-3 ms-0 me-auto">
+                                    <div class="card p-3 shadow" style="height: 300px;">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h4 class="m-0">{{ __('utd zego token') }}</h4>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-md-10">
+                                                <div class="form-group">
+                                                    <label
+                                                        for="zego_server_secret">{{ __('utd zego token') }}:</label>
+                                                    <input type="text" id="zego_server_secret"
+                                                        name="zego_token" placeholder="server_secret"
+                                                        value="{{ $zego_token }}" class="form-control"
+                                                        required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit"
+                                            class="btn btn-primary mt-3 btn-save">{{ __('save') }}</button>
+                                    </div>
+                                </div>
+                            </form>
+
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 300px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                             </div>
@@ -86,9 +118,14 @@
                                     </div>
                                 </div>
 
-                                <input type="hidden" name="zego_filter_enabled" value="0">
-                                <input type="checkbox" name="zego_filter_enabled" value="1" data-bootstrap-switch
-                                    {{ $zego_filter_enabled ? 'checked' : '' }}>
+                                <div class="col-md-6">
+                                    <div class="form-group d-flex align-items-center gap-2">
+                                        <label style="visibility: hidden;">.</label>
+                                        <input type="hidden" name="zego_filter_enabled" value="0">
+                                        <input type="checkbox" name="zego_filter_enabled" value="1" data-bootstrap-switch
+                                            {{ $zego_filter_enabled ? 'checked' : '' }}>
+                                    </div>
+                                </div>
 
                                 <script>
                                     function initZegoSwitch() {
@@ -109,8 +146,9 @@
 
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
-                        <div class="card p-3 shadow" style="height: 300px;">
+                        <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                             </div>
@@ -144,10 +182,11 @@
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Sound System Setting:') }}</label>
             <div class="row mt-4">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                         <div class="d-flex align-items-center">
@@ -159,7 +198,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                         <div class="d-flex align-items-center">
@@ -171,7 +210,9 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                
+
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                         <div class="d-flex align-items-center">
@@ -182,16 +223,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdZegoSoundRadio" class="custom-radio libraryRealTime"
+                                   name="sound_library"
+                                   value="3" {{ $soundLibrary == '3' ? 'checked' : '' }}>
+                            <label for="utdZegoSoundRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Video System Setting:') }}</label>
             <div class="row mt-4">
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Agora') }}</h4>
                         <div class="d-flex align-items-center">
@@ -203,7 +257,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Zego') }}</h4>
                         <div class="d-flex align-items-center">
@@ -215,7 +269,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-3">
+                <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="m-0">{{ __('admin.Tencent') }}</h4>
                         <div class="d-flex align-items-center">
@@ -226,12 +280,25 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-2 mb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="m-0">{{ __('UTD zego') }}</h4>
+                        <div class="d-flex align-items-center">
+                            <input type="radio" id="utdZegoVideoRadio" class="custom-radio libraryRealTime"
+                                   name="video_library"
+                                   value="3" {{ $videoLibrary == '3' ? 'checked' : '' }}>
+                            <label for="utdZegoVideoRadio" class="switch"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Live System Setting:') }}</label>
             <div class="row mt-4">
@@ -276,6 +343,7 @@
 
     <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('admin.is_preview') }}</label>
             <div class="row mt-4">

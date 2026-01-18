@@ -111,7 +111,15 @@ class BdController extends MainController
                 $query->where('parent_id', @$superAdmin->id);
             })
 
-            ->with(['bdSalaries', 'appUser.packs', 'creator', 'appUser.profile', 'parent.appUser.packs', 'createdBy'])
+            ->with([
+                'bdSalaries',
+                'appUser.packs',
+                'creator',
+                'appUser.profile',
+                'parent.appUser.packs',
+                'createdBy.agencies',
+                'createdBy'
+            ])
             ->withSum('bdSalaries', 'salary')
             ->withSum('bdSalaries', 'cut_amount')
             ->withCount('agencies as total_agencies')
@@ -301,7 +309,8 @@ class BdController extends MainController
         }
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+            $creator = $this->createdBy;
+            return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
         });
         $grid->column('created_at', __('Created at'))->display(function ($date) {
             $carbonDate = Carbon::parse($date);
@@ -554,7 +563,7 @@ class BdController extends MainController
         $bd = Bd::select('id', 'name', 'app_id', 'avatar', 'username', 'default')->findOrFail($id);
 
         $id = $bd->id;
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset("images/businessman-icon.jpg");
         $imageUrl = getImagePath($bd->avatar);
         if (!isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;

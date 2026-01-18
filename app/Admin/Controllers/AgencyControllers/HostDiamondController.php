@@ -49,7 +49,7 @@ class HostDiamondController extends MainController
     protected function grid()
     {
         $grid = new Grid(new GiftLog());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
             ->when($countryID, fn($q) =>
@@ -58,12 +58,17 @@ class HostDiamondController extends MainController
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
-            ->with(['receiver.profile', 'agency']) // assuming these are relationships
+            ->with([
+                'receiver:id,uuid,original_uuid,name,country_id',
+                'receiver.profile:id,user_id,avatar',
+                'receiver.country:id,name,e_name,flag',
+                'agency:id,name,img'
+            ])
             ->where('agency_id', '!=', 0)
             ->groupBy('receiver_id', 'agency_id')
-            ->when(! request('from_date'), fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()))
-            ->when(! request('to_date'), fn ($q) => $q->where('created_at', '<=', now()->endOfMonth()))
-            ->when(request('total_gift_price'), fn ($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
+            ->when(! request('from_date'), fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
+            ->when(! request('to_date'), fn($q) => $q->where('created_at', '<=', now()->endOfMonth()))
+            ->when(request('total_gift_price'), fn($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
             ->orderByDesc('total_gift_price');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -84,8 +89,7 @@ class HostDiamondController extends MainController
                     ->date()
                     ->default(request('from_date'));
 
-                $filter->where(function ($query) {
-                    }, __('Greater than diamond'), 'total_gift_price')->integer();
+                $filter->where(function ($query) {}, __('Greater than diamond'), 'total_gift_price')->integer();
             });
 
             $filter->column(1 / 2, function ($filter) {
@@ -117,7 +121,7 @@ class HostDiamondController extends MainController
             if (request()->filled('_export_')) {
                 return $this?->agency?->name ?: __('No agency');
             }
-                $agency = $this->agency;
+            $agency = $this->agency;
             /** @var AgencyService $agencyService */
             $agencyService = app(AgencyService::class);
 

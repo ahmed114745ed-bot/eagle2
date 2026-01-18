@@ -28,7 +28,7 @@
         min-width: 70px !important;
         box-shadow: 0 2px 3px 0 rgba(0,0,0,.2);
         border-radius: 0;
-        top: 5px;
+        top: auto;
     }
 
     .ltr .grid-dropdown-menu{

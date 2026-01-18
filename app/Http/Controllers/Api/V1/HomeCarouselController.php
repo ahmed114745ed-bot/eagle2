@@ -14,9 +14,9 @@ class HomeCarouselController extends Controller
 {
     public function index(Request $request)
     {
-    
+
         $user = Auth::user();
-        $displayType = $request->get('display_at'); 
+        $displayType = $request->get('display_at');
         $timezone = getTimezone();
         $now = Carbon::now($timezone);
         $offset = $now->format('P');
@@ -26,12 +26,20 @@ class HomeCarouselController extends Controller
         }
 
         $items = HomeCarousel::query()
-            ->with(['user', 'room', 'generalRole', 'countriesLite'])
+            ->with([
+                'user',
+                'room',
+                'generalRole',
+                'countriesLite',
+                'displays',
+                'user.ownerAudioRoom.pks' => fn($q) =>
+                $q->latest('created_at')->limit(2),
+            ])
             ->where('enable', 1)
 
             ->when($displayType, function ($q) use ($displayType, $now, $offset) {
                 $q->whereHas('displays', function ($sub) use ($displayType, $now, $offset) {
-                    $sub->where('display_type', $displayType)
+                    $sub->where('display_type', $displayType)->where('status', 1)
                         ->where(function ($inner) use ($now, $offset) {
                             // $inner->whereRaw("
                             //     CONVERT_TZ(end_at, '+00:00', ?) > ?
@@ -39,7 +47,7 @@ class HomeCarouselController extends Controller
                             $inner->whereRaw("
                                 CONVERT_TZ(end_at, '+00:00', ?) > ?
                                 ", [$offset, $now])
-                                ->orWhere('duration', 0); 
+                                ->orWhere('duration', 0);
                         });
                 });
             })
@@ -47,15 +55,15 @@ class HomeCarouselController extends Controller
                 $q->whereHas('countries', function ($sub) use ($country) {
                     $sub->where('country_id', $country);
                 })
-                ->whereHas('displays', function ($sub) use ($now, $offset) {
-                    $sub->where('display_type', 'country')
-                        ->where(function ($inner) use ($now, $offset) {
-                            $inner->whereRaw("
+                    ->whereHas('displays', function ($sub) use ($now, $offset) {
+                        $sub->where('display_type', 'country')
+                            ->where(function ($inner) use ($now, $offset) {
+                                $inner->whereRaw("
                                 CONVERT_TZ(end_at, '+00:00', ?) > ?
                             ", [$offset, $now])
-                            ->orWhere('duration', 0);
-                        });
-                });
+                                    ->orWhere('duration', 0);
+                            });
+                    });
             })
             ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->when($request->category === 'charge_event', fn($q) => $q->where('event_type', 'charge_event'))
@@ -63,10 +71,5 @@ class HomeCarouselController extends Controller
             ->get();
 
         return Common::apiResponse(1, '', HomeCarouselResource::collection($items));
-    
     }
 }
-
-
-
-

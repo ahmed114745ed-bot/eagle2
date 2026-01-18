@@ -59,24 +59,55 @@ class EnteranceController extends Controller
 
     public function updateRoomCountFromZego2(Request $request)
     {
-         \Log::info('🚀 log out room update zego');
         return $this->enteranceRoomService->updateRoomCountFromZego2($request);
     }
+
+    // public function libraryAgoraZego()
+    // {
+    //     $agora_app_id = Common::getConfig('app_id');
+    //     $zego_server_secret = Common::getConfig('zego_server_secret');
+    //     $zego_app_id = Common::getConfig('zego_app_id');
+    //     $app_sign = Common::getConfig('app_sign');
+    //     $library = Common::getConfig('video_library');
+    //     $liveLibrary = (int) Common::getConfig('live_library');
+    //     $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
+    //     $is_auto_preview = (int) Common::getConfig('is_auto_preview');
+
+
+    //     $libraries = ['agora', 'zego', 'tencent'];
+    //     $liveTypes = ['RTC', 'CDN', 'L3' ];
+
+    //     $data = [
+    //         'agora_app_id' => $agora_app_id,
+    //         'zego' => [
+    //             'server_secret' => $zego_server_secret,
+    //             'app_id' => $zego_app_id,
+    //             'app_sign' => $app_sign,
+    //             'filter' => $zego_filter_enabled == 1 ? true : false,
+    //             'live_type' => $liveTypes[@$liveLibrary ?? 0]
+    //         ],
+    //         'library' => $libraries[$library],
+    //         'is_auto_preview' => $is_auto_preview == 1 ? true : false,
+
+
+    //     ];
+    //     return Common::apiResponse(1, '', $data);
+    // }
 
     public function libraryAgoraZego()
     {
         $agora_app_id = Common::getConfig('app_id');
-        $zego_server_secret = Common::getConfig('zego_server_secret');
-        $zego_app_id = Common::getConfig('zego_app_id');
-        $app_sign = Common::getConfig('app_sign');
+        $zego_server_secret = Common::zegoData('zego_server_secret');
+        $zego_app_id = Common::zegoData('zego_app_id');
+        $app_sign = Common::zegoData('zego_app_sign');
         $library = Common::getConfig('video_library');
         $liveLibrary = (int) Common::getConfig('live_library');
         $zego_filter_enabled = Common::getConfig('zego_filter_enabled');
         $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
 
-        $libraries = ['agora', 'zego', 'tencent'];
-        $liveTypes = ['RTC', 'CDN', 'L3' ];
+        $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
+        $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [
             'agora_app_id' => $agora_app_id,
@@ -94,6 +125,7 @@ class EnteranceController extends Controller
         ];
         return Common::apiResponse(1, '', $data);
     }
+
 
     public function checkSignature($secert, $signature, $timestamp, $nonce)
     {
@@ -251,8 +283,11 @@ class EnteranceController extends Controller
     public function enter_room(Request $request, EnterRoomService $enterRoomServices): JsonResponse
     {
         $user = $request->user();
-        $app_feature = \Cache::get('zego_feature');
-        if ($app_feature &&$app_feature == 1) {
+        $zego_feature = \Cache::rememberForever('zego_feature', function () {
+            return \DB::table('settings')->where('key', 'zego_feature')->value('value');
+        });
+
+        if ($zego_feature && $zego_feature == 1) {
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();
@@ -536,11 +571,8 @@ class EnteranceController extends Controller
 
             if ($request->hasFile('room_cover')) {
 
-                $room->room_cover = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'rooms',
-                        'room_cover'
-                    );
+             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
+
             }
 
             if ($request->free_mic) {
