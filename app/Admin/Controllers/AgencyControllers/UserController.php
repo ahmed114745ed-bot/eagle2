@@ -28,7 +28,6 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\ChangeAgencyActionUser;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Achievement\Http\Services\UserAchievementService;
 
@@ -473,7 +472,7 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
-            ->select(['id', 'name', 'uuid', 'special_id','country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
+            ->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
@@ -488,17 +487,17 @@ class UserController extends MainController
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
+            // $filter->column(1 / 2, function ($filter) {
+            //     $filter->equal('agency_id', __('agency'))->select(Common::by_agency_filter());
 
-                $filter->column(1 / 2, function ($filter) {
-                    $filter->where(function ($query) {
-                        $input = $this->input;
-                        $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
-                    }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
-                });
-            });
+            //     $filter->column(1 / 2, function ($filter) {
+            //         $filter->where(function ($query) {
+            //             $input = $this->input;
+            //             $query->where('name', 'like', "%$input%")
+            //                 ->orWhere('uuid', 'like', "%$input%")->orWhere('special_id', 'like', "%$input%")->orWhere('nickname', 'like', "%$input%")->orWhere('email', 'like', "%$input%");
+            //         }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
+            //     });
+            // });
         });
         $grid->column('id', __('Id'));
         if ($haveCoins) {
@@ -530,14 +529,9 @@ class UserController extends MainController
 
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {
                 max-width: 90%;
-            }
-
-            .modal {
-                top: 5%;
             }
 
             .modal-body {
@@ -588,7 +582,7 @@ class UserController extends MainController
                 $actions->add(new KickOfFamilyAction());
             }
             if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new ChangeAgencyActionUser($model->id));
+                $actions->add(new ChangeAgencyAction($model->id));
             }
 
             if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
