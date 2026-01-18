@@ -4,7 +4,7 @@ on:
     branches: ["lumio"]
 jobs:
   run_lumio_hub:
-    runs-on: [self-hosted]  #ubuntu-latest  #
+    runs-on: [self-hosted]  #ubuntu-latest
     steps:
     - name: print out lumio
       uses: appleboy/ssh-action@v1.2.1
