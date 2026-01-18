@@ -461,11 +461,6 @@ class UserRepository extends Repository
     public function searchInHostAgency($key, $page, $perPage)
     {
 
-     Log::info('searchInHostAgency called', [
-        'key' => $key,
-        'page' => $page,
-        'per_page' => $perPage,
-    ]);
         return Agency::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
