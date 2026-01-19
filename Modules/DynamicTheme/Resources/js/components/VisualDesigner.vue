@@ -786,6 +786,14 @@ export default {
     selectChild(child) {
       this.selectedChildId = child.id;
       this.selectedAssetId = null;
+      
+      // If the child is already placed, select it for editing properties
+      const placedChild = this.placedChildren.find(c => c.theme_child_id === child.id);
+      if (placedChild) {
+        this.selectedElementType = 'child';
+      } else {
+        this.selectedElementType = null;
+      }
     },
     selectAsset(asset) {
       this.selectedAssetId = asset.id;
@@ -1336,21 +1344,35 @@ export default {
     setAssetAsBackground() {
       if (this.selectedElementType !== 'asset' || !this.selectedElement) return;
       
-      if (this.selectedElement.is_background) {
-        // Find the parent child and resize asset to fill it
-        for (const child of this.placedChildren) {
-          const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
-          if (asset) {
+      // Find the parent child and the asset
+      for (const child of this.placedChildren) {
+        const assetIndex = (child.assets || []).findIndex(a => a.id === this.selectedAssetId);
+        if (assetIndex !== -1) {
+          const asset = child.assets[assetIndex];
+          
+          if (asset.is_background) {
+            // Make asset fill the child
             asset.x = 0;
             asset.y = 0;
             asset.width = child.width;
             asset.height = child.height;
-            asset.z_index = -1; // Put behind other assets
-            this.hasUnsavedChanges = true;
-            this.saveToHistory();
-            this.autoSave();
-            return;
+            asset.z_index = 0; // Put at bottom (0 is the lowest valid value)
+            
+            // Increase z_index of all other assets so they appear on top
+            child.assets.forEach((a, idx) => {
+              if (idx !== assetIndex && (a.z_index || 0) <= 0) {
+                a.z_index = (a.z_index || 0) + 1;
+              }
+            });
+          } else {
+            // Reset to normal z_index
+            asset.z_index = assetIndex;
           }
+          
+          this.hasUnsavedChanges = true;
+          this.saveToHistory();
+          this.autoSave();
+          return;
         }
       }
     },
