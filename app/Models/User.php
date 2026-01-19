@@ -1716,7 +1716,7 @@ class User extends Authenticatable
         }
 
         if (empty($applicableTypes)) {
-            return $lang === 'ar' ? 'مستخدم' : 'User';
+            return $lang === 'ar' ? 'مستخدم' : 'User222222222';
         }
 
         ksort($applicableTypes);
