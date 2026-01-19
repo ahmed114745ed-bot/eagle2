@@ -1744,7 +1744,7 @@ class User extends Authenticatable
         $html .= '</div>';
 
 
-        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
+        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User11111111111111');
     }
 
     public function userBadge()
