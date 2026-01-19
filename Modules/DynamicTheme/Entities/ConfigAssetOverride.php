@@ -51,7 +51,7 @@ class ConfigAssetOverride extends Model
     public function getFileUrlAttribute(): ?string
     {
         if ($this->file_path) {
-            return asset('storage/' . $this->file_path);
+            return \Illuminate\Support\Facades\Storage::url($this->file_path);
         }
         return null;
     }

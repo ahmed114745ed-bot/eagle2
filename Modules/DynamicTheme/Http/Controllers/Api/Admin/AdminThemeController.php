@@ -584,7 +584,7 @@ public function updateAssetDashboard(Request $request, WidgetTheme $theme, Theme
             $newPath = "theme-assets/{$library->asset_type}/{$filename}";
             \Illuminate\Support\Facades\Storage::disk('public')->copy($library->file_path, $newPath);
             $data['file_path'] = $newPath;
-            $data['default_url'] = asset('storage/' . $newPath);
+            $data['default_url'] = \Illuminate\Support\Facades\Storage::url($newPath);
         }
 
         $asset = ThemeAsset::create($data);

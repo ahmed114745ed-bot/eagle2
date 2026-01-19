@@ -704,7 +704,7 @@ private function getThemeWithOverrides($themeId, $widgetOverride)
                         'type' => $assetOverride->type,
                         'text' => $assetOverride->text,
                         'file_path' => $assetOverride->file_path,
-                        'file_url' => $assetOverride->file_path ? asset('storage/' . $assetOverride->file_path) : null,
+                        'file_url' => $assetOverride->file_path ? \Illuminate\Support\Facades\Storage::url($assetOverride->file_path) : null,
                     ];
                 })->values(),
             ];
