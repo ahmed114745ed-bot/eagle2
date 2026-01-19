@@ -1,0 +1,21 @@
+name: SSh-moreDynamicTheme-pipline
+on:
+  push:
+    branches: ["moreDynamicTheme"]
+jobs:
+  run_moreDynamicTheme_job:
+    runs-on: [self-hosted]
+    steps:
+    - name: print out moreDynamicTheme
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.18.32"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 5m
+        script: |
+          cd /var/www/for-developer
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          php artisan migrate --force
+          php artisan optimize:clear
