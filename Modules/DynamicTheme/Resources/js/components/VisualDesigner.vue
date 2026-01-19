@@ -84,39 +84,82 @@
       </div>
 
       <div class="designer-body">
-        <!-- Left Panel - Theme Children & Assets Library -->
+        <!-- Left Panel - Widgets, Children & Assets Library -->
         <div class="left-panel">
-          <!-- Theme Selector -->
+          <!-- Widget Selector (Select dropdown) -->
           <div class="panel-section">
-            <h3 class="section-title">🎭 الثيمات</h3>
-            <select v-model="selectedThemeId" @change="onThemeChange" class="theme-select">
-              <option v-for="theme in themes" :key="theme.id" :value="theme.id">
-                {{ theme.theme_name }}
+            <h3 class="section-title">📦 اختر الويدجت</h3>
+            <select v-model="selectedWidgetId" @change="onWidgetSelect" class="widget-select">
+              <option :value="null">-- اختر ويدجت --</option>
+              <option v-for="widget in availableWidgets" :key="widget.id" :value="widget.id">
+                {{ widget.display_name || widget.widget_key }}
               </option>
             </select>
           </div>
 
-          <!-- Children List -->
-          <div class="panel-section flex-1">
-            <h3 class="section-title">👶 الأطفال (اسحب للموبايل) - {{ themeChildren.length }} طفل</h3>
-            <div class="children-list">
-              <!-- Debug info -->
-              <div v-if="!themes || themes.length === 0" class="empty-message" style="color: orange;">
-                ⚠️ لا يوجد ثيمات (themes is empty)
-              </div>
-              <div v-else-if="!selectedThemeId" class="empty-message" style="color: orange;">
-                ⚠️ لم يتم اختيار ثيم (selectedThemeId is null)
-              </div>
-              <div v-else-if="!selectedTheme" class="empty-message" style="color: orange;">
-                ⚠️ لم يتم العثور على الثيم المختار (selectedTheme not found for id: {{ selectedThemeId }})
+          <!-- Widget Layout Settings (for selected widget) -->
+          <div v-if="selectedWidgetData" class="panel-section">
+            <h3 class="section-title">⚙️ إعدادات الويدجت</h3>
+            <div class="widget-settings">
+              <!-- Layout Mode -->
+              <div class="setting-group">
+                <label>نوع التخطيط</label>
+                <div class="layout-buttons">
+                  <button @click="setWidgetLayout('absolute')" class="layout-btn-sm" :class="{ active: selectedWidgetData.layout_mode === 'absolute' }">
+                    📍 حر
+                  </button>
+                  <button @click="setWidgetLayout('horizontal')" class="layout-btn-sm" :class="{ active: selectedWidgetData.layout_mode === 'horizontal' }">
+                    ↔️ أفقي
+                  </button>
+                  <button @click="setWidgetLayout('vertical')" class="layout-btn-sm" :class="{ active: selectedWidgetData.layout_mode === 'vertical' }">
+                    ↕️ عمودي
+                  </button>
+                </div>
               </div>
               
-              <!-- Children list without VirtualScroller for debugging -->
+              <!-- Horizontal scroll options -->
+              <div v-if="selectedWidgetData.layout_mode === 'horizontal'" class="setting-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" v-model="selectedWidgetData.infinite_scroll" @change="onWidgetSettingChange" />
+                  <span>🔄 تكرار لا نهائي (Slider)</span>
+                </label>
+                
+                <!-- Slider speed (only if infinite scroll is enabled) -->
+                <div v-if="selectedWidgetData.infinite_scroll" class="setting-row">
+                  <div class="setting-field">
+                    <label>سرعة السلايدر (ثواني/عنصر)</label>
+                    <input type="number" v-model.number="selectedWidgetData.scroll_speed" @change="onWidgetSettingChange" class="setting-input" min="1" max="20" step="0.5" />
+                  </div>
+                </div>
+                
+                <div class="setting-row">
+                  <div class="setting-field">
+                    <label>المسافة</label>
+                    <input type="number" v-model.number="selectedWidgetData.layout_gap" @change="onWidgetSettingChange" class="setting-input" min="0" />
+                  </div>
+                  <div class="setting-field">
+                    <label>عرض الطفل</label>
+                    <input type="number" v-model.number="selectedWidgetData.child_width" @change="onWidgetSettingChange" class="setting-input" min="20" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Children List (for selected widget) -->
+          <div v-if="selectedWidgetData" class="panel-section flex-1">
+            <h3 class="section-title">👶 الأبناء - {{ themeChildren.length }}</h3>
+            <div class="children-list">
+              <div v-if="themeChildren.length === 0" class="empty-message">
+                لا يوجد أطفال لهذا الويدجت
+              </div>
+              
+              <!-- Children list -->
               <div
                 v-for="child in themeChildren"
                 :key="child.id"
                 class="child-item"
-                :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlaced(child.id) }"
+                :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlacedInWidget(child.id) }"
                 draggable="true"
                 @dragstart="onChildDragStart($event, child)"
                 @click="selectChild(child)"
@@ -128,10 +171,13 @@
                 </div>
                 <span class="child-assets-count">{{ (child.assets || []).length }} 🖼️</span>
               </div>
-              
-              <div v-if="themeChildren.length === 0 && selectedTheme" class="empty-message">
-                لا يوجد أطفال في هذا الثيم
-              </div>
+            </div>
+          </div>
+          
+          <!-- No widget selected message -->
+          <div v-else class="panel-section flex-1">
+            <div class="empty-message">
+              👆 اختر ويدجت من القائمة
             </div>
           </div>
 
@@ -182,7 +228,7 @@
             <div 
               ref="mobileScreen"
               class="mobile-screen"
-              :style="{ width: screenWidth * zoom + 'px', height: screenHeight * zoom + 'px' }"
+              :style="getMobileScreenStyle()"
               @dragover.prevent="onDragOver"
               @drop="onDrop"
               @click="onScreenClick"
@@ -190,62 +236,149 @@
               <!-- Grid -->
               <div v-if="showGrid" class="mobile-grid"></div>
               
-              <!-- Placed Children -->
+              <!-- Placed Widgets -->
               <div
-                v-for="child in placedChildren"
-                :key="child.id"
-                class="placed-child"
-                :class="{ 'selected': selectedChildId === child.theme_child_id }"
-                :style="getChildStyle(child)"
-                @mousedown.stop="startDragPlacedChild($event, child)"
-                @click.stop="selectPlacedChild(child)"
+                v-for="widget in placedWidgets"
+                :key="widget.id"
+                class="placed-widget"
+                :class="{ 'selected': selectedWidgetId === widget.id }"
+                :style="getWidgetStyle(widget)"
+                @mousedown.stop="startDragWidget($event, widget)"
+                @click.stop="selectPlacedWidget(widget)"
               >
-                <div class="child-label">{{ child.name }}</div>
+                <div class="widget-label">{{ widget.display_name || widget.widget_key }}</div>
                 
-                <!-- Assets inside child -->
-                <div
-                  v-for="asset in child.assets || []"
-                  :key="asset.id"
-                  class="placed-asset"
-                  :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
-                  :style="getAssetStyle(asset)"
-                  @mousedown.stop="startDragPlacedAsset($event, child, asset)"
-                  @click.stop="selectPlacedAsset(asset)"
+                <!-- Widget content container (scrollable if horizontal/vertical layout) -->
+                <div 
+                  class="widget-content"
+                  :class="getWidgetContentClass(widget)"
+                  :style="getWidgetContentStyle(widget)"
+                  @wheel.stop="onWidgetScroll($event, widget)"
                 >
-                  <!-- Text assets -->
-                  <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
-                    {{ asset.text_content || asset.name || asset.asset_key }}
-                  </div>
-                  <!-- Image assets -->
-                  <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" @error="onAssetImageError($event, asset)" />
-                  <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
+                  <!-- Infinite scroll wrapper (duplicates children for seamless loop) -->
+                  <template v-if="widget.layout_mode === 'horizontal' && widget.infinite_scroll">
+                    <div class="infinite-scroll-track" :style="{ animationDuration: getScrollDuration(widget) }">
+                      <!-- Original children -->
+                      <div
+                        v-for="child in widget.children || []"
+                        :key="child.id"
+                        class="placed-child layout-child"
+                        :class="{ 'selected': selectedWidgetId === widget.id && selectedChildId === child.theme_child_id }"
+                        :style="getChildStyleInWidget(child, widget)"
+                        @mousedown.stop="startDragPlacedChild($event, child, widget)"
+                        @click.stop="selectPlacedChild(child, widget)"
+                      >
+                        <div class="child-label-small">{{ child.name }}</div>
+                        <div
+                          v-for="asset in child.assets || []"
+                          :key="asset.id"
+                          class="placed-asset"
+                          :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
+                          :style="getAssetStyle(asset)"
+                        >
+                          <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                            {{ asset.text_content || asset.name || asset.asset_key }}
+                          </div>
+                          <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
+                          <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
+                        </div>
+                      </div>
+                      <!-- Duplicated children for seamless loop -->
+                      <div
+                        v-for="child in widget.children || []"
+                        :key="'dup_' + child.id"
+                        class="placed-child layout-child"
+                        :style="getChildStyleInWidget(child, widget)"
+                      >
+                        <div class="child-label-small">{{ child.name }}</div>
+                        <div
+                          v-for="asset in child.assets || []"
+                          :key="'dup_' + asset.id"
+                          class="placed-asset"
+                          :class="{ 'text-asset': asset.asset_type === 'text' }"
+                          :style="getAssetStyle(asset)"
+                        >
+                          <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                            {{ asset.text_content || asset.name || asset.asset_key }}
+                          </div>
+                          <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
+                          <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
                   
-                  <!-- Resize handles -->
-                  <div v-if="selectedAssetId === asset.id" class="resize-handles">
-                    <div class="resize-handle se" @mousedown.stop="startResize($event, 'asset', asset, 'se')"></div>
-                    <div class="resize-handle sw" @mousedown.stop="startResize($event, 'asset', asset, 'sw')"></div>
-                    <div class="resize-handle ne" @mousedown.stop="startResize($event, 'asset', asset, 'ne')"></div>
-                    <div class="resize-handle nw" @mousedown.stop="startResize($event, 'asset', asset, 'nw')"></div>
+                  <!-- Normal children (non-infinite scroll) -->
+                  <template v-else>
+                    <div
+                      v-for="child in widget.children || []"
+                      :key="child.id"
+                      class="placed-child"
+                      :class="{ 'selected': selectedWidgetId === widget.id && selectedChildId === child.theme_child_id, 'layout-child': widget.layout_mode !== 'absolute' }"
+                      :style="getChildStyleInWidget(child, widget)"
+                      @mousedown.stop="startDragPlacedChild($event, child, widget)"
+                      @click.stop="selectPlacedChild(child, widget)"
+                    >
+                      <div class="child-label-small">{{ child.name }}</div>
+                      
+                      <!-- Assets inside child -->
+                      <div
+                        v-for="asset in child.assets || []"
+                        :key="asset.id"
+                        class="placed-asset"
+                        :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
+                        :style="getAssetStyle(asset)"
+                        @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
+                        @click.stop="selectPlacedAsset(asset, widget)"
+                      >
+                        <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                          {{ asset.text_content || asset.name || asset.asset_key }}
+                        </div>
+                        <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" @error="onAssetImageError($event, asset)" />
+                        <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
+                        
+                        <!-- Asset resize handles -->
+                        <div v-if="selectedAssetId === asset.id" class="resize-handles">
+                          <div class="resize-handle se" @mousedown.stop="startResize($event, 'asset', asset, 'se')"></div>
+                          <div class="resize-handle sw" @mousedown.stop="startResize($event, 'asset', asset, 'sw')"></div>
+                          <div class="resize-handle ne" @mousedown.stop="startResize($event, 'asset', asset, 'ne')"></div>
+                          <div class="resize-handle nw" @mousedown.stop="startResize($event, 'asset', asset, 'nw')"></div>
+                        </div>
+                      </div>
+                      
+                      <!-- Child resize handles -->
+                      <div v-if="selectedWidgetId === widget.id && selectedChildId === child.theme_child_id" class="resize-handles">
+                        <div class="resize-handle se" @mousedown.stop="startResize($event, 'child', child, 'se')"></div>
+                        <div class="resize-handle sw" @mousedown.stop="startResize($event, 'child', child, 'sw')"></div>
+                        <div class="resize-handle ne" @mousedown.stop="startResize($event, 'child', child, 'ne')"></div>
+                        <div class="resize-handle nw" @mousedown.stop="startResize($event, 'child', child, 'nw')"></div>
+                      </div>
+                    </div>
+                  </template>
+                  
+                  <!-- Scroll Indicator -->
+                  <div v-if="widget.layout_mode === 'horizontal' && (widget.children || []).length > 0 && !widget.infinite_scroll" class="scroll-indicator horizontal">
+                    ← مرر →
+                  </div>
+                  
+                  <!-- Infinite scroll indicator -->
+                  <div v-if="widget.infinite_scroll" class="infinite-scroll-badge">
+                    ∞ سلايدر
                   </div>
                 </div>
                 
-                <!-- Child resize handles -->
-                <div v-if="selectedChildId === child.theme_child_id" class="resize-handles">
-                  <div class="resize-handle se" @mousedown.stop="startResize($event, 'child', child, 'se')"></div>
-                  <div class="resize-handle sw" @mousedown.stop="startResize($event, 'child', child, 'sw')"></div>
-                  <div class="resize-handle ne" @mousedown.stop="startResize($event, 'child', child, 'ne')"></div>
-                  <div class="resize-handle nw" @mousedown.stop="startResize($event, 'child', child, 'nw')"></div>
-                  <!-- مقبض جديد لتعديل أحناء الزوايا -->
-                  <div class="corner-handle tl" @mousedown.stop="startCornerResize($event, child, 'tl')"></div>
-                  <div class="corner-handle tr" @mousedown.stop="startCornerResize($event, child, 'tr')"></div>
-                  <div class="corner-handle bl" @mousedown.stop="startCornerResize($event, child, 'bl')"></div>
-                  <div class="corner-handle br" @mousedown.stop="startCornerResize($event, child, 'br')"></div>
+                <!-- Widget resize handles -->
+                <div v-if="selectedWidgetId === widget.id" class="resize-handles">
+                  <div class="resize-handle se" @mousedown.stop="startResize($event, 'widget', widget, 'se')"></div>
+                  <div class="resize-handle sw" @mousedown.stop="startResize($event, 'widget', widget, 'sw')"></div>
+                  <div class="resize-handle ne" @mousedown.stop="startResize($event, 'widget', widget, 'ne')"></div>
+                  <div class="resize-handle nw" @mousedown.stop="startResize($event, 'widget', widget, 'nw')"></div>
                 </div>
               </div>
               
               <!-- Drop indicator -->
               <div v-if="isDraggingOver" class="drop-indicator">
-                أفلت هنا
+                أفلت الويدجت هنا
               </div>
             </div>
             <div class="mobile-home-bar"></div>
@@ -258,27 +391,63 @@
             <button @click="zoomIn" class="control-btn">➕</button>
             <button @click="toggleGrid" class="control-btn" :class="{ 'active': showGrid }">⊞</button>
             <button @click="resetView" class="control-btn">↺</button>
+            <button @click="showDesignSettings = !showDesignSettings" class="control-btn settings-toggle" :class="{ 'active': showDesignSettings }" title="إعدادات التصميم">
+              ⚙️
+            </button>
           </div>
           
-          <!-- Widget Size Controls -->
-          <div class="widget-size-controls">
-            <h4 class="size-title">📏 أبعاد الويدجت</h4>
-            <div class="size-inputs">
-              <div class="size-input-group">
-                <label>العرض</label>
-                <input type="number" v-model.number="screenWidth" @change="onScreenSizeChange" class="size-input" min="100" max="800" />
+          <!-- Collapsible Settings Panel (for selected widget) -->
+          <div v-if="showDesignSettings && selectedWidget" class="design-settings-panel">
+            <!-- Widget Info -->
+            <div class="settings-section">
+              <h4 class="settings-section-title">📦 {{ selectedWidget.display_name || selectedWidget.widget_key }}</h4>
+            </div>
+            
+            <!-- Layout Mode Controls -->
+            <div class="settings-section">
+              <h4 class="settings-section-title">📐 نوع التخطيط</h4>
+              <div class="layout-mode-selector">
+                <button @click="setWidgetLayoutMode('absolute')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'absolute' || !selectedWidget.layout_mode }" title="تحديد المواقع بحرية">
+                  <span class="layout-icon">📍</span>
+                  <span>حر</span>
+                </button>
+                <button @click="setWidgetLayoutMode('horizontal')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'horizontal' }" title="تمرير أفقي - الأطفال جنباً إلى جنب">
+                  <span class="layout-icon">↔️</span>
+                  <span>أفقي</span>
+                </button>
+                <button @click="setWidgetLayoutMode('vertical')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'vertical' }" title="تمرير عمودي">
+                  <span class="layout-icon">↕️</span>
+                  <span>عمودي</span>
+                </button>
               </div>
-              <div class="size-input-group">
-                <label>الارتفاع</label>
-                <input type="number" v-model.number="screenHeight" @change="onScreenSizeChange" class="size-input" min="100" max="1200" />
+            
+              <!-- Layout Settings (shown when not absolute) -->
+              <div v-if="selectedWidget.layout_mode && selectedWidget.layout_mode !== 'absolute'" class="layout-settings">
+                <div class="layout-setting-row">
+                  <div class="layout-setting-group">
+                    <label>المسافة</label>
+                    <input type="number" v-model.number="selectedWidget.layout_gap" @change="onWidgetLayoutChange" class="size-input" min="0" max="100" />
+                  </div>
+                  <div class="layout-setting-group">
+                    <label>الهامش</label>
+                    <input type="number" v-model.number="selectedWidget.layout_padding" @change="onWidgetLayoutChange" class="size-input" min="0" max="100" />
+                  </div>
+                  <div class="layout-setting-group">
+                    <label>عرض الطفل</label>
+                    <input type="number" v-model.number="selectedWidget.child_width" @change="onWidgetLayoutChange" class="size-input" min="50" max="500" />
+                  </div>
+                  <div class="layout-setting-group">
+                    <label>ارتفاع الطفل</label>
+                    <input type="number" v-model.number="selectedWidget.child_height" @change="onWidgetLayoutChange" class="size-input" min="50" max="500" />
+                  </div>
+                </div>
+                <button @click="autoArrangeWidgetChildren" class="auto-arrange-btn-small">🔄 ترتيب</button>
               </div>
             </div>
-            <div class="size-presets">
-              <button @click="setScreenPreset('iphone')" class="preset-btn" :class="{ 'active': screenWidth === 375 && screenHeight === 667 }">📱 iPhone</button>
-              <button @click="setScreenPreset('android')" class="preset-btn" :class="{ 'active': screenWidth === 360 && screenHeight === 640 }">📱 Android</button>
-              <button @click="setScreenPreset('tablet')" class="preset-btn" :class="{ 'active': screenWidth === 768 && screenHeight === 1024 }">📱 Tablet</button>
-              <button @click="setScreenPreset('custom')" class="preset-btn">✏️ مخصص</button>
-            </div>
+          </div>
+          
+          <div v-else-if="showDesignSettings && !selectedWidget" class="design-settings-panel">
+            <div class="empty-message">👆 اختر ويدجت لتعديل إعداداته</div>
           </div>
         </div>
 
@@ -287,8 +456,8 @@
           <!-- Selected Element Properties -->
           <div v-if="selectedElement" class="panel-section properties-section full-height">
             <div class="section-header">
-              <h3 class="section-title">⚙️ خصائص {{ selectedElementType === 'child' ? 'الطفل' : 'الأصل' }}</h3>
-              <span class="element-badge">{{ selectedElement.name }}</span>
+              <h3 class="section-title">⚙️ خصائص {{ getElementTypeName() }}</h3>
+              <span class="element-badge">{{ selectedElement.name || selectedElement.display_name || selectedElement.widget_key }}</span>
             </div>
             <div class="properties-form scrollable">
               
@@ -501,6 +670,10 @@ export default {
       type: Object,
       default: null
     },
+    widgets: {
+      type: Array,
+      default: () => []
+    },
     themes: {
       type: Array,
       default: () => []
@@ -517,7 +690,9 @@ export default {
       selectedThemeId: null,
       selectedChildId: null,
       selectedAssetId: null,
-      selectedElementType: null, // 'child' | 'asset'
+      selectedElementType: null, // 'widget' | 'child' | 'asset'
+      selectedWidgetId: null, // الويدجت المختار حالياً
+      placedWidgets: [], // كل الويدجتات الموضوعة في الشاشة
       placedChildren: [],
       zoom: 1,
       showGrid: true,
@@ -556,11 +731,23 @@ export default {
       screenWidth: 375,
       screenHeight: 667,
       
+      // Layout settings
+      layoutMode: 'absolute', // 'absolute' | 'horizontal' | 'vertical'
+      layoutGap: 16, // Gap between children in flex layout
+      layoutPadding: 16, // Padding for the container
+      layoutItemWidth: 150, // Default item width in horizontal mode
+      layoutItemHeight: 200, // Default item height in horizontal mode
+      layoutSnapToGrid: false, // Snap children to item dimensions
+      layoutShowScrollIndicator: true, // Show scroll indicator in preview
+      
       // Corner sync value
       cornerSyncValue: 0,
       
       // Active property tab
       activePropertyTab: 'position',
+      
+      // Show design settings panel
+      showDesignSettings: false,
       
       // Auto save timeout
       autoSaveTimeout: null,
@@ -568,25 +755,53 @@ export default {
   },
   computed: {
     widgetName() {
-      return this.widget?.display_name || this.widget?.widget_key || 'Widget';
+      return this.selectedWidgetData?.display_name || this.selectedWidgetData?.widget_key || 'اختر ويدجت';
+    },
+    // بيانات الويدجت المختار من placedWidgets
+    selectedWidgetData() {
+      return this.placedWidgets.find(w => w.id === this.selectedWidgetId);
+    },
+    // الويدجت المختار (للتوافق)
+    selectedWidget() {
+      return this.selectedWidgetData;
+    },
+    // كل الويدجتات المتاحة (من props أو widget واحد)
+    availableWidgets() {
+      if (this.widgets && this.widgets.length > 0) {
+        return this.widgets;
+      }
+      return this.widget ? [this.widget] : [];
     },
     selectedTheme() {
       // مقارنة مرنة للتعامل مع اختلاف الأنواع (string vs number)
       return this.themes.find(t => String(t.id) === String(this.selectedThemeId));
     },
+    // أبناء الويدجت المختار (من الثيم المختار)
     themeChildren() {
-      const children = this.selectedTheme?.children || [];
-      console.log('🔍 themeChildren:', children.length, 'selectedThemeId:', this.selectedThemeId, 'selectedTheme:', this.selectedTheme?.theme_name);
+      if (!this.selectedWidgetData) return [];
+      const themeId = this.selectedWidgetData.theme_id || this.selectedThemeId;
+      const theme = this.themes.find(t => String(t.id) === String(themeId));
+      const children = theme?.children || [];
       return children;
+    },
+    // الأبناء الموضوعة للويدجت المختار
+    currentWidgetChildren() {
+      return this.selectedWidgetData?.children || [];
     },
     selectedChild() {
       return this.themeChildren.find(c => c.id === this.selectedChildId);
     },
     selectedElement() {
-      if (this.selectedElementType === 'child') {
-        return this.placedChildren.find(c => c.theme_child_id === this.selectedChildId);
+      if (this.selectedElementType === 'widget') {
+        return this.selectedWidgetData;
+      } else if (this.selectedElementType === 'child') {
+        const widget = this.selectedWidgetData;
+        if (!widget) return null;
+        return (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
       } else if (this.selectedElementType === 'asset') {
-        for (const child of this.placedChildren) {
+        const widget = this.selectedWidgetData;
+        if (!widget) return null;
+        for (const child of widget.children || []) {
           const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
           if (asset) return asset;
         }
@@ -600,7 +815,13 @@ export default {
       return this.historyIndex < this.history.length - 1;
     },
     totalAssets() {
-      return this.placedChildren.reduce((total, child) => total + (child.assets || []).length, 0);
+      let total = 0;
+      for (const widget of this.placedWidgets) {
+        for (const child of widget.children || []) {
+          total += (child.assets || []).length;
+        }
+      }
+      return total;
     }
   },
   watch: {
@@ -645,7 +866,7 @@ export default {
   methods: {
     open() {
       this.isOpen = true;
-      this.initializeFromWidget();
+      this.initializeWidgets();
     },
     async close() {
       if (this.hasUnsavedChanges) {
@@ -654,96 +875,373 @@ export default {
       this.isOpen = false;
       this.$emit('close');
     },
-    initializeFromWidget() {
-      if (!this.widget) {
-        console.log('❌ [VisualDesigner] No widget provided');
-        return;
-      }
+    
+    // Initialize all widgets
+    initializeWidgets() {
+      console.log('🎨 [VisualDesigner] initializeWidgets called');
+      console.log('🎨 [VisualDesigner] availableWidgets:', this.availableWidgets);
       
-      console.log('🎨 [VisualDesigner] initializeFromWidget called');
-      console.log('🎨 [VisualDesigner] widget:', this.widget);
-      console.log('🎨 [VisualDesigner] themes:', this.themes);
-      console.log('🎨 [VisualDesigner] themes.length:', this.themes?.length);
-      
-      // Set initial theme first
-      const themeId = this.widget.settings?.theme_id || this.widget.selected_theme_id || this.widget.widget_theme_id;
-      console.log('🎨 [VisualDesigner] themeId from widget:', themeId);
-      
-      if (themeId) {
-        this.selectedThemeId = themeId;
-      } else if (this.themes.length > 0) {
-        this.selectedThemeId = this.themes[0].id;
-      }
-      
-      // Set widget dimensions from theme first, then from widget settings
-      const currentTheme = this.selectedTheme;
-      if (currentTheme?.widget_width) {
-        this.screenWidth = currentTheme.widget_width;
-      } else if (this.widget.settings?.widget_width) {
-        this.screenWidth = this.widget.settings.widget_width;
-      }
-      if (currentTheme?.widget_height) {
-        this.screenHeight = currentTheme.widget_height;
-      } else if (this.widget.settings?.widget_height) {
-        this.screenHeight = this.widget.settings.widget_height;
-      }
-      
-      console.log('🎨 [VisualDesigner] selectedThemeId:', this.selectedThemeId);
-      console.log('🎨 [VisualDesigner] selectedTheme:', this.selectedTheme);
-      console.log('🎨 [VisualDesigner] themeChildren:', this.themeChildren?.length);
-      console.log('🎨 [VisualDesigner] screen dimensions:', this.screenWidth, 'x', this.screenHeight);
-      
-      // Load placed children from widget settings
-      const savedChildren = this.widget.settings?.children || [];
-      this.placedChildren = savedChildren.map(child => {
-        const themeChild = this.themeChildren.find(c => c.id === child.theme_child_id);
+      // Load placed widgets from configuration or create default positions
+      this.placedWidgets = this.availableWidgets.map((widget, index) => {
+        const settings = widget.settings || {};
+        const themeId = settings.theme_id || widget.selected_theme_id || widget.widget_theme_id;
+        const theme = this.themes.find(t => String(t.id) === String(themeId));
+        
         return {
-          theme_child_id: child.theme_child_id,
-          name: themeChild?.label || themeChild?.child_key || child.name || `طفل ${child.theme_child_id}`,
-          child_key: themeChild?.child_key || child.child_key,
-          width: child.width || themeChild?.width || 200,
-          height: child.height || themeChild?.height || 150,
-          x: child.x ?? 0,
-          y: child.y ?? 0,
-          is_visible: child.is_visible ?? true,
-          rotation: child.rotation ?? 0,
-          scale: child.scale ?? 1,
-          opacity: child.opacity ?? 1,
-          z_index: child.z_index ?? 0,
-          background_color: child.background_color || 'transparent',
-          border_width: child.border_width ?? 2,
-          border_style: child.border_style || 'dashed',
-          border_color: child.border_color || '#6366f1',
-          border_radius_tl: child.border_radius_tl ?? child.border_radius ?? 8,
-          border_radius_tr: child.border_radius_tr ?? child.border_radius ?? 8,
-          border_radius_bl: child.border_radius_bl ?? child.border_radius ?? 8,
-          border_radius_br: child.border_radius_br ?? child.border_radius ?? 8,
-          assets: (child.assets || []).map(asset => ({
-            ...asset,
-            name: asset.name || asset.asset_key,
-            width: asset.width || 80,
-            height: asset.height || 80,
-            x: asset.x ?? 0,
-            y: asset.y ?? 0,
-            opacity: asset.opacity ?? 1,
-            z_index: asset.z_index ?? 0,
-            rotation: asset.rotation ?? 0,
-            scale: asset.scale ?? 1,
-            border_width: asset.border_width ?? 0,
-            border_style: asset.border_style || 'solid',
-            border_color: asset.border_color || 'transparent',
-            border_radius_tl: asset.border_radius_tl ?? asset.border_radius ?? 0,
-            border_radius_tr: asset.border_radius_tr ?? asset.border_radius ?? 0,
-            border_radius_bl: asset.border_radius_bl ?? asset.border_radius ?? 0,
-            border_radius_br: asset.border_radius_br ?? asset.border_radius ?? 0,
-            is_visible: asset.is_visible ?? true,
-          }))
+          id: widget.id,
+          widget_key: widget.widget_key,
+          display_name: widget.display_name || widget.widget_key,
+          theme_id: themeId,
+          // Position & Size
+          x: settings.x ?? (10 + (index % 3) * 130),
+          y: settings.y ?? (10 + Math.floor(index / 3) * 150),
+          width: settings.width || settings.widget_width || theme?.widget_width || 120,
+          height: settings.height || settings.widget_height || theme?.widget_height || 140,
+          // Layout settings
+          layout_mode: settings.layout_mode || 'absolute',
+          layout_gap: settings.layout_gap ?? 8,
+          layout_padding: settings.layout_padding ?? 8,
+          child_width: settings.child_width || settings.layout_item_width || 80,
+          child_height: settings.child_height || settings.layout_item_height || 100,
+          infinite_scroll: settings.infinite_scroll ?? false,
+          scroll_speed: settings.scroll_speed ?? 3,
+          // Style
+          opacity: settings.opacity ?? 1,
+          z_index: settings.z_index ?? index,
+          background_color: settings.background_color || 'transparent',
+          border_radius: settings.border_radius ?? 8,
+          // Children
+          children: (settings.children || []).map(child => {
+            const themeChild = (theme?.children || []).find(c => c.id === child.theme_child_id);
+            return {
+              id: child.id || `child_${child.theme_child_id}`,
+              theme_child_id: child.theme_child_id,
+              name: themeChild?.label || themeChild?.child_key || child.name,
+              child_key: themeChild?.child_key || child.child_key,
+              width: child.width || themeChild?.width || 80,
+              height: child.height || themeChild?.height || 80,
+              x: child.x ?? 0,
+              y: child.y ?? 0,
+              opacity: child.opacity ?? 1,
+              z_index: child.z_index ?? 0,
+              assets: (child.assets || []).map(asset => ({
+                ...asset,
+                x: asset.x ?? 0,
+                y: asset.y ?? 0,
+                width: asset.width || 40,
+                height: asset.height || 40,
+                opacity: asset.opacity ?? 1,
+              }))
+            };
+          })
         };
       });
+      
+      console.log('🎨 [VisualDesigner] placedWidgets:', this.placedWidgets);
+      
+      // Select first widget if available
+      if (this.placedWidgets.length > 0) {
+        this.selectedWidgetId = this.placedWidgets[0].id;
+      }
       
       // Save initial state to history
       this.saveToHistory();
     },
+    
+    // Get element type name for display
+    getElementTypeName() {
+      switch (this.selectedElementType) {
+        case 'widget': return 'الويدجت';
+        case 'child': return 'الطفل';
+        case 'asset': return 'الأصل';
+        default: return 'العنصر';
+      }
+    },
+    
+    // Widget methods
+    isWidgetPlaced(widgetId) {
+      return this.placedWidgets.some(w => w.id === widgetId);
+    },
+    
+    selectWidget(widget) {
+      this.selectedWidgetId = widget.id;
+      this.selectedElementType = 'widget';
+      this.selectedChildId = null;
+      this.selectedAssetId = null;
+    },
+    
+    // عند اختيار ويدجت من القائمة
+    onWidgetSelect(event) {
+      const widgetId = parseInt(event.target.value);
+      const widget = this.placedWidgets.find(w => w.id === widgetId);
+      if (widget) {
+        this.selectWidget(widget);
+      }
+    },
+    
+    // تغيير نوع التخطيط للويدجت المختار
+    setWidgetLayout(mode) {
+      if (!this.selectedWidgetData) return;
+      this.selectedWidgetData.layout_mode = mode;
+      this.hasUnsavedChanges = true;
+      this.repositionChildrenByLayout(this.selectedWidgetData);
+      this.saveToHistory();
+    },
+    
+    // عند تغيير إعدادات الويدجت
+    onWidgetSettingChange() {
+      if (!this.selectedWidgetData) return;
+      this.hasUnsavedChanges = true;
+      if (this.selectedWidgetData.layout_mode !== 'absolute') {
+        this.repositionChildrenByLayout(this.selectedWidgetData);
+      }
+      this.saveToHistory();
+    },
+    
+    // إعادة ترتيب الأبناء حسب نوع التخطيط
+    repositionChildrenByLayout(widget) {
+      if (!widget || !widget.children || widget.children.length === 0) return;
+      
+      const padding = widget.layout_padding || 8;
+      const gap = widget.layout_gap || 8;
+      const childWidth = widget.child_width || 80;
+      const childHeight = widget.child_height || 100;
+      
+      widget.children.forEach((child, index) => {
+        if (widget.layout_mode === 'horizontal') {
+          child.x = padding + index * (childWidth + gap);
+          child.y = padding;
+          child.width = childWidth;
+          child.height = childHeight;
+        } else if (widget.layout_mode === 'vertical') {
+          child.x = padding;
+          child.y = padding + index * (childHeight + gap);
+          child.width = childWidth;
+          child.height = childHeight;
+        }
+        // للتخطيط المطلق لا نغير المواقع
+      });
+    },
+    
+    selectPlacedWidget(widget) {
+      this.selectedWidgetId = widget.id;
+      this.selectedElementType = 'widget';
+      this.selectedChildId = null;
+      this.selectedAssetId = null;
+    },
+    
+    onWidgetDragStart(e, widget) {
+      e.dataTransfer.setData('text/plain', JSON.stringify({ type: 'widget', widget }));
+      this.dragType = 'new-widget';
+      this.dragData = widget;
+    },
+    
+    startDragWidget(e, widget) {
+      this.isDragging = true;
+      this.dragType = 'placed-widget';
+      this.dragData = widget;
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.dragStartElementX = widget.x;
+      this.dragStartElementY = widget.y;
+      this.selectPlacedWidget(widget);
+    },
+    
+    // Widget styles
+    getWidgetStyle(widget) {
+      return {
+        left: widget.x * this.zoom + 'px',
+        top: widget.y * this.zoom + 'px',
+        width: widget.width * this.zoom + 'px',
+        height: widget.height * this.zoom + 'px',
+        opacity: widget.opacity ?? 1,
+        zIndex: widget.z_index || 0,
+        backgroundColor: widget.background_color || 'transparent',
+        borderRadius: (widget.border_radius || 8) + 'px',
+      };
+    },
+    
+    getWidgetContentClass(widget) {
+      return {
+        'horizontal-scroll': widget.layout_mode === 'horizontal' && !widget.infinite_scroll,
+        'vertical-scroll': widget.layout_mode === 'vertical',
+        'infinite-scroll-wrapper': widget.layout_mode === 'horizontal' && widget.infinite_scroll,
+      };
+    },
+    
+    getWidgetContentStyle(widget) {
+      if (widget.layout_mode === 'horizontal') {
+        const baseStyle = {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: (widget.layout_gap || 8) * this.zoom + 'px',
+          padding: (widget.layout_padding || 8) * this.zoom + 'px',
+          height: '100%',
+          alignItems: 'flex-start',
+        };
+        
+        if (widget.infinite_scroll) {
+          // Infinite scroll (slider) - no scrollbar, uses animation
+          return {
+            ...baseStyle,
+            overflow: 'hidden',
+            '--scroll-duration': ((widget.scroll_speed || 3) * (widget.children?.length || 3)) + 's',
+          };
+        } else {
+          // Normal horizontal scroll
+          return {
+            ...baseStyle,
+            overflowX: 'auto',
+            overflowY: 'hidden',
+          };
+        }
+      } else if (widget.layout_mode === 'vertical') {
+        return {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: (widget.layout_gap || 8) * this.zoom + 'px',
+          padding: (widget.layout_padding || 8) * this.zoom + 'px',
+          overflowX: 'hidden',
+          overflowY: 'auto',
+          width: '100%',
+        };
+      }
+      return {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      };
+    },
+    
+    getChildStyleInWidget(child, widget) {
+      const isLayoutMode = widget.layout_mode && widget.layout_mode !== 'absolute';
+      
+      if (isLayoutMode) {
+        return {
+          width: (widget.child_width || child.width || 80) * this.zoom + 'px',
+          height: (widget.child_height || child.height || 80) * this.zoom + 'px',
+          minWidth: (widget.child_width || child.width || 80) * this.zoom + 'px',
+          minHeight: (widget.child_height || child.height || 80) * this.zoom + 'px',
+          flexShrink: 0,
+          opacity: child.opacity ?? 1,
+          position: 'relative',
+        };
+      }
+      
+      return {
+        position: 'absolute',
+        left: child.x * this.zoom + 'px',
+        top: child.y * this.zoom + 'px',
+        width: child.width * this.zoom + 'px',
+        height: child.height * this.zoom + 'px',
+        opacity: child.opacity ?? 1,
+        zIndex: child.z_index || 0,
+      };
+    },
+    
+    // حساب مدة الـ animation للسلايدر
+    getScrollDuration(widget) {
+      const childrenCount = (widget.children || []).length || 1;
+      const speed = widget.scroll_speed || 3; // ثواني لكل عنصر
+      return (speed * childrenCount) + 's';
+    },
+    
+    // Widget layout methods
+    setWidgetLayoutMode(mode) {
+      if (!this.selectedWidget) return;
+      this.selectedWidget.layout_mode = mode;
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+      
+      if (mode !== 'absolute') {
+        this.autoArrangeWidgetChildren();
+      }
+    },
+    
+    onWidgetLayoutChange() {
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+    },
+    
+    autoArrangeWidgetChildren() {
+      if (!this.selectedWidget) return;
+      const widget = this.selectedWidget;
+      
+      (widget.children || []).forEach((child, index) => {
+        child.width = widget.child_width || 80;
+        child.height = widget.child_height || 80;
+        
+        if (widget.layout_mode === 'horizontal') {
+          child.x = index * (child.width + (widget.layout_gap || 8));
+          child.y = 0;
+        } else if (widget.layout_mode === 'vertical') {
+          child.x = 0;
+          child.y = index * (child.height + (widget.layout_gap || 8));
+        }
+      });
+      
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+    },
+    
+    onWidgetScroll(e, widget) {
+      // Allow natural scrolling in horizontal/vertical layout
+      if (widget.layout_mode === 'absolute') {
+        e.preventDefault();
+      }
+    },
+    
+    // Check if child is placed in current widget
+    isChildPlacedInWidget(childId) {
+      if (!this.selectedWidget) return false;
+      return (this.selectedWidget.children || []).some(c => c.theme_child_id === childId);
+    },
+    
+    // Modified child methods to work with widgets
+    selectPlacedChild(child, widget) {
+      if (widget) {
+        this.selectedWidgetId = widget.id;
+      }
+      this.selectedChildId = child.theme_child_id;
+      this.selectedElementType = 'child';
+      this.selectedAssetId = null;
+    },
+    
+    selectPlacedAsset(asset, widget) {
+      if (widget) {
+        this.selectedWidgetId = widget.id;
+      }
+      this.selectedAssetId = asset.id;
+      this.selectedElementType = 'asset';
+    },
+    
+    startDragPlacedChild(e, child, widget) {
+      this.isDragging = true;
+      this.dragType = 'placed-child';
+      this.dragData = { child, widget };
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.dragStartElementX = child.x;
+      this.dragStartElementY = child.y;
+      this.selectPlacedChild(child, widget);
+    },
+    
+    startDragPlacedAsset(e, child, asset, widget) {
+      this.isDragging = true;
+      this.dragType = 'placed-asset';
+      this.dragData = { child, asset, widget };
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+      this.dragStartElementX = asset.x;
+      this.dragStartElementY = asset.y;
+      this.selectPlacedAsset(asset, widget);
+    },
+    
+    initializeFromWidget() {
+      // Legacy support - redirect to initializeWidgets
+      this.initializeWidgets();
+    },
+    
     onKeyDown(e) {
       // Arrow keys for moving (with shift for 10px steps)
       if (this.selectedElement && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -769,6 +1267,7 @@ export default {
 
       // Escape to deselect
       if (e.key === 'Escape') {
+        this.selectedWidgetId = null;
         this.selectedChildId = null;
         this.selectedAssetId = null;
         this.selectedElementType = null;
@@ -829,63 +1328,123 @@ export default {
     },
     onDrop(e) {
       this.isDraggingOver = false;
-      const type = e.dataTransfer.getData('type');
       const rect = this.$refs.mobileScreen.getBoundingClientRect();
       const x = Math.round((e.clientX - rect.left) / this.zoom);
       const y = Math.round((e.clientY - rect.top) / this.zoom);
       
+      // Try to parse JSON data first
+      try {
+        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+        if (data.type === 'widget') {
+          this.placeWidget(data.widget, x, y);
+          return;
+        }
+      } catch (err) {
+        // Not JSON, try legacy format
+      }
+      
+      const type = e.dataTransfer.getData('type');
       if (type === 'child') {
         const childId = parseInt(e.dataTransfer.getData('childId'));
-        this.placeChild(childId, x, y);
+        this.placeChildInWidget(childId, x, y);
       } else if (type === 'asset') {
         const assetId = parseInt(e.dataTransfer.getData('assetId'));
-        this.placeAsset(assetId, x, y);
+        this.placeAssetInChild(assetId, x, y);
       }
     },
-    placeChild(childId, x, y) {
+    
+    // Place widget on screen
+    placeWidget(widgetData, x, y) {
       // Check if already placed
-      if (this.isChildPlaced(childId)) {
+      if (this.isWidgetPlaced(widgetData.id)) {
+        // Just select it
+        this.selectedWidgetId = widgetData.id;
+        return;
+      }
+      
+      const settings = widgetData.settings || {};
+      const themeId = settings.theme_id || widgetData.selected_theme_id || widgetData.widget_theme_id;
+      const theme = this.themes.find(t => String(t.id) === String(themeId));
+      
+      const newWidget = {
+        id: widgetData.id,
+        widget_key: widgetData.widget_key,
+        display_name: widgetData.display_name || widgetData.widget_key,
+        theme_id: themeId,
+        x: x,
+        y: y,
+        width: settings.width || settings.widget_width || theme?.widget_width || 120,
+        height: settings.height || settings.widget_height || theme?.widget_height || 140,
+        layout_mode: 'absolute',
+        layout_gap: 8,
+        layout_padding: 8,
+        child_width: 80,
+        child_height: 80,
+        opacity: 1,
+        z_index: this.placedWidgets.length,
+        background_color: 'transparent',
+        border_radius: 8,
+        children: []
+      };
+      
+      this.placedWidgets.push(newWidget);
+      this.selectPlacedWidget(newWidget);
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+    },
+    
+    // Place child inside selected widget
+    placeChildInWidget(childId, x, y) {
+      if (!this.selectedWidget) {
+        alert('يرجى اختيار ويدجت أولاً');
+        return;
+      }
+      
+      // Check if already placed in this widget
+      if (this.isChildPlacedInWidget(childId)) {
         return;
       }
       
       const themeChild = this.themeChildren.find(c => c.id === childId);
       if (!themeChild) return;
       
+      // Calculate position relative to widget
+      const widget = this.selectedWidget;
+      const relativeX = Math.max(0, x - widget.x);
+      const relativeY = Math.max(0, y - widget.y);
+      
       const newChild = {
+        id: `child_${Date.now()}_${childId}`,
         theme_child_id: themeChild.id,
         name: themeChild.label || themeChild.child_key || `طفل ${themeChild.id}`,
         child_key: themeChild.child_key,
-        width: themeChild.width || 200,
-        height: themeChild.height || 150,
-        x: x,
-        y: y,
-        is_visible: true,
-        rotation: 0,
-        scale: 1,
+        width: widget.child_width || themeChild.width || 80,
+        height: widget.child_height || themeChild.height || 80,
+        x: relativeX,
+        y: relativeY,
         opacity: 1,
-        z_index: this.placedChildren.length,
-        background_color: 'transparent',
-        border_width: 2,
-        border_style: 'dashed',
-        border_color: '#6366f1',
-        border_radius_tl: 8,
-        border_radius_tr: 8,
-        border_radius_bl: 8,
-        border_radius_br: 8,
+        z_index: (widget.children || []).length,
         assets: []
       };
       
-      this.placedChildren.push(newChild);
-      this.selectPlacedChild(newChild);
+      if (!widget.children) widget.children = [];
+      widget.children.push(newChild);
+      this.selectPlacedChild(newChild, widget);
       this.hasUnsavedChanges = true;
       this.saveToHistory();
-      this.autoSave();
     },
-    placeAsset(assetId, x, y) {
-      // Find the selected placed child
-      const placedChild = this.placedChildren.find(c => c.theme_child_id === this.selectedChildId);
+    
+    // Place asset inside selected child
+    placeAssetInChild(assetId, x, y) {
+      if (!this.selectedWidget) {
+        alert('يرجى اختيار ويدجت أولاً');
+        return;
+      }
+      
+      const widget = this.selectedWidget;
+      const placedChild = (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
       if (!placedChild) {
-        alert('يرجى اختيار طفل موضوع في الشاشة أولاً');
+        alert('يرجى اختيار طفل موضوع في الويدجت أولاً');
         return;
       }
       
@@ -899,11 +1458,11 @@ export default {
         return;
       }
       
-      // Calculate position relative to child
-      const childX = placedChild.x;
-      const childY = placedChild.y;
-      const relativeX = Math.max(0, x - childX);
-      const relativeY = Math.max(0, y - childY);
+      // Calculate position relative to child (and widget)
+      const childAbsX = widget.x + placedChild.x;
+      const childAbsY = widget.y + placedChild.y;
+      const relativeX = Math.max(0, x - childAbsX);
+      const relativeY = Math.max(0, y - childAbsY);
       
       const newAsset = {
         id: themeAsset.id,
@@ -911,52 +1470,44 @@ export default {
         name: themeAsset.name || themeAsset.asset_key,
         file_url: themeAsset.file_url || themeAsset.url,
         url: themeAsset.file_url || themeAsset.url,
-        width: themeAsset.width || 80,
-        height: themeAsset.height || 80,
+        asset_type: themeAsset.asset_type,
+        text_content: themeAsset.text_content,
+        width: themeAsset.width || 40,
+        height: themeAsset.height || 40,
         x: relativeX,
         y: relativeY,
         opacity: 1,
         z_index: (placedChild.assets || []).length,
-        rotation: 0,
-        scale: 1,
-        border_width: 0,
-        border_style: 'solid',
-        border_color: 'transparent',
-        border_radius_tl: 0,
-        border_radius_tr: 0,
-        border_radius_bl: 0,
-        border_radius_br: 0,
-        is_visible: true,
       };
       
       if (!placedChild.assets) placedChild.assets = [];
       placedChild.assets.push(newAsset);
-      this.selectPlacedAsset(newAsset);
+      this.selectPlacedAsset(newAsset, widget);
       this.hasUnsavedChanges = true;
       this.saveToHistory();
-      this.autoSave();
     },
     
-    // Drag placed elements
-    startDragPlacedChild(e, child) {
-      this.isDragging = true;
-      this.dragType = 'placed-child';
-      this.dragData = child;
-      this.dragStartX = e.clientX;
-      this.dragStartY = e.clientY;
-      this.dragStartElementX = child.x;
-      this.dragStartElementY = child.y;
-      this.selectPlacedChild(child);
+    // Legacy methods for backward compatibility
+    placeChild(childId, x, y) {
+      this.placeChildInWidget(childId, x, y);
     },
-    startDragPlacedAsset(e, child, asset) {
-      this.isDragging = true;
-      this.dragType = 'placed-asset';
-      this.dragData = { child, asset };
-      this.dragStartX = e.clientX;
-      this.dragStartY = e.clientY;
-      this.dragStartElementX = asset.x;
-      this.dragStartElementY = asset.y;
-      this.selectPlacedAsset(asset);
+    placeAsset(assetId, x, y) {
+      this.placeAssetInChild(assetId, x, y);
+    },
+    
+    isChildPlaced(childId) {
+      return this.isChildPlacedInWidget(childId);
+    },
+    
+    // Get all placed children from all widgets (flattened)
+    getAllPlacedChildren() {
+      const allChildren = [];
+      for (const widget of this.placedWidgets) {
+        for (const child of widget.children || []) {
+          allChildren.push(child);
+        }
+      }
+      return allChildren;
     },
     
     // Resize
@@ -988,11 +1539,18 @@ export default {
         const deltaX = (e.clientX - this.dragStartX) / this.zoom;
         const deltaY = (e.clientY - this.dragStartY) / this.zoom;
         
-        if (this.dragType === 'placed-child') {
+        if (this.dragType === 'placed-widget') {
+          // سحب الويدجت
+          this.dragData.x = Math.max(0, Math.round(this.dragStartElementX + deltaX));
+          this.dragData.y = Math.max(0, Math.round(this.dragStartElementY + deltaY));
+          this.hasUnsavedChanges = true;
+        } else if (this.dragType === 'placed-child') {
+          // سحب الابن داخل الويدجت
           this.dragData.x = Math.max(0, Math.round(this.dragStartElementX + deltaX));
           this.dragData.y = Math.max(0, Math.round(this.dragStartElementY + deltaY));
           this.hasUnsavedChanges = true;
         } else if (this.dragType === 'placed-asset') {
+          // سحب الـ asset داخل الابن
           this.dragData.asset.x = Math.max(0, Math.round(this.dragStartElementX + deltaX));
           this.dragData.asset.y = Math.max(0, Math.round(this.dragStartElementY + deltaY));
           this.hasUnsavedChanges = true;
@@ -1499,19 +2057,217 @@ export default {
       this.hasUnsavedChanges = true;
     },
     
+    // Layout Mode Methods
+    setLayoutMode(mode) {
+      this.layoutMode = mode;
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+      
+      // Auto arrange when switching to layout mode
+      if (mode !== 'absolute') {
+        this.autoArrangeChildren();
+      }
+    },
+    
+    onLayoutChange() {
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+    },
+    
+    // Auto arrange children based on layout mode
+    autoArrangeChildren() {
+      if (this.layoutMode === 'absolute') return;
+      
+      this.placedChildren.forEach((child, index) => {
+        child.width = this.layoutItemWidth;
+        child.height = this.layoutItemHeight;
+        
+        if (this.layoutMode === 'horizontal') {
+          child.x = index * (this.layoutItemWidth + this.layoutGap);
+          child.y = 0;
+        } else if (this.layoutMode === 'vertical') {
+          child.x = 0;
+          child.y = index * (this.layoutItemHeight + this.layoutGap);
+        }
+      });
+      
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
+    },
+    
+    // Mobile screen class for layout mode
+    getMobileScreenClass() {
+      return {
+        'layout-mode': this.layoutMode !== 'absolute',
+        'horizontal-layout': this.layoutMode === 'horizontal',
+        'vertical-layout': this.layoutMode === 'vertical',
+      };
+    },
+    
+    // Mobile screen style
+    getMobileScreenStyle() {
+      return {
+        width: this.screenWidth * this.zoom + 'px',
+        height: this.screenHeight * this.zoom + 'px',
+      };
+    },
+    
+    // Scroll container class
+    getScrollContainerClass() {
+      return {
+        'horizontal': this.layoutMode === 'horizontal',
+        'vertical': this.layoutMode === 'vertical',
+      };
+    },
+    
+    // Scroll container style
+    getScrollContainerStyle() {
+      if (this.layoutMode === 'horizontal') {
+        return {
+          display: 'flex',
+          flexDirection: 'row',
+          gap: this.layoutGap * this.zoom + 'px',
+          padding: this.layoutPadding * this.zoom + 'px',
+          overflowX: 'auto',
+          overflowY: 'hidden',
+          height: '100%',
+          alignItems: 'flex-start',
+        };
+      } else if (this.layoutMode === 'vertical') {
+        return {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: this.layoutGap * this.zoom + 'px',
+          padding: this.layoutPadding * this.zoom + 'px',
+          overflowX: 'hidden',
+          overflowY: 'auto',
+          width: '100%',
+          alignItems: 'flex-start',
+        };
+      }
+      return {};
+    },
+    
+    // Style for children in layout mode
+    getLayoutChildStyle(child) {
+      const borderRadius = this.getBorderRadiusStyle(child);
+      return {
+        width: child.width * this.zoom + 'px',
+        height: child.height * this.zoom + 'px',
+        minWidth: child.width * this.zoom + 'px',
+        minHeight: child.height * this.zoom + 'px',
+        flexShrink: 0,
+        display: child.is_visible ? 'block' : 'none',
+        transform: `rotate(${child.rotation || 0}deg) scale(${child.scale || 1})`,
+        opacity: child.opacity ?? 1,
+        backgroundColor: child.background_color || 'transparent',
+        borderWidth: (child.border_width || 2) + 'px',
+        borderStyle: child.border_style || 'dashed',
+        borderColor: child.border_color || '#6366f1',
+        borderRadius: borderRadius,
+        zIndex: child.z_index || 0,
+        position: 'relative',
+      };
+    },
+    
+    // Handle scroll in mobile screen preview
+    onMobileScreenScroll(e) {
+      if (this.layoutMode === 'absolute') return;
+      
+      const scrollContainer = this.$refs.scrollContainer;
+      if (!scrollContainer) return;
+      
+      e.preventDefault();
+      
+      if (this.layoutMode === 'horizontal') {
+        scrollContainer.scrollLeft += e.deltaY;
+      } else {
+        scrollContainer.scrollTop += e.deltaY;
+      }
+    },
+    
     // Save
     async saveDesign() {
       if (this.isSaving) return; // Prevent multiple saves
       this.isSaving = true;
       
       try {
-        // Prepare data for saving with ALL properties
+        // Prepare data for saving with ALL widgets and their children
         const designData = {
           theme_id: this.selectedThemeId,
           // Widget dimensions (screen size)
           widget_width: this.screenWidth,
           widget_height: this.screenHeight,
-          children: this.placedChildren.map(child => ({
+          // All placed widgets with their layout and children
+          widgets: this.placedWidgets.map(widget => ({
+            widget_id: widget.id,
+            widget_key: widget.widget_key,
+            display_name: widget.display_name,
+            x: widget.x,
+            y: widget.y,
+            width: widget.width,
+            height: widget.height,
+            z_index: widget.z_index || 1,
+            // Layout settings for this widget
+            layout_mode: widget.layout_mode || 'absolute',
+            layout_gap: widget.layout_gap || 10,
+            layout_padding: widget.layout_padding || 10,
+            layout_item_width: widget.layout_item_width || widget.child_width || 100,
+            layout_item_height: widget.layout_item_height || widget.child_height || 100,
+            child_width: widget.child_width || 80,
+            child_height: widget.child_height || 100,
+            infinite_scroll: widget.infinite_scroll || false,
+            scroll_speed: widget.scroll_speed || 3,
+            layout_show_scroll_indicator: widget.layout_show_scroll_indicator !== false,
+            // Children inside this widget
+            children: (widget.children || []).map(child => ({
+              theme_child_id: child.theme_child_id,
+              name: child.name,
+              child_key: child.child_key,
+              width: child.width,
+              height: child.height,
+              x: child.x,
+              y: child.y,
+              is_visible: child.is_visible,
+              rotation: child.rotation,
+              scale: child.scale,
+              opacity: child.opacity,
+              z_index: child.z_index,
+              background_color: child.background_color,
+              border_width: child.border_width,
+              border_style: child.border_style,
+              border_color: child.border_color,
+              border_radius_tl: child.border_radius_tl,
+              border_radius_tr: child.border_radius_tr,
+              border_radius_bl: child.border_radius_bl,
+              border_radius_br: child.border_radius_br,
+              assets: (child.assets || []).map(asset => ({
+                id: asset.id,
+                asset_key: asset.asset_key,
+                name: asset.name,
+                file_url: asset.file_url,
+                url: asset.file_url,
+                width: asset.width,
+                height: asset.height,
+                x: asset.x,
+                y: asset.y,
+                opacity: asset.opacity,
+                z_index: asset.z_index,
+                rotation: asset.rotation,
+                scale: asset.scale,
+                border_width: asset.border_width,
+                border_style: asset.border_style,
+                border_color: asset.border_color,
+                border_radius_tl: asset.border_radius_tl,
+                border_radius_tr: asset.border_radius_tr,
+                border_radius_bl: asset.border_radius_bl,
+                border_radius_br: asset.border_radius_br,
+                is_visible: asset.is_visible,
+              }))
+            }))
+          })),
+          // Legacy: also include flattened children for backward compatibility
+          children: this.getAllPlacedChildren().map(child => ({
             theme_child_id: child.theme_child_id,
             name: child.name,
             child_key: child.child_key,
@@ -1561,79 +2317,78 @@ export default {
         this.$emit('save', designData);
         // حفظ فعلي في config المختار
         if (this.configurationId) {
-          const widgetOverride = {
-            widget_id: this.widget?.id,
+          const widgetsOverride = this.placedWidgets.map(widget => ({
+            widget_id: widget.id,
             theme_id: this.selectedThemeId,
-            widget_width: this.screenWidth,
-            widget_height: this.screenHeight,
-            children: designData.children,
-          };
+            x: widget.x,
+            y: widget.y,
+            width: widget.width,
+            height: widget.height,
+            layout_mode: widget.layout_mode,
+            layout_gap: widget.layout_gap,
+            layout_padding: widget.layout_padding,
+            layout_item_width: widget.layout_item_width,
+            layout_item_height: widget.layout_item_height,
+            children: (widget.children || []),
+          }));
           try {
             await configurationsApi.update(this.configurationId, {
-              widget_overrides: [widgetOverride]
+              widget_overrides: widgetsOverride,
+              screen_width: this.screenWidth,
+              screen_height: this.screenHeight,
             });
           } catch (e) {
             console.error('خطأ في حفظ التعديلات في الكونفيج المختار', e);
           }
         }
         
-        // Save widget dimensions to designerApi
-        if (this.widget?.id) {
-          try {
-            await designerApi.updateWidgetDimensions(this.widget.id, {
-              widget_width: this.screenWidth,
-              widget_height: this.screenHeight,
-              theme_id: this.selectedThemeId,
-            });
-          } catch (e) {
-            console.warn('لم يتم حفظ أبعاد الويدجت:', e);
-          }
-        }
         // Also save ALL properties to database if we have real IDs
         const childrenToUpdate = [];
         const assetsToUpdate = [];
-        for (const child of this.placedChildren) {
-          if (child.theme_child_id) {
-            childrenToUpdate.push({
-              id: child.theme_child_id,
-              width: child.width,
-              height: child.height,
-              x: child.x,
-              y: child.y,
-              rotation: child.rotation,
-              scale: child.scale,
-              opacity: child.opacity,
-              z_index: child.z_index,
-              background_color: child.background_color,
-              border_width: child.border_width,
-              border_style: child.border_style,
-              border_color: child.border_color,
-              border_radius_tl: child.border_radius_tl,
-              border_radius_tr: child.border_radius_tr,
-              border_radius_bl: child.border_radius_bl,
-              border_radius_br: child.border_radius_br,
-            });
-          }
-          for (const asset of child.assets || []) {
-            if (asset.id) {
-              assetsToUpdate.push({
-                id: asset.id,
-                width: asset.width,
-                height: asset.height,
-                x: asset.x,
-                y: asset.y,
-                opacity: asset.opacity,
-                z_index: asset.z_index,
-                rotation: asset.rotation,
-                scale: asset.scale,
-                border_width: asset.border_width,
-                border_style: asset.border_style,
-                border_color: asset.border_color,
-                border_radius_tl: asset.border_radius_tl,
-                border_radius_tr: asset.border_radius_tr,
-                border_radius_bl: asset.border_radius_bl,
-                border_radius_br: asset.border_radius_br,
+        for (const widget of this.placedWidgets) {
+          for (const child of widget.children || []) {
+            if (child.theme_child_id) {
+              childrenToUpdate.push({
+                id: child.theme_child_id,
+                width: child.width,
+                height: child.height,
+                x: child.x,
+                y: child.y,
+                rotation: child.rotation,
+                scale: child.scale,
+                opacity: child.opacity,
+                z_index: child.z_index,
+                background_color: child.background_color,
+                border_width: child.border_width,
+                border_style: child.border_style,
+                border_color: child.border_color,
+                border_radius_tl: child.border_radius_tl,
+                border_radius_tr: child.border_radius_tr,
+                border_radius_bl: child.border_radius_bl,
+                border_radius_br: child.border_radius_br,
               });
+            }
+            for (const asset of child.assets || []) {
+              if (asset.id) {
+                assetsToUpdate.push({
+                  id: asset.id,
+                  width: asset.width,
+                  height: asset.height,
+                  x: asset.x,
+                  y: asset.y,
+                  opacity: asset.opacity,
+                  z_index: asset.z_index,
+                  rotation: asset.rotation,
+                  scale: asset.scale,
+                  border_width: asset.border_width,
+                  border_style: asset.border_style,
+                  border_color: asset.border_color,
+                  border_radius_tl: asset.border_radius_tl,
+                  border_radius_tr: asset.border_radius_tr,
+                  border_radius_bl: asset.border_radius_bl,
+                  border_radius_br: asset.border_radius_br,
+                });
+              }
             }
           }
         }
@@ -1891,15 +2646,210 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   background: #1a1a2e;
   padding: 20px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  gap: 12px;
 }
 
 .panel-section {
   padding: 16px;
   border-bottom: 1px solid #3d3d5c;
+}
+
+/* Widget Select Dropdown */
+.widget-select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.widget-select:hover {
+  border-color: #6366f1;
+}
+
+.widget-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Widget Layout Settings */
+.widget-layout-settings {
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.setting-group {
+  margin-bottom: 12px;
+}
+
+.setting-group:last-child {
+  margin-bottom: 0;
+}
+
+.setting-label {
+  display: block;
+  font-size: 12px;
+  color: #a0a0b0;
+  margin-bottom: 6px;
+}
+
+.setting-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.setting-field {
+  flex: 1;
+}
+
+.setting-input {
+  width: 100%;
+  padding: 8px 10px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+}
+
+.setting-input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* Layout Buttons Small */
+.layout-btn-sm {
+  padding: 6px 10px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: #a0a0b0;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.layout-btn-sm:hover {
+  border-color: #6366f1;
+  color: white;
+}
+
+.layout-btn-sm.active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: transparent;
+  color: white;
+}
+
+/* Checkbox Label */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #e0e0e0;
+  padding: 8px 0;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+
+/* Horizontal Scroll Container */
+.horizontal-scroll-container {
+  display: flex;
+  gap: var(--layout-gap, 8px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--layout-padding, 8px);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+.horizontal-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 2px;
+}
+
+/* Infinite Scroll Animation */
+.infinite-scroll-container {
+  display: flex;
+  gap: var(--layout-gap, 8px);
+  animation: infinite-scroll 20s linear infinite;
+  width: max-content;
+}
+
+.infinite-scroll-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.infinite-scroll-track {
+  display: flex;
+  gap: inherit;
+  animation: infinite-scroll-slide linear infinite;
+  animation-duration: var(--scroll-duration, 15s);
+  width: max-content;
+}
+
+.infinite-scroll-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes infinite-scroll-slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.infinite-scroll-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  font-size: 8px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  z-index: 10;
+  opacity: 0.9;
 }
 
 .panel-section.properties-section {
@@ -2134,6 +3084,7 @@ export default {
   border-radius: 40px;
   padding: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 3px #333;
+  flex-shrink: 0;
 }
 
 .mobile-notch {
@@ -2188,6 +3139,131 @@ export default {
   margin: 8px auto 0;
 }
 
+/* Widget List in Left Panel */
+.widgets-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.widget-list-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #252536;
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.widget-list-item:hover {
+  background: #3d3d5c;
+}
+
+.widget-list-item.active {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.widget-list-item.placed {
+  border-color: #6366f1;
+}
+
+.widget-icon {
+  font-size: 20px;
+}
+
+.widget-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.widget-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-type {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.placed-badge {
+  color: #10b981;
+  font-size: 14px;
+}
+
+/* Placed Widget */
+.placed-widget {
+  position: absolute;
+  background: rgba(16, 185, 129, 0.05);
+  border: 2px solid #10b981;
+  border-radius: 8px;
+  cursor: move;
+  transition: box-shadow 0.2s;
+  overflow: hidden;
+}
+
+.placed-widget.selected {
+  border-width: 3px;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+}
+
+.placed-widget .widget-label {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  background: #10b981;
+  color: white;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.widget-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.widget-content.horizontal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+}
+
+.widget-content.horizontal-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.widget-content.horizontal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 2px;
+}
+
+.widget-content.vertical-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+}
+
+.widget-content.vertical-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.widget-content.vertical-scroll::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 2px;
+}
+
 /* Placed Elements */
 .placed-child {
   position: absolute;
@@ -2196,6 +3272,12 @@ export default {
   border-radius: 8px;
   cursor: move;
   transition: box-shadow 0.2s;
+  overflow: hidden;
+}
+
+.placed-child.layout-child {
+  position: relative;
+  flex-shrink: 0;
 }
 
 .placed-child.selected {
@@ -2213,6 +3295,19 @@ export default {
   padding: 2px 8px;
   border-radius: 4px;
   white-space: nowrap;
+}
+
+.placed-child .child-label-small {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: rgba(99, 102, 241, 0.8);
+  color: white;
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  z-index: 5;
 }
 
 .placed-asset {
@@ -2289,10 +3384,11 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
-  padding: 8px 16px;
+  margin-top: 12px;
+  padding: 6px 12px;
   background: #252536;
   border-radius: 12px;
+  flex-shrink: 0;
 }
 
 .control-btn {
@@ -2322,12 +3418,64 @@ export default {
   text-align: center;
 }
 
-/* Widget Size Controls */
-.widget-size-controls {
-  margin-top: 12px;
-  padding: 12px;
+.control-btn.settings-toggle {
+  margin-left: auto;
+}
+
+/* Design Settings Panel */
+.design-settings-panel {
   background: #252536;
   border-radius: 12px;
+  padding: 12px;
+  width: 100%;
+  max-width: 450px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.settings-section {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3d3d5c;
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-section-title {
+  color: #e2e8f0;
+  font-size: 13px;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.auto-arrange-btn-small {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auto-arrange-btn-small:hover {
+  opacity: 0.9;
+}
+
+/* Widget Size Controls */
+.widget-size-controls {
+  margin-top: 8px;
+  padding: 10px;
+  background: #252536;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  flex-shrink: 0;
 }
 
 .size-title {
@@ -2344,6 +3492,7 @@ export default {
 
 .size-input-group {
   flex: 1;
+  min-width: 0;
 }
 
 .size-input-group label {
@@ -2394,6 +3543,196 @@ export default {
   background: #6366f1;
   border-color: #6366f1;
   color: white;
+}
+
+/* Widget Layout Controls */
+.widget-layout-controls {
+  margin-top: 8px;
+  padding: 10px;
+  background: #252536;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  flex-shrink: 0;
+}
+
+.layout-mode-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.layout-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.layout-btn:hover {
+  background: #3d3d5c;
+  color: white;
+}
+
+.layout-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}
+
+.layout-icon {
+  font-size: 18px;
+}
+
+.layout-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #3d3d5c;
+  margin-top: 8px;
+}
+
+.layout-setting-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.layout-setting-group {
+  flex: 1;
+  min-width: 60px;
+}
+
+.layout-setting-group label {
+  display: block;
+  color: #9ca3af;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.layout-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggle-label-small {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.toggle-label-small input {
+  width: 14px;
+  height: 14px;
+  accent-color: #6366f1;
+}
+
+.auto-arrange-btn {
+  width: 100%;
+  padding: 8px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.auto-arrange-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Scroll Container Styles */
+.mobile-screen.layout-mode {
+  overflow: hidden;
+}
+
+.scroll-container {
+  width: 100%;
+  height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.5);
+  border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.7);
+}
+
+.scroll-container.horizontal {
+  white-space: nowrap;
+}
+
+/* Layout Child (in scroll mode) */
+.placed-child.layout-child {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.placed-child.layout-child .child-label {
+  top: -20px;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  pointer-events: none;
+  animation: pulse 2s infinite;
+}
+
+.scroll-indicator.horizontal {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.scroll-indicator.vertical {
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 /* Properties Panel */
