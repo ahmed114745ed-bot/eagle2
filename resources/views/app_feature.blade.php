@@ -677,51 +677,53 @@
                 </div>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-header">
-                    <div class="feature-icon">
-                        <i class="fas fa-camera"></i>
+            @if(\Nwidart\Modules\Facades\Module::has('Moment') && \Nwidart\Modules\Facades\Module::isEnabled('Moment'))
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="feature-name">
+                            {{ __('Moment Status') }}
+                        </div>
+                        <div class="feature-status">
+                            {{ $momentStatus ? __('Enabled') : __('Disabled') }}
+                        </div>
+                        <div class="feature-label">{{ __('Moment') }}</div>
                     </div>
-                    <div class="feature-name">
-                        {{ __('Moment Status') }}
-                    </div>
-                    <div class="feature-status">
-                        {{ $momentStatus ? __('Enabled') : __('Disabled') }}
-                    </div>
-                    <div class="feature-label">{{ __('Moment') }}</div>
-                </div>
-                <div class="feature-body">
-                    <form id="momentStatusForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
-                          enctype="multipart/form-data">
-                        @csrf
-                        @php
-                            $errorMessage = $errors ? $errors->first('msg') : null;
-                        @endphp
-                        @if ($errorMessage)
-                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
-                        @endif
+                    <div class="feature-body">
+                        <form id="momentStatusForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                              enctype="multipart/form-data">
+                            @csrf
+                            @php
+                                $errorMessage = $errors ? $errors->first('msg') : null;
+                            @endphp
+                            @if ($errorMessage)
+                                <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                            @endif
 
-                        <div class="feature-toggle-container">
-                            <span class="toggle-label">{{ __('Enable moment status Feature') }}</span>
-                            <label class="switch">
-                                <input type="checkbox" id="moment_status_toggle" {{ $momentStatus ? 'checked' : '' }}
-                                onchange="document.getElementById('moment_status_value').value = this.checked ? '1' : '0';
+                            <div class="feature-toggle-container">
+                                <span class="toggle-label">{{ __('Enable moment status Feature') }}</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="moment_status_toggle" {{ $momentStatus ? 'checked' : '' }}
+                                    onchange="document.getElementById('moment_status_value').value = this.checked ? '1' : '0';
                                     document.getElementById('momentStatusForm').submit();">
-                                <span class="slider round"></span>
-                            </label>
-                            <input type="hidden" name="moment_status" id="moment_status_value"
-                                   value="{{ $momentStatus ? '1' : '0' }}">
-                        </div>
-
-                        <div class="feature-description-container">
-                            <h4>{{ __('Feature Description') }}</h4>
-                            <div id="feature-description-content" class="external-content">
-                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                                    <span class="slider round"></span>
+                                </label>
+                                <input type="hidden" name="moment_status" id="moment_status_value"
+                                       value="{{ $momentStatus ? '1' : '0' }}">
                             </div>
-                        </div>
-                    </form>
+
+                            <div class="feature-description-container">
+                                <h4>{{ __('Feature Description') }}</h4>
+                                <div id="feature-description-content" class="external-content">
+                                    <div class="loading">{{ __('Loading feature description...') }}</div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <div class="feature-card">
                 <div class="feature-header">

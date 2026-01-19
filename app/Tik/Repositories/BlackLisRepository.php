@@ -3,14 +3,10 @@
 namespace App\Tik\Repositories;
 
 use App\Models\BlackList;
-use App\Models\Interest;
-use Illuminate\Support\Facades\DB;
-use Modules\Moment\Entities\Moment;
-
 
 class BlackLisRepository extends AbstractRepository
 {
-    
+
     public function __construct()
     {
         parent::__construct(new BlackList());
@@ -29,18 +25,18 @@ class BlackLisRepository extends AbstractRepository
                           ->select('id','user_id')
                           ->has('user')
                           ->with('user:id,name,uuid')
-                          
+
                           ->paginate($perPage, ['*'], 'page', $page);
-   
+
     }
-   
+
 
     // public function search($key){
     //     return $this->model->with('user')->whereHas('user', function ($query) use ($key) {
     //         $query->where('uuid', 'like', "%$key%")
     //         ->orWhere('name', 'like', "%$key%");
     //     })->get()->unique('user_id')->values();
-        
+
     // }
 
     // public function blocked_search($user_id,$key){
@@ -49,11 +45,11 @@ class BlackLisRepository extends AbstractRepository
     //         $query->where('uuid', 'like', "%$key%")
     //         ->orWhere('name', 'like', "%$key%");
     //     })->get()->unique('user_id')->values();
-        
+
     // }
-    
+
     public function store( array $data){
-           return $this->create($data);   
+           return $this->create($data);
     }
     public function black_lists($userid,$key,$perPage,$page){
         return $this->model
@@ -65,11 +61,11 @@ class BlackLisRepository extends AbstractRepository
         })
         ->with('blockedPerson')->whereHas('user', function ($query) use ($userid) {
             $query->where('id', 'like', "%$userid%");
-        })->paginate($perPage, ['*'], 'page', $page);   
+        })->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function delete($id){
-        return $this->delete($id);   
+        return $this->delete($id);
     }
-    
+
 }

@@ -2,9 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Interest;
 use App\Models\MangerType;
-use Modules\Moment\Entities\Moment;
 
 
 class MangerTypesRepository extends AbstractRepository
@@ -32,12 +30,12 @@ class MangerTypesRepository extends AbstractRepository
 
         $query->whereHas('user', function ($query) use ($input) {
             $query->where('uuid', trim($input)) ;
-                 
+
         })->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
-        
-        $result = $query->get(); 
-        
+
+        $result = $query->get();
+
         return $result ;
-     
+
     }
 }

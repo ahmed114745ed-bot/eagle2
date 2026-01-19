@@ -98,7 +98,6 @@ use App\Http\Controllers\utd\WeeklyEventController;
 use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
-use Modules\Moment\Http\Controllers\utd\ReportMomentController;
 
 // 'utd.decreptHeader'
 // utd apis

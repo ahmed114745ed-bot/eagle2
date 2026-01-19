@@ -2,18 +2,17 @@
 
 namespace App\Tik\Services;
 
-use App\Helpers\Common;
-use App\Tik\Repositories\WareRepository;
-use App\Http\Resources\MomentGiftResource;
+use App\Http\Resources\AudioGiftsListResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
-use App\Http\Resources\AudioGiftsListResource;
+use Modules\Moment\Transformers\MomentGiftResource;
 use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
+use Nwidart\Modules\Facades\Module;
 
 
 class WalletStatisticService
 {
-   
+
     public function __construct(
         private readonly GiftLogRepository $giftLogRepository,
         private readonly UserLogRepository $userCoinLogRepository
@@ -35,13 +34,16 @@ class WalletStatisticService
                 break;
 
             case 3:
-                $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
-                    ->whereHas('moment', function ($q) use ($userId) {
-                        $q->where('user_id', $userId);
-                    })
-                    ->groupBy('user_id', 'moment_id', 'gift_id')
-                    ->with(['user', 'gift'])
-                    ->paginate($perPage, ['*'], 'page', $page);
+                $list = collect();
+                if (Module::has('Moment') && Module::isEnabled('Moment')) {
+                    $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
+                        ->whereHas('moment', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        })
+                        ->groupBy('user_id', 'moment_id', 'gift_id')
+                        ->with(['user', 'gift'])
+                        ->paginate($perPage, ['*'], 'page', $page);
+                }
 
                 $resourceClass = MomentGiftResource::class;
                 break;
@@ -55,5 +57,5 @@ class WalletStatisticService
         ];
     }
 
- 
+
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Modules\Moment\Transformers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;

@@ -5,6 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\TargetEdit;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Nwidart\Modules\Facades\Module;
 use PDF;
 use App\Models\User;
 use App\Models\Target;
@@ -27,6 +28,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 class TargetController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'target';
 
     public function index(Content $content)
@@ -79,7 +81,6 @@ class TargetController extends MainController
     }
 
 
-
     /**
      * Make a grid builder.
      *
@@ -107,7 +108,9 @@ class TargetController extends MainController
         // $this->addAppProfitColumn($grid, $coins);
         $this->addHoursDaysColumns($grid);
         $this->addReelColumn($grid);
-        $this->addMomentColumn($grid);
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $this->addMomentColumn($grid);
+        }
         // $this->addConfirmColumn($grid);
 
         $this->addExportButton($grid);
@@ -125,7 +128,7 @@ class TargetController extends MainController
         });
 
         Admin::html('
-        <div id="loadingOverlay" 
+        <div id="loadingOverlay"
             style="display:none; position:fixed; top:0; left:0; width:100%; height:100%;
             background:rgba(255,255,255,0.7); z-index:999999; text-align:center;">
             <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);">
@@ -319,6 +322,10 @@ class TargetController extends MainController
 
     protected function addMomentColumn($grid)
     {
+        if (!Module::has('Moment') || !Module::isEnabled('Moment')) {
+            return;
+        }
+
         $grid->column('moment', __('Moment'))
             ->display(function ($value) {
                 $old = explode(',', $value);
@@ -349,6 +356,7 @@ class TargetController extends MainController
                 return '';
             });
     }
+
     protected function displayOldNewValue($old, $new, $prefix = '', $isPercentage = false)
     {
         if ($old == $new) {
@@ -399,7 +407,6 @@ class TargetController extends MainController
     //         ");
 
 
-
     // }
 
     protected function addConfirmScript()
@@ -430,9 +437,6 @@ class TargetController extends MainController
         });
     ");
     }
-
-
-
 
 
     protected function addExportButton($grid)
@@ -516,14 +520,11 @@ class TargetController extends MainController
         $coins = Common::getMaxCoins();
 
 
-
         $form->display(__('ID'));
 
         $form->hidden('level', __('target no'))->default(function () {
             return Target::max('level') + 1;
         });
-
-
 
 
         $form->decimal('diamonds', __('diamonds'))
@@ -534,25 +535,25 @@ class TargetController extends MainController
             ->required();
 
         $form->decimal('usd', __('Host Percentage') . '(%)')
-            ->help('<span id="usd_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->help('<span id="usd_amount">' . __('Amount will be: ') . ' USD</span>')
             ->rules('min:0')
             ->default(0)
             ->required();
 
-        $form->decimal('agency_share',  __('agency share') . '(%)')
-            ->help('<span id="agency_amount">' . __('Amount will be: ')  . ' USD</span>')
+        $form->decimal('agency_share', __('agency share') . '(%)')
+            ->help('<span id="agency_amount">' . __('Amount will be: ') . ' USD</span>')
             ->rules('min:0')
             ->default(0)
             ->required();
 
-        $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
-            ->help('<span id="super_admin_amount">' . __('Amount will be: ')  . ' USD</span>')
+        $form->decimal('db_percentage', __('DB  Percentage') . '(%)')
+            ->help('<span id="super_admin_amount">' . __('Amount will be: ') . ' USD</span>')
             ->rules('min:0')
             ->default(0)
             ->required();
 
         $form->decimal('app_profit_percentage', __('app profit Percentage') . '(%)')
-            ->help('<span id="zone_amount">' . __('Amount will be: ')  . ' USD</span>')
+            ->help('<span id="zone_amount">' . __('Amount will be: ') . ' USD</span>')
             ->rules('min:0')
             ->default(100)
             ->disable();
@@ -650,7 +651,7 @@ class TargetController extends MainController
         $form->hidden('reel', 'reel');
         $form->number('reel1', __('uploadReel'))->default(function ($form) {
             $reel = $form->model()->reel;
-            $str    = @explode(',', $reel)[0];
+            $str = @explode(',', $reel)[0];
             return $str == null || $str == '' ? 0 : $str;
         });
         $form->number('reel2', __('LikeReel'))->default(function ($form) {
@@ -663,24 +664,26 @@ class TargetController extends MainController
 
             return @explode(',', $reel)[2] ?? 0;
         });
-        $form->html('<h1>' . __('Moment') . '</h1>');
-        $form->hidden('moment', 'moment');
 
-        $form->number('moment1', __('uploadMoment'))->default(function ($form) {
-            $moment = $form->model()->moment;
-            $str    = @explode(',', $moment)[0];
-            return $str == null || $str == '' ? 0 : $str;
-        });
-        $form->number('moment2', __('likeMoment'))->default(function ($form) {
-            $moment = $form->model()->moment;
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $form->html('<h1>' . __('Moment') . '</h1>');
+            $form->hidden('moment', 'moment');
+            $form->number('moment1', __('uploadMoment'))->default(function ($form) {
+                $moment = $form->model()->moment;
+                $str = @explode(',', $moment)[0];
+                return $str == null || $str == '' ? 0 : $str;
+            });
+            $form->number('moment2', __('likeMoment'))->default(function ($form) {
+                $moment = $form->model()->moment;
 
-            return @explode(',', $moment)[1] ?? 0;
-        });
-        $form->number('moment3', __('commentMoment'))->default(function ($form) {
-            $moment = $form->model()->moment;
+                return @explode(',', $moment)[1] ?? 0;
+            });
+            $form->number('moment3', __('commentMoment'))->default(function ($form) {
+                $moment = $form->model()->moment;
 
-            return @explode(',', $moment)[2] ?? 0;
-        });
+                return @explode(',', $moment)[2] ?? 0;
+            });
+        }
 
         $form->editing(function (Form $form) {
 
@@ -709,7 +712,8 @@ class TargetController extends MainController
                         }
                     });
                 </script>
-                HTML);
+                HTML
+        );
 
 
         $form->saving(function (Form $form) {
@@ -727,7 +731,7 @@ class TargetController extends MainController
                 if ($value < 0) {
                     $error = new MessageBag(
                         [
-                            'title'   => 'forbidden',
+                            'title' => 'forbidden',
                             'message' => __('The field :field must be a positive number.', ['field' => $key]),
                         ]
                     );
@@ -739,13 +743,12 @@ class TargetController extends MainController
             if ($total > 100) {
                 $error = new MessageBag(
                     [
-                        'title'   => 'forbidden',
+                        'title' => 'forbidden',
                         'message' => __('The total percentage must be 100%.'),
                     ]
                 );
                 return back()->with(compact('error'));
             }
-
 
 
             if ($form->isEditing()) {
@@ -760,9 +763,11 @@ class TargetController extends MainController
                     'hours' => $form->hours,
                     'days' => $form->days,
                     'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
-                    'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
                 ];
 
+                if (Module::has('Moment') && Module::isEnabled('Moment')) {
+                    $editData['moment'] = $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3;
+                }
 
                 $edit = TargetEdit::updateOrCreate(
                     ['target_id' => $target->id],
@@ -792,11 +797,11 @@ class TargetController extends MainController
 
     public function update($id)
     {
-        $data   = \request()->all();
+        $data = \request()->all();
         if (isset($data['reel1'])) {
-            $reel1  = $data['reel1'];
-            $reel2  = $data['reel2'];
-            $reel3  = $data['reel3'];
+            $reel1 = $data['reel1'];
+            $reel2 = $data['reel2'];
+            $reel3 = $data['reel3'];
             $values = [
                 $reel1,
                 $reel2,
@@ -809,23 +814,20 @@ class TargetController extends MainController
             unset($data['reel3']);
         }
 
-        if (isset($data['moment1'])) {
-            $moment1 = $data['moment1'];
-            $moment2 = $data['moment2'];
-            $moment3 = $data['moment3'];
-            $values2 = [
-                $moment1,
-                $moment2,
-                $moment3,
-            ];
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            if (isset($data['moment1'])) {
+                $values2 = [
+                    $data['moment1'],
+                    $data['moment2'],
+                    $data['moment3'],
+                ];
 
-            $data = array_merge($data, ['moment' => implode(" ,", $values2)]);
-            unset($data['moment1']);
-            unset($data['moment2']);
-            unset($data['moment3']);
+                $data = array_merge($data, ['moment' => implode(" ,", $values2)]);
+                unset($data['moment1']);
+                unset($data['moment2']);
+                unset($data['moment3']);
+            }
         }
-
-
 
         \request()->replace($data);
         return $this->form()->update($id);
@@ -841,20 +843,27 @@ class TargetController extends MainController
             $data['reel3'],
         ];
 
-        $values2 = [
-            $data['moment1'],
-            $data['moment2'],
-            $data['moment3'],
-        ];
-
-        $data = array_merge($data, ['reel' => implode(" ,", $values), 'moment' => implode(" ,", $values2)]);
+        $data = array_merge($data, ['reel' => implode(" ,", $values)]);
 
         unset($data['reel1']);
         unset($data['reel2']);
         unset($data['reel3']);
-        unset($data['moment1']);
-        unset($data['moment2']);
-        unset($data['moment3']);
+
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            if (isset($data['moment1'])) {
+                $values2 = [
+                    $data['moment1'],
+                    $data['moment2'],
+                    $data['moment3'],
+                ];
+
+                $data = array_merge($data, ['moment' => implode(" ,", $values2)]);
+                unset($data['moment1']);
+                unset($data['moment2']);
+                unset($data['moment3']);
+            }
+        }
+
         request()->replace($data);
 
         //        Target::create($data);

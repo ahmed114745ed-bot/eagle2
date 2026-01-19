@@ -2,22 +2,17 @@
 
 namespace Modules\UsersWallet\Services;
 
-use App\Models\WalletTransaction;
+use App\Http\Resources\AudioGiftsListResource;
+use App\Tik\Repositories\GiftLogRepository;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Exception;
-use Modules\UsersWallet\Entities\UserWallet;
-use Modules\UsersWallet\Entities\WalletLog;
+use Modules\Moment\Entities\MomentUserGift;
+use Modules\Moment\Transformers\MomentGiftResource;
 use Modules\UsersWallet\Entities\WalletTemplate;
 use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
-use App\Helpers\Common;
-use App\Tik\Repositories\WareRepository;
-use App\Http\Resources\MomentGiftResource;
-use App\Tik\Repositories\GiftLogRepository;
-use Modules\Moment\Entities\MomentUserGift;
-use App\Http\Resources\AudioGiftsListResource;
 use Nwidart\Modules\Facades\Module;
 
 class WalletService
