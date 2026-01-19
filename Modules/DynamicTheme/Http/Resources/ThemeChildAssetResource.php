@@ -4,6 +4,7 @@ namespace Modules\DynamicTheme\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ThemeChildAssetResource extends JsonResource
 {
@@ -12,7 +13,8 @@ class ThemeChildAssetResource extends JsonResource
         // Build file_url from file_path or use default_url
         $fileUrl = $this->default_url;
         if ($this->file_path) {
-            $fileUrl = asset('storage/' . $this->file_path);
+            // Use Storage::url() to get the correct URL (works with GCS, S3, local, etc.)
+            $fileUrl = Storage::url($this->file_path);
         }
         
         return [
