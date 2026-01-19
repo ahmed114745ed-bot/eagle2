@@ -134,7 +134,7 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-        $form->html('<div class="custom-full-width">');
+         $form->html('<div class="full-column-width">');
         $form->hidden('milestone_id')->value(request('milestone_id'));
 
         $form->select('type', __('Type'))->options([
@@ -171,12 +171,16 @@ class MilestoneRewardController
             ->when("coins", function (Form $form) {
                 $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
             });
-
+           $form->html('</div>');
 
         Admin::style('
               .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
                     display: table !important;
                     width: 50% !important;
+                }
+
+                .rtl .fields-group .form-group {
+                    /* display: flex !important; */
                 }
         ');
         $form->saving(function (Form $form) {
