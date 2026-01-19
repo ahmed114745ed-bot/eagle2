@@ -1131,8 +1131,8 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
-                    {{-- <span class="meta-value">{{@$user->userType() }}</span>  --}}
-                    {!! @$user->userTypeBadge() !!}
+                   
+                    {!! @$user->userTypeBadge() !!}{!! @$user->userTypeBadge() !!}
                 </div>
 
             </div>
