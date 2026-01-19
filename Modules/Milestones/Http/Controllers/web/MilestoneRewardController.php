@@ -169,24 +169,16 @@ class MilestoneRewardController
             });
            $form->html('</div>');
 
-        Admin::style('
-              .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
-                    display: table !important;
-                    width: 50% !important;
-                }
+         Admin::style('
 
-                .rtl .fields-group .form-group {
-                    /* display: flex !important; */
-                }
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
 
-             .rtl .form-horizontal .form-group {
-                text-align: right;
-             }
-
-            .rtl .form-horizontal .form-group .control-label {
-                float: right;
-            }
-        ');
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
         $form->saving(function (Form $form) {
             switch ($form->type) {
                 case 'ware':
