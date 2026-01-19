@@ -2,13 +2,11 @@
 
 namespace App\Admin\Controllers;
 
-use App\Facades\UserHandling;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Target;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -16,6 +14,7 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
+use App\Facades\UserHandling;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use App\Models\ShippingAgency;
@@ -24,16 +23,18 @@ use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
-use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class AgencyController extends MainController
 {
@@ -94,7 +95,7 @@ class AgencyController extends MainController
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
                 ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'bd_id', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'admin_id', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
 
@@ -102,9 +103,16 @@ class AgencyController extends MainController
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::query()
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                    ->select('id', 'name', 'app_owner_id', 'admin_id', 'phone', 'coins', 'img')
                     ->find($id);
             });
+        }
+        $adminUser = DB::table('admin_users')->where('id', $agency->admin_id)->first() ?? $agency->owner;
+        $pathAdmin = $adminUser?->avatar;
+        $defaultImageAdmin = asset('images/businessman-icon.jpg');
+        $imageUrlAdmin = getImagePath($pathAdmin);
+        if (!isImageExists($imageUrlAdmin)) {
+            $imageUrlAdmin = $defaultImageAdmin;
         }
 
         $path = $agency?->img;
@@ -278,6 +286,8 @@ class AgencyController extends MainController
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
+                'adminUser',
+                'imageUrlAdmin',
                 'agency',
                 'prefix',
                 'members',
