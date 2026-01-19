@@ -100,22 +100,29 @@
           <div class="panel-section flex-1">
             <h3 class="section-title">👶 الأطفال (اسحب للموبايل)</h3>
             <div class="children-list">
-              <div
-                v-for="child in themeChildren"
-                :key="child.id"
-                class="child-item"
-                :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlaced(child.id) }"
-                draggable="true"
-                @dragstart="onChildDragStart($event, child)"
-                @click="selectChild(child)"
+              <VirtualScroller
+                :items="themeChildren"
+                :item-height="60"
+                class="virtual-list"
+                v-slot="{ item: child }"
               >
-                <div class="child-icon">🧩</div>
-                <div class="child-info">
-                  <span class="child-name">{{ child.label || child.child_key }}</span>
-                  <span class="child-type">{{ child.child_type }}</span>
+                <div
+                  v-if="child"
+                  :key="child.id"
+                  class="child-item"
+                  :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlaced(child.id) }"
+                  draggable="true"
+                  @dragstart="onChildDragStart($event, child)"
+                  @click="selectChild(child)"
+                >
+                  <div class="child-icon">🧩</div>
+                  <div class="child-info">
+                    <span class="child-name">{{ child.label || child.child_key }}</span>
+                    <span class="child-type">{{ child.child_type }}</span>
+                  </div>
+                  <span class="child-assets-count">{{ (child.assets || []).length }} 🖼️</span>
                 </div>
-                <span class="child-assets-count">{{ (child.assets || []).length }} 🖼️</span>
-              </div>
+              </VirtualScroller>
               <div v-if="!themeChildren.length" class="empty-message">
                 لا يوجد أطفال في هذا الثيم
               </div>
@@ -209,6 +216,11 @@
                   <div class="resize-handle sw" @mousedown.stop="startResize($event, 'child', child, 'sw')"></div>
                   <div class="resize-handle ne" @mousedown.stop="startResize($event, 'child', child, 'ne')"></div>
                   <div class="resize-handle nw" @mousedown.stop="startResize($event, 'child', child, 'nw')"></div>
+                  <!-- مقبض جديد لتعديل أحناء الزوايا -->
+                  <div class="corner-handle tl" @mousedown.stop="startCornerResize($event, child, 'tl')"></div>
+                  <div class="corner-handle tr" @mousedown.stop="startCornerResize($event, child, 'tr')"></div>
+                  <div class="corner-handle bl" @mousedown.stop="startCornerResize($event, child, 'bl')"></div>
+                  <div class="corner-handle br" @mousedown.stop="startCornerResize($event, child, 'br')"></div>
                 </div>
               </div>
               
@@ -423,10 +435,15 @@
 </template>
 
 <script>
-import { designerApi } from '../services/api';
+import { designerApi, configurationsApi } from '../services/api';
+import VirtualScroller from 'vue3-virtual-scroller';
+import 'vue3-virtual-scroller/dist/vue3-virtual-scroller.css';
 
 export default {
   name: 'VisualDesigner',
+  components: {
+    VirtualScroller
+  },
   props: {
     widget: {
       type: Object,
@@ -499,10 +516,13 @@ export default {
       return this.widget?.display_name || this.widget?.widget_key || 'Widget';
     },
     selectedTheme() {
-      return this.themes.find(t => t.id === this.selectedThemeId);
+      // مقارنة مرنة للتعامل مع اختلاف الأنواع (string vs number)
+      return this.themes.find(t => String(t.id) === String(this.selectedThemeId));
     },
     themeChildren() {
-      return this.selectedTheme?.children || [];
+      const children = this.selectedTheme?.children || [];
+      console.log('🔍 themeChildren:', children.length, 'selectedThemeId:', this.selectedThemeId, 'selectedTheme:', this.selectedTheme?.theme_name);
+      return children;
     },
     selectedChild() {
       return this.themeChildren.find(c => c.id === this.selectedChildId);
@@ -547,22 +567,31 @@ export default {
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
     document.addEventListener('keydown', this.onKeyDown);
+    // دعم اللمس للسحب والإفلات
+    if (this.$refs.mobileScreen) {
+      this.$refs.mobileScreen.addEventListener('touchstart', this.onTouchStart, { passive: false });
+      this.$refs.mobileScreen.addEventListener('touchmove', this.onTouchMove, { passive: false });
+      this.$refs.mobileScreen.addEventListener('touchend', this.onTouchEnd, { passive: false });
+    }
   },
   beforeUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
     document.removeEventListener('keydown', this.onKeyDown);
+    if (this.$refs.mobileScreen) {
+      this.$refs.mobileScreen.removeEventListener('touchstart', this.onTouchStart);
+      this.$refs.mobileScreen.removeEventListener('touchmove', this.onTouchMove);
+      this.$refs.mobileScreen.removeEventListener('touchend', this.onTouchEnd);
+    }
   },
   methods: {
     open() {
       this.isOpen = true;
       this.initializeFromWidget();
     },
-    close() {
+    async close() {
       if (this.hasUnsavedChanges) {
-        if (!confirm('هناك تغييرات غير محفوظة. هل تريد الإغلاق؟')) {
-          return;
-        }
+        await this.saveDesign();
       }
       this.isOpen = false;
       this.$emit('close');
@@ -573,54 +602,91 @@ export default {
       // Set initial theme
       const themeId = this.widget.settings?.theme_id || this.widget.selected_theme_id || this.widget.widget_theme_id;
       if (themeId) {
-        this.selectedThemeId = parseInt(themeId);
+        this.selectedThemeId = themeId;
       } else if (this.themes.length > 0) {
         this.selectedThemeId = this.themes[0].id;
       }
       
       // Load placed children from widget settings
-      this.placedChildren = (this.widget.settings?.children || []).map(child => ({
-        ...child,
-        name: child.name || child.child_key || `طفل ${child.theme_child_id}`,
-        width: child.width || 300,
-        height: child.height || 200,
-        x: child.x ?? 10,
-        y: child.y ?? 10,
-        is_visible: child.is_visible ?? true,
-        rotation: child.rotation ?? 0,
-        scale: child.scale ?? 1,
-        background_color: child.background_color || 'transparent',
-        border_width: child.border_width ?? 2,
-        border_style: child.border_style || 'dashed',
-        border_color: child.border_color || '#6366f1',
-        border_radius_tl: child.border_radius_tl ?? child.border_radius ?? 8,
-        border_radius_tr: child.border_radius_tr ?? child.border_radius ?? 8,
-        border_radius_bl: child.border_radius_bl ?? child.border_radius ?? 8,
-        border_radius_br: child.border_radius_br ?? child.border_radius ?? 8,
-        assets: (child.assets || []).map(asset => ({
-          ...asset,
-          name: asset.name || asset.asset_key,
-          width: asset.width || 80,
-          height: asset.height || 80,
-          x: asset.x ?? 0,
-          y: asset.y ?? 0,
-          opacity: asset.opacity ?? 1,
-          z_index: asset.z_index ?? 0,
-          rotation: asset.rotation ?? 0,
-          scale: asset.scale ?? 1,
-          border_width: asset.border_width ?? 0,
-          border_style: asset.border_style || 'solid',
-          border_color: asset.border_color || 'transparent',
-          border_radius_tl: asset.border_radius_tl ?? asset.border_radius ?? 0,
-          border_radius_tr: asset.border_radius_tr ?? asset.border_radius ?? 0,
-          border_radius_bl: asset.border_radius_bl ?? asset.border_radius ?? 0,
-          border_radius_br: asset.border_radius_br ?? asset.border_radius ?? 0,
-          is_visible: asset.is_visible ?? true,
-        }))
-      }));
+      const savedChildren = this.widget.settings?.children || [];
+      this.placedChildren = savedChildren.map(child => {
+        const themeChild = this.themeChildren.find(c => c.id === child.theme_child_id);
+        return {
+          theme_child_id: child.theme_child_id,
+          name: themeChild?.label || themeChild?.child_key || child.name || `طفل ${child.theme_child_id}`,
+          child_key: themeChild?.child_key || child.child_key,
+          width: child.width || themeChild?.width || 200,
+          height: child.height || themeChild?.height || 150,
+          x: child.x ?? 0,
+          y: child.y ?? 0,
+          is_visible: child.is_visible ?? true,
+          rotation: child.rotation ?? 0,
+          scale: child.scale ?? 1,
+          opacity: child.opacity ?? 1,
+          z_index: child.z_index ?? 0,
+          background_color: child.background_color || 'transparent',
+          border_width: child.border_width ?? 2,
+          border_style: child.border_style || 'dashed',
+          border_color: child.border_color || '#6366f1',
+          border_radius_tl: child.border_radius_tl ?? child.border_radius ?? 8,
+          border_radius_tr: child.border_radius_tr ?? child.border_radius ?? 8,
+          border_radius_bl: child.border_radius_bl ?? child.border_radius ?? 8,
+          border_radius_br: child.border_radius_br ?? child.border_radius ?? 8,
+          assets: (child.assets || []).map(asset => ({
+            ...asset,
+            name: asset.name || asset.asset_key,
+            width: asset.width || 80,
+            height: asset.height || 80,
+            x: asset.x ?? 0,
+            y: asset.y ?? 0,
+            opacity: asset.opacity ?? 1,
+            z_index: asset.z_index ?? 0,
+            rotation: asset.rotation ?? 0,
+            scale: asset.scale ?? 1,
+            border_width: asset.border_width ?? 0,
+            border_style: asset.border_style || 'solid',
+            border_color: asset.border_color || 'transparent',
+            border_radius_tl: asset.border_radius_tl ?? asset.border_radius ?? 0,
+            border_radius_tr: asset.border_radius_tr ?? asset.border_radius ?? 0,
+            border_radius_bl: asset.border_radius_bl ?? asset.border_radius ?? 0,
+            border_radius_br: asset.border_radius_br ?? asset.border_radius ?? 0,
+            is_visible: asset.is_visible ?? true,
+          }))
+        };
+      });
       
       // Save initial state to history
       this.saveToHistory();
+    },
+    onKeyDown(e) {
+      // Arrow keys for moving (with shift for 10px steps)
+      if (this.selectedElement && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        switch (e.key) {
+          case 'ArrowUp':
+            this.selectedElement.y = Math.max(0, this.selectedElement.y - step);
+            break;
+          case 'ArrowDown':
+            this.selectedElement.y += step;
+            break;
+          case 'ArrowLeft':
+            this.selectedElement.x = Math.max(0, this.selectedElement.x - step);
+            break;
+          case 'ArrowRight':
+            this.selectedElement.x += step;
+            break;
+        }
+        this.hasUnsavedChanges = true;
+        return;
+      }
+
+      // Escape to deselect
+      if (e.key === 'Escape') {
+        this.selectedChildId = null;
+        this.selectedAssetId = null;
+        this.selectedElementType = null;
+      }
     },
     onThemeChange() {
       // Clear selections when theme changes
@@ -719,6 +785,7 @@ export default {
       this.selectPlacedChild(newChild);
       this.hasUnsavedChanges = true;
       this.saveToHistory();
+      this.autoSave();
     },
     placeAsset(assetId, x, y) {
       // Find the selected placed child
@@ -773,6 +840,7 @@ export default {
       this.selectPlacedAsset(newAsset);
       this.hasUnsavedChanges = true;
       this.saveToHistory();
+      this.autoSave();
     },
     
     // Drag placed elements
@@ -810,6 +878,15 @@ export default {
       this.resizeStartHeight = target.height;
       this.resizeStartX = target.x;
       this.resizeStartY = target.y;
+    },
+    startCornerResize(e, child, corner) {
+      e.preventDefault();
+      this.isResizing = true;
+      this.resizeType = 'corner';
+      this.resizeTarget = child;
+      this.resizeCorner = corner;
+      this.dragStartY = e.clientY;
+      this.cornerStartValue = child[`border_radius_${corner}`] || 0;
     },
     
     onMouseMove(e) {
@@ -868,72 +945,33 @@ export default {
         }
         this.hasUnsavedChanges = true;
       }
+      if (this.isResizing && this.resizeType === 'corner') {
+        const deltaY = e.clientY - this.dragStartY;
+        let newRadius = Math.max(0, Math.round(this.cornerStartValue + deltaY));
+        this.resizeTarget[`border_radius_${this.resizeCorner}`] = newRadius;
+        this.hasUnsavedChanges = true;
+        this.saveToHistory();
+        this.autoSave();
+      }
     },
     onMouseUp() {
+      // إعادة تعيين حالة السحب والتغيير
+      const wasDragging = this.isDragging;
+      const wasResizing = this.isResizing;
+      
       this.isDragging = false;
       this.isResizing = false;
       this.dragType = null;
       this.dragData = null;
       this.resizeTarget = null;
-    },
-    onKeyDown(e) {
-      if (!this.isOpen) return;
+      this.resizeType = null;
+      this.resizeDirection = null;
+      this.resizeCorner = null;
       
-      // Undo (Ctrl+Z)
-      if (e.ctrlKey && e.key === 'z') {
-        e.preventDefault();
-        this.undo();
-        return;
-      }
-      
-      // Redo (Ctrl+Y or Ctrl+Shift+Z)
-      if (e.ctrlKey && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) {
-        e.preventDefault();
-        this.redo();
-        return;
-      }
-      
-      // Duplicate (Ctrl+D)
-      if (e.ctrlKey && e.key === 'd') {
-        e.preventDefault();
-        this.duplicateSelected();
-        return;
-      }
-      
-      // Delete selected element
-      if (e.key === 'Delete' && this.selectedElement) {
-        this.deleteSelected();
-      }
-      
-      // Arrow keys for moving (with shift for 10px steps)
-      if (this.selectedElement && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-        e.preventDefault();
-        const step = e.shiftKey ? 10 : 1;
-        
-        switch (e.key) {
-          case 'ArrowUp':
-            this.selectedElement.y = Math.max(0, this.selectedElement.y - step);
-            break;
-          case 'ArrowDown':
-            this.selectedElement.y += step;
-            break;
-          case 'ArrowLeft':
-            this.selectedElement.x = Math.max(0, this.selectedElement.x - step);
-            break;
-          case 'ArrowRight':
-            this.selectedElement.x += step;
-            break;
-        }
-        
-        this.hasUnsavedChanges = true;
-        return;
-      }
-      
-      // Escape to deselect
-      if (e.key === 'Escape') {
-        this.selectedChildId = null;
-        this.selectedAssetId = null;
-        this.selectedElementType = null;
+      // حفظ التاريخ إذا حدث تغيير
+      if (wasDragging || wasResizing) {
+        this.saveToHistory();
+        this.autoSave();
       }
     },
     onScreenClick(e) {
@@ -952,6 +990,7 @@ export default {
         this.selectedElementType = null;
         this.hasUnsavedChanges = true;
         this.saveToHistory();
+        this.autoSave();
       }
     },
     removeAsset(child, asset) {
@@ -962,6 +1001,7 @@ export default {
         this.selectedElementType = null;
         this.hasUnsavedChanges = true;
         this.saveToHistory();
+        this.autoSave();
       }
     },
     
@@ -1154,18 +1194,37 @@ export default {
     fitToScreen() {
       if (!this.selectedElement) return;
       
-      this.selectedElement.x = 0;
-      this.selectedElement.y = 0;
-      this.selectedElement.width = this.screenWidth;
-      this.selectedElement.height = this.screenHeight;
-      this.hasUnsavedChanges = true;
-      this.saveToHistory();
+      // إذا كان العنصر المحدد هو أصل (asset)، يجب أن يملأ حدود الطفل وليس الشاشة
+      if (this.selectedElementType === 'asset') {
+        // البحث عن الطفل الذي يحتوي على هذا الأصل
+        for (const child of this.placedChildren) {
+          const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
+          if (asset) {
+            // ملء حدود الطفل
+            asset.x = 0;
+            asset.y = 0;
+            asset.width = child.width;
+            asset.height = child.height;
+            this.hasUnsavedChanges = true;
+            this.saveToHistory();
+            return;
+          }
+        }
+      } else {
+        // إذا كان العنصر هو طفل، يملأ الشاشة
+        this.selectedElement.x = 0;
+        this.selectedElement.y = 0;
+        this.selectedElement.width = this.screenWidth;
+        this.selectedElement.height = this.screenHeight;
+        this.hasUnsavedChanges = true;
+        this.saveToHistory();
+      }
     },
     
     // Styles
     getChildStyle(child) {
       const borderRadius = this.getBorderRadiusStyle(child);
-      return {
+      let style = {
         left: child.x * this.zoom + 'px',
         top: child.y * this.zoom + 'px',
         width: child.width * this.zoom + 'px',
@@ -1180,6 +1239,12 @@ export default {
         borderRadius: borderRadius,
         zIndex: child.z_index || 0,
       };
+      if (child.background_image) {
+        style.backgroundImage = `url('${child.background_image}')`;
+        style.backgroundSize = 'cover';
+        style.backgroundPosition = 'center';
+      }
+      return style;
     },
     getAssetStyle(asset) {
       const borderRadius = this.getBorderRadiusStyle(asset);
@@ -1257,7 +1322,7 @@ export default {
               asset_key: asset.asset_key,
               name: asset.name,
               file_url: asset.file_url,
-              url: asset.url,
+              url: asset.file_url,
               width: asset.width,
               height: asset.height,
               x: asset.x,
@@ -1277,14 +1342,26 @@ export default {
             }))
           }))
         };
-        
         // Emit to parent to save in configuration
         this.$emit('save', designData);
-        
+        // حفظ فعلي في config المختار
+        if (this.configurationId) {
+          const widgetOverride = {
+            widget_id: this.widget?.id,
+            theme_id: this.selectedThemeId,
+            children: designData.children,
+          };
+          try {
+            await configurationsApi.update(this.configurationId, {
+              widget_overrides: [widgetOverride]
+            });
+          } catch (e) {
+            console.error('خطأ في حفظ التعديلات في الكونفيج المختار', e);
+          }
+        }
         // Also save ALL properties to database if we have real IDs
         const childrenToUpdate = [];
         const assetsToUpdate = [];
-        
         for (const child of this.placedChildren) {
           if (child.theme_child_id) {
             childrenToUpdate.push({
@@ -1330,14 +1407,12 @@ export default {
             }
           }
         }
-        
         if (childrenToUpdate.length > 0 || assetsToUpdate.length > 0) {
           await designerApi.batchUpdatePositions({
             children: childrenToUpdate,
             assets: assetsToUpdate,
           });
         }
-        
         this.hasUnsavedChanges = false;
       } catch (error) {
         console.error('Failed to save design:', error);
@@ -1345,7 +1420,62 @@ export default {
       } finally {
         this.isSaving = false;
       }
-    }
+    },
+    onTouchStart(e) {
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const target = e.target;
+      // دعم السحب للطفل أو الأصل
+      if (target.classList.contains('placed-child')) {
+        this.isDragging = true;
+        this.dragType = 'placed-child';
+        this.dragData = this.placedChildren.find(c => c.theme_child_id === target.getAttribute('data-child-id'));
+        this.dragStartX = touch.clientX;
+        this.dragStartY = touch.clientY;
+        this.dragStartElementX = this.dragData.x;
+        this.dragStartElementY = this.dragData.y;
+      } else if (target.classList.contains('placed-asset')) {
+        const childId = target.getAttribute('data-child-id');
+        const assetId = target.getAttribute('data-asset-id');
+        const child = this.placedChildren.find(c => c.theme_child_id === childId);
+        if (child) {
+          const asset = (child.assets || []).find(a => a.id == assetId);
+          if (asset) {
+            this.isDragging = true;
+            this.dragType = 'placed-asset';
+            this.dragData = { child, asset };
+            this.dragStartX = touch.clientX;
+            this.dragStartY = touch.clientY;
+            this.dragStartElementX = asset.x;
+            this.dragStartElementY = asset.y;
+          }
+        }
+      }
+    },
+    onTouchMove(e) {
+      if (!this.isDragging || e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      const deltaX = (touch.clientX - this.dragStartX) / this.zoom;
+      const deltaY = (touch.clientY - this.dragStartY) / this.zoom;
+      if (this.dragType === 'placed-child') {
+        this.dragData.x = Math.max(0, Math.round(this.dragStartElementX + deltaX));
+        this.dragData.y = Math.max(0, Math.round(this.dragStartElementY + deltaY));
+        this.hasUnsavedChanges = true;
+        this.saveToHistory();
+        this.autoSave();
+      } else if (this.dragType === 'placed-asset') {
+        this.dragData.asset.x = Math.max(0, Math.round(this.dragStartElementX + deltaX));
+        this.dragData.asset.y = Math.max(0, Math.round(this.dragStartElementY + deltaY));
+        this.hasUnsavedChanges = true;
+        this.saveToHistory();
+        this.autoSave();
+      }
+    },
+    onTouchEnd(e) {
+      this.isDragging = false;
+      this.dragType = null;
+      this.dragData = null;
+    },
   }
 };
 </script>
@@ -2197,4 +2327,20 @@ export default {
   color: #6b7280;
   font-size: 13px;
 }
+
+/* إضافة ستايل لمقابض تعديل الزوايا */
+.corner-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #f59e0b;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+}
+.corner-handle.tl { top: -10px; left: -10px; }
+.corner-handle.tr { top: -10px; right: -10px; }
+.corner-handle.bl { bottom: -10px; left: -10px; }
+.corner-handle.br { bottom: -10px; right: -10px; }
 </style>
