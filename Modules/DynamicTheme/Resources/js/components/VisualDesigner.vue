@@ -169,6 +169,7 @@
             <div 
               ref="mobileScreen"
               class="mobile-screen"
+              :style="{ width: screenWidth * zoom + 'px', height: screenHeight * zoom + 'px' }"
               @dragover.prevent="onDragOver"
               @drop="onDrop"
               @click="onScreenClick"
@@ -239,6 +240,27 @@
             <button @click="zoomIn" class="control-btn">➕</button>
             <button @click="toggleGrid" class="control-btn" :class="{ 'active': showGrid }">⊞</button>
             <button @click="resetView" class="control-btn">↺</button>
+          </div>
+          
+          <!-- Widget Size Controls -->
+          <div class="widget-size-controls">
+            <h4 class="size-title">📏 أبعاد الويدجت</h4>
+            <div class="size-inputs">
+              <div class="size-input-group">
+                <label>العرض</label>
+                <input type="number" v-model.number="screenWidth" @change="onScreenSizeChange" class="size-input" min="100" max="800" />
+              </div>
+              <div class="size-input-group">
+                <label>الارتفاع</label>
+                <input type="number" v-model.number="screenHeight" @change="onScreenSizeChange" class="size-input" min="100" max="1200" />
+              </div>
+            </div>
+            <div class="size-presets">
+              <button @click="setScreenPreset('iphone')" class="preset-btn" :class="{ 'active': screenWidth === 375 && screenHeight === 667 }">📱 iPhone</button>
+              <button @click="setScreenPreset('android')" class="preset-btn" :class="{ 'active': screenWidth === 360 && screenHeight === 640 }">📱 Android</button>
+              <button @click="setScreenPreset('tablet')" class="preset-btn" :class="{ 'active': screenWidth === 768 && screenHeight === 1024 }">📱 Tablet</button>
+              <button @click="setScreenPreset('custom')" class="preset-btn">✏️ مخصص</button>
+            </div>
           </div>
         </div>
 
@@ -597,15 +619,37 @@ export default {
       this.$emit('close');
     },
     initializeFromWidget() {
-      if (!this.widget) return;
+      if (!this.widget) {
+        console.log('❌ [VisualDesigner] No widget provided');
+        return;
+      }
+      
+      console.log('🎨 [VisualDesigner] initializeFromWidget called');
+      console.log('🎨 [VisualDesigner] widget:', this.widget);
+      console.log('🎨 [VisualDesigner] themes:', this.themes);
+      console.log('🎨 [VisualDesigner] themes.length:', this.themes?.length);
+      
+      // Set widget dimensions from settings
+      if (this.widget.settings?.widget_width) {
+        this.screenWidth = this.widget.settings.widget_width;
+      }
+      if (this.widget.settings?.widget_height) {
+        this.screenHeight = this.widget.settings.widget_height;
+      }
       
       // Set initial theme
       const themeId = this.widget.settings?.theme_id || this.widget.selected_theme_id || this.widget.widget_theme_id;
+      console.log('🎨 [VisualDesigner] themeId from widget:', themeId);
+      
       if (themeId) {
         this.selectedThemeId = themeId;
       } else if (this.themes.length > 0) {
         this.selectedThemeId = this.themes[0].id;
       }
+      
+      console.log('🎨 [VisualDesigner] selectedThemeId:', this.selectedThemeId);
+      console.log('🎨 [VisualDesigner] selectedTheme:', this.selectedTheme);
+      console.log('🎨 [VisualDesigner] themeChildren:', this.themeChildren?.length);
       
       // Load placed children from widget settings
       const savedChildren = this.widget.settings?.children || [];
@@ -1287,6 +1331,31 @@ export default {
       this.showGrid = !this.showGrid;
     },
     
+    // Screen Size Controls
+    onScreenSizeChange() {
+      this.hasUnsavedChanges = true;
+    },
+    setScreenPreset(preset) {
+      switch (preset) {
+        case 'iphone':
+          this.screenWidth = 375;
+          this.screenHeight = 667;
+          break;
+        case 'android':
+          this.screenWidth = 360;
+          this.screenHeight = 640;
+          break;
+        case 'tablet':
+          this.screenWidth = 768;
+          this.screenHeight = 1024;
+          break;
+        case 'custom':
+          // Keep current values
+          break;
+      }
+      this.hasUnsavedChanges = true;
+    },
+    
     // Save
     async saveDesign() {
       if (this.isSaving) return; // Prevent multiple saves
@@ -1296,6 +1365,9 @@ export default {
         // Prepare data for saving with ALL properties
         const designData = {
           theme_id: this.selectedThemeId,
+          // Widget dimensions (screen size)
+          widget_width: this.screenWidth,
+          widget_height: this.screenHeight,
           children: this.placedChildren.map(child => ({
             theme_child_id: child.theme_child_id,
             name: child.name,
@@ -2035,6 +2107,80 @@ export default {
   font-size: 14px;
   min-width: 50px;
   text-align: center;
+}
+
+/* Widget Size Controls */
+.widget-size-controls {
+  margin-top: 12px;
+  padding: 12px;
+  background: #252536;
+  border-radius: 12px;
+}
+
+.size-title {
+  color: #e2e8f0;
+  font-size: 14px;
+  margin: 0 0 10px 0;
+}
+
+.size-inputs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.size-input-group {
+  flex: 1;
+}
+
+.size-input-group label {
+  display: block;
+  color: #9ca3af;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.size-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+}
+
+.size-input:focus {
+  border-color: #6366f1;
+  outline: none;
+}
+
+.size-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.preset-btn {
+  padding: 4px 8px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: #9ca3af;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset-btn:hover {
+  background: #3d3d5c;
+  color: white;
+}
+
+.preset-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
 }
 
 /* Properties Panel */
