@@ -1752,7 +1752,7 @@ class User extends Authenticatable
     public function userBadge()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','regular'))->active()->with("badge")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
