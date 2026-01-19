@@ -1715,6 +1715,8 @@ class User extends Authenticatable
             $applicableTypes[4] = $types[4];
         }
 
+        dd($this->type_user);
+
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User222222222';
         }
