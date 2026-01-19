@@ -134,8 +134,8 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-        $form->html('<div class="custom-full-width">');
-        //   $form->hidden('milestone_id')->value(request('milestone_id'));
+       // $form->html('<div class="custom-full-width">');
+        $form->hidden('milestone_id')->value(request('milestone_id'));
 
         $form->select('type', __('Type'))->options([
             "coins"        => __('Coins'),
