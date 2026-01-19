@@ -274,7 +274,7 @@ class AgencyController extends MainController
             });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
         $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
-         $prefix = dashboardName();
+        $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
@@ -804,6 +804,23 @@ class AgencyController extends MainController
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
 
+            $currentAgencyId = $form->model()->id ?? null;
+
+            if ($appOwnerId) {
+                $existingAgency = Agency::where('app_owner_id', $appOwnerId)
+                    ->when($currentAgencyId, function ($query) use ($currentAgencyId) {
+                        $query->where('id', '!=', $currentAgencyId);
+                    })
+                    ->first();
+
+                if ($existingAgency) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already an owner of agency: ') . $existingAgency->name],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+            }
+
             if (!$form->bd_id && !$form->model()->bd_id) {
                 $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
 
@@ -1206,5 +1223,37 @@ class AgencyController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         return $grid;
+    }
+
+
+    public function usersAgency()
+    {
+        $users = User::where('agency_id', '!=', 0)->whereNotNull('agency_id')
+            ->where('type_user', 0)
+            ->get();
+
+        return response()->json([
+            'count_users'    => $users->count(),        // how many users
+            'user_ids' => $users->pluck('id'),    // list of user IDs
+        ]);
+    }
+
+    public function UpdateTypeUserAgency()
+    {
+        $query = User::whereIn('id', Agency::select('app_owner_id'))
+            ->where('type_user', 0);
+
+        $userIds = $query->pluck('id');
+        $count   = $userIds->count();
+
+        $query->update(['type_user' => 2]);
+
+        $query = User::where('agency_id', '!=', 0)->whereNotNull('agency_id')->where('type_user', 0)
+            ->whereNotIn('id', $userIds->toArray())->update(['type_user' => 1]);
+
+        return response()->json([
+            'count'    => $count,
+            'user_ids' => $userIds,
+        ]);
     }
 }

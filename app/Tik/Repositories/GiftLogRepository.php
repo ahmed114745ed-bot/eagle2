@@ -117,10 +117,19 @@ class GiftLogRepository extends AbstractRepository
     {
         return $this->model->query()
             ->has('sender')
-            ->with('sender', 'receiver')
-            ->select('sender_id', 'receiver_id')
-            ->selectRaw('SUM( giftPrice) AS total')
-            ->selectRaw('CAST(SUM(giftPrice) AS DECIMAL(10, 2)) AS total_decimal')
+            ->with([
+                'sender.profile',
+                'sender.country',
+                'receiver',
+            ])
+            // ->select('sender_id', 'receiver_id')
+            // ->selectRaw('SUM( giftPrice) AS total')
+            // ->selectRaw('CAST(SUM(giftPrice) AS DECIMAL(10, 2)) AS total_decimal')
+            ->selectRaw('
+            sender_id,
+            receiver_id,
+            SUM(giftPrice) AS total
+        ')
             ->where('receiver_id', $userId)
             ->groupBy('sender_id', 'receiver_id')
             ->orderByDesc('total')
@@ -162,8 +171,8 @@ class GiftLogRepository extends AbstractRepository
                 $q->where('type', 'live');
             })
             ->selectRaw('sender_id, room_id,created_at,giftId,SUM( giftPrice) AS total')
-            ->groupBy('sender_id', 'room_id', 'giftId','created_at')
-            ->orderByDesc('created_at') 
+            ->groupBy('sender_id', 'room_id', 'giftId', 'created_at')
+            ->orderByDesc('created_at')
             ->with(['room', 'sender', 'gift'])
             ->paginate($perPage, ['*'], 'page', $page);
     }
@@ -183,8 +192,8 @@ class GiftLogRepository extends AbstractRepository
                 $q->where('type', 'audio');
             })
             ->selectRaw('sender_id,created_at, room_id,giftId,SUM( giftPrice) AS total')
-            ->orderByDesc('created_at') 
-            ->groupBy('sender_id', 'room_id', 'giftId','created_at')
+            ->orderByDesc('created_at')
+            ->groupBy('sender_id', 'room_id', 'giftId', 'created_at')
             ->with(['room', 'sender', 'gift'])
             ->paginate($perPage, ['*'], 'page', $page);
     }

@@ -20,7 +20,10 @@
     "shipments_revenue": "إيرادات الشحنات",
     "filter_week": "أسبوع",
     "filter_month": "شهر",
+    "Play coin sound inside the room when the win amount is greater than or equal to the added value.":"تشغيل صوت الكوينات داخل الغرفه عندما تكون قيمه المكسب اكبر من او تساوى القيمه المضافه",
     "filter_year": "سنة",
+    "room in home screen layer": "الغرف في واجهة الشاشة الرئيسية",
+  "show rooms": "عرض الغرف",
     "latest_withdrawals": "آخر المسحوبات",
     "latest_payments": "آخر عمليات الدفع",
     "table_header_index": "#",
@@ -80,6 +83,7 @@
     "Create area manager": "إنشاء مدير منطقة",
     "Delete area manager": "حذف مدير المنطقة",
     "Edit area manager": "تعديل مدير المنطقة",
+    "user is country manager": "المستخدم مدير الدولة",
     "Show area manager": "عرض مدير المنطقة",
     "Charge To Area Manager": "تحصيل من مدير المنطقة",
     "Browse charge to area manager": "تصفح عمليات التحصيل من مديري المناطق",
@@ -5143,5 +5147,6 @@
     "moment_viewer.randomOrder": "ترتيب عشوائي",
     "moment_viewer.refresh": "تحديث",
     "moment_viewer.loadMore": "تحميل المزيد",
+    "Settings updated successfully!": "تم تحديث الإعدادات بنجاح!",
     "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
 }

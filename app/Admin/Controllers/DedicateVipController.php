@@ -118,11 +118,21 @@ class DedicateVipController extends MainController
         $grid->disableCreateButton();
         $grid->disableActions();
         $grid->disableRowSelector();
-//        Admin::script("
-//        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-//            $('.table-responsive').removeClass('table-responsive');
-//            }
-//        ");
+        Admin::script("
+            function removeTableResponsive() {
+                if (window.innerWidth >= 1024) {
+                    $('.table-responsive').removeClass('table-responsive');
+                }
+            }
+
+            removeTableResponsive();
+
+            $(document).on('click', '.grid-expand', function() {
+                setTimeout(removeTableResponsive, 100);
+            });
+
+            $(window).resize(removeTableResponsive);
+        ");
         return $grid;
     }
 }

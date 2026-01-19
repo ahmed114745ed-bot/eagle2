@@ -43,14 +43,14 @@
     }
 
     .settings-menu button {
-        background-color: var(--secondary-color);
+        background-color: transparent;
         border: none;
         padding: 10px 15px;
         width: 200px;
         font-size: 16px;
         cursor: pointer;
         transition: color 0.3s ease-in-out;
-        color: var(--text-secondary-color) !important;
+        color: black !important;
         border: var(--primary-color) solid 2px  !important;
     }
 

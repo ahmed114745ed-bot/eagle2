@@ -23,21 +23,41 @@ class OctaneBroadcasterService
     public static function rebuildBroadcaster(): void
     {
         try {
+            if (!app()->bound('broadcast')) {
+                return;
+            }
+
             $broadcastManager = app('broadcast');
             
-            $reflection = new \ReflectionClass($broadcastManager);
-            $driversProperty = $reflection->getProperty('drivers');
-            $driversProperty->setAccessible(true);
-            $driversProperty->setValue($broadcastManager, []);
+            try {
+                if (method_exists($broadcastManager, 'forgetDriver')) {
+                    $broadcastManager->forgetDriver('pusher');
+                }
+            } catch (\Exception $e1) {
+            }
+
+            try {
+                $reflection = new \ReflectionClass($broadcastManager);
+                $parentClass = $reflection->getParentClass();
+                
+                if ($parentClass && $parentClass->hasProperty('drivers')) {
+                    $driversProperty = $parentClass->getProperty('drivers');
+                    $driversProperty->setAccessible(true);
+                    $driversProperty->setValue($broadcastManager, []);
+                }
+                
+            } catch (\ReflectionException $e2) {
+                
+                try {
+                    app()->forgetInstance('broadcast');
+                } catch (\Exception $e3) {
+                }
+            }
             
             \Illuminate\Support\Facades\Cache::forget('pusher_config_changed');
 
-            logger('OctaneBroadcasterService: Broadcaster cache cleared - will rebuild on next use', [
-                'pid' => getmypid(),
-                'timestamp' => now()->toDateTimeString(),
-            ]);
         } catch (\Exception $e) {
-            logger('OctaneBroadcasterService Error: ' . $e->getMessage(), ['exception' => $e]);
+      
         }
     }
 

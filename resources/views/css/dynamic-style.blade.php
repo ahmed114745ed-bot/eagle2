@@ -1425,6 +1425,10 @@
         position: fixed;
     }
 
+    .table-responsive .grid-dropdown-menu {
+        position: absolute;
+    }
+
     .rtl .dropdown-menu {
         left: 7%;
     }
@@ -3116,6 +3120,14 @@
         padding: 24px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid #eaeaea;
+    }
+    @media (max-width: 768px) {
+        .table-responsive td,
+        .table-responsive th {
+            white-space: nowrap !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+        }
     }
 </style>
 

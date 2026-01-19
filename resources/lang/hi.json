@@ -19,6 +19,10 @@
     "Charge by": "चार्ज करें द्वारा",
     "Enter the lucky gift coins value": "लकी गिफ्ट कॉइन्स का मान दर्ज करें",
   "lucky gift coins": "लकी गिफ्ट कॉइन्स",
+  "room in home screen layer": "होम स्क्रीन की परत में कमरे",
+  "Play coin sound inside the room when the win amount is greater than or equal to the added value.": "जब जीत की राशि जोड़ी गई मान से अधिक या उसके बराबर हो, तब कमरे के अंदर सिक्कों की ध्वनि बजाएँ।",
+  "user is country manager": "उपयोगकर्ता देश का प्रबंधक है",
+  "show rooms": "कमरे दिखाएँ",
     "Enable hide comments": "टिप्पणियाँ छिपाने को सक्षम करें",
   "hide comments": "टिप्पणियाँ छिपाएँ",
     "profile updated successfully": "प्रोफ़ाइल सफलतापूर्वक अपडेट की गई",
@@ -4063,5 +4067,6 @@
     "moment_viewer.randomOrder": "रैंडम क्रम",
     "moment_viewer.refresh": "ताज़ा करें",
     "moment_viewer.loadMore": "और लोड करें",
+    "Settings updated successfully!": "सेटिंग्स सफलतापूर्वक अपडेट कर दी गई हैं!",
     "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है"
   }
