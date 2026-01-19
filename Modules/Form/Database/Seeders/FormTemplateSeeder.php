@@ -3,7 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\FormTemplate;
+use Modules\Form\Entities\FormTemplate;
+
 
 class FormTemplateSeeder extends Seeder
 {

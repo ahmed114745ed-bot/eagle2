@@ -54,6 +54,7 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use Modules\Form\Http\Controllers\FormTemplateController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -244,6 +245,7 @@ Route::get('/clear_clear', function () {
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
+ Route::get('remove-repetition-form-templates',[FormTemplateController::class,'removeRepetition'] );
 
 Route::get('/seed', function () {
 
@@ -1131,10 +1133,6 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
-use App\Admin\Controllers\AppearChargerAgencyController;
-use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
-use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 Route::get('/run-lucky-gift-test', function () {
     Artisan::call('cache:clear');
