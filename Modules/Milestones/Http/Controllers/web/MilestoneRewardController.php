@@ -145,11 +145,7 @@ class MilestoneRewardController
             "badge"        => __('Badge'),
         ])
             ->when("ware", function (Form $form) {
-
-
-                $form->html('<div class="full-column-width">');
-                $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required')->column(10000000);
-                $form->html('</div>');
+                $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
