@@ -1770,6 +1770,28 @@ class User extends Authenticatable
         return $html;
     }
 
+    public function userBadgeTop()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','top'))->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
+
+
     public function wallet()
     {
         return $this->hasOne(UserWallet::class);
