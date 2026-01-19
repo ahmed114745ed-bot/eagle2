@@ -21,7 +21,8 @@ class Widget extends Model
         'icon',
         'is_active',
         'parent_id',
-        'has_pages'
+        'has_pages',
+        'settings',
     ];
 
     protected $casts = [
@@ -29,7 +30,7 @@ class Widget extends Model
         'has_children' => 'boolean',
         'is_active' => 'boolean',
         'has_pages' => 'boolean',
-
+        'settings' => 'array',
     ];
 
     /**

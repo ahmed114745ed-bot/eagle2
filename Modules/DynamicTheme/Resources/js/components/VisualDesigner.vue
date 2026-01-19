@@ -285,171 +285,183 @@
         <!-- Right Panel - Properties -->
         <div class="right-panel">
           <!-- Selected Element Properties -->
-          <div v-if="selectedElement" class="panel-section properties-section">
-            <h3 class="section-title">⚙️ الخصائص</h3>
+          <div v-if="selectedElement" class="panel-section properties-section full-height">
+            <div class="section-header">
+              <h3 class="section-title">⚙️ خصائص {{ selectedElementType === 'child' ? 'الطفل' : 'الأصل' }}</h3>
+              <span class="element-badge">{{ selectedElement.name }}</span>
+            </div>
             <div class="properties-form scrollable">
-              <div class="property-group">
-                <label>الاسم</label>
-                <input type="text" v-model="selectedElement.name" readonly class="property-input readonly" />
+              
+              <!-- Tabs for properties sections -->
+              <div class="property-tabs">
+                <button @click="activePropertyTab = 'position'" class="property-tab" :class="{ active: activePropertyTab === 'position' }">📍 الموضع</button>
+                <button @click="activePropertyTab = 'style'" class="property-tab" :class="{ active: activePropertyTab === 'style' }">🎨 المظهر</button>
+                <button @click="activePropertyTab = 'advanced'" class="property-tab" :class="{ active: activePropertyTab === 'advanced' }">⚡ متقدم</button>
               </div>
               
-              <div class="property-row">
-                <div class="property-group half">
-                  <label>العرض (W)</label>
-                  <input type="number" v-model.number="selectedElement.width" @change="onPropertyChange" class="property-input" />
+              <!-- Position Tab -->
+              <div v-show="activePropertyTab === 'position'" class="property-tab-content">
+                <div class="property-section-title">📐 الأبعاد</div>
+                <div class="property-row">
+                  <div class="property-group half">
+                    <label>العرض <span class="unit">px</span></label>
+                    <input type="number" v-model.number="selectedElement.width" @change="onPropertyChange" class="property-input" />
+                  </div>
+                  <div class="property-group half">
+                    <label>الارتفاع <span class="unit">px</span></label>
+                    <input type="number" v-model.number="selectedElement.height" @change="onPropertyChange" class="property-input" />
+                  </div>
                 </div>
-                <div class="property-group half">
-                  <label>الارتفاع (H)</label>
-                  <input type="number" v-model.number="selectedElement.height" @change="onPropertyChange" class="property-input" />
+                
+                <div class="property-section-title">📍 الموقع</div>
+                <div class="property-row">
+                  <div class="property-group half">
+                    <label>X <span class="unit">px</span></label>
+                    <input type="number" v-model.number="selectedElement.x" @change="onPropertyChange" class="property-input" />
+                  </div>
+                  <div class="property-group half">
+                    <label>Y <span class="unit">px</span></label>
+                    <input type="number" v-model.number="selectedElement.y" @change="onPropertyChange" class="property-input" />
+                  </div>
                 </div>
-              </div>
-              
-              <div class="property-row">
-                <div class="property-group half">
-                  <label>X</label>
-                  <input type="number" v-model.number="selectedElement.x" @change="onPropertyChange" class="property-input" />
+                
+                <div class="property-section-title">🔄 التحويل</div>
+                <div class="property-row">
+                  <div class="property-group half">
+                    <label>الدوران <span class="unit">°</span></label>
+                    <input type="number" v-model.number="selectedElement.rotation" min="-360" max="360" @change="onPropertyChange" class="property-input" />
+                  </div>
+                  <div class="property-group half">
+                    <label>التكبير <span class="unit">x</span></label>
+                    <input type="number" v-model.number="selectedElement.scale" min="0.1" max="5" step="0.1" @change="onPropertyChange" class="property-input" />
+                  </div>
                 </div>
-                <div class="property-group half">
-                  <label>Y</label>
-                  <input type="number" v-model.number="selectedElement.y" @change="onPropertyChange" class="property-input" />
-                </div>
-              </div>
-              
-              <!-- Rotation & Scale -->
-              <div class="property-row">
-                <div class="property-group half">
-                  <label>الدوران (°)</label>
-                  <input type="number" v-model.number="selectedElement.rotation" min="-360" max="360" @change="onPropertyChange" class="property-input" />
-                </div>
-                <div class="property-group half">
-                  <label>التكبير</label>
-                  <input type="number" v-model.number="selectedElement.scale" min="0.1" max="5" step="0.1" @change="onPropertyChange" class="property-input" />
-                </div>
-              </div>
-              
-              <!-- Opacity Slider -->
-              <div class="property-group">
-                <label>الشفافية: {{ (selectedElement.opacity || 1).toFixed(1) }}</label>
-                <div class="slider-container">
-                  <input type="range" min="0" max="1" step="0.1" v-model.number="selectedElement.opacity" @input="onPropertyChange" class="slider-input" />
-                </div>
-              </div>
-              
-              <!-- Z-Index -->
-              <div class="property-group">
-                <label>الترتيب (Z-Index)</label>
-                <input type="number" v-model.number="selectedElement.z_index" @change="onPropertyChange" class="property-input" />
-              </div>
-              
-              <!-- Background Color (for children) -->
-              <div v-if="selectedElementType === 'child'" class="property-group">
-                <label>لون الخلفية</label>
-                <div class="color-picker-row">
-                  <input type="color" v-model="selectedElement.background_color" @input="onPropertyChange" class="color-picker" />
-                  <input type="text" v-model="selectedElement.background_color" @change="onPropertyChange" class="property-input flex-1" placeholder="transparent" />
+                
+                <div class="property-group">
+                  <label>الترتيب (Z-Index)</label>
+                  <input type="number" v-model.number="selectedElement.z_index" @change="onPropertyChange" class="property-input" />
                 </div>
               </div>
               
-              <!-- Border -->
-              <div class="property-group">
-                <label>الحدود</label>
-                <div class="border-controls">
-                  <input type="number" v-model.number="selectedElement.border_width" min="0" max="20" @change="onPropertyChange" class="property-input small" placeholder="0" title="العرض" />
-                  <select v-model="selectedElement.border_style" @change="onPropertyChange" class="property-input">
-                    <option value="solid">صلب</option>
-                    <option value="dashed">متقطع</option>
-                    <option value="dotted">منقط</option>
-                    <option value="double">مزدوج</option>
-                    <option value="groove">محفور</option>
-                    <option value="ridge">بارز</option>
-                    <option value="none">بدون</option>
-                  </select>
-                  <input type="color" v-model="selectedElement.border_color" @input="onPropertyChange" class="color-picker" title="اللون" />
+              <!-- Style Tab -->
+              <div v-show="activePropertyTab === 'style'" class="property-tab-content">
+                <!-- Opacity Slider -->
+                <div class="property-group">
+                  <label>الشفافية <span class="value-badge">{{ Math.round((selectedElement.opacity || 1) * 100) }}%</span></label>
+                  <div class="slider-container">
+                    <input type="range" min="0" max="1" step="0.05" v-model.number="selectedElement.opacity" @input="onPropertyChange" class="slider-input" />
+                  </div>
                 </div>
-              </div>
-              
-              <!-- Border Radius - 4 Corners -->
-              <div class="property-group">
-                <label>🔘 حواف دائرية (الزوايا الأربع)</label>
-                <div class="corners-grid">
-                  <div class="corner-input">
+                
+                <!-- Background Color (for children) -->
+                <div v-if="selectedElementType === 'child'" class="property-group">
+                  <label>لون الخلفية</label>
+                  <div class="color-picker-row">
+                    <input type="color" v-model="selectedElement.background_color" @input="onPropertyChange" class="color-picker" />
+                    <input type="text" v-model="selectedElement.background_color" @change="onPropertyChange" class="property-input flex-1" placeholder="transparent" />
+                    <button @click="selectedElement.background_color = 'transparent'; onPropertyChange()" class="clear-btn" title="شفاف">✕</button>
+                  </div>
+                </div>
+                
+                <!-- Border -->
+                <div class="property-section-title">🔲 الحدود</div>
+                <div class="property-row">
+                  <div class="property-group third">
+                    <label>السمك</label>
+                    <input type="number" v-model.number="selectedElement.border_width" min="0" max="20" @change="onPropertyChange" class="property-input" placeholder="0" />
+                  </div>
+                  <div class="property-group third">
+                    <label>النمط</label>
+                    <select v-model="selectedElement.border_style" @change="onPropertyChange" class="property-input">
+                      <option value="solid">صلب</option>
+                      <option value="dashed">متقطع</option>
+                      <option value="dotted">منقط</option>
+                      <option value="none">بدون</option>
+                    </select>
+                  </div>
+                  <div class="property-group third">
+                    <label>اللون</label>
+                    <input type="color" v-model="selectedElement.border_color" @input="onPropertyChange" class="color-picker full-width" />
+                  </div>
+                </div>
+                
+                <!-- Border Radius - 4 Corners -->
+                <div class="property-section-title">🔘 الزوايا الدائرية</div>
+                <div class="corners-grid-modern">
+                  <div class="corner-input-modern">
                     <span class="corner-label">↖</span>
-                    <input type="number" v-model.number="selectedElement.border_radius_tl" min="0" max="200" @change="onPropertyChange" class="property-input" placeholder="0" title="أعلى يسار" />
+                    <input type="number" v-model.number="selectedElement.border_radius_tl" min="0" max="200" @change="onPropertyChange" class="property-input" />
                   </div>
-                  <div class="corner-input">
+                  <div class="corner-input-modern">
                     <span class="corner-label">↗</span>
-                    <input type="number" v-model.number="selectedElement.border_radius_tr" min="0" max="200" @change="onPropertyChange" class="property-input" placeholder="0" title="أعلى يمين" />
+                    <input type="number" v-model.number="selectedElement.border_radius_tr" min="0" max="200" @change="onPropertyChange" class="property-input" />
                   </div>
-                  <div class="corner-input">
+                  <div class="corner-input-modern">
                     <span class="corner-label">↙</span>
-                    <input type="number" v-model.number="selectedElement.border_radius_bl" min="0" max="200" @change="onPropertyChange" class="property-input" placeholder="0" title="أسفل يسار" />
+                    <input type="number" v-model.number="selectedElement.border_radius_bl" min="0" max="200" @change="onPropertyChange" class="property-input" />
                   </div>
-                  <div class="corner-input">
+                  <div class="corner-input-modern">
                     <span class="corner-label">↘</span>
-                    <input type="number" v-model.number="selectedElement.border_radius_br" min="0" max="200" @change="onPropertyChange" class="property-input" placeholder="0" title="أسفل يمين" />
+                    <input type="number" v-model.number="selectedElement.border_radius_br" min="0" max="200" @change="onPropertyChange" class="property-input" />
                   </div>
                 </div>
-                <div class="corner-sync">
-                  <button @click="syncCorners" class="sync-btn" title="تطبيق نفس القيمة على جميع الزوايا">🔗 توحيد الزوايا</button>
-                  <input type="number" v-model.number="cornerSyncValue" min="0" max="200" class="property-input small" placeholder="قيمة" />
+                <div class="corner-sync-modern">
+                  <input type="number" v-model.number="cornerSyncValue" min="0" max="200" class="property-input" placeholder="الكل" />
+                  <button @click="syncCorners" class="sync-btn-modern" title="تطبيق على جميع الزوايا">🔗 توحيد</button>
                 </div>
               </div>
               
-              <!-- Visibility -->
-              <div class="property-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" v-model="selectedElement.is_visible" @change="onPropertyChange" />
-                  مرئي
-                </label>
-              </div>
-              
-              <!-- Quick Actions -->
-              <div class="quick-actions">
-                <button @click="resetElementTransform" class="quick-action-btn">↺ إعادة تعيين</button>
-                <button @click="fitToScreen" class="quick-action-btn">📐 ملء الشاشة</button>
+              <!-- Advanced Tab -->
+              <div v-show="activePropertyTab === 'advanced'" class="property-tab-content">
+                <!-- Make asset as background (for assets only) -->
+                <div v-if="selectedElementType === 'asset'" class="property-group">
+                  <label class="toggle-label">
+                    <input type="checkbox" v-model="selectedElement.is_background" @change="setAssetAsBackground" class="toggle-input" />
+                    <span class="toggle-slider"></span>
+                    <span>جعله خلفية كاملة للابن</span>
+                  </label>
+                  <p class="property-hint">سيملأ الأصل كامل مساحة الابن</p>
+                </div>
+                
+                <!-- Visibility -->
+                <div class="property-group">
+                  <label class="toggle-label">
+                    <input type="checkbox" v-model="selectedElement.is_visible" @change="onPropertyChange" class="toggle-input" />
+                    <span class="toggle-slider"></span>
+                    <span>مرئي</span>
+                  </label>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="property-section-title">⚡ إجراءات سريعة</div>
+                <div class="quick-actions-grid">
+                  <button @click="resetElementTransform" class="quick-action-btn-modern">↺ إعادة تعيين</button>
+                  <button @click="fitToScreen" class="quick-action-btn-modern">📐 ملء</button>
+                  <button @click="centerElement" class="quick-action-btn-modern">⊕ توسيط</button>
+                  <button @click="duplicateSelected" class="quick-action-btn-modern">📋 نسخ</button>
+                </div>
               </div>
             </div>
           </div>
           
-          <div v-else class="panel-section">
-            <div class="empty-properties">
-              <span class="empty-icon">👆</span>
-              <p>اختر عنصراً لعرض خصائصه</p>
-            </div>
-          </div>
-
-          <!-- Layer List -->
-          <div class="panel-section flex-1">
-            <h3 class="section-title">📚 الطبقات</h3>
-            <div class="layers-list">
-              <div
-                v-for="child in placedChildren"
-                :key="child.id"
-                class="layer-group"
-              >
-                <div 
-                  class="layer-item parent"
-                  :class="{ 'selected': selectedChildId === child.theme_child_id }"
-                  @click="selectPlacedChild(child)"
-                >
-                  <span class="layer-icon">🧩</span>
-                  <span class="layer-name">{{ child.name }}</span>
-                  <button @click.stop="removeChild(child)" class="layer-remove">🗑️</button>
-                </div>
-                <div 
-                  v-for="asset in child.assets || []"
-                  :key="asset.id"
-                  class="layer-item child-layer"
-                  :class="{ 'selected': selectedAssetId === asset.id }"
-                  @click="selectPlacedAsset(asset)"
-                >
-                  <span class="layer-icon">🖼️</span>
-                  <span class="layer-name">{{ asset.name }}</span>
-                  <button @click.stop="removeAsset(child, asset)" class="layer-remove">🗑️</button>
-                </div>
+          <div v-else class="panel-section full-height">
+            <div class="empty-properties-modern">
+              <div class="empty-icon-container">
+                <span class="empty-icon">👆</span>
               </div>
-              <div v-if="!placedChildren.length" class="empty-message">
-                اسحب الأطفال إلى الشاشة
+              <h4>لم يتم تحديد عنصر</h4>
+              <p>اختر طفلاً أو أصلاً من الشاشة لعرض خصائصه</p>
+              
+              <!-- Quick stats -->
+              <div class="quick-stats" v-if="placedChildren.length > 0">
+                <div class="stat-item">
+                  <span class="stat-value">{{ placedChildren.length }}</span>
+                  <span class="stat-label">طفل</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value">{{ totalAssets }}</span>
+                  <span class="stat-label">أصل</span>
+                </div>
               </div>
             </div>
           </div>
@@ -547,6 +559,9 @@ export default {
       // Corner sync value
       cornerSyncValue: 0,
       
+      // Active property tab
+      activePropertyTab: 'position',
+      
       // Auto save timeout
       autoSaveTimeout: null,
     };
@@ -583,6 +598,9 @@ export default {
     },
     canRedo() {
       return this.historyIndex < this.history.length - 1;
+    },
+    totalAssets() {
+      return this.placedChildren.reduce((total, child) => total + (child.assets || []).length, 0);
     }
   },
   watch: {
@@ -647,15 +665,7 @@ export default {
       console.log('🎨 [VisualDesigner] themes:', this.themes);
       console.log('🎨 [VisualDesigner] themes.length:', this.themes?.length);
       
-      // Set widget dimensions from settings
-      if (this.widget.settings?.widget_width) {
-        this.screenWidth = this.widget.settings.widget_width;
-      }
-      if (this.widget.settings?.widget_height) {
-        this.screenHeight = this.widget.settings.widget_height;
-      }
-      
-      // Set initial theme
+      // Set initial theme first
       const themeId = this.widget.settings?.theme_id || this.widget.selected_theme_id || this.widget.widget_theme_id;
       console.log('🎨 [VisualDesigner] themeId from widget:', themeId);
       
@@ -665,9 +675,23 @@ export default {
         this.selectedThemeId = this.themes[0].id;
       }
       
+      // Set widget dimensions from theme first, then from widget settings
+      const currentTheme = this.selectedTheme;
+      if (currentTheme?.widget_width) {
+        this.screenWidth = currentTheme.widget_width;
+      } else if (this.widget.settings?.widget_width) {
+        this.screenWidth = this.widget.settings.widget_width;
+      }
+      if (currentTheme?.widget_height) {
+        this.screenHeight = currentTheme.widget_height;
+      } else if (this.widget.settings?.widget_height) {
+        this.screenHeight = this.widget.settings.widget_height;
+      }
+      
       console.log('🎨 [VisualDesigner] selectedThemeId:', this.selectedThemeId);
       console.log('🎨 [VisualDesigner] selectedTheme:', this.selectedTheme);
       console.log('🎨 [VisualDesigner] themeChildren:', this.themeChildren?.length);
+      console.log('🎨 [VisualDesigner] screen dimensions:', this.screenWidth, 'x', this.screenHeight);
       
       // Load placed children from widget settings
       const savedChildren = this.widget.settings?.children || [];
@@ -1283,6 +1307,54 @@ export default {
       }
     },
     
+    // Center element in screen or parent
+    centerElement() {
+      if (!this.selectedElement) return;
+      
+      if (this.selectedElementType === 'asset') {
+        // Center asset in parent child
+        for (const child of this.placedChildren) {
+          const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
+          if (asset) {
+            asset.x = Math.round((child.width - asset.width) / 2);
+            asset.y = Math.round((child.height - asset.height) / 2);
+            this.hasUnsavedChanges = true;
+            this.saveToHistory();
+            return;
+          }
+        }
+      } else {
+        // Center child in screen
+        this.selectedElement.x = Math.round((this.screenWidth - this.selectedElement.width) / 2);
+        this.selectedElement.y = Math.round((this.screenHeight - this.selectedElement.height) / 2);
+        this.hasUnsavedChanges = true;
+        this.saveToHistory();
+      }
+    },
+    
+    // Set asset as full background of child
+    setAssetAsBackground() {
+      if (this.selectedElementType !== 'asset' || !this.selectedElement) return;
+      
+      if (this.selectedElement.is_background) {
+        // Find the parent child and resize asset to fill it
+        for (const child of this.placedChildren) {
+          const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
+          if (asset) {
+            asset.x = 0;
+            asset.y = 0;
+            asset.width = child.width;
+            asset.height = child.height;
+            asset.z_index = -1; // Put behind other assets
+            this.hasUnsavedChanges = true;
+            this.saveToHistory();
+            this.autoSave();
+            return;
+          }
+        }
+      }
+    },
+    
     // Styles
     getChildStyle(child) {
       const borderRadius = this.getBorderRadiusStyle(child);
@@ -1470,6 +1542,8 @@ export default {
           const widgetOverride = {
             widget_id: this.widget?.id,
             theme_id: this.selectedThemeId,
+            widget_width: this.screenWidth,
+            widget_height: this.screenHeight,
             children: designData.children,
           };
           try {
@@ -1478,6 +1552,19 @@ export default {
             });
           } catch (e) {
             console.error('خطأ في حفظ التعديلات في الكونفيج المختار', e);
+          }
+        }
+        
+        // Save widget dimensions to designerApi
+        if (this.widget?.id) {
+          try {
+            await designerApi.updateWidgetDimensions(this.widget.id, {
+              widget_width: this.screenWidth,
+              widget_height: this.screenHeight,
+              theme_id: this.selectedThemeId,
+            });
+          } catch (e) {
+            console.warn('لم يتم حفظ أبعاد الويدجت:', e);
           }
         }
         // Also save ALL properties to database if we have real IDs
@@ -2484,6 +2571,317 @@ export default {
   font-size: 40px;
   display: block;
   margin-bottom: 10px;
+}
+
+/* New Professional Properties Panel Styles */
+.panel-section.full-height {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.element-badge {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.property-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: #1e1e2e;
+  padding: 4px;
+  border-radius: 8px;
+}
+
+.property-tab {
+  flex: 1;
+  padding: 8px 6px;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.property-tab:hover {
+  color: #a5b4fc;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.property-tab.active {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  font-weight: 500;
+}
+
+.property-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.property-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #3d3d5c;
+}
+
+.property-group.third {
+  width: calc(33.333% - 6px);
+}
+
+.property-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+label .unit {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: normal;
+}
+
+label .value-badge {
+  background: rgba(99, 102, 241, 0.2);
+  color: #a5b4fc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+.clear-btn {
+  padding: 6px 10px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: #f87171;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.clear-btn:hover {
+  background: rgba(248, 113, 113, 0.2);
+}
+
+.color-picker.full-width {
+  width: 100%;
+  height: 36px;
+}
+
+/* Modern Corners Grid */
+.corners-grid-modern {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.corner-input-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #1e1e2e;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.corner-input-modern .corner-label {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.corner-input-modern .property-input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.corner-sync-modern {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.corner-sync-modern .property-input {
+  flex: 1;
+}
+
+.sync-btn-modern {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.sync-btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+/* Toggle Switch */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+.toggle-input {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  appearance: none;
+  background: #3d3d5c;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.toggle-input:checked {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.toggle-input::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle-input:checked::before {
+  transform: translateX(20px);
+}
+
+.property-hint {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Quick Actions Grid */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.quick-action-btn-modern {
+  padding: 10px 12px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.quick-action-btn-modern:hover {
+  background: #2d2d44;
+  color: white;
+  border-color: #6366f1;
+}
+
+/* Empty Properties Modern */
+.empty-properties-modern {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
+  flex: 1;
+}
+
+.empty-icon-container {
+  width: 60px;
+  height: 60px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.empty-properties-modern .empty-icon {
+  font-size: 28px;
+  margin-bottom: 0;
+}
+
+.empty-properties-modern h4 {
+  color: #d1d5db;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.empty-properties-modern p {
+  color: #6b7280;
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Quick Stats */
+.quick-stats {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #3d3d5c;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6b7280;
 }
 
 /* Layers */

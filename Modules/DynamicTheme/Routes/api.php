@@ -101,6 +101,7 @@ Route::prefix('dashboard')->group(function () {
     Route::put('/theme-children/{id}/position', [AdminThemeController::class, 'updateChildPosition']);
     Route::put('/theme-assets/{id}/position', [AdminThemeController::class, 'updateAssetPosition']);
     Route::post('/designer/batch-update-positions', [AdminThemeController::class, 'batchUpdatePositions']);
+    Route::put('/widgets/{id}/dimensions', [AdminThemeController::class, 'updateWidgetDimensions']);
 
      //children
     Route::post('/theme-children', [AdminThemeController::class, 'theme_children']);

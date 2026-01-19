@@ -179,6 +179,10 @@ export const designerApi = {
     // Batch update positions
     batchUpdatePositions: (data) => 
         api.post('/dashboard/designer/batch-update-positions', data),
+    
+    // Update widget dimensions
+    updateWidgetDimensions: (widgetId, data) =>
+        api.put(`/dashboard/widgets/${widgetId}/dimensions`, data),
 };
 
 // ==================== Configurations API ====================

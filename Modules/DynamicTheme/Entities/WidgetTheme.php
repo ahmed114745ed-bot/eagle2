@@ -19,11 +19,15 @@ class WidgetTheme extends Model
         'description',
         'is_default',
         'is_active',
+        'widget_width',
+        'widget_height',
     ];
 
     protected $casts = [
         'is_default' => 'boolean',
         'is_active' => 'boolean',
+        'widget_width' => 'integer',
+        'widget_height' => 'integer',
     ];
 
     /**

@@ -194,6 +194,55 @@ class AdminThemeController extends Controller
     }
     
     /**
+     * Update widget dimensions (width/height for designer)
+     */
+    public function updateWidgetDimensions(Request $request, $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'widget_width' => 'nullable|integer|min:100|max:1200',
+            'widget_height' => 'nullable|integer|min:100|max:2000',
+            'theme_id' => 'nullable|integer|exists:widget_themes,id',
+        ]);
+        
+        // If theme_id is provided, update the theme dimensions
+        if (isset($validated['theme_id'])) {
+            $theme = WidgetTheme::findOrFail($validated['theme_id']);
+            $theme->update([
+                'widget_width' => $validated['widget_width'] ?? $theme->widget_width,
+                'widget_height' => $validated['widget_height'] ?? $theme->widget_height,
+            ]);
+            
+            return response()->json([
+                'message' => 'Theme dimensions updated successfully',
+                'data' => [
+                    'theme_id' => $theme->id,
+                    'widget_width' => $theme->widget_width,
+                    'widget_height' => $theme->widget_height,
+                ],
+            ]);
+        }
+        
+        // Otherwise, update the first theme of this widget
+        $widget = \Modules\DynamicTheme\Entities\Widget::findOrFail($id);
+        $theme = $widget->themes()->first();
+        
+        if ($theme) {
+            $theme->update([
+                'widget_width' => $validated['widget_width'] ?? $theme->widget_width,
+                'widget_height' => $validated['widget_height'] ?? $theme->widget_height,
+            ]);
+        }
+        
+        return response()->json([
+            'message' => 'Widget dimensions updated successfully',
+            'data' => [
+                'widget_width' => $theme?->widget_width ?? null,
+                'widget_height' => $theme?->widget_height ?? null,
+            ],
+        ]);
+    }
+    
+    /**
      * Store a newly created theme.
      */
     public function store(Request $request)
