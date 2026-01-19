@@ -119,12 +119,18 @@
               
               <!-- Horizontal scroll options -->
               <div v-if="selectedWidgetData.layout_mode === 'horizontal'" class="setting-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" v-model="selectedWidgetData.infinite_scroll" @change="onWidgetSettingChange" />
-                  <span>🔄 تكرار لا نهائي (Slider)</span>
-                </label>
+                <!-- Scroll Mode Selection -->
+                <label>نوع التمرير</label>
+                <div class="scroll-mode-buttons">
+                  <button @click="setScrollMode('manual')" class="layout-btn-sm" :class="{ active: !selectedWidgetData.infinite_scroll }">
+                    👆 يدوي
+                  </button>
+                  <button @click="setScrollMode('auto')" class="layout-btn-sm" :class="{ active: selectedWidgetData.infinite_scroll }">
+                    🔄 تلقائي
+                  </button>
+                </div>
                 
-                <!-- Slider speed (only if infinite scroll is enabled) -->
+                <!-- Slider speed (only if auto scroll is enabled) -->
                 <div v-if="selectedWidgetData.infinite_scroll" class="setting-row">
                   <div class="setting-field">
                     <label>سرعة السلايدر (ثواني/عنصر)</label>
@@ -275,12 +281,30 @@
                           class="placed-asset"
                           :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
                           :style="getAssetStyle(asset)"
+                          @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
+                          @click.stop="selectPlacedAsset(asset, widget)"
                         >
                           <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
                             {{ asset.text_content || asset.name || asset.asset_key }}
                           </div>
                           <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
                           <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
+                          
+                          <!-- Asset resize handles -->
+                          <div v-if="selectedAssetId === asset.id" class="resize-handles">
+                            <div class="resize-handle se" @mousedown.stop="startResize($event, 'asset', asset, 'se')"></div>
+                            <div class="resize-handle sw" @mousedown.stop="startResize($event, 'asset', asset, 'sw')"></div>
+                            <div class="resize-handle ne" @mousedown.stop="startResize($event, 'asset', asset, 'ne')"></div>
+                            <div class="resize-handle nw" @mousedown.stop="startResize($event, 'asset', asset, 'nw')"></div>
+                          </div>
+                        </div>
+                        
+                        <!-- Child resize handles -->
+                        <div v-if="selectedWidgetId === widget.id && selectedChildId === child.theme_child_id" class="resize-handles">
+                          <div class="resize-handle se" @mousedown.stop="startResize($event, 'child', child, 'se')"></div>
+                          <div class="resize-handle sw" @mousedown.stop="startResize($event, 'child', child, 'sw')"></div>
+                          <div class="resize-handle ne" @mousedown.stop="startResize($event, 'child', child, 'ne')"></div>
+                          <div class="resize-handle nw" @mousedown.stop="startResize($event, 'child', child, 'nw')"></div>
                         </div>
                       </div>
                       <!-- Duplicated children for seamless loop -->
@@ -985,6 +1009,14 @@ export default {
       this.selectedWidgetData.layout_mode = mode;
       this.hasUnsavedChanges = true;
       this.repositionChildrenByLayout(this.selectedWidgetData);
+      this.saveToHistory();
+    },
+    
+    // تغيير وضع التمرير (يدوي/تلقائي)
+    setScrollMode(mode) {
+      if (!this.selectedWidgetData) return;
+      this.selectedWidgetData.infinite_scroll = (mode === 'auto');
+      this.hasUnsavedChanges = true;
       this.saveToHistory();
     },
     
@@ -2637,6 +2669,11 @@ export default {
   overflow: hidden;
 }
 
+.left-panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .right-panel {
   overflow-y: auto;
 }
@@ -2751,6 +2788,14 @@ export default {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border-color: transparent;
   color: white;
+}
+
+/* Scroll Mode Buttons */
+.scroll-mode-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  margin-bottom: 10px;
 }
 
 /* Checkbox Label */
@@ -2904,7 +2949,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
@@ -2966,7 +3011,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
-  max-height: 150px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
