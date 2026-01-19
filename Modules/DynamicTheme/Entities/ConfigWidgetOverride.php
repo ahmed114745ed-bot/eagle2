@@ -34,6 +34,22 @@ class ConfigWidgetOverride extends Model
         'primary_settings',
         'secondary_settings',
         'action',
+        // Layout fields for Visual Designer
+        'x',
+        'y',
+        'width',
+        'height',
+        'z_index',
+        'opacity',
+        'layout_mode',
+        'layout_gap',
+        'layout_padding',
+        'child_width',
+        'child_height',
+        'infinite_scroll',
+        'scroll_speed',
+        'background_color',
+        'border_radius',
     ];
 
     protected $casts = [
@@ -42,6 +58,20 @@ class ConfigWidgetOverride extends Model
         'primary_settings' => 'array',
         'secondary_settings' => 'array',
         'action' => 'array',
+        // Layout field casts
+        'x' => 'integer',
+        'y' => 'integer',
+        'width' => 'integer',
+        'height' => 'integer',
+        'z_index' => 'integer',
+        'opacity' => 'float',
+        'layout_gap' => 'integer',
+        'layout_padding' => 'integer',
+        'child_width' => 'integer',
+        'child_height' => 'integer',
+        'infinite_scroll' => 'boolean',
+        'scroll_speed' => 'integer',
+        'border_radius' => 'integer',
     ];
 
     /**

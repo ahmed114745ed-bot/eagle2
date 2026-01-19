@@ -948,6 +948,17 @@ export default {
               y: child.y ?? 0,
               opacity: child.opacity ?? 1,
               z_index: child.z_index ?? 0,
+              is_visible: child.is_visible !== false,
+              rotation: child.rotation ?? 0,
+              scale: child.scale ?? 1,
+              background_color: child.background_color || 'transparent',
+              border_width: child.border_width ?? 0,
+              border_style: child.border_style || 'solid',
+              border_color: child.border_color || 'transparent',
+              border_radius_tl: child.border_radius_tl ?? 0,
+              border_radius_tr: child.border_radius_tr ?? 0,
+              border_radius_bl: child.border_radius_bl ?? 0,
+              border_radius_br: child.border_radius_br ?? 0,
               assets: (child.assets || []).map(asset => ({
                 ...asset,
                 x: asset.x ?? 0,
@@ -955,6 +966,17 @@ export default {
                 width: asset.width || 40,
                 height: asset.height || 40,
                 opacity: asset.opacity ?? 1,
+                is_visible: asset.is_visible !== false,
+                z_index: asset.z_index ?? 0,
+                rotation: asset.rotation ?? 0,
+                scale: asset.scale ?? 1,
+                border_width: asset.border_width ?? 0,
+                border_style: asset.border_style || 'solid',
+                border_color: asset.border_color || 'transparent',
+                border_radius_tl: asset.border_radius_tl ?? 0,
+                border_radius_tr: asset.border_radius_tr ?? 0,
+                border_radius_bl: asset.border_radius_bl ?? 0,
+                border_radius_br: asset.border_radius_br ?? 0,
               }))
             };
           })
@@ -1147,6 +1169,7 @@ export default {
     
     getChildStyleInWidget(child, widget) {
       const isLayoutMode = widget.layout_mode && widget.layout_mode !== 'absolute';
+      const isVisible = child.is_visible !== false;
       
       if (isLayoutMode) {
         return {
@@ -1157,6 +1180,7 @@ export default {
           flexShrink: 0,
           opacity: child.opacity ?? 1,
           position: 'relative',
+          display: isVisible ? 'block' : 'none',
         };
       }
       
@@ -1168,6 +1192,7 @@ export default {
         height: child.height * this.zoom + 'px',
         opacity: child.opacity ?? 1,
         zIndex: child.z_index || 0,
+        display: isVisible ? 'block' : 'none',
       };
     },
     
@@ -1999,9 +2024,9 @@ export default {
         top: asset.y * this.zoom + 'px',
         width: asset.width * this.zoom + 'px',
         height: asset.height * this.zoom + 'px',
-        opacity: asset.opacity,
-        zIndex: asset.z_index,
-        display: asset.is_visible ? 'block' : 'none',
+        opacity: asset.opacity ?? 1,
+        zIndex: asset.z_index ?? 0,
+        display: asset.is_visible !== false ? 'block' : 'none',
         transform: `rotate(${asset.rotation || 0}deg) scale(${asset.scale || 1})`,
         borderRadius: borderRadius,
         borderWidth: (asset.border_width || 0) + 'px',
@@ -2356,12 +2381,63 @@ export default {
             y: widget.y,
             width: widget.width,
             height: widget.height,
-            layout_mode: widget.layout_mode,
-            layout_gap: widget.layout_gap,
-            layout_padding: widget.layout_padding,
-            layout_item_width: widget.layout_item_width,
-            layout_item_height: widget.layout_item_height,
-            children: (widget.children || []),
+            layout_mode: widget.layout_mode || 'absolute',
+            layout_gap: widget.layout_gap ?? 8,
+            layout_padding: widget.layout_padding ?? 8,
+            layout_item_width: widget.layout_item_width || widget.child_width || 80,
+            layout_item_height: widget.layout_item_height || widget.child_height || 100,
+            child_width: widget.child_width || 80,
+            child_height: widget.child_height || 100,
+            infinite_scroll: widget.infinite_scroll || false,
+            scroll_speed: widget.scroll_speed || 3,
+            z_index: widget.z_index ?? 0,
+            opacity: widget.opacity ?? 1,
+            background_color: widget.background_color || 'transparent',
+            border_radius: widget.border_radius ?? 8,
+            children: (widget.children || []).map(child => ({
+              theme_child_id: child.theme_child_id,
+              name: child.name,
+              child_key: child.child_key,
+              width: child.width,
+              height: child.height,
+              x: child.x,
+              y: child.y,
+              is_visible: child.is_visible !== false,
+              rotation: child.rotation ?? 0,
+              scale: child.scale ?? 1,
+              opacity: child.opacity ?? 1,
+              z_index: child.z_index ?? 0,
+              background_color: child.background_color || 'transparent',
+              border_width: child.border_width ?? 0,
+              border_style: child.border_style || 'solid',
+              border_color: child.border_color || 'transparent',
+              border_radius_tl: child.border_radius_tl ?? 0,
+              border_radius_tr: child.border_radius_tr ?? 0,
+              border_radius_bl: child.border_radius_bl ?? 0,
+              border_radius_br: child.border_radius_br ?? 0,
+              assets: (child.assets || []).map(asset => ({
+                id: asset.id,
+                asset_key: asset.asset_key,
+                name: asset.name,
+                file_url: asset.file_url || asset.url,
+                width: asset.width,
+                height: asset.height,
+                x: asset.x,
+                y: asset.y,
+                opacity: asset.opacity ?? 1,
+                z_index: asset.z_index ?? 0,
+                rotation: asset.rotation ?? 0,
+                scale: asset.scale ?? 1,
+                is_visible: asset.is_visible !== false,
+                border_width: asset.border_width ?? 0,
+                border_style: asset.border_style || 'solid',
+                border_color: asset.border_color || 'transparent',
+                border_radius_tl: asset.border_radius_tl ?? 0,
+                border_radius_tr: asset.border_radius_tr ?? 0,
+                border_radius_bl: asset.border_radius_bl ?? 0,
+                border_radius_br: asset.border_radius_br ?? 0,
+              })),
+            })),
           }));
           try {
             await configurationsApi.update(this.configurationId, {
@@ -2386,18 +2462,19 @@ export default {
                 height: child.height,
                 x: child.x,
                 y: child.y,
-                rotation: child.rotation,
-                scale: child.scale,
-                opacity: child.opacity,
-                z_index: child.z_index,
-                background_color: child.background_color,
-                border_width: child.border_width,
-                border_style: child.border_style,
-                border_color: child.border_color,
-                border_radius_tl: child.border_radius_tl,
-                border_radius_tr: child.border_radius_tr,
-                border_radius_bl: child.border_radius_bl,
-                border_radius_br: child.border_radius_br,
+                rotation: child.rotation ?? 0,
+                scale: child.scale ?? 1,
+                opacity: child.opacity ?? 1,
+                z_index: child.z_index ?? 0,
+                is_visible: child.is_visible !== false,
+                background_color: child.background_color || 'transparent',
+                border_width: child.border_width ?? 0,
+                border_style: child.border_style || 'solid',
+                border_color: child.border_color || 'transparent',
+                border_radius_tl: child.border_radius_tl ?? 0,
+                border_radius_tr: child.border_radius_tr ?? 0,
+                border_radius_bl: child.border_radius_bl ?? 0,
+                border_radius_br: child.border_radius_br ?? 0,
               });
             }
             for (const asset of child.assets || []) {
@@ -2408,17 +2485,18 @@ export default {
                   height: asset.height,
                   x: asset.x,
                   y: asset.y,
-                  opacity: asset.opacity,
-                  z_index: asset.z_index,
-                  rotation: asset.rotation,
-                  scale: asset.scale,
-                  border_width: asset.border_width,
-                  border_style: asset.border_style,
-                  border_color: asset.border_color,
-                  border_radius_tl: asset.border_radius_tl,
-                  border_radius_tr: asset.border_radius_tr,
-                  border_radius_bl: asset.border_radius_bl,
-                  border_radius_br: asset.border_radius_br,
+                  opacity: asset.opacity ?? 1,
+                  z_index: asset.z_index ?? 0,
+                  rotation: asset.rotation ?? 0,
+                  scale: asset.scale ?? 1,
+                  is_visible: asset.is_visible !== false,
+                  border_width: asset.border_width ?? 0,
+                  border_style: asset.border_style || 'solid',
+                  border_color: asset.border_color || 'transparent',
+                  border_radius_tl: asset.border_radius_tl ?? 0,
+                  border_radius_tr: asset.border_radius_tr ?? 0,
+                  border_radius_bl: asset.border_radius_bl ?? 0,
+                  border_radius_br: asset.border_radius_br ?? 0,
                 });
               }
             }
@@ -3282,17 +3360,33 @@ export default {
 }
 
 .widget-content.horizontal-scroll {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(99, 102, 241, 0.5) transparent;
+  cursor: grab;
+}
+
+.widget-content.horizontal-scroll:active {
+  cursor: grabbing;
 }
 
 .widget-content.horizontal-scroll::-webkit-scrollbar {
-  height: 4px;
+  height: 6px;
 }
 
 .widget-content.horizontal-scroll::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.5);
-  border-radius: 2px;
+  background: rgba(99, 102, 241, 0.7);
+  border-radius: 3px;
+}
+
+.widget-content.horizontal-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
 }
 
 .widget-content.vertical-scroll {

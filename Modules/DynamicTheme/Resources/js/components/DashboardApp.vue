@@ -277,6 +277,7 @@
             v-if="showVisualDesigner"
             ref="visualDesignerRef"
             :widget="editingWidget"
+            :widgets="currentWidgets"
             :themes="editingWidgetThemes"
             :configurationId="selectedConfigId"
             @close="closeVisualDesigner"
