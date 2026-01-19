@@ -1718,7 +1718,7 @@ class User extends Authenticatable
        
 
         if (empty($applicableTypes)) {
-            return $lang === 'ar' ? 'مستخدم' : 'User222222222';
+            return $lang === 'ar' ? 'مستخدم' : 'User';
         }
 
         ksort($applicableTypes);
@@ -1746,7 +1746,7 @@ class User extends Authenticatable
         $html .= '</div>';
 
 
-        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User11111111111111');
+        return $html ?: ($lang === 'ar' ? 'مستخدم' : 'User');
     }
 
     public function userBadge()
