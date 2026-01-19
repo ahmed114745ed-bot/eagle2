@@ -761,6 +761,12 @@ Route::get('gifts-by-id', function (Request $request) {
     ]);
 });
 
+Route::get('/moment-contract-test', function (\App\Contracts\MomentContract $moment) {
+    return response()->json([
+        'resolved_class' => get_class($moment),
+        'data' => $moment->getMomentsByType(1, 1206, 1, null),
+    ]);
+});
 
 Route::post('/countries-in-polygon', [CountriesInPolygonController::class, 'getCountriesInPolygon']);
 Route::get('dashboard/summary', [StatisticsController::class, 'summary']);
