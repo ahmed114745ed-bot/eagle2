@@ -90,9 +90,30 @@
         $permission = reset($permission);
     }
 
+    $moduleGuards = [
+        'moment' => 'Moment',
+    ];
+
+    $moduleAllowed = true;
+
+    $checkStrings = [
+        strtolower((string) $permission),
+        strtolower($normalizedTitle),
+    ];
+
+    foreach ($moduleGuards as $keyword => $module) {
+        foreach ($checkStrings as $value) {
+            if ($value && str_contains($value, $keyword)) {
+                $moduleAllowed = Module::has($module) && Module::isEnabled($module);
+                break 2;
+            }
+        }
+    }
+
     $isVisible =
         !$shouldHideBd &&
         Admin::user()->visible($roles) &&
+        $moduleAllowed &&
         Admin::user()->can($permission) &&
         (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 

@@ -6,6 +6,7 @@ use App\Models\RoleCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Nwidart\Modules\Facades\Module;
 
 
 class AdminPermissionRefact extends Seeder
@@ -367,14 +368,6 @@ class AdminPermissionRefact extends Seeder
                 ],
             ],
             [
-                'name' => 'Moment',
-                'sort' => 28,
-                'permissions' => [
-                    ['key' => 'Moment', 'except' => [], 'additional' => []],
-                    ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
-                ],
-            ],
-            [
                 'name' => 'Employees and Permissions',
                 'sort' => 29,
                 'permissions' => [
@@ -491,6 +484,16 @@ class AdminPermissionRefact extends Seeder
             ],
         ];
 
+        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+            $categories[] = [
+                'name' => 'Moment',
+                'sort' => 28,
+                'permissions' => [
+                    ['key' => 'Moment', 'except' => [], 'additional' => []],
+                    ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
+                ],
+            ];
+        }
 
         $categoryNames = Arr::pluck($categories, 'name');
 
