@@ -449,7 +449,7 @@ return [
     "hours" => 'ساعات',
     "days" => 'أيام',
     "reals" => 'فيديوهات',
-    "moments" => 'لحظات',
+    "Moments" => 'لحظات',
     "RTC" => "RTC",
     "CDN" => "CDN",
     "L3" => "L3",

@@ -99,8 +99,8 @@ use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Controllers\UtdAchievementController;
 
-// 'utd.decreptHeader'
-// utd apis
+// 'Utd.decreptHeader'
+// Utd apis
 Route::middleware([])->group(function () {
     //configs
     Route::prefix('configs')->group(function () {
@@ -567,8 +567,8 @@ Route::middleware([])->group(function () {
 
 
     // users
-    Route::resource('utd-users', UtdUserController::class);
-    Route::get('utd-users/show/{id}', [UtdUserController::class, 'show']);
+    Route::resource('Utd-users', UtdUserController::class);
+    Route::get('Utd-users/show/{id}', [UtdUserController::class, 'show']);
 
 
 

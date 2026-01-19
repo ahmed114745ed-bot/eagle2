@@ -829,7 +829,7 @@
 
                     const hours = parseFloat(document.querySelector('input[name="hours"]').value) || 0;
                     const days = parseFloat(document.querySelector('input[name="days"]').value) || 0;
-                    const moments = parseFloat(document.querySelector('input[name="moments"]').value) || 0;
+                    const moments = parseFloat(document.querySelector('input[name="Moments"]').value) || 0;
                     const reels = parseFloat(document.querySelector('input[name="reels"]').value) || 0;
                     const diamonds = parseFloat(document.querySelector('input[name="diamonds"]').value) || 0;
 

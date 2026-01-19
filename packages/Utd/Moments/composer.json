@@ -1,0 +1,20 @@
+{
+    "name": "utd/moments",
+    "description": "Moments Laravel Package",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Utd\\Moments\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Moments\\Providers\\MomentServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

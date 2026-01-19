@@ -336,7 +336,7 @@ class ReportController extends MainController
 //
 //            return <<<HTML
 //                <div
-//                    class="moments-reels"
+//                    class="Moments-reels"
 //                    data-user="{$userId}"
 //                    data-month="{$month}"
 //                    data-year="{$year}"
@@ -348,10 +348,10 @@ class ReportController extends MainController
 //        });
 //
 //        Admin::script(<<<JS
-//        $('.moments-reels').each(function () {
+//        $('.Moments-reels').each(function () {
 //            let el = $(this);
 //
-//            $.get('/admin/moments-reels', {
+//            $.get('/admin/Moments-reels', {
 //                user_id: el.data('user'),
 //                month: el.data('month'),
 //                year: el.data('year')
@@ -362,14 +362,14 @@ class ReportController extends MainController
 //        JS);
 
         if (Module::has('Moment') && Module::isEnabled('Moment')) {
-            $grid->column('moments', __('Moments'))->display(function () {
+            $grid->column('Moments', __('Moments'))->display(function () {
                 $userId = $this->id;
                 $month  = request('month', now()->month);
                 $year   = request('year', now()->year);
 
                 return <<<HTML
                 <div
-                    class="moments-data"
+                    class="Moments-data"
                     data-user="{$userId}"
                     data-month="{$month}"
                     data-year="{$year}"
@@ -400,13 +400,13 @@ class ReportController extends MainController
         });
 
         Admin::script(<<<JS
-            $('.moments-data').each(function () {
+            $('.Moments-data').each(function () {
                 let el = $(this);
-                $.get('/admin/moments-reels', {
+                $.get('/admin/Moments-reels', {
                     user_id: el.data('user'),
                     month: el.data('month'),
                     year: el.data('year'),
-                    type: 'moments'
+                    type: 'Moments'
                 }, function (res) {
                     el.html(res.html);
                 });
@@ -414,7 +414,7 @@ class ReportController extends MainController
 
             $('.reels-data').each(function () {
                 let el = $(this);
-                $.get('/admin/moments-reels', {
+                $.get('/admin/Moments-reels', {
                     user_id: el.data('user'),
                     month: el.data('month'),
                     year: el.data('year'),
@@ -739,7 +739,7 @@ class ReportController extends MainController
 //        $extras = json_decode($salary->extras, true);
 //
 //        return response()->json([
-//            'html' => view('moments-reels', [
+//            'html' => view('Moments-reels', [
 //                'extras' => $extras
 //            ])->render()
 //        ]);
@@ -766,7 +766,7 @@ class ReportController extends MainController
 
         $extras = json_decode($salary->extras, true);
 
-        if ($type === 'moments') {
+        if ($type === 'Moments') {
             $data = $extras['moment'] ?? null;
             $label = __('Moments');
         } else {

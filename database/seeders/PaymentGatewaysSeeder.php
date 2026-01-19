@@ -117,7 +117,7 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
-        //utd fawry
+        //Utd fawry
         $utd_fawry_id = PaymentCoin::updateOrCreate([
             'type' => 'utd_fawry',
         ], [

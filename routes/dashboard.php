@@ -283,7 +283,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
             route::post('/Change-Sort-Interests','change_sort');
         });
 
-        Route::get('admin-moments-report',[AdminReportsController::class,'moment']);
+        Route::get('admin-Moments-report',[AdminReportsController::class,'moment']);
         Route::get('admin-reels-report',[AdminReportsController::class,'reels']);
         Route::get('admin-tickets',[AdminReportsController::class,'tickets']);
         Route::get('admin-delete-tickets/{id}',[AdminReportsController::class,'delete_tickets']);

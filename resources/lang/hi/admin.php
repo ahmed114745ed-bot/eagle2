@@ -431,7 +431,7 @@ return [
     "hours" => 'घंटे',
     "days" => 'दिन',
     "reals" => 'रील्स',
-    "moments" => 'क्षण',
+    "Moments" => 'क्षण',
     "RTC" => "RTC",
     "CDN" => "CDN",
     "L3" => "L3",

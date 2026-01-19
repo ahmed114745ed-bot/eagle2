@@ -536,8 +536,8 @@ Route::group(
         Route::get('filter-rooms', [FilterController::class, 'rooms'])->name('filter-rooms');
 
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
-        Route::get('/moments-reels', [ReportController::class, 'momentsReels'])
-            ->name('admin.ajax.moments-reels');
+        Route::get('/Moments-reels', [ReportController::class, 'momentsReels'])
+            ->name('admin.ajax.Moments-reels');
          Route::get('/expenses', [ReportController::class, 'expenses']);
             Route::get('/due-salary', [ReportController::class, 'dueSalary'])
     ->name('admin.manager.due-salary');

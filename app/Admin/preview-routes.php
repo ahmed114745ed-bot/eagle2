@@ -232,7 +232,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::post('cashing', 'ReportController@cashing')->name('cashing');
     Route::resource('trxs', 'CoinLogController');
     Route::resource('images', 'ImageController');
-    Route::resource('moments', MomentController::class);
+    Route::resource('Moments', MomentController::class);
     Route::resource('reels', ReelController::class);
     Route::resource('levels/users', UserLevelController::class)->names([
         'index' => 'levels.users.index',
@@ -284,7 +284,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
 
     Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
     Route::resource('report-reals', \App\Admin\Controllers\ReportRealsController::class);
-    Route::resource('report-moments', ReportMomentController::class);
+    Route::resource('report-Moments', ReportMomentController::class);
     Route::resource('admin-users', AdminUsersController::class);
     Route::resource('parent-users', ParentUsersController::class);
     Route::resource('custom-zego-messages', CustomZegoMessageController::class);

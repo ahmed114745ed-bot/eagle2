@@ -71,7 +71,7 @@ class SingleUserResource extends JsonResource
             ],
             'followers'  =>  $this->followers->count(),
             'followeds'  =>  $this->followeds->count(),
-            'moments'    =>  $this->moments?->count(),
+            'Moments'    =>  $this->moments?->count(),
             'reals'      =>  $this->reals->count(),
         ];
 

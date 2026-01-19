@@ -206,7 +206,7 @@ return [
     "closeSuperBox" => "Your Super Lucky Bos duration finished",
     "relations_help" => "🔒 When disabled, the message will be sent to only one friend. <br> 🔓 When enabled, the message will be sent to all friends.",
 
-    
+
     'resetSalary' => 'Are You sure you want to reset salary?',
     "fawry" => 'Fawry',
     'My Fawry'      => 'My Fawry',
@@ -452,7 +452,7 @@ return [
     "hours" => "Hours",
     "days" => "Days",
     "reals" => 'reals',
-    "moments" => 'moments',
+    "Moments" => 'Moments',
     "RTC"=> "RTC",
     "CDN"=> "CDN",
     "L3"=> "L3",

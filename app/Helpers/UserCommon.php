@@ -123,7 +123,7 @@ class UserCommon
             } elseif ($type == 1) {
                 $real_likes->whereBetween("real_user_likes.created_at", [$startDate, $endDate]);
             }
-        }, 'moments' => function ($moments) use ($startDate, $endDate, $type) {
+        }, 'Moments' => function ($moments) use ($startDate, $endDate, $type) {
             if ($type == 0) {
                 $moments->whereBetween("moment.created_at", getToday());
             } elseif ($type == 1) {
@@ -144,7 +144,7 @@ class UserCommon
         }])->find($userId);
 
         $key = ($reals) ? 'reals' : 'reel';
-        $key2 = ($reals) ? 'moments' : 'moment';
+        $key2 = ($reals) ? 'Moments' : 'moment';
         $key3 = ($reals) ? 'like' : 'likes';
         $key4 = ($reals) ? 'comment' : 'comments';
 

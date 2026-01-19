@@ -33,13 +33,13 @@ class AgencySettingsController extends MainController
 
         // $hours =  settings()->get('hours');
         // $days =  settings()->get('days');
-        // $moments =  settings()->get('moments');
+        // $Moments =  settings()->get('Moments');
         // $reels = settings()->get('reels');
         // $diamonds = settings()->get('diamonds');
 
         $hours =  Common::getSettingValue('hours') ?? 0;
         $days =  Common::getSettingValue('days') ?? 0;
-        $moments =  Common::getSettingValue('moments') ?? 0;
+        $moments =  Common::getSettingValue('Moments') ?? 0;
         $reels = Common::getSettingValue('reels') ?? 0;
         $diamonds = Common::getSettingValue('diamonds');
         $hoursDays = Common::getSettingValue('hours_days');

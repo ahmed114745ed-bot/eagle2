@@ -10,13 +10,13 @@
     <style>
         :root {
             /* Enhanced color scheme */
-            --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};     
+            --primary-color: {{ data_get($settings, 'app_primary_color', '#32e5ac') }};
             --secondary-color:{{ data_get($settings, 'app_primary_color', '#ffffff') }};
             --accent-color: #06b6d4;
             --dark-bg: #0f0f23;
             --text-color: #1a1a2e;
             --text-light: {{ data_get($settings, 'text_header_color', '#fff') }};
-            
+
             --background:{{ data_get($settings, 'background_color', '#fff') }};
             --background-alt:{{ data_get($settings, 'background_color', '#fff') }};
             --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -299,13 +299,13 @@
         }
 
         @keyframes float-shape {
-            0%, 100% { 
+            0%, 100% {
                 transform: translate(0, 0) rotate(0deg) scale(1);
             }
-            33% { 
+            33% {
                 transform: translate(100px, -100px) rotate(120deg) scale(1.2);
             }
-            66% { 
+            66% {
                 transform: translate(-50px, 100px) rotate(240deg) scale(0.8);
             }
         }
@@ -373,11 +373,11 @@
         }
 
         @keyframes pulse {
-            0%, 100% { 
+            0%, 100% {
                 transform: scale(1);
                 box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
             }
-            50% { 
+            50% {
                 transform: scale(1.05);
                 box-shadow: 0 4px 25px rgba(124, 58, 237, 0.5);
             }
@@ -686,7 +686,7 @@
             height: 640px;
             background: linear-gradient(145deg, #1a1a2e, #16213e);
             border-radius: 45px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4), 
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4),
                         inset 0 0 0 2px rgba(255,255,255,0.1);
             padding: 18px;
             position: relative;
@@ -694,16 +694,16 @@
         }
 
         @keyframes float {
-            0%, 100% { 
+            0%, 100% {
                 transform: translateY(0px) rotate(0deg);
             }
-            25% { 
+            25% {
                 transform: translateY(-15px) rotate(-2deg);
             }
-            50% { 
+            50% {
                 transform: translateY(-20px) rotate(0deg);
             }
-            75% { 
+            75% {
                 transform: translateY(-15px) rotate(2deg);
             }
         }
@@ -811,16 +811,16 @@
         }
 
         @keyframes bounceIn {
-            0% { 
-                transform: scale(0); 
-                opacity: 0; 
+            0% {
+                transform: scale(0);
+                opacity: 0;
             }
-            50% { 
-                transform: scale(1.1); 
+            50% {
+                transform: scale(1.1);
             }
-            100% { 
-                transform: scale(1); 
-                opacity: 1; 
+            100% {
+                transform: scale(1);
+                opacity: 1;
             }
         }
 
@@ -916,7 +916,7 @@
             transform: translateY(-15px);
             box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
         }
-       
+
 
         .feature-icon {
             width: 90px;
@@ -1723,11 +1723,11 @@
                                 {{ strtoupper(substr($appName, 0, 1)) }}
                         @endif
                     </div>
-                
+
                 <div class="logo-text">{{ $appName }}</div>
                 </div>
                 <p style="margin-top: 20px; color: #94a3b8;" data-translate="footer.desc">Connect with millions worldwide through live streaming and social discovery.</p>
-                
+
                 <div class="social-links flex gap-4">
 
                 @if(!empty(@$settings['facebook_link']))
@@ -1823,7 +1823,7 @@
                     {
                         titleMain: "Go Live Instantly",
                         titleSub: "Stream Your Talent",
-                        description: "Broadcast your moments to millions of viewers worldwide. Share your talents, hobbies, and daily adventures with a global audience. Get real-time reactions, gifts, and build your fan community with our powerful streaming platform."
+                        description: "Broadcast your Moments to millions of viewers worldwide. Share your talents, hobbies, and daily adventures with a global audience. Get real-time reactions, gifts, and build your fan community with our powerful streaming platform."
                     },
                     {
                         titleMain: "Chat & Connect",
@@ -1833,7 +1833,7 @@
                     {
                         titleMain: "Join Group Parties",
                         titleSub: "Fun Together",
-                        description: "Host amazing video parties with up to 9 friends simultaneously. Play games, celebrate special moments, or just hang out together. Create private rooms for intimate gatherings or go public to meet new people with similar interests."
+                        description: "Host amazing video parties with up to 9 friends simultaneously. Play games, celebrate special Moments, or just hang out together. Create private rooms for intimate gatherings or go public to meet new people with similar interests."
                     },
                     {
                         titleMain: "Global Community",
@@ -1855,7 +1855,7 @@
                 },
                 feature3: {
                     title: "Group Parties",
-                    desc: "Host or join group video calls with up to 9 people. Create unforgettable moments with friends from around the globe."
+                    desc: "Host or join group video calls with up to 9 people. Create unforgettable Moments with friends from around the globe."
                 },
                 feature4: {
                     title: "Global Community",
@@ -2050,18 +2050,18 @@
         function updateLanguage(lang) {
             currentLanguage = lang;
             const elements = document.querySelectorAll('[data-translate]');
-            
+
             elements.forEach(element => {
                 const key = element.getAttribute('data-translate');
                 const keys = key.split('.');
                 let translation = translations[lang];
-                
+
                 for (let k of keys) {
                     if (translation[k]) {
                         translation = translation[k];
                     }
                 }
-                
+
                 if (typeof translation === 'string') {
                     element.innerHTML = translation;
                 }
@@ -2070,10 +2070,10 @@
             // Update document direction
             document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
             document.documentElement.setAttribute('lang', lang === 'ar' ? 'ar' : 'en');
-            
+
             // Update current language display
             document.getElementById('currentLang').textContent = lang.toUpperCase();
-            
+
             // Update active language option
             document.querySelectorAll('.lang-option').forEach(option => {
                 option.classList.remove('active');
@@ -2157,7 +2157,7 @@
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
-            
+
             setTimeout(() => {
                 cursorFollower.style.left = e.clientX - 10 + 'px';
                 cursorFollower.style.top = e.clientY - 10 + 'px';
@@ -2213,18 +2213,18 @@
             const heroTitleMain = document.getElementById('heroTitleMain');
             const heroTitleSub = document.getElementById('heroTitleSub');
             const heroDescription = document.getElementById('heroDescription');
-            
+
             // Add fade animation class
             heroTitleMain.classList.add('content-fade');
             heroTitleSub.classList.add('content-fade');
             heroDescription.classList.add('content-fade');
-            
+
             // Change content after a short delay
             setTimeout(() => {
                 heroTitleMain.textContent = content.titleMain;
                 heroTitleSub.textContent = content.titleSub;
                 heroDescription.textContent = content.description;
-                
+
                 // Remove animation class
                 setTimeout(() => {
                     heroTitleMain.classList.remove('content-fade');
@@ -2371,13 +2371,13 @@
                 ripple.style.background = 'rgba(255,255,255,0.5)';
                 ripple.style.transform = 'translate(-50%, -50%)';
                 ripple.style.pointerEvents = 'none';
-                
+
                 const rect = this.getBoundingClientRect();
                 ripple.style.left = (e.clientX - rect.left) + 'px';
                 ripple.style.top = (e.clientY - rect.top) + 'px';
-                
+
                 this.appendChild(ripple);
-                
+
                 ripple.animate([
                     { width: '0', height: '0', opacity: 1 },
                     { width: '300px', height: '300px', opacity: 0 }
@@ -2385,7 +2385,7 @@
                     duration: 600,
                     easing: 'ease-out'
                 });
-                
+
                 setTimeout(() => ripple.remove(), 600);
             });
         });
@@ -2396,16 +2396,16 @@
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
+
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
+
                 const rotateX = (y - centerY) / 10;
                 const rotateY = (centerX - x) / 10;
-                
+
                 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = '';
             });

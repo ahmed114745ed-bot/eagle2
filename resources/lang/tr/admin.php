@@ -433,7 +433,7 @@ return [
     "hours" => 'Saatler',
     "days" => 'Günler',
     "reals" => 'reels',
-    "moments" => 'anlar',
+    "Moments" => 'anlar',
     "RTC" => "RTC",
     "CDN" => "CDN",
     "L3" => "L3",

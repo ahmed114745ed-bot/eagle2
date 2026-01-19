@@ -449,7 +449,7 @@ return [
     "hours" => 'Jam',
     "days" => 'Hari',
     "reals" => 'Video',
-    "moments" => 'Momen',
+    "Moments" => 'Momen',
     "RTC" => "RTC",
     "CDN" => "CDN",
     "L3" => "L3",

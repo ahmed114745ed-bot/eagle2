@@ -16,7 +16,7 @@ class PercentageTargetController extends Controller
         $data = [
             'hours' =>  settings()->get('hours'),
             'days' =>  settings()->get('days'),
-            'moments' =>  settings()->get('moments'),
+            'Moments' =>  settings()->get('Moments'),
             'reels' => settings()->get('reels'),
             'error_message' => $errorMessage
         ];
@@ -37,7 +37,7 @@ class PercentageTargetController extends Controller
         settings()->set("hours", $hours);
         settings()->set("days", $days);
         settings()->set("reels", $reels);
-        settings()->set("moments", $moments);
+        settings()->set("Moments", $moments);
 
         return Common::apiResponse(true, '');
     }

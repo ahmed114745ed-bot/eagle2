@@ -37,7 +37,7 @@ class AddTargetToJsonController extends Controller
         foreach ($request->all() as $key => $value) {
             if (!is_null($value)) {
                 Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-                
+
                 Cache::forget($key);
                 Cache::forever($key, $value);
             }
@@ -51,7 +51,7 @@ class AddTargetToJsonController extends Controller
             'hours'        => 'required|numeric',
             'days'        => 'required|numeric',
             'reels'        => 'nullable|numeric',
-            'moments'         => 'nullable|numeric',
+            'Moments'         => 'nullable|numeric',
 
         ]);
         if ($validator->fails()) {
@@ -69,7 +69,7 @@ class AddTargetToJsonController extends Controller
         settings()->set("hours", $hours);
         settings()->set("days", $days);
         settings()->set("reels", $reels);
-        settings()->set("moments", $moments);
+        settings()->set("Moments", $moments);
         return Common::apiResponse(1, 'created successfully');
     }
 
@@ -77,13 +77,13 @@ class AddTargetToJsonController extends Controller
     {
         $hours =  settings()->get('hours');
         $days =  settings()->get('days');
-        $moments =  settings()->get('moments');
+        $moments =  settings()->get('Moments');
         $reels = settings()->get('reels');
         $data = [
             'hours'  => $hours,
             'days' => $days,
             'reels' => $reels,
-            'moments' => $moments,
+            'Moments' => $moments,
         ];
         return Common::apiResponse(1, '', $data);
     }

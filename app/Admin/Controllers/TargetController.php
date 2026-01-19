@@ -468,7 +468,7 @@ class TargetController extends MainController
                         <label><input type="checkbox" name="columns[]" value="hours" checked> ' . __('Hours') . '</label><br>
                         <label><input type="checkbox" name="columns[]" value="days" checked> ' . __('Days') . '</label><br>
                         <label><input type="checkbox" name="columns[]" value="reels" checked> ' . __('Reels') . '</label><br>
-                        <label><input type="checkbox" name="columns[]" value="moments" checked> ' . __('Moments') . '</label><br>
+                        <label><input type="checkbox" name="columns[]" value="Moments" checked> ' . __('Moments') . '</label><br>
                         </div>
                         <div class="modal-footer">
                         <button type="submit" formaction="/admin/download-target-pdf" class="btn btn-primary">' . __('Export PDF') . '</button>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c23451822a8b14b315c37ac58820d920",
+    "content-hash": "f94b7eee9ef056a21b105639e0cc4796",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14226,6 +14226,36 @@
             "time": "2024-12-21T16:25:41+00:00"
         },
         {
+            "name": "utd/moments",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Moments",
+                "reference": "b952e8e667910bd34b0f8ca2e140fc1748edc648"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Moments\\Providers\\MomentServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Moments\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Moments Laravel Package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.2",
             "source": {
@@ -14996,7 +15026,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20
+        "fruitcake/laravel-cors": 20,
+        "utd/moments": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
@@ -15005,6 +15036,6 @@
         "ext-curl": "*",
         "ext-openssl": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }

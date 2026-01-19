@@ -2132,7 +2132,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $followed
  * @property-read \App\Models\User|null $follower
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $moments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $Moments
  * @property-read int|null $moments_count
  * @property-read \App\Models\Room|null $room
  * @method static \Illuminate\Database\Eloquent\Builder|Follow newModelQuery()
@@ -2252,7 +2252,7 @@ namespace App\Models{
  * @property-read \Modules\Achievement\Entities\GiftAchievement|null $achievement
  * @property-read \App\Models\LuckyGift|null $luckyGift
  * @property-read \App\Models\LuckyGift|null $lucky_gift
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $moments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $Moments
  * @property-read int|null $moments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $users
  * @property-read int|null $users_count
@@ -5810,7 +5810,7 @@ namespace App\Models{
  * @property-read int|null $moment_comments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\MomentLikes> $moment_likes
  * @property-read int|null $moment_likes_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $moments
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Moment\Entities\Moment> $Moments
  * @property-read int|null $moments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, User> $mutualFollows
  * @property-read int|null $mutual_follows_count

@@ -40,7 +40,7 @@ class RegularTarget implements TargetInterface
             $targetMoment = explode(',', $target->moment);
             if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
-                $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
+                $per += (((int)Common::getSettingsValue('Moments')) ?? 0) / 100;
             }
         }
 
@@ -84,7 +84,7 @@ class RegularTarget implements TargetInterface
         if (Module::has('Moment') && Module::isEnabled('Moment')) {
             $targetMoment = explode(',', $target->moment);
             if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
-                $per += (((int)Common::getSettingsValue('moments')) ?? 0) / 100;
+                $per += (((int)Common::getSettingsValue('Moments')) ?? 0) / 100;
             }
         }
         // logger('targetMoment Achieved:', [$per]);

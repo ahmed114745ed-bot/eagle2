@@ -48,7 +48,8 @@
         "pusher/pusher-php-server": "*",
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
-        "stripe/stripe-php": "^9.9"
+        "stripe/stripe-php": "^9.9",
+        "utd/moments": "@dev"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -112,5 +113,14 @@
         "sort-packages": true
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Moments",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
 }

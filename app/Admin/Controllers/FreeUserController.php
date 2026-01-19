@@ -499,7 +499,7 @@ class FreeUserController extends MainController
                 $tab->add(__('Packs'), $this->packList($id)->render());
                 $tab->add(__('vips'), $this->vipList($id)->render());
                 $tab->add(__('Reals'), $this->realList($id)->render());
-                $tab->add(__('moments'), $this->momentList($id)->render());
+                $tab->add(__('Moments'), $this->momentList($id)->render());
 
                 $column->append($tab);
             });

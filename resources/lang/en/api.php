@@ -8,7 +8,7 @@ return [
         'silver'          => 'you buy :quantity من الفضة بنجاح',
         'vip_upgrade'     => "Congrats! Your level is raised to :level \nYour level rises when you send gifts",
         'send_ware'       => 'You send :wareName to :toUserName',
-        'got_gift_moment' => "Congrats! :giftName sent you a gift \nClick now and post more  moments and win cash",
+        'got_gift_moment' => "Congrats! :giftName sent you a gift \nClick now and post more  Moments and win cash",
         'got_gift_reel'   => "Congrats! :giftName sent you a gift \nClick now and post more  reels and win cash",
 
 

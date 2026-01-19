@@ -159,7 +159,7 @@
         <div class="settings-content">
             <div>
                 @php
-                    $url = url('admin/moments');
+                    $url = url('admin/Moments');
                 @endphp
                 <a href="{{ $url }}"
                     style="display: block; text-align: center; margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="settings-content">
             <div>
                 @php
-                    $url = url('admin/moments');
+                    $url = url('admin/Moments');
                 @endphp
                 <a href="{{ $url }}"
                     style="display: block; text-align: center; margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border-radius: 5px; text-decoration: none;">

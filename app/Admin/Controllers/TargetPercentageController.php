@@ -17,7 +17,7 @@ class TargetPercentageController extends MainController
 
         $hours = settings()->get('hours');
         $days = settings()->get('days');
-        $moments = settings()->get('moments');
+        $moments = settings()->get('Moments');
         $reels = settings()->get('reels');
         $diamonds = settings()->get('diamonds');
 
@@ -45,7 +45,7 @@ class TargetPercentageController extends MainController
         $fields = [
             ['id' => 'hours', 'value' => $hours, 'label' => __('Hours')],
             ['id' => 'days', 'value' => $days, 'label' => __('Days')],
-            ['id' => 'moments', 'value' => $moments, 'label' => __('Moments')],
+            ['id' => 'Moments', 'value' => $moments, 'label' => __('Moments')],
             ['id' => 'reels', 'value' => $reels, 'label' => __('Reels')],
             ['id' => 'diamonds', 'value' => $diamonds, 'label' => __('Diamonds')],
         ];

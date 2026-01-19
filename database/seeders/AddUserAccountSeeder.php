@@ -15,7 +15,7 @@ class AddUserAccountSeeder extends Seeder
     {
 
         User::factory()->create([
-            'name' => 'utd',
+            'name' => 'Utd',
             'phone' => '+201000100010',
             'password' => '111',
             'can_play' => 3,

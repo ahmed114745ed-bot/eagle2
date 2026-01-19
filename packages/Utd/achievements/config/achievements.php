@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'license_key' => env('ACHIEVEMENTS_LICENSE_KEY'),
-    'secret' => env('ACHIEVEMENTS_SECRET', 'utd-achievements-2024'),
+    'secret' => env('ACHIEVEMENTS_SECRET', 'Utd-achievements-2024'),
 
     /*
     |--------------------------------------------------------------------------

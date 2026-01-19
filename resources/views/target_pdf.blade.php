@@ -119,7 +119,7 @@
                                     echo __('uploads').':'. ($target->reel_parts[0] ?? 0) . '<br>';
                                     echo __('like').':' . ($target->reel_parts[1] ?? 0) . '<br>';
                                     echo __('comment').':' . ($target->reel_parts[2] ?? 0);
-                                } elseif ($column == 'moments' || $column == 'moment') {
+                                } elseif ($column == 'Moments' || $column == 'moment') {
                                     echo __('uploads').':' . ($target->moment_parts[0] ?? 0) . '<br>';
                                     echo __('like').':' . ($target->moment_parts[1] ?? 0) . '<br>';
                                     echo __('comment').':' . ($target->moment_parts[2] ?? 0);

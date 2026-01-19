@@ -106,7 +106,7 @@ class EnteranceController extends Controller
         $is_auto_preview = (int) Common::getConfig('is_auto_preview');
 
 
-        $libraries = ['agora', 'zego', 'tencent', 'utd zego'];
+        $libraries = ['agora', 'zego', 'tencent', 'Utd zego'];
         $liveTypes = ['RTC', 'CDN', 'L3'];
 
         $data = [

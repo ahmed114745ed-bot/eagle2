@@ -113,7 +113,7 @@ class Kernel extends HttpKernel
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,
-        //        'utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
+        //        'Utd.decreptHeader' => \App\Http\Middleware\UtdDecreptHeader::class,
         'timezone' => \App\Http\Middleware\SetUserTimezone::class,
         'agencyFeature' => EnsureAgencyFeatureEnabled::class,
         'web-agency-feature' => WebAgencyFeatureEnable::class,

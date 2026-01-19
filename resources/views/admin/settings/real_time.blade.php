@@ -61,14 +61,14 @@
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
                                     <div class="card p-3 shadow" style="height: 300px;">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h4 class="m-0">{{ __('utd zego token') }}</h4>
+                                            <h4 class="m-0">{{ __('Utd zego token') }}</h4>
                                         </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-md-10">
                                                 <div class="form-group">
                                                     <label
-                                                        for="zego_server_secret">{{ __('utd zego token') }}:</label>
+                                                        for="zego_server_secret">{{ __('Utd zego token') }}:</label>
                                                     <input type="text" id="zego_server_secret"
                                                         name="zego_token" placeholder="server_secret"
                                                         value="{{ $zego_token }}" class="form-control"
@@ -210,7 +210,7 @@
                     </div>
                 </div>
 
-                
+
 
                 <div class="col-md-2 mb-2">
                     <div class="d-flex justify-content-between align-items-center">

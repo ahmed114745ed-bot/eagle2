@@ -20,7 +20,7 @@ class ReportUserController extends Controller
 
         $perPage = request('per_page') ?? 10;
 
-        $result = User::with('liveTime', 'reals', 'moments')->when($search,function($q)use($search){
+        $result = User::with('liveTime', 'reals', 'Moments')->when($search,function($q)use($search){
             $q->where('uuid', 'like', "%{$search}%");
         })
         ->when($year, function($q) use($year){

@@ -35,7 +35,7 @@
         <label for="utd_fawry_return_url">{{ __('admin.return_url') }}:</label>
         <div class="copy-container">
             <input type="text" id="utd_fawry_return_url" name="utd_fawry_return_url" placeholder="utd_fawry_return_url"
-                   value="{{ url('/api/utd-fawry-callback') }}" class="form-control" readonly>
+                   value="{{ url('/api/Utd-fawry-callback') }}" class="form-control" readonly>
             <button type="button" class="copy-button" data-copy-target="utd_fawry_return_url" title="Copy">📋</button>
         </div>
     </div>
