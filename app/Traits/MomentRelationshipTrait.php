@@ -2,17 +2,30 @@
 
 namespace App\Traits;
 
+use Modules\Moment\Entities\Moment;
+use Modules\Moment\Entities\MomentCommint;
+use Modules\Moment\Entities\MomentLikes;
+
 trait MomentRelationshipTrait
 {
     public function moment_likes(){
-        return $this->hasMany(\Modules\Moment\Entities\MomentLikes::class);
+        if (!class_exists(MomentLikes::class,false)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany(MomentLikes::class);
     }
 
     public function moment_comments(){
-        return $this->hasMany(\Modules\Moment\Entities\MomentCommint::class);
+        if (!class_exists(MomentCommint::class,false)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany(MomentCommint::class);
     }
 
     public function moments(){
-        return $this->hasMany(\Modules\Moment\Entities\Moment::class);
+        if (!class_exists(Moment::class,false)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany(Moment::class);
     }
 }

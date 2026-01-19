@@ -1264,7 +1264,7 @@ class User extends Authenticatable
 
     public function moments()
     {
-        if (! class_exists(Moment::class)){
+        if (! class_exists(Moment::class,false)){
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Moment::class, 'user_id');
@@ -1778,6 +1778,9 @@ class User extends Authenticatable
 
     public function momentUserGift()
     {
+        if (!class_exists(MomentUserGift::class)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
         return $this->hasMany(MomentUserGift::class, 'user_id');
     }
 
