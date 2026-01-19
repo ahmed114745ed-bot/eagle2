@@ -1688,7 +1688,7 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-
+       //dd($this->type_user);
         $types = [
             1 => 'host',
             2 => 'agency_owner',
@@ -1714,6 +1714,8 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
+
+       
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
