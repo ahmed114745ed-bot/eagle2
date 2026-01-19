@@ -44,6 +44,7 @@ class RequestAgencyFilterationController extends AdminController
         $grid->model()->where('status', '!=', 0)->with([
             'owner',
             'additionalInfo',
+            'additionalInfo.country',
             'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
 
         ])
