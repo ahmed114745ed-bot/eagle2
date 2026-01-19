@@ -182,6 +182,14 @@ class MilestoneRewardController
                 .rtl .fields-group .form-group {
                     /* display: flex !important; */
                 }
+
+             .rtl .form-horizontal .form-group {
+                text-align: right;
+             }
+
+            .rtl .form-horizontal .form-group .control-label {
+                float: right;
+            }
         ');
         $form->saving(function (Form $form) {
             switch ($form->type) {
