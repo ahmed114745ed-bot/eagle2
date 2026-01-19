@@ -10,11 +10,33 @@ class ThemeChildAssetResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // Build file_url from file_path or use default_url
-        $fileUrl = $this->default_url;
+        // Build file_url from file_path first, then fallback to default_url
+        $fileUrl = null;
+        
+        // Priority 1: Use file_path with Storage::url() for GCS
         if ($this->file_path) {
-            // Use Storage::url() to get the correct URL (works with GCS, S3, local, etc.)
-            $fileUrl = Storage::url($this->file_path);
+            $fileUrl = Storage::disk('admin')->url($this->file_path);
+        }
+        
+        // Priority 2: Use default_url but fix it if it's using local storage
+        if (!$fileUrl && $this->default_url) {
+            $defaultUrl = $this->default_url;
+            // Fix old local storage URLs to use GCS
+            if (str_contains($defaultUrl, '/storage/') && !str_contains($defaultUrl, 'googleapis.com')) {
+                // Extract the path after /storage/
+                $path = preg_replace('/^.*\/storage\//', '', $defaultUrl);
+                if ($path) {
+                    $fileUrl = Storage::disk('admin')->url($path);
+                }
+            } else {
+                $fileUrl = $defaultUrl;
+            }
+        }
+        
+        // For text assets, include the text content
+        $textContent = null;
+        if ($this->asset_type === 'text') {
+            $textContent = $this->text_content ?? $this->asset_label ?? $this->asset_key;
         }
         
         return [
@@ -31,6 +53,7 @@ class ThemeChildAssetResource extends JsonResource
             'original_filename' => $this->original_filename,
             'is_required' => (bool) $this->is_required,
             'order' => $this->order,
+            'text_content' => $textContent,
             // Designer fields - use database values or defaults
             'width' => $this->width ?? 80,
             'height' => $this->height ?? 80,

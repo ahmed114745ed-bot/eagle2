@@ -98,32 +98,38 @@
 
           <!-- Children List -->
           <div class="panel-section flex-1">
-            <h3 class="section-title">👶 الأطفال (اسحب للموبايل)</h3>
+            <h3 class="section-title">👶 الأطفال (اسحب للموبايل) - {{ themeChildren.length }} طفل</h3>
             <div class="children-list">
-              <VirtualScroller
-                :items="themeChildren"
-                :item-height="60"
-                class="virtual-list"
-                v-slot="{ item: child }"
+              <!-- Debug info -->
+              <div v-if="!themes || themes.length === 0" class="empty-message" style="color: orange;">
+                ⚠️ لا يوجد ثيمات (themes is empty)
+              </div>
+              <div v-else-if="!selectedThemeId" class="empty-message" style="color: orange;">
+                ⚠️ لم يتم اختيار ثيم (selectedThemeId is null)
+              </div>
+              <div v-else-if="!selectedTheme" class="empty-message" style="color: orange;">
+                ⚠️ لم يتم العثور على الثيم المختار (selectedTheme not found for id: {{ selectedThemeId }})
+              </div>
+              
+              <!-- Children list without VirtualScroller for debugging -->
+              <div
+                v-for="child in themeChildren"
+                :key="child.id"
+                class="child-item"
+                :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlaced(child.id) }"
+                draggable="true"
+                @dragstart="onChildDragStart($event, child)"
+                @click="selectChild(child)"
               >
-                <div
-                  v-if="child"
-                  :key="child.id"
-                  class="child-item"
-                  :class="{ 'active': selectedChildId === child.id, 'placed': isChildPlaced(child.id) }"
-                  draggable="true"
-                  @dragstart="onChildDragStart($event, child)"
-                  @click="selectChild(child)"
-                >
-                  <div class="child-icon">🧩</div>
-                  <div class="child-info">
-                    <span class="child-name">{{ child.label || child.child_key }}</span>
-                    <span class="child-type">{{ child.child_type }}</span>
-                  </div>
-                  <span class="child-assets-count">{{ (child.assets || []).length }} 🖼️</span>
+                <div class="child-icon">🧩</div>
+                <div class="child-info">
+                  <span class="child-name">{{ child.label || child.child_key }}</span>
+                  <span class="child-type">{{ child.child_type }}</span>
                 </div>
-              </VirtualScroller>
-              <div v-if="!themeChildren.length" class="empty-message">
+                <span class="child-assets-count">{{ (child.assets || []).length }} 🖼️</span>
+              </div>
+              
+              <div v-if="themeChildren.length === 0 && selectedTheme" class="empty-message">
                 لا يوجد أطفال في هذا الثيم
               </div>
             </div>
@@ -137,16 +143,23 @@
                 v-for="asset in selectedChild.assets || []"
                 :key="asset.id"
                 class="asset-item"
-                :class="{ 'active': selectedAssetId === asset.id }"
+                :class="{ 'active': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
                 draggable="true"
                 @dragstart="onAssetDragStart($event, asset)"
                 @click="selectAsset(asset)"
               >
                 <div class="asset-preview">
-                  <img v-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" />
+                  <!-- Text assets -->
+                  <div v-if="asset.asset_type === 'text'" class="text-asset-preview">
+                    <span class="text-icon">📝</span>
+                    <span class="text-content">{{ asset.text_content || asset.name || asset.asset_key }}</span>
+                  </div>
+                  <!-- Image assets -->
+                  <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" @error="onAssetImageError($event, asset)" />
                   <span v-else class="asset-placeholder">📦</span>
                 </div>
                 <span class="asset-name">{{ asset.name || asset.asset_key }}</span>
+                <span class="asset-type-badge">{{ asset.asset_type || 'image' }}</span>
               </div>
               <div v-if="!(selectedChild.assets || []).length" class="empty-message">
                 لا يوجد أصول
@@ -194,12 +207,17 @@
                   v-for="asset in child.assets || []"
                   :key="asset.id"
                   class="placed-asset"
-                  :class="{ 'selected': selectedAssetId === asset.id }"
+                  :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
                   :style="getAssetStyle(asset)"
                   @mousedown.stop="startDragPlacedAsset($event, child, asset)"
                   @click.stop="selectPlacedAsset(asset)"
                 >
-                  <img v-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
+                  <!-- Text assets -->
+                  <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                    {{ asset.text_content || asset.name || asset.asset_key }}
+                  </div>
+                  <!-- Image assets -->
+                  <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" @error="onAssetImageError($event, asset)" />
                   <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
                   
                   <!-- Resize handles -->
@@ -1308,6 +1326,37 @@ export default {
       };
     },
     
+    // Style for text asset content
+    getTextAssetStyle(asset) {
+      return {
+        fontSize: (asset.font_size || 14) * this.zoom + 'px',
+        fontWeight: asset.font_weight || 'normal',
+        fontFamily: asset.font_family || 'inherit',
+        color: asset.text_color || '#ffffff',
+        textAlign: asset.text_align || 'center',
+        lineHeight: asset.line_height || 1.4,
+        textShadow: asset.text_shadow || 'none',
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        wordBreak: 'break-word',
+      };
+    },
+    
+    // Handle image loading errors
+    onAssetImageError(event, asset) {
+      console.warn('Failed to load asset image:', asset.file_url || asset.url);
+      // Replace with placeholder
+      event.target.style.display = 'none';
+      const placeholder = document.createElement('span');
+      placeholder.textContent = asset.name || '📦';
+      placeholder.className = 'asset-error-placeholder';
+      event.target.parentElement.appendChild(placeholder);
+    },
+    
     // Helper for border radius
     getBorderRadiusStyle(element) {
       const tl = element.border_radius_tl ?? element.border_radius ?? 0;
@@ -1913,6 +1962,61 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+}
+
+/* Text Asset Styles */
+.text-asset .asset-preview {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.text-asset-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  padding: 4px;
+}
+
+.text-asset-preview .text-icon {
+  font-size: 16px;
+}
+
+.text-asset-preview .text-content {
+  font-size: 9px;
+  color: #fff;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-type-badge {
+  font-size: 8px;
+  background: rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+.text-asset-content {
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.asset-error-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.1);
+  color: #f87171;
+  font-size: 12px;
+  border: 1px dashed #f87171;
+  border-radius: 4px;
 }
 
 /* Mobile Frame */
