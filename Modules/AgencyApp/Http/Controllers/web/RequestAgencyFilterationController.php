@@ -63,7 +63,9 @@ class RequestAgencyFilterationController extends AdminController
         });
         $grid->column('id', __('Id'));
         $grid->column('owner.name', trans('name'));
-        $grid->column('owner.uuid', trans('uuid'));
+        $grid->column('ownerUuid', trans('uuid'))->display(function ($q) {
+            return $this->owner->uuid;
+        });;
         $grid->column('status', __('status'))->display(function ($q) {
             return $this->status == 1 ? __("accept") : __("denied");
         });
