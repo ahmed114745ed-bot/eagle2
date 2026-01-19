@@ -95,7 +95,7 @@ class AgencyController extends MainController
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
                 ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'admin_id', 'coins', 'bd_id', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'created_by', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
 
@@ -103,11 +103,11 @@ class AgencyController extends MainController
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::query()
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'admin_id', 'phone', 'coins', 'img')
+                    ->select('id', 'name', 'app_owner_id', 'created_by', 'phone', 'coins', 'img')
                     ->find($id);
             });
         }
-        $adminUser = DB::table('admin_users')->where('id', $agency->admin_id)->first() ?? $agency->owner;
+        $adminUser = DB::table('admin_users')->where('id', $agency->created_by)->first() ?? $agency->owner;
         $pathAdmin = $adminUser?->avatar;
         $defaultImageAdmin = asset('images/businessman-icon.jpg');
         $imageUrlAdmin = getImagePath($pathAdmin);
@@ -536,8 +536,8 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $id = $creatorId;
-            return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
+           $creator = $this->creator;
+            return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
         });
         // --- Actions ---
         $permission = $this->permission_name;
