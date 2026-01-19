@@ -134,7 +134,7 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-
+        $form->html('<div class="custom-full-width">');
         $form->hidden('milestone_id')->value(request('milestone_id'));
 
         $form->select('type', __('Type'))->options([
@@ -145,7 +145,7 @@ class MilestoneRewardController
             "badge"        => __('Badge'),
         ])
             ->when("ware", function (Form $form) {
-                $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
+                $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required')->column(10000000);
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
