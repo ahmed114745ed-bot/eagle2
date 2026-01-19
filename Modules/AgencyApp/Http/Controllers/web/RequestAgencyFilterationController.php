@@ -7,15 +7,11 @@ use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Services\AppFeatureService;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\AcceptAgencyAction;
-use App\Admin\Actions\RefuseAgencyAction;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
+use App\Services\AppFeatureService;
+use App\Admin\Controllers\MainController;
 
-class RequestAgencyFilterationController extends AdminController
+class RequestAgencyFilterationController extends MainController
 {
 
     public function __construct()
