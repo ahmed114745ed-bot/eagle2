@@ -157,6 +157,20 @@
             </div>
           </div>
 
+          <!-- Screen Settings (background color) -->
+          <div class="panel-section">
+            <h3 class="section-title">📱 إعدادات الشاشة</h3>
+            <div class="widget-settings">
+              <div class="setting-group">
+                <label>لون خلفية الشاشة</label>
+                <div class="color-picker-row">
+                  <input type="color" v-model="screenBackgroundColor" @input="onScreenSettingChange" class="color-picker" />
+                  <input type="text" v-model="screenBackgroundColor" @change="onScreenSettingChange" class="setting-input flex-1" placeholder="#f5f5f5" />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Children List (for selected widget) -->
           <div v-if="selectedWidgetData" class="panel-section flex-1">
             <h3 class="section-title">👶 الأبناء - {{ themeChildren.length }}</h3>
@@ -200,14 +214,14 @@
                 v-for="asset in selectedChild.assets || []"
                 :key="asset.id"
                 class="asset-item"
-                :class="{ 'active': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
+                :class="{ 'active': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
                 draggable="true"
                 @dragstart="onAssetDragStart($event, asset)"
                 @click="selectAsset(asset)"
               >
                 <div class="asset-preview">
                   <!-- Text assets -->
-                  <div v-if="asset.asset_type === 'text'" class="text-asset-preview">
+                  <div v-if="isTextAsset(asset)" class="text-asset-preview">
                     <span class="text-icon">📝</span>
                     <span class="text-content">{{ asset.text_content || asset.name || asset.asset_key }}</span>
                   </div>
@@ -284,12 +298,12 @@
                           v-for="asset in child.assets || []"
                           :key="asset.id"
                           class="placed-asset"
-                          :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
+                          :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
                           :style="getAssetStyle(asset)"
                           @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
-                          @click.stop="selectPlacedAsset(asset, widget)"
+                          @click.stop="selectPlacedAsset(asset, widget, child)"
                         >
-                          <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                          <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                             {{ asset.text_content || asset.name || asset.asset_key }}
                           </div>
                           <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
@@ -324,10 +338,10 @@
                           v-for="asset in child.assets || []"
                           :key="'dup_' + asset.id"
                           class="placed-asset"
-                          :class="{ 'text-asset': asset.asset_type === 'text' }"
+                          :class="{ 'text-asset': isTextAsset(asset) }"
                           :style="getAssetStyle(asset)"
                         >
-                          <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                          <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                             {{ asset.text_content || asset.name || asset.asset_key }}
                           </div>
                           <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
@@ -355,12 +369,12 @@
                         v-for="asset in child.assets || []"
                         :key="asset.id"
                         class="placed-asset"
-                        :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': asset.asset_type === 'text' }"
+                        :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
                         :style="getAssetStyle(asset)"
                         @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
-                        @click.stop="selectPlacedAsset(asset, widget)"
+                        @click.stop="selectPlacedAsset(asset, widget, child)"
                       >
-                        <div v-if="asset.asset_type === 'text'" class="text-asset-content" :style="getTextAssetStyle(asset)">
+                        <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                           {{ asset.text_content || asset.name || asset.asset_key }}
                         </div>
                         <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" @error="onAssetImageError($event, asset)" />
@@ -506,6 +520,29 @@
                     <input type="color" :value="getColorValue(selectedElement.background_color)" @input="selectedElement.background_color = $event.target.value; onPropertyChange()" class="color-picker" />
                     <input type="text" v-model="selectedElement.background_color" @change="onPropertyChange" class="property-input flex-1" placeholder="transparent" />
                     <button @click="selectedElement.background_color = 'transparent'; onPropertyChange()" class="clear-btn" title="شفاف">✕</button>
+                  </div>
+                </div>
+                
+                <!-- Padding (for children) -->
+                <div v-if="selectedElementType === 'child'" class="property-group">
+                  <div class="property-section-title">📐 الحشو الداخلي (Padding)</div>
+                  <div class="property-row">
+                    <div class="property-group quarter">
+                      <label>أعلى</label>
+                      <input type="number" v-model.number="selectedElement.padding_top" min="0" @change="onPropertyChange" class="property-input" placeholder="0" />
+                    </div>
+                    <div class="property-group quarter">
+                      <label>أسفل</label>
+                      <input type="number" v-model.number="selectedElement.padding_bottom" min="0" @change="onPropertyChange" class="property-input" placeholder="0" />
+                    </div>
+                    <div class="property-group quarter">
+                      <label>يمين</label>
+                      <input type="number" v-model.number="selectedElement.padding_right" min="0" @change="onPropertyChange" class="property-input" placeholder="0" />
+                    </div>
+                    <div class="property-group quarter">
+                      <label>يسار</label>
+                      <input type="number" v-model.number="selectedElement.padding_left" min="0" @change="onPropertyChange" class="property-input" placeholder="0" />
+                    </div>
                   </div>
                 </div>
                 
@@ -707,6 +744,7 @@ export default {
       // Mobile screen dimensions (iPhone-like)
       screenWidth: 375,
       screenHeight: 667,
+      screenBackgroundColor: '#f5f5f5', // لون خلفية الشاشة
       
       // Layout settings
       layoutMode: 'absolute', // 'absolute' | 'horizontal' | 'vertical'
@@ -947,20 +985,39 @@ export default {
       console.log('🎨 [VisualDesigner] initializeWidgets called');
       console.log('🎨 [VisualDesigner] availableWidgets:', this.availableWidgets);
       
+      // Load screen background color from first widget settings if available
+      if (this.availableWidgets.length > 0) {
+        const firstSettings = this.availableWidgets[0].settings || {};
+        if (firstSettings.screen_background_color) {
+          this.screenBackgroundColor = firstSettings.screen_background_color;
+        }
+      }
+      
       // Load placed widgets from configuration or create default positions
+      // Calculate cumulative Y position for stacking widgets vertically
+      let cumulativeY = 10;
       this.placedWidgets = this.availableWidgets.map((widget, index) => {
         const settings = widget.settings || {};
         const themeId = settings.theme_id || widget.selected_theme_id || widget.widget_theme_id;
         const theme = this.themes.find(t => String(t.id) === String(themeId));
+        
+        // Calculate widget height
+        const widgetHeight = settings.height || settings.widget_height || theme?.widget_height || 140;
+        const currentY = settings.y ?? cumulativeY;
+        
+        // Update cumulative Y for next widget (add gap of 10px)
+        if (settings.y === undefined || settings.y === null) {
+          cumulativeY += widgetHeight + 10;
+        }
         
         return {
           id: widget.id,
           widget_key: widget.widget_key,
           display_name: widget.display_name || widget.widget_key,
           theme_id: themeId,
-          // Position & Size
-          x: settings.x ?? (10 + (index % 3) * 130),
-          y: settings.y ?? (10 + Math.floor(index / 3) * 150),
+          // Position & Size - stack vertically
+          x: settings.x ?? 10,
+          y: currentY,
           width: settings.width || settings.widget_width || theme?.widget_width || 120,
           height: settings.height || settings.widget_height || theme?.widget_height || 140,
           // Layout settings
@@ -1054,6 +1111,10 @@ export default {
           border_radius_tr: mergedChild.border_radius_tr ?? themeChild?.border_radius_tr ?? 0,
           border_radius_bl: mergedChild.border_radius_bl ?? themeChild?.border_radius_bl ?? 0,
           border_radius_br: mergedChild.border_radius_br ?? themeChild?.border_radius_br ?? 0,
+          padding_top: mergedChild.padding_top ?? themeChild?.padding_top ?? 0,
+          padding_bottom: mergedChild.padding_bottom ?? themeChild?.padding_bottom ?? 0,
+          padding_right: mergedChild.padding_right ?? themeChild?.padding_right ?? 0,
+          padding_left: mergedChild.padding_left ?? themeChild?.padding_left ?? 0,
           assets: this.buildChildAssets(childAssets, themeChild?.assets || themeChild?.theme?.assets)
         };
       });
@@ -1304,6 +1365,12 @@ export default {
       // الحواف الدائرية
       const borderRadius = `${child.border_radius_tl || 0}px ${child.border_radius_tr || 0}px ${child.border_radius_br || 0}px ${child.border_radius_bl || 0}px`;
       
+      // الحشو الداخلي (Padding)
+      const paddingTop = (child.padding_top || 0) * this.zoom + 'px';
+      const paddingBottom = (child.padding_bottom || 0) * this.zoom + 'px';
+      const paddingRight = (child.padding_right || 0) * this.zoom + 'px';
+      const paddingLeft = (child.padding_left || 0) * this.zoom + 'px';
+      
       // أنماط مشتركة
       const commonStyles = {
         opacity: child.opacity ?? 1,
@@ -1314,6 +1381,8 @@ export default {
         borderColor: child.border_color || 'transparent',
         borderRadius: borderRadius,
         transform: `rotate(${child.rotation || 0}deg) scale(${child.scale || 1})`,
+        padding: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`,
+        boxSizing: 'border-box',
       };
       
       if (isLayoutMode) {
@@ -1438,9 +1507,12 @@ export default {
       this.selectedAssetId = null;
     },
     
-    selectPlacedAsset(asset, widget) {
+    selectPlacedAsset(asset, widget, child) {
       if (widget) {
         this.selectedWidgetId = widget.id;
+      }
+      if (child) {
+        this.selectedChildId = child.theme_child_id;
       }
       this.selectedAssetId = asset.id;
       this.selectedElementType = 'asset';
@@ -1465,7 +1537,7 @@ export default {
       this.dragStartY = e.clientY;
       this.dragStartElementX = asset.x;
       this.dragStartElementY = asset.y;
-      this.selectPlacedAsset(asset, widget);
+      this.selectPlacedAsset(asset, widget, child);
     },
     
     initializeFromWidget() {
@@ -2220,6 +2292,11 @@ export default {
       };
     },
     
+    // Check if asset is a text type
+    isTextAsset(asset) {
+      return asset?.asset_type === 'text' || asset?.type === 'text';
+    },
+    
     // Style for text asset content
     getTextAssetStyle(asset) {
       return {
@@ -2351,7 +2428,14 @@ export default {
       return {
         width: this.screenWidth * this.zoom + 'px',
         height: this.screenHeight * this.zoom + 'px',
+        backgroundColor: this.screenBackgroundColor || '#f5f5f5',
       };
+    },
+    
+    // Screen settings change handler
+    onScreenSettingChange() {
+      this.hasUnsavedChanges = true;
+      this.saveToHistory();
     },
     
     // Scroll container class
@@ -2440,6 +2524,7 @@ export default {
           // Widget dimensions (screen size)
           widget_width: this.screenWidth,
           widget_height: this.screenHeight,
+          screen_background_color: this.screenBackgroundColor,
           // All placed widgets with their layout and children
           widgets: this.placedWidgets.map(widget => ({
             widget_id: widget.id,
@@ -2484,6 +2569,10 @@ export default {
               border_radius_tr: child.border_radius_tr,
               border_radius_bl: child.border_radius_bl,
               border_radius_br: child.border_radius_br,
+              padding_top: child.padding_top,
+              padding_bottom: child.padding_bottom,
+              padding_right: child.padding_right,
+              padding_left: child.padding_left,
               assets: (child.assets || []).map(asset => ({
                 id: asset.id,
                 asset_key: asset.asset_key,
@@ -2533,6 +2622,10 @@ export default {
             border_radius_tr: child.border_radius_tr,
             border_radius_bl: child.border_radius_bl,
             border_radius_br: child.border_radius_br,
+            padding_top: child.padding_top,
+            padding_bottom: child.padding_bottom,
+            padding_right: child.padding_right,
+            padding_left: child.padding_left,
             assets: (child.assets || []).map(asset => ({
               id: asset.id,
               asset_key: asset.asset_key,
@@ -2607,6 +2700,10 @@ export default {
               border_radius_tr: child.border_radius_tr ?? 0,
               border_radius_bl: child.border_radius_bl ?? 0,
               border_radius_br: child.border_radius_br ?? 0,
+              padding_top: child.padding_top ?? 0,
+              padding_bottom: child.padding_bottom ?? 0,
+              padding_right: child.padding_right ?? 0,
+              padding_left: child.padding_left ?? 0,
               assets: (child.assets || []).map(asset => ({
                 id: asset.id,
                 asset_key: asset.asset_key,
@@ -2646,6 +2743,7 @@ export default {
               selected_theme_id: widget.theme_id || this.selectedThemeId,
               settings: {
                 theme_id: widget.theme_id || this.selectedThemeId,
+                screen_background_color: this.screenBackgroundColor,
                 x: widget.x,
                 y: widget.y,
                 width: widget.width,
@@ -3257,22 +3355,27 @@ export default {
 /* Children List */
 .children-list {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 8px;
   max-height: 300px;
   overflow-y: auto;
+  align-items: flex-start;
 }
 
 .child-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 12px;
+  gap: 4px;
+  padding: 8px;
   background: #1e1e2e;
   border: 2px solid transparent;
   border-radius: 10px;
   cursor: grab;
   transition: all 0.2s;
+  width: calc(50% - 4px);
+  min-width: 80px;
+  max-width: 100px;
 }
 
 .child-item:hover {
@@ -3295,9 +3398,10 @@ export default {
 }
 
 .child-info {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .child-name {
@@ -3318,11 +3422,12 @@ export default {
 
 /* Assets Library */
 .assets-library {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   max-height: 300px;
   overflow-y: auto;
+  align-items: flex-start;
 }
 
 .asset-item {
@@ -3707,11 +3812,13 @@ export default {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: white;
+  background: transparent;
+  color: #9ca3af;
   font-size: 10px;
   text-align: center;
   padding: 4px;
+  border: 1px dashed #6b7280;
+  border-radius: 4px;
 }
 
 /* Text assets should not have yellow background */
@@ -4387,6 +4494,10 @@ export default {
 
 .property-group.third {
   width: calc(33.333% - 6px);
+}
+
+.property-group.quarter {
+  width: calc(25% - 6px);
 }
 
 .property-row {
