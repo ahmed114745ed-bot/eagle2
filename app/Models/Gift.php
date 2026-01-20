@@ -6,7 +6,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Moment\Entities\Moment;
 use Modules\Vip\Entities\OVip;
-use Utd\Achievements\Http\Traits\AchievementGift;
+use App\Traits\AchievementGift;
 
 class Gift extends Model
 {
