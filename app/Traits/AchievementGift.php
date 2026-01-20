@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Achievements\Http\Traits;
+namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Utd\Achievements\Entities\GiftAchievement;
