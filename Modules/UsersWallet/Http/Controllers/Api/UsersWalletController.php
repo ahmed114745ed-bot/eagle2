@@ -36,12 +36,13 @@ class UsersWalletController extends Controller
     public function transferToUser(Request $request)
     {
        \Log::info(12333444444444);
+        \Log::info('Withdrawal request data:', $request->all());
         if (!$request->user_id) return Common::apiResponse(false, __('this agency does not have owner'), null, 500);
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'amount'     => 'required|numeric|min:0.01',
         ]);
-       \Log::info('Withdrawal request data:', $request->all());
+      
 
         return $this->handleRequest(function () use ($request) {
             $from = $request->user();
