@@ -26,14 +26,14 @@ use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use Utd\Achievements\Services\UserAchievementService;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class rankingServiceV2
 {
     protected $rankingRepo, $cpRepository;
-    
+
     public function __construct(
         RankingRepositoryV2 $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
@@ -110,13 +110,13 @@ class rankingServiceV2
         switch ($class) {
             case 4:
                 return $this->handleLuckyGiftRanking($type, $limit, $user, $class);
-    
+
             case 6:
                 return $this->handleGameCoinRanking($type, $limit, $user, $class);
-    
+
             case 5:
                 return $this->handleAgencyRanking($type, $limit);
-    
+
             default:
                 return $this->handleUserRanking($class, $type, $limit, $user);
         }
@@ -147,27 +147,27 @@ class rankingServiceV2
         return $this->rankingRepo->getAgencyRanking('agency', $types[$type], $limit);
     }
 
- 
+
 
     protected function handleUserRanking(int $class, int $type, int $limit, $user)
     {
         [$keywords, $rel] = $this->getClassKeywordsAndRelation($class);
-    
+
         $types = [
             1 => 'daily',
             2 => 'weekly',
             3 => 'monthly',
         ];
-    
+
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit);
-    
+
         $userExp = $data->firstWhere($keywords, $user->id)?->total_gifts ?? 0;
-    
+
         $key = $types[$type] . '_' . $class;
-    
+
         $this->transformData3($data, $class, $keywords, $rel);
-    
-    
+
+
         $currentUser = new RankingUserV2Resource([
             'user'    => $user,
             'data'    => $data,
@@ -175,11 +175,11 @@ class rankingServiceV2
             'key'     => $key,
             'class'   => $class,
         ]);
-    
-        $topUsers = $data->take(3); 
+
+        $topUsers = $data->take(3);
         $topResources = $topUsers->map(fn($item) => new TopUserResource($item));
-        
-       
+
+
     $otherUsers = $data->slice(3);
 
     $perPage = request('per_page', 10);
@@ -210,7 +210,7 @@ class rankingServiceV2
         ]
     ];
 }
-    
+
     protected function prepareResponse3($data, User $user, $type, $key, $userId, $class, $limit, $userExp = null)
     {
         $achievement_images = [];

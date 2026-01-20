@@ -153,7 +153,6 @@ class MilestoneRewardController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {
-
                 $form->image("reward1", __('Image'))
                     ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
                     ->disk('gcs');

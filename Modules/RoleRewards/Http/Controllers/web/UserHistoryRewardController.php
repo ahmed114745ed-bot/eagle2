@@ -12,6 +12,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\RoleRewards\Entities\VUserHistoryReward;
+use Utd\Achievements\Facades\Achievement;
 
 
 class UserHistoryRewardController extends MainController
@@ -21,9 +22,9 @@ class UserHistoryRewardController extends MainController
      *
      * @var string
      */
-     public $permission_name = 'user-reward';
+    public $permission_name = 'user-reward';
 
-    public function index(Content $content )
+    public function index(Content $content)
     {
 
         return parent::index($content
@@ -40,18 +41,18 @@ class UserHistoryRewardController extends MainController
         $grid->model()->with([
             'user' => function ($query) {
                 $query->select(['id', 'name', 'uuid'])
-                      ->with([
-                          'profile:id,user_id,avatar',
-                          'packs',
-                      ]);
+                    ->with([
+                        'profile:id,user_id,avatar',
+                        'packs',
+                    ]);
             }
         ])
-        ->orderByDesc('id');
+            ->orderByDesc('id');
 
         $grid->column('id', __('ID'))->sortable();
 
         $grid->column('user_id', __('User'))->display(function () {
-            if (! $this->user) {
+            if (!$this->user) {
                 return __('No User');
             }
             return app(UserService::class)->adminUserAvatar($this->user, withoutLevels: true);
@@ -59,25 +60,22 @@ class UserHistoryRewardController extends MainController
 
         $grid->column('receive_name', __('receive_type'));
 
-        $grid->column('reward', __('Rewards'))->display(function () {
-            if ($this->reward_value) {
-                if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
-                    $path = $this->reward_value ?? 'achievement.png';
-                    $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
-                    return $imgTag ;
+        if (class_exists(Achievement::class, false)){
+            $grid->column('reward', __('Rewards'))->display(function () {
+                if ($this->reward_value) {
+                    if ($this->rewardable_type === Achievement::class) {
+                        $path = $this->reward_value ?? 'achievement.png';
+                        $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
+                        return $imgTag;
+                    }
+                    return $this->reward_value;
                 }
-                return $this->reward_value;
-            }
-
 
                 $path = $this->reward_img ?? 'coin.png';
                 $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
-
                 return "<div>{$imgTag}</div><div>{$this->reward_name}</div>";
-
-
-        });
-
+            });
+        }
 
         $grid->column('created_at', __('Created At'))
             ->display(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d H:i'));
@@ -100,7 +98,6 @@ class UserHistoryRewardController extends MainController
 
         return $grid;
     }
-
 
 
     /**
