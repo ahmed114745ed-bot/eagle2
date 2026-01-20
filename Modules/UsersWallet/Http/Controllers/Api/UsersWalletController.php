@@ -27,6 +27,7 @@ class UsersWalletController extends Controller
         try {
             return $callback();
         } catch (\Exception $e) {
+            \Log::info(123339999999999);
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }
@@ -34,8 +35,8 @@ class UsersWalletController extends Controller
 
     public function transferToUser(Request $request)
     {
-
-        if (!$request->user_id) return Common::apiResponse(false, __('this agency does not have owner'), null, 400);
+       \Log::info(12333444444444);
+        if (!$request->user_id) return Common::apiResponse(false, __('this agency does not have owner'), null, 500);
         $request->validate([
             'user_id' => 'required|integer|exists:users,id',
             'amount'     => 'required|numeric|min:0.01',
