@@ -909,17 +909,21 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        // $userSalary = UserSallary::query()
 
-            ->where('user_id', $this->id)
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+        //     ->where('user_id', $this->id)
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('sallary - cut_amount'));
+        $roomSalary = 0;
+        $userSalary = $this->relationLoaded('totalUserSalary')
+            ? $this->totalUserSalary->sum(fn($item) => $item->sallary - $item->cut_amount)
+            : $this->totalUserSalary()->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+        //     $q->where('uid', $this->id);
+        // })
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('salary - cut_amount'));
 
         $total = $userSalary + $roomSalary;
         // $total = wallet_available_by_user($this->id);

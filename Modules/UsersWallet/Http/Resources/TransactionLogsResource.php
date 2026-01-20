@@ -41,6 +41,10 @@ class TransactionLogsResource extends JsonResource
             case 'subtract':
                 $title = __('withdraw', ['admin' => $this->admin ? $this->admin->name : '']);
                 break;
+            case 'withdrawal_pending':
+                $title = __('withdrawal pending');
+                break;
+
 
             default:
                 $title = '';
