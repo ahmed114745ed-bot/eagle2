@@ -21,7 +21,7 @@ class UsersWalletController extends Controller
         $this->walletService = $walletService;
     }
 
-  
+
     private function handleRequest(callable $callback)
     {
         try {
@@ -31,13 +31,16 @@ class UsersWalletController extends Controller
         }
     }
 
-   
+
     public function transferToUser(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'amount'     => 'required|numeric|min:0.01',
-        ]);
+
+        if (!$request->user_id)return Common::apiResponse(false, __('this agency does not have owner'), null, 400);
+            $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+                'amount'     => 'required|numeric|min:0.01',
+            ]);
+
 
         return $this->handleRequest(function () use ($request) {
             $result = $this->walletService->transfer(
@@ -54,7 +57,7 @@ class UsersWalletController extends Controller
         });
     }
 
-   
+
     public function requestWithdrawal(Request $request)
     {
         $request->validate([
@@ -76,6 +79,4 @@ class UsersWalletController extends Controller
             );
         });
     }
-   
-    
 }
