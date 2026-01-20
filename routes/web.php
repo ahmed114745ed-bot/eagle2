@@ -46,13 +46,13 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
-use App\Admin\Controllers\AppearChargerAgencyController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -414,6 +414,8 @@ Route::get('/clear-admin-error', function () {
 Route::get('/admin/custom-logout', [AuthController::class, 'customLogout'])->name('admin.custom.logout');
 Route::get('/admin/super-logout', [AuthController::class, 'customSuperadminLogout'])->name('admin.super.logout');
 Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name('admin.bd.logout');
+Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCutAmount']);
+
 
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
@@ -1073,6 +1075,7 @@ Route::post('/-lucky-gift-load-test/run', [TestsController::class, 'lucky_run'])
 
 
 
+use App\Admin\Controllers\AppearChargerAgencyController;
 use Modules\SuperAdmin\Database\Seeders\SuperAdminRoleSeeder;
 use Modules\AreaManager\Database\Seeders\AreaManagerRoleSeeder;
 use Symfony\Component\Process\Exception\ProcessFailedException;
