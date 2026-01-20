@@ -365,9 +365,9 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 ]
             );
 
-            // Collect per-child settings if provided
+            // Collect per-child settings if provided - key by theme_child_id as string for consistent matching
             $childSettingsMap = collect(data_get($rawWidgetData, 'settings.children', []))
-                ->keyBy('theme_child_id');
+                ->keyBy(fn($c) => (string) ($c['theme_child_id'] ?? ''));
             
             $childVisibilities = $childSettingsMap
                 ->map(fn($c) => array_key_exists('is_visible', $c) ? (bool)$c['is_visible'] : null);
@@ -399,7 +399,7 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 }
 
                 // استرجع الحالة السابقة أو القادمة من الـ payload أو الافتراضية
-                $isVisible = $childVisibilities->get($child->id, null);
+                $isVisible = $childVisibilities->get((string) $child->id, null);
                 if ($isVisible === null) {
                     $isVisible = $previousChildVisibility->get($child->id, null);
                 }
@@ -410,7 +410,7 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 }
 
                 // Get saved child settings from payload if available
-                $savedChildSettings = $childSettingsMap->get($child->id, []);
+                $savedChildSettings = $childSettingsMap->get((string) $child->id, []);
 
                 // إنشاء أو تحديث Child Override مع الحفاظ على حالة الإظهار السابقة
                 $configThemeChildOverride = ConfigThemeChildOverride::updateOrCreate(
@@ -448,12 +448,12 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 $configThemeChildOverride->assetOverrides()->delete();
                 $assets = ThemeAsset::where('child_id', $child->id)->get();
                 
-                // Get saved asset settings from payload
+                // Get saved asset settings from payload - key by id as string for consistent matching
                 $savedAssetSettings = collect(data_get($savedChildSettings, 'assets', []))
-                    ->keyBy('id');
+                    ->keyBy(fn($a) => (string) ($a['id'] ?? ''));
 
                 foreach ($assets as $asset) {
-                    $savedAsset = $savedAssetSettings->get($asset->id, []);
+                    $savedAsset = $savedAssetSettings->get((string) $asset->id, []);
                     
                     ConfigChildAssetOverride::updateOrCreate(
                         [

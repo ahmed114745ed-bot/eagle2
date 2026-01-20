@@ -744,27 +744,46 @@ export default {
                         border_radius_tr: c.border_radius_tr ?? existing.border_radius_tr,
                         border_radius_bl: c.border_radius_bl ?? existing.border_radius_bl,
                         border_radius_br: c.border_radius_br ?? existing.border_radius_br,
-                        // Preserve assets from theme_child_overrides if present
-                        assets: Array.isArray(c.assets) && c.assets.length > 0 
-                            ? c.assets.map(asset => ({
-                                id: asset.id,
-                                asset_key: asset.asset_key || asset.name,
-                                name: asset.name || asset.asset_key,
-                                file_url: asset.file_url || asset.url,
-                                url: asset.file_url || asset.url,
-                                width: asset.width,
-                                height: asset.height,
-                                x: asset.x,
-                                y: asset.y,
-                                opacity: asset.opacity,
-                                z_index: asset.z_index,
-                                is_visible: asset.is_visible ?? true,
-                                is_background: asset.is_background ?? false,
-                                object_fit: asset.object_fit ?? 'contain',
-                                scale: asset.scale,
-                                rotation: asset.rotation,
-                            })) 
-                            : (existing.assets || []),
+                        // Preserve assets from theme_child_overrides (as asset_overrides) or settings.children (as assets)
+                        assets: (() => {
+                            // Check both c.assets and c.asset_overrides since API may return either
+                            const assetSource = (Array.isArray(c.assets) && c.assets.length > 0) 
+                                ? c.assets 
+                                : (Array.isArray(c.asset_overrides) && c.asset_overrides.length > 0)
+                                    ? c.asset_overrides
+                                    : null;
+                            
+                            if (assetSource) {
+                                return assetSource.map(asset => ({
+                                    id: asset.asset_id || asset.id,
+                                    asset_key: asset.asset?.asset_key || asset.asset_key || asset.name,
+                                    name: asset.asset?.name || asset.name || asset.asset_key,
+                                    file_url: asset.file_url || asset.asset?.file_url || asset.url,
+                                    url: asset.file_url || asset.asset?.file_url || asset.url,
+                                    asset_type: asset.asset?.asset_type || asset.asset_type || asset.type || 'image',
+                                    text_content: asset.text || asset.asset?.text || asset.text_content,
+                                    width: asset.width,
+                                    height: asset.height,
+                                    x: asset.x,
+                                    y: asset.y,
+                                    opacity: asset.opacity,
+                                    z_index: asset.z_index,
+                                    is_visible: asset.is_visible ?? true,
+                                    is_background: asset.is_background ?? false,
+                                    object_fit: asset.object_fit ?? 'contain',
+                                    scale: asset.scale,
+                                    rotation: asset.rotation,
+                                    border_width: asset.border_width,
+                                    border_style: asset.border_style,
+                                    border_color: asset.border_color,
+                                    border_radius_tl: asset.border_radius_tl,
+                                    border_radius_tr: asset.border_radius_tr,
+                                    border_radius_bl: asset.border_radius_bl,
+                                    border_radius_br: asset.border_radius_br,
+                                }));
+                            }
+                            return existing.assets || [];
+                        })(),
                     };
                 });
             }
