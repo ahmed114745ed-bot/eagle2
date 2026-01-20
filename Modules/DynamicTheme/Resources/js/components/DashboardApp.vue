@@ -1123,6 +1123,8 @@ const fillMissingSelectedThemeIds = () => {
 			console.log('[DashboardApp] Widget overrides saved:', widgetResponse.data);
 
 			// Note: asset overrides are handled via upload/remove endpoints elsewhere
+			// Reload configuration to sync local state with server
+			await loadConfigurationDetails(selectedConfigId.value);
 			hasChanges.value = false;
 			showNotification('Configuration saved successfully', 'success');
 			return;
@@ -1136,12 +1138,8 @@ const fillMissingSelectedThemeIds = () => {
 
 		// Fallback: send full update with overrides field
 		const resp = await configurationsApi.update(selectedConfigId.value, payload);
-		const data = resp.data.data || resp.data;
-		ensureConfigOverrides(selectedConfigId.value);
-		overridesMap.value[selectedConfigId.value].screen_overrides = data.screen_overrides || data.overrides?.screen_overrides || payload.overrides.screen_overrides;
-		overridesMap.value[selectedConfigId.value].widget_overrides = data.widget_overrides || data.overrides?.widget_overrides || payload.overrides.widget_overrides;
-		overridesMap.value[selectedConfigId.value].asset_overrides = data.asset_overrides || data.overrides?.asset_overrides || payload.overrides.asset_overrides;
-
+		// Reload configuration to sync local state with server
+		await loadConfigurationDetails(selectedConfigId.value);
 		hasChanges.value = false;
 		showNotification('Configuration saved successfully', 'success');
 	} catch (error) {
@@ -1151,12 +1149,8 @@ const fillMissingSelectedThemeIds = () => {
 		if (isMissingOverridesError) {
 			try {
 				const resp = await configurationsApi.update(selectedConfigId.value, payload);
-				const data = resp.data.data || resp.data;
-				ensureConfigOverrides(selectedConfigId.value);
-				overridesMap.value[selectedConfigId.value].screen_overrides = data.screen_overrides || data.overrides?.screen_overrides || payload.overrides.screen_overrides;
-				overridesMap.value[selectedConfigId.value].widget_overrides = data.widget_overrides || data.overrides?.widget_overrides || payload.overrides.widget_overrides;
-				overridesMap.value[selectedConfigId.value].asset_overrides = data.asset_overrides || data.overrides?.asset_overrides || payload.overrides.asset_overrides;
-
+				// Reload configuration to sync local state with server
+				await loadConfigurationDetails(selectedConfigId.value);
 				hasChanges.value = false;
 				showNotification('Configuration saved successfully', 'success');
 				return;
@@ -1862,7 +1856,17 @@ const fillMissingSelectedThemeIds = () => {
              // Visual Designer
              showVisualDesigner,
              visualDesignerRef,
-             openVisualDesigner: () => {
+             openVisualDesigner: async () => {
+                 // Reload configuration to ensure we have latest data from server
+                 if (selectedConfigId.value) {
+                     try {
+                         await loadConfigurationDetails(selectedConfigId.value);
+                         console.log('✅ Configuration reloaded before opening designer');
+                     } catch (error) {
+                         console.error('Failed to reload configuration:', error);
+                     }
+                 }
+                 
                  showVisualDesigner.value = true;
                  setTimeout(() => {
                      if (visualDesignerRef.value) {
@@ -1879,19 +1883,14 @@ const fillMissingSelectedThemeIds = () => {
                      editingWidget.value.settings.children = designData.children;
                      hasChanges.value = true;
                      
-                     // Auto save to configuration
+                     // Reload configuration after save to sync local state with server
                      try {
-                         if (selectedConfigId.value && editingWidget.value.id) {
-                             await configurationsApi.update(selectedConfigId.value, {
-                                 widget_overrides: [{
-                                     screen_widget_id: editingWidget.value.id,
-                                     settings: editingWidget.value.settings,
-                                 }]
-                             });
-                             console.log('✅ Configuration auto-saved');
+                         if (selectedConfigId.value) {
+                             await loadConfigurationDetails(selectedConfigId.value);
+                             console.log('✅ Configuration reloaded after save');
                          }
                      } catch (error) {
-                         console.error('Failed to auto-save configuration:', error);
+                         console.error('Failed to reload configuration:', error);
                      }
                  }
              },
