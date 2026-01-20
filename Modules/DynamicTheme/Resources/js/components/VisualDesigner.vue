@@ -753,20 +753,64 @@ export default {
       // مقارنة مرنة للتعامل مع اختلاف الأنواع (string vs number)
       return this.themes.find(t => String(t.id) === String(this.selectedThemeId));
     },
-    // أبناء الويدجت المختار (من الثيم المختار)
+    // أبناء الويدجت المختار (من الثيم المختار أو من الويدجت الأصلي)
     themeChildren() {
       if (!this.selectedWidgetData) return [];
+      
+      // أولاً: حاول الحصول على الأبناء من الثيم
       const themeId = this.selectedWidgetData.theme_id || this.selectedThemeId;
       const theme = this.themes.find(t => String(t.id) === String(themeId));
-      const children = theme?.children || [];
-      return children;
+      if (theme?.children && theme.children.length > 0) {
+        return theme.children;
+      }
+      
+      // ثانياً: حاول من الويدجت الأصلي
+      const originalWidget = this.widget;
+      if (originalWidget?.settings?.children && originalWidget.settings.children.length > 0) {
+        return originalWidget.settings.children.map(c => ({
+          id: c.theme_child_id || c.id,
+          label: c.name || c.child_key,
+          child_key: c.child_key,
+          assets: c.assets || []
+        }));
+      }
+      
+      // ثالثاً: حاول من placedWidgets
+      const placedWidget = this.selectedWidgetData;
+      if (placedWidget?.children && placedWidget.children.length > 0) {
+        return placedWidget.children.map(c => ({
+          id: c.theme_child_id,
+          label: c.name || c.child_key,
+          child_key: c.child_key,
+          assets: c.assets || []
+        }));
+      }
+      
+      return [];
     },
     // الأبناء الموضوعة للويدجت المختار
     currentWidgetChildren() {
       return this.selectedWidgetData?.children || [];
     },
     selectedChild() {
-      return this.themeChildren.find(c => c.id === this.selectedChildId);
+      // أولاً: حاول إيجاد الطفل من themeChildren
+      const themeChild = this.themeChildren.find(c => c.id === this.selectedChildId);
+      if (themeChild) return themeChild;
+      
+      // ثانياً: حاول من selectedWidgetData.children
+      const widget = this.selectedWidgetData;
+      if (widget) {
+        const placedChild = (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
+        if (placedChild) {
+          return {
+            id: placedChild.theme_child_id,
+            label: placedChild.name || placedChild.child_key,
+            child_key: placedChild.child_key,
+            assets: placedChild.assets || []
+          };
+        }
+      }
+      return null;
     },
     selectedElement() {
       if (this.selectedElementType === 'widget') {
@@ -774,7 +818,47 @@ export default {
       } else if (this.selectedElementType === 'child') {
         const widget = this.selectedWidgetData;
         if (!widget) return null;
-        return (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
+        
+        // البحث في أبناء الويدجت الموضوعة
+        let foundChild = (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
+        
+        // إذا لم يوجد، أضف الطفل للويدجت من themeChildren
+        if (!foundChild) {
+          const themeChild = this.themeChildren.find(c => c.id === this.selectedChildId);
+          if (themeChild) {
+            const newChild = {
+              id: `child_${themeChild.id}_${Date.now()}`,
+              theme_child_id: themeChild.id,
+              name: themeChild.label || themeChild.child_key,
+              child_key: themeChild.child_key,
+              width: themeChild.width || 80,
+              height: themeChild.height || 80,
+              x: 0,
+              y: 0,
+              opacity: 1,
+              z_index: (widget.children || []).length,
+              is_visible: true,
+              rotation: 0,
+              scale: 1,
+              background_color: 'transparent',
+              border_width: 0,
+              border_style: 'solid',
+              border_color: 'transparent',
+              border_radius_tl: 0,
+              border_radius_tr: 0,
+              border_radius_bl: 0,
+              border_radius_br: 0,
+              assets: this.buildChildAssets([], themeChild.assets || themeChild.theme?.assets || [])
+            };
+            // إضافة الطفل للويدجت
+            if (!widget.children) widget.children = [];
+            widget.children.push(newChild);
+            foundChild = newChild;
+            this.hasUnsavedChanges = true;
+          }
+        }
+        
+        return foundChild;
       } else if (this.selectedElementType === 'asset') {
         const widget = this.selectedWidgetData;
         if (!widget) return null;
@@ -880,15 +964,17 @@ export default {
           layout_padding: settings.layout_padding ?? 8,
           child_width: settings.child_width || settings.layout_item_width || 80,
           child_height: settings.child_height || settings.layout_item_height || 100,
-          infinite_scroll: settings.infinite_scroll ?? false,
+          // infinite_scroll يكون true افتراضياً للتخطيط الأفقي/العمودي
+          infinite_scroll: settings.infinite_scroll ?? ((settings.layout_mode || 'absolute') !== 'absolute'),
+          auto_scroll: settings.auto_scroll ?? false,
           scroll_speed: settings.scroll_speed ?? 3,
           // Style
           opacity: settings.opacity ?? 1,
           z_index: settings.z_index ?? index,
           background_color: settings.background_color || 'transparent',
           border_radius: settings.border_radius ?? 8,
-          // Children - load from settings if available, otherwise load from theme
-          children: this.buildWidgetChildren(settings.children, theme)
+          // Children - load from settings if available, otherwise load from theme or widget
+          children: this.buildWidgetChildren(settings.children, theme, widget)
         };
       });
       
@@ -904,7 +990,7 @@ export default {
     },
     
     // Build widget children from settings or theme
-    buildWidgetChildren(savedChildren, theme) {
+    buildWidgetChildren(savedChildren, theme, originalWidget = null) {
       const themeChildren = theme?.children || [];
       const savedChildrenMap = new Map();
       
@@ -913,10 +999,19 @@ export default {
         savedChildrenMap.set(child.theme_child_id, child);
       });
       
-      // If there are saved children, use them; otherwise load all from theme
-      const childrenSource = savedChildren && savedChildren.length > 0 
-        ? savedChildren 
-        : themeChildren.map(tc => ({ theme_child_id: tc.id }));
+      // تحديد مصدر الأبناء بترتيب الأولوية
+      let childrenSource = [];
+      
+      if (savedChildren && savedChildren.length > 0) {
+        // 1. الأبناء المحفوظة
+        childrenSource = savedChildren;
+      } else if (themeChildren.length > 0) {
+        // 2. أبناء الثيم
+        childrenSource = themeChildren.map(tc => ({ theme_child_id: tc.id }));
+      } else if (originalWidget?.settings?.children && originalWidget.settings.children.length > 0) {
+        // 3. أبناء الويدجت الأصلي
+        childrenSource = originalWidget.settings.children;
+      }
       
       return childrenSource.map((child, index) => {
         const themeChildId = child.theme_child_id || child.id;
@@ -926,10 +1021,16 @@ export default {
         // Merge saved child data with theme child defaults
         const mergedChild = savedChild || child;
         
+        // الحصول على الأصول من مصادر متعددة
+        let childAssets = mergedChild.assets;
+        if (!childAssets || childAssets.length === 0) {
+          childAssets = themeChild?.assets || themeChild?.theme?.assets || [];
+        }
+        
         return {
           id: mergedChild.id || `child_${themeChildId}`,
           theme_child_id: themeChildId,
-          name: themeChild?.label || themeChild?.child_key || mergedChild.name,
+          name: themeChild?.label || themeChild?.child_key || mergedChild.name || mergedChild.child_key,
           child_key: themeChild?.child_key || mergedChild.child_key,
           width: mergedChild.width || themeChild?.width || 80,
           height: mergedChild.height || themeChild?.height || 80,
@@ -948,7 +1049,7 @@ export default {
           border_radius_tr: mergedChild.border_radius_tr ?? 0,
           border_radius_bl: mergedChild.border_radius_bl ?? 0,
           border_radius_br: mergedChild.border_radius_br ?? 0,
-          assets: this.buildChildAssets(mergedChild.assets, themeChild?.assets)
+          assets: this.buildChildAssets(childAssets, themeChild?.assets || themeChild?.theme?.assets)
         };
       });
     },
@@ -1032,6 +1133,10 @@ export default {
     setWidgetLayout(mode) {
       if (!this.selectedWidgetData) return;
       this.selectedWidgetData.layout_mode = mode;
+      // تفعيل التمرير اللانهائي تلقائياً للتخطيط الأفقي/العمودي
+      if (mode !== 'absolute') {
+        this.selectedWidgetData.infinite_scroll = true;
+      }
       this.hasUnsavedChanges = true;
       // لا نستدعي repositionChildrenByLayout تلقائياً للحفاظ على الأحجام والمواقع
       this.saveToHistory();
@@ -1176,31 +1281,44 @@ export default {
       const isLayoutMode = widget.layout_mode && widget.layout_mode !== 'absolute';
       const isVisible = child.is_visible !== false;
       
+      // الحواف الدائرية
+      const borderRadius = `${child.border_radius_tl || 0}px ${child.border_radius_tr || 0}px ${child.border_radius_br || 0}px ${child.border_radius_bl || 0}px`;
+      
+      // أنماط مشتركة
+      const commonStyles = {
+        opacity: child.opacity ?? 1,
+        display: isVisible ? 'block' : 'none',
+        backgroundColor: child.background_color || 'transparent',
+        borderWidth: (child.border_width || 0) + 'px',
+        borderStyle: child.border_style || 'solid',
+        borderColor: child.border_color || 'transparent',
+        borderRadius: borderRadius,
+        transform: `rotate(${child.rotation || 0}deg) scale(${child.scale || 1})`,
+      };
+      
       if (isLayoutMode) {
         // أولوية لحجم الطفل الفردي، ثم الحجم الافتراضي للويدجت
         const childWidth = child.width || widget.child_width || 80;
         const childHeight = child.height || widget.child_height || 80;
         return {
+          ...commonStyles,
           width: childWidth * this.zoom + 'px',
           height: childHeight * this.zoom + 'px',
           minWidth: childWidth * this.zoom + 'px',
           minHeight: childHeight * this.zoom + 'px',
           flexShrink: 0,
-          opacity: child.opacity ?? 1,
           position: 'relative',
-          display: isVisible ? 'block' : 'none',
         };
       }
       
       return {
+        ...commonStyles,
         position: 'absolute',
         left: child.x * this.zoom + 'px',
         top: child.y * this.zoom + 'px',
         width: child.width * this.zoom + 'px',
         height: child.height * this.zoom + 'px',
-        opacity: child.opacity ?? 1,
         zIndex: child.z_index || 0,
-        display: isVisible ? 'block' : 'none',
       };
     },
     
@@ -1373,18 +1491,24 @@ export default {
       this.selectedElementType = null;
     },
     isChildPlaced(childId) {
-      return this.placedChildren.some(c => c.theme_child_id === childId);
+      const widget = this.selectedWidgetData;
+      if (!widget) return false;
+      return (widget.children || []).some(c => c.theme_child_id === childId);
     },
     selectChild(child) {
       this.selectedChildId = child.id;
       this.selectedAssetId = null;
       
-      // If the child is already placed, select it for editing properties
-      const placedChild = this.placedChildren.find(c => c.theme_child_id === child.id);
-      if (placedChild) {
-        this.selectedElementType = 'child';
-      } else {
-        this.selectedElementType = null;
+      // If the child is in the widget, select it for editing properties
+      const widget = this.selectedWidgetData;
+      if (widget) {
+        const placedChild = (widget.children || []).find(c => c.theme_child_id === child.id);
+        if (placedChild) {
+          this.selectedElementType = 'child';
+        } else {
+          // الطفل موجود في القائمة لكن غير موضوع، نضيفه تلقائياً
+          this.selectedElementType = 'child';
+        }
       }
     },
     selectAsset(asset) {
@@ -2315,6 +2439,7 @@ export default {
             child_width: widget.child_width || 80,
             child_height: widget.child_height || 100,
             infinite_scroll: widget.infinite_scroll || false,
+            auto_scroll: widget.auto_scroll || false,
             scroll_speed: widget.scroll_speed || 3,
             layout_show_scroll_indicator: widget.layout_show_scroll_indicator !== false,
             // Children inside this widget
@@ -2434,6 +2559,7 @@ export default {
             child_width: widget.child_width || 80,
             child_height: widget.child_height || 100,
             infinite_scroll: widget.infinite_scroll || false,
+            auto_scroll: widget.auto_scroll || false,
             scroll_speed: widget.scroll_speed || 3,
             z_index: widget.z_index ?? 0,
             opacity: widget.opacity ?? 1,
@@ -2508,6 +2634,7 @@ export default {
                 child_width: widget.child_width,
                 child_height: widget.child_height,
                 infinite_scroll: widget.infinite_scroll,
+                auto_scroll: widget.auto_scroll,
                 scroll_speed: widget.scroll_speed,
                 z_index: widget.z_index,
                 opacity: widget.opacity,
