@@ -753,35 +753,40 @@ export default {
       // مقارنة مرنة للتعامل مع اختلاف الأنواع (string vs number)
       return this.themes.find(t => String(t.id) === String(this.selectedThemeId));
     },
-    // أبناء الويدجت المختار (من الثيم المختار أو من الويدجت الأصلي)
+    // أبناء الويدجت المختار (من الثيم المختار أو من الويدجت نفسه)
     themeChildren() {
       if (!this.selectedWidgetData) return [];
       
-      // أولاً: حاول الحصول على الأبناء من الثيم
-      const themeId = this.selectedWidgetData.theme_id || this.selectedThemeId;
+      const selectedWidget = this.selectedWidgetData;
+      
+      // أولاً: حاول الحصول على الأبناء من الثيم الخاص بهذا الويدجت
+      const themeId = selectedWidget.theme_id || this.selectedThemeId;
       const theme = this.themes.find(t => String(t.id) === String(themeId));
       if (theme?.children && theme.children.length > 0) {
         return theme.children;
       }
       
-      // ثانياً: حاول من الويدجت الأصلي
-      const originalWidget = this.widget;
+      // ثانياً: حاول من أبناء الويدجت الموضوعة (placedWidgets.children)
+      if (selectedWidget.children && selectedWidget.children.length > 0) {
+        return selectedWidget.children.map(c => ({
+          id: c.theme_child_id,
+          label: c.name || c.child_key,
+          child_key: c.child_key,
+          width: c.width,
+          height: c.height,
+          assets: c.assets || []
+        }));
+      }
+      
+      // ثالثاً: حاول من الويدجت الأصلي المطابق في availableWidgets
+      const originalWidget = this.availableWidgets.find(w => w.id === selectedWidget.id);
       if (originalWidget?.settings?.children && originalWidget.settings.children.length > 0) {
         return originalWidget.settings.children.map(c => ({
           id: c.theme_child_id || c.id,
           label: c.name || c.child_key,
           child_key: c.child_key,
-          assets: c.assets || []
-        }));
-      }
-      
-      // ثالثاً: حاول من placedWidgets
-      const placedWidget = this.selectedWidgetData;
-      if (placedWidget?.children && placedWidget.children.length > 0) {
-        return placedWidget.children.map(c => ({
-          id: c.theme_child_id,
-          label: c.name || c.child_key,
-          child_key: c.child_key,
+          width: c.width,
+          height: c.height,
           assets: c.assets || []
         }));
       }
@@ -1118,6 +1123,10 @@ export default {
       this.selectedElementType = 'widget';
       this.selectedChildId = null;
       this.selectedAssetId = null;
+      // تحديث selectedThemeId ليكون الثيم الخاص بهذا الويدجت
+      if (widget.theme_id) {
+        this.selectedThemeId = widget.theme_id;
+      }
     },
     
     // عند اختيار ويدجت من القائمة
@@ -2546,7 +2555,8 @@ export default {
         if (this.configurationId) {
           const widgetsOverride = this.placedWidgets.map(widget => ({
             widget_id: widget.id,
-            theme_id: this.selectedThemeId,
+            // استخدم theme_id الخاص بكل ويدجت وليس العام
+            theme_id: widget.theme_id || this.selectedThemeId,
             x: widget.x,
             y: widget.y,
             width: widget.width,

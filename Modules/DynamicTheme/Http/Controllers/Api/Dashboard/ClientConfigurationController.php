@@ -116,6 +116,7 @@ class ClientConfigurationController extends Controller
             'widgetOverrides.screenWidget.widget',
             'widgetOverrides.selectedTheme',
             // Include child overrides so the dashboard can restore per-child visibility state per configuration
+            'widgetOverrides.themeChildOverrides.themeChild',
             'widgetOverrides.themeChildOverrides.assetOverrides.asset',
             'assetOverrides.themeAsset',
         ]);
@@ -357,6 +358,7 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                     'child_width' => data_get($settings, 'child_width'),
                     'child_height' => data_get($settings, 'child_height'),
                     'infinite_scroll' => data_get($settings, 'infinite_scroll'),
+                    'auto_scroll' => data_get($settings, 'auto_scroll'),
                     'scroll_speed' => data_get($settings, 'scroll_speed'),
                     'background_color' => data_get($settings, 'background_color'),
                     'border_radius' => data_get($settings, 'border_radius'),

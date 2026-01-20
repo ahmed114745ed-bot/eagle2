@@ -47,6 +47,7 @@ class ConfigWidgetOverride extends Model
         'child_width',
         'child_height',
         'infinite_scroll',
+        'auto_scroll',
         'scroll_speed',
         'background_color',
         'border_radius',
@@ -70,6 +71,7 @@ class ConfigWidgetOverride extends Model
         'child_width' => 'integer',
         'child_height' => 'integer',
         'infinite_scroll' => 'boolean',
+        'auto_scroll' => 'boolean',
         'scroll_speed' => 'integer',
         'border_radius' => 'integer',
     ];
@@ -131,6 +133,8 @@ class ConfigWidgetOverride extends Model
         $children = $this->relationLoaded('themeChildOverrides')
             ? $this->themeChildOverrides->map(fn($c) => [
                 'theme_child_id' => $c->theme_child_id,
+                'name' => $c->relationLoaded('themeChild') ? ($c->themeChild?->label ?? $c->themeChild?->child_key) : null,
+                'child_key' => $c->relationLoaded('themeChild') ? $c->themeChild?->child_key : null,
                 'is_visible' => $c->is_visible,
                 'width' => $c->width,
                 'height' => $c->height,
@@ -198,6 +202,7 @@ class ConfigWidgetOverride extends Model
             'child_width' => $this->child_width,
             'child_height' => $this->child_height,
             'infinite_scroll' => $this->infinite_scroll,
+            'auto_scroll' => $this->auto_scroll,
             'scroll_speed' => $this->scroll_speed,
             'background_color' => $this->background_color,
             'border_radius' => $this->border_radius,

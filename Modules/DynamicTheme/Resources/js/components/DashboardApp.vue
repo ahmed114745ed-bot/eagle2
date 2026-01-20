@@ -711,38 +711,62 @@ export default {
                 settings.theme_id = parseInt(normalized.selected_theme_id);
             }
 
-            // If API returned child overrides, surface them into settings.children so the editor can restore visibility state per child
-            if (!settings.children && Array.isArray(w.theme_child_overrides)) {
-                settings.children = w.theme_child_overrides.map((c) => ({
-                    theme_child_id: c.theme_child_id ?? c.id,
-                    is_visible: c.is_visible ?? true,
-                    width: c.width,
-                    height: c.height,
-                    x: c.x,
-                    y: c.y,
-                    rotation: c.rotation,
-                    scale: c.scale,
-                    opacity: c.opacity,
-                    padding: c.padding,
-                    margin: c.margin,
-                    gap: c.gap,
-                    // Preserve assets from theme_child_overrides if present
-                    assets: Array.isArray(c.assets) ? c.assets.map(asset => ({
-                        id: asset.id,
-                        asset_key: asset.asset_key || asset.name,
-                        name: asset.name || asset.asset_key,
-                        file_url: asset.file_url || asset.url,
-                        url: asset.file_url || asset.url,
-                        width: asset.width,
-                        height: asset.height,
-                        x: asset.x,
-                        y: asset.y,
-                        opacity: asset.opacity,
-                        z_index: asset.z_index,
-                        is_visible: asset.is_visible ?? true,
-                        scale: asset.scale,
-                    })) : [],
-                }));
+            // If API returned child overrides, surface them into settings.children
+            // This handles both cases: when settings.children is missing OR when it needs enrichment
+            if (Array.isArray(w.theme_child_overrides) && w.theme_child_overrides.length > 0) {
+                // Create a map of existing children by theme_child_id for merging
+                const existingChildrenMap = new Map();
+                (settings.children || []).forEach(c => {
+                    existingChildrenMap.set(c.theme_child_id, c);
+                });
+                
+                settings.children = w.theme_child_overrides.map((c) => {
+                    const existing = existingChildrenMap.get(c.theme_child_id ?? c.id) || {};
+                    return {
+                        ...existing,
+                        theme_child_id: c.theme_child_id ?? c.id,
+                        name: c.name || existing.name,
+                        child_key: c.child_key || existing.child_key,
+                        is_visible: c.is_visible ?? existing.is_visible ?? true,
+                        width: c.width ?? existing.width,
+                        height: c.height ?? existing.height,
+                        x: c.x ?? existing.x,
+                        y: c.y ?? existing.y,
+                        rotation: c.rotation ?? existing.rotation,
+                        scale: c.scale ?? existing.scale,
+                        opacity: c.opacity ?? existing.opacity,
+                        z_index: c.z_index ?? existing.z_index,
+                        background_color: c.background_color ?? existing.background_color,
+                        border_width: c.border_width ?? existing.border_width,
+                        border_style: c.border_style ?? existing.border_style,
+                        border_color: c.border_color ?? existing.border_color,
+                        border_radius_tl: c.border_radius_tl ?? existing.border_radius_tl,
+                        border_radius_tr: c.border_radius_tr ?? existing.border_radius_tr,
+                        border_radius_bl: c.border_radius_bl ?? existing.border_radius_bl,
+                        border_radius_br: c.border_radius_br ?? existing.border_radius_br,
+                        // Preserve assets from theme_child_overrides if present
+                        assets: Array.isArray(c.assets) && c.assets.length > 0 
+                            ? c.assets.map(asset => ({
+                                id: asset.id,
+                                asset_key: asset.asset_key || asset.name,
+                                name: asset.name || asset.asset_key,
+                                file_url: asset.file_url || asset.url,
+                                url: asset.file_url || asset.url,
+                                width: asset.width,
+                                height: asset.height,
+                                x: asset.x,
+                                y: asset.y,
+                                opacity: asset.opacity,
+                                z_index: asset.z_index,
+                                is_visible: asset.is_visible ?? true,
+                                is_background: asset.is_background ?? false,
+                                object_fit: asset.object_fit ?? 'contain',
+                                scale: asset.scale,
+                                rotation: asset.rotation,
+                            })) 
+                            : (existing.assets || []),
+                    };
+                });
             }
 
             normalized.settings = settings;
