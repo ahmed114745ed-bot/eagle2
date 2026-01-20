@@ -154,6 +154,29 @@
                   🔄 إعادة ترتيب المواقع
                 </button>
               </div>
+              
+              <!-- Widget Padding -->
+              <div class="setting-group">
+                <label>📐 حشو الويدجت (Padding)</label>
+                <div class="padding-inputs-row">
+                  <div class="padding-input-group">
+                    <span class="padding-label">↑</span>
+                    <input type="number" v-model.number="selectedWidgetData.padding_top" @change="onWidgetSettingChange" class="setting-input-sm" min="0" placeholder="0" />
+                  </div>
+                  <div class="padding-input-group">
+                    <span class="padding-label">↓</span>
+                    <input type="number" v-model.number="selectedWidgetData.padding_bottom" @change="onWidgetSettingChange" class="setting-input-sm" min="0" placeholder="0" />
+                  </div>
+                  <div class="padding-input-group">
+                    <span class="padding-label">→</span>
+                    <input type="number" v-model.number="selectedWidgetData.padding_right" @change="onWidgetSettingChange" class="setting-input-sm" min="0" placeholder="0" />
+                  </div>
+                  <div class="padding-input-group">
+                    <span class="padding-label">←</span>
+                    <input type="number" v-model.number="selectedWidgetData.padding_left" @change="onWidgetSettingChange" class="setting-input-sm" min="0" placeholder="0" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -511,6 +534,39 @@
                   <div class="slider-container">
                     <input type="range" min="0" max="1" step="0.05" v-model.number="selectedElement.opacity" @input="onPropertyChange" class="slider-input" />
                   </div>
+                </div>
+                
+                <!-- Text Color (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🎨 لون النص</label>
+                  <div class="color-picker-row">
+                    <input type="color" :value="getColorValue(selectedElement.text_color || '#ffffff')" @input="selectedElement.text_color = $event.target.value; onPropertyChange()" class="color-picker" />
+                    <input type="text" v-model="selectedElement.text_color" @change="onPropertyChange" class="property-input flex-1" placeholder="#ffffff" />
+                  </div>
+                </div>
+                
+                <!-- Font Size (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>📏 حجم الخط <span class="unit">px</span></label>
+                  <input type="number" v-model.number="selectedElement.font_size" min="8" max="100" @change="onPropertyChange" class="property-input" placeholder="14" />
+                </div>
+                
+                <!-- Font Weight (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🔤 سُمك الخط</label>
+                  <select v-model="selectedElement.font_weight" @change="onPropertyChange" class="property-input">
+                    <option value="normal">عادي</option>
+                    <option value="bold">عريض</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="300">300</option>
+                    <option value="400">400</option>
+                    <option value="500">500</option>
+                    <option value="600">600</option>
+                    <option value="700">700</option>
+                    <option value="800">800</option>
+                    <option value="900">900</option>
+                  </select>
                 </div>
                 
                 <!-- Background Color (for children) -->
@@ -985,12 +1041,18 @@ export default {
       console.log('🎨 [VisualDesigner] initializeWidgets called');
       console.log('🎨 [VisualDesigner] availableWidgets:', this.availableWidgets);
       
-      // Load screen background color from first widget settings if available
-      if (this.availableWidgets.length > 0) {
-        const firstSettings = this.availableWidgets[0].settings || {};
-        if (firstSettings.screen_background_color) {
-          this.screenBackgroundColor = firstSettings.screen_background_color;
+      // Load screen background color from any widget settings if available
+      let foundBackgroundColor = null;
+      for (const widget of this.availableWidgets) {
+        const settings = widget.settings || {};
+        if (settings.screen_background_color) {
+          foundBackgroundColor = settings.screen_background_color;
+          break;
         }
+      }
+      console.log('🎨 [VisualDesigner] Loading screen_background_color:', foundBackgroundColor);
+      if (foundBackgroundColor) {
+        this.screenBackgroundColor = foundBackgroundColor;
       }
       
       // Load placed widgets from configuration or create default positions
@@ -1035,6 +1097,11 @@ export default {
           z_index: settings.z_index ?? index,
           background_color: settings.background_color || 'transparent',
           border_radius: settings.border_radius ?? 8,
+          // Widget padding
+          padding_top: settings.padding_top ?? 0,
+          padding_bottom: settings.padding_bottom ?? 0,
+          padding_right: settings.padding_right ?? 0,
+          padding_left: settings.padding_left ?? 0,
           // Children - load from settings if available, otherwise load from theme or widget
           children: this.buildWidgetChildren(settings.children, theme, widget)
         };
@@ -1164,6 +1231,12 @@ export default {
         border_radius_tr: asset.border_radius_tr ?? 0,
         border_radius_bl: asset.border_radius_bl ?? 0,
         border_radius_br: asset.border_radius_br ?? 0,
+        // Text styling properties
+        text_color: asset.text_color || '#ffffff',
+        font_size: asset.font_size ?? 14,
+        font_weight: asset.font_weight || 'normal',
+        font_family: asset.font_family || 'inherit',
+        text_align: asset.text_align || 'center',
       }));
     },
     
@@ -1294,6 +1367,12 @@ export default {
     
     // Widget styles
     getWidgetStyle(widget) {
+      // Widget padding
+      const paddingTop = (widget.padding_top || 0) * this.zoom + 'px';
+      const paddingBottom = (widget.padding_bottom || 0) * this.zoom + 'px';
+      const paddingRight = (widget.padding_right || 0) * this.zoom + 'px';
+      const paddingLeft = (widget.padding_left || 0) * this.zoom + 'px';
+      
       return {
         left: widget.x * this.zoom + 'px',
         top: widget.y * this.zoom + 'px',
@@ -1303,6 +1382,8 @@ export default {
         zIndex: widget.z_index || 0,
         backgroundColor: widget.background_color || 'transparent',
         borderRadius: (widget.border_radius || 8) + 'px',
+        padding: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`,
+        boxSizing: 'border-box',
       };
     },
     
@@ -2517,6 +2598,8 @@ export default {
       if (this.isSaving) return; // Prevent multiple saves
       this.isSaving = true;
       
+      console.log('🎨 [VisualDesigner] Saving screen_background_color:', this.screenBackgroundColor);
+      
       try {
         // Prepare data for saving with ALL widgets and their children
         const designData = {
@@ -2579,6 +2662,11 @@ export default {
                 name: asset.name,
                 file_url: asset.file_url,
                 url: asset.file_url,
+                asset_type: asset.asset_type || 'image',
+                text_content: asset.text_content,
+                text_color: asset.text_color || '#ffffff',
+                font_size: asset.font_size || 14,
+                font_weight: asset.font_weight || 'normal',
                 width: asset.width,
                 height: asset.height,
                 x: asset.x,
@@ -2597,6 +2685,11 @@ export default {
                 is_visible: asset.is_visible,
                 is_background: asset.is_background || false,
                 object_fit: asset.object_fit || 'contain',
+                text_color: asset.text_color,
+                font_size: asset.font_size,
+                font_weight: asset.font_weight,
+                font_family: asset.font_family,
+                text_align: asset.text_align,
               }))
             }))
           })),
@@ -2630,6 +2723,13 @@ export default {
               id: asset.id,
               asset_key: asset.asset_key,
               name: asset.name,
+              asset_type: asset.asset_type,
+              text_content: asset.text_content,
+              text_color: asset.text_color,
+              font_size: asset.font_size,
+              font_weight: asset.font_weight,
+              font_family: asset.font_family,
+              text_align: asset.text_align,
               file_url: asset.file_url,
               url: asset.file_url,
               width: asset.width,
@@ -2710,6 +2810,11 @@ export default {
                 name: asset.name,
                 asset_type: asset.asset_type || 'image',
                 text_content: asset.text_content,
+                text_color: asset.text_color,
+                font_size: asset.font_size,
+                font_weight: asset.font_weight,
+                font_family: asset.font_family,
+                text_align: asset.text_align,
                 file_url: asset.file_url || asset.url,
                 url: asset.file_url || asset.url,
                 width: asset.width,
@@ -2762,6 +2867,10 @@ export default {
                 opacity: widget.opacity,
                 background_color: widget.background_color,
                 border_radius: widget.border_radius,
+                padding_top: widget.padding_top ?? 0,
+                padding_bottom: widget.padding_bottom ?? 0,
+                padding_right: widget.padding_right ?? 0,
+                padding_left: widget.padding_left ?? 0,
                 children: widget.children,
               }
             }));
@@ -3164,6 +3273,44 @@ export default {
 .setting-input:focus {
   outline: none;
   border-color: #6366f1;
+}
+
+/* Small setting input for padding */
+.setting-input-sm {
+  width: 50px;
+  padding: 4px 6px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 4px;
+  color: white;
+  font-size: 12px;
+  text-align: center;
+}
+
+.setting-input-sm:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+/* Padding inputs row */
+.padding-inputs-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.padding-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.padding-label {
+  font-size: 12px;
+  color: #9ca3af;
+  min-width: 14px;
+  text-align: center;
 }
 
 /* Layout Buttons Small */
