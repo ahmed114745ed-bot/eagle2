@@ -8,12 +8,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Modules\Moment\Entities\MomentUserGift;
-use Modules\Moment\Transformers\MomentGiftResource;
 use Modules\UsersWallet\Entities\WalletTemplate;
 use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
-use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\MomentUserGift;
+use Utd\Moments\Transformers\MomentGiftResource;
 
 class WalletService
 {
@@ -108,7 +107,7 @@ class WalletService
 
             case 3:
                 $list = collect();
-                if (Module::has('Moment') && Module::isEnabled('Moment')) {
+                if (class_exists(MomentUserGift::class) && class_exists(MomentGiftResource::class)) {
                     $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
                         ->whereHas('moment', function ($q) use ($userId) {
                             $q->where('user_id', $userId);
@@ -116,9 +115,10 @@ class WalletService
                         ->groupBy('user_id', 'moment_id', 'gift_id')
                         ->with(['user', 'gift'])
                         ->paginate($perPage, ['*'], 'page', $page);
+
+                    $resourceClass = MomentGiftResource::class;
                 }
 
-                $resourceClass = MomentGiftResource::class;
                 break;
         }
 

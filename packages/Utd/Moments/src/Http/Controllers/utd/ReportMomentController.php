@@ -8,7 +8,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Utd\Moments\Entities\ReportMoment;
-use Utd\Moments\Http\Services\MomentService;
+use Utd\Moments\Services\MomentService;
 
 class ReportMomentController extends Controller
 {

@@ -12,8 +12,8 @@ use Utd\Moments\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
 use Utd\Moments\Entities\MomentLikes;
 use Illuminate\Contracts\Support\Renderable;
-use Utd\Moments\Http\Services\MomentService;
-use Utd\Moments\Http\Services\MomentLikesService;
+use Utd\Moments\Services\MomentService;
+use Utd\Moments\Services\MomentLikesService;
 use Utd\Moments\Transformers\MomentlikesResource;
 
 class MomentUserLikesController extends Controller

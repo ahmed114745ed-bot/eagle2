@@ -1,10 +1,9 @@
 <?php
 
-namespace Utd\Moments\Http\Services;
+namespace Utd\Moments\Services;
 
 use App\Helpers\Common;
 use Utd\Moments\Repositories\MomentsRepository;
-
 
 class MomentsService
 {
@@ -23,7 +22,7 @@ class MomentsService
         $data = [
             'user_id' => $request->user_id,
             'description' => $request->user_id,
-            'img' =>  $img ?? ''
+            'img' => $img ?? ''
         ];
         $this->MomentsRepository->create($data);
         return true;
@@ -31,7 +30,6 @@ class MomentsService
 
     public function update($id, $request)
     {
-
         $data = [
             'name' => $request->name,
         ];
@@ -44,7 +42,6 @@ class MomentsService
 
     public function delete($id)
     {
-
         $data = $this->MomentsRepository->findOrFail($id);
         $data->delete();
         return true;
@@ -57,12 +54,11 @@ class MomentsService
 
     public function search($uuid)
     {
-
         return $this->MomentsRepository->search($uuid);
     }
+
     public function get_user_moments($user_id)
     {
-
         return $this->MomentsRepository->get_user_moments($user_id);
     }
 }

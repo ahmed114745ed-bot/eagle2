@@ -6,7 +6,7 @@ use App\Models\RoleCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
-use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 
 class AdminPermissionRefact extends Seeder
@@ -484,7 +484,7 @@ class AdminPermissionRefact extends Seeder
             ],
         ];
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $categories[] = [
                 'name' => 'Moment',
                 'sort' => 28,

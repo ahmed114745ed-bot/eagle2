@@ -1,13 +1,15 @@
 <?php
 
-namespace Utd\Moments\Http\Services;
+namespace Utd\Moments\Services;
 
 use Illuminate\Database\Eloquent\Model;
 
 abstract class MomentBaseModelService
 {
     public $model;
-    public function __construct(Model $model) {
+
+    public function __construct(Model $model)
+    {
         $this->model = $model;
     }
 
@@ -15,5 +17,4 @@ abstract class MomentBaseModelService
     {
         return $this->model->findOrFail($id);
     }
-
 }

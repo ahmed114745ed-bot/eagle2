@@ -11,8 +11,8 @@ use Utd\Moments\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
 use Utd\Moments\Entities\MomentCommint;
 use Illuminate\Contracts\Support\Renderable;
-use Utd\Moments\Http\Services\MomentService;
-use Utd\Moments\Http\Services\MomentCommentsService;
+use Utd\Moments\Services\MomentService;
+use Utd\Moments\Services\MomentCommentsService;
 use Utd\Moments\Transformers\MomentCommmintResource;
 
 class MomentUserCommentController extends Controller

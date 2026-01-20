@@ -8,7 +8,7 @@ use App\Models\Config;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Utd\Moments\Http\Services\MomentsService;
+use Utd\Moments\Services\MomentsService;
 use Utd\Moments\Transformers\MomentDashboardResource;
 use Utd\Moments\Transformers\utd\MomentResource;
 

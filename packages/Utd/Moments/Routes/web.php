@@ -3,7 +3,6 @@
 use Utd\Moments\Http\Controllers\web\MomentController;
 use Utd\Moments\Http\Controllers\web\MomentViewerController;
 use Utd\Moments\Http\Controllers\web\ReportMomentController;
-use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Utd\Moments\Http\Controllers\web\MomentSettingsController;
 
 /*
@@ -40,7 +39,7 @@ Route::group(
 
 
         Route::resource('report-Moments', ReportMomentController::class)->middleware('moment.allowed');
-        Route::post('moment-config', [UpgradeLevelController::class, 'momentConfig'])->name('moment-config');
+        Route::post('moment-config', [MomentSettingsController::class, 'momentConfig'])->name('moment-config');
         Route::resource('Moments', MomentController::class)->middleware('moment.allowed');
         Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
         Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');

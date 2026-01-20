@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Interfaces\TargetInterface;
 use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 class RegularTarget implements TargetInterface
 {
@@ -36,7 +37,7 @@ class RegularTarget implements TargetInterface
         }
         // logger('days Achieved:', [$per]);
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $targetMoment = explode(',', $target->moment);
             if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
@@ -81,7 +82,7 @@ class RegularTarget implements TargetInterface
 
         // logger('days Achieved:', [$per]);
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $targetMoment = explode(',', $target->moment);
             if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
                 $per += (((int)Common::getSettingsValue('Moments')) ?? 0) / 100;

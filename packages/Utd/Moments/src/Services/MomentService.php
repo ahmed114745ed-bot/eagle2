@@ -1,17 +1,13 @@
 <?php
 
-namespace Utd\Moments\Http\Services;
+namespace Utd\Moments\Services;
 
 use App\Contracts\MomentContract;
 use App\Helpers\Common;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Utd\Moments\Entities\Moment;
-use Utd\Moments\Http\Repositories\MomentRepository;
-use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Repositories\MomentRepository;
 
 class MomentService extends MomentBaseModelService implements MomentContract
 {
@@ -42,7 +38,6 @@ class MomentService extends MomentBaseModelService implements MomentContract
 
     public function deleteMomentAndReport($momentId, $reportId)
     {
-        // Find the moment by ID
         $moment = $this->momentRepository->findMomentById($momentId);
         if (!$moment) {
             return [
@@ -52,13 +47,11 @@ class MomentService extends MomentBaseModelService implements MomentContract
             ];
         }
 
-        // Find the report moment by ID and delete it
         $reportMoment = $this->momentRepository->findReportMomentById($reportId);
         if ($reportMoment) {
             $this->momentRepository->deleteReportMoment($reportMoment);
         }
 
-        // Delete the moment
         $this->momentRepository->deleteMoment($moment);
 
         return [
@@ -80,7 +73,6 @@ class MomentService extends MomentBaseModelService implements MomentContract
             ];
         }
 
-        // Perform delete operation
         $this->momentRepository->deleteMoment($moment);
 
         return [
@@ -94,7 +86,6 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $userId = Auth::id();
 
-        // Prevent posting empty content
         if (empty($contacts) && empty($imgPath)) {
             return [
                 'success' => false,
@@ -102,7 +93,6 @@ class MomentService extends MomentBaseModelService implements MomentContract
             ];
         }
 
-        // Create moment
         $moment = $this->momentRepository->createMoment([
             'user_id' => $userId,
             'description' => $contacts,
@@ -114,9 +104,9 @@ class MomentService extends MomentBaseModelService implements MomentContract
                 'message' => 'Try again',
             ];
         }
+
         if ($request->hasFile('multi_image')) {
             foreach ($request->file('multi_image') as $file) {
-
                 if ($file && $file->isValid()) {
                     $imagePath = Common::upload('profile', $file);
                     $moment->images()->create([
@@ -152,18 +142,12 @@ class MomentService extends MomentBaseModelService implements MomentContract
             'status' => 200,
         ];
     }
+
     public function show(User $user) {}
 
     public function create(array $data, int $userId) {}
 
-
-    /*
-     * $data is = [file, description, categories ids]
-     */
-
-
-
-    public function delete(int|Module $moment)
+    public function delete(int|Moment $moment)
     {
         if (gettype($moment) == 'integer') {
             $moment = Moment::query()->find($moment);

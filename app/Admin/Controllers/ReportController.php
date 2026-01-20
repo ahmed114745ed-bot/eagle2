@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
 use App\Admin\Controllers\MainController;
 use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 class ReportController extends MainController
 {
@@ -361,7 +362,7 @@ class ReportController extends MainController
 //        });
 //        JS);
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $grid->column('Moments', __('Moments'))->display(function () {
                 $userId = $this->id;
                 $month  = request('month', now()->month);

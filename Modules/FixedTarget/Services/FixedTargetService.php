@@ -13,7 +13,6 @@ use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use Modules\Reals\Entities\Real;
-use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Moment\Entities\MomentLikes;
 use Modules\Reals\Entities\RealUserLike;
@@ -25,6 +24,7 @@ use Modules\FixedTarget\Classes\RegularTarget;
 use Modules\FixedTarget\Classes\FixedTargetClass;
 use Modules\FixedTarget\Interfaces\TargetInterface;
 use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 class FixedTargetService
 {
@@ -263,7 +263,7 @@ class FixedTargetService
 
                 $targetReel  = explode(',', $target->reel);
 
-                $hasMomentModule = Module::has('Moment') && Module::isEnabled('Moment');
+                $hasMomentModule = class_exists(Moment::class);
                 $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];
 
                 $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;

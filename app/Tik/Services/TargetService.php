@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 use App\Tik\Repositories\TargetRepository;
 use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 
 class TargetService
@@ -19,7 +20,7 @@ class TargetService
 
     public function create($request)
     {
-        if (isset($request->moment) && Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (isset($request->moment) && class_exists(Moment::class)) {
             $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
@@ -51,7 +52,7 @@ class TargetService
 
     public function update($id, $request)
     {
-        if (isset($request->moment) && Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (isset($request->moment) && class_exists(Moment::class)) {
             $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);

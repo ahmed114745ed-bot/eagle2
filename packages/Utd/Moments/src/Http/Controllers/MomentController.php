@@ -15,7 +15,7 @@ use Utd\Moments\Entities\ReportMoment;
 use Utd\Moments\Transformers\MomentResource;
 use DB;
 use Illuminate\Support\Facades\Log;
-use Utd\Moments\Http\Services\MomentService;
+use Utd\Moments\Services\MomentService;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
 

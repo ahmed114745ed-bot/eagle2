@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Moments\Http\Repositories;
+namespace Utd\Moments\Repositories;
 
 use App\Models\Follow;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +10,6 @@ use Utd\Moments\Entities\ReportMoment;
 
 class MomentRepository
 {
-
     public function findReportMomentById($id)
     {
         return ReportMoment::find($id);
@@ -75,10 +74,6 @@ class MomentRepository
                     }]);
             }])
             ->orderBy('created_at', 'desc')
-            // ->when($page == 1, function ($query) {
-            //     $seed = rand(1000, 2000);
-            //     $query->orderBy(DB::raw('RAND(' . $seed . ')'));
-            // })
             ->paginate(10);
     }
 
@@ -144,7 +139,7 @@ class MomentRepository
                     }]);
             }])
             ->withCount(['likes', 'comments'])
-            ->with([ 'gifts' => function ($query) {
+            ->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
@@ -154,7 +149,6 @@ class MomentRepository
                 $query->orderBy(DB::raw('RAND(' . $seed . ')'));
             })->paginate(10);
     }
-
 
     public function getNewMoments($userId)
     {
@@ -176,14 +170,13 @@ class MomentRepository
             }])
             ->whereHas('user')->with('images')
             ->withCount(['likes', 'comments'])
-            ->with([ 'gifts' => function ($query) {
+            ->with(['gifts' => function ($query) {
                 $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
             ->take(10)->orderByDesc('id')->paginate(10);
     }
-
 
     public function momentUserFollow($userId)
     {

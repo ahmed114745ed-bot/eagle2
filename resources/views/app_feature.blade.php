@@ -677,7 +677,7 @@
                 </div>
             </div>
 
-            @if(\Nwidart\Modules\Facades\Module::has('Moment') && \Nwidart\Modules\Facades\Module::isEnabled('Moment'))
+            @if(class_exists(\Utd\Moments\Entities\Moment::class))
                 <div class="feature-card">
                     <div class="feature-header">
                         <div class="feature-icon">

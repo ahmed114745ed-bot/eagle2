@@ -3,6 +3,16 @@
     "description": "Moments Laravel Package",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0"
+    },
     "autoload": {
         "psr-4": {
             "Utd\\Moments\\": "src/"
@@ -11,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Utd\\Moments\\Providers\\MomentServiceProvider"
+                "Utd\\Moments\\MomentsServiceProvider"
             ]
         }
     },

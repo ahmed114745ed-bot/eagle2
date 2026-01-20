@@ -104,7 +104,7 @@
     foreach ($moduleGuards as $keyword => $module) {
         foreach ($checkStrings as $value) {
             if ($value && str_contains($value, $keyword)) {
-                $moduleAllowed = Module::has($module) && Module::isEnabled($module);
+                $moduleAllowed = class_exists(\Utd\Moments\Entities\Moment::class);
                 break 2;
             }
         }

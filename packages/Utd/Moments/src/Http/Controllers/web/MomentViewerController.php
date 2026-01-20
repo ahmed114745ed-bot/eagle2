@@ -31,7 +31,7 @@ class MomentViewerController extends MainController
         return $content
             ->title(__('Moment Viewer'))
             ->description(__('View Moments like in the app'))
-            ->body(view('moment::viewer.index'));
+            ->body(view('moments::viewer.index'));
     }
 
     /**
@@ -41,7 +41,7 @@ class MomentViewerController extends MainController
      */
     public function getViewerCss()
     {
-        $css = view('moment::viewer.viewer-css')->render();
+        $css = view('moments::viewer.viewer-css')->render();
 
         return response($css)
             ->header('Content-Type', 'text/css')

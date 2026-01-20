@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 
 use Illuminate\Http\Request as HttpRequest;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Moments\Entities\Moment;
 
 class TargetController extends MainController
 {
@@ -108,7 +109,7 @@ class TargetController extends MainController
         // $this->addAppProfitColumn($grid, $coins);
         $this->addHoursDaysColumns($grid);
         $this->addReelColumn($grid);
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $this->addMomentColumn($grid);
         }
         // $this->addConfirmColumn($grid);
@@ -322,7 +323,7 @@ class TargetController extends MainController
 
     protected function addMomentColumn($grid)
     {
-        if (!Module::has('Moment') || !Module::isEnabled('Moment')) {
+        if (!class_exists(Moment::class)) {
             return;
         }
 
@@ -665,7 +666,7 @@ class TargetController extends MainController
             return @explode(',', $reel)[2] ?? 0;
         });
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             $form->html('<h1>' . __('Moment') . '</h1>');
             $form->hidden('moment', 'moment');
             $form->number('moment1', __('uploadMoment'))->default(function ($form) {
@@ -765,7 +766,7 @@ class TargetController extends MainController
                     'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
                 ];
 
-                if (Module::has('Moment') && Module::isEnabled('Moment')) {
+                if (class_exists(Moment::class)) {
                     $editData['moment'] = $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3;
                 }
 
@@ -814,7 +815,7 @@ class TargetController extends MainController
             unset($data['reel3']);
         }
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             if (isset($data['moment1'])) {
                 $values2 = [
                     $data['moment1'],
@@ -849,7 +850,7 @@ class TargetController extends MainController
         unset($data['reel2']);
         unset($data['reel3']);
 
-        if (Module::has('Moment') && Module::isEnabled('Moment')) {
+        if (class_exists(Moment::class)) {
             if (isset($data['moment1'])) {
                 $values2 = [
                     $data['moment1'],
