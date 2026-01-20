@@ -113,15 +113,23 @@ class MomentsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/moments.php' => config_path('moments.php'),
                 __DIR__ . '/../config/viewer.php' => config_path('moments-viewer.php'),
-            ], 'moments-config');
+            ], 'moments');
 
             $this->publishes([
                 __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'moments-migrations');
+            ], 'moments');
 
             $this->publishes([
                 __DIR__ . '/../database/seeders' => database_path('seeders/Moments'),
-            ], 'moments-seeders');
+            ], 'moments');
+
+            $this->publishes([
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/moments'),
+            ], 'moments');
+
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => lang_path('vendor/moments'),
+            ], 'moments');
         }
     }
 

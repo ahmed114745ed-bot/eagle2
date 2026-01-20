@@ -57,7 +57,7 @@ class MomentViewerController extends MainController
     public function getMoments(Request $request)
     {
         try {
-            $sortBy = $request->get('sort', config('moment.viewer.default_sort', 'newest')); // random, newest, oldest
+            $sortBy = $request->get('sort', config('moments-viewer.default_sort', 'newest')); // random, newest, oldest
             $perPage = $request->get('per_page', 10); // تحميل 10 Moments في كل مرة
             $page = $request->get('page', 1); // رقم الصفحة الحالية
             $countryId = session('filter_country_id');
