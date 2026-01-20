@@ -48,6 +48,7 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
@@ -245,7 +246,10 @@ Route::get('/clear_clear', function () {
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
- Route::get('remove-repetition-form-templates',[FormTemplateController::class,'removeRepetition'] );
+Route::get('remove-repetition-form-templates', [FormTemplateController::class, 'removeRepetition']);
+Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCutAmount']);
+
+
 
 Route::get('/seed', function () {
 
