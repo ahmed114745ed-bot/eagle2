@@ -677,7 +677,7 @@
                 </div>
             </div>
 
-            @if(class_exists(\Utd\Moments\Entities\Moment::class))
+            @if(class_exists(\Utd\Moments\Entities\Moment::class, false))
                 <div class="feature-card">
                     <div class="feature-header">
                         <div class="feature-icon">

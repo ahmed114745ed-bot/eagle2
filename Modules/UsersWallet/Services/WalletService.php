@@ -107,7 +107,7 @@ class WalletService
 
             case 3:
                 $list = collect();
-                if (class_exists(MomentUserGift::class) && class_exists(MomentGiftResource::class)) {
+                if (class_exists(MomentUserGift::class, false) && class_exists(MomentGiftResource::class, false)) {
                     $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
                         ->whereHas('moment', function ($q) use ($userId) {
                             $q->where('user_id', $userId);

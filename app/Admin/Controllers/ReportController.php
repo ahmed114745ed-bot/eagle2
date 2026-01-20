@@ -362,7 +362,7 @@ class ReportController extends MainController
 //        });
 //        JS);
 
-        if (class_exists(Moment::class)) {
+        if (class_exists(Moment::class, false)) {
             $grid->column('Moments', __('Moments'))->display(function () {
                 $userId = $this->id;
                 $month  = request('month', now()->month);

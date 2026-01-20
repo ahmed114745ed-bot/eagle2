@@ -263,7 +263,7 @@ class FixedTargetService
 
                 $targetReel  = explode(',', $target->reel);
 
-                $hasMomentModule = class_exists(Moment::class);
+                $hasMomentModule = class_exists(Moment::class, false);
                 $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];
 
                 $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
