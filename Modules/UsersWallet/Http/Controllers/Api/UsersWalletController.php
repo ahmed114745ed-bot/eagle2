@@ -35,22 +35,25 @@ class UsersWalletController extends Controller
     public function transferToUser(Request $request)
     {
 
-        if (!$request->user_id)return Common::apiResponse(false, __('this agency does not have owner'), null, 400);
-            $request->validate([
-                'user_id' => 'required|integer|exists:users,id',
-                'amount'     => 'required|numeric|min:0.01',
-            ]);
+        if (!$request->user_id) return Common::apiResponse(false, __('this agency does not have owner'), null, 400);
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id',
+            'amount'     => 'required|numeric|min:0.01',
+        ]);
 
 
         return $this->handleRequest(function () use ($request) {
+            $from = $request->user();
             $result = $this->walletService->transfer(
                 Auth::id(),
                 $request->user_id,
                 $request->amount
             );
 
+
+            $data = ['coins' => (string)$from->di, 'usd' => (string)$from->user_wallet_balance,];
             if ($result['status'] === 'success') {
-                return Common::apiResponse(true, 'Transfer completed successfully', []);
+                return Common::apiResponse(true, 'Transfer completed successfully', $data, 200);
             }
 
             return Common::apiResponse(false, $result['message'] ?? 'Transfer failed');
