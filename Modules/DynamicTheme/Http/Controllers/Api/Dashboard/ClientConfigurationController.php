@@ -116,7 +116,7 @@ class ClientConfigurationController extends Controller
             'widgetOverrides.screenWidget.widget',
             'widgetOverrides.selectedTheme',
             // Include child overrides so the dashboard can restore per-child visibility state per configuration
-            'widgetOverrides.themeChildOverrides',
+            'widgetOverrides.themeChildOverrides.assetOverrides.asset',
             'assetOverrides.themeAsset',
         ]);
 
@@ -325,6 +325,9 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 ?? $existingWidgetOverride?->selected_theme_id
                 ?? $screenWidget->widget_theme_id;
 
+            // Extract layout settings from payload
+            $settings = data_get($rawWidgetData, 'settings', []);
+
             // 1️⃣ تحديث أو إنشاء الـ Widget Override
             $configWidgetOverride = ConfigWidgetOverride::updateOrCreate(
                 [
@@ -338,15 +341,33 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                     'widget_id' => $screenWidget->widget_id,
                     'selected_theme_id' => $themeId,
                     'selected_child_theme_id' => $rawWidgetData['selected_child_theme_id'] ?? null,
-                    'primary_settings' => data_get($rawWidgetData, 'settings.primary_settings', []),
-                    'secondary_settings' => data_get($rawWidgetData, 'settings.secondary_settings', []),
-                    'action' => data_get($rawWidgetData, 'settings.action', []),
+                    'primary_settings' => data_get($settings, 'primary_settings', []),
+                    'secondary_settings' => data_get($settings, 'secondary_settings', []),
+                    'action' => data_get($settings, 'action', []),
+                    // Visual Designer layout fields
+                    'x' => data_get($settings, 'x'),
+                    'y' => data_get($settings, 'y'),
+                    'width' => data_get($settings, 'width'),
+                    'height' => data_get($settings, 'height'),
+                    'z_index' => data_get($settings, 'z_index'),
+                    'opacity' => data_get($settings, 'opacity'),
+                    'layout_mode' => data_get($settings, 'layout_mode'),
+                    'layout_gap' => data_get($settings, 'layout_gap'),
+                    'layout_padding' => data_get($settings, 'layout_padding'),
+                    'child_width' => data_get($settings, 'child_width'),
+                    'child_height' => data_get($settings, 'child_height'),
+                    'infinite_scroll' => data_get($settings, 'infinite_scroll'),
+                    'scroll_speed' => data_get($settings, 'scroll_speed'),
+                    'background_color' => data_get($settings, 'background_color'),
+                    'border_radius' => data_get($settings, 'border_radius'),
                 ]
             );
 
-            // Collect per-child visibility if provided
-            $childVisibilities = collect(data_get($rawWidgetData, 'settings.children', []))
-                ->keyBy('theme_child_id')
+            // Collect per-child settings if provided
+            $childSettingsMap = collect(data_get($rawWidgetData, 'settings.children', []))
+                ->keyBy('theme_child_id');
+            
+            $childVisibilities = $childSettingsMap
                 ->map(fn($c) => array_key_exists('is_visible', $c) ? (bool)$c['is_visible'] : null);
 
             if (!$themeId) continue;
@@ -386,6 +407,9 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                         : ($child->hide !== null ? !$child->hide : true);
                 }
 
+                // Get saved child settings from payload if available
+                $savedChildSettings = $childSettingsMap->get($child->id, []);
+
                 // إنشاء أو تحديث Child Override مع الحفاظ على حالة الإظهار السابقة
                 $configThemeChildOverride = ConfigThemeChildOverride::updateOrCreate(
                     [
@@ -398,14 +422,37 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                         'order' => $child->order,
                         'action' => $child->action,
                         'position' => $child->position,
+                        // Visual Designer layout fields for children
+                        'width' => data_get($savedChildSettings, 'width', $child->width),
+                        'height' => data_get($savedChildSettings, 'height', $child->height),
+                        'x' => data_get($savedChildSettings, 'x', $child->x ?? 0),
+                        'y' => data_get($savedChildSettings, 'y', $child->y ?? 0),
+                        'rotation' => data_get($savedChildSettings, 'rotation', 0),
+                        'scale' => data_get($savedChildSettings, 'scale', 1),
+                        'opacity' => data_get($savedChildSettings, 'opacity', 1),
+                        'z_index' => data_get($savedChildSettings, 'z_index', 0),
+                        'background_color' => data_get($savedChildSettings, 'background_color'),
+                        'border_width' => data_get($savedChildSettings, 'border_width', 0),
+                        'border_style' => data_get($savedChildSettings, 'border_style'),
+                        'border_color' => data_get($savedChildSettings, 'border_color'),
+                        'border_radius_tl' => data_get($savedChildSettings, 'border_radius_tl', 0),
+                        'border_radius_tr' => data_get($savedChildSettings, 'border_radius_tr', 0),
+                        'border_radius_bl' => data_get($savedChildSettings, 'border_radius_bl', 0),
+                        'border_radius_br' => data_get($savedChildSettings, 'border_radius_br', 0),
                     ]
                 );
 
                 // 4️⃣ استرجاع Assets الخاصة بالـ Child وإنشاؤها
                 $configThemeChildOverride->assetOverrides()->delete();
                 $assets = ThemeAsset::where('child_id', $child->id)->get();
+                
+                // Get saved asset settings from payload
+                $savedAssetSettings = collect(data_get($savedChildSettings, 'assets', []))
+                    ->keyBy('id');
 
                 foreach ($assets as $asset) {
+                    $savedAsset = $savedAssetSettings->get($asset->id, []);
+                    
                     ConfigChildAssetOverride::updateOrCreate(
                         [
                             'configuration_id' => $configuration->id,
@@ -417,7 +464,25 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                             'type' => $asset->type,
                             'text' => $asset->text,
                             'file_path' => $asset->file_path,
-                            'is_visible' => true,
+                            'is_visible' => data_get($savedAsset, 'is_visible', true),
+                            'is_background' => data_get($savedAsset, 'is_background', false),
+                            'object_fit' => data_get($savedAsset, 'object_fit', 'contain'),
+                            // Visual Designer layout fields for assets
+                            'width' => data_get($savedAsset, 'width', $asset->width),
+                            'height' => data_get($savedAsset, 'height', $asset->height),
+                            'x' => data_get($savedAsset, 'x', $asset->x ?? 0),
+                            'y' => data_get($savedAsset, 'y', $asset->y ?? 0),
+                            'rotation' => data_get($savedAsset, 'rotation', 0),
+                            'scale' => data_get($savedAsset, 'scale', 1),
+                            'opacity' => data_get($savedAsset, 'opacity', 1),
+                            'z_index' => data_get($savedAsset, 'z_index', 0),
+                            'border_width' => data_get($savedAsset, 'border_width', 0),
+                            'border_style' => data_get($savedAsset, 'border_style'),
+                            'border_color' => data_get($savedAsset, 'border_color'),
+                            'border_radius_tl' => data_get($savedAsset, 'border_radius_tl', 0),
+                            'border_radius_tr' => data_get($savedAsset, 'border_radius_tr', 0),
+                            'border_radius_bl' => data_get($savedAsset, 'border_radius_bl', 0),
+                            'border_radius_br' => data_get($savedAsset, 'border_radius_br', 0),
                         ]
                     );
                 }

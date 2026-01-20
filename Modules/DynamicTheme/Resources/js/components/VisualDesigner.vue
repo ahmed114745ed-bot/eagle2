@@ -117,21 +117,21 @@
                 </div>
               </div>
               
-              <!-- Horizontal scroll options -->
-              <div v-if="selectedWidgetData.layout_mode === 'horizontal'" class="setting-group">
+              <!-- Layout options (for horizontal/vertical) -->
+              <div v-if="selectedWidgetData.layout_mode !== 'absolute'" class="setting-group">
                 <!-- Scroll Mode Selection -->
                 <label>نوع التمرير</label>
                 <div class="scroll-mode-buttons">
-                  <button @click="setScrollMode('manual')" class="layout-btn-sm" :class="{ active: !selectedWidgetData.infinite_scroll }">
-                    👆 يدوي
+                  <button @click="setScrollMode('manual')" class="layout-btn-sm" :class="{ active: !selectedWidgetData.auto_scroll }">
+                    👆 يدوي لانهائي
                   </button>
-                  <button @click="setScrollMode('auto')" class="layout-btn-sm" :class="{ active: selectedWidgetData.infinite_scroll }">
+                  <button @click="setScrollMode('auto')" class="layout-btn-sm" :class="{ active: selectedWidgetData.auto_scroll }">
                     🔄 تلقائي
                   </button>
                 </div>
                 
                 <!-- Slider speed (only if auto scroll is enabled) -->
-                <div v-if="selectedWidgetData.infinite_scroll" class="setting-row">
+                <div v-if="selectedWidgetData.auto_scroll" class="setting-row">
                   <div class="setting-field">
                     <label>سرعة السلايدر (ثواني/عنصر)</label>
                     <input type="number" v-model.number="selectedWidgetData.scroll_speed" @change="onWidgetSettingChange" class="setting-input" min="1" max="20" step="0.5" />
@@ -144,10 +144,15 @@
                     <input type="number" v-model.number="selectedWidgetData.layout_gap" @change="onWidgetSettingChange" class="setting-input" min="0" />
                   </div>
                   <div class="setting-field">
-                    <label>عرض الطفل</label>
-                    <input type="number" v-model.number="selectedWidgetData.child_width" @change="onWidgetSettingChange" class="setting-input" min="20" />
+                    <label>الهامش</label>
+                    <input type="number" v-model.number="selectedWidgetData.layout_padding" @change="onWidgetSettingChange" class="setting-input" min="0" />
                   </div>
                 </div>
+                
+                <!-- زر إعادة ترتيب الأبناء -->
+                <button @click="repositionChildrenByLayout(selectedWidgetData)" class="layout-btn-sm" style="width: 100%; margin-top: 8px;">
+                  🔄 إعادة ترتيب المواقع
+                </button>
               </div>
             </div>
           </div>
@@ -263,7 +268,7 @@
                 >
                   <!-- Infinite scroll wrapper (duplicates children for seamless loop) -->
                   <template v-if="widget.layout_mode === 'horizontal' && widget.infinite_scroll">
-                    <div class="infinite-scroll-track" :style="{ animationDuration: getScrollDuration(widget) }">
+                    <div class="infinite-scroll-track" :class="{ 'auto-scroll': widget.auto_scroll, 'manual-scroll': !widget.auto_scroll }" :style="{ animationDuration: getScrollDuration(widget) }">
                       <!-- Original children -->
                       <div
                         v-for="child in widget.children || []"
@@ -386,8 +391,8 @@
                   </div>
                   
                   <!-- Infinite scroll indicator -->
-                  <div v-if="widget.infinite_scroll" class="infinite-scroll-badge">
-                    ∞ سلايدر
+                  <div v-if="widget.infinite_scroll" class="infinite-scroll-badge" :class="{ 'auto': widget.auto_scroll }">
+                    {{ widget.auto_scroll ? '∞ تلقائي' : '∞ يدوي' }}
                   </div>
                 </div>
                 
@@ -420,59 +425,7 @@
             </button>
           </div>
           
-          <!-- Collapsible Settings Panel (for selected widget) -->
-          <div v-if="showDesignSettings && selectedWidget" class="design-settings-panel">
-            <!-- Widget Info -->
-            <div class="settings-section">
-              <h4 class="settings-section-title">📦 {{ selectedWidget.display_name || selectedWidget.widget_key }}</h4>
-            </div>
-            
-            <!-- Layout Mode Controls -->
-            <div class="settings-section">
-              <h4 class="settings-section-title">📐 نوع التخطيط</h4>
-              <div class="layout-mode-selector">
-                <button @click="setWidgetLayoutMode('absolute')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'absolute' || !selectedWidget.layout_mode }" title="تحديد المواقع بحرية">
-                  <span class="layout-icon">📍</span>
-                  <span>حر</span>
-                </button>
-                <button @click="setWidgetLayoutMode('horizontal')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'horizontal' }" title="تمرير أفقي - الأطفال جنباً إلى جنب">
-                  <span class="layout-icon">↔️</span>
-                  <span>أفقي</span>
-                </button>
-                <button @click="setWidgetLayoutMode('vertical')" class="layout-btn" :class="{ 'active': selectedWidget.layout_mode === 'vertical' }" title="تمرير عمودي">
-                  <span class="layout-icon">↕️</span>
-                  <span>عمودي</span>
-                </button>
-              </div>
-            
-              <!-- Layout Settings (shown when not absolute) -->
-              <div v-if="selectedWidget.layout_mode && selectedWidget.layout_mode !== 'absolute'" class="layout-settings">
-                <div class="layout-setting-row">
-                  <div class="layout-setting-group">
-                    <label>المسافة</label>
-                    <input type="number" v-model.number="selectedWidget.layout_gap" @change="onWidgetLayoutChange" class="size-input" min="0" max="100" />
-                  </div>
-                  <div class="layout-setting-group">
-                    <label>الهامش</label>
-                    <input type="number" v-model.number="selectedWidget.layout_padding" @change="onWidgetLayoutChange" class="size-input" min="0" max="100" />
-                  </div>
-                  <div class="layout-setting-group">
-                    <label>عرض الطفل</label>
-                    <input type="number" v-model.number="selectedWidget.child_width" @change="onWidgetLayoutChange" class="size-input" min="50" max="500" />
-                  </div>
-                  <div class="layout-setting-group">
-                    <label>ارتفاع الطفل</label>
-                    <input type="number" v-model.number="selectedWidget.child_height" @change="onWidgetLayoutChange" class="size-input" min="50" max="500" />
-                  </div>
-                </div>
-                <button @click="autoArrangeWidgetChildren" class="auto-arrange-btn-small">🔄 ترتيب</button>
-              </div>
-            </div>
-          </div>
-          
-          <div v-else-if="showDesignSettings && !selectedWidget" class="design-settings-panel">
-            <div class="empty-message">👆 اختر ويدجت لتعديل إعداداته</div>
-          </div>
+          <!-- Collapsible Settings Panel removed - settings are in left panel -->
         </div>
 
         <!-- Right Panel - Properties -->
@@ -934,52 +887,8 @@ export default {
           z_index: settings.z_index ?? index,
           background_color: settings.background_color || 'transparent',
           border_radius: settings.border_radius ?? 8,
-          // Children
-          children: (settings.children || []).map(child => {
-            const themeChild = (theme?.children || []).find(c => c.id === child.theme_child_id);
-            return {
-              id: child.id || `child_${child.theme_child_id}`,
-              theme_child_id: child.theme_child_id,
-              name: themeChild?.label || themeChild?.child_key || child.name,
-              child_key: themeChild?.child_key || child.child_key,
-              width: child.width || themeChild?.width || 80,
-              height: child.height || themeChild?.height || 80,
-              x: child.x ?? 0,
-              y: child.y ?? 0,
-              opacity: child.opacity ?? 1,
-              z_index: child.z_index ?? 0,
-              is_visible: child.is_visible !== false,
-              rotation: child.rotation ?? 0,
-              scale: child.scale ?? 1,
-              background_color: child.background_color || 'transparent',
-              border_width: child.border_width ?? 0,
-              border_style: child.border_style || 'solid',
-              border_color: child.border_color || 'transparent',
-              border_radius_tl: child.border_radius_tl ?? 0,
-              border_radius_tr: child.border_radius_tr ?? 0,
-              border_radius_bl: child.border_radius_bl ?? 0,
-              border_radius_br: child.border_radius_br ?? 0,
-              assets: (child.assets || []).map(asset => ({
-                ...asset,
-                x: asset.x ?? 0,
-                y: asset.y ?? 0,
-                width: asset.width || 40,
-                height: asset.height || 40,
-                opacity: asset.opacity ?? 1,
-                is_visible: asset.is_visible !== false,
-                z_index: asset.z_index ?? 0,
-                rotation: asset.rotation ?? 0,
-                scale: asset.scale ?? 1,
-                border_width: asset.border_width ?? 0,
-                border_style: asset.border_style || 'solid',
-                border_color: asset.border_color || 'transparent',
-                border_radius_tl: asset.border_radius_tl ?? 0,
-                border_radius_tr: asset.border_radius_tr ?? 0,
-                border_radius_bl: asset.border_radius_bl ?? 0,
-                border_radius_br: asset.border_radius_br ?? 0,
-              }))
-            };
-          })
+          // Children - load from settings if available, otherwise load from theme
+          children: this.buildWidgetChildren(settings.children, theme)
         };
       });
       
@@ -992,6 +901,100 @@ export default {
       
       // Save initial state to history
       this.saveToHistory();
+    },
+    
+    // Build widget children from settings or theme
+    buildWidgetChildren(savedChildren, theme) {
+      const themeChildren = theme?.children || [];
+      const savedChildrenMap = new Map();
+      
+      // Create a map of saved children by theme_child_id
+      (savedChildren || []).forEach(child => {
+        savedChildrenMap.set(child.theme_child_id, child);
+      });
+      
+      // If there are saved children, use them; otherwise load all from theme
+      const childrenSource = savedChildren && savedChildren.length > 0 
+        ? savedChildren 
+        : themeChildren.map(tc => ({ theme_child_id: tc.id }));
+      
+      return childrenSource.map((child, index) => {
+        const themeChildId = child.theme_child_id || child.id;
+        const themeChild = themeChildren.find(c => c.id === themeChildId);
+        const savedChild = savedChildrenMap.get(themeChildId);
+        
+        // Merge saved child data with theme child defaults
+        const mergedChild = savedChild || child;
+        
+        return {
+          id: mergedChild.id || `child_${themeChildId}`,
+          theme_child_id: themeChildId,
+          name: themeChild?.label || themeChild?.child_key || mergedChild.name,
+          child_key: themeChild?.child_key || mergedChild.child_key,
+          width: mergedChild.width || themeChild?.width || 80,
+          height: mergedChild.height || themeChild?.height || 80,
+          x: mergedChild.x ?? (index * 10),
+          y: mergedChild.y ?? (index * 10),
+          opacity: mergedChild.opacity ?? 1,
+          z_index: mergedChild.z_index ?? index,
+          is_visible: mergedChild.is_visible !== false,
+          rotation: mergedChild.rotation ?? 0,
+          scale: mergedChild.scale ?? 1,
+          background_color: mergedChild.background_color || 'transparent',
+          border_width: mergedChild.border_width ?? 0,
+          border_style: mergedChild.border_style || 'solid',
+          border_color: mergedChild.border_color || 'transparent',
+          border_radius_tl: mergedChild.border_radius_tl ?? 0,
+          border_radius_tr: mergedChild.border_radius_tr ?? 0,
+          border_radius_bl: mergedChild.border_radius_bl ?? 0,
+          border_radius_br: mergedChild.border_radius_br ?? 0,
+          assets: this.buildChildAssets(mergedChild.assets, themeChild?.assets)
+        };
+      });
+    },
+    
+    // Build child assets from saved data or theme
+    buildChildAssets(savedAssets, themeAssets) {
+      const assetSource = savedAssets && savedAssets.length > 0 
+        ? savedAssets 
+        : (themeAssets || []).map(ta => ({
+            id: ta.id,
+            asset_key: ta.asset_key || ta.name,
+            name: ta.name || ta.asset_key,
+            file_url: ta.file_url || ta.file_path,
+            url: ta.file_url || ta.file_path,
+            asset_type: ta.asset_type || ta.type || 'image',
+            text_content: ta.text_content || ta.text
+          }));
+      
+      return assetSource.map((asset, index) => ({
+        ...asset,
+        id: asset.id,
+        asset_key: asset.asset_key || asset.name,
+        name: asset.name || asset.asset_key,
+        file_url: asset.file_url || asset.url,
+        url: asset.file_url || asset.url,
+        asset_type: asset.asset_type || 'image',
+        text_content: asset.text_content,
+        x: asset.x ?? 0,
+        y: asset.y ?? 0,
+        width: asset.width || 40,
+        height: asset.height || 40,
+        opacity: asset.opacity ?? 1,
+        is_visible: asset.is_visible !== false,
+        is_background: asset.is_background || false,
+        object_fit: asset.is_background ? 'cover' : (asset.object_fit || 'contain'),
+        z_index: asset.z_index ?? index,
+        rotation: asset.rotation ?? 0,
+        scale: asset.scale ?? 1,
+        border_width: asset.border_width ?? 0,
+        border_style: asset.border_style || 'solid',
+        border_color: asset.border_color || 'transparent',
+        border_radius_tl: asset.border_radius_tl ?? 0,
+        border_radius_tr: asset.border_radius_tr ?? 0,
+        border_radius_bl: asset.border_radius_bl ?? 0,
+        border_radius_br: asset.border_radius_br ?? 0,
+      }));
     },
     
     // Get element type name for display
@@ -1025,56 +1028,58 @@ export default {
       }
     },
     
-    // تغيير نوع التخطيط للويدجت المختار
+    // تغيير نوع التخطيط للويدجت المختار - لا يغير مواقع/أحجام الأبناء تلقائياً
     setWidgetLayout(mode) {
       if (!this.selectedWidgetData) return;
       this.selectedWidgetData.layout_mode = mode;
       this.hasUnsavedChanges = true;
-      this.repositionChildrenByLayout(this.selectedWidgetData);
+      // لا نستدعي repositionChildrenByLayout تلقائياً للحفاظ على الأحجام والمواقع
       this.saveToHistory();
     },
     
-    // تغيير وضع التمرير (يدوي/تلقائي)
+    // تغيير وضع التمرير (يدوي لانهائي/تلقائي)
     setScrollMode(mode) {
       if (!this.selectedWidgetData) return;
-      this.selectedWidgetData.infinite_scroll = (mode === 'auto');
+      this.selectedWidgetData.auto_scroll = (mode === 'auto');
+      // التمرير دائماً لانهائي (يدوي أو تلقائي)
+      this.selectedWidgetData.infinite_scroll = true;
       this.hasUnsavedChanges = true;
       this.saveToHistory();
     },
     
-    // عند تغيير إعدادات الويدجت
+    // عند تغيير إعدادات الويدجت - لا يغير أحجام الأبناء تلقائياً
     onWidgetSettingChange() {
       if (!this.selectedWidgetData) return;
       this.hasUnsavedChanges = true;
-      if (this.selectedWidgetData.layout_mode !== 'absolute') {
-        this.repositionChildrenByLayout(this.selectedWidgetData);
-      }
+      // لا نستدعي repositionChildrenByLayout تلقائياً - المستخدم يضغط الزر يدوياً إذا أراد
       this.saveToHistory();
     },
     
-    // إعادة ترتيب الأبناء حسب نوع التخطيط
+    // إعادة ترتيب الأبناء حسب نوع التخطيط - يغير المواقع فقط ويحافظ على الأحجام
     repositionChildrenByLayout(widget) {
       if (!widget || !widget.children || widget.children.length === 0) return;
       
       const padding = widget.layout_padding || 8;
       const gap = widget.layout_gap || 8;
-      const childWidth = widget.child_width || 80;
-      const childHeight = widget.child_height || 100;
       
       widget.children.forEach((child, index) => {
+        // استخدام حجم الطفل الحالي أو الافتراضي من الويدجت
+        const childWidth = child.width || widget.child_width || 80;
+        const childHeight = child.height || widget.child_height || 100;
+        
         if (widget.layout_mode === 'horizontal') {
           child.x = padding + index * (childWidth + gap);
           child.y = padding;
-          child.width = childWidth;
-          child.height = childHeight;
+          // لا نغير الحجم - نحافظ على الحجم المحفوظ
         } else if (widget.layout_mode === 'vertical') {
           child.x = padding;
           child.y = padding + index * (childHeight + gap);
-          child.width = childWidth;
-          child.height = childHeight;
+          // لا نغير الحجم - نحافظ على الحجم المحفوظ
         }
         // للتخطيط المطلق لا نغير المواقع
       });
+      
+      this.hasUnsavedChanges = true;
     },
     
     selectPlacedWidget(widget) {
@@ -1172,11 +1177,14 @@ export default {
       const isVisible = child.is_visible !== false;
       
       if (isLayoutMode) {
+        // أولوية لحجم الطفل الفردي، ثم الحجم الافتراضي للويدجت
+        const childWidth = child.width || widget.child_width || 80;
+        const childHeight = child.height || widget.child_height || 80;
         return {
-          width: (widget.child_width || child.width || 80) * this.zoom + 'px',
-          height: (widget.child_height || child.height || 80) * this.zoom + 'px',
-          minWidth: (widget.child_width || child.width || 80) * this.zoom + 'px',
-          minHeight: (widget.child_height || child.height || 80) * this.zoom + 'px',
+          width: childWidth * this.zoom + 'px',
+          height: childHeight * this.zoom + 'px',
+          minWidth: childWidth * this.zoom + 'px',
+          minHeight: childHeight * this.zoom + 'px',
           flexShrink: 0,
           opacity: child.opacity ?? 1,
           position: 'relative',
@@ -1245,6 +1253,34 @@ export default {
       // Allow natural scrolling in horizontal/vertical layout
       if (widget.layout_mode === 'absolute') {
         e.preventDefault();
+        return;
+      }
+      
+      // التمرير اليدوي اللانهائي
+      if (widget.infinite_scroll && !widget.auto_scroll) {
+        const track = e.currentTarget.querySelector('.infinite-scroll-track');
+        if (track) {
+          // الحصول على الإزاحة الحالية
+          const currentTransform = track.style.transform || 'translateX(0px)';
+          const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)px\)/);
+          let currentX = match ? parseFloat(match[1]) : 0;
+          
+          // تطبيق حركة السكرول
+          currentX -= e.deltaY || e.deltaX;
+          
+          // حساب عرض نصف المحتوى (المحتوى الأصلي)
+          const halfWidth = track.scrollWidth / 2;
+          
+          // إعادة الإزاحة عند الوصول للنهاية (loop)
+          if (currentX < -halfWidth) {
+            currentX += halfWidth;
+          } else if (currentX > 0) {
+            currentX -= halfWidth;
+          }
+          
+          track.style.transform = `translateX(${currentX}px)`;
+          e.preventDefault();
+        }
       }
     },
     
@@ -1959,35 +1995,39 @@ export default {
     setAssetAsBackground() {
       if (this.selectedElementType !== 'asset' || !this.selectedElement) return;
       
-      // Find the parent child and the asset
-      for (const child of this.placedChildren) {
-        const assetIndex = (child.assets || []).findIndex(a => a.id === this.selectedAssetId);
-        if (assetIndex !== -1) {
-          const asset = child.assets[assetIndex];
-          
-          if (asset.is_background) {
-            // Make asset fill the child
-            asset.x = 0;
-            asset.y = 0;
-            asset.width = child.width;
-            asset.height = child.height;
-            asset.z_index = 0; // Put at bottom (0 is the lowest valid value)
+      // Find the parent child and the asset within placedWidgets
+      for (const widget of this.placedWidgets) {
+        for (const child of widget.children || []) {
+          const assetIndex = (child.assets || []).findIndex(a => a.id === this.selectedAssetId);
+          if (assetIndex !== -1) {
+            const asset = child.assets[assetIndex];
             
-            // Increase z_index of all other assets so they appear on top
-            child.assets.forEach((a, idx) => {
-              if (idx !== assetIndex && (a.z_index || 0) <= 0) {
-                a.z_index = (a.z_index || 0) + 1;
-              }
-            });
-          } else {
-            // Reset to normal z_index
-            asset.z_index = assetIndex;
+            if (asset.is_background) {
+              // Make asset fill the child completely
+              asset.x = 0;
+              asset.y = 0;
+              asset.width = child.width;
+              asset.height = child.height;
+              asset.z_index = -1; // Put at bottom (behind everything)
+              asset.object_fit = 'cover'; // Fill without gaps
+              
+              // Increase z_index of all other assets so they appear on top
+              child.assets.forEach((a, idx) => {
+                if (idx !== assetIndex && (a.z_index || 0) <= 0) {
+                  a.z_index = Math.max(1, (a.z_index || 0) + 1);
+                }
+              });
+            } else {
+              // Reset to normal
+              asset.z_index = assetIndex;
+              asset.object_fit = 'contain';
+            }
+            
+            this.hasUnsavedChanges = true;
+            this.saveToHistory();
+            this.autoSave();
+            return;
           }
-          
-          this.hasUnsavedChanges = true;
-          this.saveToHistory();
-          this.autoSave();
-          return;
         }
       }
     },
@@ -2032,6 +2072,7 @@ export default {
         borderWidth: (asset.border_width || 0) + 'px',
         borderStyle: asset.border_style || 'solid',
         borderColor: asset.border_color || 'transparent',
+        '--asset-object-fit': asset.is_background ? 'cover' : (asset.object_fit || 'contain'),
       };
     },
     
@@ -2320,6 +2361,8 @@ export default {
                 border_radius_bl: asset.border_radius_bl,
                 border_radius_br: asset.border_radius_br,
                 is_visible: asset.is_visible,
+                is_background: asset.is_background || false,
+                object_fit: asset.object_fit || 'contain',
               }))
             }))
           })),
@@ -2367,6 +2410,8 @@ export default {
               border_radius_bl: asset.border_radius_bl,
               border_radius_br: asset.border_radius_br,
               is_visible: asset.is_visible,
+              is_background: asset.is_background || false,
+              object_fit: asset.object_fit || 'contain',
             }))
           }))
         };
@@ -2429,6 +2474,8 @@ export default {
                 rotation: asset.rotation ?? 0,
                 scale: asset.scale ?? 1,
                 is_visible: asset.is_visible !== false,
+                is_background: asset.is_background || false,
+                object_fit: asset.object_fit || 'contain',
                 border_width: asset.border_width ?? 0,
                 border_style: asset.border_style || 'solid',
                 border_color: asset.border_color || 'transparent',
@@ -2440,11 +2487,36 @@ export default {
             })),
           }));
           try {
-            await configurationsApi.update(this.configurationId, {
-              widget_overrides: widgetsOverride,
-              screen_width: this.screenWidth,
-              screen_height: this.screenHeight,
-            });
+            // Save widget overrides via the correct endpoint
+            const overridesPayload = widgetsOverride.map(widget => ({
+              screen_widget_id: widget.widget_id,
+              screen_id: null, // Will be filled by controller
+              is_visible: true,
+              display_order: widget.z_index ?? 0,
+              selected_theme_id: widget.theme_id || this.selectedThemeId,
+              settings: {
+                theme_id: widget.theme_id || this.selectedThemeId,
+                x: widget.x,
+                y: widget.y,
+                width: widget.width,
+                height: widget.height,
+                layout_mode: widget.layout_mode,
+                layout_gap: widget.layout_gap,
+                layout_padding: widget.layout_padding,
+                layout_item_width: widget.layout_item_width,
+                layout_item_height: widget.layout_item_height,
+                child_width: widget.child_width,
+                child_height: widget.child_height,
+                infinite_scroll: widget.infinite_scroll,
+                scroll_speed: widget.scroll_speed,
+                z_index: widget.z_index,
+                opacity: widget.opacity,
+                background_color: widget.background_color,
+                border_radius: widget.border_radius,
+                children: widget.children,
+              }
+            }));
+            await configurationsApi.updateWidgetOverrides(this.configurationId, overridesPayload);
           } catch (e) {
             console.error('خطأ في حفظ التعديلات في الكونفيج المختار', e);
           }
@@ -2935,13 +3007,22 @@ export default {
 .infinite-scroll-track {
   display: flex;
   gap: inherit;
-  animation: infinite-scroll-slide linear infinite;
-  animation-duration: var(--scroll-duration, 15s);
   width: max-content;
 }
 
-.infinite-scroll-track:hover {
+/* التمرير التلقائي - حركة مستمرة */
+.infinite-scroll-track.auto-scroll {
+  animation: infinite-scroll-slide linear infinite;
+  animation-duration: var(--scroll-duration, 15s);
+}
+
+.infinite-scroll-track.auto-scroll:hover {
   animation-play-state: paused;
+}
+
+/* التمرير اليدوي - بدون حركة تلقائية */
+.infinite-scroll-track.manual-scroll {
+  animation: none;
 }
 
 @keyframes infinite-scroll {
@@ -3466,7 +3547,7 @@ export default {
 .placed-asset img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: var(--asset-object-fit, contain);
 }
 
 .asset-placeholder-small {

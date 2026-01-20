@@ -30,6 +30,8 @@ class ConfigChildAssetOverride extends Model
         'file_path',
         'config_theme_child_override_id',
         'is_visible',
+        'is_background',
+        'object_fit',
         // Designer fields
         'width',
         'height',
@@ -50,6 +52,7 @@ class ConfigChildAssetOverride extends Model
 
     protected $casts = [
         'is_visible' => 'boolean',
+        'is_background' => 'boolean',
         'width' => 'integer',
         'height' => 'integer',
         'x' => 'integer',
