@@ -41,7 +41,7 @@ class UsersWalletController extends Controller
             'user_id' => 'required|integer|exists:users,id',
             'amount'     => 'required|numeric|min:0.01',
         ]);
-
+       \Log::info('Withdrawal request data:', $request->all());
 
         return $this->handleRequest(function () use ($request) {
             $from = $request->user();
