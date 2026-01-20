@@ -247,6 +247,8 @@ Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
 Route::get('remove-repetition-form-templates', [FormTemplateController::class, 'removeRepetition']);
 Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCutAmount']);
+Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAmount']);
+
 
 
 
