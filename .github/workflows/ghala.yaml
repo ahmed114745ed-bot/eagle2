@@ -4,7 +4,7 @@ on:
     branches: ["ghala"]
 jobs:
   run_ghala_hub:
-    runs-on: [self-hosted] #ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
     - name: print out ghala
       uses: appleboy/ssh-action@v1.2.1
