@@ -2,20 +2,22 @@
 
 namespace App\Admin\Controllers\V2;
 
-use App\Admin\Services\UserService;
-use Encore\Admin\Facades\Admin;
 use Exception;
 use App\Models\User;
 use function request;
 use App\Models\Agency;
 use Encore\Admin\Grid;
+use App\Helpers\Common;
 use App\Models\SalaryTrx;
+use App\Models\UserSallary;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Services\UserService;
 use App\Admin\Actions\SalariesAction;
 use App\Admin\Actions\PaySalariesAction;
 use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
+use Modules\UsersWallet\Entities\UserWallet;
 
 class SalariesController extends MainController
 {
