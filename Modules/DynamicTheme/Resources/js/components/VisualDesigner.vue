@@ -3714,6 +3714,13 @@ export default {
   padding: 4px;
 }
 
+/* Text assets should not have yellow background */
+.text-asset .asset-placeholder-small,
+.text-asset .text-asset-content {
+  background: transparent;
+  color: inherit;
+}
+
 /* Resize Handles */
 .resize-handles {
   position: absolute;
