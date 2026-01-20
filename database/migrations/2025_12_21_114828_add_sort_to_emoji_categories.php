@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('emoji_categories', function (Blueprint $table) {
-           $table->bigInteger('sort')->default(0);
-        });
+        if (!Schema::hasColumn('emoji_categories', 'sort')) {
+            Schema::table('emoji_categories', function (Blueprint $table) {
+               $table->bigInteger('sort')->default(0);
+            });
+        }
     }
 
     /**
