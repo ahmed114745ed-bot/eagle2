@@ -240,6 +240,7 @@ class SalariesController extends MainController
     {
         $counter = 0;
         $usersId = [];
+        $amount = 0 ;
 
         UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId) {
             foreach ($usersWallets as $wallet) {
@@ -248,6 +249,7 @@ class SalariesController extends MainController
                     ->sum('cut_amount');
 
                 if ($wallet->cut_amount != $totalCutAmount) {
+                    $amount += abs($wallet->cut_amount - $totalCutAmount);
                     $counter++;
                     $usersId[] = $wallet->user_id;
                 }
