@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ranking_ranges', function (Blueprint $table) {
-           $table->string('generate_image')->nullable();
-        });
+        if (!Schema::hasColumn('ranking_ranges', 'generate_image')) {
+            Schema::table('ranking_ranges', function (Blueprint $table) {
+               $table->string('generate_image')->nullable();
+            });
+        }
     }
 
     /**

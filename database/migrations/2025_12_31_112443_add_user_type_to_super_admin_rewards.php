@@ -12,13 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         // 1️⃣ Modify table FIRST
-        Schema::table('super_admin_rewards', function (Blueprint $table) {
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->string('user_type')->default('super_admin');
-        });
+        if (Schema::hasTable('super_admin_rewards')) {
+            if (!Schema::hasColumn('super_admin_rewards', 'created_by')) {
+                Schema::table('super_admin_rewards', function (Blueprint $table) {
+                    $table->unsignedBigInteger('created_by')->nullable();
+                });
+            }
+            if (!Schema::hasColumn('super_admin_rewards', 'user_type')) {
+                Schema::table('super_admin_rewards', function (Blueprint $table) {
+                    $table->string('user_type')->default('super_admin');
+                });
+            }
 
-        // 2️⃣ THEN rename it
-        Schema::rename('super_admin_rewards', 'admin_rewards');
+            // 2️⃣ THEN rename it
+            if (!Schema::hasTable('admin_rewards')) {
+                Schema::rename('super_admin_rewards', 'admin_rewards');
+            }
+        }
     }
 
     public function down(): void
