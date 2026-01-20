@@ -242,7 +242,7 @@ class SalariesController extends MainController
         $usersId = [];
         $amount = 0 ;
 
-        UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId) {
+        UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId,&$amount) {
             foreach ($usersWallets as $wallet) {
 
                 $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
@@ -259,6 +259,7 @@ class SalariesController extends MainController
         return response()->json([
             'counter_user' => $counter,
             'users_id'     => $usersId,
+            'amount'       => $amount,
         ]);
     }
 }
