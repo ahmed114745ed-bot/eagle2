@@ -13,12 +13,14 @@ class CreateRankingTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('ranking_types', function (Blueprint $table) {
-            $table->id();
-            $table->string('type');
-            $table->enum('schedule', ['daily', 'weekly', 'monthly']);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ranking_types')) {
+            Schema::create('ranking_types', function (Blueprint $table) {
+                $table->id();
+                $table->string('type');
+                $table->enum('schedule', ['daily', 'weekly', 'monthly']);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
