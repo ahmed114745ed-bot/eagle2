@@ -999,6 +999,8 @@ export default {
       const themeChildren = theme?.children || [];
       const savedChildrenMap = new Map();
       
+      console.log('🎨 [buildWidgetChildren] savedChildren:', savedChildren);
+      
       // Create a map of saved children by theme_child_id
       (savedChildren || []).forEach(child => {
         savedChildrenMap.set(child.theme_child_id, child);

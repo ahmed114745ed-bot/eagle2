@@ -17,7 +17,7 @@
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
-    "file": "assets/app-D82ksODW.js",
+    "file": "assets/app-CqDeeNEA.js",
     "name": "app",
     "src": "Modules/DynamicTheme/Resources/js/app.js",
     "isEntry": true,
@@ -25,7 +25,7 @@
       "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
-      "assets/app-PS6Qpo2S.css"
+      "assets/app-BHXu-sM6.css"
     ]
   },
   "_NotificationToast-!~{004}~.js": {

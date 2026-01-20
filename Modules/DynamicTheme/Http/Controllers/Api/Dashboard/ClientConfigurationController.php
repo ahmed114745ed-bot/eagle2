@@ -369,6 +369,13 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
             $childSettingsMap = collect(data_get($rawWidgetData, 'settings.children', []))
                 ->keyBy(fn($c) => (string) ($c['theme_child_id'] ?? ''));
             
+            \Log::info('Widget Processing', [
+                'widget_override_id' => $configWidgetOverride->id,
+                'screen_widget_id' => $widgetData['screen_widget_id'],
+                'theme_id' => $themeId,
+                'children_in_payload' => $childSettingsMap->count(),
+            ]);
+            
             $childVisibilities = $childSettingsMap
                 ->map(fn($c) => array_key_exists('is_visible', $c) ? (bool)$c['is_visible'] : null);
 
@@ -411,6 +418,14 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
 
                 // Get saved child settings from payload if available
                 $savedChildSettings = $childSettingsMap->get((string) $child->id, []);
+                
+                \Log::info('Child Settings Debug', [
+                    'child_id' => $child->id,
+                    'found_settings' => !empty($savedChildSettings),
+                    'background_color' => data_get($savedChildSettings, 'background_color'),
+                    'border_radius_tl' => data_get($savedChildSettings, 'border_radius_tl'),
+                    'childSettingsMap_keys' => $childSettingsMap->keys()->all(),
+                ]);
 
                 // إنشاء أو تحديث Child Override مع الحفاظ على حالة الإظهار السابقة
                 $configThemeChildOverride = ConfigThemeChildOverride::updateOrCreate(
@@ -443,6 +458,14 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                         'border_radius_br' => data_get($savedChildSettings, 'border_radius_br', 0),
                     ]
                 );
+                
+                // Debug: Log after save
+                \Log::info('After Save Debug', [
+                    'child_id' => $child->id,
+                    'saved_border_radius_tl' => $configThemeChildOverride->border_radius_tl,
+                    'saved_background_color' => $configThemeChildOverride->background_color,
+                    'was_recently_created' => $configThemeChildOverride->wasRecentlyCreated,
+                ]);
 
                 // 4️⃣ استرجاع Assets الخاصة بالـ Child وإنشاؤها
                 $configThemeChildOverride->assetOverrides()->delete();
