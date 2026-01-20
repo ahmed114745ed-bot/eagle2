@@ -56,13 +56,13 @@
 
         // تحقق من اللغة
         const isRTL = htmlLang.startsWith('ar') ||
-                      htmlLang.startsWith('he') ||
-                      htmlLang.startsWith('fa') ||
-                      browserLang.startsWith('ar') ||
-                      browserLang.startsWith('he') ||
-                      browserLang.startsWith('fa') ||
-                      // تحقق من محتوى النصوص في الصفحة
-                      checkPageTextDirection();
+            htmlLang.startsWith('he') ||
+            htmlLang.startsWith('fa') ||
+            browserLang.startsWith('ar') ||
+            browserLang.startsWith('he') ||
+            browserLang.startsWith('fa') ||
+            // تحقق من محتوى النصوص في الصفحة
+            checkPageTextDirection();
 
         if (isRTL) {
             document.documentElement.setAttribute('dir', 'rtl');
@@ -293,7 +293,7 @@
             },
             error: function(xhr) {
                 const message = xhr.responseJSON?.message || xhr.statusText || 'Unknown error';
-                showError((texts.failedLoad || 'Failed to load Moments') + ': ' + message);
+                showError((texts.failedLoad || 'Failed to load moments') + ': ' + message);
             },
             complete: function() {
                 isLoading = false;
@@ -310,7 +310,7 @@
                     <div class="empty-state">
                         <i class="fas fa-photo-video"></i>
                         <h3>${texts.noMoments || 'No Moments Found'}</h3>
-                        <p>${texts.noMomentsMsg || 'There are no Moments to display'}</p>
+                        <p>${texts.noMomentsMsg || 'There are no moments to display'}</p>
                         ${(searchQuery || userIdFilter) ? `
                             <button class="refresh-btn" onclick="clearFilters()" style="margin-top: 20px;">
                                 <i class="fas fa-times"></i> ${texts.clearSearch || 'Clear Filters'}
@@ -434,7 +434,7 @@
                         <button class="menu-btn" onclick="toggleMenu(${moment.id}, event)">
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
-                        <div class="dropdown-menu" id="menu-${moment.id}">
+                        <div class="dropdown-menu different" id="menu-${moment.id}">
                             <button class="dropdown-item" onclick="editMoment(${moment.id}, event)">
                                 <i class="fas fa-edit"></i>
                                 <span>${texts.editDesc || 'Edit Description'}</span>
@@ -539,10 +539,10 @@
             mediaHtml += `
                 <div class="media-item" data-index="${index}" onclick="openMediaLightbox(${momentId}, ${index}, event)">
                     ${isVideo ?
-                        `<video src="${mediaPath}" preload="metadata"></video>` :
-                        `<img src="${mediaPath}" alt="Moment" loading="lazy"
+                `<video src="${mediaPath}" preload="metadata"></video>` :
+                `<img src="${mediaPath}" alt="Moment" loading="lazy"
                              onerror="this.style.display='none'">`
-                    }
+            }
                     ${index === 4 && count > 5 ? `<div class="media-overlay">+${count - 5}</div>` : ''}
                 </div>
             `;
@@ -736,8 +736,8 @@
         const title = type === 'comments'
             ? (texts.comments || 'Comments')
             : type === 'gifts'
-            ? (texts.gifts || 'Gifts')
-            : (texts.likes || 'Likes');
+                ? (texts.gifts || 'Gifts')
+                : (texts.likes || 'Likes');
 
         modal.find('.side-modal-title').text(title);
         modal.find('.side-modal-body').html('<div class="loading-container"><div class="spinner"></div></div>');
@@ -812,14 +812,14 @@
                             html += `
                                 <div class="modal-user-item">
                                     <div class="modal-user-header" onclick="window.open('${userUrl}', '_blank')">
+                                      <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                         <img src="${avatar}" alt="${escapeHtml(userName)}" class="modal-user-avatar" loading="lazy">
                                         <div class="modal-user-info">
                                             <div class="modal-user-name">${escapeHtml(userName)}</div>
                                             <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
                                         </div>
-                                        <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
                                     <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>
@@ -1448,4 +1448,137 @@
 
     window.loadMoments = loadMoments;
 
+    // Users List Variables
+    let usersPage = 1, usersLastPage = 1, usersSearch = '', selectedUserId = null, usersLoading = false;
+
+    async function loadUsers(reset = false) {
+        if (usersLoading) return;
+        usersLoading = true;
+
+        const container = document.getElementById('usersListContainer');
+        const loadMoreBtn = document.getElementById('loadMoreUsersBtn');
+
+        if (reset) {
+            usersPage = 1;
+            container.innerHTML = '<div class="loading-container"><div class="spinner"></div></div>';
+        } else {
+            document.getElementById('usersLoadingMore')?.classList.add('visible');
+        }
+
+        try {
+            const res = await fetch(`${MomentViewerConfig.routes.usersWithMoments}?page=${usersPage}&search=${encodeURIComponent(usersSearch)}`);
+            const data = await res.json();
+
+            if (data.success) {
+                if (reset) container.innerHTML = '';
+                document.getElementById('usersTotalCount').textContent = `(${data.pagination.total})`;
+                usersLastPage = data.pagination.last_page;
+
+                data.data.forEach(user => {
+                    const avatar = user.profile?.avatar
+                        ? `${MomentViewerConfig.storageUrl}/${user.profile.avatar}`
+                        : MomentViewerConfig.defaultAvatar;
+                    container.innerHTML += `
+                    <div class="user-list-item ${selectedUserId == user.id ? 'active' : ''}"
+                         data-user-id="${user.id}"
+                         onclick="selectUser(${user.id})">
+                        <img src="${avatar}" class="user-list-avatar" onerror="this.src='${MomentViewerConfig.defaultAvatar}'">
+                        <div class="user-list-info">
+                            <div class="user-list-name">${user.name}</div>
+                            <div class="user-list-meta">ID: ${user.id} • ${user.uuid}</div>
+                        </div>
+                        <span class="user-list-count">${user.moments_count}</span>
+                    </div>`;
+                });
+
+                if (loadMoreBtn) {
+                    loadMoreBtn.parentElement.style.display = usersPage < usersLastPage ? 'block' : 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        } finally {
+            usersLoading = false;
+            document.getElementById('usersLoadingMore')?.classList.remove('visible');
+        }
+    }
+
+// ✅ Fixed selectUser function
+    window.selectUser = function(userId) {
+        selectedUserId = userId;
+
+        // Update both DOM and JavaScript variable
+        document.getElementById('userIdFilter').value = userId;
+        userIdFilter = String(userId);  // Update the global variable
+
+        document.getElementById('usersFilterInfo').classList.add('visible');
+
+        // Update active state
+        document.querySelectorAll('.user-list-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.userId == userId);
+        });
+
+        // Reset and reload moments
+        currentPage = 1;
+        allMomentsLoaded = [];
+        currentlyVisibleCount = 0;
+        searchQuery = ''; // Clear search when filtering by user
+        document.getElementById('userSearch').value = '';
+
+        loadMoments(false);
+    };
+
+// ✅ Fixed clearFilter function
+    window.clearUserFilter = function() {
+        selectedUserId = null;
+        userIdFilter = '';
+        document.getElementById('userIdFilter').value = '';
+        document.getElementById('usersFilterInfo').classList.remove('visible');
+        document.querySelectorAll('.user-list-item').forEach(el => el.classList.remove('active'));
+
+        currentPage = 1;
+        allMomentsLoaded = [];
+        currentlyVisibleCount = 0;
+
+        loadMoments(false);
+    };
+
+// Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        loadUsers(true);
+
+        // Scroll handler for infinite scroll
+        const usersContainer = document.getElementById('usersListContainer');
+        if (usersContainer) {
+            usersContainer.addEventListener('scroll', function() {
+                const distanceFromBottom = this.scrollHeight - (this.scrollTop + this.clientHeight);
+                if (distanceFromBottom < 100 && !usersLoading && usersPage < usersLastPage) {
+                    usersPage++;
+                    loadUsers(false);
+                }
+            });
+        }
+
+        // Load more button click
+        document.getElementById('loadMoreUsersBtn')?.addEventListener('click', () => {
+            if (!usersLoading && usersPage < usersLastPage) {
+                usersPage++;
+                loadUsers(false);
+            }
+        });
+
+        // Clear filter button
+        document.getElementById('clearFilterBtn')?.addEventListener('click', clearUserFilter);
+
+        // Users search
+        document.getElementById('usersListSearch')?.addEventListener('input', e => {
+            clearTimeout(window.usersSearchTimeout);
+            window.usersSearchTimeout = setTimeout(() => {
+                usersSearch = e.target.value;
+                loadUsers(true);
+            }, 500);
+        });
+    });
+
 })(jQuery);
+

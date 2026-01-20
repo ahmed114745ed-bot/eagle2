@@ -49,6 +49,7 @@ Route::group(
             Route::get('/', [MomentViewerController::class, 'index'])->name('index');
             Route::get('/viewer.css', [MomentViewerController::class, 'getViewerCss'])->name('viewer-css');
             Route::get('/api/Moments', [MomentViewerController::class, 'getMoments'])->name('api.Moments');
+            Route::get('/api/users-with-moments', [MomentViewerController::class, 'getUsersWithMoments'])->name('api.users-with-moments');
             Route::get('/api/moment/{id}', [MomentViewerController::class, 'getMoment'])->name('api.moment');
             Route::get('/api/moment/{id}/likes', [MomentViewerController::class, 'getLikes'])->name('api.likes');
             Route::get('/api/moment/{id}/comments', [MomentViewerController::class, 'getComments'])->name('api.comments');
