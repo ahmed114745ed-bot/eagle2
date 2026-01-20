@@ -198,4 +198,41 @@ class SalariesController extends MainController
     }
 
 
+     public function updateUserCutAmount()
+    {
+        UserWallet::with('user')->chunk(100, function ($usersWallets) {
+            foreach ($usersWallets as $wallet) {
+                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
+                    ->sum('cut_amount');
+
+                $cutAmount = $wallet->cut_amount - $totalCutAmount;
+                $UserSalary = UserSallary::where('user_id', $wallet->user_id)->where([
+                    'month' => now()->format('m'),
+                    'year' => now()->format('Y'),
+                    'is_finished' => 0
+                ])->first();
+                if ($UserSalary) {
+                    $UserSalary->cut_amount += $cutAmount;
+                    $UserSalary->save();
+                } else {
+                    UserSallary::create([
+                        'user_id' => $wallet->user_id,
+                        'sallary' => 0,
+                        'cut_amount' => $cutAmount,
+                        'month' => now()->format('m'),
+                        'year' => now()->format('Y'),
+                        'user_agency_id' => $wallet->user->agency_id ?? 0,
+                        'is_finished' => 0
+                    ]);
+                }
+            }
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User cut amounts updated successfully.'
+        ]);
+    } 
+
+
 }
