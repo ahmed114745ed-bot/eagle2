@@ -221,6 +221,14 @@ Route::get('/clear_clear', function () {
     return "Cleared!";
 });
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
+Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
+Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
+Route::get('remove-repetition-form-templates', [FormTemplateController::class, 'removeRepetition']);
+Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCutAmount']);
+Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAmount']);
+
+
+
 
 Route::get('/seed', function () {
 

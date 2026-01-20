@@ -234,7 +234,29 @@ class SalariesController extends MainController
             'status' => 'success',
             'message' => 'User cut amounts updated successfully.'
         ]);
-    } 
+    }
 
+    public function countUserCutAmount()
+    {
+        $counter = 0;
+        $usersId = [];
 
+        UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId) {
+            foreach ($usersWallets as $wallet) {
+
+                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
+                    ->sum('cut_amount');
+
+                if ($wallet->cut_amount != $totalCutAmount) {
+                    $counter++;
+                    $usersId[] = $wallet->user_id;
+                }
+            }
+        });
+
+        return response()->json([
+            'counter_user' => $counter,
+            'users_id'     => $usersId,
+        ]);
+    }
 }
