@@ -411,8 +411,13 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
 
                 // Get saved child settings from payload if available
                 $savedChildSettings = $childSettingsMap->get((string) $child->id, []);
+                
+                // Get existing override to preserve values not in payload
+                $existingOverride = ConfigThemeChildOverride::where('configuration_id', $configuration->id)
+                    ->where('theme_child_id', $child->id)
+                    ->first();
 
-                // إنشاء أو تحديث Child Override مع الحفاظ على حالة الإظهار السابقة
+                // إنشاء أو تحديث Child Override مع الحفاظ على القيم السابقة
                 $configThemeChildOverride = ConfigThemeChildOverride::updateOrCreate(
                     [
                         'configuration_id' => $configuration->id,
@@ -424,23 +429,23 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                         'order' => $child->order,
                         'action' => $child->action,
                         'position' => $child->position,
-                        // Visual Designer layout fields for children
-                        'width' => data_get($savedChildSettings, 'width', $child->width),
-                        'height' => data_get($savedChildSettings, 'height', $child->height),
-                        'x' => data_get($savedChildSettings, 'x', $child->x ?? 0),
-                        'y' => data_get($savedChildSettings, 'y', $child->y ?? 0),
-                        'rotation' => data_get($savedChildSettings, 'rotation', 0),
-                        'scale' => data_get($savedChildSettings, 'scale', 1),
-                        'opacity' => data_get($savedChildSettings, 'opacity', 1),
-                        'z_index' => data_get($savedChildSettings, 'z_index', 0),
-                        'background_color' => data_get($savedChildSettings, 'background_color'),
-                        'border_width' => data_get($savedChildSettings, 'border_width', 0),
-                        'border_style' => data_get($savedChildSettings, 'border_style'),
-                        'border_color' => data_get($savedChildSettings, 'border_color'),
-                        'border_radius_tl' => data_get($savedChildSettings, 'border_radius_tl', 0),
-                        'border_radius_tr' => data_get($savedChildSettings, 'border_radius_tr', 0),
-                        'border_radius_bl' => data_get($savedChildSettings, 'border_radius_bl', 0),
-                        'border_radius_br' => data_get($savedChildSettings, 'border_radius_br', 0),
+                        // Visual Designer layout fields for children - preserve existing values if not in payload
+                        'width' => data_get($savedChildSettings, 'width') ?? $existingOverride?->width ?? $child->width,
+                        'height' => data_get($savedChildSettings, 'height') ?? $existingOverride?->height ?? $child->height,
+                        'x' => data_get($savedChildSettings, 'x') ?? $existingOverride?->x ?? $child->x ?? 0,
+                        'y' => data_get($savedChildSettings, 'y') ?? $existingOverride?->y ?? $child->y ?? 0,
+                        'rotation' => data_get($savedChildSettings, 'rotation') ?? $existingOverride?->rotation ?? 0,
+                        'scale' => data_get($savedChildSettings, 'scale') ?? $existingOverride?->scale ?? 1,
+                        'opacity' => data_get($savedChildSettings, 'opacity') ?? $existingOverride?->opacity ?? 1,
+                        'z_index' => data_get($savedChildSettings, 'z_index') ?? $existingOverride?->z_index ?? 0,
+                        'background_color' => data_get($savedChildSettings, 'background_color') ?? $existingOverride?->background_color,
+                        'border_width' => data_get($savedChildSettings, 'border_width') ?? $existingOverride?->border_width ?? 0,
+                        'border_style' => data_get($savedChildSettings, 'border_style') ?? $existingOverride?->border_style,
+                        'border_color' => data_get($savedChildSettings, 'border_color') ?? $existingOverride?->border_color,
+                        'border_radius_tl' => data_get($savedChildSettings, 'border_radius_tl') ?? $existingOverride?->border_radius_tl ?? 0,
+                        'border_radius_tr' => data_get($savedChildSettings, 'border_radius_tr') ?? $existingOverride?->border_radius_tr ?? 0,
+                        'border_radius_bl' => data_get($savedChildSettings, 'border_radius_bl') ?? $existingOverride?->border_radius_bl ?? 0,
+                        'border_radius_br' => data_get($savedChildSettings, 'border_radius_br') ?? $existingOverride?->border_radius_br ?? 0,
                     ]
                 );
 

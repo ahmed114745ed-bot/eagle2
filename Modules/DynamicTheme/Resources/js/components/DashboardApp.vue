@@ -666,12 +666,6 @@ export default {
             try {
                 const response = await configurationsApi.get(configId);
                 const data = response.data?.data || response.data || {};
-                
-                console.log('📦 [loadConfigurationDetails] Raw API data:', data);
-                console.log('📦 [loadConfigurationDetails] widget_overrides:', data.widget_overrides);
-                if (data.widget_overrides && data.widget_overrides[0]) {
-                    console.log('📦 [loadConfigurationDetails] First widget theme_child_overrides:', data.widget_overrides[0].theme_child_overrides);
-                }
 
                 ensureConfigOverrides(configId);
                 overridesMap.value[configId].screen_overrides = data.screen_overrides || data.screenOverrides || [];

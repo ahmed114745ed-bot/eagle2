@@ -950,8 +950,6 @@ export default {
       // Load placed widgets from configuration or create default positions
       this.placedWidgets = this.availableWidgets.map((widget, index) => {
         const settings = widget.settings || {};
-        console.log('🎨 [VisualDesigner] Widget settings for', widget.id, ':', settings);
-        console.log('🎨 [VisualDesigner] settings.children:', settings.children);
         const themeId = settings.theme_id || widget.selected_theme_id || widget.widget_theme_id;
         const theme = this.themes.find(t => String(t.id) === String(themeId));
         
@@ -1000,8 +998,6 @@ export default {
     buildWidgetChildren(savedChildren, theme, originalWidget = null) {
       const themeChildren = theme?.children || [];
       const savedChildrenMap = new Map();
-      
-      console.log('🎨 [buildWidgetChildren] savedChildren:', savedChildren);
       
       // Create a map of saved children by theme_child_id
       (savedChildren || []).forEach(child => {
