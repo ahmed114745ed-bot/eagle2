@@ -503,7 +503,7 @@
                 <div v-if="selectedElementType === 'child'" class="property-group">
                   <label>لون الخلفية</label>
                   <div class="color-picker-row">
-                    <input type="color" v-model="selectedElement.background_color" @input="onPropertyChange" class="color-picker" />
+                    <input type="color" :value="getColorValue(selectedElement.background_color)" @input="selectedElement.background_color = $event.target.value; onPropertyChange()" class="color-picker" />
                     <input type="text" v-model="selectedElement.background_color" @change="onPropertyChange" class="property-input flex-1" placeholder="transparent" />
                     <button @click="selectedElement.background_color = 'transparent'; onPropertyChange()" class="clear-btn" title="شفاف">✕</button>
                   </div>
@@ -527,7 +527,7 @@
                   </div>
                   <div class="property-group third">
                     <label>اللون</label>
-                    <input type="color" v-model="selectedElement.border_color" @input="onPropertyChange" class="color-picker full-width" />
+                    <input type="color" :value="getColorValue(selectedElement.border_color)" @input="selectedElement.border_color = $event.target.value; onPropertyChange()" class="color-picker full-width" />
                   </div>
                 </div>
                 
@@ -950,6 +950,8 @@ export default {
       // Load placed widgets from configuration or create default positions
       this.placedWidgets = this.availableWidgets.map((widget, index) => {
         const settings = widget.settings || {};
+        console.log('🎨 [VisualDesigner] Widget settings for', widget.id, ':', settings);
+        console.log('🎨 [VisualDesigner] settings.children:', settings.children);
         const themeId = settings.theme_id || widget.selected_theme_id || widget.widget_theme_id;
         const theme = this.themes.find(t => String(t.id) === String(themeId));
         
@@ -1113,6 +1115,14 @@ export default {
         case 'asset': return 'الأصل';
         default: return 'العنصر';
       }
+    },
+    
+    // Get valid color value for color input (transparent is not valid)
+    getColorValue(color) {
+      if (!color || color === 'transparent' || color === '') {
+        return '#000000';
+      }
+      return color;
     },
     
     // Widget methods

@@ -666,6 +666,12 @@ export default {
             try {
                 const response = await configurationsApi.get(configId);
                 const data = response.data?.data || response.data || {};
+                
+                console.log('📦 [loadConfigurationDetails] Raw API data:', data);
+                console.log('📦 [loadConfigurationDetails] widget_overrides:', data.widget_overrides);
+                if (data.widget_overrides && data.widget_overrides[0]) {
+                    console.log('📦 [loadConfigurationDetails] First widget theme_child_overrides:', data.widget_overrides[0].theme_child_overrides);
+                }
 
                 ensureConfigOverrides(configId);
                 overridesMap.value[configId].screen_overrides = data.screen_overrides || data.screenOverrides || [];
@@ -1533,9 +1539,19 @@ const fillMissingSelectedThemeIds = () => {
                                 rotation: existingOverride?.rotation ?? themeChild.rotation ?? 0,
                                 scale: existingOverride?.scale ?? themeChild.scale ?? 1,
                                 opacity: existingOverride?.opacity ?? themeChild.opacity ?? 1,
+                                z_index: existingOverride?.z_index ?? themeChild.z_index ?? 0,
                                 padding: existingOverride?.padding ?? themeChild.padding ?? '0',
                                 margin: existingOverride?.margin ?? themeChild.margin ?? '0',
                                 gap: existingOverride?.gap ?? themeChild.gap ?? 0,
+                                // Style properties
+                                background_color: existingOverride?.background_color ?? themeChild.background_color ?? 'transparent',
+                                border_width: existingOverride?.border_width ?? themeChild.border_width ?? 0,
+                                border_style: existingOverride?.border_style ?? themeChild.border_style ?? 'solid',
+                                border_color: existingOverride?.border_color ?? themeChild.border_color ?? 'transparent',
+                                border_radius_tl: existingOverride?.border_radius_tl ?? themeChild.border_radius_tl ?? 0,
+                                border_radius_tr: existingOverride?.border_radius_tr ?? themeChild.border_radius_tr ?? 0,
+                                border_radius_bl: existingOverride?.border_radius_bl ?? themeChild.border_radius_bl ?? 0,
+                                border_radius_br: existingOverride?.border_radius_br ?? themeChild.border_radius_br ?? 0,
                                 // Merge assets - keep override values if they exist
                                 assets: assets.map(asset => {
                                     const existingAsset = (existingOverride?.assets || []).find(a => 
@@ -1547,6 +1563,8 @@ const fillMissingSelectedThemeIds = () => {
                                         name: asset.name || asset.asset_label || asset.asset_key,
                                         file_url: asset.file_url || asset.url || asset.default_url,
                                         url: asset.file_url || asset.url || asset.default_url,
+                                        asset_type: asset.asset_type || asset.type || 'image',
+                                        text_content: asset.text_content || asset.text,
                                         width: existingAsset?.width ?? asset.width ?? 80,
                                         height: existingAsset?.height ?? asset.height ?? 80,
                                         x: existingAsset?.x ?? asset.x ?? 0,
@@ -1554,7 +1572,17 @@ const fillMissingSelectedThemeIds = () => {
                                         opacity: existingAsset?.opacity ?? asset.opacity ?? 1,
                                         z_index: existingAsset?.z_index ?? asset.z_index ?? 0,
                                         is_visible: existingAsset?.is_visible ?? asset.is_visible ?? true,
+                                        is_background: existingAsset?.is_background ?? asset.is_background ?? false,
+                                        object_fit: existingAsset?.object_fit ?? asset.object_fit ?? 'contain',
                                         scale: existingAsset?.scale ?? asset.scale ?? 1,
+                                        rotation: existingAsset?.rotation ?? asset.rotation ?? 0,
+                                        border_width: existingAsset?.border_width ?? asset.border_width ?? 0,
+                                        border_style: existingAsset?.border_style ?? asset.border_style ?? 'solid',
+                                        border_color: existingAsset?.border_color ?? asset.border_color ?? 'transparent',
+                                        border_radius_tl: existingAsset?.border_radius_tl ?? asset.border_radius_tl ?? 0,
+                                        border_radius_tr: existingAsset?.border_radius_tr ?? asset.border_radius_tr ?? 0,
+                                        border_radius_bl: existingAsset?.border_radius_bl ?? asset.border_radius_bl ?? 0,
+                                        border_radius_br: existingAsset?.border_radius_br ?? asset.border_radius_br ?? 0,
                                     };
                                 })
                             };
