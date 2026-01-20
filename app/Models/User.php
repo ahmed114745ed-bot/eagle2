@@ -2414,4 +2414,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserWallet::class);
     }
+
+    public function getUserWalletBalanceAttribute()
+    {
+        return $this->userWallet->balance - $this->userWallet->cut_amount - $this->userWallet->pending_amount;
+    }
 }
