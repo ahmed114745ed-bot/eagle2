@@ -38,6 +38,7 @@
 }
 
 .settings-menu button.active {
+        background: #fff !important;
     background-color: #fff;   /* white background */
     color: #000;              /* black text */
     border-radius: 6px;
