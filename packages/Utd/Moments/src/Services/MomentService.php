@@ -155,4 +155,61 @@ class MomentService extends MomentBaseModelService implements MomentContract
 
         $moment->delete();
     }
+
+    /**
+     * Methods merged from MomentsService
+     */
+
+    public function all($id, $perPage, $page)
+    {
+        return $this->momentRepository->all($id, $perPage, $page);
+    }
+
+    public function createFromRequest($request)
+    {
+        if ($request->hasFile('img')) {
+            $img = Common::upload('images', $request->file('img'));
+        }
+        $data = [
+            'user_id' => $request->user_id,
+            'description' => $request->user_id,
+            'img' => $img ?? ''
+        ];
+        $this->momentRepository->create($data);
+        return true;
+    }
+
+    public function updateFromRequest($id, $request)
+    {
+        $data = [
+            'name' => $request->name,
+        ];
+        if ($request->hasFile('img')) {
+            $data['img'] = Common::upload('images', $request->file('img'));
+        }
+        $this->momentRepository->update($data, $id);
+        return true;
+    }
+
+    public function deleteById($id)
+    {
+        $data = $this->momentRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
+
+    public function find($id)
+    {
+        return $this->momentRepository->find($id);
+    }
+
+    public function search($uuid)
+    {
+        return $this->momentRepository->search($uuid);
+    }
+
+    public function getUserMomentsForDashboard($user_id)
+    {
+        return $this->momentRepository->getUserMomentsForDashboard($user_id);
+    }
 }

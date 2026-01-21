@@ -8,17 +8,17 @@ use App\Models\Config;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Utd\Moments\Services\MomentsService;
+use Utd\Moments\Services\MomentService;
 use Utd\Moments\Transformers\MomentDashboardResource;
 use Utd\Moments\Transformers\utd\MomentResource;
 
 class MomentsController extends Controller
 {
-    public function __construct(private MomentsService $MomentsService) {}
+    public function __construct(private MomentService $momentService) {}
 
     public function all(Request $request)
     {
-        $data = $this->MomentsService->all($request->id, $request->per_page, $request->page);
+        $data = $this->momentService->all($request->id, $request->per_page, $request->page);
 
         return Common::apiResponse(true, 'done', MomentResource::collection($data) );
     }
@@ -38,7 +38,7 @@ class MomentsController extends Controller
 
 
         try {
-            $this->MomentsService->create($request);
+            $this->momentService->createFromRequest($request);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -59,7 +59,7 @@ class MomentsController extends Controller
         }
 
         try {
-            $this->MomentsService->update($id, $request);
+            $this->momentService->updateFromRequest($id, $request);
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -69,7 +69,7 @@ class MomentsController extends Controller
 
     public function show($id)
     {
-        $data = $this->MomentsService->show($id);
+        $data = $this->momentService->find($id);
 
         return Common::apiResponse(true, 'done', new MomentResource($data) );
     }
@@ -77,7 +77,7 @@ class MomentsController extends Controller
     public function destroy($id)
     {
         try {
-            $this->MomentsService->delete($id);
+            $this->momentService->deleteById($id);
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 
@@ -89,7 +89,7 @@ class MomentsController extends Controller
     {
 
         try {
-            $moment = $this->MomentsService->search($uuid);
+            $moment = $this->momentService->search($uuid);
             return Common::apiResponse(true, 'success', MomentResource::collection($moment) );
         } catch (Exception $exception) {
 
@@ -101,7 +101,7 @@ class MomentsController extends Controller
     {
 
         try {
-            $reels = $this->MomentsService->get_user_moments($user_id);
+            $reels = $this->momentService->getUserMomentsForDashboard($user_id);
             // return $reels;
             return Common::apiResponse(true, 'success', MomentDashboardResource::collection($reels));
         } catch (Exception $exception) {

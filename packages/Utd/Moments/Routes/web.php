@@ -36,8 +36,6 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-
-
         Route::resource('report-Moments', ReportMomentController::class)->middleware('moment.allowed');
         Route::post('moment-config', [MomentSettingsController::class, 'momentConfig'])->name('moment-config');
         Route::resource('Moments', MomentController::class)->middleware('moment.allowed');
@@ -48,7 +46,7 @@ Route::group(
         Route::prefix('moment-viewer')->name('moment-viewer.')->middleware('moment.allowed')->group(function () {
             Route::get('/', [MomentViewerController::class, 'index'])->name('index');
             Route::get('/viewer.css', [MomentViewerController::class, 'getViewerCss'])->name('viewer-css');
-            Route::get('/api/Moments', [MomentViewerController::class, 'getMoments'])->name('api.Moments');
+            Route::get('/api/moments', [MomentViewerController::class, 'getMoments'])->name('api.moments');
             Route::get('/api/users-with-moments', [MomentViewerController::class, 'getUsersWithMoments'])->name('api.users-with-moments');
             Route::get('/api/moment/{id}', [MomentViewerController::class, 'getMoment'])->name('api.moment');
             Route::get('/api/moment/{id}/likes', [MomentViewerController::class, 'getLikes'])->name('api.likes');
