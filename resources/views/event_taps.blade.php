@@ -37,9 +37,9 @@
     margin: 0 auto;
 }
 
-.settings-menu button.active {
-    background: #fff;
-    color: #000;
+.box.box-solid .settings-menu button.active {
+    background: #fff !important;
+    color: #000 !important;
 }
 
 /* Optional hover */
