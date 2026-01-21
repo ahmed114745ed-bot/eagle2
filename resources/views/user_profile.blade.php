@@ -1666,10 +1666,9 @@
                         @if($salaries)
                             <div class="pagination-container">
                                 {{ $salaries->appends([
-                                    'pack_page' => $packs?->currentPage(),
-                                    'vip_page' => $userVips?->currentPage(),
-                                    'gift_page' => $giftSLogs?->currentPage(),
-
+                                    'tab' => 'salary',
+                                    'year' => request('year'),  // preserve filters
+                                    'month' => request('month'),
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         @endif
