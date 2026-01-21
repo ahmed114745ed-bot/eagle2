@@ -238,12 +238,14 @@ class AgencyController extends MainController
                 Carbon::now()->endOfMonth(),
             ])
             ->sum('giftPrice');
+        $prefix = dashboardName();
 
 
         return $content
             ->title(__('agency profile'))
             ->view('bd_agency_profile', compact(
                 'agency',
+                'prefix',
                 'members',
                 'charges',
                 'salaries',
@@ -544,7 +546,6 @@ class AgencyController extends MainController
                 flex-wrap: wrap;
                 align-items: center;
                 justify-content: space-between;
-                padding: 10px;
             }
 
             .pagination-info {

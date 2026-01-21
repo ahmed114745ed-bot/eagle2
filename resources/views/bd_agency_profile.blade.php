@@ -15,9 +15,6 @@
             --secondary-color:
                 {{ config('themes.secondaryColor') }}
             ;
-            --green-color:
-                {{ config('themes.greenColor') }}
-            ;
             --text-primary-color:
                 {{ config('themes.textPrimaryColor') }}
             ;
@@ -195,20 +192,6 @@
 
         }
 
-        .agency-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 25px;
-            margin-bottom: 30px;
-            position: relative;
-            padding: 20px;
-            background: var(--secondary-color);
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            /* filter: brightness(0.5); */
-
-        }
-
         .agency-avatar {
             width: 120px;
             height: 120px;
@@ -362,24 +345,6 @@
             }
         }
 
-        .performers-card {
-            background: var(--secondary-color);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            /* filter: brightness(0.5); */
-
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
         .stats-row {
             display: flex;
             gap: 15px;
@@ -393,15 +358,6 @@
             align-items: center;
             gap: 8px;
             color: #2c3e50;
-        }
-
-        .section-badge {
-            background: #3498db;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
         }
 
         .avatar-grid {

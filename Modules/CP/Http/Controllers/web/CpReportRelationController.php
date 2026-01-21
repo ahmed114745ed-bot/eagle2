@@ -38,8 +38,19 @@ class CpReportRelationController extends MainController
     protected function relations()
     {
         $grid = new Grid(new Cp());
-        $countryID =session('filter_country_id');
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
+        $countryID = session('filter_country_id');
+        $grid->model()->with(
+            [
+                'cpRelation',
+                'level',
+                'fromUser',
+                'fromUser.profile',
+                'fromUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'toUser',
+                'toUser.profile',
+                'toUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            ]
+        )->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('fromUser', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);

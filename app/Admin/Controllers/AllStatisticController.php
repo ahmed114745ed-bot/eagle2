@@ -5,7 +5,7 @@ namespace App\Admin\Controllers;
 use App\Helpers\Common;
 use App\Models\Charge;
 use App\Models\CoinLog;
-use App\Models\MonthlyDiamondReceive;
+use Encore\Admin\Widgets\Box;
 use App\Models\User;
 use App\Models\GameWallet;
 use App\Models\UserSallary;
@@ -510,9 +510,9 @@ class AllStatisticController extends MainController
             ->count();
 
         $notAchievedAgencies = Agency::when($countryID, function ($query, $countryID) {
-                return $query->where('country_id', $countryID);
-            })
-                ->count() - $achievedAgencies;
+            return $query->where('country_id', $countryID);
+        })
+            ->count() - $achievedAgencies;
 
         return response()->json([
             'achieved' => $achievedAgencies,
@@ -863,8 +863,6 @@ class AllStatisticController extends MainController
                     'date' => $w->created_at->format('Y-m-d')
                 ];
             });
-        \Log::info('Withdrawals fetched for dashboard:', $withdrawals->toArray());
-
 
         $topUsers = \DB::table('charges')
             ->select('user_id', \DB::raw('SUM(usd) as total_usd'), \DB::raw('MAX(created_at) as last_charge'))
@@ -976,5 +974,19 @@ class AllStatisticController extends MainController
                 ];
             }),
         ]);
+    }
+
+
+    public function index2(Content $content)
+    {
+        $box = new Box(
+            __('Coming Soon'),
+            '<div style="text-align:center; padding:30px; font-size:20px;">🚧</div>'
+        );
+
+        return $content
+            ->title(__('Home'))
+            ->description(__('General Statistics'))
+            ->row($box);
     }
 }

@@ -79,16 +79,16 @@ function pu(val) {
     protected function assignRewards($reward, $user)
     {
 
-        DB::table('dedicate_super_admin_rewards')->insert([
+        DB::table('dedicate_admin_rewards')->insert([
             'user_id' => $user->id,
             'reward_id' => $reward->id,
-            'super_admin_id' => auth()->user()->id,
+            'admin_id' => auth()->user()->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         switch ($reward->type) {
-            case "coins":
+            case "coin":
 
                 $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
+use App\Observers\PusherConfigObserver;
 use App\Traits\TimestampsWithTimezone;
-use Artisan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
@@ -27,8 +27,10 @@ class Config extends Model
             $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
             if (in_array($model->name, $keys)) {
                 Cache::forget('pusher_config');
-                Artisan::call('config:cache');
+                Cache::put('pusher_config_changed', true, 60 * 5); 
             }
         });
+
+        static::observe(PusherConfigObserver::class);
     }
 }

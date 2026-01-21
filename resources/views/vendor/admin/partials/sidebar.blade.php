@@ -1,10 +1,8 @@
 <aside id="main-sidebar" class="main-sidebar">
-<link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
-<script src="{{ asset('js/admin-menu.js') }}"></script></section>
+    <link rel="stylesheet" href="{{ asset('css/admin-menu.css') }}">
+    <script src="{{ asset('js/admin-menu.js') }}"></script>
+    </section>
     <section class="sidebar">
-
-
-
         @if(config('admin.enable_menu_search'))
             <!-- search form (Optional) -->
             <form class="sidebar-form" style="overflow: initial;" onsubmit="return false;">
@@ -191,7 +189,8 @@
                                             <li class="crs-item">
                                                 <a href="{{ superadmin_url($child['uri']) }}" class="crs-link crs-leaf">
                                                     @if(str_contains($child['icon'] ?? '', 'fa-'))
-                                                        <i class="fa {{ $child['icon'] }} crs-icon" aria-hidden="true"></i>
+                                                        <i class="fa {{ $child['icon'] }} crs-icon"
+                                                           aria-hidden="true"></i>
                                                     @else
                                                         <span class="crs-icon emoji-icon">{{ $child['icon'] }}</span>
                                                     @endif
@@ -276,6 +275,7 @@
                                 ['uri' => '/official-message', 'icon' => '📋', 'title' => __('Official messages'), 'permission' => 'official-messages'],
                             ],
                         ],
+                          ['uri' => '/rewards?type=vip', 'icon' => '🎁', 'title' => __('reward dedicate'), 'permission' => 'reward-center'],
                         [
                             'uri' => '#',
                             'icon' => '👔',
@@ -321,9 +321,11 @@
                                     @foreach($link['children'] as $child)
                                         @if(hasPermission($child['permission'] ?? null))
                                             <li class="crs-item">
-                                                <a href="{{ areaManager_url($child['uri']) }}" class="crs-link crs-leaf">
+                                                <a href="{{ areaManager_url($child['uri']) }}"
+                                                   class="crs-link crs-leaf">
                                                     @if(str_contains($child['icon'] ?? '', 'fa-'))
-                                                        <i class="fa {{ $child['icon'] }} crs-icon" aria-hidden="true"></i>
+                                                        <i class="fa {{ $child['icon'] }} crs-icon"
+                                                           aria-hidden="true"></i>
                                                     @else
                                                         <span class="crs-icon emoji-icon">{{ $child['icon'] }}</span>
                                                     @endif
@@ -338,13 +340,18 @@
                     @else
                         @if(hasPermission($link['permission'] ?? null))
                             <li class="crs-item">
-                                <a href="{{ areaManager_url($link['uri']) }}" class="crs-link crs-leaf">
-                                    @if(str_contains($link['icon'] ?? '', 'fa-'))
-                                        <i class="fa {{ $link['icon'] }} crs-icon" aria-hidden="true"></i>
+                                <a href="{{ areaManager_url((string) ($link['uri'] ?? '')) }}" class="crs-link crs-leaf">
+                                    @if(is_string($link['icon'] ?? null) && str_contains($link['icon'], 'fa-'))
+                                        <i class="fa {{ $link['icon'] }} crs-icon"></i>
                                     @else
-                                        <span class="crs-icon emoji-icon">{{ $link['icon'] }}</span>
+                                        <span class="crs-icon emoji-icon">
+                                            {{ is_array($link['icon'] ?? null) ? '' : ($link['icon'] ?? '') }}
+                                        </span>
                                     @endif
-                                    <span class="crs-title">{{ $link['title'] }}</span>
+
+                                    <span class="crs-title">
+                                        {{ is_array($link['title'] ?? null) ? ($link['title'][app()->getLocale()] ?? '') : ($link['title'] ?? '') }}
+                                    </span>
                                 </a>
                             </li>
                         @endif
@@ -555,4 +562,218 @@
         Loading...
     </div>
     <!-- /.sidebar -->
+
+    <div class="sidebar-resizer" id="sidebar-resizer"></div>
 </aside>
+
+<script>
+    (function() {
+        'use strict';
+
+        const MIN_WIDTH = 18;
+        const MAX_WIDTH = 40;
+        const DEFAULT_WIDTH = 18;
+        const STORAGE_KEY = 'sidebar-width-percent';
+        const MOBILE_BREAKPOINT = 768; // pixels
+
+        let isResizing = false;
+        let startX = 0;
+        let startWidthPercent = 0;
+
+        function isRTL() {
+            return document.documentElement.dir === 'rtl' ||
+                document.body.dir === 'rtl' ||
+                document.body.classList.contains('rtl') ||
+                document.documentElement.classList.contains('rtl');
+        }
+
+        function isSidebarCollapsed() {
+            return document.body.classList.contains('sidebar-collapse');
+        }
+
+        function isMobile() {
+            return window.innerWidth <= MOBILE_BREAKPOINT;
+        }
+
+        function pxToPercent(px) {
+            return (px / window.innerWidth) * 100;
+        }
+
+        function clearInlineStyles() {
+            const sidebar = document.querySelector('.main-sidebar');
+            const navbar = document.querySelector('.navbar-static-top');
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const logo = document.querySelector('.main-header .logo');
+
+            if (sidebar) sidebar.style.width = '';
+            if (navbar) navbar.style.width = '';
+            if (logo) logo.style.width = '';
+            if (contentWrapper) {
+                contentWrapper.style.marginLeft = '';
+                contentWrapper.style.marginRight = '';
+            }
+        }
+
+        function updateLayout(sidebarWidthPercent) {
+            // Don't apply if mobile or sidebar is collapsed
+            if (isMobile() || isSidebarCollapsed()) {
+                clearInlineStyles();
+                return;
+            }
+
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const navbar = document.querySelector('.navbar-static-top');
+            const sidebar = document.querySelector('.main-sidebar');
+            const logo = document.querySelector('.main-header .logo');
+
+            const navbarWidth = 100 - sidebarWidthPercent - 0.5;
+
+            const logoOffset = isRTL() ? 0.6 : 0.7;
+            const logoWidth = sidebarWidthPercent - logoOffset;
+
+            if (sidebar) {
+                sidebar.style.width = sidebarWidthPercent + '%';
+            }
+
+            if (logo) {
+                logo.style.setProperty('width', logoWidth + '%', 'important');
+            }
+
+            if (navbar) {
+                navbar.style.width = navbarWidth + '%';
+            }
+
+            if (contentWrapper) {
+                if (isRTL()) {
+                    contentWrapper.style.marginRight = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginLeft = '0';
+                } else {
+                    contentWrapper.style.marginLeft = sidebarWidthPercent + '%';
+                    contentWrapper.style.marginRight = '0';
+                }
+            }
+        }
+
+        function init() {
+            const resizer = document.getElementById('sidebar-resizer');
+            const sidebar = document.querySelector('.main-sidebar');
+
+            if (!resizer || !sidebar) return;
+
+            // Don't initialize on mobile
+            if (isMobile()) {
+                clearInlineStyles();
+                return;
+            }
+
+            // Only apply saved width if sidebar is NOT collapsed and NOT mobile
+            if (!isSidebarCollapsed() && !isMobile()) {
+                const savedWidth = localStorage.getItem(STORAGE_KEY);
+                if (savedWidth) {
+                    updateLayout(parseFloat(savedWidth));
+                }
+            }
+
+            // Watch for sidebar collapse/expand changes
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'class') {
+                        // Skip on mobile
+                        if (isMobile()) {
+                            clearInlineStyles();
+                            return;
+                        }
+
+                        if (isSidebarCollapsed()) {
+                            clearInlineStyles();
+                        } else {
+                            const savedWidth = localStorage.getItem(STORAGE_KEY);
+                            if (savedWidth) {
+                                updateLayout(parseFloat(savedWidth));
+                            }
+                        }
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+
+            // Handle window resize - clear styles if resized to mobile
+            window.addEventListener('resize', function() {
+                if (isMobile()) {
+                    clearInlineStyles();
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                } else if (!isSidebarCollapsed()) {
+                    const savedWidth = localStorage.getItem(STORAGE_KEY);
+                    if (savedWidth) {
+                        updateLayout(parseFloat(savedWidth));
+                    }
+                }
+            });
+
+            resizer.addEventListener('mousedown', function(e) {
+                // Don't allow resizing on mobile or when collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
+
+                e.preventDefault();
+                isResizing = true;
+                startX = e.clientX;
+                startWidthPercent = pxToPercent(sidebar.offsetWidth);
+                document.body.classList.add('sidebar-resizing');
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (!isResizing) return;
+
+                // Stop if mobile or sidebar gets collapsed during resize
+                if (isMobile() || isSidebarCollapsed()) {
+                    isResizing = false;
+                    document.body.classList.remove('sidebar-resizing');
+                    clearInlineStyles();
+                    return;
+                }
+
+                const deltaX = e.clientX - startX;
+                const deltaPercent = (deltaX / window.innerWidth) * 100;
+
+                let newWidthPercent;
+                if (isRTL()) {
+                    newWidthPercent = startWidthPercent - deltaPercent;
+                } else {
+                    newWidthPercent = startWidthPercent + deltaPercent;
+                }
+
+                newWidthPercent = Math.min(Math.max(newWidthPercent, MIN_WIDTH), MAX_WIDTH);
+
+                updateLayout(newWidthPercent);
+            });
+
+            document.addEventListener('mouseup', function() {
+                if (!isResizing) return;
+
+                isResizing = false;
+                document.body.classList.remove('sidebar-resizing');
+
+                // Only save if not mobile and sidebar is not collapsed
+                if (!isMobile() && !isSidebarCollapsed()) {
+                    const finalWidth = pxToPercent(sidebar.offsetWidth).toFixed(2);
+                    localStorage.setItem(STORAGE_KEY, finalWidth);
+                }
+            });
+
+            resizer.addEventListener('dblclick', function() {
+                // Don't do anything if mobile or collapsed
+                if (isMobile() || isSidebarCollapsed()) return;
+
+                clearInlineStyles();
+                localStorage.removeItem(STORAGE_KEY);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    })();
+</script>

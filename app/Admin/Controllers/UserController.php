@@ -462,30 +462,43 @@ class UserController extends MainController
         $usersCoins = null;
         $badges = null;
         $walletLogs = null;
+
+        // Decide active tab early so we only eager load what we need
+        $activeTab = request('tab', 'packs');
+
         /* =========================
-     | USER (ONE QUERY ONLY)
+     | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $user = User::with([
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user','country_id', 'di']);
+
+        $with = [
             'profile:id,user_id,avatar',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
-            'senderLevel:id,level,type',
-            'receiverLevel:id,level,type',
-            'packs' => function ($q) {
+            'senderLevel:id,level,type,img',
+            'receiverLevel:id,level,type,img',
+        ];
+
+        // Only load packs when viewing packs tab
+        if ($activeTab === 'packs') {
+            $with['packs'] = function ($q) {
                 $q->where('type', 25)
                     ->where('is_used', true)
                     ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                     ->with('ware:id,value');
-            },
-        ])->findOrFail($id);
-        $curantBalance = wallet_available_by_user($id);
-        $availableBalance = wallet_available_by_user($id);
+            };
+        }
+
+        $user = $userQuery->with($with)->findOrFail($id);
+
+        // Avoid duplicate wallet calls
+        $availableBalance = $curantBalance = wallet_available_by_user($id);
         /* =========================
         | USER IMAGE
         ========================= */
         $defaultImage = asset('images/businessman-icon.jpg');
         $avatar = optional($user->profile)->avatar;
         $user->display_image = isImageExists(getImagePath($avatar)) ? getImagePath($avatar) : $defaultImage;
-        $activeTab = request('tab', 'packs');
+        // $activeTab already set above
         switch ($activeTab) {
 
             case 'packs':
@@ -549,8 +562,8 @@ class UserController extends MainController
 
                 $giftSLogs = (clone $giftBaseQuery)
                     ->with([
-                        'receiver',
-                        'sender',
+                        'receiver:id,name,uuid,special_id',
+                        'sender:id,name,uuid,special_id',
                         // 'sender.packs' => function ($q) {
                         //     $q->whereIn('type', [25])
                         //         ->where('is_used', true)
@@ -561,8 +574,8 @@ class UserController extends MainController
                         //         ->where('is_used', true)
                         //         ->with('ware:id,value');
                         // },
-                        'receiver.profile',
-                        'sender.profile',
+                        // 'receiver.profile',
+                        // 'sender.profile',
                         'gift:id,name,price',
                         'room:id,room_name',
                         'agency:id,name',
@@ -725,8 +738,6 @@ class UserController extends MainController
                 ]);
         }
 
-        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
-
         // $form->hidden('transfer_salary', __('transfer_salary'))->default(0);
 
         $form->text('name', __('Name'));
@@ -762,14 +773,34 @@ class UserController extends MainController
                     $(document).ready(function() {
                         $('input[name="photo"]').closest('.form-group').find('.fileinput-remove').hide();
                     });
-                    JS
+                JS
             );
         }
 
-
+        $form->html('<div class="full-column-width">');
         $form->hasMany('images', __('Profile Images'), function ($form) {
             $form->image('img', __('Image'));
         })->useTable()->disableCreate()->disableDelete();
+        $form->html('</div>');
+
+        Admin::style('
+            .has-many-images .has-many-images-forms {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 20px !important;
+            }
+
+            .has-many-images .form-group {
+                margin-bottom: 0 !important;
+            }
+
+            .has-many-images .file-preview-image {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                border-radius: 8px !important;
+            }
+        ');
 
         if (!Admin::user()->can('delete-profile-switch-' . $this->permission_name) && !Admin::user()->can('*')) {
             Admin::script(
@@ -823,6 +854,8 @@ class UserController extends MainController
             });
         </script>');
         }
+
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'))->setElementName('full-column-width');
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;

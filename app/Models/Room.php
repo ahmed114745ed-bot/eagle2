@@ -108,24 +108,63 @@ class Room extends Model
         return $this->hasMany(RoomMicrophone::class);
     }
 
+    // public function getLangAttribute()
+    // {
+    //     if (self::$withoutAppends) {
+    //         return;
+    //     }
+
+    //     return @$this->owner->country->language;
+    // }
+
     public function getLangAttribute()
     {
         if (self::$withoutAppends) {
-            return;
+            return null;
         }
 
-        return @$this->owner->country->language;
+        // prevent lazy loading
+        if (! $this->relationLoaded('owner')) {
+            return null;
+        }
+
+        if (! $this->owner || ! $this->owner->relationLoaded('country')) {
+            return null;
+        }
+
+        return $this->owner->country->language ?? null;
     }
+
+    // public function getCountryAttribute()
+    // {
+    //     if (self::$withoutAppends) {
+    //         return;
+    //     }
+    //     $country = @$this->owner->country;
+
+    //     return $country;
+    // }
 
     public function getCountryAttribute()
     {
         if (self::$withoutAppends) {
-            return;
+            return null;
         }
-        $country = @$this->owner->country;
 
-        return $country;
+        // prevent lazy-loading queries
+        if (! $this->relationLoaded('owner')) {
+            return null;
+        }
+
+        $owner = $this->owner;
+
+        if (! $owner || ! $owner->relationLoaded('country')) {
+            return null;
+        }
+
+        return $owner->country;
     }
+
 
     public function myClass()
     {
@@ -188,20 +227,40 @@ class Room extends Model
     //        return implode(',', $array);
     //    }
 
+    // public function getMicrophoneAttribute()
+    // {
+    //     return $this->microphones()
+    //         ->orderBy('position')
+    //         ->get()
+    //         ->map(function ($mic) {
+    //             $userId = $mic->user_id ?? 0;
+    //             $status = $mic->status ?? 0;
+
+    //             if ($userId > 0) {
+    //                 return "{$userId}#{$status}";
+    //             } else {
+    //                 return (string)$status;
+    //             }
+    //         })
+    //         ->implode(',');
+    // }
+
     public function getMicrophoneAttribute()
     {
-        return $this->microphones()
-            ->orderBy('position')
-            ->get()
+        // Use already-loaded relation
+        $microphones = $this->relationLoaded('microphones')
+            ? $this->microphones
+            : collect(); // or $this->microphones()->get() if you REALLY need fallback
+
+        return $microphones
+            ->sortBy('position')
             ->map(function ($mic) {
                 $userId = $mic->user_id ?? 0;
                 $status = $mic->status ?? 0;
 
-                if ($userId > 0) {
-                    return "{$userId}#{$status}";
-                } else {
-                    return (string)$status;
-                }
+                return $userId > 0
+                    ? "{$userId}#{$status}"
+                    : (string) $status;
             })
             ->implode(',');
     }

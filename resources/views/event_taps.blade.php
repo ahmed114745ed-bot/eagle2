@@ -28,6 +28,14 @@
         transition: all 0.3s;
         border-radius: 3px;
     }
+
+    .settings-sidebar {
+    width: 90%;
+    min-height: 65px;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    margin: 0 auto;
+}
 </style>
 
 <div class="box box-solid">

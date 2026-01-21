@@ -20,6 +20,7 @@ use Modules\Form\Entities\FormTemplate;
 use Encore\Admin\Auth\Permission;
 use Carbon\Carbon;
 
+
 class FormTemplateController extends Controller
 {
     public $permission_name = 'templates-form';
@@ -582,5 +583,47 @@ class FormTemplateController extends Controller
         $type = $formRequest->template->form_type;
         $formRequest->delete();
         return redirect()->to(route('forms.showByType') . "?type={$type}&token={$linkToken}&lang={$defaultLang}");
+    }
+
+
+
+
+    public function removeRepetition()
+    {
+        DB::transaction(function () {
+
+            // get duplicated form_types
+            $duplicates = FormTemplate::select('form_type')
+                ->groupBy('form_type')
+                ->havingRaw('COUNT(*) > 1')
+                ->pluck('form_type');
+
+            foreach ($duplicates as $formType) {
+
+                // get all templates for this form_type ordered by oldest
+                $templates = FormTemplate::where('form_type', $formType)
+                    ->orderBy('id')
+                    ->get();
+
+                // keep first one
+                $keep = $templates->shift();
+
+                // delete duplicates
+                foreach ($templates as $template) {
+
+                    // delete related fields & sections safely
+                    foreach ($template->sections as $section) {
+                        $section->fields()->delete();
+                    }
+
+                    $template->sections()->delete();
+                    $template->delete();
+                }
+            }
+        });
+        return response()->json([
+            'message'    => 'remove repetition',
+
+        ]);
     }
 }

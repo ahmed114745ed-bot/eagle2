@@ -6,10 +6,12 @@
             <div class="row mt-4">
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                 </form>
 
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
                         <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -54,6 +56,7 @@
                            <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}"
                                 method="POST">
                                 @csrf
+                              <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                                 <!-- Zego Fields -->
                                 <div class="col-md-6 mb-3 ms-0 me-auto">
                                     <div class="card p-3 shadow" style="height: 300px;">
@@ -81,6 +84,7 @@
 
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
                         <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -142,6 +146,7 @@
 
                 <form class="no-background-form" action="{{ route('admin.update-agora-zego') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
                     <div class="col-md-6 mb-3 ms-0 me-auto">
                         <div class="card p-3 shadow real-time-card-height">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -177,6 +182,7 @@
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Sound System Setting:') }}</label>
             <div class="row mt-4">
@@ -235,6 +241,7 @@
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Video System Setting:') }}</label>
             <div class="row mt-4">
@@ -291,6 +298,7 @@
 
     <form action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('Live System Setting:') }}</label>
             <div class="row mt-4">
@@ -335,6 +343,7 @@
 
     <form id="autoPreviewForm" action="{{ route('admin.update-agora-zego') }}" method="POST">
         @csrf
+        <input type="hidden" name="redirect_to" value="{{ request()->fullUrl() }}">
         <div class="form">
             <label class="d-block">{{ __('admin.is_preview') }}</label>
             <div class="row mt-4">

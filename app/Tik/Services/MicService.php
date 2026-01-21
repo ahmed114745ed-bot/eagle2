@@ -139,11 +139,6 @@ class MicService
 
         if (!$room)  throw new Exception(__('room does not exist'));
         $data['owner_id'] = $room->uid;
-        //
-//        $position = $data['position']; // mic index
-//        $mic_arr = explode(',', $room->microphone);
-//        $main_mic = explode(',', $room->main_microphone);
-//        $base_mic = explode(',', $room->microphone_only_users);
 
         $position = (int) $data['position'];
 
@@ -151,20 +146,6 @@ class MicService
         if ($position < 0 || $position > $maxPositions) {
             throw new Exception(__('api_responses.position_error'));
         }
-
-//        $current = $mic_arr[$position] ?? '0';
-//        $old_status = '0';
-//        $old_user = '0';
-//
-//        if (str_contains($current, '#')) {
-//            [$old_user, $old_status] = explode('#', $current);
-//        } elseif (is_numeric($current) && (int)$current > 0) {
-//            $old_user = $current;
-//            $old_status = '0'; // Assume occupied but no explicit status
-//        } else {
-//            $old_user = '0';
-//            $old_status = $current;
-//        }
 
         $micSeat = $room->microphones()->where('position', $position)->first();
 
@@ -183,31 +164,22 @@ class MicService
             throw new Exception(__('This microphone is closed and cannot be accessed'));
         }
 
-//        if (in_array($user->id, $mic_arr)) {
-//            CpRoomHistory::where("user_one_id", $user->id)
-//                ->orWhere("user_two_id", $user->id)->delete();
-//
-//            $key = array_search($user->id, $mic_arr);
-//            $old = $main_mic[$key] ?? '0';
-//            $base_mic[$key] = $old;
-//        }
-
         $existingMic = $room->microphones()->where('user_id', $user->id)->first();
         if ($existingMic) {
-            CpRoomHistory::where("user_one_id", $user->id)
-                ->orWhere("user_two_id", $user->id)
-                ->delete();
 
-            $existingMic->delete();
-//            $existingMic->update([
-//                'user_id' => null,
-//                'status'  => $existingMic->status,
-//            ]);
+            if ($existingMic->position !== $position) {
+        
+                CpRoomHistory::where("user_one_id", $user->id)
+                    ->orWhere("user_two_id", $user->id)
+                    ->delete();
+
+                $existingMic->delete();
+            } else {
+            
+            }
         }
 
-//        $base_mic[$position] = $user->id . '#' . $old_status;
-//        $mic = implode(',', $base_mic);
-//
+
         $micSeat->update([
             'user_id' => $user->id,
             'status'  => $old_status,

@@ -230,12 +230,6 @@ class DailyRankingRewardCommand extends Command
         // Convert to array if it's a Collection
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
 
-        // Log the user IDs being notified
-        Log::info('Dispatching notifications to user IDs', [
-            'user_ids' => $userIds,
-            'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
-        ]);
-
         if (empty($userIds)) {
             Log::warning('No user IDs found for notification');
             return;
@@ -249,10 +243,6 @@ class DailyRankingRewardCommand extends Command
             ->pluck('notification_id')
             ->toArray();
 
-        // Log the tokens that will receive notifications
-        Log::info('Notification tokens', [
-            'tokens' => $tokens
-        ]);
 
         $image = $range->generate_image;
         $icon  = getImagePath($image);

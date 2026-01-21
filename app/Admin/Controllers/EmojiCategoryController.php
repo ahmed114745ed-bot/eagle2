@@ -80,7 +80,9 @@ class EmojiCategoryController extends MainController
             return $value[$locale] ?? ($value['en'] ?? '');
         });
         $grid->column('type', __('Type'));
+        $this->extendGrid($grid);
 
+        $grid->disableExport();
 
         return $grid;
     }

@@ -49,7 +49,7 @@ class WalletRepository implements WalletRepositoryInterface
 
     public function getLatestTransactions($userId, $limit = 20)
     {
-        return WalletLog::where('user_id', $userId)
+        return WalletLog::where('user_id', $userId)->with(['admin','related'])
             ->orderBy('id', 'DESC')
             ->limit($limit)
             ->get();

@@ -3,7 +3,6 @@
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
             --secondary-color: {{ config('themes.secondaryColor') }};
-            --green-color: {{ config('themes.greenColor') }};
             --text-primary-color: {{ config('themes.textPrimaryColor') }};
             --text-secondary-color: {{ config('themes.textSecondaryColor') }};
             --box-background-color: {{ config('themes.boxBackgroundColor') }};
@@ -595,8 +594,10 @@
         }
 
         .tab-btn.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
+            color: var(--text-secondary-color);
+            background-color: var(--primary-color);
+            border-bottom-color: transparent;
+            border-radius: 4px;
         }
 
         .tab-btn:hover:not(.active) {
@@ -1026,17 +1027,12 @@
             color: #333;
             font-weight: 500;
         }
-
-        .nav>li>a:hover, .nav>li>a:active, .nav>li>a:focus {
-            background: var(--secondary-color) !important;
-        }
     </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="..." crossorigin="anonymous"/>
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 </head>
 
 <body>
-
 <div class="agency-profile-container" id="pjax-container">
     {{-- Error Messages --}}
     @if ($errors->any())
@@ -1091,7 +1087,7 @@
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
 
-                        <span class="meta-value d-block">{{ $availableBalance }}</span>
+                        <span class="meta-value d-block">{{ @$user->salary }}</span>
                         <!-- <span class="meta-value">{{ $curantBalance }}</span>
                                 <span class="meta-value">{{ $availableBalance }}</span> -->
 
@@ -1099,14 +1095,14 @@
                     <div class="meta-item">
                         <span class="meta-label">{{__('level')}}:</span>
                         <span class="meta-value">
-                                    <img src="{{ getImagePath(Common::level_center($user)['sender_img']) }}"
+                                    <img src="{{ getImagePath(@$user->senderLevel->img) }}"
                                          style="height: 24px;">
                                 </span>
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{__('Receiver Level')}}:</span>
                         <span class="meta-value">
-                                <img src="{{ getImagePath(Common::level_center($user)['receiver_img']) }}"
+                                <img src="{{ getImagePath(@$user->receiverLevel->img) }}"
                                      style="height: 24px;">
                             </span>
                     </div>
@@ -1135,8 +1131,8 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
-                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                    {!! @$user->userTypeBadge() !!}
+                   
+                    {!! @$user->userTypeBadge() !!}{!! @$user->userBadgeTop() !!}
                 </div>
 
             </div>
@@ -1144,7 +1140,6 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('badges')}}:</span>
-                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
                     {!! @$user->userBadge() !!}
                 </div>
 
@@ -1522,73 +1517,50 @@
             </div>
 
             <div class="box-body p-3">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
-                              class="form-horizontal gift-log-form" pjax-container="">
-                            <input type="hidden" name="tab" value="salary">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="box-body">
-                                        <div class="fields-group">
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">السنة</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة"
-                                                               name="year"
-                                                               value="{{ request('year') }}" style="text-align: right;">
-                                                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="GET" action="{{ url('admin/users/' . $user->id) }}"
+                                  class="form-horizontal" pjax-container="">
+                                <input type="hidden" name="tab" value="salary">
+                                <div class="filter-container">
+                                    <div class="filter-content">
+                                        <div class="filter-group">
+                                            <label class="form-label">السنة</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-pencil"></i>
                                                 </div>
+                                                <input type="text" class="form-control year" placeholder="السنة"
+                                                       name="year"
+                                                       value="{{ request('year') }}" style="text-align: right;">
                                             </div>
-
-                                            <div class="form-group">
-                                                <label class="col-sm-2 control-label">الشهر</label>
-                                                <div class="col-sm-8">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-addon">
-                                                            <i class="fa fa-pencil"></i>
-                                                        </div>
-                                                        <input type="text" class="form-control month"
-                                                               placeholder="الشهر"
-                                                               name="month" value="{{ request('month') }}"
-                                                               style="text-align: right;">
-                                                    </div>
+                                        </div>
+                                        <div class="filter-group">
+                                            <label class="form-label">الشهر</label>
+                                            <div class="input-group input-group-sm">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-pencil"></i>
                                                 </div>
+                                                <input type="text" class="form-control month"
+                                                       placeholder="الشهر"
+                                                       name="month" value="{{ request('month') }}"
+                                                       style="text-align: right;">
                                             </div>
+                                        </div>
+                                        <div class="filter-actions">
+                                            <button class="btn btn-info submit btn-sm">
+                                                <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
+                                            </button>
+                                            <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
+                                               class="btn btn-default btn-sm">
+                                                <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- /.box-body -->
-                            <div class="box-footer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="col-md-2"></div>
-                                        <div class="col-md-8">
-                                            <div class="btn-group pull-left">
-                                                <button class="btn btn-info submit btn-sm">
-                                                    <i class="fa fa-search"></i>&nbsp;&nbsp;{{__('Search')}}
-                                                </button>
-                                            </div>
-                                            <div class="btn-group pull-left" style="margin-left: 10px;">
-                                                <a href="{{ url('admin/users/' . $user->id. '?'.'tab=salary') }}"
-                                                   class="btn btn-default btn-sm">
-                                                    <i class="fa fa-undo"></i>&nbsp;&nbsp;{{__('Reset')}}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
-                </div>
 
                 <div class="table-responsive">
                     <div class="box-body ">
@@ -1769,13 +1741,13 @@
                                         <div class="fields-group">
 
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">السنة</label>
+                                                <label class="col-sm-2 control-label">{{__("year")}}</label>
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
-                                                        <input type="text" class="form-control year" placeholder="السنة"
+                                                        <input type="text" class="form-control year"  placeholder="{{ __('year') }}"
                                                                name="year"
                                                                value="{{ request('year') }}" style="text-align: right;">
                                                     </div>
@@ -1783,14 +1755,14 @@
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">الشهر</label>
+                                                <label class="col-sm-2 control-label">{{__('month')}}</label>
                                                 <div class="col-sm-8">
                                                     <div class="input-group input-group-sm">
                                                         <div class="input-group-addon">
                                                             <i class="fa fa-pencil"></i>
                                                         </div>
                                                         <input type="text" class="form-control month"
-                                                               placeholder="الشهر"
+                                                               placeholder="{{__('month')}}"
                                                                name="month" value="{{ request('month') }}"
                                                                style="text-align: right;">
                                                     </div>

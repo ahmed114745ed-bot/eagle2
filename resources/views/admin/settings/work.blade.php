@@ -32,7 +32,7 @@
             <div class="exp-cards-grid">
                 <!-- Wealth Card -->
                 <div class="exp-card">
-                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon wealth">
@@ -46,7 +46,7 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="text" name="exp_sender_percentage"
                                        value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 coin = X EXP</small>
                             </div>
 
@@ -69,7 +69,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>
@@ -78,7 +78,7 @@
 
                 <!-- Attraction Card -->
                 <div class="exp-card">
-                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" enctype="multipart/form-data" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon attraction">
@@ -92,7 +92,7 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="text" name="exp_received_percentage"
                                        value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 Diamond = X EXP</small>
                             </div>
 
@@ -115,7 +115,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>
@@ -124,7 +124,7 @@
 
                 <!-- Charge Card -->
                 <div class="exp-card">
-                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon charge">
@@ -138,7 +138,7 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="text" name="exp_charge_percentage"
                                        value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 charge = X EXP</small>
                             </div>
 
@@ -161,7 +161,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>
@@ -170,7 +170,7 @@
 
                 <!-- Rooms Card -->
                 <div class="exp-card">
-                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon rooms">
@@ -184,7 +184,7 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="text" name="exp_room_percentage"
                                        value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 room action = X EXP</small>
                             </div>
 
@@ -207,7 +207,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>
@@ -216,7 +216,7 @@
 
                 <!-- CP Card -->
                 <div class="exp-card">
-                    <form action="{{ route('admin.ovip-config') }}" method="POST">
+                    <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon cp">
@@ -230,7 +230,7 @@
                                 <label>{{ __('EXP Rate') }}</label>
                                 <input type="text" name="exp_cp_percentage"
                                        value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
-                                       placeholder="{{ __('Enter Exp') }}" class="form-control">
+                                       placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 CP action = X EXP</small>
                             </div>
 
@@ -253,7 +253,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>
@@ -273,7 +273,7 @@
 
             <div class="exp-cards-grid single-card">
                 <div class="exp-card">
-                    <form action="{{ route('admin.exchange-coins') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.exchange-coins') }}" method="POST" enctype="multipart/form-data" class="settings-form">
                         @csrf
                         <div class="exp-card-header">
                             <div class="exp-card-icon diamond">
@@ -287,7 +287,7 @@
                                 <label>{{ __('Exchange Rate') }}</label>
                                 <input type="text" id="coin_exp" name="exchange_coin_percentage"
                                        value="{{ $settings['exchange_coin_percentage'] ?? 1 }}"
-                                       placeholder="{{ __('Enter rate') }}" class="form-control">
+                                       placeholder="{{ __('Enter rate') }}" class="form-control" required>
                                 <small class="text-muted">1 diamond = X coin</small>
                             </div>
 
@@ -304,7 +304,7 @@
                         </div>
 
                         <div class="exp-card-footer">
-                            <button type="submit" class="btn btn-primary btn-block">
+                            <button type="submit" class="btn btn-primary btn-block btn-save">
                                 <i class="fas fa-save"></i> {{ __('Save') }}
                             </button>
                         </div>

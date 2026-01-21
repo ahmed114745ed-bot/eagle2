@@ -18,7 +18,7 @@ use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
 class Agency extends Model
 {
-    use AgencyAdditionalInfoTraits, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone ,CreatedByTrait;
+    use AgencyAdditionalInfoTraits, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait;
 
     protected $guarded = [];
 
@@ -66,11 +66,11 @@ class Agency extends Model
     {
         return $this->hasMany(User::class, 'agency_id');
     }
- 
+
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'agency_id');
     }
 
     public function admins()
@@ -167,12 +167,12 @@ class Agency extends Model
 
     public function getSalaryAttribute()
     {
-        return $this->agencySalaries->sum(fn ($row) => ($row->sallary - $row->cut_amount));
+        return $this->agencySalaries->sum(fn($row) => ($row->sallary - $row->cut_amount));
 
-//        $salary = AgencySallary::query()->where('agency_id', $this->id)
-//            ->sum(DB::raw('sallary - cut_amount'));
-//
-//        return $salary;
+        //        $salary = AgencySallary::query()->where('agency_id', $this->id)
+        //            ->sum(DB::raw('sallary - cut_amount'));
+        //
+        //        return $salary;
     }
 
     public function setSalaryAttribute()
@@ -493,5 +493,4 @@ class Agency extends Model
     {
         return $this->bd_id ?? null;
     }
-
 }

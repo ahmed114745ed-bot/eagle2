@@ -2,91 +2,117 @@
 
 namespace Modules\UsersWallet\Services;
 
-use App\Models\WalletTransaction;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Exception;
-use Modules\UsersWallet\Entities\UserWallet;
-use Modules\UsersWallet\Entities\WalletLog;
-use Modules\UsersWallet\Entities\WalletTemplate;
-use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
-use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\User;
 use App\Helpers\Common;
+use App\Helpers\UserCommon;
+use App\Enums\UserCoinLogType;
+use App\Models\WalletTransaction;
+use App\Helpers\UserCoinLogHelper;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Tik\Repositories\WareRepository;
 use App\Http\Resources\MomentGiftResource;
 use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
+use Modules\UsersWallet\Entities\WalletLog;
+use Illuminate\Database\Eloquent\Collection;
+use Modules\UsersWallet\Entities\UserWallet;
 use App\Http\Resources\AudioGiftsListResource;
+use Modules\UsersWallet\Entities\WalletTemplate;
+use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
+use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
+
 class WalletService
 {
     protected $walletRepo;
 
-    public function __construct(WalletRepositoryInterface $walletRepo ,private readonly GiftLogRepository $GiftLogRepository,private readonly UserLogRepository $userCoinLogRepository)
+    public function __construct(WalletRepositoryInterface $walletRepo, private readonly GiftLogRepository $GiftLogRepository, private readonly UserLogRepository $userCoinLogRepository)
     {
         $this->walletRepo = $walletRepo;
     }
- 
+
     public function transfer(int $fromUserId, int $toUserId, float $amount)
     {
+
+        $app_feature = \Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
         DB::beginTransaction();
 
-            try {
-                $fromWallet = $this->walletRepo->getWalletByUserId($fromUserId)
-                            ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
+        try {
+            $fromWallet = $this->walletRepo->getWalletByUserId($fromUserId)
+                ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
 
-                 $available = wallet_available_by_wallet($fromWallet);
-                    if ($available < $amount) {
-                            throw new \Exception('Insufficient balance.');
-                    }
-
-                $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
-                        ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
-                $this->walletRepo->updateWallet($fromWallet->id, ['cut_amount' => $fromWallet->cut_amount + $amount]);
-               
-                $this->walletRepo->createLog([
-                    'wallet_id' => $fromWallet->id,
-                    'user_id' => $fromUserId,
-                    'amount' => -$amount,
-                    'operation' => 'transfer',
-                    'type' => 'transfer',
-                    'before_amount' => $fromWallet->balance - $fromWallet->cut_amount - $fromWallet->pending_amount ,
-                    'after_amount' => wallet_available_by_user($fromUserId),
-                    'related_id'  =>  $toUserId
-
-                ]);
-
-                $this->walletRepo->updateWallet($toWallet->id, ['balance' => $toWallet->balance + $amount]);
-                $this->walletRepo->createLog([
-                    'wallet_id' => $toWallet->id,
-                    'user_id' => $toUserId,
-                    'amount' => $amount,
-                    'operation' => 'transfer',
-                    'type' => 'transfer',
-                    'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
-                    'after_amount' =>  wallet_available_by_user($toUserId),
-                    'related_id'  =>  $fromUserId
-                ]);
-
-                DB::commit();
-
-                return ['status' => 'success',];
-
-            } catch (Exception $e) {
-                DB::rollBack();
-                return ['status' => 'error', 'message' => $e->getMessage()];
+            $available = wallet_available_by_wallet($fromWallet);
+            if ($available < $amount) {
+                throw new \Exception('Insufficient balance.');
             }
-    
+
+            $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
+                ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
+            $this->walletRepo->updateWallet($fromWallet->id, ['cut_amount' => $fromWallet->cut_amount + $amount]);
+
+            $this->walletRepo->createLog([
+                'wallet_id' => $fromWallet->id,
+                'user_id' => $fromUserId,
+                'amount' => -$amount,
+                'operation' => 'transfer',
+                'type' => 'transfer',
+                'before_amount' => $fromWallet->balance - $fromWallet->cut_amount - $fromWallet->pending_amount,
+                'after_amount' => wallet_available_by_user($fromUserId),
+                'related_id'  =>  $toUserId
+
+            ]);
+
+            $receiver = User::find($toUserId);
+            $amountBefore =  $receiver->di;
+
+
+            // $type = $receiver->user_type;
+            $receiver->increment('di', $amount);
+            UserCoinLogHelper::logByType(
+                $toUserId,
+                $amount,
+                $amountBefore,
+                UserCoinLogType::APP_CHARGE,
+            );
+
+            $this->walletRepo->updateWallet($toWallet->id, ['balance' => $toWallet->balance + $amount]);
+            $this->walletRepo->createLog([
+                'wallet_id' => $toWallet->id,
+                'user_id' => $toUserId,
+                'amount' => $amount,
+                'operation' => 'transfer',
+                'type' => 'transfer',
+                'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
+                'after_amount' =>  wallet_available_by_user($toUserId),
+                'related_id'  =>  $fromUserId
+            ]);
+
+            if ($receiver instanceof User) {
+                (new UserAchievementService())->insertCharging($receiver, $amount);
+            }
+            UserCommon::UserEarnedInvitation($receiver->id, $amount);
+            UserCommon::addChargeLevel($receiver->id, $amount);
+            DB::commit();
+
+            return ['status' => 'success',];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return ['status' => 'error', 'message' => $e->getMessage()];
+        }
     }
 
     public function getWalletTransactions($request)
     {
-        $userId = Auth::user()->id ;
+        $userId = Auth::user()->id;
         $type = $request['type'] ?? 'add';
         $perPage = $request['per_page'] ?? 15;
-        $page = $request['page'] ?? 1;  
-        return $this->walletRepo->getTransactions($userId,$type  ,$perPage , $page);
-
+        $page = $request['page'] ?? 1;
+        return $this->walletRepo->getTransactions($userId, $type, $perPage, $page);
     }
 
     public function getTemplate($type): Collection|array
@@ -95,10 +121,10 @@ class WalletService
     }
 
 
-       public function diamondsStatistic($userId, $type, $startDate, $endDate, $perPage, $page)
+    public function diamondsStatistic($userId, $type, $startDate, $endDate, $perPage, $page)
     {
-        $list = collect(); 
-        $resourceClass = AudioGiftsListResource::class; 
+        $list = collect();
+        $resourceClass = AudioGiftsListResource::class;
 
         switch ($type) {
             case 1:
@@ -130,9 +156,9 @@ class WalletService
         ];
     }
 
-       public function history($userId, $type,$startDate, $endDate, $page, $perPage)
+    public function history($userId, $type, $startDate, $endDate, $page, $perPage)
     {
-        return $this->userCoinLogRepository->index($userId, $type, $startDate, $endDate,$page, $perPage);
+        return $this->userCoinLogRepository->index($userId, $type, $startDate, $endDate, $page, $perPage);
     }
 
 
@@ -141,7 +167,7 @@ class WalletService
     {
         $userId = Auth::user()->id;
         $type = $params['type'] ?? 'user';
-        return $this->walletRepo->getProfitsByType($userId,$type);
+        return $this->walletRepo->getProfitsByType($userId, $type);
     }
 
     public function getLatestTransactions($params)
@@ -151,5 +177,4 @@ class WalletService
 
         return $this->walletRepo->getLatestTransactions($userId, $limit);
     }
-    
 }

@@ -16,9 +16,11 @@ use Modules\AreaManager\Http\Controllers\AdminUserController;
 use Modules\AreaManager\Http\Controllers\AgencyUserController;
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
+use Modules\AreaManager\Http\Controllers\AdminRewardController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
 use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
+use Modules\AreaManager\Http\Controllers\DedicateRewardHistoryController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerController as AdminAreaManagerController;
@@ -137,6 +139,10 @@ Route::group(
                 'show' => 'users.show'
             ]
         ]);
+        Route::resource('rewards', AdminRewardController::class);
+        Route::get('search/super-admin', [AdminRewardController::class, 'getSuperAdmins'])->name('super-admin');
+
+        Route::resource('rewards-history', DedicateRewardHistoryController::class);
         //
         Route::resource('rooms', RoomController::class);
 

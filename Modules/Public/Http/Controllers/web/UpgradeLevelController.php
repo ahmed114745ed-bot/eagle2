@@ -22,8 +22,7 @@ class UpgradeLevelController extends MainController
 
     public function ovipConfig(Request $request)
     {
-
-        $data = $request->except('_token','test_calco');
+        $data = $request->except('_token', 'test_calco', 'current_tab', 'inner_tab_type');
         $Keys = [
             'exp_sender_percentage',
             'exp_received_percentage',
@@ -31,27 +30,56 @@ class UpgradeLevelController extends MainController
             'exp_room_percentage',
             'exp_charge_percentage'
         ];
+        
         foreach ($data as $key => $value) {
             Config::updateOrCreate(['name' => $key], ['value' => $value]);
+            // Clear old cache first, then set new value
+            Cache::forget($key);
+            Cache::put($key, $value, now()->addYear());
+
             if (in_array($key, $Keys)) {
-                \Cache::forget('exp_percentages');
+                Cache::forget('exp_percentages');
             }
         }
-        return redirect()->back()->with('message', __('dashboard.update'));
-
+        
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
+        Cache::flush();
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        }
+        
+        return redirect($redirectUrl)->with('message', __('dashboard.update'));
     }
 
     public function exchange(Request $request)
     {
-
-        $data = $request->except('_token','test_calco');
+        $data = $request->except('_token', 'test_calco', 'current_tab', 'inner_tab_type');
         
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
-            Cache::put($key, $value);
+            // Clear old cache first
+            Cache::forget($key);
+            Cache::put($key, $value, now()->addYear());
         }
-        return redirect()->back()->with('message', __('dashboard.update'));
-
+        
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
+        Cache::flush();
+        
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        }
+        
+        return redirect($redirectUrl)->with('message', __('dashboard.update'));
     }
     public function group_chat_config(Request $request)
     {

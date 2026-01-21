@@ -11,7 +11,6 @@
         .wrapper {
             /* min-width: max-content; */
         }
-
     }
 
     @media (max-width: 1200px) {
@@ -27,6 +26,10 @@
     @media (max-width: 992px) {
         .app-class {
             margin-top: 10% !important;
+        }
+
+        html.ltr .dropdown-menu {
+            right: 10%;
         }
 
         .content {
@@ -48,6 +51,14 @@
     }
 
     @media (max-width: 768px) {
+        .rtl .dropdown-menu {
+            left: 12%;
+        }
+
+        html.ltr .dropdown-menu {
+            right: 14%;
+        }
+
         .main-sidebar, .left-side {
             padding-top: 20% !important;
         }
@@ -244,6 +255,10 @@
             padding-top: 20% !important;
         }
 
+        html.ltr .dropdown-menu {
+            right: 10%;
+        }
+
         .box-footer {
             flex-direction: column;
             align-items: center;
@@ -437,8 +452,8 @@
 
         .fields-group .col-sm-2.control-label {
             flex: 0 0 auto;
-            width: 16.66666667%;
-            min-width: 80px;
+            /*width: 16.66666667%;*/
+            /*min-width: 80px;*/
             text-align: right;
             margin-bottom: 0;
             font-size: 12px;
@@ -477,10 +492,12 @@
         }
 
         .rtl .col-md-3 .card {
+            margin-left: 4% !important;
             margin-right: 4% !important;
         }
 
         .col-md-3 .card {
+            margin-right: 4% !important;
             margin-left: 4% !important;
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\GiftLog;
 use App\Models\Target;
 use App\Models\UserSallary;
 use App\Models\MonthlyDiamondReceive;
@@ -28,7 +29,6 @@ class ProcessTargetDiamonds implements ShouldQueue
     public function handle()
     {
         $this->processSalaries();
-
     }
 
 
@@ -49,7 +49,7 @@ class ProcessTargetDiamonds implements ShouldQueue
         }
     }
 
-  
+
     protected function processSingleSalary(UserSallary $salary, Target $target, int $month, int $year): void
     {
         $salary->is_finished = 1;
@@ -77,9 +77,14 @@ class ProcessTargetDiamonds implements ShouldQueue
                     'old_diamond' => $current_diamond,
                 ]
             );
+            GiftLog::create([
+                'giftId' => 0,
+                'roomowner_id' => 0,
+                'giftPrice' => $extra_diamond,
+                'giftNum' => 1,
+                'sender_id' => 0,
+                'receiver_id' => $salary->user_id,
+            ]);
         }
     }
-
- 
-   
 }
