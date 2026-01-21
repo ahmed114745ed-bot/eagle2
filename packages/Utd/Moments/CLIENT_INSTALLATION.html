@@ -108,29 +108,38 @@
     </div>
 
     <div class="step">
-        <span class="step-num">4</span> <strong>Publish Configuration</strong>
+        <span class="step-num">4</span> <strong>Register Service Provider</strong>
+        <p>Add the service provider to <code style="display:inline; padding:2px 6px;">config/app.php</code> in the "providers" array:</p>
+        <code>'providers' => [
+    // Other providers...
+    Utd\Moments\MomentsServiceProvider::class,
+]</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">5</span> <strong>Publish Configuration</strong>
         <code>php artisan vendor:publish --tag=moments</code>
     </div>
 
     <div class="step">
-        <span class="step-num">5</span> <strong>Run Database Migrations</strong>
+        <span class="step-num">6</span> <strong>Run Database Migrations</strong>
         <code>php artisan migrate</code>
     </div>
 
     <div class="step">
-        <span class="step-num">6</span> <strong>Clear Cache</strong>
+        <span class="step-num">7</span> <strong>Clear Cache</strong>
         <code>php artisan cache:clear
 php artisan config:clear
 php artisan route:clear</code>
     </div>
 
     <div class="step">
-        <span class="step-num">7</span> <strong>Create Storage Link</strong>
+        <span class="step-num">8</span> <strong>Create Storage Link</strong>
         <code>php artisan storage:link</code>
     </div>
 
     <div class="step">
-        <span class="step-num">8</span> <strong>Setup Admin Permissions</strong>
+        <span class="step-num">9</span> <strong>Setup Admin Permissions</strong>
         <p>Run the permission seeder to add Moments permissions to admin panel:</p>
         <code>php artisan db:seed --class=AdminPermissionRefact</code>
     </div>

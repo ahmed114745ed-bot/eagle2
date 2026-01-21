@@ -396,6 +396,16 @@
 
     <div class="step">
         <span class="step-number">4</span>
+        <span class="step-title">Register Service Provider</span>
+        <p>Add the service provider to <code>config/app.php</code> in the "providers" array:</p>
+        <pre><code>'providers' => [
+    // Other providers...
+    Utd\Moments\MomentsServiceProvider::class,
+]</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
         <span class="step-title">Publish Configuration Files</span>
         <pre><code>php artisan vendor:publish --tag=moments</code></pre>
         <p>This will publish:</p>
@@ -407,20 +417,20 @@
     </div>
 
     <div class="step">
-        <span class="step-number">5</span>
+        <span class="step-number">6</span>
         <span class="step-title">Run Migrations</span>
         <pre><code>php artisan migrate</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-number">6</span>
+        <span class="step-number">7</span>
         <span class="step-title">Setup Admin Permissions</span>
         <p>Run the permission seeder to add Moments permissions to admin panel:</p>
         <pre><code>php artisan db:seed --class=AdminPermissionRefact</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-number">7</span>
+        <span class="step-number">8</span>
         <span class="step-title">Clear Cache</span>
         <pre><code>php artisan cache:clear
 php artisan config:clear
@@ -429,7 +439,7 @@ php artisan view:clear</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-number">8</span>
+        <span class="step-number">9</span>
         <span class="step-title">Create Storage Link (if not exists)</span>
         <pre><code>php artisan storage:link</code></pre>
     </div>
