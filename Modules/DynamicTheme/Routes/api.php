@@ -22,11 +22,19 @@ use Illuminate\Support\Facades\Route;
 // Mobile App API (v1) - For Flutter consumption
 // ============================================================
 
+use Modules\DynamicTheme\Http\Controllers\Api\V1\FlutterScreenController;
+
 Route::prefix('v1/app')->group(function () {
     Route::get('/screens/{screenKey}', [ScreenController::class, 'show']);
 });
 
-
+// ============================================================
+// Flutter API (v2) - Optimized columns/rows format
+// ============================================================
+Route::prefix('v2/flutter')->group(function () {
+    // Get screen with widgets, children, and assets in columns/rows format
+    Route::get('/screens/{screenKey}', [FlutterScreenController::class, 'show']);
+});
 
 Route::prefix('v1')->group(function () {
     // Screens - Get screen layout with widgets for mobile app
