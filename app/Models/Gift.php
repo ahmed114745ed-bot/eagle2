@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Moment\Entities\Moment;
 use Modules\Vip\Entities\OVip;
 use App\Traits\AchievementGift;
+use Utd\Moments\Entities\Moment;
 
 class Gift extends Model
 {

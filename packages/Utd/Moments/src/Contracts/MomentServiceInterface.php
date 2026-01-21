@@ -1,5 +1,7 @@
 <?php
 
+namespace Utd\Moments\Contracts;
+
 interface MomentServiceInterface
 {
     public function getMomentsByType($type, $userId, $page, $currentUser);

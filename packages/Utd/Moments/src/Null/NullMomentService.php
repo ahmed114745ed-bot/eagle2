@@ -1,8 +1,9 @@
 <?php
 
-namespace Utd\Achievements\Null;
+namespace Utd\Moments\Null;
 
-use MomentServiceInterface;
+
+use Utd\Moments\Contracts\MomentServiceInterface;
 
 class NullMomentService implements MomentServiceInterface
 {

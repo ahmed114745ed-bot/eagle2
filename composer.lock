@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67a434d5c1a2f016b8fd22648fbc713a",
+    "content-hash": "50a7e74aa3a4fd8a8207aedfbb881437",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14376,6 +14376,50 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
+            "name": "utd/achievements",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Achievements",
+                "reference": "b012e1cf0a4733660241e73e7c9047ae64697325"
+            },
+            "require": {
+                "encore/laravel-admin": "^1.8",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Achievements\\AchievementsServiceProvider"
+                    ],
+                    "aliases": {
+                        "Achievement": "Utd\\Achievements\\Facades\\Achievement"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Achievements\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Achievement System Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "utd/moments",
             "version": "dev-achievmentPackage",
             "dist": {
@@ -15188,6 +15232,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
+        "utd/achievements": 20,
         "utd/moments": 20
     },
     "prefer-stable": true,

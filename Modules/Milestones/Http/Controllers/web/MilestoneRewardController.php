@@ -12,11 +12,11 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
 use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
-use Modules\Achievement\Entities\Achievement;
 use Modules\Badge\Entities\Badge;
 use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Selectables\Wares;
+use Utd\Achievements\Entities\Achievement;
 
 class MilestoneRewardController
 {
@@ -121,7 +121,6 @@ class MilestoneRewardController
         });
 
 
-
         Admin::script("
             if (window.innerWidth >= 1024) {
                 $('.table-responsive').removeClass('table-responsive');
@@ -137,13 +136,26 @@ class MilestoneRewardController
 
         $form->hidden('milestone_id')->value(request('milestone_id'));
 
-        $form->select('type', __('Type'))->options([
-            "coins"        => __('Coins'),
-            "ware"         => __('Wares'),
-            "vip"          => __('vip'),
-            "achievement"  => __('Achievement'),
-            "badge"        => __('Badge'),
-        ])
+//        $form->select('type', __('Type'))->options([
+//            "coins" => __('Coins'),
+//            "ware" => __('Wares'),
+//            "vip" => __('vip'),
+//            "achievement" => __('Achievement'),
+//            "badge" => __('Badge'),
+//        ]);
+
+        $options = [
+            "coins" => __('Coins'),
+            "ware"  => __('Wares'),
+            "vip"   => __('vip'),
+            "badge" => __('Badge'),
+        ];
+
+        if (class_exists(Achievement::class, false)) {
+            $options['achievement'] = __('Achievement');
+        }
+
+        $form->select('type', __('Type'))->options($options)
             ->when("ware", function (Form $form) {
                 $form->belongsTo('rewardable_id', Wares::class, trans('Wares'))->rules('required');
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
@@ -153,6 +165,10 @@ class MilestoneRewardController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {
+                if (! class_exists(Achievement::class, false)) {
+                    return;
+                }
+
                 $form->image("reward1", __('Image'))
                     ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
                     ->disk('gcs');
@@ -166,7 +182,6 @@ class MilestoneRewardController
             ->when("coins", function (Form $form) {
                 $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
             });
-
 
 
         $form->saving(function (Form $form) {
@@ -187,19 +202,20 @@ class MilestoneRewardController
                     break;
 
                 case 'achievement':
+                    if (! class_exists(Achievement::class, false)) {
+                        return false;
+                    }
                     $form->rewardable_id = 0;
                     $form->model()->rewardable_id = 0;
-                    $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                    $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-
-
+                    $form->rewardable_type = Achievement::class;
+                    $form->model()->rewardable_type = Achievement::class;
                     break;
 
                 case 'coins':
                     $form->rewardable_id = 0;
                     $form->model()->rewardable_id = 0;
                     $form->model()->rewardable_type = \App\Models\User::class;
-                    $form->reward = (int) $form->reward2;
+                    $form->reward = (int)$form->reward2;
                     $form->model()->reward = $form->reward2;
                     break;
             }
