@@ -38,11 +38,8 @@
 }
 
 .settings-menu button.active {
-        background: #fff !important;
-    background-color: #fff;   /* white background */
-    color: #000;              /* black text */
-    border-radius: 6px;
-    font-weight: 600;
+    background: #fff;
+    color: #000;
 }
 
 /* Optional hover */
