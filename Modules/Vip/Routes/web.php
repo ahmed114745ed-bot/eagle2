@@ -35,9 +35,10 @@ Route::group(
 
         Route::prefix('ovip-theme')->group(function () {
             Route::get('/{ovip_id}', [OVipController::class, 'editBackgroundImage']);
+            Route::post('/{ovip_id}', [OVipController::class, 'updateBackgroundImage'])->name('backgroundImage.update');
             Route::put('/{ovip_id}', [OVipController::class, 'update']);
         });
-        
+
         Route::get('ovip-settings', [OVipController::class, 'vipSettings']);
         Route::prefix('ware-gift')->group(function () {
             Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);

@@ -85,6 +85,11 @@ class OVipController extends MainController
             ->body($this->backgroundImage()->edit($id)));
     }
 
+    public function updateBackgroundImage($id)
+    {
+        return $this->backgroundImage()->update($id);
+    }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -234,6 +239,8 @@ class OVipController extends MainController
 
         $form = new Form(new OVip);
         $this->disableFormTools($form);
+        $form->action(route('admin.backgroundImage.update', $form->model()->id ?? 0));
+        $form->method('POST');
         $form->image('background_img', trans('background'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
 
         $form->saved(function (Form $form) {
