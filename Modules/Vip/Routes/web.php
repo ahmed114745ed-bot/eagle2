@@ -32,9 +32,14 @@ Route::group(
         Route::resource('vip_privilege', VipPrivilegeController::class);
         Route::resource('ovip', OVipController::class);
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
+
+        Route::prefix('ovip-theme')->group(function () {
+            Route::get('/{ovip_id}', [OVipController::class, 'create']);
+            Route::put('/{ovip_id}', [OVipController::class, 'update']);
+        });
         Route::get('ovip-theme/{ovip_id}', [OVipController::class, 'editBackgroundImage']);
-         Route::post('ovip-theme/{ovip_id}', [OVipController::class, 'store']);
-        Route::get('ovip-settings', [OVipController::class, 'vipSettings']);  
+        Route::post('ovip-theme/{ovip_id}', [OVipController::class, 'store']);
+        Route::get('ovip-settings', [OVipController::class, 'vipSettings']);
         Route::prefix('ware-gift')->group(function () {
             Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
             Route::post('/{level}', [OvipGiftTapController::class, 'store']);
@@ -45,7 +50,5 @@ Route::group(
             Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
         });
-
     }
 );
-
