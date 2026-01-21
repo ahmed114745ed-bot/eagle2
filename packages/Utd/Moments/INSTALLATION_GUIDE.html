@@ -451,11 +451,7 @@ php artisan view:clear</code></pre>
 
     <h2>3.1 Environment Variables</h2>
     <p>Add these to your <code>.env</code> file:</p>
-    <pre><code># Moments Package Configuration
-MOMENTS_LICENSE_KEY=your_license_key
-MOMENTS_LICENSE_SECRET=moments-secret-key
-
-# Moment Viewer Configuration
+    <pre><code># Moment Viewer Configuration
 MOMENT_VIEWER_PER_PAGE=12
 MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
 
@@ -464,10 +460,6 @@ MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
 
 return [
     'name' => 'Moments',
-    
-    // License key for the package
-    'license_key' => env('MOMENTS_LICENSE_KEY', ''),
-    'license_secret' => env('MOMENTS_LICENSE_SECRET', 'moments-secret-key'),
     
     // Default moment privacy setting
     'default_privacy' => 'public',

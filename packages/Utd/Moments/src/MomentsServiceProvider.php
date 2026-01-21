@@ -21,16 +21,7 @@ class MomentsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/moments.php', 'moments');
-        $this->mergeConfigFrom(__DIR__ . '/../config/viewer.php', 'moments.viewer');
 
-        // Register MomentService based on license validation
-//        $this->app->singleton(MomentContract::class, function ($app) {
-//            if ($this->isLicenseValid()) {
-//                return $app->make(MomentService::class);
-//            }
-//
-//            return $app->make(NullMomentService::class);
-//        });
         $this->app->singleton(MomentContract::class, MomentService::class);
     }
 
@@ -112,7 +103,6 @@ class MomentsServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/moments.php' => config_path('moments.php'),
-                __DIR__ . '/../config/viewer.php' => config_path('moments-viewer.php'),
             ], 'moments');
 
             $this->publishes([
@@ -131,24 +121,5 @@ class MomentsServiceProvider extends ServiceProvider
 //                __DIR__ . '/../resources/lang' => lang_path('vendor/moments'),
 //            ], 'moments');
         }
-    }
-
-    /**
-     * Check if the package license is valid.
-     *
-     * @return bool
-     */
-    protected function isLicenseValid(): bool
-    {
-        $licenseKey = config('moments.license_key');
-
-        if (empty($licenseKey)) {
-            return false;
-        }
-
-        $domain = request()->getHost();
-        $expectedHash = hash('sha256', $domain . config('moments.license_secret'));
-
-        return $licenseKey === $expectedHash;
     }
 }

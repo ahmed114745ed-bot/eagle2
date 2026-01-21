@@ -2,17 +2,6 @@
 
 return [
     'name' => 'Moments',
-
-    /**
-     * License key for the package (domain-based validation)
-     * Generate: hash('sha256', $domain . $license_secret)
-     */
-    'license_key' => env('MOMENTS_LICENSE_KEY', ''),
-
-    /**
-     * License secret for hash validation
-     */
-    'license_secret' => env('MOMENTS_LICENSE_SECRET', 'moments-secret-key'),
     
     /**
      * The default moment privacy setting
@@ -38,4 +27,9 @@ return [
      * Enable/disable moment likes
      */
     'likes_enabled' => true,
+    
+    /**
+     * Default sort order for moments viewer: random, newest, oldest
+     */
+    'default_sort' => env('MOMENT_VIEWER_DEFAULT_SORT', 'random'),
 ];
