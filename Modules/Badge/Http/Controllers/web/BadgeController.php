@@ -86,9 +86,9 @@ class BadgeController extends MainController
     {
         $form = new Form(new Badge());
 
-        if (!$form->isEditing()) {
-            $form->setAction(admin_url('badges'));
-        }
+        // if (!$form->isEditing()) {
+        //     $form->setAction(admin_url('badges'));
+        // }
 
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
