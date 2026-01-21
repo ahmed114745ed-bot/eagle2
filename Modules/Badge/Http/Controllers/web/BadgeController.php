@@ -86,13 +86,17 @@ class BadgeController extends MainController
     {
         $form = new Form(new Badge());
 
+        if (!$form->isEditing()) {
+            $form->setAction(admin_url('badges'));
+        }
+
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
-         $form->image('show_image', trans('img'))->name(function ($file) {
+        $form->image('show_image', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-        
+
         $form->file('image', __('Default Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
         })->required();
