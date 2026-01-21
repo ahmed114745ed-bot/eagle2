@@ -4,6 +4,7 @@ namespace Utd\Moments\Http\Controllers\web;
 
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Illuminate\Http\JsonResponse;
 use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentCommint;
 use Utd\Moments\Entities\MomentLikes;
@@ -398,5 +399,46 @@ class MomentViewerController extends MainController
             'message' => __('Random order reset successfully'),
             'keys_deleted' => $keysDeleted
         ]);
+    }
+
+    public function getUsersWithMoments(Request $request): JsonResponse
+    {
+        try {
+            $search = $request->get('search', '');
+            $perPage = $request->get('per_page', 20);
+            $countryId = session('filter_country_id');
+
+            $query = \App\Models\User::select(['id', 'uuid', 'name'])
+                ->withCount('moments')
+                ->having('moments_count', '>', 0)
+                ->with(['profile:id,user_id,avatar']);
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('uuid', 'like', "%{$search}%")
+                        ->orWhere('id', $search);
+                });
+            }
+
+            if ($countryId) {
+                $query->where('country_id', $countryId);
+            }
+
+            $users = $query->orderByDesc('moments_count')->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }
