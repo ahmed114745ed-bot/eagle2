@@ -1924,6 +1924,7 @@
 
             <div class="pagination-wrapper">
                 {{ $badges?->appends([
+                    'tab'         => 'badges',
                      'type'        => $type,
                     'badges_page' => $badges?->currentPage(),
                 ])->links('vendor.pagination.default') }}
