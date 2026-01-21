@@ -2684,50 +2684,123 @@ export default {
         element.style.minWidth = '40px';
         element.style.minHeight = '40px';
         element.style.position = 'relative';
+        element.style.textAlign = 'left'; // Fix for SVGA player alignment
+        element.style.background = 'transparent';
         
         // Show loading indicator
-        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#10b981;font-size:12px;">⏳</div>';
+        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#10b981;font-size:20px;background:transparent;">⏳</div>';
         
-        const player = new SVGA.Player(element);
+        // Timeout for loading - show error if takes too long
+        let loadTimedOut = false;
+        const loadTimeout = setTimeout(() => {
+          if (element.dataset.svgaLoaded === 'loading') {
+            loadTimedOut = true;
+            element.dataset.svgaLoaded = 'false';
+            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#f59e0b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span style="font-size:16px;">⚠️</span><span>انتهت المهلة</span></div>';
+            element.onclick = () => {
+              element.dataset.svgaLoaded = 'false';
+              this.initSvgaPlayerInternal(element, url);
+            };
+          }
+        }, 15000); // 15 seconds timeout
+        
         const parser = new SVGA.Parser();
         
-        // Use downloader for cross-origin URLs (like Google Storage)
-        parser.load(url, (videoItem) => {
-          element.innerHTML = ''; // Clear loading indicator
-          player.setVideoItem(videoItem);
-          player.loops = 0; // Infinite loop
-          player.clearsAfterStop = false;
-          player.startAnimation();
-          element.dataset.svgaLoaded = 'true';
-          
-          // Ensure canvas is visible and properly sized
-          setTimeout(() => {
-            const canvas = element.querySelector('canvas');
-            if (canvas) {
-              canvas.style.width = '100%';
-              canvas.style.height = '100%';
-              canvas.style.display = 'block';
-              canvas.style.visibility = 'visible';
-              canvas.style.opacity = '1';
-              canvas.style.position = 'absolute';
-              canvas.style.top = '0';
-              canvas.style.left = '0';
+        // Set download mode for cross-origin URLs
+        if (parser.load) {
+          parser.load(url, (videoItem) => {
+            clearTimeout(loadTimeout);
+            if (loadTimedOut) return; // Already timed out
+            
+            if (!videoItem) {
+              console.error('❌ [initSvgaPlayerInternal] No videoItem returned for:', url);
+              element.dataset.svgaLoaded = 'false';
+              element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span><span style="font-size:8px;">فارغ</span></div>';
+              return;
             }
-          }, 50);
-        }, (error) => {
-          console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
-          element.dataset.svgaLoaded = 'false';
-          // Show error placeholder with retry button
-          element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span>⚠️ SVGA</span><span style="font-size:8px;">خطأ تحميل</span></div>';
-          element.onclick = () => {
+            
+            // Clear loading indicator first
+            element.innerHTML = '';
+            
+            // Create player AFTER clearing content
+            const player = new SVGA.Player(element);
+            player.setVideoItem(videoItem);
+            player.loops = 0; // Infinite loop
+            player.clearsAfterStop = false;
+            player.startAnimation();
+            element.dataset.svgaLoaded = 'true';
+            
+            // Ensure canvas is visible and properly sized with multiple retries
+            const fixCanvas = (retries = 3) => {
+              const canvas = element.querySelector('canvas');
+              if (canvas) {
+                canvas.style.cssText = 'width:100% !important;height:100% !important;display:block !important;visibility:visible !important;opacity:1 !important;position:absolute !important;top:0 !important;left:0 !important;object-fit:contain;background:transparent;';
+                // Force resize
+                const rect = element.getBoundingClientRect();
+                if (rect.width > 0 && rect.height > 0) {
+                  player.setContentMode('AspectFill');
+                  player.startAnimation();
+                }
+              } else if (retries > 0) {
+                setTimeout(() => fixCanvas(retries - 1), 100);
+              } else {
+                console.warn('⚠️ Canvas not found for SVGA element after retries');
+              }
+            };
+            setTimeout(() => fixCanvas(), 100);
+          }, (error) => {
+            clearTimeout(loadTimeout);
+            if (loadTimedOut) return;
+            
+            console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
             element.dataset.svgaLoaded = 'false';
-            this.initSvgaPlayerInternal(element, url);
-          };
-        });
+            // Show error placeholder with retry button
+            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span style="font-size:16px;">⚠️</span><span>خطأ تحميل</span></div>';
+            element.onclick = () => {
+              element.dataset.svgaLoaded = 'false';
+              this.initSvgaPlayerInternal(element, url);
+            };
+          });
+        } else {
+          // Fallback: try using downloader approach
+          this.loadSvgaWithFetch(element, url);
+        }
       } catch (error) {
         console.error('❌ [initSvgaPlayerInternal] Error initializing SVGA player:', error);
         element.dataset.svgaLoaded = 'false';
         element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;">⚠️ Error</div>';
+      }
+    },
+    
+    // Fallback method to load SVGA using fetch
+    async loadSvgaWithFetch(element, url) {
+      try {
+        const response = await fetch(url, { mode: 'cors' });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        
+        const parser = new SVGA.Parser();
+        parser.load(arrayBuffer, (videoItem) => {
+          if (!videoItem) {
+            element.dataset.svgaLoaded = 'false';
+            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span></div>';
+            return;
+          }
+          
+          element.innerHTML = '';
+          const player = new SVGA.Player(element);
+          player.setVideoItem(videoItem);
+          player.loops = 0;
+          player.clearsAfterStop = false;
+          player.startAnimation();
+          element.dataset.svgaLoaded = 'true';
+        });
+      } catch (error) {
+        console.error('❌ [loadSvgaWithFetch] Failed:', error);
+        element.dataset.svgaLoaded = 'false';
+        element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span></div>';
       }
     },
     
@@ -2785,6 +2858,8 @@ export default {
       
       // Mark the URL being loaded
       element.dataset.svgaUrl = url;
+      
+      console.log('🎬 [onSvgaMounted] Starting SVGA load for:', url);
       
       // Use requestAnimationFrame to ensure DOM is ready
       requestAnimationFrame(() => {
@@ -4172,7 +4247,7 @@ export default {
   width: 100%;
   height: 100%;
   display: block;
-  background: transparent;
+  background: transparent !important;
   min-width: 40px;
   min-height: 40px;
   position: absolute;
@@ -4180,6 +4255,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
+  overflow: hidden;
 }
 
 .svga-asset-container canvas {
@@ -4196,8 +4272,12 @@ export default {
 
 .placed-asset.svga-asset {
   overflow: visible;
-  background: rgba(16, 185, 129, 0.05);
-  border: 1px dashed rgba(16, 185, 129, 0.5);
+  background: transparent !important;
+  border: none;
+}
+
+.placed-asset.svga-asset.selected {
+  border: 1px dashed rgba(16, 185, 129, 0.7);
 }
 
 .placed-asset.svga-asset .svga-asset-container {
@@ -4220,6 +4300,13 @@ export default {
   display: block !important;
   visibility: visible !important;
   opacity: 1 !important;
+  background: transparent !important;
+}
+
+/* Override any SVGA player default styles */
+.svga-asset-container div,
+.placed-asset.svga-asset .svga-asset-container div {
+  background: transparent !important;
 }
 
 .text-asset-content {
