@@ -78,11 +78,6 @@ class UserResource extends JsonResource
             ]);
         }
         $data      = [
-            // ========================================
-            // Achievement Data (Conditional)
-            // ========================================
-            'achievements' => $this->getAchievementsData(),
-            'medals_count' => $this->getMedalsCount(),
             'id'      => @$this->id,
             'uuid'    => @$this->uuid_v2,
             'special_color'    => @$this->color_id ?? '',
@@ -157,7 +152,6 @@ class UserResource extends JsonResource
         if (@$this->is_mic == '0' || @$this->is_mic == '1') {
             $data['is_mic'] = $this->is_mic;
         }
-
         if ($this->pivot) {
             $data['visit_time'] = $this->pivot->updated_at;
         }
@@ -173,23 +167,4 @@ class UserResource extends JsonResource
 
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
-
-    /**
-     * Get achievements data safely
-     */
-    private function getAchievementsData(): array
-    {
-        $service = app(\App\Contracts\AchievementContract::class);
-        return $service->getUserAchievements($this->id, 3);
-    }
-
-    /**
-     * Get medals count safely
-     */
-    private function getMedalsCount(): int
-    {
-        $service = app(\App\Contracts\AchievementContract::class);
-        return count($service->getEnabledMedals($this->id));
-    }
-
 }
