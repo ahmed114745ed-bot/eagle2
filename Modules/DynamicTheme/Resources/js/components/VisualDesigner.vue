@@ -237,7 +237,7 @@
                 v-for="asset in selectedChild.assets || []"
                 :key="asset.id"
                 class="asset-item"
-                :class="{ 'active': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
+                :class="{ 'active': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset), 'svga-asset': isSvgaAsset(asset) }"
                 draggable="true"
                 @dragstart="onAssetDragStart($event, asset)"
                 @click="selectAsset(asset)"
@@ -247,6 +247,15 @@
                   <div v-if="isTextAsset(asset)" class="text-asset-preview">
                     <span class="text-icon">📝</span>
                     <span class="text-content">{{ asset.text_content || asset.name || asset.asset_key }}</span>
+                  </div>
+                  <!-- SVGA assets -->
+                  <div v-else-if="isSvgaAsset(asset)" class="svga-asset-preview">
+                    <div 
+                      :ref="el => { if(el) onSvgaMounted(asset, el) }"
+                      class="svga-player-container"
+                      :data-url="asset.file_url || asset.url"
+                    ></div>
+                    <span class="svga-badge">SVGA</span>
                   </div>
                   <!-- Image assets -->
                   <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" @error="onAssetImageError($event, asset)" />
@@ -321,7 +330,7 @@
                           v-for="asset in child.assets || []"
                           :key="asset.id"
                           class="placed-asset"
-                          :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
+                          :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset), 'svga-asset': isSvgaAsset(asset) }"
                           :style="getAssetStyle(asset)"
                           @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
                           @click.stop="selectPlacedAsset(asset, widget, child)"
@@ -329,6 +338,8 @@
                           <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                             {{ asset.text_content || asset.name || asset.asset_key }}
                           </div>
+                          <!-- SVGA Asset -->
+                          <div v-else-if="isSvgaAsset(asset)" class="svga-asset-container" :ref="el => { if(el) onSvgaMounted(asset, el) }" :data-url="asset.file_url || asset.url"></div>
                           <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
                           <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
                           
@@ -361,12 +372,14 @@
                           v-for="asset in child.assets || []"
                           :key="'dup_' + asset.id"
                           class="placed-asset"
-                          :class="{ 'text-asset': isTextAsset(asset) }"
+                          :class="{ 'text-asset': isTextAsset(asset), 'svga-asset': isSvgaAsset(asset) }"
                           :style="getAssetStyle(asset)"
                         >
                           <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                             {{ asset.text_content || asset.name || asset.asset_key }}
                           </div>
+                          <!-- SVGA Asset -->
+                          <div v-else-if="isSvgaAsset(asset)" class="svga-asset-container" :ref="el => { if(el) onSvgaMounted(asset, el) }" :data-url="asset.file_url || asset.url"></div>
                           <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" />
                           <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
                         </div>
@@ -392,7 +405,7 @@
                         v-for="asset in child.assets || []"
                         :key="asset.id"
                         class="placed-asset"
-                        :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset) }"
+                        :class="{ 'selected': selectedAssetId === asset.id, 'text-asset': isTextAsset(asset), 'svga-asset': isSvgaAsset(asset) }"
                         :style="getAssetStyle(asset)"
                         @mousedown.stop="startDragPlacedAsset($event, child, asset, widget)"
                         @click.stop="selectPlacedAsset(asset, widget, child)"
@@ -400,6 +413,8 @@
                         <div v-if="isTextAsset(asset)" class="text-asset-content" :style="getTextAssetStyle(asset)">
                           {{ asset.text_content || asset.name || asset.asset_key }}
                         </div>
+                        <!-- SVGA Asset -->
+                        <div v-else-if="isSvgaAsset(asset)" class="svga-asset-container" :ref="el => { if(el) onSvgaMounted(asset, el) }" :data-url="asset.file_url || asset.url"></div>
                         <img v-else-if="asset.file_url || asset.url" :src="asset.file_url || asset.url" draggable="false" @error="onAssetImageError($event, asset)" />
                         <span v-else class="asset-placeholder-small">{{ asset.name }}</span>
                         
@@ -1147,6 +1162,12 @@ export default {
       this.$refs.mobileScreen.addEventListener('touchmove', this.onTouchMove, { passive: false });
       this.$refs.mobileScreen.addEventListener('touchend', this.onTouchEnd, { passive: false });
     }
+    // تحميل مكتبة SVGA إذا لم تكن محملة
+    this.loadSvgaLibrary().then(() => {
+      console.log('✅ SVGA library loaded successfully');
+    }).catch(err => {
+      console.warn('⚠️ Failed to load SVGA library:', err);
+    });
   },
   beforeUnmount() {
     document.removeEventListener('mousemove', this.onMouseMove);
@@ -2592,6 +2613,91 @@ export default {
       return isTextType;
     },
     
+    // Check if asset is SVGA type
+    isSvgaAsset(asset) {
+      if (!asset) return false;
+      
+      // Check by asset_type field
+      if (asset.asset_type === 'svga') return true;
+      
+      // Check by file extension
+      const url = asset.file_url || asset.url || '';
+      const extension = url.split('.').pop()?.toLowerCase();
+      return extension === 'svga' || extension === 'zz';
+    },
+    
+    // Initialize SVGA player for an element
+    initSvgaPlayer(element, url) {
+      if (!element || !url || element.dataset.svgaLoaded) return;
+      
+      // Check if SVGA library is loaded
+      if (typeof SVGA === 'undefined') {
+        console.warn('SVGA library not loaded. Loading from CDN...');
+        this.loadSvgaLibrary().then(() => {
+          this.initSvgaPlayerInternal(element, url);
+        });
+        return;
+      }
+      
+      this.initSvgaPlayerInternal(element, url);
+    },
+    
+    // Internal method to initialize SVGA player
+    initSvgaPlayerInternal(element, url) {
+      if (!element || element.dataset.svgaLoaded) return;
+      
+      try {
+        element.dataset.svgaLoaded = 'true';
+        const player = new SVGA.Player(element);
+        const parser = new SVGA.Parser(element);
+        
+        parser.load(url, (videoItem) => {
+          player.setVideoItem(videoItem);
+          player.loops = 0; // Infinite loop
+          player.clearsAfterStop = false;
+          player.startAnimation();
+        }, (error) => {
+          console.error('Failed to load SVGA:', url, error);
+          element.dataset.svgaLoaded = 'false';
+        });
+      } catch (error) {
+        console.error('Error initializing SVGA player:', error);
+        element.dataset.svgaLoaded = 'false';
+      }
+    },
+    
+    // Load SVGA library dynamically
+    loadSvgaLibrary() {
+      return new Promise((resolve, reject) => {
+        if (typeof SVGA !== 'undefined') {
+          resolve();
+          return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    },
+    
+    // Get unique ID for SVGA player
+    getSvgaPlayerId(asset) {
+      return `svga_player_${asset.id}_${Date.now()}`;
+    },
+    
+    // Handle SVGA element mounted
+    onSvgaMounted(asset, event) {
+      const element = event?.target || event;
+      const url = asset.file_url || asset.url;
+      if (element && url) {
+        this.$nextTick(() => {
+          this.initSvgaPlayer(element, url);
+        });
+      }
+    },
+    
     // Style for text asset content
     getTextAssetStyle(asset) {
       // Handle text alignment for flexbox justify-content
@@ -3917,6 +4023,61 @@ export default {
   padding: 1px 4px;
   border-radius: 3px;
   margin-top: 2px;
+}
+
+/* SVGA Asset Styles */
+.svga-asset .asset-preview,
+.svga-asset-preview {
+  background: linear-gradient(135deg, #10b981, #059669);
+  position: relative;
+}
+
+.svga-asset-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.svga-asset-preview .svga-player-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svga-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 8px;
+  background: rgba(16, 185, 129, 0.9);
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.svga-asset-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.placed-asset.svga-asset {
+  overflow: visible;
+}
+
+.placed-asset.svga-asset .svga-asset-container {
+  width: 100%;
+  height: 100%;
 }
 
 .text-asset-content {
