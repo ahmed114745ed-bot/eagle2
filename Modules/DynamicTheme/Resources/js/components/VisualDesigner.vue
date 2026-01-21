@@ -975,6 +975,27 @@ export default {
     widgetName() {
       return this.selectedWidgetData?.display_name || this.selectedWidgetData?.widget_key || 'اختر ويدجت';
     },
+    // حساب ارتفاع الشاشة الديناميكي بناءً على الويدجات
+    dynamicScreenHeight() {
+      if (!this.placedWidgets || this.placedWidgets.length === 0) {
+        return this.screenHeight;
+      }
+      
+      // حساب أقصى نقطة يصل إليها أي ويدجت
+      let maxY = 0;
+      for (const widget of this.placedWidgets) {
+        const widgetBottom = (widget.y || 0) + (widget.height || 100);
+        if (widgetBottom > maxY) {
+          maxY = widgetBottom;
+        }
+      }
+      
+      // إضافة هامش إضافي للأسفل (100px)
+      const calculatedHeight = maxY + 100;
+      
+      // الحد الأدنى هو الارتفاع الافتراضي
+      return Math.max(this.screenHeight, calculatedHeight);
+    },
     // بيانات الويدجت المختار من placedWidgets
     selectedWidgetData() {
       return this.placedWidgets.find(w => w.id === this.selectedWidgetId);
@@ -2617,17 +2638,26 @@ export default {
     isSvgaAsset(asset) {
       if (!asset) return false;
       
-      // Check by asset_type field
-      if (asset.asset_type === 'svga') return true;
+      // Check by asset_type field first
+      if (asset.asset_type === 'svga') {
+        console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| asset_type: svga | isSvga: true');
+        return true;
+      }
       
       // Check by file extension (handle URLs with query params)
       const url = asset.file_url || asset.url || '';
+      if (!url) {
+        return false;
+      }
+      
       // Remove query params before getting extension
       const urlPath = url.split('?')[0];
       const extension = urlPath.split('.').pop()?.toLowerCase();
       const isSvga = extension === 'svga' || extension === 'zz';
       
-      console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| url:', url, '| ext:', extension, '| isSvga:', isSvga);
+      if (isSvga) {
+        console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| url:', url, '| ext:', extension, '| isSvga:', isSvga);
+      }
       return isSvga;
     },
     
@@ -2891,7 +2921,8 @@ export default {
     getMobileScreenStyle() {
       return {
         width: this.screenWidth * this.zoom + 'px',
-        height: this.screenHeight * this.zoom + 'px',
+        height: this.dynamicScreenHeight * this.zoom + 'px',
+        minHeight: this.screenHeight * this.zoom + 'px',
         backgroundColor: this.screenBackgroundColor || '#f5f5f5',
       };
     },
@@ -4196,6 +4227,9 @@ export default {
   padding: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 3px #333;
   flex-shrink: 0;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .mobile-notch {
@@ -4224,11 +4258,11 @@ export default {
 
 .mobile-screen {
   width: 375px;
-  height: 667px;
+  min-height: 667px;
   background: #f5f5f5;
   border-radius: 4px;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
   transform-origin: top center;
 }
 
