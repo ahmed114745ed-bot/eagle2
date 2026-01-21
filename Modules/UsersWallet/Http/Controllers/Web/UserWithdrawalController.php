@@ -390,7 +390,7 @@ protected function detail($id)
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
             'amount' => $withdrawal->amount,
-            'operation' => 'add',
+            'operation' => 'rejected',
             'type' => 'user',
             'before_amount' => $available,
             'after_amount' => $after_amount,
