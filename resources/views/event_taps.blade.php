@@ -39,7 +39,7 @@
 
 .settings-menu button.active {
     background-color: #fff;   /* white background */
-    color: #fff;              /* black text */
+    color: #000;              /* black text */
     border-radius: 6px;
     font-weight: 600;
 }
