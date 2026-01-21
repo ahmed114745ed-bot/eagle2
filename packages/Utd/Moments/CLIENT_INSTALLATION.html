@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Moments Package - Client Installation Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.7;
+        }
+        h1 {
+            color: #2563eb;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #1e40af;
+            margin-top: 35px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        .step {
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .step-num {
+            background: #2563eb;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 12px 16px;
+            display: block;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        @media print {
+            body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📸 Moments Package<br>Installation Guide</h1>
+
+    <h2>Requirements</h2>
+    <ul>
+        <li>PHP 8.1 or higher</li>
+        <li>Laravel 10.x or 11.x</li>
+        <li>MySQL 5.7 or higher</li>
+        <li>Laravel-Admin package installed</li>
+    </ul>
+
+    <h2>Installation Steps</h2>
+
+    <div class="step">
+        <span class="step-num">1</span> <strong>Copy the Package</strong>
+        <p>Copy the <code style="display:inline; padding:2px 6px;">Moments</code> folder to:</p>
+        <code>packages/Utd/Moments</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">2</span> <strong>Update composer.json</strong>
+        <p>Add this to your project's <code style="display:inline; padding:2px 6px;">composer.json</code> in the "repositories" section:</p>
+        <code>{
+    "type": "path",
+    "url": "packages/Utd/Moments"
+}</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">3</span> <strong>Install the Package</strong>
+        <code>composer require utd/moments</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">4</span> <strong>Publish Configuration</strong>
+        <code>php artisan vendor:publish --tag=moments</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">5</span> <strong>Run Database Migrations</strong>
+        <code>php artisan migrate</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">6</span> <strong>Clear Cache</strong>
+        <code>php artisan cache:clear
+php artisan config:clear
+php artisan route:clear</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">7</span> <strong>Create Storage Link</strong>
+        <code>php artisan storage:link</code>
+    </div>
+
+    <div class="step">
+        <span class="step-num">8</span> <strong>Setup Admin Permissions</strong>
+        <p>Run the permission seeder to add Moments permissions to admin panel:</p>
+        <code>php artisan db:seed --class=AdminPermissionRefact</code>
+    </div>
+
+    <h2>Verify Installation</h2>
+    
+    <p>Open your browser and go to:</p>
+    <code>https://your-domain.com/admin/moment-viewer</code>
+
+    <div class="success">
+        <strong>✅ Done!</strong> If the page loads, your installation is complete.
+    </div>
+
+    <h2>Configuration (Optional)</h2>
+    
+    <p>Add these to your <code style="display:inline; padding:2px 6px;">.env</code> file:</p>
+    <code>MOMENT_VIEWER_PER_PAGE=12
+MOMENT_VIEWER_DEFAULT_SORT=random</code>
+
+    <div class="note">
+        <strong>⚠️ Having Issues?</strong><br>
+        Run: <code style="margin:5px 0;">php artisan route:list | grep moment</code>
+        If no routes appear, contact support.
+    </div>
+
+    <div class="footer">
+        <p>Moments Package v1.0.0 | January 2026</p>
+    </div>
+
+</body>
+</html>

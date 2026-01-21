@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moments Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2563eb;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #1e3a8a;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #3b82f6;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #1e40af;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>📸 Moments Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Moments package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: January 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Setup</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+            <li><a href="#api-reference">8. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+    
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Frontend Requirements</h2>
+    <table>
+        <tr>
+            <th>Library</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>jQuery</td>
+            <td>3.6+</td>
+            <td>DOM manipulation & AJAX</td>
+        </tr>
+        <tr>
+            <td>SweetAlert2</td>
+            <td>11+</td>
+            <td>Alert dialogs</td>
+        </tr>
+        <tr>
+            <td>Font Awesome</td>
+            <td>6.4+</td>
+            <td>Icons</td>
+        </tr>
+    </table>
+
+    <h2>1.3 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    <ul>
+        <li><code>moment</code> - Main moments table</li>
+        <li><code>moment_user_likes</code> - Likes tracking</li>
+        <li><code>moment_user_comments</code> - Comments storage</li>
+        <li><code>moment_user_gifts</code> - Gifts tracking</li>
+        <li><code>moment_gallery</code> - Media/Gallery storage</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>Moments</code> folder to your project:</p>
+        <pre><code>packages/Utd/Moments</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Moments"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/moments</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Publish Configuration Files</span>
+        <pre><code>php artisan vendor:publish --tag=moments</code></pre>
+        <p>This will publish:</p>
+        <ul>
+            <li><code>config/moments.php</code> - Main configuration</li>
+            <li><code>config/moments-viewer.php</code> - Viewer configuration</li>
+            <li>Database migrations</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Run Migrations</span>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <span class="step-title">Setup Admin Permissions</span>
+        <p>Run the permission seeder to add Moments permissions to admin panel:</p>
+        <pre><code>php artisan db:seed --class=AdminPermissionRefact</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
+        <span class="step-title">Clear Cache</span>
+        <pre><code>php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">8</span>
+        <span class="step-title">Create Storage Link (if not exists)</span>
+        <pre><code>php artisan storage:link</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Environment Variables</h2>
+    <p>Add these to your <code>.env</code> file:</p>
+    <pre><code># Moments Package Configuration
+MOMENTS_LICENSE_KEY=your_license_key
+MOMENTS_LICENSE_SECRET=moments-secret-key
+
+# Moment Viewer Configuration
+MOMENT_VIEWER_PER_PAGE=12
+MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
+
+    <h2>3.2 Main Configuration (config/moments.php)</h2>
+    <pre><code>&lt;?php
+
+return [
+    'name' => 'Moments',
+    
+    // License key for the package
+    'license_key' => env('MOMENTS_LICENSE_KEY', ''),
+    'license_secret' => env('MOMENTS_LICENSE_SECRET', 'moments-secret-key'),
+    
+    // Default moment privacy setting
+    'default_privacy' => 'public',
+    
+    // Maximum file size for uploads (in KB)
+    'max_file_size' => 10240,
+    
+    // Allowed file types
+    'allowed_file_types' => [
+        'image/jpeg', 
+        'image/png', 
+        'image/gif', 
+        'video/mp4'
+    ],
+    
+    // Enable/disable features
+    'comments_enabled' => true,
+    'likes_enabled' => true,
+];</code></pre>
+
+    <h2>3.3 Viewer Configuration (config/moments-viewer.php)</h2>
+    <pre><code>&lt;?php
+
+return [
+    'theme' => [
+        'app_name' => 'Moments Viewer',
+    ],
+    
+    // Items per page
+    'per_page' => env('MOMENT_VIEWER_PER_PAGE', 12),
+    
+    // Default sort order: random, newest, oldest
+    'default_sort' => env('MOMENT_VIEWER_DEFAULT_SORT', 'random'),
+    
+    // Feature toggles
+    'features' => [
+        'likes' => true,
+        'comments' => true,
+        'gifts' => true,
+        'delete_moment' => true,
+        'delete_comment' => true,
+        'navigation' => true,
+    ],
+    
+    // Media settings
+    'media' => [
+        'max_display_items' => 10,
+        'default_avatar' => 'images/businessman-icon.jpg',
+    ],
+    
+    // Pagination options
+    'pagination' => [
+        'per_page_options' => [12, 24, 36, 48],
+        'show_page_info' => true,
+    ],
+    
+    // Random sorting settings
+    'random' => [
+        'session_based' => true,
+        'seed_lifetime' => 3600,
+    ],
+    
+    // Cache settings (optional)
+    'cache' => [
+        'enabled' => false,
+        'ttl' => 300,
+    ],
+];</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Setup</h1>
+
+    <h2>4.1 Migration Files</h2>
+    <p>The package includes the following migrations:</p>
+    <table>
+        <tr>
+            <th>Migration</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>add_moment_table</td>
+            <td>Creates main moment table</td>
+        </tr>
+        <tr>
+            <td>add_moment_user_likes_table</td>
+            <td>Creates likes tracking table</td>
+        </tr>
+        <tr>
+            <td>add_moment_user_comments_table</td>
+            <td>Creates comments table</td>
+        </tr>
+        <tr>
+            <td>create_moment_user_gifts_table</td>
+            <td>Creates gifts tracking table</td>
+        </tr>
+        <tr>
+            <td>create_moment_galleries_table</td>
+            <td>Creates media gallery table</td>
+        </tr>
+    </table>
+
+    <h2>4.2 Database Indexing (Recommended)</h2>
+    <p>For better performance, add these indexes:</p>
+    <pre><code>-- Add indexes for better query performance
+ALTER TABLE moment ADD INDEX idx_user_id (user_id);
+ALTER TABLE moment ADD INDEX idx_created_at (created_at);
+ALTER TABLE moment ADD INDEX idx_user_created (user_id, created_at);
+ALTER TABLE moment_user_likes ADD INDEX idx_moment_id (moment_id);
+ALTER TABLE moment_user_comments ADD INDEX idx_moment_id (moment_id);</code></pre>
+
+    <h2>4.3 Seeding Test Data (Optional)</h2>
+    <pre><code>php artisan db:seed --class=Utd\\Moments\\Database\\Seeders\\MomentSeeder</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 Available Routes</h2>
+    <p>The package registers the following routes:</p>
+
+    <h3>Web Routes (Admin Panel)</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer</td>
+            <td>Viewer index page</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer/api/moments</td>
+            <td>List moments (paginated)</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer/api/moment/{id}</td>
+            <td>Get single moment</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer/api/moment/{id}/likes</td>
+            <td>Get moment likes</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer/api/moment/{id}/comments</td>
+            <td>Get moment comments</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/moment-viewer/api/moment/{id}/gifts</td>
+            <td>Get moment gifts</td>
+        </tr>
+        <tr>
+            <td>PUT</td>
+            <td>/admin/moment-viewer/api/moment/{id}/description</td>
+            <td>Update description</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/admin/moment-viewer/api/moment/{id}</td>
+            <td>Delete moment</td>
+        </tr>
+        <tr>
+            <td>DELETE</td>
+            <td>/admin/moment-viewer/api/comment/{id}</td>
+            <td>Delete comment</td>
+        </tr>
+    </table>
+
+    <h3>API Routes</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/Utd/moments</td>
+            <td>List moments</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/Utd/moments/{id}</td>
+            <td>Get moment details</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/moments</td>
+            <td>Create moment</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/moments/{id}/like</td>
+            <td>Like/Unlike moment</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/moments/{id}/comment</td>
+            <td>Add comment</td>
+        </tr>
+    </table>
+
+    <h2>5.2 Middleware Setup</h2>
+    <p>The package registers <code>moment.allowed</code> middleware automatically.</p>
+    
+    <div class="note">
+        <div class="note-title">📝 Note</div>
+        <p>If you need to customize the middleware, create your own in <code>app/Http/Middleware/</code> and register it in <code>app/Http/Kernel.php</code>:</p>
+    </div>
+    
+    <pre><code>// app/Http/Kernel.php
+protected $routeMiddleware = [
+    // ...
+    'moment.allowed' => \App\Http\Middleware\MomentAllowed::class,
+];</code></pre>
+
+    <h2>5.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr moment-viewer</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Verification -->
+    <h1 id="verification">6. Verification</h1>
+
+    <h2>6.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/moments</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Config Published</td>
+            <td>Check <code>config/moments.php</code></td>
+            <td>File exists</td>
+        </tr>
+        <tr>
+            <td>3. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All moment migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>4. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>moment-viewer routes visible</td>
+        </tr>
+        <tr>
+            <td>5. Views Working</td>
+            <td>Visit /admin/moment-viewer</td>
+            <td>Page loads without errors</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Test Access</h2>
+    <p>Open your browser and navigate to:</p>
+    <pre><code>https://your-domain.com/admin/moment-viewer</code></pre>
+
+    <h2>6.3 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Get Moments
+curl -X GET "https://your-domain.com/admin/moment-viewer/api/moments?sort=random" \
+  -H "Accept: application/json" \
+  -H "Cookie: your_session_cookie"
+
+# Test Get Single Moment
+curl -X GET "https://your-domain.com/admin/moment-viewer/api/moment/1" \
+  -H "Accept: application/json"</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If you can access the viewer page and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Troubleshooting -->
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+
+    <h2>7.1 Common Issues</h2>
+
+    <h3>Issue: Page Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan route:clear
+php artisan cache:clear
+php artisan config:clear</code></pre>
+    </div>
+
+    <h3>Issue: Route Not Defined Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Clear route cache and verify routes are registered:</p>
+        <pre><code>php artisan route:clear
+php artisan route:list | findstr moment</code></pre>
+    </div>
+
+    <h3>Issue: Images Not Displaying</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Verify storage link exists: <code>php artisan storage:link</code></li>
+            <li>Check file permissions on storage folder</li>
+            <li>Verify <code>getImagePath()</code> helper function exists</li>
+        </ol>
+    </div>
+
+    <h3>Issue: CSRF Token Mismatch</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan config:clear
+php artisan cache:clear</code></pre>
+        <p>Ensure this meta tag exists in your layout:</p>
+        <pre><code>&lt;meta name="csrf-token" content="{{ csrf_token() }}"&gt;</code></pre>
+    </div>
+
+    <h3>Issue: Middleware Not Found</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Verify middleware is registered in <code>app/Http/Kernel.php</code>:</p>
+        <pre><code>protected $routeMiddleware = [
+    'moment.allowed' => \Utd\Moments\Http\Middleware\CheckAllowedMoment::class,
+];</code></pre>
+    </div>
+
+    <h3>Issue: Database Query Errors</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <ol>
+            <li>Run migrations: <code>php artisan migrate</code></li>
+            <li>Check table structure matches model relationships</li>
+            <li>Verify foreign keys are properly set</li>
+        </ol>
+    </div>
+
+    <h2>7.2 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <h2>7.3 Browser Console</h2>
+    <p>Press <code>F12</code> to open Developer Tools and check for JavaScript errors in the Console tab.</p>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: API Reference -->
+    <h1 id="api-reference">8. API Reference</h1>
+
+    <h2>8.1 List Moments</h2>
+    <pre><code>GET /admin/moment-viewer/api/moments
+
+Parameters:
+- page (int): Page number
+- per_page (int): Items per page (default: 12)
+- sort (string): Sorting method (random, newest, oldest)
+- user_id (int): Filter by user ID
+
+Response:
+{
+    "data": [...],
+    "current_page": 1,
+    "last_page": 10,
+    "per_page": 12,
+    "total": 120
+}</code></pre>
+
+    <h2>8.2 Get Moment Details</h2>
+    <pre><code>GET /admin/moment-viewer/api/moment/{id}
+
+Response:
+{
+    "id": 1,
+    "user_id": 123,
+    "description": "...",
+    "media": [...],
+    "likes_count": 50,
+    "comments_count": 10,
+    "created_at": "2026-01-21T10:00:00Z"
+}</code></pre>
+
+    <h2>8.3 Get Likes</h2>
+    <pre><code>GET /admin/moment-viewer/api/moment/{id}/likes
+
+Response:
+{
+    "data": [
+        {
+            "user_id": 1,
+            "user_name": "John",
+            "created_at": "..."
+        }
+    ]
+}</code></pre>
+
+    <h2>8.4 Get Comments</h2>
+    <pre><code>GET /admin/moment-viewer/api/moment/{id}/comments
+
+Response:
+{
+    "data": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "comment": "Nice!",
+            "created_at": "..."
+        }
+    ]
+}</code></pre>
+
+    <h2>8.5 Delete Moment</h2>
+    <pre><code>DELETE /admin/moment-viewer/api/moment/{id}
+
+Response:
+{
+    "success": true,
+    "message": "Moment deleted successfully"
+}</code></pre>
+
+    <h2>8.6 Delete Comment</h2>
+    <pre><code>DELETE /admin/moment-viewer/api/comment/{id}
+
+Response:
+{
+    "success": true,
+    "message": "Comment deleted successfully"
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your Moments package is now ready to use.</p>
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: January 2026
+        </p>
+    </div>
+
+</body>
+</html>
