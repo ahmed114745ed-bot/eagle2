@@ -1132,7 +1132,6 @@ export default {
         for (const child of widget.children || []) {
           const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
           if (asset) {
-            console.log('🎯 [selectedElement] returning asset:', asset?.name, '| type:', asset?.type);
             return asset;
           }
         }
@@ -1184,9 +1183,7 @@ export default {
       this.$refs.mobileScreen.addEventListener('touchend', this.onTouchEnd, { passive: false });
     }
     // تحميل مكتبة SVGA إذا لم تكن محملة
-    this.loadSvgaLibrary().then(() => {
-      console.log('✅ SVGA library loaded successfully');
-    }).catch(err => {
+    this.loadSvgaLibrary().catch(err => {
       console.warn('⚠️ Failed to load SVGA library:', err);
     });
   },
@@ -1215,9 +1212,6 @@ export default {
     
     // Initialize all widgets
     initializeWidgets() {
-      console.log('🎨 [VisualDesigner] initializeWidgets called');
-      console.log('🎨 [VisualDesigner] availableWidgets:', this.availableWidgets);
-      
       // Load screen background color from screenOverrides (tied to screen + configuration)
       let foundBackgroundColor = null;
       if (this.screenId && this.screenOverrides) {
@@ -1230,7 +1224,6 @@ export default {
       if (!foundBackgroundColor && this.screen?.background_color) {
         foundBackgroundColor = this.screen.background_color;
       }
-      console.log('🎨 [VisualDesigner] Loading screen_background_color from screenOverrides:', foundBackgroundColor);
       if (foundBackgroundColor) {
         this.screenBackgroundColor = foundBackgroundColor;
       }
@@ -1286,8 +1279,6 @@ export default {
           children: this.buildWidgetChildren(settings.children, theme, widget)
         };
       });
-      
-      console.log('🎨 [VisualDesigner] placedWidgets:', this.placedWidgets);
       
       // Select first widget if available
       if (this.placedWidgets.length > 0) {
@@ -1369,21 +1360,9 @@ export default {
     
     // Build child assets from saved data or theme
     buildChildAssets(savedAssets, themeAssets) {
-      // Log للتحقق من البيانات
-      console.log('📦 [buildChildAssets] themeAssets:', themeAssets);
-      console.log('📦 [buildChildAssets] savedAssets:', savedAssets);
-      
-      // طباعة خصائص النص للأصول المحفوظة
-      if (savedAssets && savedAssets.length > 0) {
-        savedAssets.forEach(sa => {
-          console.log('📦 [buildChildAssets] savedAsset:', sa.id, sa.name, '| type:', sa.type, '| text_color:', sa.text_color, '| font_size:', sa.font_size);
-        });
-      }
-      
       // إنشاء خريطة للأصول من الثيم للحصول على type
       const themeAssetsMap = new Map();
       (themeAssets || []).forEach(ta => {
-        console.log('📦 [buildChildAssets] themeAsset:', ta.id, ta.name, '| type:', ta.type);
         themeAssetsMap.set(ta.id, ta);
       });
       
@@ -2629,9 +2608,7 @@ export default {
     // Check if asset is a text type (نص أو ملف)
     isTextAsset(asset) {
       // التحقق من نوع الأصل من حقل type (نص أو ملف)
-      const isTextType = asset?.type === 'text' || asset?.type === 'نص';
-      console.log('🔍 [isTextAsset] asset:', asset?.name, '| type:', asset?.type, '| isText:', isTextType);
-      return isTextType;
+      return asset?.type === 'text' || asset?.type === 'نص';
     },
     
     // Check if asset is SVGA type
@@ -2640,7 +2617,6 @@ export default {
       
       // Check by asset_type field first
       if (asset.asset_type === 'svga') {
-        console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| asset_type: svga | isSvga: true');
         return true;
       }
       
@@ -2653,12 +2629,7 @@ export default {
       // Remove query params before getting extension
       const urlPath = url.split('?')[0];
       const extension = urlPath.split('.').pop()?.toLowerCase();
-      const isSvga = extension === 'svga' || extension === 'zz';
-      
-      if (isSvga) {
-        console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| url:', url, '| ext:', extension, '| isSvga:', isSvga);
-      }
-      return isSvga;
+      return extension === 'svga' || extension === 'zz';
     },
     
     // Initialize SVGA player for an element
@@ -2683,11 +2654,8 @@ export default {
       
       // Skip if already loaded with same URL
       if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
-        console.log('⏭️ [initSvgaPlayerInternal] Already loaded, skipping:', url);
         return;
       }
-      
-      console.log('🎬 [initSvgaPlayerInternal] Initializing SVGA:', url);
       
       try {
         // Clear previous content
@@ -2705,7 +2673,6 @@ export default {
         const parser = new SVGA.Parser();
         
         parser.load(url, (videoItem) => {
-          console.log('✅ [initSvgaPlayerInternal] SVGA loaded successfully:', url, 'size:', videoItem.videoSize);
           player.setVideoItem(videoItem);
           player.loops = 0; // Infinite loop
           player.clearsAfterStop = false;
@@ -2717,7 +2684,6 @@ export default {
             canvas.style.width = '100%';
             canvas.style.height = '100%';
             canvas.style.display = 'block';
-            console.log('🎨 [initSvgaPlayerInternal] Canvas found and styled');
           }
         }, (error) => {
           console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
@@ -2763,11 +2729,8 @@ export default {
       // Create unique key for this element
       const elementKey = `svga_${assetId}_${url}`;
       
-      console.log('🎬 [onSvgaMounted] asset:', asset?.name, '| url:', url, '| element:', element, '| loaded:', element.dataset.svgaLoaded);
-      
       // Check if already initialized with same URL
       if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
-        console.log('⏭️ [onSvgaMounted] Already loaded, skipping:', url);
         return;
       }
       
@@ -3012,8 +2975,6 @@ export default {
       if (this.isSaving) return; // Prevent multiple saves
       this.isSaving = true;
       
-      console.log('🎨 [VisualDesigner] Saving screen_background_color to screen overrides:', this.screenBackgroundColor);
-      
       try {
         // Prepare data for saving with ALL widgets and their children
         const designData = {
@@ -3070,9 +3031,7 @@ export default {
               padding_bottom: child.padding_bottom,
               padding_right: child.padding_right,
               padding_left: child.padding_left,
-              assets: (child.assets || []).map(asset => {
-                console.log('💾 [saveDesign] Saving asset:', asset.id, asset.name, '| type:', asset.type, '| text_color:', asset.text_color, '| font_size:', asset.font_size);
-                return {
+              assets: (child.assets || []).map(asset => ({
                 id: asset.id,
                 asset_key: asset.asset_key,
                 name: asset.name,
@@ -3109,7 +3068,7 @@ export default {
                 is_visible: asset.is_visible,
                 is_background: asset.is_background || false,
                 object_fit: asset.object_fit || 'contain',
-              }})
+              }))
             }))
           })),
           // Legacy: also include flattened children for backward compatibility
@@ -3313,7 +3272,6 @@ export default {
                 await configurationsApi.saveScreenOverride(this.configurationId, this.screenId, {
                   background_color: this.screenBackgroundColor
                 });
-                console.log('🎨 [VisualDesigner] Screen background color saved to screenOverrides');
               } catch (screenErr) {
                 console.error('خطأ في حفظ لون خلفية الشاشة:', screenErr);
               }

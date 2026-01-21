@@ -756,12 +756,8 @@ export default {
                                     ? c.asset_overrides
                                     : null;
                             
-                            console.log('🔄 [DashboardApp] Loading assets for child:', c.theme_child_id, '| assetSource:', assetSource);
-                            
                             if (assetSource) {
-                                return assetSource.map(asset => {
-                                    console.log('🔄 [DashboardApp] Asset loaded:', asset.asset_id || asset.id, '| type:', asset.type, '| text_color:', asset.text_color, '| font_size:', asset.font_size);
-                                    return {
+                                return assetSource.map(asset => ({
                                     id: asset.asset_id || asset.id,
                                     asset_key: asset.asset?.asset_key || asset.asset_key || asset.name,
                                     name: asset.asset?.name || asset.name || asset.asset_key,
@@ -800,7 +796,7 @@ export default {
                                     text_shadow: asset.text_shadow,
                                     text_decoration: asset.text_decoration,
                                     text_transform: asset.text_transform,
-                                }});
+                                }));
                             }
                             return existing.assets || [];
                         })(),
@@ -1132,15 +1128,11 @@ const fillMissingSelectedThemeIds = () => {
 	};
 
 	try {
-		console.log('[DashboardApp] Saving configuration...');
-
 		// Try existing endpoints first (backwards-compatible)
 		try {
 			const screenResponse = await configurationsApi.updateScreenOverrides(selectedConfigId.value, { overrides: payload.overrides.screen_overrides });
-			console.log('[DashboardApp] Screen overrides saved:', screenResponse.data);
 
 			const widgetResponse = await configurationsApi.updateWidgetOverrides(selectedConfigId.value, { overrides: payload.overrides.widget_overrides });
-			console.log('[DashboardApp] Widget overrides saved:', widgetResponse.data);
 
 			// Note: asset overrides are handled via upload/remove endpoints elsewhere
 			// Reload configuration to sync local state with server
@@ -1403,15 +1395,6 @@ const fillMissingSelectedThemeIds = () => {
         };
 
         const updateWidgetOrder = (newOrder) => {
-            console.log('[DashboardApp] updateWidgetOrder called with:', newOrder.map(w => ({ id: w.id, type: w.widget_type, idType: typeof w.id })));
-            console.log('[DashboardApp] Current widgetOverrides before update:', widgetOverrides.value.map(wo => ({
-                id: wo.id,
-                screen_widget_id: wo.screen_widget_id,
-                display_order: wo.display_order,
-                idType: typeof wo.id,
-                swIdType: typeof wo.screen_widget_id
-            })));
-
             const fallbackScreenId = selectedScreen.value ? parseInt(selectedScreen.value.id) : null;
 
             newOrder.forEach((widget, index) => {
@@ -1422,13 +1405,9 @@ const fillMissingSelectedThemeIds = () => {
                     parseInt(wo.screen_widget_id) === widgetId
                 );
 
-                console.log(`[DashboardApp] Widget ${widgetId}: existing override =`, existing);
-
                 if (existing) {
-                    console.log(`[DashboardApp] Updating existing override for widget ${widgetId} from order ${existing.display_order} to ${index}`);
                     existing.display_order = index;
                 } else {
-                    console.log(`[DashboardApp] Creating new override for widget ${widgetId} with order ${index}`);
                     const resolvedScreenId = widget.screen_id != null ? parseInt(widget.screen_id) : fallbackScreenId;
                     widgetOverrides.value.push({
                         screen_widget_id: widgetId,
@@ -1451,7 +1430,6 @@ const fillMissingSelectedThemeIds = () => {
                 }
             });
 
-            console.log('[DashboardApp] widgetOverrides after update:', JSON.parse(JSON.stringify(widgetOverrides.value)));
             hasChanges.value = true;
         };
 
@@ -1489,22 +1467,10 @@ const fillMissingSelectedThemeIds = () => {
                 // fetch themes using widget_key (safer for screen widget ids)
                 const themes = await fetchThemesForWidget(widget);
                 editingWidgetThemes.value = themes || [];
-                console.log('themes for widget:', editingWidgetThemes.value);
-                
                 // Merge theme children with their assets into settings.children
                 const selectedThemeId = widget.selected_theme_id ?? widget.settings?.theme_id ?? widget.widget_theme_id;
-                console.log('🎯 [editWidget] selectedThemeId:', selectedThemeId);
-                console.log('🎯 [editWidget] widget.settings before merge:', JSON.stringify(widget.settings));
-                console.log('🎯 [editWidget] editingWidgetThemes.value.length:', editingWidgetThemes.value.length);
-                console.log('🎯 [editWidget] editingWidgetThemes.value:', editingWidgetThemes.value);
                 if (selectedThemeId && editingWidgetThemes.value.length > 0) {
-                    console.log('🎯 [editWidget] Searching for theme with id:', selectedThemeId, 'type:', typeof selectedThemeId);
-                    editingWidgetThemes.value.forEach((t, i) => {
-                        console.log(`🎯 [editWidget] Theme ${i}: id=${t.id} (type: ${typeof t.id}), has children: ${!!t.children}, children count: ${t.children?.length || 0}`);
-                    });
                     const selectedTheme = editingWidgetThemes.value.find(t => parseInt(t.id) === parseInt(selectedThemeId));
-                    console.log('🎯 [editWidget] selectedTheme:', selectedTheme);
-                    console.log('🎯 [editWidget] selectedTheme.children:', selectedTheme?.children);
                     if (selectedTheme && Array.isArray(selectedTheme.children)) {
                         // Ensure widget has settings.children
                         widget.settings = widget.settings || {};
@@ -1521,18 +1487,10 @@ const fillMissingSelectedThemeIds = () => {
                             const existingOverride = existingChildrenMap[themeChild.id];
                             // Get assets from theme child or from child's theme
                             let assets = [];
-                            console.log('🔍 [editWidget] themeChild:', themeChild.id, themeChild);
-                            console.log('🔍 [editWidget] themeChild.theme:', themeChild.theme);
-                            console.log('🔍 [editWidget] themeChild.theme?.assets:', themeChild.theme?.assets);
-                            console.log('🔍 [editWidget] themeChild.assets:', themeChild.assets);
                             if (themeChild.theme && Array.isArray(themeChild.theme.assets)) {
                                 assets = themeChild.theme.assets;
-                                console.log('✅ [editWidget] Using themeChild.theme.assets:', assets.length);
                             } else if (Array.isArray(themeChild.assets)) {
                                 assets = themeChild.assets;
-                                console.log('✅ [editWidget] Using themeChild.assets:', assets.length);
-                            } else {
-                                console.log('❌ [editWidget] No assets found for child:', themeChild.id);
                             }
                             
                             return {
@@ -1597,17 +1555,11 @@ const fillMissingSelectedThemeIds = () => {
                         });
                         
                         widget.settings.children = mergedChildren;
-                        console.log('✅ [editWidget] Merged children with assets:', mergedChildren);
-                        mergedChildren.forEach((c, i) => {
-                            console.log(`✅ [editWidget] Child ${i} (${c.theme_child_id}): ${c.assets?.length || 0} assets`);
-                        });
                     }
                 }
                 
                 // Set editingWidget AFTER merging assets so Vue detects the complete data
                 const finalWidget = { ...widget, settings: { ...widget.settings } };
-                console.log('🚀 [editWidget] Final editingWidget:', finalWidget);
-                console.log('🚀 [editWidget] Final children:', finalWidget.settings?.children);
                 editingWidget.value = finalWidget;
             } catch (error) {
                 editingWidgetThemes.value = [];
@@ -1756,8 +1708,6 @@ const fillMissingSelectedThemeIds = () => {
         const fetchThemesForWidget = async (widget) => {
                 if (!widget) return [];
 
-                console.log('editingWidget:', widget);
-
                 // Try using widget.id (screen widget id) first - this is what has themes associated
                 // Then fall back to widget definition id if needed
                 const widgetDef = availableWidgets.value.find(w => w.widget_key === widget.widget_key);
@@ -1765,22 +1715,15 @@ const fillMissingSelectedThemeIds = () => {
                 
                 if (!widgetIdToUse) return [];
 
-                console.log('widgetDef:', widgetDef);
-                console.log('🎯 Using widget ID for themes:', widgetIdToUse, '(widget.id:', widget.id, ', widgetDef.id:', widgetDef?.id, ')');
-
                 try {
                     // First try with widget.id (screen widget id)
                     let response = await widgetsApi.getThemes(widget.id);
                     let themes = response.data.data || [];
                     
-                    console.log('themes from widget.id:', widget.id, '→', themes.length, 'themes');
-                    
                     // If empty and we have a different widgetDef.id, try that
                     if (themes.length === 0 && widgetDef && widgetDef.id !== widget.id) {
-                        console.log('🔄 No themes found, trying widgetDef.id:', widgetDef.id);
                         response = await widgetsApi.getThemes(widgetDef.id);
                         themes = response.data.data || [];
-                        console.log('themes from widgetDef.id:', widgetDef.id, '→', themes.length, 'themes');
                     }
 
                     // store per-config
@@ -1788,9 +1731,6 @@ const fillMissingSelectedThemeIds = () => {
                         await ensureConfigWidgets(selectedConfigId.value);
                         perConfigWidgetThemes.value[selectedConfigId.value][widgetDef.id] = themes;
                     }
-
-                    console.log('themes returned from API:', themes);
-                    console.log('response returned from API:', response);
 
                     return themes;
                 } catch (error) {
@@ -1881,7 +1821,6 @@ const fillMissingSelectedThemeIds = () => {
                  if (selectedConfigId.value) {
                      try {
                          await loadConfigurationDetails(selectedConfigId.value);
-                         console.log('✅ Configuration reloaded before opening designer');
                      } catch (error) {
                          console.error('Failed to reload configuration:', error);
                      }
@@ -1907,7 +1846,6 @@ const fillMissingSelectedThemeIds = () => {
                      try {
                          if (selectedConfigId.value) {
                              await loadConfigurationDetails(selectedConfigId.value);
-                             console.log('✅ Configuration reloaded after save');
                          }
                      } catch (error) {
                          console.error('Failed to reload configuration:', error);
