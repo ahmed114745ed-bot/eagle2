@@ -39,14 +39,28 @@
             margin-right: 10px;
         }
         code {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 12px 16px;
-            display: block;
-            border-radius: 6px;
-            margin: 10px 0;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-family: Consolas, monospace;
             font-size: 14px;
+            color: #be185d;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
         }
         .note {
             background: #fef3c7;
@@ -89,65 +103,50 @@
 
     <div class="step">
         <span class="step-num">1</span> <strong>Copy the Package</strong>
-        <p>Copy the <code style="display:inline; padding:2px 6px;">Moments</code> folder to:</p>
-        <code>packages/Utd/Moments</code>
+        <p>Copy the <code>Moments</code> folder to:</p>
+        <pre><code>packages/Utd/Moments</code></pre>
     </div>
 
     <div class="step">
         <span class="step-num">2</span> <strong>Update composer.json</strong>
-        <p>Add this to your project's <code style="display:inline; padding:2px 6px;">composer.json</code> in the "repositories" section:</p>
-        <code>{
-    "type": "path",
-    "url": "packages/Utd/Moments"
-}</code>
+        <p>Add this to your project's <code>composer.json</code> in the "repositories" section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Moments"
+        }
+    ]
+}</code></pre>
     </div>
 
     <div class="step">
         <span class="step-num">3</span> <strong>Install the Package</strong>
-        <code>composer require utd/moments</code>
+        <pre><code>composer require utd/moments</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-num">4</span> <strong>Register Service Provider</strong>
-        <p>Add the service provider to <code style="display:inline; padding:2px 6px;">config/app.php</code> in the "providers" array:</p>
-        <code>'providers' => [
-    // Other providers...
-    Utd\Moments\MomentsServiceProvider::class,
-]</code>
-    </div>
-
-    <div class="step">
-        <span class="step-num">5</span> <strong>Publish Configuration</strong>
-        <code>php artisan vendor:publish --tag=moments</code>
-    </div>
-
-    <div class="step">
-        <span class="step-num">6</span> <strong>Run Database Migrations</strong>
-        <code>php artisan migrate</code>
-    </div>
-
-    <div class="step">
-        <span class="step-num">7</span> <strong>Clear Cache</strong>
-        <code>php artisan cache:clear
+        <span class="step-num">4</span> <strong>Clear Cache</strong>
+        <pre><code>php artisan cache:clear
 php artisan config:clear
-php artisan route:clear</code>
+php artisan route:clear</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-num">8</span> <strong>Create Storage Link</strong>
-        <code>php artisan storage:link</code>
+        <span class="step-num">5</span> <strong>Create Storage Link</strong>
+        <pre><code>php artisan storage:link</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-num">9</span> <strong>Setup Admin Permissions</strong>
+        <span class="step-num">6</span> <strong>Setup Admin Permissions</strong>
         <p>Run the permission seeder to add Moments permissions to admin panel:</p>
-        <code>php artisan db:seed --class=AdminPermissionRefact</code>
+        <pre><code>php artisan db:seed --class=AdminPermissionRefact</code></pre>
     </div>
 
     <h2>Verify Installation</h2>
     
     <p>Open your browser and go to:</p>
-    <code>https://your-domain.com/admin/moment-viewer</code>
+    <pre><code>https://your-domain.com/admin/moment-viewer</code></pre>
 
     <div class="success">
         <strong>✅ Done!</strong> If the page loads, your installation is complete.
@@ -155,13 +154,12 @@ php artisan route:clear</code>
 
     <h2>Configuration (Optional)</h2>
     
-    <p>Add these to your <code style="display:inline; padding:2px 6px;">.env</code> file:</p>
-    <code>MOMENT_VIEWER_PER_PAGE=12
-MOMENT_VIEWER_DEFAULT_SORT=random</code>
+    <p>Add this to your <code>.env</code> file:</p>
+    <pre><code>MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
 
     <div class="note">
         <strong>⚠️ Having Issues?</strong><br>
-        Run: <code style="margin:5px 0;">php artisan route:list | grep moment</code>
+        Run: <pre><code>php artisan route:list | grep moment</code></pre>
         If no routes appear, contact support.
     </div>
 

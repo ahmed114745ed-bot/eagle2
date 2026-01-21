@@ -213,8 +213,6 @@ return [
         Modules\AreaManager\Providers\AreaManagerServiceProvider::class,
         Modules\SuperAdmin\Providers\SuperAdminServiceProvider::class,
         Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
-//        \Utd\Moments\MomentsServiceProvider::class,
-//        \Utd\Achievements\AchievementsServiceProvider::class,
 
         //ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class,
 

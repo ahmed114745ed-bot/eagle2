@@ -6,7 +6,6 @@ use App\Contracts\MomentContract;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Utd\Moments\Http\Middleware\CheckAllowedMoment;
 use Utd\Moments\Services\MomentService;
 
 class MomentsServiceProvider extends ServiceProvider
@@ -32,7 +31,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
-        $router->aliasMiddleware('moment.allowed', CheckAllowedMoment::class);
+//        $router->aliasMiddleware('moment.allowed', CheckAllowedMoment::class);
 
         $this->registerRoutes();
         $this->registerViews();

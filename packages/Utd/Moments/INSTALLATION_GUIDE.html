@@ -396,41 +396,13 @@
 
     <div class="step">
         <span class="step-number">4</span>
-        <span class="step-title">Register Service Provider</span>
-        <p>Add the service provider to <code>config/app.php</code> in the "providers" array:</p>
-        <pre><code>'providers' => [
-    // Other providers...
-    Utd\Moments\MomentsServiceProvider::class,
-]</code></pre>
-    </div>
-
-    <div class="step">
-        <span class="step-number">5</span>
-        <span class="step-title">Publish Configuration Files</span>
-        <pre><code>php artisan vendor:publish --tag=moments</code></pre>
-        <p>This will publish:</p>
-        <ul>
-            <li><code>config/moments.php</code> - Main configuration</li>
-            <li><code>config/moments-viewer.php</code> - Viewer configuration</li>
-            <li>Database migrations</li>
-        </ul>
-    </div>
-
-    <div class="step">
-        <span class="step-number">6</span>
-        <span class="step-title">Run Migrations</span>
-        <pre><code>php artisan migrate</code></pre>
-    </div>
-
-    <div class="step">
-        <span class="step-number">7</span>
         <span class="step-title">Setup Admin Permissions</span>
         <p>Run the permission seeder to add Moments permissions to admin panel:</p>
         <pre><code>php artisan db:seed --class=AdminPermissionRefact</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-number">8</span>
+        <span class="step-number">5</span>
         <span class="step-title">Clear Cache</span>
         <pre><code>php artisan cache:clear
 php artisan config:clear
@@ -439,7 +411,7 @@ php artisan view:clear</code></pre>
     </div>
 
     <div class="step">
-        <span class="step-number">9</span>
+        <span class="step-number">6</span>
         <span class="step-title">Create Storage Link (if not exists)</span>
         <pre><code>php artisan storage:link</code></pre>
     </div>
@@ -450,135 +422,22 @@ php artisan view:clear</code></pre>
     <h1 id="configuration">3. Configuration</h1>
 
     <h2>3.1 Environment Variables</h2>
-    <p>Add these to your <code>.env</code> file:</p>
+    <p>Add this to your <code>.env</code> file (optional):</p>
     <pre><code># Moment Viewer Configuration
-MOMENT_VIEWER_PER_PAGE=12
 MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
 
     <h2>3.2 Main Configuration (config/moments.php)</h2>
     <pre><code>&lt;?php
 
 return [
-    'name' => 'Moments',
-    
-    // Default moment privacy setting
-    'default_privacy' => 'public',
-    
-    // Maximum file size for uploads (in KB)
-    'max_file_size' => 10240,
-    
-    // Allowed file types
-    'allowed_file_types' => [
-        'image/jpeg', 
-        'image/png', 
-        'image/gif', 
-        'video/mp4'
-    ],
-    
-    // Enable/disable features
-    'comments_enabled' => true,
-    'likes_enabled' => true,
-];</code></pre>
-
-    <h2>3.3 Viewer Configuration (config/moments-viewer.php)</h2>
-    <pre><code>&lt;?php
-
-return [
-    'theme' => [
-        'app_name' => 'Moments Viewer',
-    ],
-    
-    // Items per page
-    'per_page' => env('MOMENT_VIEWER_PER_PAGE', 12),
-    
     // Default sort order: random, newest, oldest
     'default_sort' => env('MOMENT_VIEWER_DEFAULT_SORT', 'random'),
-    
-    // Feature toggles
-    'features' => [
-        'likes' => true,
-        'comments' => true,
-        'gifts' => true,
-        'delete_moment' => true,
-        'delete_comment' => true,
-        'navigation' => true,
-    ],
-    
-    // Media settings
-    'media' => [
-        'max_display_items' => 10,
-        'default_avatar' => 'images/businessman-icon.jpg',
-    ],
-    
-    // Pagination options
-    'pagination' => [
-        'per_page_options' => [12, 24, 36, 48],
-        'show_page_info' => true,
-    ],
-    
-    // Random sorting settings
-    'random' => [
-        'session_based' => true,
-        'seed_lifetime' => 3600,
-    ],
-    
-    // Cache settings (optional)
-    'cache' => [
-        'enabled' => false,
-        'ttl' => 300,
-    ],
 ];</code></pre>
 
     <div class="page-break"></div>
 
-    <!-- Section 4: Database -->
-    <h1 id="database">4. Database Setup</h1>
-
-    <h2>4.1 Migration Files</h2>
-    <p>The package includes the following migrations:</p>
-    <table>
-        <tr>
-            <th>Migration</th>
-            <th>Description</th>
-        </tr>
-        <tr>
-            <td>add_moment_table</td>
-            <td>Creates main moment table</td>
-        </tr>
-        <tr>
-            <td>add_moment_user_likes_table</td>
-            <td>Creates likes tracking table</td>
-        </tr>
-        <tr>
-            <td>add_moment_user_comments_table</td>
-            <td>Creates comments table</td>
-        </tr>
-        <tr>
-            <td>create_moment_user_gifts_table</td>
-            <td>Creates gifts tracking table</td>
-        </tr>
-        <tr>
-            <td>create_moment_galleries_table</td>
-            <td>Creates media gallery table</td>
-        </tr>
-    </table>
-
-    <h2>4.2 Database Indexing (Recommended)</h2>
-    <p>For better performance, add these indexes:</p>
-    <pre><code>-- Add indexes for better query performance
-ALTER TABLE moment ADD INDEX idx_user_id (user_id);
-ALTER TABLE moment ADD INDEX idx_created_at (created_at);
-ALTER TABLE moment ADD INDEX idx_user_created (user_id, created_at);
-ALTER TABLE moment_user_likes ADD INDEX idx_moment_id (moment_id);
-ALTER TABLE moment_user_comments ADD INDEX idx_moment_id (moment_id);</code></pre>
-
-    <h2>4.3 Seeding Test Data (Optional)</h2>
-    <pre><code>php artisan db:seed --class=Utd\\Moments\\Database\\Seeders\\MomentSeeder</code></pre>
-
-    <div class="page-break"></div>
-
-    <!-- Section 5: Routes -->
-    <h1 id="routes">5. Routes & Middleware</h1>
+    <!-- Section 4: Routes -->
+    <h1 id="routes">4. Routes & Middleware</h1>
 
     <h2>5.1 Available Routes</h2>
     <p>The package registers the following routes:</p>
@@ -671,21 +530,7 @@ ALTER TABLE moment_user_comments ADD INDEX idx_moment_id (moment_id);</code></pr
         </tr>
     </table>
 
-    <h2>5.2 Middleware Setup</h2>
-    <p>The package registers <code>moment.allowed</code> middleware automatically.</p>
-    
-    <div class="note">
-        <div class="note-title">📝 Note</div>
-        <p>If you need to customize the middleware, create your own in <code>app/Http/Middleware/</code> and register it in <code>app/Http/Kernel.php</code>:</p>
-    </div>
-    
-    <pre><code>// app/Http/Kernel.php
-protected $routeMiddleware = [
-    // ...
-    'moment.allowed' => \App\Http\Middleware\MomentAllowed::class,
-];</code></pre>
-
-    <h2>5.3 Verify Routes</h2>
+    <h2>4.2 Verify Routes</h2>
     <pre><code>php artisan route:list | findstr moment-viewer</code></pre>
 
     <div class="page-break"></div>
@@ -787,15 +632,6 @@ php artisan route:list | findstr moment</code></pre>
 php artisan cache:clear</code></pre>
         <p>Ensure this meta tag exists in your layout:</p>
         <pre><code>&lt;meta name="csrf-token" content="{{ csrf_token() }}"&gt;</code></pre>
-    </div>
-
-    <h3>Issue: Middleware Not Found</h3>
-    <div class="step">
-        <strong>Solution:</strong>
-        <p>Verify middleware is registered in <code>app/Http/Kernel.php</code>:</p>
-        <pre><code>protected $routeMiddleware = [
-    'moment.allowed' => \Utd\Moments\Http\Middleware\CheckAllowedMoment::class,
-];</code></pre>
     </div>
 
     <h3>Issue: Database Query Errors</h3>

@@ -36,14 +36,14 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::resource('report-Moments', ReportMomentController::class)->middleware('moment.allowed');
+        Route::resource('report-Moments', ReportMomentController::class);
         Route::post('moment-config', [MomentSettingsController::class, 'momentConfig'])->name('moment-config');
-        Route::resource('Moments', MomentController::class)->middleware('moment.allowed');
-        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery'])->middleware('moment.allowed');
-        Route::resource('moment-settings', MomentSettingsController::class)->middleware('moment.allowed');
+        Route::resource('Moments', MomentController::class);
+        Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
+        Route::resource('moment-settings', MomentSettingsController::class);
 
         // 🎯 Moment Viewer Routes (Facebook-like Experience)
-        Route::prefix('moment-viewer')->name('moment-viewer.')->middleware('moment.allowed')->group(function () {
+        Route::prefix('moment-viewer')->name('moment-viewer.')->group(function () {
             Route::get('/', [MomentViewerController::class, 'index'])->name('index');
             Route::get('/viewer.css', [MomentViewerController::class, 'getViewerCss'])->name('viewer-css');
             Route::get('/api/moments', [MomentViewerController::class, 'getMoments'])->name('api.moments');
