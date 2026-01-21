@@ -86,7 +86,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $userId = Auth::id();
 
-        if (empty($contacts) && empty($imgPath)) {
+        if (empty($contacts) && !$request->hasFile('multi_image')) {
             return [
                 'success' => false,
                 'message' => 'Not allowed to post empty content',

@@ -11,7 +11,7 @@ class Moment extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $fillable = ['user_id', 'description', 'img'];
+    protected $fillable = ['user_id', 'description', 'img', 'comment_num', 'like_num'];
 
     protected $table = 'moment';
 
