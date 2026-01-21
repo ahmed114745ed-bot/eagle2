@@ -40,7 +40,7 @@ class WalletHelper
             $agency = Agency::find($agencyId);
             if ($agency) {
                 $ownerId = $agency->app_owner_id;
-                $bdId    = $agency->bd->app_id;
+                $bdId    = @$agency?->bd?->app_id;
             }
         }
         if ($ownerId && $agency_diff != 0) {
@@ -60,10 +60,6 @@ class WalletHelper
         $before = $wallet?->balance ?? 0 ;
         $wallet->balance += $amount;
         $wallet->save();
-              \Log::info('addBalance data', [
-    'target_id' => $target_id,
-  
-]);
         WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
@@ -80,7 +76,7 @@ class WalletHelper
     public static function createWithdrawal($userId, $amount, array $meta = [])
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
-       
+        $before = $wallet?->balance ?? 0 ;
         $available = wallet_available_by_wallet($wallet);
 
         if ($available < $amount) {
@@ -90,12 +86,25 @@ class WalletHelper
         $wallet->pending_amount += $amount;
         $wallet->save();
     
-        return UserWithdrawal::create([
+        $userWithdrawal = UserWithdrawal::create([
             'user_id' => $userId,
             'amount'  => $amount,
             'status'  => 'pending',
             'meta'    => $meta,
         ]);
+
+         WalletLog::create([
+            'wallet_id' => $wallet->id,
+            'user_id' => $userId,
+            'amount' => $amount,
+            'operation' => 'withdrawal_pending',
+            'type' => 'user',
+            'before_amount' => $before ,
+            'after_amount' => $wallet->balance,
+            'related_id' => $userWithdrawal->id,
+        ]);
+
+        return $userWithdrawal;
     }
     
 

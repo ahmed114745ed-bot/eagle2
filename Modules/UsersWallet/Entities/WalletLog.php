@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\UsersWallet\Entities;
 
 use App\Models\Admin;
@@ -24,7 +25,7 @@ class WalletLog extends Model
     {
         return $this->belongsTo(UserWallet::class);
     }
-        public function target()
+    public function target()
     {
         return $this->belongsTo(Target::class, 'related_id');
     }
@@ -32,6 +33,11 @@ class WalletLog extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class, 'related_id');
+    }
+
+    public function related()
+    {
+        return $this->belongsTo(User::class, 'related_id');
     }
     public function user()
     {

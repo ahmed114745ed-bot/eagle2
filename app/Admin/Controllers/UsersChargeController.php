@@ -57,7 +57,7 @@ class UsersChargeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->disableRowSelector();
 
@@ -272,11 +272,11 @@ class UsersChargeController extends MainController
         $charge->reason_en = self::reason;
         $charge->save();
 
-//        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
+        //        UserCommon::UserEarnedInvitation($user->id, $coins, $charge->id);
     }
 
     private function recentlyCharged(int $userId)
     {
-        return Charge::where('user_id', $userId)->where('reason_en',self::reason )->exists();
+        return Charge::where('user_id', $userId)->where('reason_en', self::reason)->exists();
     }
 }

@@ -26,8 +26,8 @@ class TaskStreamInvitationRepository extends AbstractRepository
 
     public function findPendingInvitation($taskStreamId, $inviteeUserId)
     {
-        $tz = getTimezone();
-        $subMinute = Carbon::now($tz)->subMinute();
+        // $tz = getTimezone();
+        $subMinute = Carbon::now()->subMinute();
 
         return $this->model
             ->where('task_stream_id', $taskStreamId)

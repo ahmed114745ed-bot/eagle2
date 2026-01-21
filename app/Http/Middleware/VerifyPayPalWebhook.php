@@ -18,8 +18,13 @@ class VerifyPayPalWebhook extends PayPalService
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Get headers as array (case-insensitive normalization)
-        $headers = array_change_key_case(getallheaders(), CASE_UPPER);
+        // Get headers using Laravel's request object (works with all servers)
+        $headers = array_change_key_case($request->headers->all(), CASE_UPPER);
+        
+        // Flatten the headers array (Laravel returns arrays for each header)
+        $headers = array_map(function ($value) {
+            return is_array($value) ? $value[0] : $value;
+        }, $headers);
 
         // Get the JSON payload as array
         $payload = $request->json()->all();
@@ -30,8 +35,8 @@ class VerifyPayPalWebhook extends PayPalService
             'transmission_id'   => $headers['PAYPAL-TRANSMISSION-ID'] ?? null,
             'transmission_sig'  => $headers['PAYPAL-TRANSMISSION-SIG'] ?? null,
             'transmission_time' => $headers['PAYPAL-TRANSMISSION-TIME'] ?? null,
-            'webhook_id'        => config('paypal.webhook_id'), // must match dashboard
-            'webhook_event'     => $payload, // ✅ JSON object, not string
+            'webhook_id'        => config('paypal.webhook_id'),
+            'webhook_event'     => $payload,
         ];
 
         $response = Http::withToken(app(PayPalService::class)->getAccessToken())

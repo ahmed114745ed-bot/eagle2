@@ -382,7 +382,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
-            Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
+            Route::prefix('gifts')->withoutMiddleware(['throttle', 'throttle:api'])->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 Route::get('/v2', [GiftController::class, 'getByCategory']);
                 Route::get('/images', [GiftController::class, 'get_images']);
@@ -394,6 +394,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 // Route::post('/send-lucky-gift', [GiftLogController::class, 'ofLucky']);
                 Route::post('/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
                 Route::post('/v2/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V2'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
+                Route::post('/v3/send-lucky-gift-combo', [GiftLogController::class, 'sendLuckyGift2V3'])->middleware(['checkCpu', 'appFeatureEnable:lucky']);
             });
             Route::prefix('gift-categories')->group(function () {
                 Route::get('/', [GiftCategoryController::class, 'index']);
@@ -409,6 +410,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
 
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);
+                Route::get('/categories', [CountryController::class, 'countryCategory']);
                 Route::get('/{id}', [CountryController::class, 'getCountry']);
                 Route::get('/{id}/html', [CountryController::class, 'getCountryByHtml']);
                 Route::post('change-request', [CountryController::class, 'changeRequest']);

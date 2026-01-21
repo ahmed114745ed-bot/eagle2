@@ -86,9 +86,7 @@ class TaskStreamValidationService
      */
     protected function validateLimit($taskStream): void
     {
-        $limit = Common::getConfig('max_task_stream') ?? 4;
-
-        if ($taskStream->rooms()->count() >= $limit) {
+        if ($taskStream->rooms()->count() >= 4) {
             throw new CValidationException(__('This task stream has reached the maximum number of rooms allowed.'), ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
         }
     }

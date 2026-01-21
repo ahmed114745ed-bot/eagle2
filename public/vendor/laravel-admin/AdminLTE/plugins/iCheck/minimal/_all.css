@@ -128,7 +128,7 @@
     display: inline-block;
     *display: inline;
     vertical-align: middle;
-    margin-right: 5px !important;
+    margin-left: 5px !important;
     margin-top: 5px;
     padding: 0;
     width: 18px;
@@ -139,8 +139,8 @@
 }
 
 .rtl .icheckbox_minimal-blue,
-.iradio_minimal-blue {
-    margin-left: 5px !important;
+.rtl .iradio_minimal-blue {
+    margin-right: 5px !important;
 }
 
 .icheckbox_minimal-blue {

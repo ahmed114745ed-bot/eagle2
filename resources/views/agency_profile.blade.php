@@ -15,9 +15,6 @@
             --secondary-color:
                 {{ config('themes.secondaryColor') }}
             ;
-            --green-color:
-                {{ config('themes.greenColor') }}
-            ;
             --text-primary-color:
                 {{ config('themes.textPrimaryColor') }}
             ;
@@ -833,6 +830,23 @@
                     </div>
 
                 </div>
+
+                <div class="agency-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">{{__('created at')}}:</span>
+                        <span class="meta-value">
+                            {{ \Carbon\Carbon::parse($agency->created_at)->format('Y-m-d') }}
+                        </span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">{{__("created by")}}:</span>
+                        <img src="{{ $imageUrlAdmin }}"
+                         class="flag-image">
+                          <span class="meta-value">{{ @$adminUser->name ?? '' }}</span>
+                    </div>
+                </div>
+
+                
             </div>
             <a class="btn-back" href="{{ route('admin.agencies.index') }}">
                 <i class="fas fa-arrow-left"></i> {{__("Go Back")}}

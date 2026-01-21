@@ -1073,6 +1073,132 @@ class Common
         return $result;
     }
 
+    /**
+     * Send Firebase notification for room sharing with image support
+     */
+    public static function send_firebase_notification_with_room_image($tokens, $title, $body, $roomImage = '', $roomId = null, $data = [], $messageType = 'share-room', $user = null)
+    {
+        try {
+            if ($tokens == null) {
+                return false;
+            }
+
+            $api_access_key = self::getGoogleAccessToken();
+            if (!$api_access_key) {
+                return false;
+            }
+
+            $isGroup = false;
+            $userData = [];
+            $key = time();
+
+            if (gettype($tokens) == 'string') {
+                $tokens = [$tokens];
+            }
+
+            $notification = [
+                'title' => $title,
+                'body' => $body,
+            ];
+
+            if (count($tokens) == 1) {
+                $token = $tokens[0];
+            } else {
+                if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+
+              
+
+                SendFirebaseNotificationJob::dispatch(
+                    tokens: $tokens,
+                    title: $title,
+                    body: $body,
+                    data: array_merge($data, [
+                        'room_id' => $roomId,
+                        'room_image' => $roomImage,
+                        'image' => $roomImage
+                    ]),
+                    messageType: $messageType,
+                    user: $user,
+                )->onQueue('notification_heavy');
+
+                return true;
+            }
+
+            if ($user) {
+                $userData = [
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'uuid' => $user->uuid,
+                    'has_color_name' => self::hasInPack($user->id, 18, true),
+                    'image' => $user->profile->avatar,
+                ];
+            }
+
+            // Merge room data with existing data
+            $mergedData = array_merge($data, [
+                'room_id' => $roomId,
+                'room_image' => $roomImage
+            ]);
+
+            $payload = [
+                'token' => $token,
+                'notification' => $notification,
+                'data' => [
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'message-type' => json_encode($messageType ?? ''),
+                    'data' => json_encode($mergedData),
+                ],
+            ];
+
+            if (isset($userData) && is_array($userData)) {
+                $payload['data']['user'] = json_encode($userData);
+            }
+
+            // Add room image to notification
+            if ($roomImage && !empty($roomImage)) {
+                $payload['notification']['image'] = $roomImage;
+            } else {
+                $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+                Log::warning('send_firebase_notification_with_room_image: Using default image', [
+                    'room_image_was' => $roomImage
+                ]);
+            }
+
+            $headers = [
+                'Authorization' => 'Bearer ' . $api_access_key,
+                'Content-Type' => 'application/json',
+            ];
+
+            $projectId = env('FIREBASE_PROJECT_NAME');
+
+            $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+                'message' => $payload
+            ]);
+
+            $resultDecoded = json_decode($result->body());
+
+            if ($result->successful()) {
+             
+            } else {
+           
+            }
+
+            // Remove group with $key if is group
+            if ($resultDecoded && $isGroup) {
+                self::removeGroupName($key, $token, $tokens, $api_access_key);
+            }
+
+            return $resultDecoded;
+        } catch (\Throwable $e) {
+            Log::error('send_firebase_notification_with_room_image: Exception occurred', [
+                'room_id' => $roomId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
+    }
+
 
 
 
@@ -1511,12 +1637,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
-        Log::info(111111);
         $zegoClientId =  config('app.zego_client_id');
-        Log::info('secret key', [
-            'env client zego id' => $zegoClientId,
-        ]);
-
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
@@ -1525,14 +1646,8 @@ class Common
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
 
-        Log::info('ZEGO | zego config values', [
-            'zego_token' => $zego_token,
-            'sounZego' => $sounZego,
-            'vedioZego' => $vedioZego,
-        ]);
 
         if ((!$zego_token && !$zegoClientId) && ($sounZego === '3' && $vedioZego === '3')) {
-            Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
@@ -1550,27 +1665,16 @@ class Common
             // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
-            Log::info(66666666666);
             $zegoData = [
                 'zego_app_id'        => $data['app_id'] ?? '',
                 'zego_server_secret' => $data['server_secret'] ?? '',
                 'zego_app_sign'      => $data['app_sign'] ?? '',
             ];
-            Log::info('ZEGO | mapped zego data', [
-                'zegoData' => $zegoData,
-            ]);
-            Log::info('secret key', [
-                'zego_token' => $zegoClientId,
-            ]);
         }
 
 
         // If a key is provided, return that specific value
         if ($key) {
-            Log::info('ZEGO | keyyyyy', [
-                'zegoData' => $zegoData[$key],
-                'keyy' => $key,
-            ]);
             return $zegoData[$key] ?? null;
         }
 
@@ -2036,7 +2140,117 @@ class Common
     }
 
 
-   
+    public static function getChargerInfoII($resource)
+    {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+        switch ($resource->charger_type) {
+            case 'dash':
+                $admin = $resource->admin;
+                return [
+                    'name' => $admin->name ?? '',
+                    'image' => $admin->avatar ?? '',
+                    'uuid' => $admin->id ?? '',
+                    'id' => $admin->id ?? '',
+                    'type' => 'dash',
+                    'url' => $admin ? url("admin/auth/users/{$admin->id}") : '#',
+
+                ];
+
+            case UserTypeEnum::AREA_MANAGER:
+                $areaManager = $resource->areaManager;
+                return [
+                    'name' => $areaManager->name ?? '',
+                    'image' => $areaManager->avatar ?? '',
+                    'uuid' => $areaManager->id ?? '',
+                    'id' => $areaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $areaManager ? url("admin/auth/users/{$areaManager->id}") : '#',
+
+                ];
+
+            case 'agency':
+                $agency = $resource->senderShippingAgency;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $agency ? url("admin/shipping-agencies/profile/{$agency->id}") : '#',
+
+                ];
+
+            case 'host_agency':
+                $agency = $resource->senderAgency;
+
+                return [
+                    'name' => $agency->name ?? '',
+                    'image' => $agency->img ?? '',
+                    'uuid' => $agency->id ?? '',
+                    'id' => $agency->id ?? '',
+                    'type' => 'host_agency',
+                    'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
+
+                ];
+
+            case 'bd':
+                $bd = $resource->bd;
+                return [
+                    'name' => $bd->username ?? '',
+                    'image' => $bd->avatar ?? '',
+                    'uuid' => $bd->id ?? '',
+                    'id' => $bd->id ?? '',
+                    'type' => 'bd',
+                    'url' => $bd ? url("admin/usersBd/{$bd->id}") : '#',
+
+                ];
+
+            case UserTypeEnum::SUB_AREA_MANAGER:
+                $subAreaManager = $resource->subAreaManager;
+                return [
+                    'name' => $subAreaManager->name ?? '',
+                    'image' => $subAreaManager->avatar ?? '',
+                    'uuid' => $subAreaManager->id ?? '',
+                    'id' => $subAreaManager->id ?? '',
+                    'type' => 'dash',
+                    'url' => $subAreaManager ? url($prefix . "/auth/users/{$subAreaManager->id}") : '#',
+
+                ];
+
+            case 'user':
+                $user = $resource->senderUser;
+
+                return [
+                    'name' => $user->name ?? '',
+                    'image' => $user->profile->avatar ?? '',
+                    'uuid' => $user->uuid ?? '',
+                    'id' => $user->id ?? '',
+                    'type' => 'user',
+                    'url' => $user ? url("admin/users/{$user->id}") : '#',
+                ];
+
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'type_name' => '',
+                    'url' => '#',
+                ];
+        }
+    }
+
+
+
 
 
     public static function getReceiverInfo($resource)
@@ -2130,6 +2344,78 @@ class Common
         }
     }
 
+    public static function getReceiverInfoII($resource)
+    {
+        if (request()->is('superadmin/*')) {
+            $prefix = 'superadmin';
+        } elseif (request()->is('areamanager/*')) {
+            $prefix = 'areamanager';
+        } else {
+            $prefix = 'admin';
+        }
+
+        switch ($resource->user_type) {
+            case 'agency':
+                return [
+                    'name' => $resource->receiveragency->name ?? '',
+                    'image' => $resource->receiveragency->img ?? '',
+                    'uuid' => $resource->receiveragency->id ?? '',
+                    'id' => $resource->receiveragency->id ?? '',
+                    'type' => 'agency',
+                    'url' => $resource->receiveragency ? url($prefix . "/shipping-agencies/profile/{$resource->receiveragency->id}") : '#',
+
+                ];
+            case 'sub_area_manager':
+                return [
+                    'name' => $resource->receiverSubAreaManager->username ?? '',
+                    'image' => $resource->receiverSubAreaManager->avatar ?? '',
+                    'uuid' => $resource->receiverSubAreaManager->id ?? '',
+                    'id' => $resource->receiverSubAreaManager->id ?? '',
+                    'type' => 'sub_area_manager',
+                    'url' => $resource->receiverSubAreaManager ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSubAreaManager->id}") : '#',
+
+                ];
+            case 'super_admin':
+                return [
+                    'name' => $resource->receiverSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSuperAdmin->avatar ?? '',
+                    'uuid' => $resource->receiverSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSuperAdmin->id ?? '',
+                    'type' => 'super_admin',
+                    'url' => $resource->receiverSuperAdmin ? url($prefix . "/shipping-agencies/profile/{$resource->receiverSuperAdmin->id}") : '#',
+                ];
+            case 'sub_super_admin':
+                return [
+                    'name' => $resource->receiverSubSuperAdmin->username ?? '',
+                    'image' => $resource->receiverSubSuperAdmin->avatar ?? '',
+                    'uuid' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'id' => $resource->receiverSubSuperAdmin->id ?? '',
+                    'type' => 'sub_super_admin',
+                    'url' => $resource->receiverSubSuperAdmin ? url($prefix . "/users/profile/{$resource->receiverSubSuperAdmin->id}") : '#',
+                ];
+            case 'user':
+                return [
+
+                    'id' => $resource->receiver->id ?? '',
+                    'name' => $resource->receiver->name ?? '',
+                    'image' => $resource->receiver->profile->avatar ?? '',
+                    'uuid' => $resource->receiver->uuid ?? '',
+                    'type' => 'user',
+                    'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
+
+                ];
+            default:
+                return [
+                    'name' => '',
+                    'image' => '',
+                    'uuid' => '',
+                    'id' => '',
+                    'type' => '',
+                    'url' => '#',
+                ];
+        }
+    }
+
 
     public static function chargerRelationsQuery()
     {
@@ -2138,20 +2424,20 @@ class Common
             'bd',
             'senderUser',
             'senderUser.packs' => function ($q) {
-            $q->whereIn('type', [25])
-              ->where('is_used', true)
-              ->with('ware:id,value');
-        },
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
             'senderUser.profile',
             'senderAgency',
             'senderShippingAgency',
             'receiverUser',
             'receiverUser.profile',
             'receiverUser.packs' => function ($q) {
-            $q->whereIn('type', [25])
-              ->where('is_used', true)
-              ->with('ware:id,value');
-        },
+                $q->whereIn('type', [25])
+                    ->where('is_used', true)
+                    ->with('ware:id,value');
+            },
             'receiveragency',
         ];
     }

@@ -282,9 +282,31 @@
     }
 
     .btn-save {
-        position: absolute;
-        bottom: 15px;
-        left: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-save:active {
+        transform: translateY(0);
+    }
+
+    .btn-save i {
+        font-size: 14px;
+    }
+
+    .settings-form {
+        position: relative;
     }
 
     .card:hover {

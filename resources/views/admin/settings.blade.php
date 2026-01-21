@@ -383,6 +383,7 @@
         <div id="realTimeSetting" class="settings-section">
             <form action="{{ route('admin.update-agora-zego') }}" method="POST">
                 @csrf
+                <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
                 <div class="form">
                     <label class="d-block">{{ __('Real Time system Setting:') }}</label>
 

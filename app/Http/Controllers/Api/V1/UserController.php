@@ -880,9 +880,6 @@ class UserController extends Controller
             0,
             substr($ZegoEncreyptkey, 0, 16)
         );
-        Log::info('ZEGO | decrypted payload', [
-            'decrypted' =>  $decryptedPayload,
-        ]);
         return Common::apiResponse(1, '', $encryptedData);
     }
 

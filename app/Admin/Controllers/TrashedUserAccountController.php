@@ -38,9 +38,12 @@ class TrashedUserAccountController extends  MainController
     protected function grid()
     {
         $grid = new Grid(new User());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()
+        $grid->model()->with([
+            'profile',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+        ])
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
             ->onlyTrashed()->orderByDesc('deleted_at');
 
@@ -52,14 +55,12 @@ class TrashedUserAccountController extends  MainController
             });
         });
         $grid->column('id', __('Id'));
-        // $grid->column('name', __('Name'));
-        // $grid->column('uuid', __('uuid'));
         $grid->column('name', __('user'))->display(function () {
             $name = $this->name;
             $uuid = $this->uuid;
             $phone = $this->phone ?: '-'; // إذا لم يكن هناك رقم هاتف، عرض "-"
             $defaultImage = asset("images/businessman-icon.jpg");
-            $avatarPath = @$this->avatar;
+            $avatarPath = @$this->profile->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
             if (!isImageExists($avatar)) {
@@ -83,10 +84,10 @@ class TrashedUserAccountController extends  MainController
         $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
-            if ( (Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ((Admin::user()->can('restore-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new RestoreUserAccount($model->id));
             }
-            if ( (Admin::user()->can('delete-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ((Admin::user()->can('delete-user-account-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new SoftDeleteUserAccount($model->id));
             }
             $actions->disableEdit();

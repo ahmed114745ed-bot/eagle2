@@ -7,12 +7,9 @@ use App\Models\User;
 use App\Models\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Models\FamilyUser;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyController extends MainController
@@ -86,69 +83,58 @@ class FamilyController extends MainController
             });
         });
         $grid->model()
+            ->select(['id', 'name', 'image', 'user_id', 'num', 'total_diamond', 'created_at'])
             ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
+            ->withCount([
+                'allMembers as members_count_cached',
+                'admins as admins_count_cached'
+            ])
             ->with([
-            'owner:id,name,uuid', // only needed fields
-            'owner.profile:id,user_id,avatar',
-            'owner.packs' => fn($q) => $q
-                ->select('id', 'user_id', 'type', 'is_used', 'target_id')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->with('ware:id,value'),
-        ])->orderByDesc('id');
+                'owner:id,name,uuid',
+                'owner.profile:id,user_id,avatar',
+            ])
+            ->orderByDesc('id');
 
         $grid->id(__('ID'));
         $grid->column('image', __('family'))->display(function ($image) {
-            $path = @$image;
-            $name = $this->name;
+            $name = e($this->name);
             $defaultImage = asset("images/family.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $image ? getImagePath($image) : $defaultImage;
+            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
-                  <strong>$name</strong><br>
-            </div>
-        ";
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                {$imgTag}<strong>{$name}</strong>
+            </div>";
         });
 
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $uid = $this->owner?->uuid;
-            $path = $this->owner?->profile?->avatar;
+            $owner = $this->owner;
+            if (!$owner) return '-';
+            
+            $uid = $owner->uuid;
+            $avatar = $owner->profile?->avatar;
             $defaultImage = asset('images/businessman-icon.jpg');
-            $url = getImagePath($path) ?? $defaultImage;
+            $url = $avatar ? getImagePath($avatar) : $defaultImage;
+            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$owner->id}");
+            $escapedName = e($name);
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : '#';
-
-            return "
-            <div style='display: flex; align-items: center; gap: 10px;'>
-                $image
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                {$imgTag}
                 <div>
-                   <a href='{$showUrl}' style='text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;'>
-                     <span style='text-decoration: underline; cursor: pointer;'>$name</span>
-                    </a>
-                    <span style='font-size: smaller;'>UUID: $uid</span>
+                    <a href='{$showUrl}' style='text-decoration: underline;'>{$escapedName}</a>
+                    <br><span style='font-size: smaller;'>UUID: {$uid}</span>
                 </div>
-            </div>
-        ";
+            </div>";
         });
 
         $grid->column('num', __('number of people'))->display(function ($value) {
-            return $this->members_count . '/' . $value;
-        });;
+            // Original accessor returns count - 1 to exclude owner
+            $count = max(0, ($this->members_count_cached ?? 0) - 1);
+            return $count . '/' . $value;
+        });
         $grid->column('num_admins', __('number of admins'))->display(function ($value) {
-            return $this->admins_num . '/' . $value;
+            return $this->admins_count_cached . '/' . $value;
         });
         $grid->column('max_level', __('level'));
         $grid->column('max_exp', __('exp'));
@@ -200,14 +186,18 @@ class FamilyController extends MainController
     //     return $show;
     // }
 
-    public function show($id, Content $content,)
+    public function show($id, Content $content)
     {
         $type = request('type');
-        $family = Family::with('allMembers', 'owner')->find($id);
-        $familyMembers = $family->allMembers()->when(isset($type), function ($query) use ($type) {
-            $query->where('user_type', $type);
-        })->paginate(10, ['*'], 'member_page');
-        return  parent::show($id, $content->title(__('family profile'))
+        $family = Family::with(['owner:id,name,uuid', 'owner.profile:id,user_id,avatar'])
+            ->findOrFail($id);
+        
+        $familyMembers = $family->allMembers()
+            ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
+            ->when($type !== null, fn($q) => $q->where('user_type', $type))
+            ->paginate(10, ['*'], 'member_page');
+            
+        return parent::show($id, $content->title(__('family profile'))
             ->view('family_profile', compact('family', 'familyMembers')));
     }
 

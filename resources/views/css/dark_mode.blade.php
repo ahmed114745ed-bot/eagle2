@@ -45,6 +45,18 @@
     .dark-mode .stat-card,
     .dark-mode .table-section,
     .dark-mode .empty-table,
+    .dark-mode .notification-item.unread,
+    .dark-mode .notification-item.read,
+    .dark-mode .fields-group .input-group.input-group-sm,
+    .dark-mode .select2-container--default .select2-selection--multiple .select2-selection__choice,
+    .dark-mode .sm\:text-base,
+    .dark-mode .user-card,
+    .dark-mode .received-message .message-bubble,
+    .dark-mode .action-menu,
+    .dark-mode .more-btn:hover,
+    .dark-mode .filter-toggle,
+    .dark-mode .filter-panel,
+    .dark-mode .active-filters,
     .dark-mode .select2-dropdown {
         background-color: var(--dark-secondry-color) !important;
     }
@@ -59,7 +71,37 @@
     .dark-mode #landPageSettings,
     .dark-mode .performers-card,
     .dark-mode .section-box,
-    .dark-mode .box-footer {
+    .dark-mode .bootstrap-datetimepicker-widget table thead tr:first-child th:hover,
+    .dark-mode .datepicker table tr td.day:hover,
+    .dark-mode .datepicker table tr td.active,
+    .dark-mode .datepicker table tr td.active:hover,
+    .dark-mode .datepicker table tr td.active.disabled,
+    .dark-mode .datepicker table tr td.active.disabled:hover,
+    .dark-mode .datepicker table tr td span.active,
+    .dark-mode .datepicker table tr td span.active:hover,
+    .dark-mode .datepicker table tr td span.active.disabled,
+    .dark-mode .datepicker table tr td span.active.disabled:hover,
+    .dark-mode .datepicker table tr td span:hover,
+    .dark-mode .select2-container--default .select2-selection--multiple,
+    .dark-mode .modal-body2,
+    .dark-mode .modal-no,
+    .dark-mode .interactions-panel,
+    .dark-mode .reels-sidebar,
+    .dark-mode .chat-input,
+    .dark-mode .chat-messages,
+    .dark-mode .edit-btn,
+    .dark-mode .reply-btn,
+    .dark-mode .delete-btn,
+    .dark-mode .chat-header,
+    .dark-mode .refresh-btn,
+    .dark-mode .action-menu-item:hover,
+    .dark-mode select > option,
+    .dark-mode .viewer-header,
+    .dark-mode .moment-post,
+    .dark-mode .side-modal-content,
+    .dark-mode .users-sidebar,
+        /*.dark-mode .box-footer {*/
+    .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;
     }
 
@@ -76,9 +118,19 @@
         color: unset !important;
     }
 
+    .dark-mode .top-loading-indicator,
+    .dark-mode .reply-preview,
+    .dark-mode .skeleton {
+        background: var(--dark-secondry-color);
+    }
+
     .dark-mode .box-header.with-border,
     .dark-mode .section-header {
         border-bottom: 1px solid var(--white) !important;
+    }
+
+    .dark-mode .box-footer {
+        border-top: 2px solid var(--white) !important;
     }
 
     .dark-mode .btn:hover,
@@ -100,6 +152,18 @@
         color: #ffffff !important;
     }
 
+    .dark-mode .box-header .form-group .control-label,
+    .dark-mode .box-header .form-group > label,
+    .dark-mode .filter-box .form-group .control-label,
+    .dark-mode .filter-box .form-group > label {
+        background: linear-gradient(to bottom, var(--dark-secondry-color) 70%, var(--dark-primary-color) 30%) !important;
+    }
+
+    .dark-mode .datepicker table tr td.old,
+    .dark-mode .datepicker table tr td.new {
+        color: #515151 !important;
+    }
+
     .dark-mode ::placeholder {
         color: #aaaaaa !important;
     }
@@ -115,6 +179,9 @@
     .dark-mode .box-body.table-responsive,
     .dark-mode .content-wrapper,
     .dark-mode .CardwalletLogsTable,
+    .dark-mode .chat-messages,
+    .dark-mode .viewer-container,
+    .dark-mode .users-list-container,
     .dark-mode .main-sidebar {
         scrollbar-color: var(--dark-secondry-color) var(--dark-primary-color) !important;
         scrollbar-width: thin;
@@ -124,6 +191,10 @@
         background-color: var(--dark-secondry-color) !important;
         border-color: rgba(255, 255, 255, 0.08) !important;
         color: var(--text-primary-color) !important;
+    }
+
+    .dark-mode .settings-menu button:hover {
+        background: var(--primary-color) !important;
     }
 
     .dark-mode input,
@@ -181,7 +252,7 @@
                 document.documentElement.classList.toggle('dark-mode', isDarkMode);
             } else {
                 // No user preference, fall back to global setting
-                const darkModeSetting = '{{ \App\Models\Setting::where("key", "dark_mode")->value("value") ?? "0" }}';
+                const darkModeSetting = '{{ \Illuminate\Support\Facades\Cache::remember("setting_dark_mode", 300, fn() => \App\Models\Setting::where("key", "dark_mode")->value("value")) ?? "0" }}';
 
                 if (darkModeSetting === '1' || darkModeSetting === 1) {
                     document.documentElement.classList.add('dark-mode');

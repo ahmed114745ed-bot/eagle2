@@ -532,28 +532,34 @@ if (!function_exists('adjustColor')) {
 if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
-        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
-            //            if (!isSubdomain()) {
-            //                return null;
-            //            }
-
-            $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
-            $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');
-
-            $appId = !empty($configs->get('pusher_app_id')) ? $configs->get('pusher_app_id') : Config::get('broadcasting.pusher-default.app_id');
-            $appKey = !empty($configs->get('pusher_app_key')) ? $configs->get('pusher_app_key') : Config::get('broadcasting.pusher-default.key');
-            $appSecret = !empty($configs->get('pusher_app_secret')) ? $configs->get('pusher_app_secret') : Config::get('broadcasting.pusher-default.secret');
-            $appCluster = !empty($configs->get('pusher_app_cluster')) ? $configs->get('pusher_app_cluster') : Config::get('broadcasting.pusher-default.options.cluster');
-
+        // return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
+            $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+            $configs = \App\Models\Config::whereIn('name', $keys)->pluck('value', 'name');
             return [
-                'app_id' => $appId,
-                'app_key' => $appKey,
-                'app_secret' => $appSecret,
-                'app_cluster' => $appCluster,
+                'app_id' => $configs->get('pusher_app_id'),
+                'app_key' => $configs->get('pusher_app_key'),
+                'app_secret' => $configs->get('pusher_app_secret'),
+                'app_cluster' => $configs->get('pusher_app_cluster'),
             ];
-        });
+        // });
     }
 }
+
+if (!function_exists('refreshOctaneBroadcaster')) {
+    function refreshOctaneBroadcaster()
+    {
+        \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    }
+}
+
+if (!function_exists('isRunningOctane')) {
+
+    function isRunningOctane(): bool
+    {
+        return \App\Services\OctaneBroadcasterService::isOctane();
+    }
+}
+
 if (!function_exists('nameRoute')) {
     function nameRoute(string $name): string
     {
@@ -645,32 +651,88 @@ if (!function_exists('handleShowImageWithTypes')) {
         return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
     }
     if (!function_exists('handleShowImageWithSvga')) {
-        function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
-        {
+        // function handleShowImageWithSvga(string $uniqueId, ?string $url, int $width = null, int $height = null, $borderRadius = 50, $objectFit = 'cover'): string
+        // {
+        //     $imageType = getFileExtension($url);
+        //     if ($imageType == 'svga' || $imageType == 'zz') {
+        //         // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
+        //         $id = 'svga_' . $uniqueId;
+        //         $safeUrl = e($url);
+        //         $style = "width: {$width}px; height: {$height}px;";
+        //         if ($objectFit !== 'cover') {
+        //             $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+        //         }
+        //         return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+        //     } elseif ($imageType == 'mp4') {
+        //         return "
+        //         <video width='$width' height='$height' controls autoplay muted loop>
+        //             <source src='$url' type='video/mp4'>
+        //             <source src='$url' type='video/webm'>
+
+        //             Your browser does not support the video tag.
+        //          </video>
+        //         ";
+        //     } elseif ($objectFit !== 'cover') {
+        //         return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+        //     }
+
+
+
+        //     return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
+        // }
+
+        function handleShowImageWithSvga(
+            string $uniqueId,
+            ?string $url,
+            int $width = null,
+            int $height = null,
+            $borderRadius = 50,
+            $objectFit = 'cover'
+        ): string {
             $imageType = getFileExtension($url);
+
+            // Detect RTL or LTR dynamically
+            $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
+            $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
+
             if ($imageType == 'svga' || $imageType == 'zz') {
-                // Standardize markup to `.svga-player` so the global initializer can detect and initialize it.
                 $id = 'svga_' . $uniqueId;
                 $safeUrl = e($url);
+
+                $direction = app()->getLocale() === 'ar' ? 'rtl' : 'ltr';
+                $marginSide = $direction === 'rtl' ? 'margin-left' : 'margin-right';
+
+                // Style for table cell alignment
                 $style = "width: {$width}px; height: {$height}px;";
+                $style .= " display: inline-block;"; // ensures it doesn't stretch the cell
+                $style .= " vertical-align: middle;"; // aligns icons in table rows
+
+                $style .= " justify-content: center;";   // horizontal center
+                $style .= " align-items: center;";
                 if ($objectFit !== 'cover') {
-                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; margin-right: 4px;";
+                    $style .= " object-fit: {$objectFit}; border-radius: {$borderRadius}px; {$marginSide}: 4px;";
                 }
-                return "<div class='svga-player rtlSvga' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
+
+                // Optional: scale and horizontal flip for RTL
+                $scale = 1;
+                $flip = $direction === 'rtl' ? 'scaleX(-0.5)' : 'scaleX(1)';
+                $style .= " transform: {$flip} scale({$scale});";
+
+                // Add RTL/LTR class for CSS if needed
+                $directionClass = $direction === 'rtl' ? 'rtlSvga' : 'ltrSvga';
+
+                return "<div class='svga-player $directionClass' data-url=\"{$safeUrl}\" id=\"{$id}\" style=\"{$style}\"></div>";
             } elseif ($imageType == 'mp4') {
                 return "
-                <video width='$width' height='$height' controls autoplay muted loop>
-                    <source src='$url' type='video/mp4'>
-                    <source src='$url' type='video/webm'>
-
-                    Your browser does not support the video tag.
-                 </video>
-                ";
+            <video width='$width' height='$height' controls autoplay muted loop>
+                <source src='$url' type='video/mp4'>
+                <source src='$url' type='video/webm'>
+                Your browser does not support the video tag.
+             </video>
+        ";
             } elseif ($objectFit !== 'cover') {
-                return '<img src="' . e($url) . '" alt="' . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+                return '<img src="' . e($url) . '" alt="" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; ' . $marginSide . ': 4px;">';
             }
-
-
 
             return "<img src='$url' style='height: {$height}px !important; width: {$width}px !important; border-radius: {$borderRadius}%; object-fit: {$objectFit};' alt='' />";
         }
@@ -1278,4 +1340,18 @@ if (!function_exists('wallet_available_by_wallet')) {
         $currentPending   = $wallet->pending_amount ?? 0;
         return $currentBalance -  $currentCutAmount - $currentPending;
     }
+}
+
+function formatLargeNumber($number): string
+{
+    if ($number >= 1000000000000) {
+        return number_format($number / 1000000000000, 2) . 'Trillion'; // Trillion
+    } elseif ($number >= 1000000000) {
+        return number_format($number / 1000000000, 2) . 'Billion'; // Billion
+    } elseif ($number >= 1000000) {
+        return number_format($number / 1000000, 2) . 'Million'; // Million
+    } elseif ($number >= 1000) {
+        return number_format($number / 1000, 2) . 'Thousand'; // Thousand
+    }
+    return number_format($number);
 }

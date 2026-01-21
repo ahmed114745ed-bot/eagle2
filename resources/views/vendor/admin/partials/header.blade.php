@@ -25,11 +25,40 @@
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
+<script>
+    // Setup CSRF token for all AJAX requests (required for Octane)
+    (function() {
+        var token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            window.Laravel = { csrfToken: token.content };
+            
+            // Setup jQuery AJAX defaults
+            if (typeof $ !== 'undefined') {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': token.content
+                    }
+                });
+            }
+            
+            // Also setup when jQuery loads later
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof $ !== 'undefined' || typeof jQuery !== 'undefined') {
+                    ($ || jQuery).ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+                }
+            });
+        }
+    })();
+</script>
+
 <style>
     :root {
         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
         --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
-        --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
         --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
         --text-secondary-color: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
         --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};
@@ -338,7 +367,7 @@
 </style>
 <header class="main-header">
     <a href="{{ admin_url('/') }}" class="menu-link logo d-flex align-items-center gap-2">
-        <div class="logo-icon ms-2" style="display: flex; align-items: center; justify-content: center; padding: 8px;">
+        <div class="logo-icon ms-2">
             @php
                 $logo   = getAppLogo();
                 $locale = $lang ?? app()->getLocale();
@@ -349,8 +378,7 @@
 
             @if(!empty($logo))
                 <img src="{{ $logo }}"
-                     alt="{{ $appName }}"
-                     style="max-height: 40px; width: auto; object-fit: contain;">
+                     alt="{{ $appName }}">
             @else
                 <span class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center"
                       style="height:32px; width:32px; font-weight:bold;">
@@ -367,24 +395,22 @@
         </a>
 
         @php
-            $areaManagers = \Modules\AreaManager\Entities\AreaManager::select(['id','name','username','avatar'])->get();
+            $areaManagers = \Illuminate\Support\Facades\Cache::remember('header_area_managers', 300, fn() => \Modules\AreaManager\Entities\AreaManager::select(['id','name','username','avatar'])->get());
             $selectAreaManagerId = session('area_manager_id') ?? request('area_manager_id');
             $selectedAreaManager   = $areaManagers->firstWhere('id', (int) $selectAreaManagerId);
             if (Admin::user()->type == 'superadmin'){
-                $country  = \App\Models\Country::find(Admin::user()->country_id);
+                $country  = \Illuminate\Support\Facades\Cache::remember('header_country_'.Admin::user()->country_id, 300, fn() => \App\Models\Country::find(Admin::user()->country_id));
             }
 //            $countries = \App\Models\Country::query()->when($selectAreaManagerId, fn($q) => $q->where('area_manager_id', $selectAreaManagerId))->select(['id', 'name', 'flag'])->get();
 
             $countries = collect();
             if ($selectAreaManagerId) {
-                $areaManager = \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId);
+                $areaManager = \Illuminate\Support\Facades\Cache::remember('header_area_manager_'.$selectAreaManagerId, 300, fn() => \Modules\AreaManager\Entities\AreaManager::find($selectAreaManagerId));
                 if ($areaManager && method_exists($areaManager, 'countries')) {
-                    $countries = $areaManager->countriesQuery()
-                        ->select(['id', 'name', 'e_name','flag'])
-                        ->get();
+                    $countries = \Illuminate\Support\Facades\Cache::remember('header_am_countries_'.$selectAreaManagerId, 300, fn() => $areaManager->countriesQuery()->select(['id', 'name', 'e_name','flag'])->get());
                 }
             } else {
-                $countries = \App\Models\Country::select(['id', 'name', 'e_name','flag'])->get();
+                $countries = \Illuminate\Support\Facades\Cache::remember('header_all_countries', 300, fn() => \App\Models\Country::select(['id', 'name', 'e_name','flag'])->get());
             }
 
 //            $authId = auth()->user()->type == 'area-manager' ? auth()->id() : auth()->user()->parent_id;
@@ -394,13 +420,12 @@
                 $authAdmin = auth()->user();
             } else {
                 $authId = auth()->user()->parent_id;
-                $authAdmin = \Modules\AreaManager\Entities\AreaManager::find($authId);
+                $authAdmin = $authId ? \Illuminate\Support\Facades\Cache::remember('header_auth_admin_'.$authId, 300, fn() => \Modules\AreaManager\Entities\AreaManager::find($authId)) : null;
             }
 
             if ($authAdmin && method_exists($authAdmin, 'countriesQuery')) {
-                $areaManagerCountries = $authAdmin->countriesQuery()
-                    ->select(['id', 'name','e_name', 'flag'])
-                    ->get();
+                $cacheKey = 'header_auth_admin_countries_'.($authAdmin->id ?? 0);
+                $areaManagerCountries = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, fn() => $authAdmin->countriesQuery()->select(['id', 'name','e_name', 'flag'])->get());
             } else {
                 $areaManagerCountries = collect();
             }

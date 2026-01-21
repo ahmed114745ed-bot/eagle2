@@ -33,6 +33,7 @@ use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Reals\Traits\RealRelationshipTrait;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Modules\Achievement\Http\Traits\AchievementUser;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
@@ -191,6 +192,11 @@ class User extends Authenticatable
         return $this->hasMany(Badge::class, 'user_id')->where(function ($q) {
             $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp);
         });
+    }
+
+    public function latestTarget()
+    {
+        return $this->hasOne(UserTarget::class)->latestOfMany();
     }
 
     public function cpsAsTwo()
@@ -908,6 +914,10 @@ class User extends Authenticatable
         //     ->where('user_id', $this->id)
         //     ->orderByDesc('id')
         //     ->sum(DB::raw('sallary - cut_amount'));
+        $roomSalary = 0;
+        $userSalary = $this->relationLoaded('totalUserSalary')
+            ? $this->totalUserSalary->sum(fn($item) => $item->sallary - $item->cut_amount)
+            : $this->totalUserSalary()->sum(DB::raw('sallary - cut_amount'));
 
         // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
         //     $q->where('uid', $this->id);
@@ -915,8 +925,8 @@ class User extends Authenticatable
         //     ->orderByDesc('id')
         //     ->sum(DB::raw('salary - cut_amount'));
 
-        // $total = $userSalary + $roomSalary;
-        $total =wallet_available_by_user($this->id);
+        $total = $userSalary + $roomSalary;
+        // $total = wallet_available_by_user($this->id);
         return floor($total * 100) / 100;
     }
 
@@ -994,12 +1004,17 @@ class User extends Authenticatable
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
     }
 
     public function nowRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'now_room_uid');
+        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+    }
+
+    public function nowAudioRoom()
+    {
+        return $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
     }
     public function myroom()
     {
@@ -1261,6 +1276,12 @@ class User extends Authenticatable
         return $this->hanMany(AdminUser::class);
     }
 
+    public function latestUserSallary()
+    {
+        // Laravel 8+ supports latestOfMany
+        return $this->hasOne(UserSallary::class)->latestOfMany();
+    }
+
     public function getUserDiamondAttribute()
     {
         if ($this->type_user === 0 || $this->type_user === 3) {
@@ -1495,26 +1516,45 @@ class User extends Authenticatable
     /**
      * Custom accessor for UUID with special pack conditions.
      */
+    // public function getUuidAttribute($value)
+    // {
+    //     if ($this->relationLoaded('packs')) {
+
+    //         $pack = $this->packs
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->where('ware.value', $this->special_id)
+    //             ->first();
+    //     } else {
+
+    //         $pack = $this->packs()
+    //             ->with('ware')
+    //             ->where('type', 25)
+    //             ->where('is_used', true)
+    //             ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
+    //             ->first();
+    //     }
+
+    //     return ($this->special_id && $pack && $pack->is_used === 1)
+    //         ? $this->special_id
+    //         : $this->original_uuid;
+    // }
+
+
     public function getUuidAttribute($value)
     {
-        if ($this->relationLoaded('packs')) {
-
-            $pack = $this->packs
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->where('ware.value', $this->special_id)
-                ->first();
-        } else {
-
-            $pack = $this->packs()
-                ->with('ware')
-                ->where('type', 25)
-                ->where('is_used', true)
-                ->whereHas('ware', fn($q) => $q->where('value', $this->special_id))
-                ->first();
+        if (!$this->relationLoaded('packs')) {
+            return $this->original_uuid;
         }
 
-        return ($this->special_id && $pack && $pack->is_used === 1)
+        $pack = $this->packs->first(
+            fn($pack) =>
+            $pack->type === 25 &&
+                $pack->is_used &&
+                optional($pack->ware)->value == $this->special_id
+        );
+
+        return ($this->special_id && $pack)
             ? $this->special_id
             : $this->original_uuid;
     }
@@ -1548,6 +1588,11 @@ class User extends Authenticatable
 
     public function getOnlineTimeAttribute($value)
     {
+        // Skip pack check if packs relation is not loaded to avoid N+1 queries
+        if (!$this->relationLoaded('packs')) {
+            return $value;
+        }
+        
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
@@ -1647,7 +1692,7 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-
+       //dd($this->type_user);
         $types = [
             1 => 'host',
             2 => 'agency_owner',
@@ -1673,6 +1718,8 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
+
+       
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
@@ -1709,7 +1756,7 @@ class User extends Authenticatable
     public function userBadge()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','regular'))->active()->with("badge")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
@@ -1726,6 +1773,28 @@ class User extends Authenticatable
 
         return $html;
     }
+
+    public function userBadgeTop()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','top'))->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
+
 
     public function wallet()
     {
@@ -2279,9 +2348,16 @@ class User extends Authenticatable
     }
 
 
-    public function nowRoomOwner()
+    public function nowRoomOwner(): HasOneThrough
     {
-        return $this->belongsTo(User::class, 'now_room_uid');
+        return $this->hasOneThrough(
+            User::class,
+            Room::class,
+            'id',
+            'id',
+            'now_room_uid',
+            'uid'
+        );
     }
 
 
@@ -2322,7 +2398,7 @@ class User extends Authenticatable
         $eventType = Common::getSettingValue('host_level_type') ?? 'daily';
         return $this->hostLevelWinner()
             ->where('host_level_id', $hostLevelId)
-            ->filterByEventType($eventType) ->exists();
+            ->filterByEventType($eventType)->exists();
     }
 
     public function lastHostLevelWinner()
@@ -2341,5 +2417,10 @@ class User extends Authenticatable
     public function userWallet()
     {
         return $this->hasOne(UserWallet::class);
+    }
+
+    public function getUserWalletBalanceAttribute()
+    {
+        return $this->userWallet->balance - $this->userWallet->cut_amount - $this->userWallet->pending_amount;
     }
 }

@@ -351,7 +351,8 @@ protected function detail($id)
         $withdrawal->status = 'approved';
         $withdrawal->save();
         $after_amount = wallet_available_by_user($withdrawal->user->id);
-           WalletLog::create([
+            $walletLog = WalletLog::where('related_id', $withdrawal->id)->first();
+        $walletLog->update([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
             'amount' => -$withdrawal->amount,
@@ -359,7 +360,7 @@ protected function detail($id)
             'type' => 'user',
             'before_amount' => $available ,
             'after_amount' => $after_amount,
-            'related_id'  =>  Auth::id()
+           'related_id' => $withdrawal->id
 
         ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
@@ -375,13 +376,26 @@ protected function detail($id)
         if ($withdrawal->status != 'pending') {
             return response()->json(['message' => 'العملية تمت مسبقاً'], 400);
         }
+        $available = wallet_available_by_wallet($wallet);
 
         $wallet->pending_amount -= $withdrawal->amount;
         $wallet->save();
 
         $withdrawal->status = 'rejected';
         $withdrawal->save();
-        
+        $after_amount = wallet_available_by_user($withdrawal->user->id);
+
+        $walletLog = WalletLog::where('related_id', $withdrawal->id)->first();
+        $walletLog->update([
+            'wallet_id' => $wallet->id,
+            'user_id' => $withdrawal->user->id,
+            'amount' => $withdrawal->amount,
+            'operation' => 'rejected',
+            'type' => 'user',
+            'before_amount' => $available,
+            'after_amount' => $after_amount,
+            'related_id' => $withdrawal->id
+        ]);
         CustomNotification::withdrawalRejected($withdrawal->user, $withdrawal->amount);
 
         return response()->json(['success'=> true ,'message' => 'تم رفض الطلب وإزالة المبلغ من المعلّق']);
