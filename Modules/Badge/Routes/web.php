@@ -33,7 +33,17 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::resource('badges', BadgeController::class);
+       // Route::resource('badges', BadgeController::class);
+
+        Route::prefix('badges')->group(function () {
+            Route::get('/', [BadgeController::class, 'index']);
+            Route::get('/create', [BadgeController::class, 'create']);
+            Route::post('/', [BadgeController::class, 'store']);
+            Route::get('/{id}', [BadgeController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/{id}/edit', [BadgeController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [BadgeController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [BadgeController::class, 'destroy'])->where('id', '[0-9]+');
+        });
         Route::resource('dedicate-badges', DedicateBadgeController::class);
         Route::get('user-badges', [UserBadgeController::class, 'index']);
 
