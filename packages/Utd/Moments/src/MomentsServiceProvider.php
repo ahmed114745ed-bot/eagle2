@@ -3,7 +3,6 @@
 namespace Utd\Moments;
 
 use App\Contracts\MomentContract;
-use App\Services\Null\NullMomentService;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
