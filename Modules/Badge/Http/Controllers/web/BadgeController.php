@@ -106,6 +106,7 @@ class BadgeController extends MainController
             ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
         $form->select('image_type', __('Image Type'))
             ->options(ImageType::options())
+            ->default(ImageType::Image->value)
             ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
 
         $form->number('priority', __('Priority'))->min(0)->default(0)->required();
