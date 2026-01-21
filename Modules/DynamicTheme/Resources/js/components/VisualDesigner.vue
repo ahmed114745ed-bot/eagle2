@@ -250,11 +250,15 @@
                   </div>
                   <!-- SVGA assets -->
                   <div v-else-if="isSvgaAsset(asset)" class="svga-asset-preview">
-                    <div 
-                      :ref="el => { if(el) onSvgaMounted(asset, el) }"
-                      class="svga-player-container"
+                    <canvas 
+                      :ref="el => { if(el) initSvgaCanvas(asset, el) }"
+                      class="svga-canvas"
                       :data-url="asset.file_url || asset.url"
-                    ></div>
+                      :data-asset-id="asset.id"
+                    ></canvas>
+                    <div class="svga-overlay" v-if="!isSvgaLoaded(asset.id)">
+                      <span class="svga-loading-icon">🎬</span>
+                    </div>
                     <span class="svga-badge">SVGA</span>
                   </div>
                   <!-- Image assets -->
@@ -969,6 +973,11 @@ export default {
       textShadowY: 0,
       textShadowBlur: 0,
       textShadowColor: '#000000',
+      
+      // SVGA tracking
+      svgaLoadedMap: {}, // Track loaded SVGA players by asset ID
+      svgaPlayersMap: {}, // Store SVGA player instances
+      svgaLibraryLoaded: false, // Track if SVGA library is loaded
     };
   },
   computed: {
@@ -1196,6 +1205,8 @@ export default {
       this.$refs.mobileScreen.removeEventListener('touchmove', this.onTouchMove);
       this.$refs.mobileScreen.removeEventListener('touchend', this.onTouchEnd);
     }
+    // Cleanup SVGA players
+    this.cleanupSvgaPlayers();
   },
   methods: {
     open() {
@@ -2632,6 +2643,11 @@ export default {
       return extension === 'svga' || extension === 'zz';
     },
     
+    // Check if SVGA is loaded for an asset
+    isSvgaLoaded(assetId) {
+      return this.svgaLoadedMap[assetId] === true;
+    },
+    
     // Initialize SVGA player for an element
     initSvgaPlayer(element, url) {
       if (!element || !url) return;
@@ -2656,11 +2672,28 @@ export default {
           this.initSvgaPlayerInternal(element, url);
         }).catch((err) => {
           console.error('Failed to load SVGA library:', err);
+          this.showSvgaFallback(element, url);
         });
         return;
       }
       
       this.initSvgaPlayerInternal(element, url);
+    },
+    
+    // Show fallback for SVGA when library fails
+    showSvgaFallback(element, url) {
+      if (!element) return;
+      element.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:8px;padding:8px;">
+          <div style="font-size:24px;margin-bottom:4px;">🎬</div>
+          <div style="color:white;font-size:10px;text-align:center;">SVGA</div>
+          <div style="color:rgba(255,255,255,0.7);font-size:8px;margin-top:2px;">انقر للتشغيل</div>
+        </div>
+      `;
+      element.style.cursor = 'pointer';
+      element.onclick = () => {
+        window.open(url, '_blank');
+      };
     },
     
     // Internal method to initialize SVGA player
@@ -2671,6 +2704,8 @@ export default {
       if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
         return;
       }
+      
+      const assetId = element.dataset.assetId;
       
       try {
         // Clear previous content
@@ -2696,13 +2731,10 @@ export default {
           if (element.dataset.svgaLoaded === 'loading') {
             loadTimedOut = true;
             element.dataset.svgaLoaded = 'false';
-            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#f59e0b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span style="font-size:16px;">⚠️</span><span>انتهت المهلة</span></div>';
-            element.onclick = () => {
-              element.dataset.svgaLoaded = 'false';
-              this.initSvgaPlayerInternal(element, url);
-            };
+            if (assetId) this.svgaLoadedMap[assetId] = false;
+            this.showSvgaFallback(element, url);
           }
-        }, 15000); // 15 seconds timeout
+        }, 10000); // 10 seconds timeout
         
         const parser = new SVGA.Parser();
         
@@ -2715,7 +2747,8 @@ export default {
             if (!videoItem) {
               console.error('❌ [initSvgaPlayerInternal] No videoItem returned for:', url);
               element.dataset.svgaLoaded = 'false';
-              element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span><span style="font-size:8px;">فارغ</span></div>';
+              if (assetId) this.svgaLoadedMap[assetId] = false;
+              this.showSvgaFallback(element, url);
               return;
             }
             
@@ -2729,6 +2762,10 @@ export default {
             player.clearsAfterStop = false;
             player.startAnimation();
             element.dataset.svgaLoaded = 'true';
+            if (assetId) {
+              this.svgaLoadedMap[assetId] = true;
+              this.svgaPlayersMap[assetId] = player;
+            }
             
             // Ensure canvas is visible and properly sized with multiple retries
             const fixCanvas = (retries = 3) => {
@@ -2754,27 +2791,26 @@ export default {
             
             console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
             element.dataset.svgaLoaded = 'false';
-            // Show error placeholder with retry button
-            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span style="font-size:16px;">⚠️</span><span>خطأ تحميل</span></div>';
-            element.onclick = () => {
-              element.dataset.svgaLoaded = 'false';
-              this.initSvgaPlayerInternal(element, url);
-            };
+            if (assetId) this.svgaLoadedMap[assetId] = false;
+            // Try fetch method as fallback
+            this.loadSvgaWithFetch(element, url, assetId);
           });
         } else {
           // Fallback: try using downloader approach
-          this.loadSvgaWithFetch(element, url);
+          this.loadSvgaWithFetch(element, url, assetId);
         }
       } catch (error) {
         console.error('❌ [initSvgaPlayerInternal] Error initializing SVGA player:', error);
         element.dataset.svgaLoaded = 'false';
-        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;">⚠️ Error</div>';
+        if (assetId) this.svgaLoadedMap[assetId] = false;
+        this.showSvgaFallback(element, url);
       }
     },
     
     // Fallback method to load SVGA using fetch
-    async loadSvgaWithFetch(element, url) {
+    async loadSvgaWithFetch(element, url, assetId) {
       try {
+        console.log('🔄 [loadSvgaWithFetch] Trying fetch method for:', url);
         const response = await fetch(url, { mode: 'cors' });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -2785,7 +2821,8 @@ export default {
         parser.load(arrayBuffer, (videoItem) => {
           if (!videoItem) {
             element.dataset.svgaLoaded = 'false';
-            element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span></div>';
+            if (assetId) this.svgaLoadedMap[assetId] = false;
+            this.showSvgaFallback(element, url);
             return;
           }
           
@@ -2796,11 +2833,17 @@ export default {
           player.clearsAfterStop = false;
           player.startAnimation();
           element.dataset.svgaLoaded = 'true';
+          if (assetId) {
+            this.svgaLoadedMap[assetId] = true;
+            this.svgaPlayersMap[assetId] = player;
+          }
+          console.log('✅ [loadSvgaWithFetch] Successfully loaded SVGA via fetch:', url);
         });
       } catch (error) {
         console.error('❌ [loadSvgaWithFetch] Failed:', error);
         element.dataset.svgaLoaded = 'false';
-        element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;"><span>⚠️</span></div>';
+        if (assetId) this.svgaLoadedMap[assetId] = false;
+        this.showSvgaFallback(element, url);
       }
     },
     
@@ -2808,15 +2851,42 @@ export default {
     loadSvgaLibrary() {
       return new Promise((resolve, reject) => {
         if (typeof SVGA !== 'undefined') {
+          this.svgaLibraryLoaded = true;
           resolve();
           return;
         }
         
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js';
-        script.onload = resolve;
-        script.onerror = reject;
-        document.head.appendChild(script);
+        // Try multiple CDN sources
+        const cdnUrls = [
+          'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js',
+          'https://unpkg.com/svgaplayerweb@2.3.1/build/svga.min.js',
+          'https://cdnjs.cloudflare.com/ajax/libs/svgaplayerweb/2.3.1/svga.min.js'
+        ];
+        
+        let currentIndex = 0;
+        
+        const tryLoadScript = () => {
+          if (currentIndex >= cdnUrls.length) {
+            reject(new Error('Failed to load SVGA library from all CDN sources'));
+            return;
+          }
+          
+          const script = document.createElement('script');
+          script.src = cdnUrls[currentIndex];
+          script.onload = () => {
+            this.svgaLibraryLoaded = true;
+            console.log('✅ SVGA library loaded from:', cdnUrls[currentIndex]);
+            resolve();
+          };
+          script.onerror = () => {
+            console.warn('⚠️ Failed to load SVGA from:', cdnUrls[currentIndex]);
+            currentIndex++;
+            tryLoadScript();
+          };
+          document.head.appendChild(script);
+        };
+        
+        tryLoadScript();
       });
     },
     
@@ -2832,10 +2902,12 @@ export default {
       const url = asset.file_url || asset.url;
       if (!url) {
         console.warn('[onSvgaMounted] No URL for asset:', asset);
+        this.showSvgaFallback(element, '');
         return;
       }
       
       const assetId = asset.id;
+      element.dataset.assetId = assetId;
       
       // Create unique key for this element
       const elementKey = `svga_${assetId}_${url}`;
@@ -2867,6 +2939,25 @@ export default {
           this.initSvgaPlayer(element, url);
         }, 100);
       });
+    },
+    
+    // Cleanup all SVGA players
+    cleanupSvgaPlayers() {
+      for (const assetId in this.svgaPlayersMap) {
+        try {
+          const player = this.svgaPlayersMap[assetId];
+          if (player && typeof player.stopAnimation === 'function') {
+            player.stopAnimation();
+          }
+          if (player && typeof player.clear === 'function') {
+            player.clear();
+          }
+        } catch (e) {
+          console.warn('Error cleaning up SVGA player:', e);
+        }
+      }
+      this.svgaPlayersMap = {};
+      this.svgaLoadedMap = {};
     },
     
     // Style for text asset content
@@ -4278,6 +4369,70 @@ export default {
 
 .placed-asset.svga-asset.selected {
   border: 1px dashed rgba(16, 185, 129, 0.7);
+}
+
+/* SVGA Overlay and Placeholder */
+.svga-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  z-index: 5;
+}
+
+.svga-loading-icon {
+  font-size: 20px;
+  animation: svga-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes svga-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+.svga-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  color: white;
+  font-size: 24px;
+  z-index: 5;
+}
+
+.svga-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.svga-canvas-full {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .placed-asset.svga-asset .svga-asset-container {
