@@ -1,11 +1,11 @@
 {
   "Modules/DynamicTheme/Resources/css/app.css": {
-    "file": "assets/app-DEcN1LN-.css",
+    "file": "assets/app-BiaYdgJm.css",
     "src": "Modules/DynamicTheme/Resources/css/app.css",
     "isEntry": true
   },
   "Modules/DynamicTheme/Resources/js/admin.js": {
-    "file": "assets/admin-ofk968uo.js",
+    "file": "assets/admin-B_Tx5SHj.js",
     "name": "admin",
     "src": "Modules/DynamicTheme/Resources/js/admin.js",
     "isEntry": true,
@@ -13,11 +13,11 @@
       "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
-      "assets/app-DEcN1LN-.css"
+      "assets/app-BiaYdgJm.css"
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
-    "file": "assets/app-DaboqK9x.js",
+    "file": "assets/app-C4PqRUJZ.js",
     "name": "app",
     "src": "Modules/DynamicTheme/Resources/js/app.js",
     "isEntry": true,
@@ -25,7 +25,7 @@
       "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
-      "assets/app-24rgiKoF.css"
+      "assets/app-B9p81NiD.css"
     ]
   },
   "_NotificationToast-!~{004}~.js": {

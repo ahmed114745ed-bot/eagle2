@@ -2620,10 +2620,15 @@ export default {
       // Check by asset_type field
       if (asset.asset_type === 'svga') return true;
       
-      // Check by file extension
+      // Check by file extension (handle URLs with query params)
       const url = asset.file_url || asset.url || '';
-      const extension = url.split('.').pop()?.toLowerCase();
-      return extension === 'svga' || extension === 'zz';
+      // Remove query params before getting extension
+      const urlPath = url.split('?')[0];
+      const extension = urlPath.split('.').pop()?.toLowerCase();
+      const isSvga = extension === 'svga' || extension === 'zz';
+      
+      console.log('🔍 [isSvgaAsset] asset:', asset?.name, '| url:', url, '| ext:', extension, '| isSvga:', isSvga);
+      return isSvga;
     },
     
     // Initialize SVGA player for an element
@@ -2644,25 +2649,36 @@ export default {
     
     // Internal method to initialize SVGA player
     initSvgaPlayerInternal(element, url) {
-      if (!element || element.dataset.svgaLoaded) return;
+      if (!element || element.dataset.svgaLoaded === 'true') return;
+      
+      console.log('🎬 [initSvgaPlayerInternal] Initializing SVGA:', url);
       
       try {
         element.dataset.svgaLoaded = 'true';
+        
+        // Ensure element has dimensions
+        if (!element.style.width) element.style.width = '100%';
+        if (!element.style.height) element.style.height = '100%';
+        
         const player = new SVGA.Player(element);
-        const parser = new SVGA.Parser(element);
+        const parser = new SVGA.Parser();
         
         parser.load(url, (videoItem) => {
+          console.log('✅ [initSvgaPlayerInternal] SVGA loaded successfully:', url);
           player.setVideoItem(videoItem);
           player.loops = 0; // Infinite loop
           player.clearsAfterStop = false;
           player.startAnimation();
         }, (error) => {
-          console.error('Failed to load SVGA:', url, error);
+          console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
           element.dataset.svgaLoaded = 'false';
+          // Show error placeholder
+          element.innerHTML = '<span style="color:#ff6b6b;font-size:10px;">⚠️ SVGA</span>';
         });
       } catch (error) {
-        console.error('Error initializing SVGA player:', error);
+        console.error('❌ [initSvgaPlayerInternal] Error initializing SVGA player:', error);
         element.dataset.svgaLoaded = 'false';
+        element.innerHTML = '<span style="color:#ff6b6b;font-size:10px;">⚠️ Error</span>';
       }
     },
     
@@ -2688,13 +2704,17 @@ export default {
     },
     
     // Handle SVGA element mounted
-    onSvgaMounted(asset, event) {
-      const element = event?.target || event;
+    onSvgaMounted(asset, element) {
+      if (!element || !asset) return;
+      
       const url = asset.file_url || asset.url;
-      if (element && url) {
-        this.$nextTick(() => {
+      console.log('🎬 [onSvgaMounted] asset:', asset?.name, '| url:', url, '| element:', element);
+      
+      if (element && url && !element.dataset.svgaLoaded) {
+        // Use setTimeout to ensure DOM is ready
+        setTimeout(() => {
           this.initSvgaPlayer(element, url);
-        });
+        }, 100);
       }
     },
     
@@ -4030,6 +4050,8 @@ export default {
 .svga-asset-preview {
   background: linear-gradient(135deg, #10b981, #059669);
   position: relative;
+  min-width: 50px;
+  min-height: 50px;
 }
 
 .svga-asset-preview {
@@ -4037,17 +4059,24 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
+  width: 50px;
+  height: 50px;
   position: relative;
+  overflow: hidden;
 }
 
 .svga-asset-preview .svga-player-container {
-  width: 100%;
-  height: 100%;
+  width: 46px;
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.svga-asset-preview .svga-player-container canvas {
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .svga-badge {
@@ -4060,6 +4089,7 @@ export default {
   padding: 1px 4px;
   border-radius: 3px;
   font-weight: bold;
+  z-index: 10;
 }
 
 .svga-asset-container {
@@ -4078,6 +4108,15 @@ export default {
 .placed-asset.svga-asset .svga-asset-container {
   width: 100%;
   height: 100%;
+}
+
+.placed-asset.svga-asset .svga-asset-container canvas,
+.svga-asset-container canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
 }
 
 .text-asset-content {
