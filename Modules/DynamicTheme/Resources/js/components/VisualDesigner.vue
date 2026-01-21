@@ -250,12 +250,12 @@
                   </div>
                   <!-- SVGA assets -->
                   <div v-else-if="isSvgaAsset(asset)" class="svga-asset-preview">
-                    <canvas 
-                      :ref="el => { if(el) initSvgaCanvas(asset, el) }"
-                      class="svga-canvas"
+                    <div 
+                      :ref="el => { if(el) onSvgaMounted(asset, el) }"
+                      class="svga-canvas-container"
                       :data-url="asset.file_url || asset.url"
                       :data-asset-id="asset.id"
-                    ></canvas>
+                    ></div>
                     <div class="svga-overlay" v-if="!isSvgaLoaded(asset.id)">
                       <span class="svga-loading-icon">🎬</span>
                     </div>
@@ -4423,6 +4423,15 @@ export default {
   height: 100%;
   display: block;
   object-fit: contain;
+}
+
+.svga-canvas-container {
+  width: 100%;
+  height: 100%;
+  min-width: 40px;
+  min-height: 40px;
+  display: block;
+  position: relative;
 }
 
 .svga-canvas-full {
