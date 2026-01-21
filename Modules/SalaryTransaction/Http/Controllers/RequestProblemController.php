@@ -37,7 +37,7 @@ class RequestProblemController extends MainController
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('transaction request problem'))
             ->body($this->detail($id)));
     }
@@ -51,7 +51,7 @@ class RequestProblemController extends MainController
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('transaction request problem'))
             ->body($this->form()->edit($id)));
     }
@@ -65,9 +65,18 @@ class RequestProblemController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AdminCheck());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
-        $grid->model()
+        $grid->model([
+            'request',
+            'request.agency.owner',
+            'request.agency.owner.profile',
+            'request.agency.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'request.host',
+            'request.host.profile',
+            'request.host.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+
+        ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('request.host', fn($q) => $q->where('country_id', $countryID))
@@ -96,34 +105,34 @@ class RequestProblemController extends MainController
             $show->field('request.bill_image', __('bill image'))->image();
             return $show;
         });
-        $grid->column( __('bill image'))->modal('show image' , function ($model ) {
+        $grid->column(__('bill image'))->modal('show image', function ($model) {
             $img = $model->bill_image;
-            if($img == null || $img == ''){
+            if ($img == null || $img == '') {
                 return 'No image founded';
             }
 
-            $img = getDriverUrl().'/'.$img;
-            $img = "<img src='" . $img ."' style='width:500px;height:500px' class='img img-thumbnail'$ />";
+            $img = getDriverUrl() . '/' . $img;
+            $img = "<img src='" . $img . "' style='width:500px;height:500px' class='img img-thumbnail'$ />";
 
             return (new WidgetsTable([''], [[$img]]));
         });
 
         $grid->column(__('Shipping Agent Name'))
-        ->display(function () {
-            $name =  $this->request?->agency?->owner?->name??'';
-            $uid = @$this->request?->agency?->owner->uuid;
-            $path = @$this->request?->agency?->owner?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            ->display(function () {
+                $name =  $this->request?->agency?->owner?->name ?? '';
+                $uid = @$this->request?->agency?->owner->uuid;
+                $path = @$this->request?->agency?->owner?->profile?->avatar;
+                $defaultImage = asset("images/businessman-icon.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            // Check if the image exists
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                // Check if the image exists
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$this->request?->agency?->owner->id}");
-            return "
+                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+                $showUrl = url("admin/users/{$this->request?->agency?->owner->id}");
+                return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
                     <div>
@@ -134,9 +143,9 @@ class RequestProblemController extends MainController
                     </div>
                 </div>
             ";
-        });
+            });
         $grid->column(__('Host Name'))->display(function () {
-            $name = $this->request?->host?->name ??'';
+            $name = $this->request?->host?->name ?? '';
             $uid = @$this->request?->host->uuid;
             $path = @$this->request?->host?->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");

@@ -66,9 +66,15 @@ class AgentRequestController extends MainController
     protected function grid()
     {
         $grid = new Grid(new AgentSalaryRequest());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
+            ->with([
+                'agency',
+                'agent',
+                'agent.profile',
+                'agent.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            ])
             ->when($countryID, fn($q) =>
             $q->where(function ($q) use ($countryID) {
                 $q->whereHas('agent', fn($q) => $q->where('country_id', $countryID))
@@ -154,7 +160,7 @@ class AgentRequestController extends MainController
         // $grid->column('country.name',__("country"));
         $grid->disableCreateButton();
         $permission = $this->permission_name;
-        $grid->actions(function ($actions)use($permission) {
+        $grid->actions(function ($actions) use ($permission) {
             $actions->disableEdit();
             $actions->disableDelete();
             if (Admin::user()->can('accept-request-switch-' . $permission) || Admin::user()->can('*')) {

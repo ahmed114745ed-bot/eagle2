@@ -16,10 +16,16 @@ class AdminReelController extends MainController
 {
     public function index(Content $content)
     {
+        // Generate or retrieve random seed for this session
+        if (!session()->has('reels_random_seed')) {
+            session(['reels_random_seed' => mt_rand(1, 999999)]);
+        }
+        $seed = session('reels_random_seed');
+        
         $reels = Real::with(['user.profile', 'user.country'])
             ->withCount(['likes', 'comments', 'Views'])
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
+            ->orderByRaw("RAND(?)", [$seed])
+            ->limit(15) 
             ->get()
             ->map(function ($reel) {
                 $videoUrl = $this->buildMediaUrl($reel->url);
@@ -43,18 +49,29 @@ class AdminReelController extends MainController
             });
 
         return $content
-            ->body(view('reals::admin.reels.index', compact('reels')));
+            ->body(view('reals::admin.reels.index', compact('reels', 'seed')));
     }
     
     public function loadMore(Request $request)
     {
         $offset = $request->input('offset', 0);
         $limit = $request->input('limit', 20);
+        $excludeIds = $request->input('exclude_ids', []);
+        $seed = $request->input('seed', session('reels_random_seed', mt_rand(1, 999999)));
         
-        $reels = Real::with(['user.profile', 'user.country'])
-            ->withCount(['likes', 'comments', 'Views'])
-            ->orderBy('created_at', 'desc')
-            ->skip($offset)
+        // Store seed in session if not exists
+        if (!session()->has('reels_random_seed')) {
+            session(['reels_random_seed' => $seed]);
+        }
+        
+        $query = Real::with(['user.profile', 'user.country'])
+            ->withCount(['likes', 'comments', 'Views']);
+        
+        if (!empty($excludeIds) && is_array($excludeIds)) {
+            $query->whereNotIn('id', $excludeIds);
+        }
+        
+        $reels = $query->orderByRaw("RAND(?)", [$seed])
             ->take($limit)
             ->get()
             ->map(function ($reel) {
@@ -78,14 +95,13 @@ class AdminReelController extends MainController
                 ];
             });
         
-        \Log::info('Load More Reels', [
-            'offset' => $offset,
-            'limit' => $limit,
-            'returned' => $reels->count(),
-            'total' => Real::count()
-        ]);
+  
             
-        return response()->json(['reels' => $reels]);
+        return response()->json([
+            'reels' => $reels,
+            'seed' => $seed,
+            'has_more' => Real::whereNotIn('id', array_merge($excludeIds, $reels->pluck('id')->toArray()))->exists()
+        ]);
     }
 
     public function show($id, Content $content)
@@ -137,7 +153,6 @@ class AdminReelController extends MainController
     
     public function getGifts($id)
     {
-        // الهدايا غير مفعلة حالياً في النظام
         return response()->json(['gifts' => []]);
     }
     
@@ -150,7 +165,6 @@ class AdminReelController extends MainController
                 return response()->json(['reels' => []]);
             }
             
-            // Limit to prevent abuse
             $reelIds = array_slice($reelIds, 0, 10);
             
             $reels = Real::whereIn('id', $reelIds)
@@ -188,23 +202,17 @@ class AdminReelController extends MainController
             
             $reel = Real::findOrFail($id);
             
-            // تحديث الوصف (description هو العمود المستخدم في الريلز)
             if ($request->has('description')) {
                 $reel->description = $request->description;
             }
             
-            // في حالة وجود title, نضعه في description أيضاً
             if ($request->has('title') && !$request->has('description')) {
                 $reel->description = $request->title;
             }
             
             $reel->save();
             
-            \Log::info('Reel Updated', [
-                'reel_id' => $id,
-                'description' => $reel->description,
-                'user_id' => $reel->user_id
-            ]);
+    
             
             return response()->json([
                 'success' => true,
@@ -233,18 +241,11 @@ class AdminReelController extends MainController
         try {
             $reel = Real::findOrFail($id);
             
-            \Log::info('Deleting Reel', [
-                'reel_id' => $id,
-                'user_id' => $reel->user_id,
-                'description' => $reel->description
-            ]);
-            
-            // Delete related records
+  
             $reel->likes()->delete();
             $reel->comments()->delete();
             $reel->Views()->delete();
             
-            // Delete the reel
             $reel->delete();
             
             return response()->json([
@@ -270,30 +271,25 @@ class AdminReelController extends MainController
             return null;
         }
 
-        // Full URL already provided
         if (filter_var($path, FILTER_VALIDATE_URL)) {
             return $path;
         }
 
-        // Highest priority: explicit base from env
         $envBase = env('MEDIA_BASE_URL');
         if ($envBase) {
             return rtrim($envBase, '/') . '/' . ltrim($path, '/');
         }
 
-        // Try the default disk URL first
         $base = getDriverUrl();
         if ($base) {
             return rtrim($base, '/') . '/' . ltrim($path, '/');
         }
 
-        // Fallback to explicit GCS disk URL if default disk has no URL configured (e.g., FILESYSTEM_DISK=local)
         $gcsBase = config('filesystems.disks.gcs.url');
         if ($gcsBase) {
             return rtrim($gcsBase, '/') . '/' . ltrim($path, '/');
         }
 
-        // Fallback to storage path
         return asset('storage/' . ltrim($path, '/'));
     }
 }

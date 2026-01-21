@@ -6,6 +6,9 @@ return [
     'google_cloud_storage_bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET'),
     'cache' => env('CACHE_ENABLE', 'disabled'),
 
+    // Deploy webhook secret
+    'deploy_secret' => env('DEPLOY_SECRET', 'change-this-secret-token'),
+
     'agora_app_id' => env('AGORA_APP_ID'),
     'agora_certificate' => env('AGORA_APP_CERTIFICATE'),
     'payment_url' => env('PAYMENT_URL'),

@@ -2,20 +2,22 @@
 
 namespace App\Admin\Controllers\V2;
 
-use App\Admin\Services\UserService;
-use Encore\Admin\Facades\Admin;
 use Exception;
 use App\Models\User;
 use function request;
 use App\Models\Agency;
 use Encore\Admin\Grid;
+use App\Helpers\Common;
 use App\Models\SalaryTrx;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
+use App\Admin\Services\UserService;
 use App\Admin\Actions\SalariesAction;
 use App\Admin\Actions\PaySalariesAction;
 use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
+use App\Models\UserSallary;
+use Modules\UsersWallet\Entities\UserWallet;
 
 class SalariesController extends MainController
 {
@@ -110,15 +112,21 @@ class SalariesController extends MainController
                 $q->where('country_id', $countryID)
                     ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
             }))
-            ->where('agency_id', '!=', 0)->LeftJoin('user_sallaries', 'users.id', '=', 'user_sallaries.user_id');
+            ->where('agency_id', '!=', 0)->withSum(
+                ['totalUserSalary as total' => function ($q) {
+                    $q->select(DB::raw('SUM(sallary - cut_amount)'));
+                }],
+                ''
+            );
         if (request('salary_only') == 1) {
             $model->having('total', '>', 0);
         }
         $model->with([
             'profile:id,user_id,avatar',
+            'totalUserSalary',
+            'country',
             'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-        ])
-            ->select('users.id', 'users.name', 'users.uuid', DB::raw('SUM(user_sallaries.sallary - user_sallaries.cut_amount) AS total'))->groupBy('users.id', 'users.name', 'users.uuid')->orderByRaw('total DESC');
+        ])->orderByRaw('total DESC');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->disableIdFilter();
             $filter->expand();
@@ -144,7 +152,7 @@ class SalariesController extends MainController
         $grid->column('total', __('salary'))->default(0);
         if (Admin::user()->isRole('developer') || Admin::user()->isRole('admin')) {
             $grid->column('pay', __('pay'))->display(function () {
-                return (new PaySalariesAction($this->id, 'user', $this->salary))->render();
+                return (new PaySalariesAction($this->id, 'user',))->render();
             });
         }
         $grid->tools(function (Grid\Tools $tools) {
@@ -189,11 +197,74 @@ class SalariesController extends MainController
         //            return (new SalariesAction($this->id, 'agency'))->render();
         //        });
         $grid->column('pay', __('pay'))->display(function () {
-            return (new PaySalariesAction($this->id, 'agency', $this->salary))->render();
+            return (new PaySalariesAction($this->id, 'agency',))->render();
         });
         $grid->tools(function (Grid\Tools $tools) {
             $tools->append('<a href="' . url('/admin/sallaries_history?type=1') . '"  class="btn btn-sm btn-success">' . __('admin.history') . '</a>');
         });
         return $grid;
+    }
+
+
+
+
+    public function updateUserCutAmount()
+    {
+        UserWallet::with('user')->chunk(100, function ($usersWallets) {
+            foreach ($usersWallets as $wallet) {
+                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
+                    ->sum('cut_amount');
+
+                $cutAmount = $wallet->cut_amount - $totalCutAmount;
+                $UserSalary = UserSallary::where('user_id', $wallet->user_id)->where([
+                    'month' => now()->format('m'),
+                    'year' => now()->format('Y'),
+                    'is_finished' => 0
+                ])->first();
+                if ($UserSalary) {
+                    $UserSalary->cut_amount += $cutAmount;
+                    $UserSalary->save();
+                } else {
+                    UserSallary::create([
+                        'user_id' => $wallet->user_id,
+                        'sallary' => 0,
+                        'cut_amount' => $cutAmount,
+                        'month' => now()->format('m'),
+                        'year' => now()->format('Y'),
+                        'user_agency_id' => $wallet->user->agency_id ?? 0,
+                        'is_finished' => 0
+                    ]);
+                }
+            }
+        });
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User cut amounts updated successfully.'
+        ]);
+    }
+
+    public function countUserCutAmount()
+    {
+        $counter = 0;
+        $usersId = [];
+
+        UserWallet::with('user')->chunk(100, function ($usersWallets) use (&$counter, &$usersId) {
+            foreach ($usersWallets as $wallet) {
+
+                $totalCutAmount = UserSallary::where('user_id', $wallet->user_id)
+                    ->sum('cut_amount');
+
+                if ($wallet->cut_amount != $totalCutAmount) {
+                    $counter++;
+                    $usersId[] = $wallet->user_id;
+                }
+            }
+        });
+
+        return response()->json([
+            'counter_user' => $counter,
+            'users_id'     => $usersId,
+        ]);
     }
 }

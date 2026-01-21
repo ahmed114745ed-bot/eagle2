@@ -28,20 +28,10 @@ class WeeklyRankingCommand extends Command
 
     public function handle()
     {
-        Log::info('Weekly ranking job started');
-
         $rankingTypes = RankingType::where('schedule', 'weekly')->get();
 
-        Log::info('Weekly ranking types count', [
-            'count' => $rankingTypes->count(),
-        ]);
 
         foreach ($rankingTypes as $rankingType) {
-
-            Log::info('Processing ranking type', [
-                'ranking_type_id' => $rankingType->id,
-                'name' => $rankingType->name ?? null,
-            ]);
 
             // 1) Get the ranking list dynamically
             $rankingList = $this->getRankingList($rankingType);
@@ -53,20 +43,11 @@ class WeeklyRankingCommand extends Command
                 continue;
             }
 
-            Log::info('Ranking list fetched', [
-                'ranking_type_id' => $rankingType->id,
-                'count' => $rankingList->count(),
-            ]);
-
             // 2) Apply ranges to give rewards
             $this->applyRanges($rankingList, $rankingType);
 
-            Log::info('Rewards applied successfully', [
-                'ranking_type_id' => $rankingType->id,
-            ]);
         }
 
-        Log::info('Weekly ranking job finished');
     }
 
 
@@ -129,10 +110,6 @@ class WeeklyRankingCommand extends Command
             ->endOfWeek();
         //
        //  dd($start,$end);
-        Log::info("Charge calculation week range", [
-            'start' => $start,
-            'end' => $end
-        ]);
 
         $query = User::query()
             // Join charges of this week
@@ -235,12 +212,6 @@ class WeeklyRankingCommand extends Command
         // Convert to array if it's a Collection
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
 
-        // Log the user IDs being notified
-        Log::info('Dispatching notifications to user IDs', [
-            'user_ids' => $userIds,
-            'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
-        ]);
-
         if (empty($userIds)) {
             Log::warning('No user IDs found for notification');
             return;
@@ -253,11 +224,6 @@ class WeeklyRankingCommand extends Command
             ->whereNotNull('notification_id')
             ->pluck('notification_id')
             ->toArray();
-
-        // Log the tokens that will receive notifications
-        Log::info('Notification tokens', [
-            'tokens' => $tokens
-        ]);
 
         $image = $range->generate_image;
         $icon  = getImagePath($image);

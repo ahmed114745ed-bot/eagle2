@@ -62,6 +62,7 @@ class MyStoreResource extends JsonResource
                 'room_salary' => (string) $roomSalary ?? '',
                 'paid' =>  $paid ?? 0,
                 'wallet_balance' =>  $this->salary ?? 0,
+                'wallet_user_balance' => $this->user_wallet_balance ?? 0,
             ], 
 
         ];

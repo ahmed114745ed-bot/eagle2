@@ -107,12 +107,14 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 5)
+            ->where('is_used', true)
             ->first()?->ware?->show_img ?? '';
     }
     public static function getBubbleId(User $user) : string
     {
         return self::getPacks($user)
             ->where('type', 5)
+            ->where('is_used', true)
             ->first()?->ware?->id ?? '';
     }
 
@@ -121,6 +123,7 @@ class UserPackHelper
     {
         return self::getPacks($user)
             ->where('type', 12)
+            ->where('is_used', true)
             ->first()?->ware?->id ?? '';
     }
 

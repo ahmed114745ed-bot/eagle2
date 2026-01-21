@@ -56,21 +56,10 @@ return [
             'secret' => env('PUSHER_APP_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'cluster' => env('PUSHER_APP_CLUSTER', 'mt1'),
                 'useTLS' => true,
             ],
         ],
-
-        // 'pusher' => [
-        //     'driver' => 'pusher',
-        //     'key' => getPusherConfig()['app_key'],
-        //     'secret' => getPusherConfig()['app_secret'],
-        //     'app_id' => getPusherConfig()['app_id'],
-        //     'options' => [
-        //         'cluster' => getPusherConfig()['app_cluster'],
-        //         'useTLS' => true,
-        //     ],
-        // ],
 
         'ably' => [
             'driver' => 'ably',
