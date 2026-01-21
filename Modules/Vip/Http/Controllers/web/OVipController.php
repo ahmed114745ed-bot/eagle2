@@ -2,27 +2,28 @@
 
 namespace Modules\Vip\Http\Controllers\web;
 
-use Illuminate\Validation\Rule;
-use App\Admin\Controllers\MainController;
-use App\Models\Config;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Vip\Entities\VipPrivilege;
+use App\Helpers\Common;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
 use App\Selectables\Privileges;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Auth\Permission;
-use Illuminate\Support\Str;
 use Modules\Vip\Services\VipService;
+use Modules\Vip\Entities\VipPrivilege;
+use Illuminate\Support\Facades\Session;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 
 class OVipController extends MainController
@@ -86,10 +87,21 @@ class OVipController extends MainController
             ->body($this->backgroundImage($oVip)->edit($id)));
     }
 
-    public function updateBackgroundImage($id)
+    public function updateBackgroundImage($ovip_id)
     {
-        $oVip = OVip::findOrFail($id);
-        return $this->backgroundImage($oVip)->update($id);
+        $oVip = OVip::findOrFail($ovip_id);
+
+        if (request()->hasFile('background_img')) {
+
+            $image = Common::upload('images', request()->file('background_img'));
+
+            $oVip->background_img = $image;
+            $oVip->save();
+        }
+
+        admin_toastr(__('Saved successfully'), 'success');
+
+        return redirect(admin_url('ovip'));
     }
 
     public function create(Content $content)
@@ -243,12 +255,23 @@ class OVipController extends MainController
         }
 
         $form = new Form($model);
-        $this->disableFormTools($form);
-        $form->image('background_img', trans('background'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
 
+        // ✅ IMPORTANT: SET FORM ACTION HERE
+        $form->setAction(
+            admin_url('ovip-theme/' . $model->id)
+        );
+
+        // Disable default tools (view, delete, etc.)
+        $this->disableFormTools($form);
+
+        // Background image upload
+        $form->image('background_img', trans('background'))
+            ->uniqueName();
+
+        // After save
         $form->saved(function (Form $form) {
-            $url = url('admin/ovip');
-            return redirect()->to($url);
+            admin_toastr(__('Background image updated successfully'), 'success');
+            return redirect(admin_url('ovip'));
         });
 
         return $form;
