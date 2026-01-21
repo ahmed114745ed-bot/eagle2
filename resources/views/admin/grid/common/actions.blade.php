@@ -32,11 +32,6 @@
         float: right;
         margin-right: 5px;
     }
-
-    .nav-pills .active a,
-    .nav-pills li[style*="background-color"] a {
-        color: white !important;
-    }
 </style>
 
 <div class="box box-solid" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">

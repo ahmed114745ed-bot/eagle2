@@ -56,13 +56,13 @@
 
         // تحقق من اللغة
         const isRTL = htmlLang.startsWith('ar') ||
-                      htmlLang.startsWith('he') ||
-                      htmlLang.startsWith('fa') ||
-                      browserLang.startsWith('ar') ||
-                      browserLang.startsWith('he') ||
-                      browserLang.startsWith('fa') ||
-                      // تحقق من محتوى النصوص في الصفحة
-                      checkPageTextDirection();
+            htmlLang.startsWith('he') ||
+            htmlLang.startsWith('fa') ||
+            browserLang.startsWith('ar') ||
+            browserLang.startsWith('he') ||
+            browserLang.startsWith('fa') ||
+            // تحقق من محتوى النصوص في الصفحة
+            checkPageTextDirection();
 
         if (isRTL) {
             document.documentElement.setAttribute('dir', 'rtl');
@@ -539,10 +539,10 @@
             mediaHtml += `
                 <div class="media-item" data-index="${index}" onclick="openMediaLightbox(${momentId}, ${index}, event)">
                     ${isVideo ?
-                        `<video src="${mediaPath}" preload="metadata"></video>` :
-                        `<img src="${mediaPath}" alt="Moment" loading="lazy"
+                `<video src="${mediaPath}" preload="metadata"></video>` :
+                `<img src="${mediaPath}" alt="Moment" loading="lazy"
                              onerror="this.style.display='none'">`
-                    }
+            }
                     ${index === 4 && count > 5 ? `<div class="media-overlay">+${count - 5}</div>` : ''}
                 </div>
             `;
@@ -736,8 +736,8 @@
         const title = type === 'comments'
             ? (texts.comments || 'Comments')
             : type === 'gifts'
-            ? (texts.gifts || 'Gifts')
-            : (texts.likes || 'Likes');
+                ? (texts.gifts || 'Gifts')
+                : (texts.likes || 'Likes');
 
         modal.find('.side-modal-title').text(title);
         modal.find('.side-modal-body').html('<div class="loading-container"><div class="spinner"></div></div>');
@@ -812,14 +812,14 @@
                             html += `
                                 <div class="modal-user-item">
                                     <div class="modal-user-header" onclick="window.open('${userUrl}', '_blank')">
+                                      <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                         <img src="${avatar}" alt="${escapeHtml(userName)}" class="modal-user-avatar" loading="lazy">
                                         <div class="modal-user-info">
                                             <div class="modal-user-name">${escapeHtml(userName)}</div>
                                             <div class="modal-user-meta">ID: ${userId}${userUuid ? ' • ' + userUuid : ''}</div>
                                         </div>
-                                        <button class="modal-delete-btn" onclick="event.stopPropagation(); deleteCommentFromModal(${comment.id}, ${momentId}, event)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
                                     </div>
                                     <div class="modal-comment-text" dir="${commentDir}" style="text-align: ${commentDir === 'rtl' ? 'right' : 'left'};">${escapeHtml(comment.comment)}</div>
                                     <div class="modal-comment-time" title="${fullDateTime}">${timeAgo}</div>

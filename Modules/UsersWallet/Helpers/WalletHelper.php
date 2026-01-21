@@ -60,10 +60,6 @@ class WalletHelper
         $before = $wallet?->balance ?? 0 ;
         $wallet->balance += $amount;
         $wallet->save();
-              \Log::info('addBalance data', [
-    'target_id' => $target_id,
-
-]);
         WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
@@ -76,23 +72,20 @@ class WalletHelper
         ]);
     }
 
-    /**
-     * @throws Exception
-     */
+
     public static function createWithdrawal($userId, $amount, array $meta = [])
     {
         $wallet = UserWallet::firstOrCreate(['user_id' => $userId]);
         $before = $wallet?->balance ?? 0 ;
-
         $available = wallet_available_by_wallet($wallet);
 
         if ($available < $amount) {
             throw new Exception('Insufficient balance.');
         }
-
+    
         $wallet->pending_amount += $amount;
         $wallet->save();
-
+    
         $userWithdrawal = UserWithdrawal::create([
             'user_id' => $userId,
             'amount'  => $amount,
@@ -100,7 +93,7 @@ class WalletHelper
             'meta'    => $meta,
         ]);
 
-        WalletLog::create([
+         WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
             'amount' => $amount,
@@ -113,4 +106,6 @@ class WalletHelper
 
         return $userWithdrawal;
     }
+    
+
 }

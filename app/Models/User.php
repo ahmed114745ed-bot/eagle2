@@ -909,17 +909,21 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        // $userSalary = UserSallary::query()
 
-            ->where('user_id', $this->id)
-            ->orderByDesc('id')
-            ->sum(DB::raw('sallary - cut_amount'));
+        //     ->where('user_id', $this->id)
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('sallary - cut_amount'));
+        $roomSalary = 0;
+        $userSalary = $this->relationLoaded('totalUserSalary')
+            ? $this->totalUserSalary->sum(fn($item) => $item->sallary - $item->cut_amount)
+            : $this->totalUserSalary()->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        // $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+        //     $q->where('uid', $this->id);
+        // })
+        //     ->orderByDesc('id')
+        //     ->sum(DB::raw('salary - cut_amount'));
 
         $total = $userSalary + $roomSalary;
         // $total = wallet_available_by_user($this->id);
@@ -1588,7 +1592,7 @@ class User extends Authenticatable
         if (!$this->relationLoaded('packs')) {
             return $value;
         }
-
+        
         if (UserPackHelper::hasHideOnlineTime($this)) {
             return null;
         }
@@ -1688,7 +1692,7 @@ class User extends Authenticatable
     public function userTypeBadge()
     {
         $lang = app()->getLocale() ?? 'en';
-
+       //dd($this->type_user);
         $types = [
             1 => 'host',
             2 => 'agency_owner',
@@ -1714,6 +1718,8 @@ class User extends Authenticatable
         if ($this->is_bd) {
             $applicableTypes[4] = $types[4];
         }
+
+       
 
         if (empty($applicableTypes)) {
             return $lang === 'ar' ? 'مستخدم' : 'User';
@@ -1750,7 +1756,7 @@ class User extends Authenticatable
     public function userBadge()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','regular'))->active()->with("badge")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
@@ -1767,6 +1773,28 @@ class User extends Authenticatable
 
         return $html;
     }
+
+    public function userBadgeTop()
+    {
+
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type','top'))->active()->with("badge")->get();
+
+        $html = '<div class="user-type-badges">';
+        foreach ($userBadges as $badge) {
+            $url = getImagePath($badge->badge->image);
+
+            if ($url) {
+                $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
+                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
+            }
+        }
+
+        $html .= '</div>';
+
+
+        return $html;
+    }
+
 
     public function wallet()
     {

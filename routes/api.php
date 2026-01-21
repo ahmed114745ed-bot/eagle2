@@ -382,7 +382,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
-            Route::prefix('gifts')->withoutMiddleware('throttle')->group(function () {
+            Route::prefix('gifts')->withoutMiddleware(['throttle', 'throttle:api'])->group(function () {
                 Route::get('/', [GiftController::class, 'index']);
                 Route::get('/v2', [GiftController::class, 'getByCategory']);
                 Route::get('/images', [GiftController::class, 'get_images']);

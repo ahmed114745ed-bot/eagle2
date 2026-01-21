@@ -1425,6 +1425,10 @@
         position: fixed;
     }
 
+    .table-responsive .grid-dropdown-menu {
+        position: absolute;
+    }
+
     .rtl .dropdown-menu {
         left: 7%;
     }
@@ -3102,14 +3106,13 @@
         width: 250px;
         min-height: 400px;
         padding: 20px;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     .settings-sidebar h2 {
         text-align: center;
         color: var(--primary-color);
     }
-
     .new-form {
         background: #ffffff;
         border-radius: 16px;
@@ -3121,6 +3124,14 @@
     button:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    @media (max-width: 768px) {
+        .table-responsive td,
+        .table-responsive th {
+            white-space: nowrap !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+        }
     }
 </style>
 

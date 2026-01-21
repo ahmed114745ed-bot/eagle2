@@ -2,13 +2,11 @@
 
 namespace App\Admin\Controllers;
 
-use App\Facades\UserHandling;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Target;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -16,6 +14,7 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
 use App\Models\UserSallary;
+use App\Facades\UserHandling;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use App\Models\ShippingAgency;
@@ -24,16 +23,18 @@ use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
 use App\Models\UsersJoinedAgency;
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Actions\Response;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
+use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Http\Request as req;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
-use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use Encore\Admin\Controllers\HasResourceActions;
 
 class AgencyController extends MainController
 {
@@ -94,7 +95,7 @@ class AgencyController extends MainController
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
                 ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'bd_id', 'img')
+                ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'created_by', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
 
@@ -102,9 +103,16 @@ class AgencyController extends MainController
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::query()
                     ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
-                    ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                    ->select('id', 'name', 'app_owner_id', 'created_by', 'phone', 'coins', 'img')
                     ->find($id);
             });
+        }
+        $adminUser = DB::table('admin_users')->where('id', $agency->created_by)->first() ?? $agency->owner;
+        $pathAdmin = $adminUser?->avatar;
+        $defaultImageAdmin = asset('images/businessman-icon.jpg');
+        $imageUrlAdmin = getImagePath($pathAdmin);
+        if (!isImageExists($imageUrlAdmin)) {
+            $imageUrlAdmin = $defaultImageAdmin;
         }
 
         $path = $agency?->img;
@@ -278,6 +286,8 @@ class AgencyController extends MainController
         return $content
             ->title(__('agency profile'))
             ->view('agency_profile', compact(
+                'adminUser',
+                'imageUrlAdmin',
                 'agency',
                 'prefix',
                 'members',
@@ -378,14 +388,6 @@ class AgencyController extends MainController
 
         $grid = new Grid(new Agency);
         $grid->model()
-            ->with([
-                'creator',
-                'country',
-                'owner',
-                'owner.profile',
-                'owner.country',
-                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            ])
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->selectRaw('agencies.*, COALESCE(SUM(agency_salaries.sallary - agency_salaries.cut_amount), 0) as salary')
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
@@ -459,8 +461,8 @@ class AgencyController extends MainController
         })->sortable();
 
         // --- Owner column ---
-        $grid->column('owner.name', trans('owner'))->display(function () {
-            $name = $this->owner->name ?? '';
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+
             $uid = @$this->owner->uuid;
             $path = @$this->owner->profile?->avatar;
             $defaultImage = asset("images/businessman-icon.jpg");
@@ -534,7 +536,7 @@ class AgencyController extends MainController
             ->switch(Common::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
-            $creator = $this->creator;
+           $creator = $this->creator;
             return app(\App\Admin\Services\CreatorService::class)->showV2($creator);
         });
         // --- Actions ---
@@ -811,6 +813,23 @@ class AgencyController extends MainController
         $form->saving(function (Form $form) {
             $isEditing = $form->isEditing();
             $appOwnerId = $form->input('app_owner_id');
+
+            $currentAgencyId = $form->model()->id ?? null;
+
+            if ($appOwnerId) {
+                $existingAgency = Agency::where('app_owner_id', $appOwnerId)
+                    ->when($currentAgencyId, function ($query) use ($currentAgencyId) {
+                        $query->where('id', '!=', $currentAgencyId);
+                    })
+                    ->first();
+
+                if ($existingAgency) {
+                    $error = new \Illuminate\Support\MessageBag([
+                        'app_owner_id' => [__('This user is already an owner of agency: ') . $existingAgency->name],
+                    ]);
+                    return back()->withInput()->withErrors($error);
+                }
+            }
 
             if (!$form->bd_id && !$form->model()->bd_id) {
                 $defaultBd = Bd::where('country_id', Auth::user()->country_id)->where('default', 1)->first();
@@ -1214,5 +1233,37 @@ class AgencyController extends MainController
         $grid->disableExport();
         $grid->disableActions();
         return $grid;
+    }
+
+
+    public function usersAgency()
+    {
+        $users = User::where('agency_id', '!=', 0)->whereNotNull('agency_id')
+            ->where('type_user', 0)
+            ->get();
+
+        return response()->json([
+            'count_users'    => $users->count(),        // how many users
+            'user_ids' => $users->pluck('id'),    // list of user IDs
+        ]);
+    }
+
+    public function UpdateTypeUserAgency()
+    {
+        $query = User::whereIn('id', Agency::select('app_owner_id'))
+            ->where('type_user', 0);
+
+        $userIds = $query->pluck('id');
+        $count   = $userIds->count();
+
+        $query->update(['type_user' => 2]);
+
+        $query = User::where('agency_id', '!=', 0)->whereNotNull('agency_id')->where('type_user', 0)
+            ->whereNotIn('id', $userIds->toArray())->update(['type_user' => 1]);
+
+        return response()->json([
+            'count'    => $count,
+            'user_ids' => $userIds,
+        ]);
     }
 }

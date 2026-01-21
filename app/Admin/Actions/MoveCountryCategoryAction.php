@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class MoveCountryCategoryAction extends RowAction
 {
-    protected static $categories;
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
@@ -38,20 +37,20 @@ class MoveCountryCategoryAction extends RowAction
         $locale = app()->getLocale();
 
         // Category select
-        if (!isset(self::$categories)) {
-            self::$categories = CountryCategory::orderBy('id')->get()
-                ->mapWithKeys(function ($category) use ($locale) {
+        $this->select('category_id', __('Select Category'))
+            ->options(function () use ($locale) {
+
+                $categories = [];
+                foreach (CountryCategory::get() as $category) {
                     $title = $category->title[$locale]
                         ?? $category->title['en']
                         ?? reset($category->title);
 
-                    return [$category->id => $title];
-                })
-                ->toArray();
-        }
+                    $categories[$category->id] = $title;
+                }
 
-        $this->select('category_id', __('Select Category'))
-            ->options(self::$categories)
+                return $categories;
+            })
             ->required();
     }
 }

@@ -129,4 +129,16 @@ return [
         'table' => 'failed_jobs',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supervisor Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The supervisor group name for queue workers. Used when auto-restarting
+    | workers after Pusher config changes.
+    |
+    */
+    
+    'supervisor_group' => env('QUEUE_SUPERVISOR_GROUP', 'laravel-worker:*'),
+
 ];

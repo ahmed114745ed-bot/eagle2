@@ -243,7 +243,7 @@ class AgencyService
         } elseif ($accept === 1 || $accept === true) {
             $action->status = 1;
             $action->save();
-            $this->userRepository->update(['agency_id' => $agency->id], $user->id);
+            $this->userRepository->update(['agency_id' => $agency->id, 'type_user' => 1], $user->id);
             $userMonthlyDiamond =  MonthlyDiamondReceive::where('user_id', $user->id)->where('month', now()->month)->where('year', now()->year)->first();
             if ($userMonthlyDiamond) $userMonthlyDiamond->update(['monthly_diamond_received' => 0]);
             $this->userRepository->updateTypeUser($user);

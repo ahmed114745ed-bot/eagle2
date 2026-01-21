@@ -1565,7 +1565,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         position: relative;
     }
@@ -1589,7 +1589,7 @@
     }
 
     .modal-user-info {
-        flex: 1;
+        /*flex: 1;*/
         min-width: 0;
         max-width: 200px;
         overflow: hidden;
@@ -1727,7 +1727,7 @@
 
     .modal-comment-text {
         margin-top: 12px;
-        margin-left: 70px;
+        /*margin-left: 70px;*/
         font-size: 15px;
         line-height: 1.4;
         word-wrap: break-word;
@@ -1739,20 +1739,20 @@
         text-align: right !important;
         direction: rtl;
         margin-left: 0;
-        margin-right: 70px;
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-text[dir="ltr"] {
         text-align: left !important;
         direction: ltr;
-        margin-left: 70px;
-        margin-right: 0;
+        /*margin-left: 70px;*/
+        /*margin-right: 0;*/
     }
 
     /* RTL Support for Comment Text */
     [dir="rtl"] .modal-comment-text:not([dir="ltr"]) {
-        margin-left: 0;
-        margin-right: 70px;
+        /*margin-left: 0;*/
+        /*margin-right: 70px;*/
     }
 
     .modal-comment-time {
@@ -1868,13 +1868,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 56px;
+            /*margin-left: 56px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 56px;
+            /*margin-left: 0;*/
+            /*margin-right: 56px;*/
         }
 
         .modal-comment-time {
@@ -1902,13 +1902,13 @@
         }
 
         .modal-comment-text {
-            margin-left: 52px;
+            /*margin-left: 52px;*/
             font-size: 14px;
         }
 
         .modal-comment-text[dir="rtl"] {
-            margin-left: 0;
-            margin-right: 52px;
+            /*margin-left: 0;*/
+            /*margin-right: 52px;*/
         }
 
         .modal-comment-time {
@@ -2021,7 +2021,6 @@
     }
 
     .user-list-item:hover {
-        background: #f8f9ff;
         border-color: var(--primary-color);
     }
 
@@ -2131,5 +2130,35 @@
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .users-sidebar {
+            display: none !important;
+        }
+
+        .viewer-main-content {
+            width: 100% !important;
+            flex: 1 !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .users-sidebar {
+            display: none !important;
+        }
+    }
+    /* Fix SweetAlert2 appearing behind modal */
+    .swal2-container {
+        z-index: 99999 !important;
+    }
+
+    .swal2-popup {
+        z-index: 99999 !important;
+    }
+
+    /* Ensure the backdrop is also above the modal */
+    .swal2-container.swal2-backdrop-show {
+        z-index: 99999 !important;
     }
 </style>

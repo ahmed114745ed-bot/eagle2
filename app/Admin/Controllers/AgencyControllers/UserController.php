@@ -472,7 +472,7 @@ class UserController extends MainController
         $haveCoins = (request()->have_coins == 1);
         $grid->model()->ofAgency()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
-            ->select(['id', 'name', 'uuid', 'special_id','country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
+            ->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
@@ -529,14 +529,9 @@ class UserController extends MainController
 
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
             .modal-dialog {
                 max-width: 90%;
-            }
-
-            .modal {
-                top: 5%;
             }
 
             .modal-body {

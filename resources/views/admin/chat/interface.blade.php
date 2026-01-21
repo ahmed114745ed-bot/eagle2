@@ -2,17 +2,20 @@
 
 <div class="chat-wrapper">
     <div class="chat-container">
+        <!-- New Message Notification (shown at top when scrolled up) -->
         <div class="new-message-notification" id="newMessageNotification" onclick="scrollToLatestMessage()">
             <i class="fa fa-comment-dots"></i>
             <span>{{ __('New message received') }}</span>
             <span class="message-count" id="notificationCount">1</span>
         </div>
 
+        <!-- Scroll to Latest Button (shown when not at bottom) -->
         <button class="scroll-to-latest" id="scrollToLatestBtn" onclick="scrollToLatestMessage()">
             <i class="fa fa-chevron-down"></i>
             <span class="unread-badge" id="unreadBadge" style="display: none;">0</span>
         </button>
 
+        <!-- Header -->
         <div class="chat-header">
             <a href="{{ route('admin.group-chat.index') }}" class="back-btn">
                 <i class="fa fa-arrow-{{ app()->getLocale() == 'ar' ? 'right' : 'left' }}"></i>
@@ -87,6 +90,7 @@
             </div>
         </div>
 
+        <!-- Reply Preview (shown when replying to a message) -->
         <div class="reply-preview" id="replyPreview" style="display: none;">
             <div class="reply-content">
                 <div class="reply-indicator"></div>
@@ -101,9 +105,11 @@
             <input type="hidden" id="replyToId" value="">
         </div>
 
+        <!-- Chat Messages -->
         <div class="chat-messages" id="chatMessages">
         </div>
 
+        <!-- Message Input -->
         <div class="chat-input {{ !$canSendMessages ? 'disabled' : '' }}">
             <input type="text" id="messageInput"
                    placeholder="{{ $canSendMessages ? __('Type your message here') : __('You cannot send messages') }}"
@@ -116,6 +122,7 @@
     </div>
 </div>
 
+<!-- Edit Modal -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -142,6 +149,7 @@
 
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <script>
+    // ==================== TRANSLATIONS ====================
     const translations = {
         loadingMessages: "{{ __('Loading messages...') }}",
         failedToLoadMessages: "{{ __('Failed to load messages') }}",
@@ -171,6 +179,7 @@
         newMessage: "{{ __('new message') }}"
     };
 
+    // ==================== CONFIGURATION ====================
     const csrfToken = '{{ csrf_token() }}';
     const adminAppId = {{ $adminAppId ?? 0 }};
     const canSendMessages = {{ $canSendMessages ? 'true' : 'false' }};
@@ -181,6 +190,7 @@
     const pusherKey = '{{ config("broadcasting.connections.pusher.key") }}';
     const pusherCluster = '{{ config("broadcasting.connections.pusher.options.cluster") }}';
 
+    // ==================== STATE VARIABLES ====================
     let currentPage = 1;
     let lastPage = 1;
     let isLoading = false;
@@ -196,6 +206,7 @@
     let channel = null;
     let newMessageIds = [];
 
+    // Filter state
     let activeFilters = {
         user_id: null,
         user_name: null,
@@ -208,6 +219,7 @@
     const SCROLL_BOTTOM_THRESHOLD = 150;
     let scrollDebounceTimer = null;
 
+    // ==================== DOM ELEMENTS ====================
     const chatContainer = document.getElementById('chatMessages');
     const filterPanel = document.getElementById('filterPanel');
     const filterToggleIcon = document.getElementById('filterToggleIcon');
@@ -215,6 +227,7 @@
     const activeFiltersContainer = document.getElementById('activeFilters');
     const filterBadgesContainer = document.getElementById('filterBadges');
 
+    // ==================== FILTER FUNCTIONS ====================
     function toggleFilterPanel() {
         const toggle = document.querySelector('.filter-toggle');
         if (filterPanel.style.display === 'none') {
@@ -663,88 +676,77 @@
         let replyHtml = '';
         if (message.parent) {
             replyHtml = `
-            <div class="replied-message" onclick="scrollToMessage(${message.parent.id})">
-                <div class="replied-user">${escapeHtml(message.parent.user_name)}</div>
-                <div class="replied-text">${escapeHtml(message.parent.text)}</div>
-            </div>`;
+                <div class="replied-message" onclick="scrollToMessage(${message.parent.id})">
+                    <div class="replied-user">${escapeHtml(message.parent.user_name)}</div>
+                    <div class="replied-text">${escapeHtml(message.parent.text)}</div>
+                </div>`;
         }
 
         const actionMenuHtml = `
-        <div class="message-actions">
-            <button class="more-btn" onclick="toggleActionMenu(event, ${message.id})">
-                <i class="fa fa-ellipsis-v"></i>
-            </button>
-            <div class="action-menu" id="action-menu-${message.id}">
-                <button class="action-menu-item reply-item" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
-                    <i class="fa fa-reply"></i> {{ __('Reply') }}
+            <div class="message-actions">
+                <button class="more-btn" onclick="toggleActionMenu(event, ${message.id})">
+                    <i class="fa fa-ellipsis-v"></i>
+                </button>
+                <div class="action-menu" id="action-menu-${message.id}">
+                    <button class="action-menu-item reply-item" onclick="setReply(${message.id}, '${escapeHtml(userName)}', '${escapeHtml(message.text)}')">
+                        <i class="fa fa-reply"></i> {{ __('Reply') }}
         </button>
         <button class="action-menu-item edit-item" onclick="editMessage(${message.id}, '${escapeHtml(message.text)}')">
-                    <i class="fa fa-edit"></i> {{ __('Edit') }}
+                        <i class="fa fa-edit"></i> {{ __('Edit') }}
         </button>
         <button class="action-menu-item delete-item" onclick="deleteMessage(${message.id})">
-                    <i class="fa fa-trash"></i> {{ __('Delete') }}
+                        <i class="fa fa-trash"></i> {{ __('Delete') }}
         </button>
     </div>
 </div>`;
 
         if (isShareRoom) {
             messageContent = `
-            <div class="share-room-content">
-                <img src="{{ asset('images/loading.gif') }}" alt="Room" class="room-share-image" style="max-width: 20%; border-radius: 8px; margin-bottom: 8px; display: ${roomImage === 'loading' ? 'block' : 'none'};">
-                <p class="share-room-text">${shareRoomText}</p>
-            </div>`;
+                <div class="share-room-content">
+                    <img src="{{ asset('images/loading.gif') }}" alt="Room" class="room-share-image" style="max-width: 50%; border-radius: 8px; margin-bottom: 8px; display: ${roomImage === 'loading' ? 'block' : 'none'};">
+                    <p class="share-room-text">${shareRoomText}</p>
+                </div>`;
         } else {
             messageContent = `<p>${escapeHtml(message.text)}</p>`;
         }
 
         if (isAdmin) {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                ${actionMenuHtml}
-                <div class="message-content">
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        ${messageContent}
-                        <div class="message-footer">
-                            <span class="message-time">${time}</span>
-                            <i class="fa fa-check-double"></i>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    ${actionMenuHtml}
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            ${messageContent}
+                            <div class="message-footer">
+                                <span class="message-time">${time}</span>
+                                <i class="fa fa-check-double"></i>
+                            </div>
+                        </div>
+                        <div class="user-avatar sender">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
                         </div>
                     </div>
-                    <div class="user-avatar sender clickable-profile" onclick="openUserProfile(${message.user_id}, event)" title="{{ __('View Profile') }}">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
-                    </div>
-                </div>
-            </div>`;
+                </div>`;
         } else {
             return `
-            <div class="message-wrapper ${messageClass}" data-id="${message.id}">
-                <div class="message-content">
-                    <div class="user-avatar clickable-profile" onclick="openUserProfile(${message.user_id}, event)" title="{{ __('View Profile') }}">
-                        <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                <div class="message-wrapper ${messageClass}" data-id="${message.id}">
+                    <div class="message-content">
+                        <div class="user-avatar">
+                            <img src="${avatarUrl}" alt="${userName}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="avatar-fallback" style="display:none;">${userInitial}</span>
+                        </div>
+                        <div class="message-bubble">
+                            ${replyHtml}
+                            <p class="user-name-label">${userName}</p>
+                            ${messageContent}
+                            <span class="message-time">${time}</span>
+                        </div>
                     </div>
-                    <div class="message-bubble">
-                        ${replyHtml}
-                        <p class="user-name-label clickable-profile" onclick="openUserProfile(${message.user_id}, event)" title="{{ __('View Profile') }}">${userName}</p>
-                        ${messageContent}
-                        <span class="message-time">${time}</span>
-                    </div>
-                </div>
-                ${actionMenuHtml}
-            </div>`;
+                    ${actionMenuHtml}
+                </div>`;
         }
-    }
-
-    // ==================== USER PROFILE ====================
-    function openUserProfile(userId, event) {
-        if (event) {
-            event.stopPropagation(); // Prevent triggering other click events
-        }
-        // Adjust the URL pattern based on your routes
-        window.open(`/admin/users/${userId}`, '_blank');
-        // Or if your route is different:
-        // window.open(`{{ url('/admin/users') }}/${userId}`, '_blank');
     }
 
     // ==================== ACTION MENU ====================

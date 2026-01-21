@@ -67,13 +67,13 @@ class ChangeAgencyAction extends RowAction
         
                 UsersJoinedAgency::create([
                     'user_id'   => $user->id,
-                    'agency_id' => $request->agency_id,
+                    'agency_id' => $request->agency_ids,
                     'type'      => 2,
                     'join_date' => now(),
                     'status'    => 'Joined',
                 ]);
         
-                $user->agency_id = $request->agency_id;
+                $user->agency_id = $request->agency_ids;
                 $user->save();
     
         
@@ -140,7 +140,7 @@ class ChangeAgencyAction extends RowAction
     public function form()
     {
         $this->hidden('id', __('id'))->value($this->id);
-        $this->select('agency_id', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
+        $this->select('agency_ids', __('agency id'))->ajax('/admin/search/host-agency', 'id', 'name');
     }
 
     public function html()

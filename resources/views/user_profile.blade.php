@@ -1131,8 +1131,8 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
-                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
-                    {!! @$user->userTypeBadge() !!}
+                   
+                    {!! @$user->userTypeBadge() !!}{!! @$user->userBadgeTop() !!}
                 </div>
 
             </div>
@@ -1140,7 +1140,6 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('badges')}}:</span>
-                    <!-- <span class="meta-value">{{@$user->userType() }}</span> -->
                     {!! @$user->userBadge() !!}
                 </div>
 
@@ -1926,8 +1925,7 @@
 
             <div class="pagination-wrapper">
                 {{ $badges?->appends([
-                    'tab'         => 'badges',  
-                    'type'        => $type,
+                     'type'        => $type,
                     'badges_page' => $badges?->currentPage(),
                 ])->links('vendor.pagination.default') }}
             </div>

@@ -19,7 +19,7 @@ use Modules\Achievement\Entities\UserAchievementLevel;
 
 class UserAchievementLevelController extends MainController
 {
-    /**
+/**
      * Title for current resource.
      *
      * @var string
@@ -36,14 +36,14 @@ class UserAchievementLevelController extends MainController
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id, $content
+        return parent::edit($id,$content
             ->title(trans('user-achievement-levels'))
             ->body($this->form()->edit($id)));
     }
 
     public function show($id, Content $content)
     {
-        return parent::show($id, $content
+        return parent::show($id,$content
             ->title(trans('user-achievement-levels'))
             ->body($this->detail($id)));
     }
@@ -57,23 +57,15 @@ class UserAchievementLevelController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserAchievementLevel());
-        $countryID = session('filter_country_id');
+        $countryID =session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user.uuid', __('uuid'));
+            $filter->column(1/2, function ($filter) {
+                $filter->equal('user.uuid',__('uuid'));
+
             });
         });
-        $grid->model()->with([
-            'user',
-            'user.profile',
-            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'achievementLevel',
-            'achievement',
-            'giftAchievement',
-            'giftAchievement.gift'
-
-        ])->when($countryID, function ($query) use ($countryID) {
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
             $query->where(function ($q) use ($countryID) {
                 $q->whereHas('user', function ($subQuery) use ($countryID) {
                     $subQuery->where('country_id', $countryID);
@@ -85,19 +77,19 @@ class UserAchievementLevelController extends MainController
         // $grid->column('achievement_level_id', __('Achievement level id'));
         // $grid->column('user_id', __('User id'));
         $grid->column('user.name', __('Users'))
-            ->display(function ($name) {
-                $uid = @$this->user?->uuid;
-                $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
-                $url = getImagePath($path) ?? $defaultImage;
+        ->display(function ($name) {
+            $uid = @$this->user?->uuid;
+            $path = @$this->user?->profile?->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = getImagePath($path) ?? $defaultImage;
 
-                // Check if the image exists
-                if (!isImageExists($url)) {
-                    $url = $defaultImage;
-                }
-                $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+            // Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-                return "
+            return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
                 <div>
@@ -106,46 +98,33 @@ class UserAchievementLevelController extends MainController
                 </div>
             </div>
         ";
-            });
-        $grid->column('achievementLevel.target', __('achievement_level_target'))->display(function ($column) {
-            if ($this->achievement_level_id != null) {
-                return $this->achievementLevel->target ?? 0;
-            } elseif ($this->gift_achievement_id  != null) {
+        });
+        $grid->column('achievementLevel.target', __('achievement_level_target'))->display(function( $column) {
+            if($this->achievement_level_id != null )
+            {
+              return $this->achievementLevel->target ?? 0;
+            }elseif( $this->gift_achievement_id  !=null ){
                 return $this->achievement->target ?? 0;
             }
 
             return "custom";
+
         });
-        // $grid->column('custom_image', __('custom_image'))->display(function ($value) {
-        //     if ($value != null) {
-        //         $image = $value;
-        //     } else {
-        //         $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift', function ($q) {
-        //             $q->select('img');
-        //         })->first()->gift->img ?? null;
-        //     }
-        //     $value = getDriverUrl() . '/' . $image;
-        //     return "<img src='$value' width='80' height='80'>";
-        // });
-
-        $grid->column('custom_image', __('custom_image'))->display(function ($value) {
-            if ($value != null) {
-                $image = $value;
-            } else {
-                // استخدم البيانات المحملة مسبقًا بدون استعلام جديد
-                $image = $this->achievementLevel?->valid_image
-                    ?? $this->giftAchievement?->gift?->img
-                    ?? null;
+        $grid->column('custom_image', __('custom_image'))->display(function ($value)  {
+            if($value != null){
+               $image = $value;
+            }else{
+                $image = $this->achievementLevel?->valid_image ?? $this->giftAchievement()->whereHas('gift',function($q){
+                    $q->select('img');
+                })->first()->gift->img ?? null;
             }
-
-            $value = $image ? getDriverUrl() . '/' . $image : null;
-
-            return $value ? "<img src='$value' width='80' height='80'>" : '-';
+            $value = getDriverUrl() .'/'. $image;
+            return "<img src='$value' width='80' height='80'>";
         });
 
         $states = [
-            'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
-            'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
+            'off'=>['value'=>0,'text'=>'no','color'=>'danger'],
+            'on'=>['value'=>1,'text'=>'yes','color'=>'success'],
         ];
         $grid->column('is_enable')->switch($states);
 
@@ -194,23 +173,24 @@ class UserAchievementLevelController extends MainController
         // $form->select('achievement', __('Achievement'))->options(Achievement::where('type','!=','gift_target')->pluck('name', 'id'));
 
 
-        // $form->select('achievementLevel', __('Achievement level id'));
+       // $form->select('achievementLevel', __('Achievement level id'));
 
 
         // $form->number('user_id', __('User id'));
         // // $form->select('achievement_level_id', __('Achievement'))
         // ->options(\Modules\Achievement\Entities\::pluck('name', 'id'));
         // $form->number('gift_achievement_id', __('Gift achievement id'));
-        $form->switch('is_enable', trans('enable'))->states(Common::getSwitchStates());
+        $form->switch('is_enable', trans('enable'))->states (Common::getSwitchStates ());
 
         return $form;
     }
 
     public function create(Content $content)
     {
-        $achievementValidImage = AchievementValidImage::where('user_id', Auth::user()->id)->get();
+        $achievementValidImage=AchievementValidImage::where('user_id',Auth::user()->id)->get();
         return parent::create($content
-            ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevel', compact('achievementValidImage'))));
+             ->title(trans('user-achievement-levels'))
+            ->body(view('admin.grid.users.UserAchievementLevel',compact('achievementValidImage'))));
     }
+
 }

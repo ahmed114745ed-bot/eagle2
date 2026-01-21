@@ -113,8 +113,7 @@ class GiftController extends MainController
         }
 
         $grid->model()
-            ->with(['vip',
-            'category'])
+            ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             // ->orderByDesc('enable')   // 1️⃣ enabled first

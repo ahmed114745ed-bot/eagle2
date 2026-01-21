@@ -68,8 +68,8 @@
         return $value === $fullKey ? $fallback : $value;
     };
     $strings = [
-        'welcome_title'   => $t('login.title', $isAr ? 'مرحباً بك!' : 'Welcome back!'),
-        'welcome_sub'     => $t('login.subtitle', $isAr ? 'سجل دخولك للوصول إلى لوحة التحكم الخاصة بك' : 'Sign in to access your dashboard'),
+        'welcome_title'   => $t('login_country.title', $isAr ? 'مرحباً بك!' : 'Welcome back!'),
+        'welcome_sub'     => $t('login_country.subtitle', $isAr ? 'سجل دخولك للوصول إلى لوحة التحكم الخاصة بك' : 'Sign in to access your dashboard'),
         'feature_secure'  => $t('login.features.secure', $isAr ? 'تسجيل دخول آمن ومشفّر' : 'Secure, encrypted login'),
         'feature_fast'    => $t('login.features.fast', $isAr ? 'وصول سريع لجميع الميزات' : 'Fast access to all features'),
         'feature_global'  => $t('login.features.global', $isAr ? 'إدارة شاملة من أي مكان' : 'Manage everything from anywhere'),

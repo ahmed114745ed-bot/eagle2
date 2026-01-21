@@ -69,8 +69,6 @@ class LeaderCCgameController extends Controller
             ], 200);
         }
 
-         \Log::info('new game' );
-
         $errorExists = $this->checkWallet($request);
         if ($errorExists) return response()->json($errorExists);
 
@@ -178,9 +176,6 @@ class LeaderCCgameController extends Controller
 
     public function makeUpOrders(Request $request)
     {
-        \Log::info(' makeUpOrders ', [
-            'request' => $request->all(),
-        ]);
         // 1️⃣ Validate input
         $validator = Validator::make($request->all(), [
             'orderId'     => 'required|string',

@@ -3,8 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\FormSubmission;
-use App\Models\FormSubmissionValue;
+use Modules\Form\Entities\FormSubmission;
+use Modules\Form\Entities\FormSubmissionValue;
+// use App\Models\FormSubmission;
+// use App\Models\FormSubmissionValue;
 
 class FormSubmissionSeeder extends Seeder
 {

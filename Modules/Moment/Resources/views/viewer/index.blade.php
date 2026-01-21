@@ -135,4 +135,3 @@
     };
 </script>
 <script src="{{ asset('modules/moment/viewer.js') }}?v={{ time() }}"></script>
-

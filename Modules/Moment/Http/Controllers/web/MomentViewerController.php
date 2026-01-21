@@ -53,7 +53,7 @@ class MomentViewerController extends MainController
      * جلب قائمة الـ Moments بناءً على الترتيب المحدد
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getMoments(Request $request)
     {
@@ -144,52 +144,11 @@ class MomentViewerController extends MainController
         }
     }
 
-    public function getUsersWithMoments(Request $request): JsonResponse
-    {
-        try {
-            $search = $request->get('search', '');
-            $perPage = $request->get('per_page', 20);
-            $countryId = session('filter_country_id');
-
-            $query = \App\Models\User::select(['id', 'uuid', 'name'])
-                ->withCount('moments')
-                ->having('moments_count', '>', 0)
-                ->with(['profile:id,user_id,avatar']);
-
-            if (!empty($search)) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('uuid', 'like', "%{$search}%")
-                        ->orWhere('id', $search);
-                });
-            }
-
-            if ($countryId) {
-                $query->where('country_id', $countryId);
-            }
-
-            $users = $query->orderByDesc('moments_count')->paginate($perPage);
-
-            return response()->json([
-                'success' => true,
-                'data' => $users->items(),
-                'pagination' => [
-                    'current_page' => $users->currentPage(),
-                    'last_page' => $users->lastPage(),
-                    'per_page' => $users->perPage(),
-                    'total' => $users->total(),
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
     /**
      * جلب تفاصيل Moment محدد
      *
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getMoment($id)
     {
@@ -225,7 +184,7 @@ class MomentViewerController extends MainController
      * جلب قائمة المستخدمين الذين قاموا بعمل Like
      *
      * @param int $momentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getLikes($momentId, Request $request)
     {
@@ -255,7 +214,7 @@ class MomentViewerController extends MainController
      * جلب قائمة التعليقات
      *
      * @param int $momentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getComments($momentId, Request $request)
     {
@@ -285,7 +244,7 @@ class MomentViewerController extends MainController
      * حذف تعليق
      *
      * @param int $commentId
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteComment($commentId)
     {
@@ -310,7 +269,7 @@ class MomentViewerController extends MainController
      *
      * @param int $momentId
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function getGifts($momentId, Request $request)
     {
@@ -354,7 +313,7 @@ class MomentViewerController extends MainController
      *
      * @param Request $request
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateDescription(Request $request, $id)
     {
@@ -385,7 +344,7 @@ class MomentViewerController extends MainController
      * حذف Moment
      *
      * @param int $id
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function deleteMoment($id)
     {
@@ -417,7 +376,7 @@ class MomentViewerController extends MainController
      * إعادة تعيين seed للترتيب العشوائي
      *
      * @param Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function resetRandomSeed(Request $request)
     {
@@ -435,15 +394,52 @@ class MomentViewerController extends MainController
         // مسح الـ seed القديم (للتوافق مع الإصدارات السابقة)
         $request->session()->forget('moment_random_seed');
 
-        \Log::info('Reset random seed', [
-            'keys_deleted' => $keysDeleted,
-            'remaining_keys' => array_keys($request->session()->all())
-        ]);
-
         return response()->json([
             'success' => true,
             'message' => __('Random order reset successfully'),
             'keys_deleted' => $keysDeleted
         ]);
     }
+
+    public function getUsersWithMoments(Request $request): JsonResponse
+    {
+        try {
+            $search = $request->get('search', '');
+            $perPage = $request->get('per_page', 20);
+            $countryId = session('filter_country_id');
+
+            $query = \App\Models\User::select(['id', 'uuid', 'name'])
+                ->withCount('moments')
+                ->having('moments_count', '>', 0)
+                ->with(['profile:id,user_id,avatar']);
+
+            if (!empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('uuid', 'like', "%{$search}%")
+                        ->orWhere('id', $search);
+                });
+            }
+
+            if ($countryId) {
+                $query->where('country_id', $countryId);
+            }
+
+            $users = $query->orderByDesc('moments_count')->paginate($perPage);
+
+            return response()->json([
+                'success' => true,
+                'data' => $users->items(),
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'last_page' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total' => $users->total(),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
 }
