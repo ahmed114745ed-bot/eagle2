@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "50a7e74aa3a4fd8a8207aedfbb881437",
+    "content-hash": "e194cb1ece95a3dc60dc0530ff8372f6",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14420,46 +14420,6 @@
             }
         },
         {
-            "name": "utd/moments",
-            "version": "dev-achievmentPackage",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/Moments",
-                "reference": "0a89bf49246a75c6aff8f6e72c82aca912119ca3"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\Moments\\MomentsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\Moments\\": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Moments Laravel Package",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15232,8 +15192,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20,
-        "utd/moments": 20
+        "utd/achievements": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
