@@ -2,6 +2,17 @@
 
 return [
     'name' => 'Moments',
+
+    /**
+     * License key for the package (domain-based validation)
+     * Generate: hash('sha256', $domain . $license_secret)
+     */
+    'license_key' => env('MOMENTS_LICENSE_KEY', ''),
+
+    /**
+     * License secret for hash validation
+     */
+    'license_secret' => env('MOMENTS_LICENSE_SECRET', 'moments-secret-key'),
     
     /**
      * The default moment privacy setting
