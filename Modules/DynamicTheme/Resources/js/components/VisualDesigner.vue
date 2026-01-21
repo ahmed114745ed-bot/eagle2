@@ -2649,26 +2649,46 @@ export default {
     
     // Internal method to initialize SVGA player
     initSvgaPlayerInternal(element, url) {
-      if (!element || element.dataset.svgaLoaded === 'true') return;
+      if (!element) return;
+      
+      // Skip if already loaded with same URL
+      if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
+        console.log('⏭️ [initSvgaPlayerInternal] Already loaded, skipping:', url);
+        return;
+      }
       
       console.log('🎬 [initSvgaPlayerInternal] Initializing SVGA:', url);
       
       try {
+        // Clear previous content
+        element.innerHTML = '';
         element.dataset.svgaLoaded = 'true';
+        element.dataset.svgaUrl = url;
         
         // Ensure element has dimensions
-        if (!element.style.width) element.style.width = '100%';
-        if (!element.style.height) element.style.height = '100%';
+        element.style.width = '100%';
+        element.style.height = '100%';
+        element.style.minWidth = '40px';
+        element.style.minHeight = '40px';
         
         const player = new SVGA.Player(element);
         const parser = new SVGA.Parser();
         
         parser.load(url, (videoItem) => {
-          console.log('✅ [initSvgaPlayerInternal] SVGA loaded successfully:', url);
+          console.log('✅ [initSvgaPlayerInternal] SVGA loaded successfully:', url, 'size:', videoItem.videoSize);
           player.setVideoItem(videoItem);
           player.loops = 0; // Infinite loop
           player.clearsAfterStop = false;
           player.startAnimation();
+          
+          // Ensure canvas is visible
+          const canvas = element.querySelector('canvas');
+          if (canvas) {
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.display = 'block';
+            console.log('🎨 [initSvgaPlayerInternal] Canvas found and styled');
+          }
         }, (error) => {
           console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
           element.dataset.svgaLoaded = 'false';
@@ -2708,13 +2728,27 @@ export default {
       if (!element || !asset) return;
       
       const url = asset.file_url || asset.url;
-      console.log('🎬 [onSvgaMounted] asset:', asset?.name, '| url:', url, '| element:', element);
+      const assetId = asset.id;
       
-      if (element && url && !element.dataset.svgaLoaded) {
+      // Create unique key for this element
+      const elementKey = `svga_${assetId}_${url}`;
+      
+      console.log('🎬 [onSvgaMounted] asset:', asset?.name, '| url:', url, '| element:', element, '| loaded:', element.dataset.svgaLoaded);
+      
+      // Check if already initialized with same URL
+      if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
+        console.log('⏭️ [onSvgaMounted] Already loaded, skipping:', url);
+        return;
+      }
+      
+      if (element && url) {
+        // Mark the URL being loaded
+        element.dataset.svgaUrl = url;
+        
         // Use setTimeout to ensure DOM is ready
         setTimeout(() => {
           this.initSvgaPlayer(element, url);
-        }, 100);
+        }, 150);
       }
     },
     
@@ -4074,9 +4108,13 @@ export default {
   position: relative;
 }
 
-.svga-asset-preview .svga-player-container canvas {
-  max-width: 100%;
-  max-height: 100%;
+.svga-asset-preview .svga-player-container canvas,
+.svga-asset-preview canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
 }
 
 .svga-badge {
@@ -4099,10 +4137,24 @@ export default {
   align-items: center;
   justify-content: center;
   background: transparent;
+  min-width: 40px;
+  min-height: 40px;
+  position: relative;
+}
+
+.svga-asset-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  object-fit: contain;
 }
 
 .placed-asset.svga-asset {
   overflow: visible;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px dashed rgba(16, 185, 129, 0.5);
 }
 
 .placed-asset.svga-asset .svga-asset-container {
