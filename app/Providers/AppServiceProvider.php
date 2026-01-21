@@ -66,13 +66,6 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // Schema::createIfNotExists macro - skip if table already exists
-        \Illuminate\Database\Schema\Builder::macro('createIfNotExists', function (string $table, \Closure $callback) {
-            if (!Schema::hasTable($table)) {
-                Schema::create($table, $callback);
-            }
-        });
-
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
