@@ -93,9 +93,9 @@ class BadgeController extends MainController
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
-        // $form->image('show_image', trans('img'))->name(function ($file) {
-        //     return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        // });
+        $form->image('show_image', trans('img'))->name(function ($file) {
+            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+        });
 
         $form->file('image', __('Default Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
