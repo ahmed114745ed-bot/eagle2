@@ -2,14 +2,15 @@
 
 namespace Modules\UsersWallet\Http\Controllers\Api;
 
+use App\Models\User;
 use App\Helpers\Common;
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Modules\UsersWallet\Entities\UserWithdrawal;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Support\Renderable;
 use Modules\UsersWallet\Helpers\WalletHelper;
 use Modules\UsersWallet\Services\WalletService;
-use Illuminate\Support\Facades\Auth;
 
 class UsersWalletController extends Controller
 {
@@ -27,7 +28,6 @@ class UsersWalletController extends Controller
         try {
             return $callback();
         } catch (\Exception $e) {
-            \Log::info(123339999999999);
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }
@@ -35,30 +35,61 @@ class UsersWalletController extends Controller
 
     public function transferToUser(Request $request)
     {
-       \Log::info(12333444444444);
-        \Log::info('Withdrawal request data:', $request->all());
-        if (!$request->user_id) return Common::apiResponse(false, __('this agency does not have owner'), null, 500);
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer|exists:users,id',
             'amount'     => 'required|numeric|min:0.01',
         ]);
-      
 
-        return $this->handleRequest(function () use ($request) {
+        if ($validator->errors()->has('user_id')) {
+            return Common::apiResponse(
+                false,
+                __('this agency does not have owner'),
+                null,
+                400
+            );
+        }
+
+        if ($validator->fails()) {
+            return Common::apiResponse(
+                false,
+                $validator->errors()->first(),
+                null,
+                400
+            );
+        }
+
+        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
+        if ($stop_all_charge == 1) return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
+
+        $from = $request->user();
+        $to = User::find($request->user_id);
+        if ($from->transfer_salary == 1)  return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+
+
+        Common::checkUserAgencyFrozen($from);
+
+        if ($to->transfer_salary == 1) return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
+
+        $rate = Common::getCoinsValue('user_coins');
+
+        if (!$rate) return Common::apiResponse(0, __('please set usd_value_in_coins in configs'), 422);
+        $usd = $request->amount;
+        $coins = $usd * $rate;
+        return $this->handleRequest(function () use ($request, $coins) {
             $from = $request->user();
             $result = $this->walletService->transfer(
                 Auth::id(),
                 $request->user_id,
-                $request->amount
+                $coins
             );
 
 
             $data = ['coins' => (string)$from->di, 'usd' => (string)$from->user_wallet_balance,];
             if ($result['status'] === 'success') {
-                return Common::apiResponse(true, 'Transfer completed successfully', $data, 200);
+                return Common::apiResponse(true, __('Transfer completed successfully'), $data, 200);
             }
 
-            return Common::apiResponse(false, $result['message'] ?? 'Transfer failed');
+            return Common::apiResponse(false, $result['message'] ?? __('Transfer failed'));
         });
     }
 
