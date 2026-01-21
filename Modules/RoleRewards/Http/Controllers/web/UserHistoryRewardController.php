@@ -12,7 +12,7 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\RoleRewards\Entities\VUserHistoryReward;
-use Utd\Achievements\Facades\Achievement;
+use Utd\Achievements\Entities\Achievement;
 
 
 class UserHistoryRewardController extends MainController

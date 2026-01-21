@@ -151,7 +151,7 @@ class MilestoneRewardController
             "badge" => __('Badge'),
         ];
 
-        if (class_exists(Achievement::class, false)) {
+        if (class_exists(Achievement::class)) {
             $options['achievement'] = __('Achievement');
         }
 
@@ -165,7 +165,7 @@ class MilestoneRewardController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {
-                if (! class_exists(Achievement::class, false)) {
+                if (! class_exists(Achievement::class)) {
                     return;
                 }
 
@@ -202,7 +202,7 @@ class MilestoneRewardController
                     break;
 
                 case 'achievement':
-                    if (! class_exists(Achievement::class, false)) {
+                    if (! class_exists(Achievement::class)) {
                         return false;
                     }
                     $form->rewardable_id = 0;

@@ -3,10 +3,10 @@
 namespace Utd\Moments;
 
 use App\Contracts\MomentContract;
+use App\Services\Null\NullMomentService;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Utd\Moments\Null\NullMomentService;
 use Utd\Moments\Http\Middleware\CheckAllowedMoment;
 use Utd\Moments\Services\MomentService;
 
@@ -24,13 +24,14 @@ class MomentsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/moments.php', 'moments');
         $this->mergeConfigFrom(__DIR__ . '/../config/viewer.php', 'moments.viewer');
 
-        $this->app->singleton(MomentContract::class, function ($app) {
-            if ($this->isLicenseValid()) {
-                return $app->make(MomentService::class);
-            }
-
-            return new NullMomentService();
-        });
+        // Register MomentService based on license validation
+//        $this->app->singleton(MomentContract::class, function ($app) {
+//            if ($this->isLicenseValid()) {
+//                return $app->make(MomentService::class);
+//            }
+//
+//            return $app->make(NullMomentService::class);
+//        });
         $this->app->singleton(MomentContract::class, MomentService::class);
     }
 
@@ -133,22 +134,22 @@ class MomentsServiceProvider extends ServiceProvider
         }
     }
 
+    /**
+     * Check if the package license is valid.
+     *
+     * @return bool
+     */
     protected function isLicenseValid(): bool
     {
-        $licenseKey = config('achievements.license_key');
+        $licenseKey = config('moments.license_key');
 
         if (empty($licenseKey)) {
             return false;
         }
 
-        // Simple validation - domain hash
         $domain = request()->getHost();
-        $expectedHash = hash('sha256', $domain . config('achievements.secret'));
+        $expectedHash = hash('sha256', $domain . config('moments.license_secret'));
 
-        if ($licenseKey === $expectedHash) {
-            return true;
-        }
-
-        return false;
+        return $licenseKey === $expectedHash;
     }
 }
