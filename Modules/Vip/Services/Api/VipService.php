@@ -42,6 +42,11 @@ class VipService
         return $this->vipRepository->getByType($type);
     }
 
+    public function backgroundImage($ovipId)
+    {
+        return $this->ovipRepository->findVipById($ovipId);
+    }
+
     public function vipList()
     {
         $privileges = $this->vipPrivilegeRepository->all();

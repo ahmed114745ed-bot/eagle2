@@ -78,6 +78,13 @@ class OVipController extends MainController
             ->body($this->form()->edit($id)));
     }
 
+    public function editBackgroundImage($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('vip'))
+            ->body($this->backgroundImage()->edit($id)));
+    }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -129,6 +136,16 @@ class OVipController extends MainController
                 $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
 
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
+                return $button1;
+            });
+        }
+
+        if (Admin::user()->can('edit-' . 'vip-gift') || Admin::user()->can('*')) {
+            $grid->column(__('Theme'))->display(function () {
+
+                $url1 = url('admin/ovip-theme/' . $this->id);
+
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('Theme') . "</a>";
                 return $button1;
             });
         }
@@ -205,6 +222,23 @@ class OVipController extends MainController
 
         $form->saving(function (Form $form) {
             app(VipService::class)->handleSaving($form);
+        });
+
+        return $form;
+    }
+
+
+
+    protected function backgroundImage()
+    {
+
+        $form = new Form(new OVip);
+        $this->disableFormTools($form);
+        $form->image('background_img', trans('background'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
+
+        $form->saved(function (Form $form) {
+            $url = url('admin/ovip');
+            return redirect()->to($url);
         });
 
         return $form;

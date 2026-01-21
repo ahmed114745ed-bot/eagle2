@@ -2,23 +2,24 @@
 
 namespace Modules\Vip\Http\Controllers\Api;
 
-use Modules\Vip\Traits\HandlesApiExceptions;
 use Exception;
 use App\Helpers\Common;
-use Modules\Vip\Http\Requests\CreateWareVipRequest;
-use Modules\Vip\Http\Requests\GetWareVipRequest;
-use Modules\Vip\Http\Requests\DeleteWareRequest;
-use Modules\Vip\Http\Requests\BadgesRequest;
-use Modules\Vip\Http\Requests\BuyVipPercentageRequest;
-use Modules\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use Modules\Vip\Services\Api\VipService;
+use Modules\Vip\Http\Resources\VipResource;
+use Modules\Vip\Http\Requests\BadgesRequest;
+use Modules\Vip\Http\Resources\OVipResource;
+use Modules\Vip\Traits\HandlesApiExceptions;
+use Modules\Vip\Http\Resources\OVipNewResource;
+use Modules\Vip\Http\Requests\DeleteWareRequest;
+use Modules\Vip\Http\Requests\GetWareVipRequest;
+use Modules\Vip\Http\Resources\BackgroundResource;
+use Modules\Vip\Http\Requests\CreateWareVipRequest;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
-use Modules\Vip\Http\Resources\OVipNewResource;
-use Modules\Vip\Http\Resources\OVipResource;
-use Modules\Vip\Http\Resources\VipResource;
+use Modules\Vip\Http\Requests\BuyVipPercentageRequest;
 
 
 
@@ -37,6 +38,17 @@ class VipController extends Controller
             true,
             'VIP list fetched successfully.',
             VipResource::collection($vips)
+        );
+    }
+
+    public function background($ovipId)
+    {
+        $vips = $this->vipService->backgroundImage($ovipId);
+
+        return Common::apiResponse(
+            true,
+            'successfully fetched.',
+            new BackgroundResource($vips)
         );
     }
 
