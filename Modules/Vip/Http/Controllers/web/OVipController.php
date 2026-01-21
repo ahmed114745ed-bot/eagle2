@@ -80,14 +80,16 @@ class OVipController extends MainController
 
     public function editBackgroundImage($id, Content $content)
     {
+        $oVip = OVip::findOrFail($id);
         return parent::edit($id, $content
             ->title(trans('vip'))
-            ->body($this->backgroundImage()->edit($id)));
+            ->body($this->backgroundImage($oVip)->edit($id)));
     }
 
     public function updateBackgroundImage($id)
     {
-        return $this->backgroundImage()->update($id);
+        $oVip = OVip::findOrFail($id);
+        return $this->backgroundImage($oVip)->update($id);
     }
 
     public function create(Content $content)
@@ -234,12 +236,16 @@ class OVipController extends MainController
 
 
 
-    protected function backgroundImage()
+    protected function backgroundImage($model = null)
     {
+        if ($model === null) {
+            $model = new OVip;
+        }
 
-        $form = new Form(new OVip);
+        $form = new Form($model);
         $this->disableFormTools($form);
         $form->image('background_img', trans('background'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
+
         $form->saved(function (Form $form) {
             $url = url('admin/ovip');
             return redirect()->to($url);
