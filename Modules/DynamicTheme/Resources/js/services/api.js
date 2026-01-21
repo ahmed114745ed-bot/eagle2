@@ -216,6 +216,20 @@ export const configurationsApi = {
     updateScreenOverrides: (id, overrides) =>
         api.put(`/dashboard/configurations/${id}/screens`, { overrides }),
 
+    // Save single screen override (background color, etc.)
+    saveScreenOverride: async (configId, screenId, data) => {
+        try {
+            const response = await api.post(`/dashboard/configurations/${configId}/screen-overrides`, {
+                screen_id: screenId,
+                ...data
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error saving screen override:', error);
+            throw error;
+        }
+    },
+
     // Update widget overrides
     updateWidgetOverrides: (id, overrides) =>
         api.put(`/dashboard/configurations/${id}/widgets`, { overrides }),

@@ -60,19 +60,32 @@ class ConfigurationOverrideController extends Controller
         try {
             $validated = $request->validate([
                 'screen_id' => 'required|integer|exists:screens,id',
-                'is_visible' => 'required|boolean',
-                'display_order' => 'nullable|integer|min:0'
+                'is_visible' => 'nullable|boolean',
+                'display_order' => 'nullable|integer|min:0',
+                'background_color' => 'nullable|string|max:50',
             ]);
+
+            // Prepare update data
+            $updateData = [];
+            if (isset($validated['is_visible'])) {
+                $updateData['is_visible'] = $validated['is_visible'];
+            }
+            if (isset($validated['display_order'])) {
+                $updateData['display_order'] = $validated['display_order'];
+            }
+            if (isset($validated['background_color'])) {
+                $updateData['background_color'] = $validated['background_color'];
+            }
 
             $override = ConfigScreenOverride::updateOrCreate(
                 [
                     'configuration_id' => $configId,
                     'screen_id' => $validated['screen_id']
                 ],
-                [
-                    'is_visible' => $validated['is_visible'],
-                    'display_order' => $validated['display_order'] ?? 0
-                ]
+                array_merge([
+                    'is_visible' => true,
+                    'display_order' => 0
+                ], $updateData)
             );
 
             return response()->json([

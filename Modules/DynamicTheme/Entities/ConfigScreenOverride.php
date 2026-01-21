@@ -25,6 +25,7 @@ class ConfigScreenOverride extends Model
         'screen_id',
         'is_visible',
         'display_order',
+        'background_color',
     ];
 
     protected $casts = [

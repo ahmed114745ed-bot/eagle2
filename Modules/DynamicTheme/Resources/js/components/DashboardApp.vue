@@ -280,6 +280,9 @@
             :widgets="currentWidgets"
             :themes="editingWidgetThemes"
             :configurationId="selectedConfigId"
+            :screenId="selectedScreen?.id"
+            :screen="selectedScreen"
+            :screenOverrides="currentScreenOverrides"
             @close="closeVisualDesigner"
             @save="onVisualDesignerSave"
         />
@@ -753,15 +756,21 @@ export default {
                                     ? c.asset_overrides
                                     : null;
                             
+                            console.log('🔄 [DashboardApp] Loading assets for child:', c.theme_child_id, '| assetSource:', assetSource);
+                            
                             if (assetSource) {
-                                return assetSource.map(asset => ({
+                                return assetSource.map(asset => {
+                                    console.log('🔄 [DashboardApp] Asset loaded:', asset.asset_id || asset.id, '| type:', asset.type, '| text_color:', asset.text_color, '| font_size:', asset.font_size);
+                                    return {
                                     id: asset.asset_id || asset.id,
                                     asset_key: asset.asset?.asset_key || asset.asset_key || asset.name,
                                     name: asset.asset?.name || asset.name || asset.asset_key,
                                     file_url: asset.file_url || asset.asset?.file_url || asset.url,
                                     url: asset.file_url || asset.asset?.file_url || asset.url,
+                                    // type field for text check (نص أو ملف)
+                                    type: asset.type || asset.asset?.type,
                                     asset_type: asset.asset?.asset_type || asset.asset_type || asset.type || 'image',
-                                    text_content: asset.text || asset.asset?.text || asset.text_content,
+                                    text_content: asset.text_content || asset.text || asset.asset?.text,
                                     width: asset.width,
                                     height: asset.height,
                                     x: asset.x,
@@ -780,7 +789,18 @@ export default {
                                     border_radius_tr: asset.border_radius_tr,
                                     border_radius_bl: asset.border_radius_bl,
                                     border_radius_br: asset.border_radius_br,
-                                }));
+                                    // Text styling properties
+                                    text_color: asset.text_color,
+                                    font_size: asset.font_size,
+                                    font_weight: asset.font_weight,
+                                    font_family: asset.font_family,
+                                    text_align: asset.text_align,
+                                    line_height: asset.line_height,
+                                    letter_spacing: asset.letter_spacing,
+                                    text_shadow: asset.text_shadow,
+                                    text_decoration: asset.text_decoration,
+                                    text_transform: asset.text_transform,
+                                }});
                             }
                             return existing.assets || [];
                         })(),

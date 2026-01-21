@@ -48,6 +48,18 @@ class ConfigChildAssetOverride extends Model
         'border_radius_tr',
         'border_radius_bl',
         'border_radius_br',
+        // Text styling fields
+        'text_content',
+        'text_color',
+        'font_size',
+        'font_weight',
+        'font_family',
+        'text_align',
+        'line_height',
+        'letter_spacing',
+        'text_shadow',
+        'text_decoration',
+        'text_transform',
     ];
 
     protected $casts = [
@@ -66,6 +78,10 @@ class ConfigChildAssetOverride extends Model
         'border_radius_tr' => 'integer',
         'border_radius_bl' => 'integer',
         'border_radius_br' => 'integer',
+        // Text styling casts
+        'font_size' => 'integer',
+        'line_height' => 'float',
+        'letter_spacing' => 'float',
     ];
 
     protected $appends = ['file_url'];

@@ -174,6 +174,10 @@ Route::prefix('dashboard')->group(function () {
         Route::put('/{configuration}/screens', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'updateScreenOverrides']);
         Route::put('/{configuration}/widgets', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'updateWidgetOverrides']);
 
+        // Screen overrides (save/get per screen)
+        Route::post('/{configuration}/screen-overrides', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'saveScreenOverride']);
+        Route::get('/{configuration}/screen-overrides', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'getScreenOverrides']);
+
         // Child asset overrides (per configuration)
         Route::get('/{configuration}/children/{child}/assets', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'getChildAssets']);
         Route::post('/{configuration}/child-asset-overrides/{override}/toggle', [Modules\DynamicTheme\Http\Controllers\Api\Dashboard\ClientConfigurationController::class, 'toggleChildAssetVisibility']);

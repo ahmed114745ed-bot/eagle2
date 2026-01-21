@@ -457,8 +457,22 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                 $savedAssetSettings = collect(data_get($savedChildSettings, 'assets', []))
                     ->keyBy(fn($a) => (string) ($a['id'] ?? ''));
 
+                // Also try keying by asset_id for backwards compatibility
+                $savedAssetSettingsByAssetId = collect(data_get($savedChildSettings, 'assets', []))
+                    ->keyBy(fn($a) => (string) ($a['asset_id'] ?? $a['id'] ?? ''));
+
+                // DEBUG: Log saved asset settings with all keys
+                \Log::info('📦 [updateWidgetOverrides] child_id: ' . $child->id . ' | savedAssetSettings: ' . json_encode(data_get($savedChildSettings, 'assets', [])));
+                
                 foreach ($assets as $asset) {
+                    // Try both id and asset_id for matching
                     $savedAsset = $savedAssetSettings->get((string) $asset->id, []);
+                    if (empty($savedAsset)) {
+                        $savedAsset = $savedAssetSettingsByAssetId->get((string) $asset->id, []);
+                    }
+                    
+                    // DEBUG: Log each asset being saved
+                    \Log::info('📦 [updateWidgetOverrides] Saving asset: ' . $asset->id . ' | savedAsset: ' . json_encode($savedAsset));
                     
                     ConfigChildAssetOverride::updateOrCreate(
                         [
@@ -490,6 +504,18 @@ public function updateWidgetOverrides(Request $request, ClientConfiguration $con
                             'border_radius_tr' => data_get($savedAsset, 'border_radius_tr', 0),
                             'border_radius_bl' => data_get($savedAsset, 'border_radius_bl', 0),
                             'border_radius_br' => data_get($savedAsset, 'border_radius_br', 0),
+                            // Text styling fields
+                            'text_content' => data_get($savedAsset, 'text_content'),
+                            'text_color' => data_get($savedAsset, 'text_color', '#ffffff'),
+                            'font_size' => data_get($savedAsset, 'font_size', 14),
+                            'font_weight' => data_get($savedAsset, 'font_weight', 'normal'),
+                            'font_family' => data_get($savedAsset, 'font_family', 'inherit'),
+                            'text_align' => data_get($savedAsset, 'text_align', 'center'),
+                            'line_height' => data_get($savedAsset, 'line_height', 1.4),
+                            'letter_spacing' => data_get($savedAsset, 'letter_spacing', 0),
+                            'text_shadow' => data_get($savedAsset, 'text_shadow', 'none'),
+                            'text_decoration' => data_get($savedAsset, 'text_decoration', 'none'),
+                            'text_transform' => data_get($savedAsset, 'text_transform', 'none'),
                         ]
                     );
                 }
@@ -795,7 +821,7 @@ private function getThemeWithOverrides($themeId, $widgetOverride)
                         'id' => $assetOverride->id,
                         'asset_id' => $assetOverride->asset_id,
                         'child_id' => $assetOverride->child_id,
-                        'type' => $assetOverride->type,
+                        'type' => $assetOverride->type ?? $assetOverride->asset?->type,
                         'text' => $assetOverride->text,
                         'file_path' => $assetOverride->file_path,
                         'file_url' => $assetOverride->file_path ? \Illuminate\Support\Facades\Storage::url($assetOverride->file_path) : null,
@@ -822,12 +848,66 @@ private function getThemeWithOverrides($themeId, $widgetOverride)
                         'border_radius_tr' => $assetOverride->border_radius_tr ?? $assetOverride->asset?->border_radius_tr ?? 0,
                         'border_radius_bl' => $assetOverride->border_radius_bl ?? $assetOverride->asset?->border_radius_bl ?? 0,
                         'border_radius_br' => $assetOverride->border_radius_br ?? $assetOverride->asset?->border_radius_br ?? 0,
+                        // Text styling fields
+                        'text_content' => $assetOverride->text_content ?? $assetOverride->asset?->text,
+                        'text_color' => $assetOverride->text_color ?? '#ffffff',
+                        'font_size' => $assetOverride->font_size ?? 14,
+                        'font_weight' => $assetOverride->font_weight ?? 'normal',
+                        'font_family' => $assetOverride->font_family ?? 'inherit',
+                        'text_align' => $assetOverride->text_align ?? 'center',
+                        'line_height' => $assetOverride->line_height ?? 1.4,
+                        'letter_spacing' => $assetOverride->letter_spacing ?? 0,
+                        'text_shadow' => $assetOverride->text_shadow ?? 'none',
+                        'text_decoration' => $assetOverride->text_decoration ?? 'none',
+                        'text_transform' => $assetOverride->text_transform ?? 'none',
                     ];
                 })->values(),
             ];
         })->values(),
     ];
 }
+
+    /**
+     * Save screen override (background color, etc.)
+     */
+    public function saveScreenOverride(Request $request, ClientConfiguration $configuration)
+    {
+        $validated = $request->validate([
+            'screen_id' => 'required|integer|exists:screens,id',
+            'background_color' => 'nullable|string',
+            'is_visible' => 'nullable|boolean',
+            'display_order' => 'nullable|integer',
+        ]);
+
+        $screenOverride = ConfigScreenOverride::updateOrCreate(
+            [
+                'configuration_id' => $configuration->id,
+                'screen_id' => $validated['screen_id'],
+            ],
+            array_filter([
+                'background_color' => $validated['background_color'] ?? null,
+                'is_visible' => $validated['is_visible'] ?? true,
+                'display_order' => $validated['display_order'] ?? null,
+            ], fn($v) => $v !== null)
+        );
+
+        return response()->json([
+            'message' => 'Screen override saved successfully',
+            'data' => $screenOverride
+        ]);
+    }
+
+    /**
+     * Get screen overrides for a configuration
+     */
+    public function getScreenOverrides(ClientConfiguration $configuration)
+    {
+        $overrides = $configuration->screenOverrides()->with('screen')->get();
+
+        return response()->json([
+            'data' => $overrides
+        ]);
+    }
 
     /**
      * Initialize screen overrides with current defaults

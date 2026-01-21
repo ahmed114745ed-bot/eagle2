@@ -46,6 +46,8 @@ class ThemeChildAssetResource extends JsonResource
             'asset_label' => $this->asset_label,
             'name' => $this->asset_label ?? $this->asset_key,
             'asset_type' => $this->asset_type,
+            'type' => $this->type, // نص أو ملف
+            'text' => $this->text, // محتوى النص من قاعدة البيانات
             'default_url' => $this->default_url,
             'file_url' => $fileUrl,
             'url' => $fileUrl,

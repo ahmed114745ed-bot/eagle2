@@ -536,6 +536,15 @@
                   </div>
                 </div>
                 
+                <!-- Debug: Show element type info -->
+                <div v-if="selectedElementType === 'asset'" class="property-group" style="background: #1e293b; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+                  <div style="font-size: 11px; color: #94a3b8;">
+                    نوع العنصر: <strong style="color: #22d3ee;">{{ selectedElementType }}</strong> |
+                    نوع الأصل: <strong style="color: #a78bfa;">{{ selectedElement.type || 'غير محدد' }}</strong> |
+                    نص؟: <strong :style="{ color: isTextAsset(selectedElement) ? '#4ade80' : '#f87171' }">{{ isTextAsset(selectedElement) ? 'نعم ✓' : 'لا ✗' }}</strong>
+                  </div>
+                </div>
+                
                 <!-- Text Color (for text assets) -->
                 <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
                   <label>🎨 لون النص</label>
@@ -566,6 +575,111 @@
                     <option value="700">700</option>
                     <option value="800">800</option>
                     <option value="900">900</option>
+                  </select>
+                </div>
+                
+                <!-- Text Content (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>📝 محتوى النص</label>
+                  <textarea v-model="selectedElement.text_content" @change="onPropertyChange" class="property-textarea" rows="3" placeholder="أدخل النص هنا..."></textarea>
+                </div>
+                
+                <!-- Font Family (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🔠 عائلة الخط</label>
+                  <select v-model="selectedElement.font_family" @change="onPropertyChange" class="property-input">
+                    <option value="inherit">افتراضي</option>
+                    <option value="Arial, sans-serif">Arial</option>
+                    <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
+                    <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                    <option value="Georgia, serif">Georgia</option>
+                    <option value="'Courier New', Courier, monospace">Courier New</option>
+                    <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                    <option value="'Cairo', sans-serif">Cairo (عربي)</option>
+                    <option value="'Tajawal', sans-serif">Tajawal (عربي)</option>
+                    <option value="'Amiri', serif">Amiri (عربي)</option>
+                    <option value="'Noto Sans Arabic', sans-serif">Noto Sans Arabic</option>
+                  </select>
+                </div>
+                
+                <!-- Text Alignment (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>↔️ محاذاة النص</label>
+                  <div class="text-align-buttons">
+                    <button @click="selectedElement.text_align = 'right'; onPropertyChange()" class="align-btn" :class="{ active: selectedElement.text_align === 'right' }" title="يمين">
+                      ➡️
+                    </button>
+                    <button @click="selectedElement.text_align = 'center'; onPropertyChange()" class="align-btn" :class="{ active: selectedElement.text_align === 'center' || !selectedElement.text_align }" title="وسط">
+                      ↔️
+                    </button>
+                    <button @click="selectedElement.text_align = 'left'; onPropertyChange()" class="align-btn" :class="{ active: selectedElement.text_align === 'left' }" title="يسار">
+                      ⬅️
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Line Height (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>📐 ارتفاع السطر <span class="value-badge">{{ selectedElement.line_height || 1.4 }}</span></label>
+                  <div class="slider-container">
+                    <input type="range" min="0.8" max="3" step="0.1" v-model.number="selectedElement.line_height" @input="onPropertyChange" class="slider-input" />
+                  </div>
+                </div>
+                
+                <!-- Letter Spacing (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🔤 المسافة بين الحروف <span class="unit">px</span></label>
+                  <input type="number" v-model.number="selectedElement.letter_spacing" min="-5" max="20" step="0.5" @change="onPropertyChange" class="property-input" placeholder="0" />
+                </div>
+                
+                <!-- Text Shadow (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🌫️ ظل النص</label>
+                  <div class="text-shadow-controls">
+                    <div class="property-row">
+                      <div class="property-group half">
+                        <label>X</label>
+                        <input type="number" v-model.number="textShadowX" @change="updateTextShadow" class="property-input" placeholder="0" />
+                      </div>
+                      <div class="property-group half">
+                        <label>Y</label>
+                        <input type="number" v-model.number="textShadowY" @change="updateTextShadow" class="property-input" placeholder="0" />
+                      </div>
+                    </div>
+                    <div class="property-row">
+                      <div class="property-group half">
+                        <label>Blur</label>
+                        <input type="number" v-model.number="textShadowBlur" min="0" @change="updateTextShadow" class="property-input" placeholder="0" />
+                      </div>
+                      <div class="property-group half">
+                        <label>اللون</label>
+                        <input type="color" v-model="textShadowColor" @input="updateTextShadow" class="color-picker full-width" />
+                      </div>
+                    </div>
+                    <button @click="clearTextShadow" class="clear-shadow-btn">✕ إزالة الظل</button>
+                  </div>
+                </div>
+                
+                <!-- Text Decoration (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>✨ زخرفة النص</label>
+                  <select v-model="selectedElement.text_decoration" @change="onPropertyChange" class="property-input">
+                    <option value="none">بدون</option>
+                    <option value="underline">تحته خط</option>
+                    <option value="line-through">خط في المنتصف</option>
+                    <option value="overline">خط فوقه</option>
+                  </select>
+                </div>
+                
+                <!-- Text Transform (for text assets) -->
+                <div v-if="selectedElementType === 'asset' && isTextAsset(selectedElement)" class="property-group">
+                  <label>🔡 تحويل النص</label>
+                  <select v-model="selectedElement.text_transform" @change="onPropertyChange" class="property-input">
+                    <option value="none">بدون</option>
+                    <option value="uppercase">أحرف كبيرة</option>
+                    <option value="lowercase">أحرف صغيرة</option>
+                    <option value="capitalize">أول حرف كبير</option>
                   </select>
                 </div>
                 
@@ -751,6 +865,18 @@ export default {
     configurationId: {
       type: [Number, String],
       default: null
+    },
+    screenId: {
+      type: [Number, String],
+      default: null
+    },
+    screen: {
+      type: Object,
+      default: null
+    },
+    screenOverrides: {
+      type: Array,
+      default: () => []
     }
   },
   emits: ['close', 'save'],
@@ -822,6 +948,12 @@ export default {
       
       // Auto save timeout
       autoSaveTimeout: null,
+      
+      // Text Shadow controls
+      textShadowX: 0,
+      textShadowY: 0,
+      textShadowBlur: 0,
+      textShadowColor: '#000000',
     };
   },
   computed: {
@@ -963,7 +1095,10 @@ export default {
         if (!widget) return null;
         for (const child of widget.children || []) {
           const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
-          if (asset) return asset;
+          if (asset) {
+            console.log('🎯 [selectedElement] returning asset:', asset?.name, '| type:', asset?.type);
+            return asset;
+          }
         }
       }
       return null;
@@ -1041,16 +1176,19 @@ export default {
       console.log('🎨 [VisualDesigner] initializeWidgets called');
       console.log('🎨 [VisualDesigner] availableWidgets:', this.availableWidgets);
       
-      // Load screen background color from any widget settings if available
+      // Load screen background color from screenOverrides (tied to screen + configuration)
       let foundBackgroundColor = null;
-      for (const widget of this.availableWidgets) {
-        const settings = widget.settings || {};
-        if (settings.screen_background_color) {
-          foundBackgroundColor = settings.screen_background_color;
-          break;
+      if (this.screenId && this.screenOverrides) {
+        const screenOverride = this.screenOverrides.find(so => so.screen_id === this.screenId);
+        if (screenOverride?.background_color) {
+          foundBackgroundColor = screenOverride.background_color;
         }
       }
-      console.log('🎨 [VisualDesigner] Loading screen_background_color:', foundBackgroundColor);
+      // Fallback to screen prop or default
+      if (!foundBackgroundColor && this.screen?.background_color) {
+        foundBackgroundColor = this.screen.background_color;
+      }
+      console.log('🎨 [VisualDesigner] Loading screen_background_color from screenOverrides:', foundBackgroundColor);
       if (foundBackgroundColor) {
         this.screenBackgroundColor = foundBackgroundColor;
       }
@@ -1189,6 +1327,24 @@ export default {
     
     // Build child assets from saved data or theme
     buildChildAssets(savedAssets, themeAssets) {
+      // Log للتحقق من البيانات
+      console.log('📦 [buildChildAssets] themeAssets:', themeAssets);
+      console.log('📦 [buildChildAssets] savedAssets:', savedAssets);
+      
+      // طباعة خصائص النص للأصول المحفوظة
+      if (savedAssets && savedAssets.length > 0) {
+        savedAssets.forEach(sa => {
+          console.log('📦 [buildChildAssets] savedAsset:', sa.id, sa.name, '| type:', sa.type, '| text_color:', sa.text_color, '| font_size:', sa.font_size);
+        });
+      }
+      
+      // إنشاء خريطة للأصول من الثيم للحصول على type
+      const themeAssetsMap = new Map();
+      (themeAssets || []).forEach(ta => {
+        console.log('📦 [buildChildAssets] themeAsset:', ta.id, ta.name, '| type:', ta.type);
+        themeAssetsMap.set(ta.id, ta);
+      });
+      
       const assetSource = savedAssets && savedAssets.length > 0 
         ? savedAssets 
         : (themeAssets || []).map(ta => ({
@@ -1197,47 +1353,61 @@ export default {
             name: ta.name || ta.asset_key,
             file_url: ta.file_url || ta.file_path,
             url: ta.file_url || ta.file_path,
-            asset_type: ta.asset_type || ta.type || 'image',
+            asset_type: ta.asset_type || 'image',
+            type: ta.type, // نص أو ملف - من قاعدة البيانات
+            text: ta.text, // محتوى النص من قاعدة البيانات
             text_content: ta.text_content || ta.text
           }));
       
-      return assetSource.map((asset, index) => ({
-        ...asset,
-        id: asset.id,
-        asset_key: asset.asset_key || asset.name,
-        name: asset.name || asset.asset_key,
-        file_url: asset.file_url || asset.url,
-        url: asset.file_url || asset.url,
-        // Read asset_type from multiple sources: asset_type, type, or asset.asset?.asset_type
-        asset_type: asset.asset_type || asset.type || asset.asset?.asset_type || 'image',
-        // Read text_content from multiple sources
-        text_content: asset.text_content || asset.text || asset.asset?.text,
-        x: asset.x ?? 0,
-        y: asset.y ?? 0,
-        width: asset.width ?? 40,
-        height: asset.height ?? 40,
-        opacity: asset.opacity ?? 1,
-        is_visible: asset.is_visible ?? true,
-        is_background: asset.is_background ?? false,
-        object_fit: asset.is_background ? 'cover' : (asset.object_fit ?? 'contain'),
-        // Use index + 1 as default z_index to ensure assets are above background (z_index: 0)
-        z_index: asset.z_index ?? (index + 1),
-        rotation: asset.rotation ?? 0,
-        scale: asset.scale ?? 1,
-        border_width: asset.border_width ?? 0,
-        border_style: asset.border_style ?? 'solid',
-        border_color: asset.border_color ?? 'transparent',
-        border_radius_tl: asset.border_radius_tl ?? 0,
-        border_radius_tr: asset.border_radius_tr ?? 0,
-        border_radius_bl: asset.border_radius_bl ?? 0,
-        border_radius_br: asset.border_radius_br ?? 0,
-        // Text styling properties
-        text_color: asset.text_color || '#ffffff',
-        font_size: asset.font_size ?? 14,
-        font_weight: asset.font_weight || 'normal',
-        font_family: asset.font_family || 'inherit',
-        text_align: asset.text_align || 'center',
-      }));
+      return assetSource.map((asset, index) => {
+        // الحصول على بيانات الأصل من الثيم (للحصول على type)
+        const themeAsset = themeAssetsMap.get(asset.id);
+        
+        return {
+          ...asset,
+          id: asset.id,
+          asset_key: asset.asset_key || asset.name,
+          name: asset.name || asset.asset_key,
+          file_url: asset.file_url || asset.url,
+          url: asset.file_url || asset.url,
+          // Read asset_type from multiple sources
+          asset_type: asset.asset_type || 'image',
+          // type field for text check (نص أو ملف) - جلب من themeAsset إذا غير موجود
+          type: asset.type || themeAsset?.type,
+          // Read text_content from multiple sources
+          text_content: asset.text_content || asset.text || themeAsset?.text_content || themeAsset?.text,
+          x: asset.x ?? 0,
+          y: asset.y ?? 0,
+          width: asset.width ?? 40,
+          height: asset.height ?? 40,
+          opacity: asset.opacity ?? 1,
+          is_visible: asset.is_visible ?? true,
+          is_background: asset.is_background ?? false,
+          object_fit: asset.is_background ? 'cover' : (asset.object_fit ?? 'contain'),
+          // Use index + 1 as default z_index to ensure assets are above background (z_index: 0)
+          z_index: asset.z_index ?? (index + 1),
+          rotation: asset.rotation ?? 0,
+          scale: asset.scale ?? 1,
+          border_width: asset.border_width ?? 0,
+          border_style: asset.border_style ?? 'solid',
+          border_color: asset.border_color ?? 'transparent',
+          border_radius_tl: asset.border_radius_tl ?? 0,
+          border_radius_tr: asset.border_radius_tr ?? 0,
+          border_radius_bl: asset.border_radius_bl ?? 0,
+          border_radius_br: asset.border_radius_br ?? 0,
+          // Text styling properties
+          text_color: asset.text_color || '#ffffff',
+          font_size: asset.font_size ?? 14,
+          font_weight: asset.font_weight || 'normal',
+          font_family: asset.font_family || 'inherit',
+          text_align: asset.text_align || 'center',
+          line_height: asset.line_height ?? 1.4,
+          letter_spacing: asset.letter_spacing ?? 0,
+          text_shadow: asset.text_shadow || 'none',
+          text_decoration: asset.text_decoration || 'none',
+          text_transform: asset.text_transform || 'none',
+        };
+      });
     },
     
     // Get element type name for display
@@ -1597,6 +1767,11 @@ export default {
       }
       this.selectedAssetId = asset.id;
       this.selectedElementType = 'asset';
+      
+      // Parse text shadow if it's a text asset
+      if (this.isTextAsset(asset)) {
+        this.parseTextShadow(asset.text_shadow);
+      }
     },
     
     startDragPlacedChild(e, child, widget) {
@@ -1687,15 +1862,7 @@ export default {
     selectAsset(asset) {
       this.selectedAssetId = asset.id;
     },
-    selectPlacedChild(child) {
-      this.selectedChildId = child.theme_child_id;
-      this.selectedAssetId = null;
-      this.selectedElementType = 'child';
-    },
-    selectPlacedAsset(asset) {
-      this.selectedAssetId = asset.id;
-      this.selectedElementType = 'asset';
-    },
+    // تم حذف selectPlacedChild و selectPlacedAsset المكررة - الدوال الصحيحة موجودة أعلاه
     
     // Drag & Drop handlers
     onChildDragStart(e, child) {
@@ -2076,6 +2243,50 @@ export default {
       this.saveToHistory();
     },
     
+    // Text Shadow methods
+    updateTextShadow() {
+      if (!this.selectedElement || !this.isTextAsset(this.selectedElement)) return;
+      
+      if (this.textShadowX === 0 && this.textShadowY === 0 && this.textShadowBlur === 0) {
+        this.selectedElement.text_shadow = 'none';
+      } else {
+        this.selectedElement.text_shadow = `${this.textShadowX}px ${this.textShadowY}px ${this.textShadowBlur}px ${this.textShadowColor}`;
+      }
+      this.hasUnsavedChanges = true;
+      this.onPropertyChange();
+    },
+    
+    clearTextShadow() {
+      this.textShadowX = 0;
+      this.textShadowY = 0;
+      this.textShadowBlur = 0;
+      this.textShadowColor = '#000000';
+      if (this.selectedElement) {
+        this.selectedElement.text_shadow = 'none';
+        this.hasUnsavedChanges = true;
+        this.onPropertyChange();
+      }
+    },
+    
+    parseTextShadow(shadowStr) {
+      if (!shadowStr || shadowStr === 'none') {
+        this.textShadowX = 0;
+        this.textShadowY = 0;
+        this.textShadowBlur = 0;
+        this.textShadowColor = '#000000';
+        return;
+      }
+      
+      // Parse shadow string like "2px 2px 4px #000000"
+      const match = shadowStr.match(/(-?\d+)px\s+(-?\d+)px\s+(\d+)px\s+(#[a-fA-F0-9]{6}|rgba?\([^)]+\))/);
+      if (match) {
+        this.textShadowX = parseInt(match[1]);
+        this.textShadowY = parseInt(match[2]);
+        this.textShadowBlur = parseInt(match[3]);
+        this.textShadowColor = match[4];
+      }
+    },
+    
     // History (Undo/Redo)
     saveToHistory() {
       // Remove any future states if we're in the middle of history
@@ -2373,13 +2584,21 @@ export default {
       };
     },
     
-    // Check if asset is a text type
+    // Check if asset is a text type (نص أو ملف)
     isTextAsset(asset) {
-      return asset?.asset_type === 'text' || asset?.type === 'text';
+      // التحقق من نوع الأصل من حقل type (نص أو ملف)
+      const isTextType = asset?.type === 'text' || asset?.type === 'نص';
+      console.log('🔍 [isTextAsset] asset:', asset?.name, '| type:', asset?.type, '| isText:', isTextType);
+      return isTextType;
     },
     
     // Style for text asset content
     getTextAssetStyle(asset) {
+      // Handle text alignment for flexbox justify-content
+      let justifyContent = 'center';
+      if (asset.text_align === 'left') justifyContent = 'flex-start';
+      else if (asset.text_align === 'right') justifyContent = 'flex-end';
+      
       return {
         fontSize: (asset.font_size || 14) * this.zoom + 'px',
         fontWeight: asset.font_weight || 'normal',
@@ -2387,14 +2606,18 @@ export default {
         color: asset.text_color || '#ffffff',
         textAlign: asset.text_align || 'center',
         lineHeight: asset.line_height || 1.4,
+        letterSpacing: (asset.letter_spacing || 0) + 'px',
         textShadow: asset.text_shadow || 'none',
+        textDecoration: asset.text_decoration || 'none',
+        textTransform: asset.text_transform || 'none',
         width: '100%',
         height: '100%',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: justifyContent,
         overflow: 'hidden',
         wordBreak: 'break-word',
+        padding: '4px',
       };
     },
     
@@ -2598,7 +2821,7 @@ export default {
       if (this.isSaving) return; // Prevent multiple saves
       this.isSaving = true;
       
-      console.log('🎨 [VisualDesigner] Saving screen_background_color:', this.screenBackgroundColor);
+      console.log('🎨 [VisualDesigner] Saving screen_background_color to screen overrides:', this.screenBackgroundColor);
       
       try {
         // Prepare data for saving with ALL widgets and their children
@@ -2607,7 +2830,7 @@ export default {
           // Widget dimensions (screen size)
           widget_width: this.screenWidth,
           widget_height: this.screenHeight,
-          screen_background_color: this.screenBackgroundColor,
+          // screen_background_color is now saved in screenOverrides (not widget settings)
           // All placed widgets with their layout and children
           widgets: this.placedWidgets.map(widget => ({
             widget_id: widget.id,
@@ -2656,17 +2879,27 @@ export default {
               padding_bottom: child.padding_bottom,
               padding_right: child.padding_right,
               padding_left: child.padding_left,
-              assets: (child.assets || []).map(asset => ({
+              assets: (child.assets || []).map(asset => {
+                console.log('💾 [saveDesign] Saving asset:', asset.id, asset.name, '| type:', asset.type, '| text_color:', asset.text_color, '| font_size:', asset.font_size);
+                return {
                 id: asset.id,
                 asset_key: asset.asset_key,
                 name: asset.name,
                 file_url: asset.file_url,
                 url: asset.file_url,
                 asset_type: asset.asset_type || 'image',
+                type: asset.type, // نص أو ملف
                 text_content: asset.text_content,
                 text_color: asset.text_color || '#ffffff',
                 font_size: asset.font_size || 14,
                 font_weight: asset.font_weight || 'normal',
+                font_family: asset.font_family || 'inherit',
+                text_align: asset.text_align || 'center',
+                line_height: asset.line_height || 1.4,
+                letter_spacing: asset.letter_spacing || 0,
+                text_shadow: asset.text_shadow || 'none',
+                text_decoration: asset.text_decoration || 'none',
+                text_transform: asset.text_transform || 'none',
                 width: asset.width,
                 height: asset.height,
                 x: asset.x,
@@ -2685,12 +2918,7 @@ export default {
                 is_visible: asset.is_visible,
                 is_background: asset.is_background || false,
                 object_fit: asset.object_fit || 'contain',
-                text_color: asset.text_color,
-                font_size: asset.font_size,
-                font_weight: asset.font_weight,
-                font_family: asset.font_family,
-                text_align: asset.text_align,
-              }))
+              }})
             }))
           })),
           // Legacy: also include flattened children for backward compatibility
@@ -2723,13 +2951,19 @@ export default {
               id: asset.id,
               asset_key: asset.asset_key,
               name: asset.name,
-              asset_type: asset.asset_type,
+              asset_type: asset.asset_type || 'image',
+              type: asset.type, // نص أو ملف
               text_content: asset.text_content,
-              text_color: asset.text_color,
-              font_size: asset.font_size,
-              font_weight: asset.font_weight,
-              font_family: asset.font_family,
-              text_align: asset.text_align,
+              text_color: asset.text_color || '#ffffff',
+              font_size: asset.font_size || 14,
+              font_weight: asset.font_weight || 'normal',
+              font_family: asset.font_family || 'inherit',
+              text_align: asset.text_align || 'center',
+              line_height: asset.line_height || 1.4,
+              letter_spacing: asset.letter_spacing || 0,
+              text_shadow: asset.text_shadow || 'none',
+              text_decoration: asset.text_decoration || 'none',
+              text_transform: asset.text_transform || 'none',
               file_url: asset.file_url,
               url: asset.file_url,
               width: asset.width,
@@ -2809,12 +3043,18 @@ export default {
                 asset_key: asset.asset_key,
                 name: asset.name,
                 asset_type: asset.asset_type || 'image',
+                type: asset.type, // نص أو ملف
                 text_content: asset.text_content,
-                text_color: asset.text_color,
-                font_size: asset.font_size,
-                font_weight: asset.font_weight,
-                font_family: asset.font_family,
-                text_align: asset.text_align,
+                text_color: asset.text_color || '#ffffff',
+                font_size: asset.font_size || 14,
+                font_weight: asset.font_weight || 'normal',
+                font_family: asset.font_family || 'inherit',
+                text_align: asset.text_align || 'center',
+                line_height: asset.line_height || 1.4,
+                letter_spacing: asset.letter_spacing || 0,
+                text_shadow: asset.text_shadow || 'none',
+                text_decoration: asset.text_decoration || 'none',
+                text_transform: asset.text_transform || 'none',
                 file_url: asset.file_url || asset.url,
                 url: asset.file_url || asset.url,
                 width: asset.width,
@@ -2848,7 +3088,7 @@ export default {
               selected_theme_id: widget.theme_id || this.selectedThemeId,
               settings: {
                 theme_id: widget.theme_id || this.selectedThemeId,
-                screen_background_color: this.screenBackgroundColor,
+                // screen_background_color is now saved in screenOverrides (not widget settings)
                 x: widget.x,
                 y: widget.y,
                 width: widget.width,
@@ -2875,6 +3115,18 @@ export default {
               }
             }));
             await configurationsApi.updateWidgetOverrides(this.configurationId, overridesPayload);
+            
+            // Save screen background color to screenOverrides (tied to screen + configuration)
+            if (this.screenId) {
+              try {
+                await configurationsApi.saveScreenOverride(this.configurationId, this.screenId, {
+                  background_color: this.screenBackgroundColor
+                });
+                console.log('🎨 [VisualDesigner] Screen background color saved to screenOverrides');
+              } catch (screenErr) {
+                console.error('خطأ في حفظ لون خلفية الشاشة:', screenErr);
+              }
+            }
           } catch (e) {
             console.error('خطأ في حفظ التعديلات في الكونفيج المختار', e);
           }
@@ -4392,6 +4644,80 @@ export default {
   border-radius: 6px;
   color: white;
   font-size: 14px;
+}
+
+.property-textarea {
+  padding: 8px 12px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.property-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.text-align-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.align-btn {
+  flex: 1;
+  padding: 8px;
+  background: #1e1e2e;
+  border: 1px solid #3d3d5c;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.align-btn:hover {
+  background: #2d2d4a;
+  border-color: #6366f1;
+}
+
+.align-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+
+.text-shadow-controls {
+  background: #1a1a2a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #3d3d5c;
+}
+
+.text-shadow-controls .property-row {
+  margin-bottom: 8px;
+}
+
+.clear-shadow-btn {
+  width: 100%;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+.clear-shadow-btn:hover {
+  background: #ef4444;
+  color: white;
 }
 
 .property-input.readonly {
