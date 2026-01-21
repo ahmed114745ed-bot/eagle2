@@ -2326,10 +2326,10 @@
                 <div class="pagination-container mt-3">
                     {{ $charges->appends([
                         'tab' => 'charge',
-                        'pack_page' => $packs?->currentPage(),
-                        'vip_page' => $userVips?->currentPage(),
-                        'salary_page' => $salaries?->currentPage(),
-                        'gift_page' => $giftSLogs?->currentPage(),
+                        'type' => $chargeTabType,
+                        'receiver_page' => request('receiver_page'),
+                        'charger_page' => request('charger_page'),
+                        // other tabs' pages if needed
                     ])->links('vendor.pagination.bootstrap-4') }}
                 </div>
             @endif

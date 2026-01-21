@@ -469,7 +469,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user','country_id', 'di']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di']);
 
         $with = [
             'profile:id,user_id,avatar',
@@ -541,7 +541,7 @@ class UserController extends MainController
                     ->when($chargeTabType === 'receiver', fn($q) => $q->where('user_id', $id)->where('user_type', 'user'))
                     ->when($chargeTabType === 'charger', fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user'))
                     ->orderByDesc('id')
-                    ->paginate(10, ['*'], 'charges_page');
+                    ->paginate(10, ['*'], $chargeTabType === 'receiver' ? 'receiver_page' : 'charger_page');
                 break;
 
             case 'gift-log':
