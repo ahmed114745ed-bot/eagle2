@@ -257,9 +257,7 @@ class OVipController extends MainController
         $form = new Form($model);
 
         // ✅ IMPORTANT: SET FORM ACTION HERE
-        $form->setAction(
-            admin_url('ovip-theme/' . $model->id)
-        );
+        $form->setAction(admin_url('ovip-theme/' . $model->id));
 
         // Disable default tools (view, delete, etc.)
         $this->disableFormTools($form);
