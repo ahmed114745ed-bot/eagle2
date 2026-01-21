@@ -125,7 +125,7 @@ class AdminThemeController extends Controller
     {
         $validated = $request->validate([
             'children' => 'nullable|array',
-            'children.*.id' => 'required|integer|exists:theme_children,id',
+            'children.*.id' => 'required|integer',
             'children.*.width' => 'nullable|integer|min:10',
             'children.*.height' => 'nullable|integer|min:10',
             'children.*.x' => 'nullable|integer|min:0',
@@ -143,7 +143,7 @@ class AdminThemeController extends Controller
             'children.*.border_radius_bl' => 'nullable|integer|min:0',
             'children.*.border_radius_br' => 'nullable|integer|min:0',
             'assets' => 'nullable|array',
-            'assets.*.id' => 'required|integer|exists:theme_assets,id',
+            'assets.*.id' => 'required|integer',
             'assets.*.width' => 'nullable|integer|min:10',
             'assets.*.height' => 'nullable|integer|min:10',
             'assets.*.x' => 'nullable|integer|min:0',
