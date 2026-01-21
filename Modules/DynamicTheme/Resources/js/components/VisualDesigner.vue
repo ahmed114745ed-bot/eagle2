@@ -2634,13 +2634,28 @@ export default {
     
     // Initialize SVGA player for an element
     initSvgaPlayer(element, url) {
-      if (!element || !url || element.dataset.svgaLoaded) return;
+      if (!element || !url) return;
+      
+      // Skip if already loaded successfully with same URL
+      if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
+        // Verify canvas exists
+        const canvas = element.querySelector('canvas');
+        if (canvas) return;
+        // Canvas missing, allow reinit
+      }
+      
+      // Skip if currently loading same URL
+      if (element.dataset.svgaLoaded === 'loading' && element.dataset.svgaUrl === url) {
+        return;
+      }
       
       // Check if SVGA library is loaded
       if (typeof SVGA === 'undefined') {
         console.warn('SVGA library not loaded. Loading from CDN...');
         this.loadSvgaLibrary().then(() => {
           this.initSvgaPlayerInternal(element, url);
+        }).catch((err) => {
+          console.error('Failed to load SVGA library:', err);
         });
         return;
       }
@@ -2660,7 +2675,7 @@ export default {
       try {
         // Clear previous content
         element.innerHTML = '';
-        element.dataset.svgaLoaded = 'true';
+        element.dataset.svgaLoaded = 'loading';
         element.dataset.svgaUrl = url;
         
         // Ensure element has dimensions
@@ -2668,33 +2683,51 @@ export default {
         element.style.height = '100%';
         element.style.minWidth = '40px';
         element.style.minHeight = '40px';
+        element.style.position = 'relative';
+        
+        // Show loading indicator
+        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#10b981;font-size:12px;">⏳</div>';
         
         const player = new SVGA.Player(element);
         const parser = new SVGA.Parser();
         
+        // Use downloader for cross-origin URLs (like Google Storage)
         parser.load(url, (videoItem) => {
+          element.innerHTML = ''; // Clear loading indicator
           player.setVideoItem(videoItem);
           player.loops = 0; // Infinite loop
           player.clearsAfterStop = false;
           player.startAnimation();
+          element.dataset.svgaLoaded = 'true';
           
-          // Ensure canvas is visible
-          const canvas = element.querySelector('canvas');
-          if (canvas) {
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-            canvas.style.display = 'block';
-          }
+          // Ensure canvas is visible and properly sized
+          setTimeout(() => {
+            const canvas = element.querySelector('canvas');
+            if (canvas) {
+              canvas.style.width = '100%';
+              canvas.style.height = '100%';
+              canvas.style.display = 'block';
+              canvas.style.visibility = 'visible';
+              canvas.style.opacity = '1';
+              canvas.style.position = 'absolute';
+              canvas.style.top = '0';
+              canvas.style.left = '0';
+            }
+          }, 50);
         }, (error) => {
           console.error('❌ [initSvgaPlayerInternal] Failed to load SVGA:', url, error);
           element.dataset.svgaLoaded = 'false';
-          // Show error placeholder
-          element.innerHTML = '<span style="color:#ff6b6b;font-size:10px;">⚠️ SVGA</span>';
+          // Show error placeholder with retry button
+          element.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;cursor:pointer;" title="انقر للمحاولة مجددا"><span>⚠️ SVGA</span><span style="font-size:8px;">خطأ تحميل</span></div>';
+          element.onclick = () => {
+            element.dataset.svgaLoaded = 'false';
+            this.initSvgaPlayerInternal(element, url);
+          };
         });
       } catch (error) {
         console.error('❌ [initSvgaPlayerInternal] Error initializing SVGA player:', error);
         element.dataset.svgaLoaded = 'false';
-        element.innerHTML = '<span style="color:#ff6b6b;font-size:10px;">⚠️ Error</span>';
+        element.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:#ff6b6b;font-size:10px;">⚠️ Error</div>';
       }
     },
     
@@ -2724,25 +2757,41 @@ export default {
       if (!element || !asset) return;
       
       const url = asset.file_url || asset.url;
+      if (!url) {
+        console.warn('[onSvgaMounted] No URL for asset:', asset);
+        return;
+      }
+      
       const assetId = asset.id;
       
       // Create unique key for this element
       const elementKey = `svga_${assetId}_${url}`;
       
-      // Check if already initialized with same URL
+      // Check if already initialized with same URL and loaded successfully
       if (element.dataset.svgaLoaded === 'true' && element.dataset.svgaUrl === url) {
+        // Check if canvas actually exists
+        const existingCanvas = element.querySelector('canvas');
+        if (existingCanvas) {
+          return;
+        }
+        // Canvas missing, reinitialize
+        element.dataset.svgaLoaded = 'false';
+      }
+      
+      // Skip if currently loading
+      if (element.dataset.svgaLoaded === 'loading' && element.dataset.svgaUrl === url) {
         return;
       }
       
-      if (element && url) {
-        // Mark the URL being loaded
-        element.dataset.svgaUrl = url;
-        
-        // Use setTimeout to ensure DOM is ready
+      // Mark the URL being loaded
+      element.dataset.svgaUrl = url;
+      
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
         setTimeout(() => {
           this.initSvgaPlayer(element, url);
-        }, 150);
-      }
+        }, 100);
+      });
     },
     
     // Style for text asset content
@@ -4122,13 +4171,15 @@ export default {
 .svga-asset-container {
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   background: transparent;
   min-width: 40px;
   min-height: 40px;
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .svga-asset-container canvas {
@@ -4138,17 +4189,25 @@ export default {
   max-height: 100% !important;
   display: block !important;
   object-fit: contain;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
 }
 
 .placed-asset.svga-asset {
   overflow: visible;
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.05);
   border: 1px dashed rgba(16, 185, 129, 0.5);
 }
 
 .placed-asset.svga-asset .svga-asset-container {
   width: 100%;
   height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .placed-asset.svga-asset .svga-asset-container canvas,
@@ -4158,6 +4217,9 @@ export default {
   width: 100% !important;
   height: 100% !important;
   object-fit: contain;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .text-asset-content {
@@ -4185,9 +4247,12 @@ export default {
   padding: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 3px #333;
   flex-shrink: 0;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  height: calc(100vh - 180px);
+  min-height: 700px;
+  max-height: 900px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .mobile-notch {
@@ -4220,8 +4285,29 @@ export default {
   background: #f5f5f5;
   border-radius: 4px;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   transform-origin: top center;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+.mobile-screen::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mobile-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mobile-screen::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.mobile-screen::-webkit-scrollbar-thumb:hover {
+  background: #666;
 }
 
 .mobile-grid {
