@@ -18,10 +18,12 @@
     "Recharge Level": "Yeniden Yükleme Seviyesi",
      "Enable hide comments": "Yorumları gizlemeyi etkinleştir",
   "hide comments": "Yorumları gizle",
+  "withdrawal_pending": "Para çekme talebi inceleniyor :tutar",
   "room in home screen layer": "Ana ekran katmanında odalar",
   "show rooms": "Odaları göster",
   "Play coin sound inside the room when the win amount is greater than or equal to the added value.": "Kazanılan miktar eklenen değere eşit veya daha büyük olduğunda odada para sesi çal.",
-
+  "user is country manager": "Kullanıcı ülke yöneticisidir",
+"this agency does not have owner": "Bu ajansın sahibi yok",
   "Enter the lucky gift coins value": "Şanslı hediye coin değerini girin",
 "lucky gift coins": "Şanslı hediye coinleri",
     "badge_gift_message_tr": "Yeni bir rozet hediye olarak aldınız.",

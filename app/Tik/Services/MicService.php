@@ -166,25 +166,23 @@ class MicService
 
         $existingMic = $room->microphones()->where('user_id', $user->id)->first();
         if ($existingMic) {
-            CpRoomHistory::where("user_one_id", $user->id)
-                ->orWhere("user_two_id", $user->id)
-                ->delete();
 
-            $existingMic->delete();
+            if ($existingMic->position !== $position) {
+        
+                CpRoomHistory::where("user_one_id", $user->id)
+                    ->orWhere("user_two_id", $user->id)
+                    ->delete();
 
+                $existingMic->delete();
+            } else {
+            
+            }
         }
 
 
         $micSeat->update([
             'user_id' => $user->id,
             'status'  => $old_status,
-        ]);
-
-        Log::info("User moved to microphone position", [
-            'user_id' => $user->id,
-            'position' => $position,
-            'room_id' => $room->id,
-            'status' => $old_status,
         ]);
 
         $micString = $room->microphones()

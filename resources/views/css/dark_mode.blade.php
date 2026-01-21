@@ -96,6 +96,10 @@
     .dark-mode .refresh-btn,
     .dark-mode .action-menu-item:hover,
     .dark-mode select > option,
+    .dark-mode .viewer-header,
+    .dark-mode .moment-post,
+    .dark-mode .side-modal-content,
+    .dark-mode .users-sidebar,
         /*.dark-mode .box-footer {*/
     .dark-mode .sidebarContainer {
         background: var(--dark-primary-color) !important;
@@ -176,6 +180,8 @@
     .dark-mode .content-wrapper,
     .dark-mode .CardwalletLogsTable,
     .dark-mode .chat-messages,
+    .dark-mode .viewer-container,
+    .dark-mode .users-list-container,
     .dark-mode .main-sidebar {
         scrollbar-color: var(--dark-secondry-color) var(--dark-primary-color) !important;
         scrollbar-width: thin;
