@@ -33,6 +33,7 @@ Route::group(
         Route::resource('ovip', OVipController::class);
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
         Route::get('ovip-theme/{ovip_id}', [OVipController::class, 'editBackgroundImage']);
+         Route::post('ovip-theme/{ovip_id}', [OVipController::class, 'store']);
         Route::get('ovip-settings', [OVipController::class, 'vipSettings']);  
         Route::prefix('ware-gift')->group(function () {
             Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
