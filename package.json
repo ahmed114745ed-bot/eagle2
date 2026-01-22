@@ -35,6 +35,7 @@
         "firebase": "^10.0.0",
         "jquery": "^3.7.1",
         "svga.lite": "^1.6.1",
+        "svgaplayerweb": "^2.3.2",
         "vue-draggable-next": "^2.3.0",
         "vue3-virtual-scroller": "^0.2.3"
     }

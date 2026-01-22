@@ -1066,82 +1066,61 @@ export default {
             }[type] || '📁'
         }
 
-        // SVGA Player methods
+        // SVGA Player methods using svgaplayerweb
         const playSvga = async (asset) => {
             try {
                 const canvasId = 'svga-canvas-' + asset.id
                 const canvas = document.getElementById(canvasId)
-                if (!canvas) return
+                if (!canvas) {
+                    console.error('Canvas not found:', canvasId)
+                    return
+                }
 
                 // Stop existing player if any
                 if (svgaPlayers.value[asset.id]) {
-                    svgaPlayers.value[asset.id].clear()
+                    try {
+                        svgaPlayers.value[asset.id].clear()
+                    } catch (e) {}
                     svgaPlayers.value[asset.id] = null
                 }
 
-                // Dynamically import SVGA library
-                const { Parser, Player } = await import('svga.lite')
+                // Import svgaplayerweb
+                const SVGA = await import('svgaplayerweb')
+                
+                const parser = new SVGA.Parser()
+                const player = new SVGA.Player(canvas)
+                
+                // Set canvas size
+                canvas.width = 300
+                canvas.height = 300
 
-                const parser = new Parser()
-                const svgaData = await parser.load(asset.default_url)
-
-                const player = new Player({
-                    container: canvas,
-                    loop: true,
-                    fillMode: 'AspectFit'
-                })
-
-                await player.mount(svgaData)
-                player.start()
-
-                svgaPlayers.value[asset.id] = player
-            } catch (error) {
-                console.error('Failed to play SVGA:', error)
-                // Fallback: try using svgaplayerweb
-                try {
-                    await playSvgaFallback(asset)
-                } catch (fallbackError) {
-                    console.error('Fallback SVGA player also failed:', fallbackError)
-                    emit('notify', 'Failed to play SVGA file')
-                }
-            }
-        }
-
-        const playSvgaFallback = async (asset) => {
-            const canvasId = 'svga-canvas-' + asset.id
-            const canvas = document.getElementById(canvasId)
-            if (!canvas) return
-
-            // Use fetch to load SVGA as ArrayBuffer
-            const response = await fetch(asset.default_url)
-            const arrayBuffer = await response.arrayBuffer()
-
-            // Try using SVGA.Parser if available globally
-            if (window.SVGA) {
-                const parser = new window.SVGA.Parser()
-                parser.load(arrayBuffer, (videoItem) => {
-                    const player = new window.SVGA.Player(canvas)
+                parser.load(asset.default_url, (videoItem) => {
                     player.setVideoItem(videoItem)
+                    player.loops = 0 // infinite loop
                     player.startAnimation()
                     svgaPlayers.value[asset.id] = player
+                    emit('notify', 'SVGA playing')
+                }, (error) => {
+                    console.error('SVGA parse error:', error)
+                    emit('notify', 'Failed to parse SVGA file')
                 })
+
+            } catch (error) {
+                console.error('Failed to play SVGA:', error)
+                emit('notify', 'Failed to play SVGA: ' + error.message)
             }
         }
 
         const stopSvga = (asset) => {
             if (svgaPlayers.value[asset.id]) {
                 try {
-                    if (typeof svgaPlayers.value[asset.id].stop === 'function') {
-                        svgaPlayers.value[asset.id].stop()
-                    } else if (typeof svgaPlayers.value[asset.id].clear === 'function') {
-                        svgaPlayers.value[asset.id].clear()
-                    } else if (typeof svgaPlayers.value[asset.id].stopAnimation === 'function') {
-                        svgaPlayers.value[asset.id].stopAnimation()
-                    }
+                    svgaPlayers.value[asset.id].stopAnimation()
+                    svgaPlayers.value[asset.id].clear()
                 } catch (e) {
                     console.error('Error stopping SVGA:', e)
                 }
                 svgaPlayers.value[asset.id] = null
+                emit('notify', 'SVGA stopped')
             }
         }
 
