@@ -368,4 +368,9 @@ class VipService
     {
         return $this->vipRepository->getLevelGroups();
     }
+
+    public function getRoomLevel(): array
+    {
+        return $this->vipRepository->getRoomLevel();
+    }
 }
