@@ -628,7 +628,7 @@ class RoomController extends MainController
             if ($levelimage) {
                 $levelImageHtml = "
                     <div style='margin-top:4px;'>
-                        <img src='{$levelimage}' style='width:32px;height:20px;margin-right:2px;'>
+                        <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
                     </div>
                 ";
             }
