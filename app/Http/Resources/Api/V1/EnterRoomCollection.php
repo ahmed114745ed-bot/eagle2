@@ -72,7 +72,7 @@ class EnterRoomCollection extends JsonResource
             "name"                => @$this->name ?? '',
             "room_pass"           => $this->room_pass,
             'room_type'           =>  app()->getLocale() === 'ar' ? $this->roomCategory?->name  ?? $this->roomCategory?->name_en : $this->roomCategory?->name_en ?? $this->roomCategory?->name,
-            'room_level_image'   => $this->type == 'audio' ? @$this->level->img ?? '' : '',
+            'room_level_image'   => $this->type == 'audio' ? @$this->roomLevel->img ?? '' : '',
             "hot"                 => '',
             "microphone"          => $this->microphone,
             "room_welcome"        => $this->room_welcome,

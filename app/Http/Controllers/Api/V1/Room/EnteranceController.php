@@ -324,7 +324,7 @@ class EnteranceController extends Controller
 
     private function findRoom(int $roomId): ?Room
     {
-        return Room::with(['level', 'owner'])->find($roomId);
+        return Room::with(['roomLevel', 'owner'])->find($roomId);
     }
 
     private function isRoomBanned(int $ownerId, string $roomType): bool

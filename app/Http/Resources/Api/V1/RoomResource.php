@@ -66,7 +66,7 @@ class RoomResource extends JsonResource
             'agency' => $agency_joined,
             'visitors_count' => $this->count_room_socket_v2,
             'cover' => $this->room_cover ?: '',
-            'room_level_image'   => $this->type == 'audio' ? @$this->level->img ?? '' : '',
+            'room_level_image'   => $this->type == 'audio' ? @$this->roomLevel->img ?? '' : '',
             //            'class' => $this->myClass ?: new \stdClass(),
             //            'type' => $this->myType ?: new \stdClass(),
             'is_hot' => $this->hot ?: 0,

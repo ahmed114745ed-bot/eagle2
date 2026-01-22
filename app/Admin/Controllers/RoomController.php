@@ -358,7 +358,7 @@ class RoomController extends MainController
             )
 
             ->with([
-                'level',
+                'roomLevel',
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
@@ -621,8 +621,8 @@ class RoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
-           
-            $levelimage = @$this->level?->img ? getImagePath(@$this->level->img ?? '') : null;
+                 //dd( $this->roomLevel);
+            $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
             $levelImageHtml = '';
 
             if ($levelimage) {
