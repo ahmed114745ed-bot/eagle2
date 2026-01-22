@@ -2235,9 +2235,12 @@ export default {
     },
     
     removeChild(child) {
-      const index = this.placedChildren.findIndex(c => c.theme_child_id === child.theme_child_id);
+      const widget = this.selectedWidgetData;
+      if (!widget || !widget.children) return;
+      
+      const index = widget.children.findIndex(c => c.theme_child_id === child.theme_child_id);
       if (index !== -1) {
-        this.placedChildren.splice(index, 1);
+        widget.children.splice(index, 1);
         this.selectedChildId = null;
         this.selectedElementType = null;
         this.hasUnsavedChanges = true;
@@ -2337,8 +2340,8 @@ export default {
         this.history = this.history.slice(0, this.historyIndex + 1);
       }
       
-      // Save current state
-      const state = JSON.stringify(this.placedChildren);
+      // Save current state - save placedWidgets (which contains all widgets and their children)
+      const state = JSON.stringify(this.placedWidgets);
       this.history.push(state);
       
       // Limit history size
@@ -2351,14 +2354,14 @@ export default {
     undo() {
       if (this.canUndo) {
         this.historyIndex--;
-        this.placedChildren = JSON.parse(this.history[this.historyIndex]);
+        this.placedWidgets = JSON.parse(this.history[this.historyIndex]);
         this.hasUnsavedChanges = true;
       }
     },
     redo() {
       if (this.canRedo) {
         this.historyIndex++;
-        this.placedChildren = JSON.parse(this.history[this.historyIndex]);
+        this.placedWidgets = JSON.parse(this.history[this.historyIndex]);
         this.hasUnsavedChanges = true;
       }
     },
@@ -2367,25 +2370,31 @@ export default {
     duplicateSelected() {
       if (!this.selectedElement) return;
       
+      const widget = this.selectedWidgetData;
+      if (!widget) return;
+      
       if (this.selectedElementType === 'child') {
-        const child = this.placedChildren.find(c => c.theme_child_id === this.selectedChildId);
+        const child = (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
         if (child) {
           const newChild = JSON.parse(JSON.stringify(child));
           newChild.x += 20;
           newChild.y += 20;
-          newChild.theme_child_id = child.theme_child_id + '_copy_' + Date.now();
-          this.placedChildren.push(newChild);
+          newChild.id = child.id + '_copy_' + Date.now();
+          newChild.theme_child_id = child.theme_child_id;
+          if (!widget.children) widget.children = [];
+          widget.children.push(newChild);
           this.hasUnsavedChanges = true;
           this.saveToHistory();
         }
       } else if (this.selectedElementType === 'asset') {
-        for (const child of this.placedChildren) {
+        for (const child of widget.children || []) {
           const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
           if (asset) {
             const newAsset = JSON.parse(JSON.stringify(asset));
             newAsset.x += 10;
             newAsset.y += 10;
             newAsset.id = asset.id + '_copy_' + Date.now();
+            if (!child.assets) child.assets = [];
             child.assets.push(newAsset);
             this.hasUnsavedChanges = true;
             this.saveToHistory();
@@ -2397,11 +2406,14 @@ export default {
     deleteSelected() {
       if (!this.selectedElement) return;
       
+      const widget = this.selectedWidgetData;
+      if (!widget) return;
+      
       if (this.selectedElementType === 'child') {
-        const child = this.placedChildren.find(c => c.theme_child_id === this.selectedChildId);
+        const child = (widget.children || []).find(c => c.theme_child_id === this.selectedChildId);
         if (child) this.removeChild(child);
       } else if (this.selectedElementType === 'asset') {
-        for (const child of this.placedChildren) {
+        for (const child of widget.children || []) {
           const asset = (child.assets || []).find(a => a.id === this.selectedAssetId);
           if (asset) {
             this.removeAsset(child, asset);
