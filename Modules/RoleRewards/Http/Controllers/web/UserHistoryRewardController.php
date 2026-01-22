@@ -60,7 +60,7 @@ class UserHistoryRewardController extends MainController
 
         $grid->column('receive_name', __('receive_type'));
 
-        if (class_exists(Achievement::class, false)){
+        if (class_exists(Achievement::class)){
             $grid->column('reward', __('Rewards'))->display(function () {
                 if ($this->reward_value) {
                     if ($this->rewardable_type === Achievement::class) {
