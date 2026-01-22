@@ -264,13 +264,19 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
+        \Log::info('sendLuckyGift2 - Room Type Check', [
+            'room_id' => $room->id,
+            'room_type' => $room->type,
+            'total_diamond' => $room->total_diamond,
+            'totalPrice' => $totalPrice,
+        ]);
+
         if ($room->type == 'audio') {
             $serviceLevel  = new UpgradeRoomLevelServices();
-            \Log::info('rooms', [
-                // 'room_id' => $room->id,
+            \Log::info('sendLuckyGift2 - Upgrading Room Level', [
+                'room_id' => $room->id,
                 'diamonds' => $totalPrice,
                 'type' => $room->type,
-
             ]);
             $serviceLevel->sendGift($room, $totalPrice);
         }
@@ -512,10 +518,18 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
+        \Log::info('sendLuckyGift2V2 - Room Type Check', [
+            'room_id' => $room->id,
+            'room_type' => $room->type,
+            'total_diamond' => $room->total_diamond,
+            'totalPrice' => $totalPrice,
+        ]);
+
         // Upgrade room level for audio rooms
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
-            \Log::info('rooms', [
+            \Log::info('sendLuckyGift2V2 - Upgrading Room Level', [
+                'room_id' => $room->id,
                 'diamonds' => $totalPrice,
                 'type' => $room->type,
             ]);
