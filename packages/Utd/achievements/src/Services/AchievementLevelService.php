@@ -2,6 +2,7 @@
 
 namespace Utd\Achievements\Services;
 
+use App\Contracts\AchievementLevelContract;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -10,7 +11,7 @@ use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Achievements\Enums\TargetType;
 
-class AchievementLevelService
+class AchievementLevelService implements AchievementLevelContract
 {
     private Collection $userAchievementLevels;
     private int $countTargets = 2;

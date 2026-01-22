@@ -3,59 +3,23 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
-/**
- * Dynamic Achievement Trait
- *
- * Checks for package existence before any operation.
- * Returns empty collection if package not installed.
- */
 trait DynamicAchievementTrait
 {
-    /**
-     * User Achievement Levels Relation
-     */
-    public function achievementLevels(): HasMany
+    public function medals(): HasMany
     {
-        if (class_exists('Utd\\Achievements\\Entities\\UserAchievementLevel')) {
-            return $this->hasMany('Utd\\Achievements\\Entities\\UserAchievementLevel', 'user_id');
+        if (!class_exists(UserAchievementLevel::class)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        // Return empty relation
-        return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        return $this->hasMany(UserAchievementLevel::class, 'user_id');
     }
 
-    /**
-     * Enabled Achievement Levels
-     */
-    public function enabledAchievementLevels(): HasMany
+    public function enabledMedals(): HasMany
     {
-        if (class_exists('Utd\\Achievements\\Entities\\UserAchievementLevel')) {
-            return $this->hasMany('Utd\\Achievements\\Entities\\UserAchievementLevel', 'user_id')
-                ->where('is_enable', true);
+        if (!class_exists(UserAchievementLevel::class)) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
-    }
-
-    /**
-     * Get first N achievements for display
-     */
-    public function getDisplayAchievements(int $limit = 3): Collection
-    {
-        if (!class_exists('Utd\\Achievements\\Entities\\UserAchievementLevel')) {
-            return collect([]);
-        }
-        return $this->enabledAchievementLevels()
-            ->with('achievementLevel')
-            ->latest()
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
-     * Check if achievement feature is available
-     */
-    public function hasAchievementFeature(): bool
-    {
-        return class_exists('Utd\\Achievements\\Entities\\UserAchievementLevel');
+        return $this->hasMany(UserAchievementLevel::class, 'user_id')->where('is_enable', true);
     }
 }

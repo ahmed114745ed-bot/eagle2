@@ -2,10 +2,14 @@
 namespace App\Providers;
 
 use App\Contracts\MomentContract;
-use App\Services\Null\NullMomentService;
-use Illuminate\Support\ServiceProvider;
 use App\Contracts\AchievementContract;
+use App\Contracts\AchievementLevelContract;
+use App\Contracts\UserAchievementContract;
+use App\Services\Null\NullMomentService;
 use App\Services\Null\NullAchievementService;
+use App\Services\Null\NullAchievementLevelService;
+use App\Services\Null\NullUserAchievementService;
+use Illuminate\Support\ServiceProvider;
 
 class FeatureServiceProvider extends ServiceProvider
 {
@@ -20,6 +24,21 @@ class FeatureServiceProvider extends ServiceProvider
             );
         }
 
+        if (!$this->app->bound(AchievementLevelContract::class)) {
+            $this->app->singleton(
+                AchievementLevelContract::class,
+                NullAchievementLevelService::class
+            );
+        }
+
+        if (!$this->app->bound(UserAchievementContract::class)) {
+            $this->app->singleton(
+                UserAchievementContract::class,
+                NullUserAchievementService::class
+            );
+        }
+
+        // Moment Feature
         if (!$this->app->bound(MomentContract::class)) {
             $this->app->singleton(
                 MomentContract::class,

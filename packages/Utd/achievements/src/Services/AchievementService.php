@@ -236,7 +236,7 @@ class AchievementService implements AchievementContract
     // Helper methods
     // =============================================
 
-    protected function updateOrCreateUserAchievement(
+    public function updateOrCreateUserAchievement(
         Model $user,
         Achievement $achievement,
         int $amount,
@@ -274,28 +274,5 @@ class AchievementService implements AchievementContract
 
         // Assign achievement level to user
         app(AchievementLevelService::class)->assignAchievementToUser($userAchievement);
-    }
-
-    public function getEnabledMedals(int $userId): array
-    {
-        return UserAchievementLevel::query()
-            ->where('user_id', $userId)
-            ->where('is_enable', true)
-            ->get();
-    }
-
-    public function calculateAchievement(int $userId, string $type, float $amount): void
-    {
-        // TODO: Implement calculateAchievement() method.
-    }
-
-    public function hasAchievement(int $userId, int $achievementId): bool
-    {
-        // TODO: Implement hasAchievement() method.
-    }
-
-    public function getStatistics(int $userId): array
-    {
-        // TODO: Implement getStatistics() method.
     }
 }

@@ -3,8 +3,12 @@
 namespace Utd\Achievements;
 
 use App\Contracts\AchievementContract;
+use App\Contracts\AchievementLevelContract;
+use App\Contracts\UserAchievementContract;
 use Illuminate\Support\ServiceProvider;
 use Utd\Achievements\Services\AchievementService;
+use Utd\Achievements\Services\AchievementLevelService;
+use Utd\Achievements\Services\UserAchievementService;
 use Utd\Achievements\Console\ResetUserAchievementMonthly;
 
 class AchievementsServiceProvider extends ServiceProvider
@@ -14,6 +18,8 @@ class AchievementsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/achievements.php', 'achievements');
 
         $this->app->singleton(AchievementContract::class, AchievementService::class);
+        $this->app->singleton(AchievementLevelContract::class, AchievementLevelService::class);
+        $this->app->singleton(UserAchievementContract::class, UserAchievementService::class);
     }
 
     public function boot(): void

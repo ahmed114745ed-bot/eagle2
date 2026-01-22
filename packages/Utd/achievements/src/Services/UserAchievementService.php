@@ -2,13 +2,14 @@
 
 namespace Utd\Achievements\Services;
 
+use App\Contracts\UserAchievementContract;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Achievements\Enums\AchievementType;
 
-class UserAchievementService
+class UserAchievementService implements UserAchievementContract
 {
     /**
      * Insert charging achievement progress

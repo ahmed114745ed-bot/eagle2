@@ -2,35 +2,110 @@
 namespace App\Services\Null;
 
 use App\Contracts\AchievementContract;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Utd\Achievements\Entities\Achievement;
 
 class NullAchievementService implements AchievementContract
 {
-    public function getUserAchievements(int $userId, int $limit = 3): array
+    public function getUserAchievements(Model $user): Collection
     {
-        return [];
+        return collect();
     }
 
-    public function getEnabledMedals(int $userId): array
+    public function getUserMedals(Model $user): Collection
     {
-        return [];
+        return collect();
     }
 
-    public function calculateAchievement(int $userId, string $type, float $amount): void
+    public function trackCharging(Model $user, int $totalCoins): void
     {
-        // Do nothing - feature not available
+        // No-op
     }
 
-    public function hasAchievement(int $userId, int $achievementId): bool
+    public function trackRoomTarget(Model $user, int $totalCoins): void
+    {
+        // No-op
+    }
+
+    public function trackGiftTarget(Model $gift, int $total): void
+    {
+        // No-op
+    }
+
+    public function all(): Collection
+    {
+        return collect();
+    }
+
+    public function paginate(int $perPage = 15): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, $perPage);
+    }
+
+    public function create(array $data): ?Model
+    {
+        return null;
+    }
+
+    public function update(int $id, array $data): bool
     {
         return false;
     }
 
-    public function getStatistics(int $userId): array
+    public function delete(int $id): bool
     {
-        return [
-            'total_achievements' => 0,
-            'enabled_medals' => 0,
-            'latest_achievement' => null,
-        ];
+        return false;
+    }
+
+    public function find(int $id): ?Model
+    {
+        return null;
+    }
+
+    public function getAllLevels(int $achievementId, int $perPage = 15): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, $perPage);
+    }
+
+    public function createLevel(array $data): ?Model
+    {
+        return null;
+    }
+
+    public function updateLevel(int $id, array $data): bool
+    {
+        return false;
+    }
+
+    public function deleteLevel(int $id): bool
+    {
+        return false;
+    }
+
+    public function getUserAchievementLevels(int $perPage = 15, ?string $uuid = null): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, $perPage);
+    }
+
+    public function toggleUserAchievementLevel(int $id, bool $isEnabled): bool
+    {
+        return false;
+    }
+
+    public function deleteUserAchievementLevel(int $id): bool
+    {
+        return false;
+    }
+
+    public function isEnabled(): bool
+    {
+        return false;
+    }
+
+    public function updateOrCreateUserAchievement(Model $user, Achievement $achievement, int $amount, ?int $giftAchievementId = null): void
+    {
+        // No-op
     }
 }
