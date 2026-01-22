@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1cab88ef889a4e6eb8f4d783edfe98fd",
+    "content-hash": "112fb318cc5a78603ba65c28cee99761",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14420,6 +14420,47 @@
             }
         },
         {
+            "name": "utd/moments",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Moments",
+                "reference": "ed1a9236e70257dbf92528425e1a2cee0c8a37b4"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Moments\\MomentsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Moments\\": "src/",
+                    "Utd\\Moments\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Moments Laravel Package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15192,7 +15233,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20
+        "utd/achievements": 20,
+        "utd/moments": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

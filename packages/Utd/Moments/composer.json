@@ -15,7 +15,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Utd\\Moments\\": "src/"
+            "Utd\\Moments\\": "src/",
+            "Utd\\Moments\\Database\\": "Database/"
         }
     },
     "extra": {
