@@ -3,11 +3,13 @@
 namespace Modules\Public\Jobs;
 
 use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\UserCommon;
 use Illuminate\Bus\Queueable;
+use App\Enums\UserCoinLogType;
+use Modules\Vip\Entities\OVip;
+use App\Helpers\UserCoinLogHelper;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Modules\Public\Entities\LevelInterval;
@@ -47,16 +49,24 @@ class RewardWinnerLevel implements ShouldQueue
             foreach ($rewards as $rewad) {
 
                 if ($rewad->type == "coins") {
+                    $amountBefore = $user->di;
                     $user->di += $rewad->target;
                     $user->save();
+
+                    UserCoinLogHelper::logByType(
+                        $user->id,
+                        $rewad->target,
+                        $amountBefore,
+                        UserCoinLogType::ROOM_LEVEL,
+                    );
                 } elseif ($rewad->type == "vip") {
                     $vip = OVip::query()->find($rewad->target);
                     if (!$vip) return;
-                    UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-level');
+                    UserCommon::addVipToUser($user, $vip, $rewad->expire, null, 'reward-winner-level');
                 } elseif ($rewad->type == "ware") {
                     $ware = Ware::query()->find($rewad->target);
                     if (!$ware) return;
-                    UserCommon::addWareToUser($user, $ware, $rewad->expire ,null,'reward-winner-level');
+                    UserCommon::addWareToUser($user, $ware, $rewad->expire, null, 'reward-winner-level');
                 } elseif ($rewad->type == "achievement") {
                     $attributes = [
                         'user_id'       => $user->id,

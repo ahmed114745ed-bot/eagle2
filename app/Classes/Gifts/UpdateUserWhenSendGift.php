@@ -62,7 +62,7 @@ class UpdateUserWhenSendGift
         $user->save();
 
 
-     /*   try {
+        /*   try {
             uploadMonthlyDiamondReceive($receivedUser->id, $diamondUser);
 
             Log::build([
@@ -87,8 +87,7 @@ class UpdateUserWhenSendGift
         //     'exchange_diamonds' => DB::raw("CASE WHEN agency_id = 0 THEN exchange_diamonds + $totalCoins ELSE exchange_diamonds END"),
         // ]);
         DB::transaction(function () use ($totalCoins, $userIds) {
-            $users = User::
-                  whereIn('id', $userIds)
+            $users = User::whereIn('id', $userIds)
                 ->lockForUpdate()
                 ->get();
 
@@ -185,14 +184,14 @@ class UpdateUserWhenSendGift
 
         $userGift = UserGift::where('user_id', $senderUser->id)
             ->where('gift_id', $giftId)
-            ->where('quantity', '>',0)
-            ->where(function($query) {
+            ->where('quantity', '>', 0)
+            ->where(function ($query) {
                 $query->where('expire', 0)
                     ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
             })->first();
 
 
-        throw_if(( !$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+        throw_if((!$userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
 
         $userGift->quantity -= $number;
 
@@ -231,6 +230,12 @@ class UpdateUserWhenSendGift
         // $total = intval($totalDiamondSend + $totalDiamond) * $this->expPercentages[0] ;
         $levelVip                 = $this->getLevel(4, $total);
         return $levelVip != null ? @$levelVip->level ?? 0 : 0;
+    }
+
+    public function getRoomLevelDetails($total)
+    {
+        $levelVip  = $this->getLevel(4, $total);
+        return $levelVip;
     }
 
     public function getReceiverLevel($totalDiamondReceived, $totalDiamond, int $subReceiverLevel)
