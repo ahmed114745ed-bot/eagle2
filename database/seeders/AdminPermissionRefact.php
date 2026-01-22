@@ -489,7 +489,7 @@ class AdminPermissionRefact extends Seeder
                 'name' => 'Moment',
                 'sort' => 28,
                 'permissions' => [
-                    ['key' => 'Moment', 'except' => [], 'additional' => []],
+                    ['key' => 'moment', 'except' => [], 'additional' => []],
                     ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => []],
                 ],
             ];

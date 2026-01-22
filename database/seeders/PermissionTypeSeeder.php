@@ -6,6 +6,7 @@ use App\Models\RoleCategory;
 use App\Enums\PermissionType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Utd\Moments\Entities\Moment;
 
 
 class PermissionTypeSeeder extends Seeder
@@ -916,21 +917,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Moment',
-                'sort' => 34,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 34],
-                ],
-                'permissions' => [
-                    ['key' => 'Moment', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'create'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Employees and Permissions',
                 'sort' => 35,
                 'types' => [
@@ -1237,7 +1223,23 @@ class PermissionTypeSeeder extends Seeder
             ],
         ];
 
-
+        if (class_exists(Moment::class)) {
+            $categories[] = [
+                'name' => 'Moment',
+                'sort' => 34,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 34],
+                ],
+                'permissions' => [
+                    ['key' => 'Moment', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'create'],
+                    ],],
+                ],
+            ];
+        }
 
         $allSlugs = [];
 

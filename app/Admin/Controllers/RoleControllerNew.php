@@ -220,6 +220,7 @@ class RoleControllerNew extends MainController
         // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
 
         // Custom tabbed view
+        info($permissions);
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
             'selectedPermissions' => $id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray() : [],
