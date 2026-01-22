@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Models\Room;
+use App\Models\User;
+use App\Models\Ware;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use Modules\Vip\Entities\OVip;
-use App\Models\User;
-use App\Models\UserGameChallange;
-use App\Models\Room;
 use Modules\Vip\Entities\Vip;
-use App\Models\Ware;
+use Modules\Vip\Entities\OVip;
+use App\Models\UserGameChallange;
+use Modules\Public\Jobs\RewardWinnerLevel;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 class RoomLevelServices
@@ -28,7 +29,7 @@ class RoomLevelServices
                 $room->exp = $level->exp;
                 if (count($level->gifts) > 0) {
                     foreach ($level->gifts as $gift) {
-                        dispatch(new RewardWinnerLeve($user->id,$senderLevel,2))->onQueue('level_rewards');
+                        dispatch(new RewardWinnerLevel($user->id,$senderLevel,2))->onQueue('level_rewards');
                     }
                 }
             }
