@@ -1094,6 +1094,9 @@ export default {
                     return
                 }
 
+                console.log('Loading SVGA from:', asset.default_url)
+                emit('notify', 'جاري التحميل...')
+
                 // Stop existing player if any
                 if (svgaPlayers.value[asset.id]) {
                     try {
@@ -1105,10 +1108,19 @@ export default {
                 // Load SVGA from CDN
                 await loadSvgaScript()
 
+                // First fetch the file as ArrayBuffer to avoid CORS issues
+                const response = await fetch(asset.default_url)
+                if (!response.ok) {
+                    throw new Error('Failed to fetch SVGA file: ' + response.status)
+                }
+                const arrayBuffer = await response.arrayBuffer()
+
                 const player = new window.SVGA.Player(containerId)
                 const parser = new window.SVGA.Parser()
 
-                parser.load(asset.default_url, (videoItem) => {
+                // Use ArrayBuffer instead of URL
+                parser.load(arrayBuffer, (videoItem) => {
+                    console.log('SVGA loaded successfully:', videoItem)
                     player.setVideoItem(videoItem)
                     player.loops = 0 // infinite loop
                     player.startAnimation()
@@ -1116,12 +1128,12 @@ export default {
                     emit('notify', 'SVGA playing ▶️')
                 }, (error) => {
                     console.error('SVGA parse error:', error)
-                    emit('notify', 'Failed to parse SVGA file')
+                    emit('notify', 'فشل تحميل SVGA: ' + (error?.message || error))
                 })
 
             } catch (error) {
                 console.error('Failed to play SVGA:', error)
-                emit('notify', 'Failed to play SVGA: ' + error.message)
+                emit('notify', 'فشل تحميل SVGA: ' + error.message)
             }
         }
 
