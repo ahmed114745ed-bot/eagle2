@@ -200,7 +200,7 @@ class VipService
         return $this->wareRepository->getByTypeAndLevel($vipPrivilege->type, $vip->level);
     }
 
-    public function badges($type)
+    public function     badges($type)
     {
         return $this->vipRepository->badgesVip($type);
     }

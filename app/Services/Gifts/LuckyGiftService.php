@@ -769,10 +769,17 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-        //    \Log::info('🚀 room responseData   19 V3...', [
-        //                         'responseData'  => $responseData,
 
-        //                     ]);
+        // Upgrade room level for audio rooms
+        if ($room->type == 'audio') {
+            $serviceLevel = new UpgradeRoomLevelServices();
+            \Log::info('rooms', [
+                'diamonds' => $totalPrice,
+                'type' => $room->type,
+            ]);
+            $serviceLevel->sendGift($room, $totalPrice);
+        }
+
         return  $responseData;
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
