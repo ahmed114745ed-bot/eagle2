@@ -243,9 +243,9 @@ class GiftLogController extends Controller
     {
        $close_open_gifts = settings()->get('close_open_gifts');
 
-        // if ($close_open_gifts == 1) {
-        //     return Common::apiResponse(0, __('Send gift stopped by admin'));
-        // }
+        if ($close_open_gifts == 1) {
+            return Common::apiResponse(0, __('Send gift stopped by admin'));
+        }
 
         // Update when sending the gift
         $validator = Validator::make($request->all(), [

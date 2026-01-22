@@ -242,6 +242,12 @@ class GiftLogService
 
             if ($room->type == 'audio') {
                 $serviceLevel  = new UpgradeRoomLevelServices();
+                \Log::info('rooms', [
+                    // 'room_id' => $room->id,
+                    'diamonds' => $totalPrice,
+                    'type' => $room->type,
+
+                ]);
                 $serviceLevel->sendGift($room, $totalPrice);
             }
             $message = "  {$numberOfGift} x" . __('api.sendGift') . __("api.value") . "{$totalPrice} " .  __('api.to') . "{$to}";
