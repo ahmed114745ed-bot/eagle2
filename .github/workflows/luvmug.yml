@@ -1,0 +1,86 @@
+name: SSh-luvmug-pipline
+on:
+  push:
+    branches: ["luvmug"]
+jobs:
+  run_luvmug_hub:
+    runs-on: [self-hosted] #ubuntu-latest
+    steps:
+    - name: print out luvmug
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.70.88"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 3m
+        script: |
+          cd /var/www/luvmug
+          source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_luvmug_app:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_luvmug_hub
+    steps:
+    - name: print out luvmug
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.70.88"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/luvmug
+          pwd
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t luvmug-octa:${{ github.sha }} -f Dockerfile-octana .
+          docker service update --image luvmug-octa:${{ github.sha }} luvmug-octa
+
+          # Get container ID of task luvmug-octa
+          CONTAINER_ID=$(docker ps --filter "name=luvmug-octa.1" --format "{{.ID}}" | head -n 1)
+
+          # Run artisan command inside that container
+          if [ -n "$CONTAINER_ID" ]; then
+            docker exec  $CONTAINER_ID php artisan whatsapp:change-token
+          else
+            echo "No running container found for luvmug-octa.1 service task"
+            exit 1
+          fi
+
+          # check again
+          threshold=80
+          current=$(df -h | awk '$NF=="/"{printf "%d", $5}' | sed 's/%//')
+          if [ $current -gt $threshold ]; then
+            echo "Disk space is more than $threshold% utilized"
+          # Execute the command to clean up Docker system
+            docker system prune -a -f && docker system prune --all --force && echo "Docker system cleaned successfully"
+          else
+            echo "Disk space is within acceptable limits $current% "
+          fi
+  run_luvmug_job:
+    runs-on: [self-hosted] #ubuntu-latest
+    needs: run_luvmug_hub
+    steps:
+    - name: print out luvmug Job
+      uses: appleboy/ssh-action@v1.2.1
+      with:
+        host: "34.18.70.88"
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.UTDVM }}
+        port: ${{ secrets.PORT }}
+        command_timeout: 20m
+        script: |
+          cd /var/www/luvmug
+          pwd
+          #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
+          docker build -t luvmug-job:${{ github.sha }} -f Dockerfile-jobs .
+          docker service update --image luvmug-job:${{ github.sha }} luvmug-job
