@@ -621,6 +621,7 @@ class RoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
+            dd(@$this->level?->img);
             $levelimage = @$this->level?->img ? getImagePath(@$this->level->img ?? '') : null;
             $levelImageHtml = '';
 
