@@ -1,7 +1,7 @@
 name: SSh-luvmug-pipline
 on:
   push:
-    branches: ["luvmug"]
+    branches: ["LuvMug"]
 jobs:
   run_luvmug_hub:
     runs-on: [self-hosted] #ubuntu-latest
