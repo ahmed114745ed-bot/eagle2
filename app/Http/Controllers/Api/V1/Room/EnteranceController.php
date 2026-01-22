@@ -324,7 +324,7 @@ class EnteranceController extends Controller
 
     private function findRoom(int $roomId): ?Room
     {
-        return Room::find($roomId);
+        return Room::with(['level', 'owner'])->find($roomId);
     }
 
     private function isRoomBanned(int $ownerId, string $roomType): bool
@@ -571,8 +571,7 @@ class EnteranceController extends Controller
 
             if ($request->hasFile('room_cover')) {
 
-             $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
-
+                $room->room_cover = Common::upload('rooms', $request->file('room_cover'));
             }
 
             if ($request->free_mic) {
