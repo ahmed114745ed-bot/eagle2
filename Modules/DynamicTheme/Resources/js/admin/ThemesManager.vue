@@ -1070,8 +1070,9 @@ export default {
                     return
                 }
 
+                // Try svgaplayerweb first (more compatible)
                 const script = document.createElement('script')
-                script.src = 'https://cdn.jsdelivr.net/npm/svga.lite/dist/svga.min.js'
+                script.src = 'https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js'
                 script.onload = () => {
                     if (window.SVGA) {
                         resolve(window.SVGA)
@@ -1086,8 +1087,8 @@ export default {
 
         const playSvga = async (asset) => {
             try {
-                const containerId = '#svga-container-' + asset.id
-                const container = document.querySelector(containerId)
+                const containerId = 'svga-container-' + asset.id
+                const container = document.getElementById(containerId)
                 if (!container) {
                     console.error('Container not found:', containerId)
                     emit('notify', 'Container not found')
@@ -1101,26 +1102,19 @@ export default {
                 if (svgaPlayers.value[asset.id]) {
                     try {
                         svgaPlayers.value[asset.id].clear()
+                        container.innerHTML = ''
                     } catch (e) {}
                     svgaPlayers.value[asset.id] = null
                 }
 
-                // Load SVGA from CDN
+                // Load SVGA script from CDN
                 await loadSvgaScript()
 
-                // First fetch the file as ArrayBuffer to avoid CORS issues
-                const response = await fetch(asset.default_url)
-                if (!response.ok) {
-                    throw new Error('Failed to fetch SVGA file: ' + response.status)
-                }
-                const arrayBuffer = await response.arrayBuffer()
+                const player = new window.SVGA.Player(container)
+                const parser = new window.SVGA.Parser(container)
 
-                const player = new window.SVGA.Player(containerId)
-                const parser = new window.SVGA.Parser()
-
-                // Use ArrayBuffer instead of URL
-                parser.load(arrayBuffer, (videoItem) => {
-                    console.log('SVGA loaded successfully:', videoItem)
+                parser.load(asset.default_url, (videoItem) => {
+                    console.log('SVGA loaded successfully, frames:', videoItem.frames)
                     player.setVideoItem(videoItem)
                     player.loops = 0 // infinite loop
                     player.startAnimation()
@@ -1128,7 +1122,7 @@ export default {
                     emit('notify', 'SVGA playing ▶️')
                 }, (error) => {
                     console.error('SVGA parse error:', error)
-                    emit('notify', 'فشل تحميل SVGA: ' + (error?.message || error))
+                    emit('notify', 'فشل تحميل SVGA - جرب تحميل الملف مرة أخرى')
                 })
 
             } catch (error) {
