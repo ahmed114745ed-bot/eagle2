@@ -49,8 +49,7 @@
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
-        "utd/achievements": "@dev",
-        "utd/moments": "dev-achievmentPackage"
+        "utd/achievements": "@dev"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

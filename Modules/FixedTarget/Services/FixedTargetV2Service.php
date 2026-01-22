@@ -283,7 +283,7 @@ class FixedTargetV2Service
 
                 $targetReel  = explode(',', $target->reel);
 
-                $hasMomentModule = class_exists(Moment::class, false);
+                $hasMomentModule = class_exists(Moment::class);
                 $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);

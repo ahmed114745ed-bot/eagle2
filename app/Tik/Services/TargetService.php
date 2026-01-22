@@ -20,7 +20,7 @@ class TargetService
 
     public function create($request)
     {
-        if (isset($request->moment) && class_exists(Moment::class, false)) {
+        if (isset($request->moment) && class_exists(Moment::class)) {
             $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
@@ -52,7 +52,7 @@ class TargetService
 
     public function update($id, $request)
     {
-        if (isset($request->moment) && class_exists(Moment::class, false)) {
+        if (isset($request->moment) && class_exists(Moment::class)) {
             $arrayMoment = array_values(json_decode($request->moment));
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);

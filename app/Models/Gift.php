@@ -27,7 +27,7 @@ class Gift extends Model
 
     public function moments()
     {
-        if (! class_exists(Moment::class,false)){
+        if (! class_exists(Moment::class)){
             return $this->belongsToMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->belongsToMany(Moment::class, 'moment_user_gifts')->withPivot('num', 'created_at', 'updated_at')->withTimestamps();

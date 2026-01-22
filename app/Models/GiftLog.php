@@ -44,7 +44,7 @@ class GiftLog extends Model
 
     public function moment(): BelongsTo
     {
-        if (! class_exists(Moment::class,false)){
+        if (! class_exists(Moment::class)){
             return $this->belongsTo(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         return $this->belongsTo(Moment::class, 'moent_id');

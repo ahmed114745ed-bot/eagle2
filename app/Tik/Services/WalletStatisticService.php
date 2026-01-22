@@ -33,7 +33,7 @@ class WalletStatisticService
                 break;
 
             case 3:
-                if (class_exists(MomentUserGift::class, false) && class_exists(MomentGiftResource::class, false)) {
+                if (class_exists(MomentUserGift::class) && class_exists(MomentGiftResource::class)) {
                     $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
                         ->whereHas('moment', function ($q) use ($userId) {
                             $q->where('user_id', $userId);
