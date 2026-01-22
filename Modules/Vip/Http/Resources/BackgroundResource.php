@@ -11,7 +11,7 @@ class BackgroundResource extends JsonResource
     {
 
         return [
-            "id" => $this?->id,
+            "vip" => $this?->level ?? 0,
             "background" => $this->background_img ?? '',
         ];
     }

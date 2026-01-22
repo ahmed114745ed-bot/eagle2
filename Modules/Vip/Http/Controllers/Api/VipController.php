@@ -41,14 +41,14 @@ class VipController extends Controller
         );
     }
 
-    public function background($ovipId)
+    public function background()
     {
-        $vips = $this->vipService->backgroundImage($ovipId);
+        $vips = $this->vipService->backgroundImage();
 
         return Common::apiResponse(
             true,
             'successfully fetched.',
-            new BackgroundResource($vips)
+            BackgroundResource::collection($vips)
         );
     }
 

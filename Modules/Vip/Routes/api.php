@@ -18,7 +18,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
     function () {
 
         Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-            Route::get('background/{vip_id}', [VipController::class, 'background']);
+            Route::get('background', [VipController::class, 'background']);
             Route::get('/list', [VipController::class, 'vipList']);
             Route::get('/user/list', [VipController::class, 'vipUserList']);
             Route::post('/buyVip', [VipController::class, 'buyVip']);

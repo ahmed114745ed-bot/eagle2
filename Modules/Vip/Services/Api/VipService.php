@@ -42,9 +42,9 @@ class VipService
         return $this->vipRepository->getByType($type);
     }
 
-    public function backgroundImage($ovipId)
+    public function backgroundImage()
     {
-        return $this->ovipRepository->findVipById($ovipId);
+        return $this->ovipRepository->getOvip();
     }
 
     public function vipList()
