@@ -1856,6 +1856,17 @@ export default {
         return;
       }
 
+      // Delete or Backspace to delete selected element
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        // Don't delete if user is typing in an input field
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+          return;
+        }
+        e.preventDefault();
+        this.deleteSelected();
+        return;
+      }
+
       // Escape to deselect
       if (e.key === 'Escape') {
         this.selectedWidgetId = null;
@@ -4668,6 +4679,13 @@ export default {
   border-radius: 4px;
   white-space: nowrap;
   z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.placed-widget:hover .widget-label,
+.placed-widget.selected .widget-label {
+  opacity: 1;
 }
 
 .widget-content {
@@ -4764,6 +4782,13 @@ export default {
   border-radius: 3px;
   white-space: nowrap;
   z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.placed-child:hover .child-label-small,
+.placed-child.selected .child-label-small {
+  opacity: 1;
 }
 
 .placed-asset {
