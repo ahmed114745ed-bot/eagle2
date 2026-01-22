@@ -2,22 +2,45 @@
 
 namespace Utd\Achievements\Http\Controllers;
 
+use App\Helpers\Common;
+use App\Http\Resources\AchievementValidImagesResource;
+use App\Models\AchievementValidImage;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Modules\Events\Entities\PkEvent;
+use Modules\Events\Entities\PkReward;
+use Modules\Events\Entities\Reward;
+use Modules\Events\Entities\RewardTarget;
+use Modules\Events\Entities\WeeklyStar;
+use Illuminate\Contracts\Support\Renderable;
 use Utd\Achievements\Entities\Achievement;
+use Modules\Events\Entities\ChargeTargetEvent;
+use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Achievements\Services\AchievementService;
 use Utd\Achievements\Transformers\AchievementResource;
 use Utd\Achievements\Transformers\AchievementDetailResource;
 use Utd\Achievements\Transformers\AchievementOneLevelsResource;
 
 class AchievementController extends Controller
 {
+
+    // public function __construct(private AchievementService $achievementService) { }
+
     /**
-     * Update user's selected achievements
+     * Display a listing of the resource.
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function achievementSelect(Request $request)
+    // public function index()
+    // {
+    //     $user = Auth::user();
+    //     $data = $this->achievementService->show($user);
+    //     return Common::apiResponse(1, 'successfully', $data);
+    // }
+
+    public function achivement_select(Request $request)
     {
         $user = $request->user();
 
@@ -31,16 +54,33 @@ class AchievementController extends Controller
             }
         });
 
-        return $this->apiResponse(1, 'Achievements updated successfully', []);
+        return Common::apiResponse(1, 'Achievements updated successfully', []);
+    }
+
+    public function store(Request $request)
+    {
+        //
     }
 
     /**
-     * Get all selected achievements for a user
+     * Show the specified resource.
+     * @param int $id
+     * @return Renderable
      */
-    public function getAllSelect($id = null)
+    public function show($id)
+    {
+        return view('achievement::show');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     * @param Request $request
+     * @param int $id
+     * @return Renderable
+     */
+    public function get_all_select($id = null)
     {
         $user = Auth::user();
-        
         if (isset($id)) {
             $achievements = Achievement::whereHas("userAchievments", function ($q) use ($id) {
                 $q->where("enable", 1)->where("picked", 1)->where("user_id", $id);
@@ -55,21 +95,21 @@ class AchievementController extends Controller
                 },
             ])->get();
 
-            return $this->apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
+
+            return Common::apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
         }
 
         $achievements = Achievement::whereHas("userAchievments", function ($q) use ($user) {
             $q->where("enable", 1)->where("picked", 1)->where("user_id", $user->id);
         })->get();
 
-        return $this->apiResponse(1, 'successfully', AchievementResource::collection($achievements));
+        return Common::apiResponse(1, 'successfully', AchievementResource::collection($achievements));
     }
 
-    /**
-     * Get all achievements
-     */
-    public function getAll($id = null)
+
+    public function get_all($id = null)
     {
+
         if (isset($id) && ($id != 4)) {
             $achievements = Achievement::where('id', $id)->with([
                 'levels' => function ($query) {
@@ -82,26 +122,114 @@ class AchievementController extends Controller
                 },
             ])->get();
 
-            return $this->apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
+            return Common::apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
         }
 
+        if (isset($id) && ($id == 4)) {
+            $weeklyStar = WeeklyStar::currentEvent()
+                ->select('*')
+                ->with(['rewards' => function ($query) {
+                    $query->where('type', 'achievement');
+                }])
+                ->distinct()
+                ->get();
+            $pkEvent = PkEvent::currentEvent()->with(['rewards' => function ($query) {
+                $query->where('type', 'achievement');
+            }])->first();
+
+            $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
+                $query->where('type', 'achievement');
+            }])->get();
+
+
+            $append = [
+                "achievement_id" => 1,
+                "gift_id" => null,
+                "created_at" => "2023-12-21T13:11:38.000000Z",
+                "updated_at" => "2023-12-21T13:11:38.000000Z",
+                "deleted_at" => null,
+                "enable" => 1,
+                "description" => null,
+                'id' => 0,
+                'type' => '',
+                'invalid_image' => '',
+                'target_type' => '',
+            ];
+            $pkArray = ($pkEvent?->rewards->map(fn($e) =>
+            /** @var PkReward $e*/
+            collect(
+                ['image' => $e->target, 'name' => 'event' .'_'. $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,]
+            )->merge($append))->toArray()) ?? [];
+            $chargeArray = $chargeEvent?->pluck('rewards')->flatten()->map(function ($e) use ($append) {
+                /** @var RewardTarget $e */
+                return collect(['image' => @$e->getAttribute('target'), 'name' => 'event' .'_'. $e->getAttribute('target'), 'target' => __('target-events')])->merge($append);
+            })->toArray() ?? [];
+            $weeklyArray = $weeklyStar?->pluck('rewards')->flatten()->map(fn($e) =>
+            /** @var Reward $e*/
+            collect(['image' => $e->target,'name' => 'event' . '_'. $e->target, 'target' => __('weekly Star') . ' top ' . $e->level])->merge($append))->toArray() ?? [];
+
+
+            $list = array_merge($weeklyArray, $pkArray, $chargeArray);
+
+            $data = [[
+                'levels' => $list,
+                "id" => 1,
+                "type" => "recharge_target",
+                "valid_image" => "/test",
+                "invalid_image" => "/test2",
+                "target" => null,
+                "target_type" => null,
+            ]];
+
+                /*['weekly_star' => $weeklyStar,
+                  'pk_event' => $pkEvent,
+                  'charge_event' => $chargeEvent,
+
+                ]*/;
+            return Common::apiResponse(1, 'successfully', $data);
+        }
         $user = Auth::user();
         $achievements = Achievement::whereHas("userAchievementLevel", function ($q) use ($user) {
             $q->where("is_enable", 1)->where("user_id", $user->id);
         })->get();
-
-        return $this->apiResponse(1, 'successfully', AchievementResource::collection($achievements));
+        return Common::apiResponse(1, 'successfully', AchievementResource::collection($achievements));
     }
 
-    /**
-     * Get achievement details
-     */
-    public function getDetails($id = null)
+    // public function get_details($id = null)
+    // {
+    //     $user=Auth::user();
+    //     if(isset($id)){
+    //         $achievements = Achievement::whereHas("userAchievments",function($q) use ($id){
+    //             $q->where("user_id",$id);
+    //         })-> with([
+    //             'levels' => function ($query) {
+    //                 $query->withCount([
+    //                     'achievementUsers as enable' => function ($query) {
+    //                         $query->where('user_id', auth()->id())
+    //                               ->where('is_enable', true);
+    //                     }
+    //                 ]);
+    //             },
+    //         ])->get();
+
+
+    //         return Common::apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
+    //     }
+
+    //     $achievements = Achievement::whereHas("userAchievments",function($q) use ($user){
+    //         $q->where("user_id",$user->id);
+    //     })-> get();
+    //     return Common::apiResponse(1, 'successfully', AchievementDetailResource::collection($achievements));
+
+    // }
+
+    public function get_details($id = null)
     {
         $user = Auth::user();
         $userId = $id ?? $user->id;
 
         $achievementsQuery = UserAchievementLevel::with("achievementLevel");
+
         $achievementsQuery->where("user_id", $userId);
 
         if (request('type')) {
@@ -118,20 +246,24 @@ class AchievementController extends Controller
                 }
             });
         }
-        
         $achievements = $achievementsQuery->get();
-        return $this->apiResponse(1, 'successfully', AchievementDetailResource::collection($achievements));
+        return Common::apiResponse(1, 'successfully', AchievementDetailResource::collection($achievements));
     }
 
+
     /**
-     * API response helper
+     * Remove the specified resource from storage.
+     * @param int $id
+     * @return Renderable
      */
-    protected function apiResponse($status, $message, $data = null)
+    public function destroy($id)
     {
-        return response()->json([
-            'status' => $status,
-            'message' => $message,
-            'data' => $data,
-        ]);
+        //
+    }
+
+    public function achievement_valid_images()
+    {
+        $data = AchievementValidImage::all();
+        return Common::apiResponse(1, 'successfully', AchievementValidImagesResource::collection($data));
     }
 }

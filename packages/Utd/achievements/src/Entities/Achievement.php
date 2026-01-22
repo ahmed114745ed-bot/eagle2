@@ -2,70 +2,43 @@
 
 namespace Utd\Achievements\Entities;
 
+use App\Models\User;
+use App\Traits\TimestampsWithTimezone;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Utd\Achievements\Enums\AchievementType;
+use Utd\Achievements\Enums\TargetType;
 
-/**
- * Achievement Entity - Completely Standalone
- *
- * No dependencies on base project!
- */
 class Achievement extends Model
 {
+    use HasFactory, TimestampsWithTimezone;
+
+    protected $fillable = [];
+
     protected $guarded = [];
 
     protected $casts = [
-        'type' => 'string',
-        'target_type' => 'string',
+        'type' => AchievementType::class,
+        'target_type' => TargetType::class,
     ];
 
-    /**
-     * Get table name from config
-     */
-    public function getTable(): string
+    public function levels()
     {
-        return config('achievements.tables.achievements', 'achievements');
+        return $this->hasMany(AchievementLevel::class, 'achievement_id', 'id');
     }
 
-    /**
-     * Achievement levels
-     */
-    public function levels(): HasMany
+    public function userAchievement()
     {
-        return $this->hasMany(AchievementLevel::class, 'achievement_id');
+        return $this->hasManyThrough(User::class, UserAchievement::class, 'user_id', 'id');
     }
 
-    /**
-     * User achievements
-     */
-    public function userAchievements(): HasMany
+    public function userAchievments()
     {
         return $this->hasMany(UserAchievement::class);
     }
 
-    /**
-     * User achievement levels
-     */
-    public function userAchievementLevels(): HasMany
+    public function userAchievementLevel()
     {
         return $this->hasMany(UserAchievementLevel::class);
-    }
-
-    /**
-     * Get users with this achievement - Dynamic model binding
-     */
-    public function users()
-    {
-        $userModel = config('achievements.models.user');
-        $foreignKey = config('achievements.foreign_keys.user', 'user_id');
-
-        return $this->hasManyThrough(
-            $userModel,
-            UserAchievement::class,
-            'achievement_id',
-            'id',
-            'id',
-            $foreignKey
-        );
     }
 }

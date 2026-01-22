@@ -2,70 +2,54 @@
 
 /*
 |--------------------------------------------------------------------------
-| Achievement Web Routes (Admin Panel)
+| Web Routes
 |--------------------------------------------------------------------------
 |
-| These routes are for the Laravel Admin panel integration.
-| They will be loaded automatically when the package is installed.
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
 |
 */
 
+use Utd\Achievements\Http\Controllers\web\AchievementDedicateController;
+use Utd\Achievements\Http\Controllers\web\AchievementsController;
+use Utd\Achievements\Http\Controllers\web\GiftAchievemntController;
+use Utd\Achievements\Http\Controllers\web\AchievementsLevelsController;
+use Utd\Achievements\Http\Controllers\web\UserAchievementLevelController;
+use Utd\Achievements\Http\Controllers\web\AchievementLevelsModuleController;
+use Utd\Achievements\Http\Controllers\web\UserGiftAchController;
+use Utd\Achievements\Http\Controllers\web\GiftAchiementController;
 use Illuminate\Support\Facades\Route;
-use Utd\Achievements\Http\Controllers\Web\AchievementsController;
-use Utd\Achievements\Http\Controllers\Web\AchievementsLevelsController;
-use Utd\Achievements\Http\Controllers\Web\AchievementDedicateController;
-use Utd\Achievements\Http\Controllers\Web\UserAchievementLevelController;
-use Utd\Achievements\Http\Controllers\Web\AchievementLevelsModuleController;
-use Utd\Achievements\Http\Controllers\Web\GiftAchievementController;
-use Utd\Achievements\Http\Controllers\Web\UserGiftAchievementController;
-use Utd\Achievements\Http\Controllers\Web\GiftTypeController;
 
 Route::group(
     [
         'prefix'     => config('admin.route.prefix'),
-        'middleware' => array_merge(
-            config('admin.route.middleware', ['web', 'admin']),
-            ['appFeatureEnable:achievement']
-        ),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            //            'adminGeneralBan',
+            'multiLanguage',
+            'appFeatureEnable:achievement',
+        ],
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        // Main Achievements Resource
         Route::resource('achievements', AchievementsController::class);
-
-        // Store User Achievement
-        Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])
-            ->name('store-user-achievement');
-
-        // Get Achievement Levels (AJAX)
-        Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class, 'getAchievementLevels'])
-            ->name('get-achievement-levels');
-
-        // View Page Redirect
-        Route::get('/get-view-page', [AchievementLevelsModuleController::class, 'viewPage'])
-            ->name('get-view-page');
-
-        // User Achievement Levels Resource
+        Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
+        Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class, 'getAchievementLevels'])->name('get-achievement-levels');
+        Route::get('/get-view-page', [AchievementLevelsModuleController::class, 'viewPage'])->name('get-view-page');
         Route::resource('user-achievement-levels', UserAchievementLevelController::class);
-
-        // Achievement Dedicate (Gift a Badge)
         Route::resource('achievement-dedicate', AchievementDedicateController::class);
+        // Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class,'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        //  Route::get('achievement-levels/create/{id}', 'AchievementsLevelsController@create')->where('id', '[0-9]+')->name('achievement-levels.create');
+        Route::resource('gift-achievements', UserGiftAchController::class);
+        Route::resource('gift-achievment', GiftAchiementController::class);
+        Route::post('postAddGiftAchievement', [GiftAchievemntController::class, 'postAddGiftAchievemnt'])->name('postAddGiftAchievement');
+        Route::post('postAddGiftAchievementLevel', [GiftAchievemntController::class, 'postAddGiftAchievementLevel'])->name('postAddGiftAchievementLevel');
+        Route::post('posteditGiftAchievementLevel', [GiftAchievemntController::class, 'posteditGiftAchievementLevel'])->name('posteditGiftAchievementLevel');
+        // Route::resource('achievement-levels', AchievementsLevelsController::class,['names'=>['create'=>'achievement-levels.create2']]);
 
-        // Gift Achievements
-        Route::resource('gift-achievements', UserGiftAchievementController::class);
-
-        // Gift Achievement Type (Gift type = 7)
-        Route::resource('gift-achievment', GiftTypeController::class);
-
-        // Gift Achievement Actions
-        Route::post('postAddGiftAchievement', [GiftAchievementController::class, 'postAddGiftAchievement'])
-            ->name('postAddGiftAchievement');
-        Route::post('postAddGiftAchievementLevel', [GiftAchievementController::class, 'postAddGiftAchievementLevel'])
-            ->name('postAddGiftAchievementLevel');
-        Route::post('posteditGiftAchievementLevel', [GiftAchievementController::class, 'posteditGiftAchievementLevel'])
-            ->name('posteditGiftAchievementLevel');
-
-        // Achievement Levels (nested under achievement)
         Route::prefix('achievements-levels/{achievement_id}')->group(function () {
             Route::get('/', [AchievementsLevelsController::class, 'index']);
             Route::get('/create', [AchievementsLevelsController::class, 'create']);

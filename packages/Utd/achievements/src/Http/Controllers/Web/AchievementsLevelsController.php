@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Achievements\Http\Controllers\Web;
+namespace Utd\Achievements\Http\Controllers\web;
 
 use App\Helpers\Common;
 use App\Models\AchievementValidImage;
@@ -17,6 +17,12 @@ use Encore\Admin\Facades\Admin;
 class AchievementsLevelsController extends MainController
 {
     public $permission_name = 'achievement_level';
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
 
     public function create(Content $content)
     {
@@ -49,6 +55,7 @@ class AchievementsLevelsController extends MainController
             ->body($this->grid()));
     }
 
+
     protected function grid()
     {
         $grid = new Grid(new AchievementLevel());
@@ -64,23 +71,24 @@ class AchievementsLevelsController extends MainController
         $grid->column('valid_image', __('Valid image'))->display(function ($path) {
             $url = getImagePath($path);
             $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
-            return '<div style="direction:ltr;">' . $mediaHtml . '</div>';
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
-        
         $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
+            /** @var Ware $this */
             $url = getImagePath($path);
             $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
-            return '<div style="direction:ltr;">' . $mediaHtml . '</div>';
+
+            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
         });
-        
         $grid->column('ar_description', __('ar_description'));
         $grid->column('en_description', __('en_description'));
 
         $grid->disableExport();
         Admin::script("
-        if (window.innerWidth >= 1024) {
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
-        }
+            }
         ");
 
         return $grid;
@@ -101,6 +109,7 @@ class AchievementsLevelsController extends MainController
         $show->field('target', __('Target'));
         $show->field('target_type', __('Target type'));
         $show->field('valid_image', __('Valid image'));
+
         $show->field('invalid_image', __('Invalid image'));
         $show->field('created_at', __('Created at'));
         $show->field('updated_at', __('Updated at'));
@@ -113,6 +122,8 @@ class AchievementsLevelsController extends MainController
      * Make a form builder.
      *
      * @return Form
+     *
+     *
      */
     protected function form()
     {
@@ -124,18 +135,14 @@ class AchievementsLevelsController extends MainController
         $form->select('target_type', __('Target type'))->options(function ($value) {
             return TargetType::getTranslatedOptions();
         })->rules('required');
-        
         $form->file('valid_image', trans('Valid image'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->rules('required');
-        
         $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->rules('required');
-        
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
-        
         $form->saving(function (Form $form) {
             if (request()->hasFile('valid_image')) {
                 $file = request()->file('valid_image');
@@ -143,6 +150,11 @@ class AchievementsLevelsController extends MainController
                 $form->model()->valid_image = $validImagePath;
             }
 
+            // if ($form->model()->valid_image) {
+            //     AchievementValidImage::create([
+            //         'image' => $form->model()->valid_image, //
+            //     ]);
+            // }
             if ($form->model()->valid_image) {
                 $existingImage = AchievementValidImage::where('image', $form->model()->valid_image)->first();
 
@@ -153,7 +165,6 @@ class AchievementsLevelsController extends MainController
                 }
             }
         });
-        
         return $form;
     }
 }

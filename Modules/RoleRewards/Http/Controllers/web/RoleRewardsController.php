@@ -4,6 +4,7 @@ namespace Modules\RoleRewards\Http\Controllers\web;
 
 use App\Models\Role;
 use App\Selectables\OVips;
+use Modules\Achievement\Entities\Achievement;
 use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
 use Modules\RoleRewards\Entities\RoleReward;
@@ -22,7 +23,6 @@ use App\Services\AppFeatureService;
 use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Entities\RewardTarget;
 use Encore\Admin\Controllers\HasResourceActions;
-use Utd\Achievements\Entities\Achievement;
 
 class RoleRewardsController extends MainController
 {
@@ -251,12 +251,9 @@ class RoleRewardsController extends MainController
                     $form->model()->rewardable_type = \Modules\Badge\Entities\Badge::class;
                     break;
                 case 'achievement':
-                    if (! class_exists(Achievement::class)) {
-                        return false;
-                    }
                     $form->rewardable_id = 0;
-                    $form->rewardable_type = Achievement::class;
-                    $form->model()->rewardable_type = Achievement::class;
+                    $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
+                    $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
                     break;
             }
         });

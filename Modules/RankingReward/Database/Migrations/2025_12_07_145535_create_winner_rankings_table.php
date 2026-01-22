@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('winner_rankings', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('winner_id');
-            $table->unsignedInteger('reward_id');
-            $table->string('type');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('winner_rankings')) {
+            Schema::create('winner_rankings', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedInteger('winner_id');
+                $table->unsignedInteger('reward_id');
+                $table->string('type');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

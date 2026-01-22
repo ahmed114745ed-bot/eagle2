@@ -3,276 +3,163 @@
 namespace Utd\Achievements\Services;
 
 use App\Contracts\AchievementContract;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\Models\User;
+use App\Helpers\Common;
+use App\Tik\Repositories\GiftRepository;
+use Utd\Achievements\Enums\TargetType;
 use Utd\Achievements\Entities\Achievement;
-use Utd\Achievements\Entities\AchievementLevel;
-use Utd\Achievements\Entities\UserAchievement;
-use Utd\Achievements\Entities\UserAchievementLevel;
-use Utd\Achievements\Enums\AchievementType;
-use Utd\Achievements\Support\AchievementHelper;
+use Utd\Achievements\Repositories\AchievementRepository;
+use Utd\Achievements\Repositories\GiftAchievementRepository;
+use Utd\Achievements\Repositories\AchievementLevelRepository;
+use Utd\Achievements\Repositories\UserAchievementLevelRepository;
+use Request;
 
-/**
- * Main Achievement Service Implementation
- *
- * This implements the BASE PROJECT's Contract!
- * The package provides the real implementation.
- */
 class AchievementService implements AchievementContract
 {
-    // =============================================
-    // User-facing methods (API)
-    // =============================================
+    public function __construct(
+        private readonly AchievementRepository $achievementRepository,
+        private readonly AchievementLevelRepository $achievementLevelRepository,
+        private readonly GiftAchievementRepository $giftAchievementRepository,
+        private readonly GiftRepository $giftRepository,
+        private readonly UserAchievementLevelRepository $userAchievementLevelRepository,
 
-    public function getUserAchievements(Model $user): Collection
+    ) {}
+
+    public function show(User $user, int $page = 1)
     {
-        return UserAchievementLevel::query()
-            ->where('user_id', $user->id)
-            ->where('is_enable', true)
-            ->where('picked', true)
-            ->with('achievementLevel.achievement')
-            ->get();
-    }
-
-    public function getUserMedals(Model $user): Collection
-    {
-        return UserAchievementLevel::query()
-            ->where('user_id', $user->id)
-            ->where('is_enable', true)
-            ->get();
-    }
-
-    public function trackCharging(Model $user, int $totalCoins): void
-    {
-        $achievement = Achievement::query()
-            ->where('type', AchievementType::RECHARGE_TARGET)
-            ->first();
-
-        if (!$achievement) {
-            return;
-        }
-
-        $this->updateOrCreateUserAchievement($user, $achievement, $totalCoins);
-    }
-
-    public function trackRoomTarget(Model $user, int $totalCoins): void
-    {
-        $achievement = Achievement::query()
-            ->where('type', AchievementType::ROOM_TARGET)
-            ->first();
-
-        if (!$achievement) {
-            return;
-        }
-
-        $this->updateOrCreateUserAchievement($user, $achievement, $totalCoins);
-    }
-
-    public function trackGiftTarget(Model $gift, int $total): void
-    {
-        $achievement = Achievement::query()
-            ->where('type', AchievementType::GIFT_TARGET)
-            ->first();
-
-        if (!$achievement || !method_exists($gift, 'achievement')) {
-            return;
-        }
-
-        $giftAchievement = $gift->achievement;
-        if (!$giftAchievement) {
-            return;
-        }
-
-        $user = $giftAchievement->user;
-        $this->updateOrCreateUserAchievement($user, $achievement, $total, $giftAchievement->id);
-    }
-
-    // =============================================
-    // Admin methods
-    // =============================================
-
-    public function all(): Collection
-    {
-        return Achievement::all();
-    }
-
-    public function paginate(int $perPage = 15): LengthAwarePaginator
-    {
+        $userId = $user->id;
         return Achievement::query()
-            ->with('levels')
-            ->orderByDesc('id')
-            ->paginate($perPage);
+            /*->withExists(['userAchievement' => function($query) use($userId){
+                              $query->where('user_id', $userId)->where('is_achieve', true);
+                          }])*/
+            ->get();
     }
 
-    public function create(array $data): ?Model
+    public function all()
     {
-        return Achievement::create($data);
+        return $this->achievementRepository->all();
     }
 
-    public function update(int $id, array $data): bool
+    public function allAchievementLevel($achievementId, $perPage, $Page)
     {
-        $achievement = Achievement::find($id);
-        if (!$achievement) {
-            return false;
-        }
-        return $achievement->update($data);
+        return $this->achievementLevelRepository->all($achievementId, $perPage, $Page);
     }
 
-    public function delete(int $id): bool
+    public function createAchievementLevel($request)
     {
-        $achievement = Achievement::find($id);
-        if (!$achievement) {
-            return false;
+        if ($request->hasFile('valid_image')) {
+            $validImage = Common::upload('images', $request->file('valid_image'));
         }
-        return $achievement->delete();
+        if ($request->hasFile('invalid_image')) {
+            $invalidImage = Common::upload('images', $request->file('invalid_image'));
+        }
+        $data = [
+            'invalid_image' => $invalidImage,
+            'valid_image' => $validImage,
+            'achievement_id' => $request->achievement_id,
+            'target' => $request->target,
+            'target_type' => $request->target_type,
+            'ar_description' => $request->ar_description,
+            'en_description' => $request->en_description
+        ];
+        $this->achievementLevelRepository->create($data);
+        return true;
     }
 
-    public function find(int $id): ?Model
+    public function updateAchievementLevel($id, $request)
     {
-        return Achievement::with('levels')->find($id);
+
+        $data = [
+            'achievement_id' => $request->achievement_id,
+            'target' => $request->target,
+            'target_type' => $request->target_type,
+            'ar_description' => $request->ar_description,
+            'en_description' => $request->en_description
+        ];
+        if ($request->hasFile('valid_image')) {
+            $data['valid_image'] = Common::upload('images', $request->file('valid_image'));
+        }
+        if ($request->hasFile('invalid_image')) {
+            $data['invalid_image'] = Common::upload('images', $request->file('invalid_image'));
+        }
+        $this->achievementLevelRepository->update($data, $id);
+        return true;
     }
 
-    // =============================================
-    // Achievement Levels
-    // =============================================
-
-    public function getAllLevels(int $achievementId, int $perPage = 15): LengthAwarePaginator
+    public function deleteAchievementLevel($id)
     {
-        return AchievementLevel::query()
-            ->where('achievement_id', $achievementId)
-            ->orderBy('target')
-            ->paginate($perPage);
+        $data = $this->achievementLevelRepository->findOrFail($id);
+        $data->delete();
+        return true;
     }
 
-    public function createLevel(array $data): ?Model
+    public function showAchievementLevel($id)
     {
-        // Handle image uploads
-        if (isset($data['valid_image']) && $data['valid_image'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['valid_image'] = AchievementHelper::upload('achievements', $data['valid_image']);
-        }
-        if (isset($data['invalid_image']) && $data['invalid_image'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['invalid_image'] = AchievementHelper::upload('achievements', $data['invalid_image']);
-        }
-
-        return AchievementLevel::create($data);
+        return $this->achievementLevelRepository->findOrFail($id, ['achievements']);
     }
 
-    public function updateLevel(int $id, array $data): bool
+    public function achievementTargetType()
     {
-        $level = AchievementLevel::find($id);
-        if (!$level) {
-            return false;
-        }
-
-        // Handle image uploads
-        if (isset($data['valid_image']) && $data['valid_image'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['valid_image'] = AchievementHelper::upload('achievements', $data['valid_image']);
-        }
-        if (isset($data['invalid_image']) && $data['invalid_image'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['invalid_image'] = AchievementHelper::upload('achievements', $data['invalid_image']);
-        }
-
-        return $level->update($data);
+        return TargetType::getTranslatedOptions();
     }
 
-    public function deleteLevel(int $id): bool
+    public function allAchievementGift($achievementId, $perPage, $Page)
     {
-        $level = AchievementLevel::find($id);
-        if (!$level) {
-            return false;
-        }
-        return $level->delete();
+        return $this->giftAchievementRepository->getByAchievementId($achievementId, $perPage, $Page);
     }
 
-    // =============================================
-    // User Achievement Levels
-    // =============================================
-
-    public function getUserAchievementLevels(int $perPage = 15, ?string $uuid = null): LengthAwarePaginator
+    public function achievementGift($request)
     {
-        $query = UserAchievementLevel::query()
-            ->with(['user', 'achievementLevel', 'achievement']);
-
-        if ($uuid) {
-            $userModel = config('achievements.models.user');
-            $user = $userModel::where('uuid', $uuid)->first();
-            if ($user) {
-                $query->where('user_id', $user->id);
-            }
-        }
-
-        return $query->orderByDesc('id')->paginate($perPage);
+        $this->giftAchievementRepository->store($request);
+        return true;
     }
 
-    public function toggleUserAchievementLevel(int $id, bool $isEnabled): bool
+    public function giftAchievement()
     {
-        $userLevel = UserAchievementLevel::find($id);
-        if (!$userLevel) {
-            return false;
-        }
-        return $userLevel->update(['is_enable' => $isEnabled]);
+        return $this->giftRepository->allAchievementGift();
     }
 
-    public function deleteUserAchievementLevel(int $id): bool
+    public function userAchievementLevel($perPage, $Page, $uuid)
     {
-        $userLevel = UserAchievementLevel::find($id);
-        if (!$userLevel) {
-            return false;
-        }
-        return $userLevel->delete();
+        return $this->userAchievementLevelRepository->all($perPage, $Page, $uuid);
     }
 
-    // =============================================
-    // Status
-    // =============================================
-
-    public function isEnabled(): bool
+    public function isEnable($id, $isEnable)
     {
-        return true; // Package is installed and working
+        $this->userAchievementLevelRepository->update(['is_enable' => $isEnable], $id);
+        return true;
     }
 
-    // =============================================
-    // Helper methods
-    // =============================================
+    public function deleteUserAchievementLevel($id)
+    {
+        $data = $this->userAchievementLevelRepository->findOrFail($id);
+        $data->delete();
+        return true;
+    }
 
-    public function updateOrCreateUserAchievement(
-        Model $user,
-        Achievement $achievement,
-        int $amount,
-        ?int $giftAchievementId = null
-    ): void {
-        $userAchievement = UserAchievement::query()
-            ->where('user_id', $user->id)
-            ->where('achievement_id', $achievement->id)
-            ->where('gift_achievement_id', $giftAchievementId)
-            ->where('month', now()->month)
-            ->where('year', now()->year)
-            ->first();
+    public function giftAchievementIndex($perPage, $Page)
+    {
+        return $this->giftAchievementRepository->all($perPage, $Page);
+    }
 
-        if (!$userAchievement) {
-            $totalTarget = UserAchievement::query()
-                ->where('gift_achievement_id', $giftAchievementId)
-                ->where('user_id', $user->id)
-                ->where('achievement_id', $achievement->id)
-                ->max('total_target') ?? 0;
+    public function getAchievementLevelsTarget($achievementId)
+    {
+        return $this->achievementLevelRepository->getTarget($achievementId);
+    }
 
-            $userAchievement = UserAchievement::create([
-                'user_id' => $user->id,
-                'achievement_id' => $achievement->id,
-                'gift_achievement_id' => $giftAchievementId,
-                'target' => $amount,
-                'total_target' => $totalTarget + $amount,
-                'month' => now()->month,
-                'year' => now()->year,
-            ]);
-        } else {
-            $userAchievement->target += $amount;
-            $userAchievement->total_target += $amount;
-            $userAchievement->save();
+    public function createUserAchievementLevel($request)
+    {
+        if ($request->hasFile('custom_image')) {
+            $customImage = Common::upload('images', $request->file('custom_image'));
         }
-
-        // Assign achievement level to user
-        app(AchievementLevelService::class)->assignAchievementToUser($userAchievement);
+        $data = [
+            'user_id' => $request->user_id,
+            'achievement_id' => $request->achievement_id,
+            'achievement_level_id' => $request->achievement_level_id,
+            'custom_image' => $customImage ?? null,
+            'gift_achievement_id' => $request->gift_achievement_id,
+        ];
+        $this->userAchievementLevelRepository->create($data);
+        return true;
     }
 }

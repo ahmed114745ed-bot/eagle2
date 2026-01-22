@@ -7,36 +7,30 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-
+use Utd\Achievements\Services\UserAchievementService;
+use App\Models\Gift;
+use App\Models\User;
 class CalculateAchievement implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     protected $gift;
     protected $number;
     protected $room_owner;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct($gift, $number, $room_owner)
+    public function __construct(Gift $gift,$number,User $room_owner)
     {
         $this->gift = $gift;
         $this->number = $number;
         $this->room_owner = $room_owner;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle()
     {
-        $achievementService = app(\App\Contracts\AchievementContract::class);
-        
-        if ($this->gift?->type == 5 && $this->gift?->achievement) {
-            $achievementService->giftTarget($this->gift, $this->number);
+        $userAchievementService = new UserAchievementService();
+        if($this->gift?->type == 5 && $this->gift?->achievement){
+            $userAchievementService->giftTarget($this->gift, $this->number);
         }
 
-        $achievementService->roomTarget($this->room_owner, ($this->number * $this->gift?->price));
+        $userAchievementService->roomTarget($this->room_owner, ($this->number * $this->gift?->price));
     }
 }

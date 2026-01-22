@@ -1,28 +1,33 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Utd\Achievements\Http\Controllers\AchievementController;
-use Utd\Achievements\Http\Controllers\AchievementLevelController;
-
 /*
 |--------------------------------------------------------------------------
-| Achievement Package API Routes
+| api Routes
 |--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
 */
 
-$middleware = config('achievements.routes.middleware', ['auth:sanctum']);
-$prefix = config('achievements.routes.prefix', 'api');
+use Illuminate\Support\Facades\Route;
+use Utd\Achievements\Services\AchievementLevelsService;
 
-Route::middleware($middleware)->prefix($prefix)->group(function () {
-
+Route::middleware(['auth:sanctum','appFeatureEnable:achievement' ,'update.last.seen'])->group(function () {
+    Route::get('/test/achievement', function () {
+        (new AchievementLevelsService())->setUserAchievementLevel(true);
+        return response()->json('Success');
+    });
     Route::prefix('achievement')->group(function () {
-        Route::get('/{id}', [AchievementController::class, 'getAll']);
-        Route::get('/', [AchievementController::class, 'getAll']);
-        Route::get('/user/{id}', [AchievementLevelController::class, 'show']);
+        Route::get('/{id}', 'AchievementController@get_all');
+        Route::get('/', 'AchievementController@get_all');
+        Route::get('/user/{id}', 'AchievementLevelController@show');
     });
 
-    Route::post('/user-achievement-select', [AchievementController::class, 'achievementSelect']);
-    Route::get('/achievement-all', [AchievementController::class, 'getAll']);
-    Route::get('/achievements-details/{id?}', [AchievementController::class, 'getDetails']);
-    Route::get('/achievements-picked/{id?}', [AchievementController::class, 'getAllSelect']);
+    Route::post('/user-achievement-select', 'AchievementController@achivement_select');
+    Route::get('/achievement-all', 'AchievementController@get_all');
+    Route::get('/achievements-details/{id?}', 'AchievementController@get_details');
+    Route::get('/achievements-picked/{id?}', 'AchievementController@get_all_select');
+
 });

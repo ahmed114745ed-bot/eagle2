@@ -2,35 +2,35 @@
 
 namespace Utd\Achievements\Entities;
 
+use App\Traits\TimestampsWithTimezone;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Utd\Achievements\Enums\TargetType;
 
-/**
- * AchievementLevel Entity
- */
 class AchievementLevel extends Model
 {
+    use HasFactory, TimestampsWithTimezone;
+
     protected $guarded = [];
 
-    public function getTable(): string
+    protected $fillable = [];
+
+    protected $casts = [
+        'target_type' => TargetType::class,
+    ];
+
+    public function achievement()
     {
-        return config('achievements.tables.achievement_levels', 'achievement_levels');
+        return $this->hasOne(Achievement::class, 'id', 'achievement_id');
     }
 
-    /**
-     * Parent achievement
-     */
-    public function achievement(): BelongsTo
+    public function achievements()
     {
         return $this->belongsTo(Achievement::class, 'achievement_id');
     }
 
-    /**
-     * Users at this level
-     */
-    public function userAchievementLevels(): HasMany
+    public function achievementUsers()
     {
-        return $this->hasMany(UserAchievementLevel::class, 'achievement_level_id');
+        return $this->hasMany(UserAchievementLevel::class, 'achievement_level_id', 'id');
     }
 }

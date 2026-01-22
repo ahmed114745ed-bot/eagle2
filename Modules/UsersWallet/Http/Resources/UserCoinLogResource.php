@@ -62,7 +62,7 @@ class UserCoinLogResource extends JsonResource
                         'coins'    => abs($this->coin),
                     ]),
                 ];
-                
+
             case 'gift_room_audio':
             case 'gift_room_live':
                 return [
@@ -93,7 +93,7 @@ class UserCoinLogResource extends JsonResource
                     __('coin_game.win_description', ['amount' => $amount]),
                 ];
 
-                case 'packs':
+            case 'packs':
                 return [
                     __('packs.purchase_title'),
                     __('packs.purchase_description', [
@@ -168,6 +168,13 @@ class UserCoinLogResource extends JsonResource
                             __('subtract_title'),
                             __('subtract_description', ['amount' => abs($this->amount)]),
                         ];
+
+                    case 'withdrawal_pending':
+                        return [
+                            __('withdrawal pending'),
+                            __('withdrawal_pending', ['amount' => abs($this->amount)]),
+                        ];
+                        break;
                     default:
                         return [
                             __('general_title'),
@@ -175,15 +182,12 @@ class UserCoinLogResource extends JsonResource
                         ];
                 }
 
-    
+
             default:
                 return [
                     __('wallet.general_title'),
                     __('wallet.general_description'),
                 ];
-
-
-
         }
     }
 }

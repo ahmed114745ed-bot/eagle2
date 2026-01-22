@@ -3,26 +3,27 @@
 namespace App\Services\Null;
 
 use App\Contracts\UserAchievementContract;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Gift;
+use App\Models\User;
 
 class NullUserAchievementService implements UserAchievementContract
 {
-    public function insertCharging(Model $user, $totalCoins): void
+    public function insertCharging(User $user, $totalCoins): void
     {
-        // No-op
+        // Do nothing when achievement feature is disabled
     }
 
-    public function roomTarget(Model $user, $totalCoins): void
+    public function roomTarget(User $user, $totalCoins)
     {
-        // No-op
+        // Do nothing when achievement feature is disabled
     }
 
-    public function giftTarget(Model $gift, $total): void
+    public function giftTarget(Gift $gift, $total)
     {
-        // No-op
+        // Do nothing when achievement feature is disabled
     }
 
-    public function getUserAchievement(Model $user)
+    public function getUserAchievement(User $user)
     {
         return collect();
     }

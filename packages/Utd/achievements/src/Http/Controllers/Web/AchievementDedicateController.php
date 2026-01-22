@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Achievements\Http\Controllers\Web;
+namespace Utd\Achievements\Http\Controllers\web;
 
 use Carbon\Carbon;
 use Encore\Admin\Grid;
@@ -12,6 +12,11 @@ use Utd\Achievements\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
 {
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
     public $permission_name = 'gift-a-medal';
 
     public function index(Content $content)
@@ -59,7 +64,6 @@ class AchievementDedicateController extends MainController
                 }, __('To Date'), 'to_date')->date();
             });
         });
-        
         $grid->model()->with([
             'user.profile',
             'user',
@@ -92,7 +96,9 @@ class AchievementDedicateController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('user'))
             ->display(function ($recever) {
-                $name = $this->user?->name ?? '';
+
+                $name =  $this->user?->name ?? '';
+
                 $uid = @$this->user?->uuid ?? 0;
                 if (request()->filled('_export_')) {
                     return "{$name} (UUID: {$uid})";
@@ -101,6 +107,7 @@ class AchievementDedicateController extends MainController
                 $defaultImage = asset("images/businessman-icon.jpg");
                 $url = getImagePath($path) ?? $defaultImage;
 
+                // Check if the image exists
                 if (!isImageExists($url)) {
                     $url = $defaultImage;
                 }
@@ -117,7 +124,9 @@ class AchievementDedicateController extends MainController
          ";
             });
 
+
         $grid->column('admin.name', __('creator'))->display(function () {
+
             $name = $this->admin->name ?? '';
             $id = $this->admin->id ?? 0;
             if (request()->filled('_export_')) {
@@ -127,13 +136,15 @@ class AchievementDedicateController extends MainController
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = $path ?? $defaultImage;
 
+            // Check if the image exists
             if (!isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
 
-            $showUrl = '#';
+            // Validate admin existence before accessing id
+            $showUrl = '#'; // Default to prevent broken links
             if ($this->admin && $this->admin->id) {
                 $showUrl = url("admin/auth/users/{$this->admin->id}");
             }
@@ -147,7 +158,6 @@ class AchievementDedicateController extends MainController
              </div>
              ";
         });
-        
         if (!request()->filled('_export_')) {
             $grid->column('file', __('image'))->display(function ($img) {
                 $defaultImage = asset("images/background_room.jpg");
@@ -178,6 +188,7 @@ class AchievementDedicateController extends MainController
                             document.getElementById('imageModal').style.display = 'none';
                         }
 
+                        // Close modal when clicking outside the image
                         document.getElementById('imageModal').addEventListener('click', function(event) {
                             if (event.target === this) {
                                 closeModal();
@@ -186,7 +197,6 @@ class AchievementDedicateController extends MainController
                     </script>
                 ";
             });
-            
             $states = [
                 'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
                 'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
@@ -196,17 +206,20 @@ class AchievementDedicateController extends MainController
             }
         } else {
             $grid->column('is_enable', __('is enabled'))->display(function ($isEnable) {
-                return $isEnable == 1 ? __('on') : __('off');
+                return   $isEnable == 1 ? __('on') : __('off');
             });
         }
 
+
         $grid->column('created_at', trans('admin.created_at'));
+
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();
         });
         $this->extendGrid($grid);
+
 
         return $grid;
     }

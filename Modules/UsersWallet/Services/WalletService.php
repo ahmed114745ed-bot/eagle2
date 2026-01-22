@@ -2,18 +2,22 @@
 
 namespace Modules\UsersWallet\Services;
 
-use App\Http\Resources\AudioGiftsListResource;
-use App\Tik\Repositories\GiftLogRepository;
-use Exception;
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Exception;
+use Modules\UsersWallet\Entities\UserWallet;
+use Modules\UsersWallet\Entities\WalletLog;
 use Modules\UsersWallet\Entities\WalletTemplate;
 use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Modules\UsersWallet\Repositories\WalletRepositoryInterface;
-use Utd\Moments\Entities\MomentUserGift;
-use Utd\Moments\Transformers\MomentGiftResource;
-
+use Illuminate\Database\Eloquent\Collection;
+use App\Helpers\Common;
+use App\Tik\Repositories\WareRepository;
+use App\Http\Resources\MomentGiftResource;
+use App\Tik\Repositories\GiftLogRepository;
+use Modules\Moment\Entities\MomentUserGift;
+use App\Http\Resources\AudioGiftsListResource;
 class WalletService
 {
     protected $walletRepo;
@@ -22,7 +26,7 @@ class WalletService
     {
         $this->walletRepo = $walletRepo;
     }
-
+ 
     public function transfer(int $fromUserId, int $toUserId, float $amount)
     {
         DB::beginTransaction();
@@ -39,7 +43,7 @@ class WalletService
                 $toWallet = $this->walletRepo->getWalletByUserId($toUserId)
                         ?? $this->walletRepo->createWallet(['user_id' => $toUserId, 'balance' => 0]);
                 $this->walletRepo->updateWallet($fromWallet->id, ['cut_amount' => $fromWallet->cut_amount + $amount]);
-
+               
                 $this->walletRepo->createLog([
                     'wallet_id' => $fromWallet->id,
                     'user_id' => $fromUserId,
@@ -70,9 +74,10 @@ class WalletService
 
             } catch (Exception $e) {
                 DB::rollBack();
+                 \Log::info(12333);
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
-
+    
     }
 
     public function getWalletTransactions($request)
@@ -80,7 +85,7 @@ class WalletService
         $userId = Auth::user()->id ;
         $type = $request['type'] ?? 'add';
         $perPage = $request['per_page'] ?? 15;
-        $page = $request['page'] ?? 1;
+        $page = $request['page'] ?? 1;  
         return $this->walletRepo->getTransactions($userId,$type  ,$perPage , $page);
 
     }
@@ -93,8 +98,8 @@ class WalletService
 
        public function diamondsStatistic($userId, $type, $startDate, $endDate, $perPage, $page)
     {
-        $list = collect();
-        $resourceClass = AudioGiftsListResource::class;
+        $list = collect(); 
+        $resourceClass = AudioGiftsListResource::class; 
 
         switch ($type) {
             case 1:
@@ -106,19 +111,15 @@ class WalletService
                 break;
 
             case 3:
-                $list = collect();
-                if (class_exists(MomentUserGift::class) && class_exists(MomentGiftResource::class)) {
-                    $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
-                        ->whereHas('moment', function ($q) use ($userId) {
-                            $q->where('user_id', $userId);
-                        })
-                        ->groupBy('user_id', 'moment_id', 'gift_id')
-                        ->with(['user', 'gift'])
-                        ->paginate($perPage, ['*'], 'page', $page);
+                $list = MomentUserGift::selectRaw('user_id, moment_id, gift_id, SUM(num) as total')
+                    ->whereHas('moment', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    })
+                    ->groupBy('user_id', 'moment_id', 'gift_id')
+                    ->with(['user', 'gift'])
+                    ->paginate($perPage, ['*'], 'page', $page);
 
-                    $resourceClass = MomentGiftResource::class;
-                }
-
+                $resourceClass = MomentGiftResource::class;
                 break;
         }
 
@@ -151,5 +152,5 @@ class WalletService
 
         return $this->walletRepo->getLatestTransactions($userId, $limit);
     }
-
+    
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Achievements\Http\Controllers\Web;
+namespace Utd\Achievements\Http\Controllers\web;
 
 use App\Helpers\Common;
 use App\Models\AchievementValidImage;
@@ -11,13 +11,14 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\Support\Renderable;
 use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Utd\Achievements\Services\AchievementLevelService;
+use Utd\Achievements\Services\AchievementLevelsService;
 
 class AchievementLevelsModuleController extends Controller
 {
+
     protected $userAchievementService;
 
-    public function __construct(AchievementLevelService $userAchievementService)
+    public function __construct(AchievementLevelsService $userAchievementService)
     {
         $this->userAchievementService = $userAchievementService;
     }
@@ -31,15 +32,14 @@ class AchievementLevelsModuleController extends Controller
         $adminId = Auth::user()->id;
 
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
-        
         if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
-                'user_id' => $userId,
+                'user_id'       => $userId,
                 'custom_image' => $customImage,
                 'file' => $customImage,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' => $adminId,
+                'admin_id' =>  $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -51,11 +51,11 @@ class AchievementLevelsModuleController extends Controller
         } elseif ($achievementLevel_id == null && $request->hasFile('custom_file')) {
             $custom_file = Common::upload('custom_file', $request->file('custom_file'));
             $attributes = [
-                'user_id' => $userId,
+                'user_id'       => $userId,
                 'file' => $custom_file,
                 'custom_image' => $custom_file,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' => $adminId,
+                'admin_id' =>  $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -67,14 +67,14 @@ class AchievementLevelsModuleController extends Controller
         } elseif ($achievementLevel_id == null && request('custom_image')) {
             $customImagepath = request('custom_image');
             $attributes = [
-                'user_id' => $userId,
+                'user_id'       => $userId,
                 'custom_image' => $customImagepath,
                 'file' => $customImagepath,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' => $adminId,
+                'admin_id' =>  $adminId,
             ];
 
-            UserAchievementLevel::create($attributes);
+           UserAchievementLevel::create($attributes);
         } elseif ($achievementLevel != null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
@@ -83,11 +83,11 @@ class AchievementLevelsModuleController extends Controller
                     'message' => __('this user not found'),
                 ]);
 
-                return redirect()->route(nameRoute('admin.get-view-page'), compact('error'));
+                return redirect()->route(nameRoute('admin.get-view-page'), compact('error')); // Error message added
             }
         } elseif ($achievementLevel_id == null && $gift) {
             $attributes = [
-                'user_id' => $userId,
+                'user_id'       => $userId,
                 'gift_achievement_id' => $gift,
                 'achievement_id' => $request->input('achievement_id'),
             ];
@@ -110,7 +110,7 @@ class AchievementLevelsModuleController extends Controller
      */
     public function index()
     {
-        return view('achievements::index');
+        return view('achievement::index');
     }
 
     /**
@@ -119,8 +119,15 @@ class AchievementLevelsModuleController extends Controller
      */
     public function create()
     {
-        return view('achievements::create');
+        return view('achievement::create');
     }
+
+    /**
+     * Store a newly created resource in storage.
+     * @param Request $request
+     * @return Renderable
+     */
+
 
     /**
      * Show the specified resource.
@@ -139,7 +146,7 @@ class AchievementLevelsModuleController extends Controller
      */
     public function edit($id)
     {
-        return view('achievements::edit');
+        return view('achievement::edit');
     }
 
     /**

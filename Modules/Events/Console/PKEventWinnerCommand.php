@@ -100,17 +100,15 @@ class PKEventWinnerCommand extends Command
                 case "coins":
 
                     $amountBefore = $user->di;
+                    $user->di += $reward->target;
+                    $user->save();
+
                     UserCoinLogHelper::logByType(
                         $user->id,
                         $reward->target,
                         $amountBefore,
                         UserCoinLogType::PK,
                     );
-
-                    $user->di += $reward->target;
-                    $user->save();
-
-
                     break;
                 case "vip":
                     $vip = OVip::find($reward->target);
