@@ -5,28 +5,24 @@
     "isEntry": true
   },
   "Modules/DynamicTheme/Resources/js/admin.js": {
-    "file": "assets/admin-6Yvl3IB8.js",
+    "file": "assets/admin-Bt6ir9Xy.js",
     "name": "admin",
     "src": "Modules/DynamicTheme/Resources/js/admin.js",
     "isEntry": true,
     "imports": [
       "_NotificationToast-CaonYhPK.js"
     ],
-    "dynamicImports": [
-      "_svga.min-ByIdj54d.js"
-    ],
     "css": [
       "assets/app-C88YnOvB.css"
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
-    "file": "assets/app-CZv8SUo0.js",
+    "file": "assets/app-B0qgbi-w.js",
     "name": "app",
     "src": "Modules/DynamicTheme/Resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_NotificationToast-CaonYhPK.js",
-      "__commonjsHelpers-C4iS2aBk.js"
+      "_NotificationToast-CaonYhPK.js"
     ],
     "css": [
       "assets/app-RpTKHlZY.css"
@@ -41,18 +37,6 @@
     "name": "NotificationToast",
     "css": [
       "assets/NotificationToast-D5ZeL8XF.css"
-    ]
-  },
-  "__commonjsHelpers-C4iS2aBk.js": {
-    "file": "assets/_commonjsHelpers-C4iS2aBk.js",
-    "name": "_commonjsHelpers"
-  },
-  "_svga.min-ByIdj54d.js": {
-    "file": "assets/svga.min-ByIdj54d.js",
-    "name": "svga.min",
-    "isDynamicEntry": true,
-    "imports": [
-      "__commonjsHelpers-C4iS2aBk.js"
     ]
   }
 }

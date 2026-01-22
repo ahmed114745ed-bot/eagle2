@@ -232,7 +232,7 @@
 
                                                 <!-- SVGA Preview -->
                                                 <div
-                                                    v-if="asset.input_type === 'file' && asset.asset_type === 'svga' && asset.default_url"
+                                                    v-if="asset.asset_type === 'svga' && asset.default_url"
                                                     class="w-full rounded-lg border border-gray-700 bg-gray-900/60 p-3"
                                                 >
                                                     <div class="flex items-center justify-between mb-2">
@@ -252,16 +252,12 @@
                                                             </button>
                                                         </div>
                                                     </div>
+                                                    <!-- SVGA Container - using div like the working example -->
                                                     <div
-                                                        :id="'svga-player-' + asset.id"
-                                                        :ref="el => { if (el) svgaContainers[asset.id] = el }"
-                                                        class="w-full h-64 flex items-center justify-center bg-gray-800 rounded"
-                                                    >
-                                                        <canvas
-                                                            :id="'svga-canvas-' + asset.id"
-                                                            class="max-w-full max-h-full"
-                                                        ></canvas>
-                                                    </div>
+                                                        :id="'svga-container-' + asset.id"
+                                                        class="w-full h-64 bg-gray-800 rounded flex items-center justify-center"
+                                                        style="min-height: 250px;"
+                                                    ></div>
                                                     <p class="text-xs text-gray-500 mt-2 text-center">{{ asset.default_url.split('/').pop() }}</p>
                                                 </div>
                                             </div>
@@ -1066,13 +1062,35 @@ export default {
             }[type] || '📁'
         }
 
-        // SVGA Player methods using svgaplayerweb
+        // SVGA Player methods - using CDN script
+        const loadSvgaScript = () => {
+            return new Promise((resolve, reject) => {
+                if (window.SVGA) {
+                    resolve(window.SVGA)
+                    return
+                }
+
+                const script = document.createElement('script')
+                script.src = 'https://cdn.jsdelivr.net/npm/svga.lite/dist/svga.min.js'
+                script.onload = () => {
+                    if (window.SVGA) {
+                        resolve(window.SVGA)
+                    } else {
+                        reject(new Error('SVGA not loaded'))
+                    }
+                }
+                script.onerror = () => reject(new Error('Failed to load SVGA script'))
+                document.head.appendChild(script)
+            })
+        }
+
         const playSvga = async (asset) => {
             try {
-                const canvasId = 'svga-canvas-' + asset.id
-                const canvas = document.getElementById(canvasId)
-                if (!canvas) {
-                    console.error('Canvas not found:', canvasId)
+                const containerId = '#svga-container-' + asset.id
+                const container = document.querySelector(containerId)
+                if (!container) {
+                    console.error('Container not found:', containerId)
+                    emit('notify', 'Container not found')
                     return
                 }
 
@@ -1084,22 +1102,18 @@ export default {
                     svgaPlayers.value[asset.id] = null
                 }
 
-                // Import svgaplayerweb
-                const SVGA = await import('svgaplayerweb')
-                
-                const parser = new SVGA.Parser()
-                const player = new SVGA.Player(canvas)
-                
-                // Set canvas size
-                canvas.width = 300
-                canvas.height = 300
+                // Load SVGA from CDN
+                await loadSvgaScript()
+
+                const player = new window.SVGA.Player(containerId)
+                const parser = new window.SVGA.Parser()
 
                 parser.load(asset.default_url, (videoItem) => {
                     player.setVideoItem(videoItem)
                     player.loops = 0 // infinite loop
                     player.startAnimation()
                     svgaPlayers.value[asset.id] = player
-                    emit('notify', 'SVGA playing')
+                    emit('notify', 'SVGA playing ▶️')
                 }, (error) => {
                     console.error('SVGA parse error:', error)
                     emit('notify', 'Failed to parse SVGA file')
@@ -1120,7 +1134,7 @@ export default {
                     console.error('Error stopping SVGA:', e)
                 }
                 svgaPlayers.value[asset.id] = null
-                emit('notify', 'SVGA stopped')
+                emit('notify', 'SVGA stopped ⏹️')
             }
         }
 
