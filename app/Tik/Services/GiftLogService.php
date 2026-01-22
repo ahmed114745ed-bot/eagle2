@@ -83,9 +83,9 @@ class GiftLogService
 
             // Get Room Data
             if (isset($ownerId)) {
-                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,	room_name,room_cover,play_num,hot,room_pass,session,microphone,charizma_status,type');
+                $room =  $this->repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,room_name,room_cover,play_num,hot,room_pass,session,microphone,charizma_status,type,total_diamond,level,level_id');
             } else {
-                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,room_cover,	room_name,hot,room_pass,session,microphone,charizma_status,type');
+                $room =  $this->repository->findUserRoomById($roomId, 'id,uid,room_visitor,play_num,room_cover,room_name,hot,room_pass,session,microphone,charizma_status,type,total_diamond,level,level_id');
                 $ownerId = $room?->uid;
             }
 
@@ -302,7 +302,7 @@ class GiftLogService
 
 
             // Get Room Data
-            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status');
+            $room =  $this->repository->findUserRoom($ownerId, 'id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type,total_diamond,level,level_id');
             // Validation if no room
             if (!$room)  throw new \Exception('room does not exist');
 
