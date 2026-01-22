@@ -216,8 +216,9 @@
                                                 <button @click="deleteChildAsset(asset)" class="text-red-400 hover:text-red-300">🗑️</button>
                                             </div>
 
-                                            <!-- Preview: show image (without link) or text value -->
+                                            <!-- Preview: show image, SVGA or text value -->
                                             <div class="border-t border-gray-600 pt-3">
+                                                <!-- Image Preview -->
                                                 <div
                                                     v-if="asset.input_type === 'file' && asset.asset_type === 'image' && asset.default_url"
                                                     class="w-full max-h-64 rounded-lg border border-gray-700 bg-gray-900/60 p-3 flex items-center justify-center"
@@ -227,6 +228,41 @@
                                                         alt="Asset preview"
                                                         class="max-h-56 w-auto object-contain"
                                                     />
+                                                </div>
+
+                                                <!-- SVGA Preview -->
+                                                <div
+                                                    v-if="asset.input_type === 'file' && asset.asset_type === 'svga' && asset.default_url"
+                                                    class="w-full rounded-lg border border-gray-700 bg-gray-900/60 p-3"
+                                                >
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span class="text-sm text-gray-400">🎞️ SVGA Preview</span>
+                                                        <div class="flex gap-2">
+                                                            <button
+                                                                @click="playSvga(asset)"
+                                                                class="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                                                            >
+                                                                ▶️ Play
+                                                            </button>
+                                                            <button
+                                                                @click="stopSvga(asset)"
+                                                                class="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+                                                            >
+                                                                ⏹️ Stop
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        :id="'svga-player-' + asset.id"
+                                                        :ref="el => { if (el) svgaContainers[asset.id] = el }"
+                                                        class="w-full h-64 flex items-center justify-center bg-gray-800 rounded"
+                                                    >
+                                                        <canvas
+                                                            :id="'svga-canvas-' + asset.id"
+                                                            class="max-w-full max-h-full"
+                                                        ></canvas>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 mt-2 text-center">{{ asset.default_url.split('/').pop() }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -792,13 +828,17 @@ export default {
             default_url: '',
             description: '',
             file: null,
-            // maximum file size in MB (editable in UI)
-            max_file_size: 5,
+            // maximum file size in MB (editable in UI) - increased to support large SVGA files
+            max_file_size: 10,
             child_id: null,
         })
         const showAddChildAssetForm = ref(false)
         const uploadingNewAsset = ref(false)
         const uploadingAssetId = ref(null)
+
+        // SVGA Player state
+        const svgaContainers = ref({})
+        const svgaPlayers = ref({})
 
         /* ================== Computed ================== */
         const filteredThemes = computed(() => {
@@ -1026,6 +1066,85 @@ export default {
             }[type] || '📁'
         }
 
+        // SVGA Player methods
+        const playSvga = async (asset) => {
+            try {
+                const canvasId = 'svga-canvas-' + asset.id
+                const canvas = document.getElementById(canvasId)
+                if (!canvas) return
+
+                // Stop existing player if any
+                if (svgaPlayers.value[asset.id]) {
+                    svgaPlayers.value[asset.id].clear()
+                    svgaPlayers.value[asset.id] = null
+                }
+
+                // Dynamically import SVGA library
+                const { Parser, Player } = await import('svga.lite')
+
+                const parser = new Parser()
+                const svgaData = await parser.load(asset.default_url)
+
+                const player = new Player({
+                    container: canvas,
+                    loop: true,
+                    fillMode: 'AspectFit'
+                })
+
+                await player.mount(svgaData)
+                player.start()
+
+                svgaPlayers.value[asset.id] = player
+            } catch (error) {
+                console.error('Failed to play SVGA:', error)
+                // Fallback: try using svgaplayerweb
+                try {
+                    await playSvgaFallback(asset)
+                } catch (fallbackError) {
+                    console.error('Fallback SVGA player also failed:', fallbackError)
+                    emit('notify', 'Failed to play SVGA file')
+                }
+            }
+        }
+
+        const playSvgaFallback = async (asset) => {
+            const canvasId = 'svga-canvas-' + asset.id
+            const canvas = document.getElementById(canvasId)
+            if (!canvas) return
+
+            // Use fetch to load SVGA as ArrayBuffer
+            const response = await fetch(asset.default_url)
+            const arrayBuffer = await response.arrayBuffer()
+
+            // Try using SVGA.Parser if available globally
+            if (window.SVGA) {
+                const parser = new window.SVGA.Parser()
+                parser.load(arrayBuffer, (videoItem) => {
+                    const player = new window.SVGA.Player(canvas)
+                    player.setVideoItem(videoItem)
+                    player.startAnimation()
+                    svgaPlayers.value[asset.id] = player
+                })
+            }
+        }
+
+        const stopSvga = (asset) => {
+            if (svgaPlayers.value[asset.id]) {
+                try {
+                    if (typeof svgaPlayers.value[asset.id].stop === 'function') {
+                        svgaPlayers.value[asset.id].stop()
+                    } else if (typeof svgaPlayers.value[asset.id].clear === 'function') {
+                        svgaPlayers.value[asset.id].clear()
+                    } else if (typeof svgaPlayers.value[asset.id].stopAnimation === 'function') {
+                        svgaPlayers.value[asset.id].stopAnimation()
+                    }
+                } catch (e) {
+                    console.error('Error stopping SVGA:', e)
+                }
+                svgaPlayers.value[asset.id] = null
+            }
+        }
+
 
         const openEditChildModal = (theme, child) => {
             selectedThemeForChild.value = theme
@@ -1190,6 +1309,12 @@ export default {
             getAcceptTypes,
             uploadingAssetId,
             uploadingNewAsset,
+
+            // SVGA
+            svgaContainers,
+            svgaPlayers,
+            playSvga,
+            stopSvga,
 
             openEditChildModal,
 

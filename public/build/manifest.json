@@ -1,19 +1,22 @@
 {
   "Modules/DynamicTheme/Resources/css/app.css": {
-    "file": "assets/app-BiaYdgJm.css",
+    "file": "assets/app-C88YnOvB.css",
     "src": "Modules/DynamicTheme/Resources/css/app.css",
     "isEntry": true
   },
   "Modules/DynamicTheme/Resources/js/admin.js": {
-    "file": "assets/admin-B_Tx5SHj.js",
+    "file": "assets/admin-uBG1FYU-.js",
     "name": "admin",
     "src": "Modules/DynamicTheme/Resources/js/admin.js",
     "isEntry": true,
     "imports": [
       "_NotificationToast-CaonYhPK.js"
     ],
+    "dynamicImports": [
+      "_svga.lite.min--nIUfUTd.js"
+    ],
     "css": [
-      "assets/app-BiaYdgJm.css"
+      "assets/app-C88YnOvB.css"
     ]
   },
   "Modules/DynamicTheme/Resources/js/app.js": {
@@ -38,5 +41,10 @@
     "css": [
       "assets/NotificationToast-D5ZeL8XF.css"
     ]
+  },
+  "_svga.lite.min--nIUfUTd.js": {
+    "file": "assets/svga.lite.min--nIUfUTd.js",
+    "name": "svga.lite.min",
+    "isDynamicEntry": true
   }
 }
