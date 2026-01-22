@@ -68,12 +68,22 @@ class VipRepository extends AbstractRepository
 
     public function getRoomLevel(): array
     {
-        return Cache::remember('levels_chunks', 3600, function () {
+        return Cache::remember('room_levels_all', 3600, function () {
             return [
-
-                'room_level' => $this->mapChunk($this->getLevelsByType(4)),
+                'room_level' => $this->mapAllLevels($this->getLevelsByType(4)),
             ];
         });
+    }
+
+    private function mapAllLevels($vips)
+    {
+        return $vips->map(function ($vip) {
+            return [
+                'level' => $vip->level,
+                'badge' => $vip->img,
+                'exp'   => $vip->exp ?? 0,
+            ];
+        })->toArray();
     }
 
     private function mapChunk($vips)
