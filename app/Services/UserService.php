@@ -1319,7 +1319,7 @@ class UserService
             ];
         }
         $expLevel = $room->total_diamond;
-        $currentLevel = $this->vipRepository->findByLevel($room->roomLevel->level, 4);
+        $currentLevel = $this->vipRepository->findByLevel(@$room->roomLevel->level, 4);
         if ($currentLevel) {
             $secondLevel = $this->vipRepository->nextLevel($room->roomLevel->level, 4);
         } else {
