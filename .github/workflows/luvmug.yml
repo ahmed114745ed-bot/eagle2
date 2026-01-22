@@ -9,7 +9,7 @@ jobs:
     - name: print out luvmug
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.70.88"
+        host: "34.18.71.45"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
@@ -33,7 +33,7 @@ jobs:
     - name: print out luvmug
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.70.88"
+        host: "34.18.71.45"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
@@ -73,7 +73,7 @@ jobs:
     - name: print out luvmug Job
       uses: appleboy/ssh-action@v1.2.1
       with:
-        host: "34.18.70.88"
+        host: "34.18.71.45"
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.UTDVM }}
         port: ${{ secrets.PORT }}
