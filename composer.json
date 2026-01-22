@@ -118,10 +118,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "packages/Utd/Moments",
-            "options": {
-                "symlink": true
-            }
+            "url": "packages/Utd/Moments"
         },
         {
             "type": "path",

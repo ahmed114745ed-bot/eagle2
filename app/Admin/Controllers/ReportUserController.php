@@ -170,7 +170,7 @@ class ReportUserController extends MainController
                 }
                 return "<span style='color:orange; font-weight: bold;'>{$count}</span>";
             });
-            if (class_exists(Moment::class, false)) {
+            if (class_exists(Moment::class)) {
                 $grid->column(__('moment_count'))->display(function () {
                     $count = request()->year == null && request()->month == null ? $this->moments()->count() : $this->moments()->whereMonth('created_at', request()->month)->whereYear('created_at', request()->year)->count();
                     if (request()->filled('_export_')) {

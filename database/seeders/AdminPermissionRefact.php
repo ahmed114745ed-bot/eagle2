@@ -484,7 +484,7 @@ class AdminPermissionRefact extends Seeder
             ],
         ];
 
-        if (class_exists(Moment::class, false)) {
+        if (class_exists(Moment::class)) {
             $categories[] = [
                 'name' => 'Moment',
                 'sort' => 28,

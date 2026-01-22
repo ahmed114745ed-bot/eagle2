@@ -36,9 +36,9 @@ Route::group(
         'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
-        Route::resource('report-Moments', ReportMomentController::class);
+        Route::resource('report-moments', ReportMomentController::class);
         Route::post('moment-config', [MomentSettingsController::class, 'momentConfig'])->name('moment-config');
-        Route::resource('Moments', MomentController::class);
+        Route::resource('moments', MomentController::class);
         Route::get('moment-gallery/{id}', [MomentController::class, 'momentGallery']);
         Route::resource('moment-settings', MomentSettingsController::class);
 

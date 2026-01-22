@@ -37,7 +37,7 @@ class RegularTarget implements TargetInterface
         }
         // logger('days Achieved:', [$per]);
 
-        if (class_exists(Moment::class, false)) {
+        if (class_exists(Moment::class)) {
             $targetMoment = explode(',', $target->moment);
             if (((@$targetMoment[0] ?? 0) <= ($extras['moment']['upload'] ?? 0)) && ((@$targetMoment[1] ?? 0) <= ($extras['moment']['likes']) ?? 0) && ((@$targetMoment[2] ?? 0) <= (@$extras['moment']['comments'] ?? 0))) {
 
@@ -82,7 +82,7 @@ class RegularTarget implements TargetInterface
 
         // logger('days Achieved:', [$per]);
 
-        if (class_exists(Moment::class, false)) {
+        if (class_exists(Moment::class)) {
             $targetMoment = explode(',', $target->moment);
             if ((@$targetMoment[0] ?? 0) <= $extras['moment']['upload'] && (@$targetMoment[1] ?? 0) <= $extras['moment']['likes'] && (@$targetMoment[2] ?? 0) <= $extras['moment']['comments']) {
                 $per += (((int)Common::getSettingsValue('Moments')) ?? 0) / 100;

@@ -104,9 +104,9 @@ class MomentsServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/moments.php' => config_path('moments.php'),
             ], 'moments');
 
-            $this->publishes([
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'moments');
+//            $this->publishes([
+//                __DIR__ . '/../database/migrations' => database_path('migrations'),
+//            ], 'moments');
 
 //            $this->publishes([
 //                __DIR__ . '/../database/seeders' => database_path('seeders/Moments'),

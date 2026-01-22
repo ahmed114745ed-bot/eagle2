@@ -403,6 +403,12 @@
 
     <div class="step">
         <span class="step-number">5</span>
+        <span class="step-title">Run Migrations</span>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
         <span class="step-title">Clear Cache</span>
         <pre><code>php artisan cache:clear
 php artisan config:clear
@@ -410,28 +416,23 @@ php artisan route:clear
 php artisan view:clear</code></pre>
     </div>
 
-    <div class="step">
-        <span class="step-number">6</span>
-        <span class="step-title">Create Storage Link (if not exists)</span>
-        <pre><code>php artisan storage:link</code></pre>
-    </div>
-
     <div class="page-break"></div>
 
     <!-- Section 3: Configuration -->
     <h1 id="configuration">3. Configuration</h1>
 
-    <h2>3.1 Environment Variables</h2>
-    <p>Add this to your <code>.env</code> file (optional):</p>
-    <pre><code># Moment Viewer Configuration
-MOMENT_VIEWER_DEFAULT_SORT=random</code></pre>
+    <h2>3.1 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --provider="Utd\Moments\MomentsServiceProvider" --tag="config"</code></pre>
 
-    <h2>3.2 Main Configuration (config/moments.php)</h2>
+    <h2>3.2 Configuration File</h2>
+    <p>After publishing, you can edit the configuration directly in <code>config/moments.php</code>:</p>
+
     <pre><code>&lt;?php
 
 return [
     // Default sort order: random, newest, oldest
-    'default_sort' => env('MOMENT_VIEWER_DEFAULT_SORT', 'random'),
+    'default_sort' => 'random',
 ];</code></pre>
 
     <div class="page-break"></div>

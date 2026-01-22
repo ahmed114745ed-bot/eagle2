@@ -26,7 +26,7 @@ class MenuMomentSeeder extends Seeder
         $this->createChildMenu(
             $momentParent->id,
             'Moment',
-            '/moments',
+            '/moment-viewer',
             'browse-Moment',
             '🕐'
         );
