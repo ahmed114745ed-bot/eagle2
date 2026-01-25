@@ -2,11 +2,14 @@
 
 namespace Modules\UsersWallet\Http\Controllers\Api;
 
+use App\Helpers\ShippingAgencyHelper;
+use App\Models\ShippingAgency;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\UsersWallet\Helpers\WalletHelper;
@@ -63,6 +66,11 @@ class UsersWalletController extends Controller
 
         $from = $request->user();
         $to = User::find($request->user_id);
+        
+        if (!$to) {
+            return Common::apiResponse(0, __('api_responses.user_not_found'), 404);
+        }
+        
         if ($from->transfer_salary == 1)  return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
 
 
@@ -115,5 +123,105 @@ class UsersWalletController extends Controller
                 $withdrawal
             );
         });
+    }
+
+
+
+
+
+     public function agencyRequestWithdrawal(Request $request)
+    {
+        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
+        if ($stop_all_charge == 1) {
+            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
+        }
+
+        $toId = $request->to_id;
+        $from = $request->user();
+
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
+
+        Common::checkUserAgencyFrozen($from);
+
+        $to = Common::searchAgency($toId);
+        if (!$to) {
+            return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
+        }
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
+        if ($to->is_frozen == 1) {
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+
+        $usd = floatval($request->usd);
+
+        if ($usd <= 0) {
+            return Common::apiResponse(0, 'This value is not allowed', 422);
+        }
+
+        $rate = Common::getCoinsValue('shipping_coins');
+
+        if (!$rate) {
+            return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
+        }
+        
+        $coins = $usd * $rate;
+        
+        $available = wallet_available_by_user($from->id);
+        
+        if ($available < $usd) {
+            return Common::apiResponse(0, 'balance not enough', 407);
+        }
+
+        DB::beginTransaction();
+        try {
+            $this->chargeToAgencyFromWallet($from, $to, $coins, $usd);
+
+            $newAvailable = wallet_available_by_user($from->id);
+            $data = [
+                'usd' => (string)$newAvailable,
+            ];
+
+            DB::commit();
+            return Common::apiResponse(1, 'success', $data, 201);
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            return Common::apiResponse(0, $exception->getMessage(), 400);
+        }
+    }
+
+    public function chargeToAgencyFromWallet(User $fromUser, ShippingAgency $toAgency, $coins, $usd)
+    {
+        $chargeType = 'user';
+
+        $wallet = \Modules\UsersWallet\Entities\UserWallet::firstOrCreate(['user_id' => $fromUser->id]);
+        $available = wallet_available_by_wallet($wallet);
+
+        if ($available < $usd) {
+            throw new \Exception('Insufficient balance.');
+        }
+
+        $wallet->cut_amount += $usd;
+        $wallet->save();
+     
+        $toAgency->increment('coins', $coins);
+
+        \Modules\UsersWallet\Entities\WalletLog::create([
+            'wallet_id' => $wallet->id,
+            'user_id' => $fromUser->id,
+            'amount' => -$usd,
+            'operation' => 'withdraw_to_shipping_agency',
+            'type' => 'user',
+            'before_amount' => $available,
+            'after_amount' => wallet_available_by_user($fromUser->id),
+            'related_id' => $toAgency->id,
+        ]);
+
+
     }
 }

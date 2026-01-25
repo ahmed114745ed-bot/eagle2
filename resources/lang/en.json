@@ -1623,6 +1623,7 @@
     "transfer_title": "Transfer",
     "transfer_description": "Transferred :amount coins",
     "withdrawal_pending": "Withdrawal request under review :amount",
+    "withdraw_to_shipping_agency": "Withdraw to Shipping Agency",
     "subtract_title": "Withdraw",
     "subtract_description": "Withdrawn :amount coins from your wallet",
 

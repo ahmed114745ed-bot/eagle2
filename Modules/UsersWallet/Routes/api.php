@@ -20,7 +20,8 @@ use App\Http\Controllers\Api\V1\ChargeController;
 
 Route::group(['prefix' => 'wallets', 'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'localization']], function (){
     Route::post('/withdraw', [UsersWalletController::class, 'requestWithdrawal'])->middleware('auth:sanctum');
-   Route::post('/transfer', [UsersWalletController::class, 'transferToUser']);
+    Route::post('/agency-withdraw', [UsersWalletController::class, 'agencyRequestWithdrawal'])->middleware('auth:sanctum');
+    Route::post('/transfer', [UsersWalletController::class, 'transferToUser']);
 //    Route::post('/transfer', [ChargeController::class, 'chargeTo']);
     Route::get('/profits', [WalletController::class, 'getProfitsByType']);
     Route::get('/latest-operations', [WalletController::class, 'getLatestOperations']);
