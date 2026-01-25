@@ -21,10 +21,9 @@
     "filter_week": "أسبوع",
 
     "Level Gifts history": "سجل هدايا المستويات",
-    // "":"",
-    // "":"",
-    // "":"",
-    // "":"",
+    "Level Gifts History": "سجل هدايا المستويات",
+"Browse level gifts history": "استعرض سجل هدايا المستويات",
+    
 
     "filter_month": "شهر",
     "this agency does not have owner": "هذه الوكالة ليس لديها مالك",
