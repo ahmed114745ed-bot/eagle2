@@ -215,6 +215,10 @@ class VersionController extends Controller
             $settings = CacheHelper::cacheSettings();
         }
         
+        if (!$settings) {
+            return [];
+        }
+        
         return $settings->whereIn('key', ['reel_status', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
     }
 
