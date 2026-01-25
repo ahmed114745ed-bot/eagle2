@@ -19,13 +19,13 @@ class RewardLevelHistoryController extends MainController
      * @var string
      */
     protected $title = 'WinnerLevelInterval';
-    public $permission_name = 'level-gifts-history';
+    public $permission_name = 'room-level-history';
 
 
     public function index(Content $content)
     {
         return parent::index($content
-            ->title(trans('Level Gifts history'))
+            ->title(trans('room level history'))
             ->body($this->grid()));
     }
 
