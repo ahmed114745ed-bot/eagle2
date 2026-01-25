@@ -95,24 +95,34 @@ class EmojiController extends MainController
 
         // Header tabs
         $grid->header(function () use ($filterType) {
-            $locale = App::getLocale();
+            try {
+                $locale = App::getLocale();
 
-            $tabs = ['all' => __('All')];
-            $categories = EmojiCategory::orderBy('id')->get();
-            foreach ($categories as $cat) {
-                $title = $cat->title[$locale] ?? $cat->title['en'] ?? '';
-                $tabs[$cat->id] = $title;
+                $tabs = ['all' => __('All')];
+                $categories = EmojiCategory::orderBy('id')->get();
+                foreach ($categories as $cat) {
+                    // Handle both array and JSON string
+                    $titleData = $cat->title;
+                    if (is_string($titleData)) {
+                        $titleData = json_decode($titleData, true) ?? [];
+                    }
+                    $title = $titleData[$locale] ?? $titleData['en'] ?? $cat->id;
+                    $tabs[$cat->id] = $title;
+                }
+
+                $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+                foreach ($tabs as $key => $label) {
+                    $active = ($filterType == $key || ($filterType === 'all' && $key === 'all')) ? 'active' : '';
+                    $url = request()->fullUrlWithQuery(['filter' => $key]);
+                    $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+                }
+                $html .= '</ul></div>';
+
+                return $html;
+            } catch (\Exception $e) {
+                \Log::error('EmojiController header error: ' . $e->getMessage());
+                return ''; // Return empty string on error
             }
-
-            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-            foreach ($tabs as $key => $label) {
-                $active = ($filterType == $key || ($filterType === 'all' && $key === 'all')) ? 'active' : '';
-                $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-            }
-            $html .= '</ul></div>';
-
-            return $html;
         });
 
         // Apply filter to the grid
@@ -164,16 +174,28 @@ class EmojiController extends MainController
         
         $permission    = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
-            $model = $actions->row;
+            try {
+                $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new MoveEmojiCategoryAction());
+                if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                    $actions->add(new MoveEmojiCategoryAction());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController actions error: ' . $e->getMessage());
             }
         });
 
-      
+        $grid->batchActions(function ($batch) {
+            try {
+                $batch->disableDelete();
+                if (class_exists(MoveGroupEmoji::class)) {
+                    $batch->add(new MoveGroupEmoji());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController batchActions error: ' . $e->getMessage());
+            }
+        });
 
-        
         return $grid;
     }
 
