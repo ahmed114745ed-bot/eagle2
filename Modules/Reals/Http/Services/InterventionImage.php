@@ -70,7 +70,7 @@ class InterventionImage
             $img = $this->readImage($path);
             if (!$img) {
                 // Log missing file
-                Log::warning("Image not found: $path");
+             //   Log::warning("Image not found: $path");
                 continue; // skip
             }
             if ($img) {
