@@ -167,6 +167,7 @@ class RewardLevelIntervalController extends MainController
             })
             ->when('coins', function () use ($form) {
                 $form->number('target3', __('coins'));
+                $form->hidden('expire')->value(0);
             })
             ->when('achievement', function () use ($form) {
                 $form->image('target4', __('image'))->name(function ($file) {
