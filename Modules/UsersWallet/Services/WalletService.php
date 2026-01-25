@@ -92,7 +92,7 @@ class WalletService
                 UserCoinLogType::APP_CHARGE,
             );
 
-            $this->walletRepo->updateWallet($toWallet->id, ['balance' => $toWallet->balance + $amount]);
+            // لا نضيف للمحفظة - فقط نضيف للماس (di)
             $this->walletRepo->createLog([
                 'wallet_id' => $toWallet->id,
                 'user_id' => $toUserId,
