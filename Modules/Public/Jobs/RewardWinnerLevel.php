@@ -94,7 +94,7 @@ class RewardWinnerLevel implements ShouldQueue
                 WinnerLevelInterval::query()->create($data);
             }
            \Log::info('Dispatch Room Level Notification Job", ', ['user_id' => $user->id, 'level' => $this->level, 'type' => $firstReward->levelInterval->type]);
-            CustomNotification::RoomLevel($user, $this->level, $firstReward->levelInterval->type);
+            CustomNotification::RoomLevel($user->id, $this->level, $firstReward->levelInterval->type);
         }
     }
 }
