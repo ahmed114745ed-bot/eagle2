@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Achievement\AdminSendAchievementResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class AdminSendAchievementController extends Controller
 {

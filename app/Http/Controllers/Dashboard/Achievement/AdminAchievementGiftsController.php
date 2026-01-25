@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Achievement;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Achievement\AdminAchievementGifts;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\GiftAchievement;
+use Utd\Achievements\Entities\GiftAchievement;
 
 class AdminAchievementGiftsController extends Controller
 {

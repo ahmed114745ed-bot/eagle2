@@ -15,6 +15,7 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Modules\HostLevel\Entities\HostLevelReward;
+use Utd\Achievements\Entities\Achievement;
 
 class HostLevelRewardController extends MainController
 {
@@ -185,13 +186,16 @@ class HostLevelRewardController extends MainController
 
         $form->hidden('host_level_id')->value(request('host_level_id'));
 
-        $form->select('type', __('Type'))->options([
+        $typeOptions = [
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),
             "vip"          => __('vip'),
-            "achievement"  => __('Achievement'),
             "badge"        => __('Badge'),
-        ])
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('Achievement');
+        }
+        $form->select('type', __('Type'))->options($typeOptions)
             ->when("ware", function (Form $form) {
                 $form->belongsTo('target1', Wares::class, trans('Wares'))->rules('required');
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));

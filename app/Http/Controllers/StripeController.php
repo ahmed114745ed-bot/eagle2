@@ -16,7 +16,7 @@ use App\Traits\User\PaymentTrait;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;

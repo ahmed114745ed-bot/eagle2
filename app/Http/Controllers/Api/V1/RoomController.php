@@ -43,7 +43,7 @@ use App\Http\Requests\Api\V1\Room\CommentRequest;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Resources\Api\V1\RoomVisitorsResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Transformers\RoomBoomLevelResource;
 use Modules\RoomBoom\Transformers\RoomBoomResource;

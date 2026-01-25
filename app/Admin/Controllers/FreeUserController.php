@@ -32,7 +32,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentGallery;
 use Modules\Reals\Entities\Real;

@@ -352,13 +352,13 @@
             $('#achievementLevelDiv, #imageDiv, #gift_achievement_div, #file_image').hide();
             let selected = $(this).find(':selected').data('type');
 
-            if (selected == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}') {
+            if (selected == '{{\Utd\Achievements\Enums\AchievementType::GIFT_TARGET}}') {
                 $('#gift_achievement_div').fadeIn();
             } else if (achievementId === '') {
                 $('#file_image').show();
                 $('#gift_achievement_div').hide();
                 $('#achievementLevelDiv').hide();
-            } else if (selected !== '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}' || selected !== '') {
+            } else if (selected !== '{{\Utd\Achievements\Enums\AchievementType::GIFT_TARGET}}' || selected !== '') {
                 $('#gift_achievement_div').hide();
                 $('#achievementLevelDiv').show();
             }

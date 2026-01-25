@@ -29,8 +29,8 @@ use App\Http\Resources\Api\V1\RoomRankingResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use App\Http\Resources\RankingGameCollectionResource;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Utd\Achievements\Services\UserAchievementService;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 
 class RankingService

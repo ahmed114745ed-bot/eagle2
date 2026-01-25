@@ -41,7 +41,7 @@ use App\Admin\Widgets\Table as TableWidget;
 use Encore\Admin\Widgets\Table;
 
 use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 // use Encore\Admin\Actions\Response;
 
 class UserFamilyController extends MainController

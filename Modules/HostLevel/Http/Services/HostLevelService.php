@@ -13,7 +13,7 @@ use App\Helpers\UserCoinLogHelper;
 use Modules\Events\Entities\GeneralRole;
 use Modules\HostLevel\Entities\HostLevel;
 use Modules\HostLevel\Entities\HostLevelWinner;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class HostLevelService
 {
@@ -132,11 +132,13 @@ class HostLevelService
                     ];
                 }
             } elseif ($reward->type == "achievement") {
-                $attributes = [
-                    'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
-                ];
-                UserAchievementLevel::create($attributes);
+                if (class_exists(UserAchievementLevel::class)) {
+                    $attributes = [
+                        'user_id'       => $user->id,
+                        'custom_image' => $reward->target,
+                    ];
+                    UserAchievementLevel::create($attributes);
+                }
 
                 $notifications[] = [
                     'title' => __('Achievement Reward'),

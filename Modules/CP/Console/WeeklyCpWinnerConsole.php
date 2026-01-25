@@ -17,7 +17,7 @@ use Modules\CP\Entities\CpWinnerReward;
 use Modules\CP\Entities\WeeklyCpWinner;
 use Modules\CP\Http\Services\CpService;
 use Modules\Events\Entities\WeeklyStar;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class WeeklyCpWinnerConsole extends Command
 {

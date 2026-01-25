@@ -7,7 +7,7 @@ use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\UserCommon;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 
 
@@ -93,7 +93,9 @@ class UserRewardsWeeklyCp
             'end_at'       => $dateTimestamp,
         ];
 
-        UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
-        UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+        if (class_exists(UserAchievementLevel::class)) {
+            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+        }
     }
 }

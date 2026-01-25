@@ -17,6 +17,7 @@ use App\Admin\Controllers\MainController;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\ChargeTargetEvent;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Achievements\Entities\Achievement;
 
 class RewardTargetController extends MainController
 {
@@ -153,7 +154,11 @@ class RewardTargetController extends MainController
         $this->disableFormTools($form);
 
         $form->hidden('charge_event_id')->value(request('charge_event_id'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'),"badge"=>__('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+        $typeOptions = ["ware" => __('ware'),"badge"=>__('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)
             ->when("ware", function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })

@@ -15,7 +15,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ChargeResource;
 use App\Http\Resources\UserChargeResource;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 
 class ChargesController extends Controller
 {

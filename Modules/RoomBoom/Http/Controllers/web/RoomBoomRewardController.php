@@ -20,6 +20,8 @@ use Modules\RoomBoom\Entities\RoomBoomLevel;
 use Modules\RoomBoom\Entities\RoomBoomReward;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
+use Utd\Achievements\Entities\Achievement;
+
 class RoomBoomRewardController extends MainController
 {
     public $permission_name = 'room-boom-rewards';
@@ -257,12 +259,16 @@ class RoomBoomRewardController extends MainController
             }
         });
 
-        $form->select('target_type', trans('Target Type'))->options([
+        $targetTypeOptions = [
             "ware" => __('ware'),
             "gift" => __('gift'),
-            "achievement" => __('achievement'),
             "coin" => __('coin'),
-        ])
+        ];
+        if (class_exists(Achievement::class)) {
+            $targetTypeOptions['achievement'] = __('achievement');
+        }
+
+        $form->select('target_type', trans('Target Type'))->options($targetTypeOptions)
             ->when("ware", function (Form $form) {
                 $this->addWareFields($form);
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
@@ -272,6 +278,7 @@ class RoomBoomRewardController extends MainController
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
             })
             ->when("achievement", function (Form $form) {
+                if (!class_exists(Achievement::class)) return;
                 $this->addAchievementFields($form);
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
             })

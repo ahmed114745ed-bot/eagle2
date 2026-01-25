@@ -5,9 +5,6 @@ namespace Modules\SalaryTransaction\Transformers;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Achievement\Entities\UserAchievement;
-use Modules\Achievement\Entities\AchievementLevel;
-use Modules\Achievement\Entities\UserAchievementLevel;
 
 class RequestsResource extends JsonResource
 {

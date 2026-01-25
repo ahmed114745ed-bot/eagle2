@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\ChargeTargetEvent;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 
 

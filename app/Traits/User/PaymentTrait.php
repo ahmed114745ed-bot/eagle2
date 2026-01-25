@@ -13,7 +13,7 @@ use App\Models\CoinLog;
 use App\Helpers\UserCommon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 
 
 trait PaymentTrait

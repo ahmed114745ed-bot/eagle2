@@ -16,7 +16,7 @@ use App\Helpers\UserCoinLogHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class DedicateSuperAdminRewardAction extends Action
 {
@@ -210,13 +210,15 @@ class DedicateSuperAdminRewardAction extends Action
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'admin_dedicate');
                 break;
             case "achievement":
-                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
-                $attributes = [
-                    'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
-                    'end_at' => $dateTimestamp,
-                ];
-                UserAchievementLevel::create($attributes);
+                if (class_exists(UserAchievementLevel::class)) {
+                    $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                    $attributes = [
+                        'user_id'       => $user->id,
+                        'custom_image' => $reward->target,
+                        'end_at' => $dateTimestamp,
+                    ];
+                    UserAchievementLevel::create($attributes);
+                }
                 break;
         }
     }

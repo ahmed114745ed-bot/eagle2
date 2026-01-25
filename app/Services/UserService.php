@@ -55,8 +55,8 @@ use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Utd\Achievements\Services\UserAchievementService;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class UserService
 {

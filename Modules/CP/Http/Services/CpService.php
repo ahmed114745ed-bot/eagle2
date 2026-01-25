@@ -13,7 +13,7 @@ use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\CP\Entities\Cp as EntitiesCp;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
@@ -280,19 +280,21 @@ class CpService
         $title = __('Achievement Reward');
         $body = __('You have received a new achievement.');
 
-        if ($rewardGender == $userOneGender || $rewardGender == 'all'){
-            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
-            Common::sendOfficialMessage($userOne->id, $title, $body);
-            $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
-            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+        if (class_exists(UserAchievementLevel::class)) {
+            if ($rewardGender == $userOneGender || $rewardGender == 'all'){
+                UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+                Common::sendOfficialMessage($userOne->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userOne->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
 //            CustomNotification::charges($userOne, $title, $body);
-        }
-        if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
-            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
-            Common::sendOfficialMessage($userTwo->id, $title, $body);
-            $tokens_notfacion[] = DB::table('users')->where('id', $userTwo->id)->value('notification_id');
-            Common::send_firebase_notification($tokens_notfacion, $title, $body);
+            }
+            if ($rewardGender == $userTwoGender || $rewardGender == 'all') {
+                UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userTwo->id]));
+                Common::sendOfficialMessage($userTwo->id, $title, $body);
+                $tokens_notfacion[] = DB::table('users')->where('id', $userTwo->id)->value('notification_id');
+                Common::send_firebase_notification($tokens_notfacion, $title, $body);
 //            CustomNotification::charges($userTwo, $title, $body);
+            }
         }
     }
 

@@ -97,7 +97,7 @@ use App\Http\Controllers\utd\TicketController;
 use App\Http\Controllers\utd\WeeklyEventController;
 use App\Http\Controllers\utd\WithdrawController;
 use Illuminate\Support\Facades\Route;
-use Modules\Achievement\Http\Controllers\UtdAchievementController;
+use Utd\Achievements\Http\Controllers\UtdAchievementController;
 
 // 'Utd.decreptHeader'
 // Utd apis

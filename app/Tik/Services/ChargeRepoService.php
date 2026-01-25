@@ -23,7 +23,7 @@ use App\Http\Resources\Api\V1\GeneralUserResource;
 use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 
 class ChargeRepoService
 {

@@ -16,6 +16,7 @@ use App\Services\AppFeatureService;
 use Modules\Events\Entities\PkReward;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Achievements\Entities\Achievement;
 
 class PkEventGiftController extends MainController
 {
@@ -351,7 +352,11 @@ class PkEventGiftController extends MainController
         $form->hidden('pk_type')->value(request('pk_type'));
 
         $form->hidden('level')->value(request()->route('level'));
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
             })

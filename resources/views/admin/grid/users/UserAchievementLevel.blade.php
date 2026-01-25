@@ -23,7 +23,7 @@
                    
                     $achievements=DB::table('achievements')->get();
                   //  $users=DB::table('users')->get();
-                  $gifts = \Modules\Achievement\Entities\GiftAchievement::with('gift')->get();
+                  $gifts = \Utd\Achievements\Entities\GiftAchievement::with('gift')->get();
 
         @endphp
        <form method="POST" action="{{ route('admin.store-user-achievement') }}" enctype="multipart/form-data">
@@ -180,7 +180,7 @@
             let selected = $(this).find(':selected').data('type');
            
 
-          if(selected == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}'){
+          if(selected == '{{\Utd\Achievements\Enums\AchievementType::GIFT_TARGET}}'){
                    $('#gift_achievement_div').fadeIn()
             }else if (achievementId === ''){
             $('#file_image').show();
@@ -188,7 +188,7 @@
 
                     $('#gift_achievement_div').hide()
                     $('#achievementLevelDiv').hide();
-            }else if (selected !== '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}' || selected !== '')
+            }else if (selected !== '{{\Utd\Achievements\Enums\AchievementType::GIFT_TARGET}}' || selected !== '')
             {
                 $('#gift_achievement_div').hide()
                 $('#achievementLevelDiv').show();
@@ -236,7 +236,7 @@
         //      if (selectedValue === '') {
         //         // If "Achievement" is selected, show the corresponding div
         //         $('#imageDiv').show();
-        //     } else if(selectedValue == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}'){
+        //     } else if(selectedValue == '{{\Utd\Achievements\Enums\AchievementType::GIFT_TARGET}}'){
         //         $('#gift_achievement_div').show();
                 
         //         }else{

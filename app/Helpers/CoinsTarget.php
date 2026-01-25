@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use Modules\Vip\Entities\OVip;
 use Carbon\Carbon;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class CoinsTarget
 {
@@ -29,6 +29,8 @@ class CoinsTarget
             'custom_image' => $itemId,
             'end_at'       => $dateTimestamp,
         ];
-        UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+        if (class_exists(UserAchievementLevel::class)) {
+            UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));
+        }
     }
 }

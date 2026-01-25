@@ -14,8 +14,8 @@ use App\Services\AppFeatureService;
 use Modules\CP\Entities\CpRelation;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
-use Modules\Achievement\Entities\Achievement;
-use Modules\Achievement\Enums\AchievementType;
+use Utd\Achievements\Entities\Achievement;
+use Utd\Achievements\Enums\AchievementType;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class WeeklyCpController extends MainController

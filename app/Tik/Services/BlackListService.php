@@ -12,7 +12,7 @@ use Modules\Events\Entities\RewardWinnerPk;
 use App\Http\Resources\AgencyReportResource;
 use Modules\Events\Services\LoseWinnerRewards;
 use App\Http\Resources\AdminUserReportResource;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class BlackListService
 {

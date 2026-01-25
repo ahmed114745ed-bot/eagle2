@@ -6,7 +6,7 @@ use App\Models\User;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\UserAchievement;
+use Utd\Achievements\Entities\UserAchievement;
 use Encore\Admin\Actions\Action;
 
 

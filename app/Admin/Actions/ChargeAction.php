@@ -15,7 +15,7 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 
 class ChargeAction extends Action
 {

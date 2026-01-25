@@ -15,6 +15,7 @@ use Modules\CP\Entities\WeeklyCpGift;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Achievements\Entities\Achievement;
 
 class WeeklyCpGiftController extends MainController
 {
@@ -240,13 +241,16 @@ class WeeklyCpGiftController extends MainController
      */
     protected function addTypeField(Form $form)
     {
-        $form->select('type', trans('type'))->options([
+        $typeOptions = [
             "ware" => __('ware'),
             "vip" => __('vip'),
             "badge" => __('badge'),
             "coins" => __('coins'),
-            "achievement" => __('achievement')
-        ])->when('ware', function () use ($form) {
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)->when('ware', function () use ($form) {
             $this->addWareField($form);
         })->when("badge", function () use ($form) {
             $this->addBadgeField($form);

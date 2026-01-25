@@ -22,6 +22,7 @@ use Modules\RankingReward\Entities\RankingRange;
 use Modules\RankingReward\Entities\RankingReward;
 use Modules\Reals\Http\Services\InterventionImage;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Utd\Achievements\Entities\Achievement;
 
 class RankingTypeController extends MainController
 {
@@ -218,7 +219,7 @@ class RankingTypeController extends MainController
                     $path = 'coin.png';
                     break;
 
-                case 'achievement':
+                case 'a':
                     $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
                     $path = $reward->target;
                     break;
@@ -379,13 +380,16 @@ class RankingTypeController extends MainController
             }
         }
 
-        $form->select('target_type', trans('type'))->options([
+        $targetTypeOptions = [
             "ware" => __('ware'),
             "badge" => __('badge'),
             "vip" => __('vip'),
             "coins" => __('coins'),
-            "achievement" => __('achievement')
-        ])
+        ];
+        if (class_exists(Achievement::class)) {
+            $targetTypeOptions['achievement'] = __('achievement');
+        }
+        $form->select('target_type', trans('type'))->options($targetTypeOptions)
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
                 $form->number('expire_days', __('expire'))->default(1);

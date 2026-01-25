@@ -62,8 +62,8 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use Utd\Achievements\Services\UserAchievementService;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class UserController extends Controller
 {

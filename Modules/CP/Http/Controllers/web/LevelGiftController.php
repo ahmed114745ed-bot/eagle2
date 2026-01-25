@@ -19,6 +19,7 @@ use Illuminate\Http\UploadedFile;
 use Modules\CP\Entities\CpLevel;
 use Modules\CP\Entities\CpLevelGift;
 use Encore\Admin\Admin;
+use Utd\Achievements\Entities\Achievement;
 
 
 class LevelGiftController extends MainController
@@ -165,13 +166,16 @@ class LevelGiftController extends MainController
 
         $form->hidden('item_id');
 
+        $typeOptions = [
+            "ware" => __('ware'),
+            "vip" => __('vip'),
+            "coins" => __('coins'),
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
         $form->select('type', trans('type'))
-            ->options([
-                "ware" => __('ware'),
-                "vip" => __('vip'),
-                "coins" => __('coins'),
-                "achievement" => __('achievement')
-            ])
+            ->options($typeOptions)
             ->when("ware", fn() => $this->addWareFields($form, 'ware_'))
             ->when("vip", fn() => $this->addVipFields($form, 'vip_'))
             ->when("coins", fn() => $this->addCoinsFields($form))

@@ -18,7 +18,7 @@ use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Achievement\Enums\AchievementType;
+use Utd\Achievements\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 
 class RankingRepositoryV2

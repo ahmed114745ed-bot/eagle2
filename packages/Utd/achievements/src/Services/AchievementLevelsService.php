@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
@@ -20,11 +21,10 @@ class AchievementLevelsService implements AchievementLevelContract
     public function __construct() { }
 
     /**
-     * @param int $userId
-     * @param int $achievement_id
+     * @param UserAchievement|Model|null $userAchievement
      * @return void
      */
-    public function assignAchievementToUser( ?UserAchievement $userAchievement): void
+    public function assignAchievementToUser(?Model $userAchievement): void
     {
         if (!$userAchievement) return;
         $month = now()->month;
@@ -48,11 +48,11 @@ class AchievementLevelsService implements AchievementLevelContract
     }
 
     /**
-     * @param UserAchievement|null $userAchievement
+     * @param UserAchievement|Model|null $userAchievement
      * @param array|null $notificationIds
      * @return array
      */
-    public function approveAchievement(?UserAchievement $userAchievement, ?array $notificationIds = null): array
+    public function approveAchievement(?Model $userAchievement, ?array $notificationIds = null): array
     {
 
         if ($notificationIds == null) $notificationIds = array_fill(0, $this->countTargets, []);
@@ -78,10 +78,10 @@ class AchievementLevelsService implements AchievementLevelContract
     }
 
     /**
-     * @param UserAchievement $userAchievement
-     * @return string|null
+     * @param UserAchievement|Model|null $userAchievement
+     * @return TargetType|null
      */
-    public function getAchievement(UserAchievement $userAchievement): ?TargetType
+    public function getAchievement(?Model $userAchievement): ?TargetType
     {
         $achievement       = $userAchievement->achievement;
         $achievementLevels = $achievement->levels;

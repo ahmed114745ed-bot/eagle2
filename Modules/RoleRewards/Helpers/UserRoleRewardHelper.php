@@ -11,7 +11,7 @@ use Modules\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Entities\UserHistoryReward;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Badge\Entities\Badge;
 
 class UserRoleRewardHelper
@@ -86,10 +86,12 @@ class UserRoleRewardHelper
             $ware = Ware::find($reward->rewardable_id);
             UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType);
         } elseif ($reward->type === "achievement") {
-            UserAchievementLevel::create([
-                'user_id'      => $user->id,
-                'custom_image' => $reward->reward_achievement,
-            ]);
+            if (class_exists(UserAchievementLevel::class)) {
+                UserAchievementLevel::create([
+                    'user_id'      => $user->id,
+                    'custom_image' => $reward->reward_achievement,
+                ]);
+            }
         } elseif ($reward->type === "badge") {
             Common::userBadge($user->id, $reward->rewardable_id, $reward->expire, $receiveType);
         }
@@ -103,10 +105,12 @@ class UserRoleRewardHelper
         } elseif ($reward->rewardable_type === self::mapTypeToModel('ware')) {
             UserCommon::removeEventsWareFromUser($user, $reward->rewardable_id, $reward->receive_type);
         } elseif ($reward->rewardable_type === self::mapTypeToModel('achievement')) {
-            UserAchievementLevel::where('user_id', $user->id)
-                ->where('custom_image', $reward->rewardable_id)
-                ->where('receive_type',  $reward->receive_type)
-                ->delete();
+            if (class_exists(UserAchievementLevel::class)) {
+                UserAchievementLevel::where('user_id', $user->id)
+                    ->where('custom_image', $reward->rewardable_id)
+                    ->where('receive_type',  $reward->receive_type)
+                    ->delete();
+            }
         } elseif ($reward->rewardable_type === self::mapTypeToModel('badge')) {
             UserCommon::removeBadgeFromUser($user, $reward->rewardable_id, $reward->receive_type);
         }
