@@ -5,16 +5,17 @@ namespace App\Admin\Middleware;
 use Encore\Admin\Middleware\Pjax as BasePjax;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\DomCrawler\Crawler;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PjaxOverride extends BasePjax
 {
     /**
      * Send a response through this middleware.
-     * Override to avoid using exit() which breaks Swoole
+     * Override to avoid using exit() which breaks Swoole/Octane
+     * Uses HttpResponseException instead of exit to stop execution
      *
      * @param Response $response
-     * @return Response
+     * @throws HttpResponseException
      */
     public static function respond(Response $response)
     {
@@ -22,6 +23,10 @@ class PjaxOverride extends BasePjax
             return $response;
         };
 
-        return (new static())->handle(Request::capture(), $next);
+        $result = (new static())->handle(Request::capture(), $next);
+
+        // Throw HttpResponseException instead of exit()
+        // Laravel will catch this and send the response properly
+        throw new HttpResponseException($result);
     }
 }
