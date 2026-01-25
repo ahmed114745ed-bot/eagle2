@@ -854,9 +854,9 @@ class UserController extends MainController
             });
         </script>');
         }
-
-        $form->belongsTo('image_color_id', ImageColors::class, __('Color'))->setElementName('full-column-width');
-
+        $form->html('<div class="full-column-width">');
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
+        $form->html('</div>');
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
             $model = $form->model();
