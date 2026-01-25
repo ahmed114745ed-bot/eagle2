@@ -2426,9 +2426,9 @@ class User extends Authenticatable
         if (!$wallet) {
             return 0;
         }
-        return ($wallet->balance ?? 0)
-            - ($wallet->cut_amount ?? 0)
-            - ($wallet->pending_amount ?? 0);
-            
+        
+        return (float)($wallet->balance ?? 0)
+            - (float)($wallet->cut_amount ?? 0)
+            - (float)($wallet->pending_amount ?? 0);
     }
 }
