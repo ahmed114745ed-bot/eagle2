@@ -100,9 +100,10 @@ class rankingServiceV2
         $item->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
         $item->vip = Common::ovip_center($user);
         $item->has_color_name = Common::hasInPack($user->id, 18, true);
-        $item->data_achivement = UserAchievementLevelsResource::collection(
-            $this->achievementService->getUserAchievement($user)
-        );
+        $achievements = $this->achievementService->getUserAchievement($user);
+        $item->data_achivement = class_exists(UserAchievementLevelsResource::class)
+            ? UserAchievementLevelsResource::collection($achievements)
+            : $achievements;
     }
 
     public function getRanking22(int $class, int $type, $user, int $limit)

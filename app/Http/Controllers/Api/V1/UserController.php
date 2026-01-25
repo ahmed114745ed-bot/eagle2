@@ -786,9 +786,11 @@ class UserController extends Controller
                     'name' => $sender->country->name ?? '',
                     'flag' => $sender->country->flag ?? '',
                 ],
-                'achievements' => UserAchievementLevelsResource::collection(
-                    $achievementService->getUserAchievement($sender)
-                ),
+                'achievements' => class_exists(UserAchievementLevelsResource::class)
+                    ? UserAchievementLevelsResource::collection(
+                        $achievementService->getUserAchievement($sender)
+                    )
+                    : $achievementService->getUserAchievement($sender),
                 'total'      => numToString($currentTotal),
                 'total_diff' => $totalDiff,
                 'frame'      => $frame,

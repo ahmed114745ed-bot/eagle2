@@ -65,7 +65,7 @@ class UserService
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
-        private readonly  GiftLogRepository $giftLogRepository,
+        private readonly GiftLogRepository $giftLogRepository,
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
@@ -787,7 +787,10 @@ class UserService
             $v->manger_type = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
             $v->vip = @Common::ovip_center($user);
             $v->has_color_name = Common::hasInPack($user->id, 18, true);
-            $v->data_achivement = UserAchievementLevelsResource::collection($achivement->getUserAchievement($user));
+            $achievements = $achivement->getUserAchievement($user);
+            $v->data_achivement = class_exists(UserAchievementLevelsResource::class)
+                ? UserAchievementLevelsResource::collection($achievements)
+                : $achievements;
 
             if ($v->sender_id == $user_id) {
                 $l = $i;

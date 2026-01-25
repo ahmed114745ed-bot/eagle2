@@ -30,8 +30,8 @@ use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use App\Http\Resources\RankingGameCollectionResource;
 use App\Contracts\UserAchievementContract;
-use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class RankingService
 {
@@ -104,9 +104,10 @@ class RankingService
         $item->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
         $item->vip = Common::ovip_center($user);
         $item->has_color_name = Common::hasInPack($user->id, 18, true);
-        $item->data_achivement = UserAchievementLevelsResource::collection(
-            $this->achievementService->getUserAchievement($user)
-        );
+        $achievements = $this->achievementService->getUserAchievement($user);
+        $item->data_achivement = class_exists(UserAchievementLevelsResource::class)
+            ? UserAchievementLevelsResource::collection($achievements)
+            : $achievements;
     }
 
     public function getRanking22(int $class, int $type, $user, int $limit)
@@ -164,7 +165,7 @@ class RankingService
         ];
 
         $data = $this->rankingRepo->getUserRanking($rel, $types[$type], $limit,$type);
-      
+
       if($rel == 'roomId') return RoomRankingResource::collection($data);
         $userExp = $data->firstWhere('ranker_id', $user->id)?->total_gifts ?? 0;
 
