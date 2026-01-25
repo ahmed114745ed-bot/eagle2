@@ -149,7 +149,14 @@ if (!function_exists('decryptToArray')) {
     {
         $iv = substr($key, 0, 16);
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
-        return json_decode($decrypted, true);
+        
+        if ($decrypted === false) {
+            return [];
+        }
+        
+        $result = json_decode($decrypted, true);
+        
+        return is_array($result) ? $result : [];
     }
 }
 
