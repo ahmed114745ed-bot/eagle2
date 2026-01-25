@@ -55,7 +55,7 @@ use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class UserService
@@ -758,7 +758,7 @@ class UserService
             });
 
         $i = $l = 0;
-        $achivement      = new UserAchievementService();
+        $achivement      = app(UserAchievementContract::class);
 
         foreach ($data as $k => &$v) {
             $user = User::find($v->sender_id);

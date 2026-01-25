@@ -18,7 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class RewardWinnerLevel implements ShouldQueue
 {

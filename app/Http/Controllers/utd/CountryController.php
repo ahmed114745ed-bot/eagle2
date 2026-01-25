@@ -14,7 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class CountryController extends Controller
 {

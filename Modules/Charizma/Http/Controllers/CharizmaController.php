@@ -12,7 +12,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Modules\Charizma\Http\Services\UserCharismaService;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 
 class CharizmaController extends Controller

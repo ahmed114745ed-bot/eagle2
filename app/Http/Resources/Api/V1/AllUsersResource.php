@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Facades\UserHandling;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class AllUsersResource extends JsonResource
 {
@@ -20,7 +20,7 @@ class AllUsersResource extends JsonResource
     public function toArray($request)
     {
         $usersSameDeviceToken =  User::select("name", 'uuid', 'phone')->where('device_token', $this->device_token)->where('id', '!=', $this->id)->where('device_token', '!=', null)->get();
-        $achievement      = new UserAchievementService();
+        $achievement = app(UserAchievementContract::class);
         $data_achivement = $achievement->getUserAchievement($this->resource);
         return [
             'id' => $this->id,

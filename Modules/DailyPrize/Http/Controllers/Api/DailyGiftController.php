@@ -22,7 +22,6 @@ use Utd\Achievements\Entities\UserAchievement;
 use Modules\DailyPrize\Transformers\WeeklyStarGift;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\DailyPrize\Http\Services\DailyPrizeService;
-use Utd\Achievements\Services\AchievementService;
 use Utd\Achievements\Transformers\AchievementResource;
 use Utd\Achievements\Transformers\AchievementDetailResource;
 use Utd\Achievements\Transformers\AchievementOneLevelsResource;

@@ -20,7 +20,7 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use App\Http\Resources\Api\V1\ChargeRecievedInfoResource;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;
 use Illuminate\Support\Facades\Log;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 
 class ChargeController extends Controller
@@ -263,7 +263,7 @@ class ChargeController extends Controller
         try {
             $userReceiver = $this->chargeService->sendMoney($user, $userUuid, $count);
             if ($userReceiver instanceof User) {
-                (new UserAchievementService())->insertCharging($userReceiver, $count);
+                app(UserAchievementContract::class)->insertCharging($userReceiver, $count);
             }
             UserCommon::UserEarnedInvitation($userReceiver->id, $count);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
@@ -334,7 +334,7 @@ class ChargeController extends Controller
             [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
 
             if ($user instanceof User) {
-                (new UserAchievementService())->insertCharging($receiver, $amount);
+                app(UserAchievementContract::class)->insertCharging($receiver, $amount);
             }
             UserCommon::UserEarnedInvitation($receiver->id, $amount);
             UserCommon::addChargeLevel($receiver->id, $amount);

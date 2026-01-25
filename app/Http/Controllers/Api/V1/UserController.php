@@ -62,7 +62,7 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class UserController extends Controller
@@ -752,7 +752,7 @@ class UserController extends Controller
     {
         $userId = request('user_id');
         $results = $this->userService->supporter($userId);
-        $achievementService = new UserAchievementService();
+        $achievementService = app(UserAchievementContract::class);
 
         $previousTotal = null;
 

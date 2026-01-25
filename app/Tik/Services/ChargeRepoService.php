@@ -23,7 +23,7 @@ use App\Http\Resources\Api\V1\GeneralUserResource;
 use App\Tik\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class ChargeRepoService
 {
@@ -82,7 +82,7 @@ class ChargeRepoService
             $this->userRepository->incrementCoins($toUserUuId, $coins);
 
             \DB::commit();
-            (new UserAchievementService())->insertCharging($userResve, $coins);
+            app(UserAchievementContract::class)->insertCharging($userResve, $coins);
             UserCommon::UserEarnedInvitation($userResve->id, $coins,$data->id);
 
             return true; //
@@ -107,7 +107,7 @@ class ChargeRepoService
             $this->charge($fromUser, $toUser, $chargeType, $coins, $usd);
 
             if ($toUser instanceof User) {
-                (new UserAchievementService())->insertCharging($toUser, $coins);
+                app(UserAchievementContract::class)->insertCharging($toUser, $coins);
             }
             UserCommon::UserEarnedInvitation($toUser->id, $coins);
             UserCommon::addChargeLevel($toUser->id, $coins);
@@ -582,7 +582,7 @@ class ChargeRepoService
         );
 
         if ($receiver instanceof User) {
-            (new UserAchievementService())->insertCharging($receiver, $amount);
+            app(UserAchievementContract::class)->insertCharging($receiver, $amount);
         }
 
         UserCommon::UserEarnedInvitation($receiver->id, $amount );

@@ -29,7 +29,7 @@ use App\Http\Resources\Api\V1\RoomRankingResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use App\Http\Resources\RankingGameCollectionResource;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 
@@ -42,7 +42,7 @@ class RankingService
         RankingRepository $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
-        public UserAchievementService $achievementService,
+        public UserAchievementContract $achievementService,
         RepositoriesCpRepository $cpRepository
     ) {
         $this->cpRepository = $cpRepository;

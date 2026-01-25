@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class ShowUserResource extends JsonResource
 {

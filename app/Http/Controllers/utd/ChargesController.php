@@ -15,7 +15,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\ChargeResource;
 use App\Http\Resources\UserChargeResource;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class ChargesController extends Controller
 {
@@ -131,7 +131,7 @@ class ChargesController extends Controller
             $user->save();
 
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount);
-            (new UserAchievementService())->insertCharging($user, $request->amount);
+            app(UserAchievementContract::class)->insertCharging($user, $request->amount);
         });
 
         return Common::apiResponse(true, 'Success');

@@ -41,7 +41,7 @@ use App\Admin\Widgets\Table as TableWidget;
 use Encore\Admin\Widgets\Table;
 
 use Modules\SwitchAccount\Entities\UserAccount;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 // use Encore\Admin\Actions\Response;
 
 class UserFamilyController extends MainController
@@ -370,7 +370,7 @@ class UserFamilyController extends MainController
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
-            $achivement      = new UserAchievementService();
+            $achivement      = app(UserAchievementContract::class);
             $data_achivement = $achivement->getUserAchievement($model);
 
             $filtered = $data_achivement->map(function ($user) {
