@@ -98,7 +98,7 @@ class RewardLevelIntervalController extends MainController
                 ]);
             });
         });
-        $grid->model()->with(['ware', 'vip', 'badge'])->where('level_interval_id', $level_interval);
+        $grid->model()->with(['ware', 'vip'])->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
