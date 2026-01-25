@@ -339,10 +339,14 @@ protected function detail($id)
         if ($withdrawal->status != 'pending') {
             return response()->json(['message' => 'العملية تمت مسبقاً'], 400);
         }
-        $available = wallet_available_by_wallet($wallet);
-        if ($available < $withdrawal->amount) {
-                throw new \Exception('Insufficient balance.');
+        
+        // التحقق من أن المبلغ موجود في المعلق
+        if ($wallet->pending_amount < $withdrawal->amount) {
+            return response()->json(['success' => false, 'message' => 'المبلغ غير متوفر في الرصيد المعلق'], 400);
         }
+        
+        $available = wallet_available_by_wallet($wallet);
+        
         $wallet->cut_amount += $withdrawal->amount;
         $wallet->pending_amount -= $withdrawal->amount;
         $wallet->save();
@@ -351,7 +355,8 @@ protected function detail($id)
         $withdrawal->status = 'approved';
         $withdrawal->save();
         $after_amount = wallet_available_by_user($withdrawal->user->id);
-            $walletLog = WalletLog::where('related_id', $withdrawal->id)->first();
+        $walletLog = WalletLog::where('related_id', $withdrawal->id)->first();
+        
         $walletLog->update([
             'wallet_id' => $wallet->id,
             'user_id' => $withdrawal->user->id,
