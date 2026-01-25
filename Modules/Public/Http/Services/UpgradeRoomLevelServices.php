@@ -19,18 +19,18 @@ class UpgradeRoomLevelServices
     {
         $room->total_diamond += $diamonds;
         $room->save();
-        \Log::info('Gift received after', [
-            // 'room_id' => $room->id,
-             'diamonds' => $diamonds,
-            'after' => $room->total_diamond,
+        // \Log::info('Gift received after', [
+        //     // 'room_id' => $room->id,
+        //      'diamonds' => $diamonds,
+        //     'after' => $room->total_diamond,
 
-        ]);
+        // ]);
         $this->checkUserLevelUpgrated($room);
-        \Log::info('Gift received', [
-            'room_id' => $room->id,
-            'diamonds' => $diamonds,
-            'before' => $room->total_diamond,
-        ]);
+        // \Log::info('Gift received', [
+        //     'room_id' => $room->id,
+        //     'diamonds' => $diamonds,
+        //     'before' => $room->total_diamond,
+        // ]);
     }
 
 
