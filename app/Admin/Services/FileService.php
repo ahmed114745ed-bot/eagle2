@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
+use App\Support\DynamicReals;
 
 class FileService
 {
@@ -42,7 +42,10 @@ class FileService
 
             $videoPath = getDriverUrl().'/'.$urlVideo;
 
-            (new FfmpegService())->extractByFrame($videoPath, $wareId);
+            $ffmpeg = DynamicReals::newFfmpegService();
+            if ($ffmpeg) {
+                $ffmpeg->extractByFrame($videoPath, $wareId);
+            }
 
             $imagePath = (config('app.env') !== 'production' ? '' : 'test-').'frames/'.$wareId.'.jpg';
 

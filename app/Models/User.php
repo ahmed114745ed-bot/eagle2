@@ -6,6 +6,7 @@ use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use App\Models\Config as ConfigModel;
 use App\Traits\DynamicAchievementTrait;
+use App\Traits\DynamicRealsTrait;
 use App\Traits\FollowTrait;
 use App\Traits\MomentRelationshipTrait;
 use App\Traits\PaymentGetWayTrait;
@@ -31,8 +32,6 @@ use Modules\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentUserGift;
-use Modules\Reals\Entities\Real;
-use Modules\Reals\Traits\RealRelationshipTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
@@ -47,7 +46,7 @@ use Modules\Vip\Entities\Vip;
  */
 class User extends Authenticatable
 {
-    use DynamicAchievementTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
+    use DynamicAchievementTrait, DynamicRealsTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -1257,10 +1256,7 @@ class User extends Authenticatable
         return $this->hasMany(Agency::class, 'agency_dash_manger_id');
     }
 
-    public function reals()
-    {
-        return $this->hasMany(Real::class, 'user_id');
-    }
+    // reals() method is now provided by DynamicRealsTrait
 
     public function moments()
     {

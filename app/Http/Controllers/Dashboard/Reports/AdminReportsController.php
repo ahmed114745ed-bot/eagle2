@@ -7,9 +7,9 @@ use App\Http\Resources\Dashboard\Reports\AdminMomentReports;
 use App\Http\Resources\Dashboard\Reports\AdminReealsReports;
 use App\Http\Resources\Dashboard\Reports\AdminTicketsResource;
 use App\Models\Ticket;
+use App\Support\DynamicReals;
 use Illuminate\Http\Request;
 use Modules\Moment\Entities\ReportMoment;
-use Modules\Reals\Entities\ReportReals;
 
 class AdminReportsController extends Controller
 {
@@ -22,7 +22,11 @@ class AdminReportsController extends Controller
 
     public function reels(Request $request)
     {
-        $data = ReportReals::whereHas('reel')->with('reel')->orderBy('id','desc')->paginate(10);
+        $query = DynamicReals::queryReportReals();
+        if (!$query) {
+            return response()->json(['data' => [], 'message' => 'Reals feature not available'], 200);
+        }
+        $data = $query->whereHas('reel')->with('reel')->orderBy('id','desc')->paginate(10);
         return AdminReealsReports::collection($data);
     }
     public function tickets(Request $request)

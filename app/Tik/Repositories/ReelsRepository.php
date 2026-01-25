@@ -2,23 +2,32 @@
 
 namespace App\Tik\Repositories;
 
+use App\Support\DynamicReals;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Reals\Entities\Real;
 
 class ReelsRepository extends AbstractRepository
 {
 
     public function __construct()
     {
-        $model = new Real();
-        parent::__construct($model);
-
-        if (!$this->model instanceof Real) return;
+        $realClass = DynamicReals::getRealClass();
+        if ($realClass) {
+            $model = new $realClass();
+            parent::__construct($model);
+        } else {
+            // Create a null model to prevent errors
+            parent::__construct(new class extends Model {
+                protected $table = 'reals';
+            });
+        }
     }
 
     public function all($perPage, $Page)
     {
+        if (!DynamicReals::isAvailable()) {
+            return collect()->paginate($perPage);
+        }
         $reals = $this->model->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar']);
         return $reals->paginate($perPage, ['*'], 'page', $Page);
     }

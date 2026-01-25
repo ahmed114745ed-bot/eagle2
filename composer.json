@@ -49,8 +49,9 @@
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
-        "utd/achievements": "dev-achievmentPackage",
-        "utd/moments": "dev-achievmentPackage"
+        "utd/achievements": "@dev",
+        "utd/moments": "dev-achievmentPackage",
+        "utd/reals": "@dev"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -62,7 +63,8 @@
             "App\\": "app/",
             "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Utd\\Reals\\": "packages/Utd/Reals/src/"
         },
         "files": [
             "app/helpers.php",
@@ -118,11 +120,21 @@
     "repositories": [
         {
             "type": "path",
-            "url": "packages/Utd/Moments"
+            "url": "packages/Utd/Moments",
+            "options": {
+                "symlink": true
+            }
         },
         {
             "type": "path",
             "url": "packages/Utd/Achievements",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Reals",
             "options": {
                 "symlink": true
             }

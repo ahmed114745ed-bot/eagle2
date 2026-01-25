@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
+use App\Support\DynamicReals;
 use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -358,7 +358,10 @@ class OvipGiftTapController extends MainController
                     $videoPath = getDriverUrl() . '/' . upload($form->img2);
                     $wareId = $form->model()->id;
 
-                    (new FfmpegService())->extractByDuration($videoPath, $wareId);
+                    $ffmpeg = DynamicReals::newFfmpegService();
+                    if ($ffmpeg) {
+                        $ffmpeg->extractByDuration($videoPath, $wareId);
+                    }
 
                     $imagePath = (config('app.env') !== 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
                     $response = Http::attach('image', Storage::disk('gcs')->get($imagePath), "{$wareId}.jpg")

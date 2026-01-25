@@ -20,7 +20,7 @@ use App\Admin\Controllers\MainController;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\RankingRange;
 use Modules\RankingReward\Entities\RankingReward;
-use Modules\Reals\Http\Services\InterventionImage;
+use App\Support\DynamicReals;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RankingTypeController extends MainController
@@ -584,7 +584,7 @@ class RankingTypeController extends MainController
                 }
 
                 $rewards = RankingReward::where('ranking_range_id', $rankingRange->id)->get();
-                $intervalImage = (new InterventionImage());
+                $intervalImage = DynamicReals::newInterventionImage();
 
 
                 $images = [];
@@ -632,8 +632,8 @@ class RankingTypeController extends MainController
                 }
 
                 //  dd( $images,$rewards,$target);
-                if (!empty($images)) {
-                    $intervalImageUrl =  $intervalImage->combineImages($images);
+                if (!empty($images) && $intervalImage) {
+                    $intervalImageUrl = $intervalImage->combineImages($images);
                     if ($intervalImageUrl) {
                         $rankingRange->generate_image = $intervalImageUrl;
                         $rankingRange->save();

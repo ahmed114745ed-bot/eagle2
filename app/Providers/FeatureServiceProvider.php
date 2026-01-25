@@ -5,10 +5,12 @@ use App\Contracts\MomentContract;
 use App\Contracts\AchievementContract;
 use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
+use App\Contracts\RealsContract;
 use App\Services\Null\NullMomentService;
 use App\Services\Null\NullAchievementService;
 use App\Services\Null\NullAchievementLevelService;
 use App\Services\Null\NullUserAchievementService;
+use App\Services\Null\NullRealsService;
 use Illuminate\Support\ServiceProvider;
 
 class FeatureServiceProvider extends ServiceProvider
@@ -43,6 +45,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 MomentContract::class,
                 NullMomentService::class
+            );
+        }
+
+        // Reals Feature
+        if (!$this->app->bound(RealsContract::class)) {
+            $this->app->singleton(
+                RealsContract::class,
+                NullRealsService::class
             );
         }
     }

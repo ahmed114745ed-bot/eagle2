@@ -13,18 +13,17 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
-use Modules\Reals\Entities\Real;
-use Modules\Moment\Entities\Moment;
+use App\Support\DynamicReals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Moment\Entities\MomentLikes;
-use Modules\Reals\Entities\RealUserLike;
 use Modules\FixedTarget\Enums\TargetType;
 use Modules\Moment\Entities\MomentCommint;
-use Modules\Reals\Entities\RealUserComment;
 use Modules\FixedTarget\Entities\SpecialUser;
 use Modules\FixedTarget\Classes\RegularTarget;
 use Modules\FixedTarget\Classes\FixedTargetClass;
 use Modules\FixedTarget\Interfaces\TargetInterface;
+use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 class FixedTargetV2Service
 {
@@ -109,12 +108,16 @@ class FixedTargetV2Service
                 $this->endDate
             ])->count();
 
-            $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                // Carbon::now()->startOfMonth(),
-                // Carbon::now()->endOfMonth()
-                $this->startDate,
-                $this->endDate
-            ])->count();
+            $realQuery = DynamicReals::queryReal();
+            $countReels = 0;
+            if ($realQuery) {
+                $countReels = $realQuery->where('user_id', $user->id)->whereBetween('created_at', [
+                    // Carbon::now()->startOfMonth(),
+                    // Carbon::now()->endOfMonth()
+                    $this->startDate,
+                    $this->endDate
+                ])->count();
+            }
 
 
             $userTarget = UserTarget::where('user_id', $user->id)->first();
@@ -281,8 +284,9 @@ class FixedTargetV2Service
 
 
                 $targetReel  = explode(',', $target->reel);
-                $targetMoment = explode(',', $target->moment);
 
+                $hasMomentModule = class_exists(Moment::class);
+                $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
 
@@ -315,9 +319,9 @@ class FixedTargetV2Service
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
             }else{
                 $times = $this->getUserLiveTime($user);
-                $hours = $times?->hnum ?? 0;     
+                $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
-                
+
                  UserSallary::updateOrCreate(
                     [
                         'user_id' => $user->id ,

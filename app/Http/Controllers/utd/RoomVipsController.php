@@ -6,7 +6,6 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\RoomVipResource;
 use App\Tik\Services\RoomVipsService;
-use Modules\Reals\Entities\Real;
 use App\Tik\Services\ReelsService;
 use Illuminate\Http\Request;
 use Exception;
