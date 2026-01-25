@@ -154,7 +154,7 @@ class UserWithdrawalController extends MainController
 
                         Swal.fire({
                             title: messages[actionType].title,
-                            type: 'question',
+                            icon: 'question',
                             showCancelButton: true,
                             confirmButtonText: messages[actionType].confirm,
                             cancelButtonText: messages[actionType].cancel,
@@ -168,7 +168,7 @@ class UserWithdrawalController extends MainController
                                     if(res.success){
                                         Swal.fire({
                                             title: res.message || messages.success[locale],
-                                            type: 'success',
+                                            icon: 'success',
                                             timer: 1800,
                                             showConfirmButton: false
                                         });
