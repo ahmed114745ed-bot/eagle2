@@ -16,7 +16,10 @@ class AchievementDatabaseSeeder extends Seeder
     {
         Model::unguard();
 
-        $this->call(AchievementTableSeeder::class);
-        $this->call(AchievementLevelTableSeeder::class);
+        $this->call([
+            MenuAchievementSeeder::class
+        ]);
+//        $this->call(AchievementTableSeeder::class);
+//        $this->call(AchievementLevelTableSeeder::class);
     }
 }

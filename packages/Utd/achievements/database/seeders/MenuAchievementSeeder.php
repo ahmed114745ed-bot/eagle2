@@ -1,41 +1,41 @@
 <?php
 
-namespace Utd\Moments\Database\Seeders;
+namespace Utd\Achievements\Database\Seeders;
 
 use Encore\Admin\Auth\Database\Menu;
 use Illuminate\Database\Seeder;
 
-class MenuMomentSeeder extends Seeder
+class MenuAchievementSeeder extends Seeder
 {
     public function run(): void
     {
         $parentOrder = Menu::where('parent_id', 0)->max('order') ?? 0;
 
-        $momentParent = Menu::firstOrCreate(
+        $achievementParent = Menu::firstOrCreate(
             [
-                'title' => 'Moment',
+                'title' => 'Achievements',
                 'parent_id' => 0,
             ],
             [
                 'order' => $parentOrder + 1,
-                'icon'  => '📸',
+                'icon'  => '🏅',
             ]
         );
 
         $this->createChildMenu(
-            $momentParent->id,
-            'Moment',
-            '/moment-viewer',
-            'browse-Moment',
-            '🕐'
+            $achievementParent->id,
+            'achievements',
+            '/achievements',
+            'browse-achievement',
+            '⭐'
         );
 
         $this->createChildMenu(
-            $momentParent->id,
-            'Moment reports',
-            '/report-moments',
-            'browse-report-moment',
-            '📈'
+            $achievementParent->id,
+            'Achievement Reports',
+            '/user-achievement-levels',
+            'browse-user_achievement_level',
+            '📄'
         );
     }
 
