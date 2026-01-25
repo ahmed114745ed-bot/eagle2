@@ -93,7 +93,27 @@ class EmojiController extends MainController
             $category = EmojiCategory::find($filterType);
         }
 
-       
+        // Header tabs
+        $grid->header(function () use ($filterType) {
+            $locale = App::getLocale();
+
+            $tabs = ['all' => __('All')];
+            $categories = EmojiCategory::orderBy('id')->get();
+            foreach ($categories as $cat) {
+                $title = $cat->title[$locale] ?? $cat->title['en'] ?? '';
+                $tabs[$cat->id] = $title;
+            }
+
+            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+            foreach ($tabs as $key => $label) {
+                $active = ($filterType == $key || ($filterType === 'all' && $key === 'all')) ? 'active' : '';
+                $url = request()->fullUrlWithQuery(['filter' => $key]);
+                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+            }
+            $html .= '</ul></div>';
+
+            return $html;
+        });
 
         // Apply filter to the grid
         if ($filterType !== 'all' && $filterType) {
