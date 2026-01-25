@@ -92,11 +92,10 @@ class WalletService
                 UserCoinLogType::APP_CHARGE,
             );
 
-            // لا نضيف للمحفظة - فقط نضيف للماس (di)
             $this->walletRepo->createLog([
                 'wallet_id' => $toWallet->id,
                 'user_id' => $toUserId,
-                'amount' => $amount,
+                'amount' => $usd,
                 'operation' => 'transfer',
                 'type' => 'transfer',
                 'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
