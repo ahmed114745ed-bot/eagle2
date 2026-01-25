@@ -23,8 +23,16 @@
     "Level Gifts history": "سجل هدايا المستويات",
     "Level Gifts History": "سجل هدايا المستويات",
 "Browse level gifts history": "استعرض سجل هدايا المستويات",
-    
-
+    "regions system": "نظام المناطق",
+"countries system": "نظام الدول",
+"chat": "الدردشة",
+"charging system": "نظام الشحن",
+"hosts system": "نظام المضيفين",
+"shipping agencies charge": "رسوم وكالات الشحن",
+"countries charge": "رسوم الدول",
+"e_wallet": "المحفظة الإلكترونية",
+"registration forms": "نماذج التسجيل",
+"addons": "الإضافات",
     "filter_month": "شهر",
     "this agency does not have owner": "هذه الوكالة ليس لديها مالك",
     "Play coin sound inside the room when the win amount is greater than or equal to the added value.":"تشغيل صوت الكوينات داخل الغرفه عندما تكون قيمه المكسب اكبر من او تساوى القيمه المضافه",
