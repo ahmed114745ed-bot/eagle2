@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\App;
 use App\Admin\Actions\Grid\MoveGroupEmoji;
 use App\Admin\Actions\MoveEmojiCategoryAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\Facades\Log;
 
 class EmojiController extends MainController
 {
@@ -28,30 +27,9 @@ class EmojiController extends MainController
     }
     public function index(Content $content)
     {
-        Log::info('=== EmojiController@index START ===');
-        Log::info('Request filter: ' . request('filter'));
-        Log::info('Request all: ', request()->all());
-        
-        $totalEmojis = \App\Models\Emoji::count();
-        Log::info('Total Emojis in DB: ' . $totalEmojis);
-        
-        $categories = \App\Models\EmojiCategory::count();
-        Log::info('Total EmojiCategories: ' . $categories);
-        
-        try {
-            $grid = $this->grid();
-            Log::info('Grid created successfully');
-            
-            return parent::index($content
-                ->title(trans('Emojis'))
-                ->row(function ($row) use ($grid) {
-                    $row->column(12, $grid);
-                }));
-        } catch (\Exception $e) {
-            Log::error('Error in EmojiController@index: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
-            throw $e;
-        }
+        return $content
+            ->title(trans('Emojis'))
+            ->body($this->grid());
     }
 
     /**
@@ -104,71 +82,65 @@ class EmojiController extends MainController
      */
     protected function grid()
     {
-        Log::info('=== EmojiController@grid START ===');
-        
         $grid = new Grid(new Emoji);
-      //  $grid->sortable();
 
         // Get the current filter from request or default to first category
         $filterType = request()->get('filter', 'all');
-        Log::info('Filter type: ' . $filterType);
         
-        $category  = [];
+        $category  = null;
 
-        if (request('filter') != 'all') {
-            $category = EmojiCategory::find(request('filter'));
-            Log::info('Category found: ' . ($category ? json_encode($category->toArray()) : 'null'));
+        if ($filterType !== 'all' && $filterType) {
+            $category = EmojiCategory::find($filterType);
         }
 
-
-
         // Header tabs
-        // $grid->header(function () use ($filterType) {
-        //     $locale = App::getLocale();
+        $grid->header(function () use ($filterType) {
+            try {
+                $locale = App::getLocale();
 
-        //     $tabs = ['all' => __('All')];
-        //     $categories = EmojiCategory::orderBy('id')->get();
-        //     foreach ($categories as $category) {
-        //         $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-        //         $tabs[$category->id] = $title;
-        //     }
+                $tabs = ['all' => __('All')];
+                $categories = EmojiCategory::orderBy('id')->get();
+                foreach ($categories as $cat) {
+                    // Handle both array and JSON string
+                    $titleData = $cat->title;
+                    if (is_string($titleData)) {
+                        $titleData = json_decode($titleData, true) ?? [];
+                    }
+                    $title = $titleData[$locale] ?? $titleData['en'] ?? $cat->id;
+                    $tabs[$cat->id] = $title;
+                }
 
-        //     $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-        //     foreach ($tabs as $key => $label) {
-        //         $active = $filterType == $key ? 'active' : '';
-        //         $url = request()->fullUrlWithQuery(['filter' => $key]);
-        //         $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-        //     }
-        //     $html .= '</ul></div>';
+                $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+                foreach ($tabs as $key => $label) {
+                    $active = ($filterType == $key || ($filterType === 'all' && $key === 'all')) ? 'active' : '';
+                    $url = request()->fullUrlWithQuery(['filter' => $key]);
+                    $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+                }
+                $html .= '</ul></div>';
 
-        //     return $html;
-        // });
+                return $html;
+            } catch (\Exception $e) {
+                \Log::error('EmojiController header error: ' . $e->getMessage());
+                return ''; // Return empty string on error
+            }
+        });
 
         // Apply filter to the grid
-        $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
-            Log::info('Applying filter: emoji_category_id = ' . $filterType);
-            $q->where('emoji_category_id', $filterType);
-        });
-
-        // Log the query being executed
-        $grid->model()->collection(function ($collection) use ($filterType) {
-            Log::info('=== Grid Query Result ===');
-            Log::info('Total records in collection: ' . $collection->count());
-            Log::info('First 5 records: ' . $collection->take(5)->pluck('id', 'name')->toJson());
-            return $collection;
-        });
+        if ($filterType !== 'all' && $filterType) {
+            $grid->model()->where('emoji_category_id', $filterType);
+        }
 
         // Columns
         $grid->id(__('ID'));
         $grid->name(__('name'));
         $grid->column('name_en', __('name_en'));
-        // $grid->column('emoji', trans('emoji'))->display(function ($path) {
-        //     $url = getImagePath($path);
-        //     return handleShowImageWithTypes($this->id, $url, 50, 50);
-        // });
+         $grid->column('emoji', trans('emoji'))->display(function ($path) {
+            $url = getImagePath($path);
+             return handleShowImageWithTypes($this->id, $url, 50, 50);
+         });
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
 
-        $this->extendGrid($grid);
+        // $this->extendGrid($grid);
 
         $grid->disableExport();
         $grid->disableCreateButton();
@@ -188,34 +160,43 @@ class EmojiController extends MainController
             });
         }
 
-        // Admin::style("
-        //     .rtl .column-emoji .rtlSvga{
-        //         direction: ltr;
-        //     }
-        // ");
-        // // Optional: remove table-responsive for large screens
-        // Admin::script("
-        //     if (window.innerWidth >= 1024) {
-        //         $('.table-responsive').removeClass('table-responsive');
-        //     }
-        // ");
+         Admin::style("
+             .rtl .column-emoji .rtlSvga{
+                 direction: ltr;
+             }
+         ");
+         // Optional: remove table-responsive for large screens
+            Admin::script("
+                if (window.innerWidth >= 1024) {
+                    $('.table-responsive').removeClass('table-responsive');
+            }
+         ");
         
         $permission    = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
-            $model = $actions->row;
+            try {
+                $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new MoveEmojiCategoryAction());
+                if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                    $actions->add(new MoveEmojiCategoryAction());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController actions error: ' . $e->getMessage());
             }
         });
 
+   
         $grid->batchActions(function ($batch) {
-            $batch->disableDelete();
-            $batch->add(new MoveGroupEmoji());
+            try {
+                $batch->disableDelete();
+                if (class_exists(MoveGroupEmoji::class)) {
+                    $batch->add(new MoveGroupEmoji());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController batchActions error: ' . $e->getMessage());
+            }
         });
 
-        Log::info('=== EmojiController@grid END ===');
-        
         return $grid;
     }
 
