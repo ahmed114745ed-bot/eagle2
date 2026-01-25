@@ -4,7 +4,7 @@ namespace App\Admin\Middleware;
 
 use Encore\Admin\Middleware\Pjax as BasePjax;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class PjaxOverride extends BasePjax
