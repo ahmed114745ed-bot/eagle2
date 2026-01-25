@@ -564,7 +564,7 @@ class RoomRepository extends AbstractRepository
 
     private function baseRoomQueryMine($user)
     {
-        $authUserId = request()->user()->id ?? 0;
+        $authUserId = request()->user()->id ?? $user->id;
 
         return $this->model
             ->where('uid', $user->id)
