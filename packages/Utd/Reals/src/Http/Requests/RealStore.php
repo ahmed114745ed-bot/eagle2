@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Reals\Http\Requests;
+namespace Utd\Reals\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -17,7 +17,7 @@ class RealStore extends FormRequest
             'video' => 'required',
             'description' => 'sometimes|max:500',
             'categories' => 'sometimes|array',
-            'categories.*' => 'sometimes    |int|exists:interests,id',
+            'categories.*' => 'sometimes|int|exists:interests,id',
         ];
     }
 

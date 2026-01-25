@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Reals\Http\Controllers\web;
+namespace Utd\Reals\Http\Controllers\Web;
 
 use App\Models\User;
 use Encore\Admin\Form;

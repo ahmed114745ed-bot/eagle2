@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\Reals\Http\Controllers\web;
+namespace Utd\Reals\Http\Controllers\Web;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Modules\Reals\Entities\Real;
-use Modules\Reals\Entities\ReportReals;
+use Utd\Reals\Entities\Real;
+use Utd\Reals\Entities\ReportReals;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 

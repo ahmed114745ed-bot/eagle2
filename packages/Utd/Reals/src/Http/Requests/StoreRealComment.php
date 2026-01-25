@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Reals\Http\Requests;
+namespace Utd\Reals\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

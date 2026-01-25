@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Reals\Http\Controllers;
+namespace Utd\Reals\Http\Controllers;
 
 use App\Helpers\Common;
 use App\Models\User;
@@ -8,8 +8,8 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Modules\Reals\Entities\Real;
-use Modules\Reals\Entities\ReportReals as EntitiesReportReals;
+use Utd\Reals\Entities\Real;
+use Utd\Reals\Entities\ReportReals as EntitiesReportReals;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class ReportController extends Controller

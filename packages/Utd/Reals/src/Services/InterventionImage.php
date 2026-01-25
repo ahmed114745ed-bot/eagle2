@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Reals\Http\Services;
+namespace Utd\Reals\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
