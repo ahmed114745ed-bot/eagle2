@@ -47,6 +47,18 @@ class WalletService
                 ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
 
             $available = wallet_available_by_wallet($fromWallet);
+            
+            \Log::info('Transfer - Wallet Info', [
+                'from_user_id' => $fromUserId,
+                'to_user_id' => $toUserId,
+                'amount' => $amount,
+                'wallet_id' => $fromWallet->id,
+                'wallet_balance' => $fromWallet->balance,
+                'wallet_cut_amount' => $fromWallet->cut_amount,
+                'wallet_pending_amount' => $fromWallet->pending_amount,
+                'available' => $available,
+            ]);
+            
             if ($available < $amount) {
                 throw new \Exception('Insufficient balance.');
             }
