@@ -57,21 +57,6 @@ class AchievementController extends Controller
         return Common::apiResponse(1, 'Achievements updated successfully', []);
     }
 
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Show the specified resource.
-     * @param int $id
-     * @return Renderable
-     */
-    public function show($id)
-    {
-        return view('achievement::show');
-    }
-
     /**
      * Update the specified resource in storage.
      * @param Request $request
@@ -248,17 +233,6 @@ class AchievementController extends Controller
         }
         $achievements = $achievementsQuery->get();
         return Common::apiResponse(1, 'successfully', AchievementDetailResource::collection($achievements));
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     * @param int $id
-     * @return Renderable
-     */
-    public function destroy($id)
-    {
-        //
     }
 
     public function achievement_valid_images()

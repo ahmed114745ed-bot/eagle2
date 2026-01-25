@@ -5,6 +5,7 @@ namespace Utd\Achievements;
 use App\Contracts\AchievementContract;
 use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Utd\Achievements\Services\AchievementService;
 use Utd\Achievements\Services\AchievementLevelsService;
@@ -92,8 +93,15 @@ class AchievementsServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         }
 
+        if (config('achievements.routes.utd_enabled', true)) {
+            Route::prefix('api/utd')
+                ->middleware(['api', 'localization'])
+                ->group(__DIR__ . '/../routes/utd.php');
+        }
+
         if (config('achievements.routes.web_enabled', true) && $this->isLaravelAdminInstalled()) {
             $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__ . '/../routes/preview.php');
         }
     }
 

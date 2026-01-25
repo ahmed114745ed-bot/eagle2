@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c03f9ececc2c68b86e653922a3d8df6",
+    "content-hash": "414c336e3e5251f087442f352735db50",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14375,6 +14375,47 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
+            "name": "utd/achievements",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Achievements",
+                "reference": "8030ba34491c98f883a5ecd11e13e7e5334d0509"
+            },
+            "require": {
+                "encore/laravel-admin": "^1.8",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Achievements\\AchievementsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Achievements\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Achievement System Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "utd/moments",
             "version": "dev-achievmentPackage",
             "dist": {
@@ -15187,6 +15228,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
+        "utd/achievements": 20,
         "utd/moments": 20
     },
     "prefer-stable": true,

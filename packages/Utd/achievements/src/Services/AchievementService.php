@@ -12,18 +12,18 @@ use Utd\Achievements\Repositories\AchievementRepository;
 use Utd\Achievements\Repositories\GiftAchievementRepository;
 use Utd\Achievements\Repositories\AchievementLevelRepository;
 use Utd\Achievements\Repositories\UserAchievementLevelRepository;
-use Request;
 
 class AchievementService implements AchievementContract
 {
     public function __construct(
-        private readonly AchievementRepository $achievementRepository,
-        private readonly AchievementLevelRepository $achievementLevelRepository,
-        private readonly GiftAchievementRepository $giftAchievementRepository,
-        private readonly GiftRepository $giftRepository,
+        private readonly AchievementRepository          $achievementRepository,
+        private readonly AchievementLevelRepository     $achievementLevelRepository,
+        private readonly GiftAchievementRepository      $giftAchievementRepository,
+        private readonly GiftRepository                 $giftRepository,
         private readonly UserAchievementLevelRepository $userAchievementLevelRepository,
-
-    ) {}
+    )
+    {
+    }
 
     public function show(User $user, int $page = 1)
     {
