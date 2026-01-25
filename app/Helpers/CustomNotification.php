@@ -59,7 +59,7 @@ class CustomNotification
     public function RoomLevel(int $userId ,$level, $reward)
     {
 
-        $user = User::withoutAppends()->where('id', $userId)->with('ownerAudioRoom.vipLevel')->first();
+        $user = User::withoutAppends()->where('id', $userId)->with('ownerAudioRoom.roomLevel')->first();
         if (!$user) {
             return 0;
         }
@@ -71,7 +71,7 @@ class CustomNotification
 
         $title = __('congratulation', [], $lang);
 
-        $image = $user->ownerAudioRoom->vipLevel?->img;
+        $image = $user->ownerAudioRoom->roomLevel?->img;
         $data = getImagePath($image);
         $icon = $data;
         if (!$user->is_logout)  Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data);
