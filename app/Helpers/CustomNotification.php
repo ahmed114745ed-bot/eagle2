@@ -58,10 +58,13 @@ class CustomNotification
 
     public function RoomLevel(int $userId ,$level, $reward)
     {
+
         $user = User::withoutAppends()->where('id', $userId)->with('ownerAudioRoom.vipLevel')->first();
         if (!$user) {
             return 0;
         }
+            \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
+
         $lang = $user->lan ?? 'en';
         $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
         $body = __('api.room_level', [ 'level' => $level, 'reward' => $reward],  $lang);
