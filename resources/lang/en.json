@@ -1622,6 +1622,7 @@
     "add_description": "Added :amount coins to your wallet",
     "transfer_title": "Transfer",
     "transfer_description": "Transferred :amount coins",
+    "withdrawal_pending": "Withdrawal request under review :amount",
     "subtract_title": "Withdraw",
     "subtract_description": "Withdrawn :amount coins from your wallet",
 

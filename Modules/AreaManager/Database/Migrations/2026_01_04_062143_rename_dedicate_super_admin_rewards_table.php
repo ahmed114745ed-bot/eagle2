@@ -11,13 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::rename(
-            'dedicate_super_admin_rewards',
-            'dedicate_admin_rewards'
-        );
-        Schema::table('dedicate_admin_rewards', function (Blueprint $table) {
-            $table->renameColumn('super_admin_id', 'admin_id');
-        });
+        // Rename table if old name exists and new name doesn't
+        if (Schema::hasTable('dedicate_super_admin_rewards') && !Schema::hasTable('dedicate_admin_rewards')) {
+            Schema::rename(
+                'dedicate_super_admin_rewards',
+                'dedicate_admin_rewards'
+            );
+        }
+        
+        // Rename column if table exists and old column exists
+        if (Schema::hasTable('dedicate_admin_rewards') && Schema::hasColumn('dedicate_admin_rewards', 'super_admin_id')) {
+            Schema::table('dedicate_admin_rewards', function (Blueprint $table) {
+                $table->renameColumn('super_admin_id', 'admin_id');
+            });
+        }
     }
 
     public function down(): void

@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('country_categories', function (Blueprint $table) {
-            $table->id();
-            $table->json('title');
-            $table->string('type');
-             $table->bigInteger('sort')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('country_categories')) {
+            Schema::create('country_categories', function (Blueprint $table) {
+                $table->id();
+                $table->json('title');
+                $table->string('type');
+                 $table->bigInteger('sort')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

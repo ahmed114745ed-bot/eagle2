@@ -31,7 +31,7 @@ class EnterRoomCollection extends JsonResource
         $owner = $this->owner;
         $vip_level_img = Common::ovip_center_rank_img($owner->id);
 
-        $cpRoomHistories = CpRoomHistory::where('room_id',$this->id)->get(['index1', 'index2']);
+        $cpRoomHistories = CpRoomHistory::where('room_id', $this->id)->get(['index1', 'index2']);
 
         $indices = $cpRoomHistories->map(function ($history) {
             return [$history->index1, $history->index2];
@@ -49,30 +49,30 @@ class EnterRoomCollection extends JsonResource
             "room_background"     => $this->final_room_image, // room background
             "owner_image"         => $owner->avatar ?: '', // owner image
             'owner_task_room_id'  => $this->taskStream?->id,
-            'current_task_room_id'=> $this->taskStreamRoom?->task_stream_id,
+            'current_task_room_id' => $this->taskStreamRoom?->task_stream_id,
             "giftPrice"           => $this->session_string ?: '', // gift price
             "password_status"     => !($this->room_pass == ""), // room password state
             "admins"              => explode(',', $this->room_admin ?? ''), // room admins
             "pk"                  => (@$pks[0]) && $pks[0]->end_at >= now() ? new PkCollection($pks[0]) : new \stdClass(), // all pk data
             "room_intro"          => $this->room_intro, // room intro
-//            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
+            //            "microphones"         => $this->getMicrophones($this->microphone, $this->main_microphone), // seat states
             "microphones"         => $this->getMicrophones2(), // seat states
             "cp_indexs"           => $indices, // cp
             "charisma_status"     => ($this->charizma_status) ? true : false, // isCharisma
-            "is_comment_closed"   => $this->is_comment_closed ,
+            "is_comment_closed"   => $this->is_comment_closed,
             'is_live' => (bool) ($this->is_live ?? false),
             "room_rule"           => Common::getConfig('room_rule' . (app()->getLocale() != 'ar' ? '_en' : '')), // room rules
             //////////////////////////////////////////////////////////
             ///
             ///
-            'lucky_gift_coins' => Common::getSettingsValue('lucky_gift_coins') ?? 2000, 
+            'lucky_gift_coins' => Common::getSettingsValue('lucky_gift_coins') ?? 2000,
             "room_id_num"         => $this->numid,
             "room_status"         => (string)$this->room_status,
 
             "name"                => @$this->name ?? '',
             "room_pass"           => $this->room_pass,
             'room_type'           =>  app()->getLocale() === 'ar' ? $this->roomCategory?->name  ?? $this->roomCategory?->name_en : $this->roomCategory?->name_en ?? $this->roomCategory?->name,
-
+            'room_level_image'   => $this->type == 'audio' ? @$this->roomLevel->img ?? '' : '',
             "hot"                 => '',
             "microphone"          => $this->microphone,
             "room_welcome"        => $this->room_welcome,
@@ -91,7 +91,7 @@ class EnterRoomCollection extends JsonResource
             'owner_image_color'          => @$owner?->color_image,
             'owner_avatar'        => @$owner->profile->avatar ?? '',
             'owner_vip_level'     => (int) ($owner->UserVip->level ?? 0),
-            'owner_vip_img'     => $vip_level_img  ,
+            'owner_vip_img'     => $vip_level_img,
             'vip' => [
                 'id'        => 1,
                 'level'     =>  0,

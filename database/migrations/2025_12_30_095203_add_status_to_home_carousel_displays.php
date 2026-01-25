@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('home_carousel_displays', function (Blueprint $table) {
-            $table->boolean('status')->default(true);
-        });
+        if (!Schema::hasColumn('home_carousel_displays', 'status')) {
+            Schema::table('home_carousel_displays', function (Blueprint $table) {
+                $table->boolean('status')->default(true);
+            });
+        }
     }
 
     /**

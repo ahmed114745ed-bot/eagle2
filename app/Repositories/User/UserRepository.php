@@ -112,6 +112,10 @@ class UserRepository extends Repository
             ->where(function ($query) {
                 $query->where('is_bd', 0)
                     ->orWhereNull('is_bd');
+            })->where(function ($query) {
+                $query->where('is_super_admin', 0)->orWhereNull('is_super_admin');
+            })->where(function ($query) {
+                $query->where('is_sub_super_admin', 0)->orWhereNull('is_sub_super_admin');
             })
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);
@@ -233,6 +237,8 @@ class UserRepository extends Repository
                 $query->where('is_super_admin', 0)->orWhereNull('is_super_admin');
             })->where(function ($query) {
                 $query->where('is_sub_super_admin', 0)->orWhereNull('is_sub_super_admin');
+            })->where(function ($query) {
+                $query->where('agency_id', 0)->orWhereNull('agency_id');
             })
             ->whereDoesntHave('hostAgency', function ($query) {
                 $query->where('type', 1);

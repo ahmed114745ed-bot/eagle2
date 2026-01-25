@@ -23,7 +23,14 @@ class OvipRepository extends AbstractRepository
     {
         return $this->model
             ->newQuery()
-            ->select('id', 'name', 'level', 'img')
+            ->select('id', 'name', 'level', 'img', 'background_img')
+            ->get();
+    }
+
+    public function getOvipByLevel(): Collection
+    {
+        return $this->model
+            ->select('id',  'level', 'background_img')->orderBy('level', 'asc')
             ->get();
     }
 

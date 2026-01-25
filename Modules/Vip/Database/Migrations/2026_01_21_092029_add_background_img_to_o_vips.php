@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('badges', 'show_image')) {
-            Schema::table('badges', function (Blueprint $table) {
-                $table->string('show_image')->nullable();
-            });
-        }
+        Schema::table('o_vips', function (Blueprint $table) {
+           $table->string('background_img')->nullable()->after('img');
+        });
     }
 
     /**
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('badges', function (Blueprint $table) {
-            $table->dropColumn('show_image');
+        Schema::table('o_vips', function (Blueprint $table) {
+            $table->dropColumn('background_img');
         });
     }
 };

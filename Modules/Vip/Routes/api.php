@@ -14,18 +14,20 @@ use Modules\Vip\Http\Controllers\Api\VipController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan' ,'update.last.seen'])->group(
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->group(
     function () {
-        
+
         Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-        Route::get('/list', [VipController::class, 'vipList']);
-        Route::get('/user/list', [VipController::class, 'vipUserList']);
-        Route::post('/buyVip', [VipController::class, 'buyVip']);
-        Route::post('/buy-vip-percentage', [VipController::class, 'buyVipPercentage']);
-        Route::post('/use', [VipController::class, 'vip_use']);
-        Route::post('/use-pack', [VipController::class, 'pack_use']);
-        Route::post('/send-to-user', [VipController::class, 'vip_send']);
-    });
-    Route::get('levels/badges', [VipController::class, 'badges']);
-    Route::get('levels', [VipController::class, 'index']);
-    });
+            Route::get('/theme-settings', [VipController::class, 'background']);
+            Route::get('/list', [VipController::class, 'vipList']);
+            Route::get('/user/list', [VipController::class, 'vipUserList']);
+            Route::post('/buyVip', [VipController::class, 'buyVip']);
+            Route::post('/buy-vip-percentage', [VipController::class, 'buyVipPercentage']);
+            Route::post('/use', [VipController::class, 'vip_use']);
+            Route::post('/use-pack', [VipController::class, 'pack_use']);
+            Route::post('/send-to-user', [VipController::class, 'vip_send']);
+        });
+        Route::get('levels/badges', [VipController::class, 'badges']);
+        Route::get('levels', [VipController::class, 'index']);
+    }
+);
