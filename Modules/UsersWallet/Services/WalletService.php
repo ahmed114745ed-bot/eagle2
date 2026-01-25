@@ -33,7 +33,7 @@ class WalletService
         $this->walletRepo = $walletRepo;
     }
 
-    public function transfer(int $fromUserId, int $toUserId, float $amount)
+    public function transfer(int $fromUserId, int $toUserId, float $amount , float $usd )
     {
 
         $app_feature = \Cache::get('host_agency');
@@ -47,7 +47,19 @@ class WalletService
                 ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
 
             $available = wallet_available_by_wallet($fromWallet);
-            if ($available < $amount) {
+            
+            \Log::info('Transfer - Wallet Info', [
+                'from_user_id' => $fromUserId,
+                'to_user_id' => $toUserId,
+                'amount' => $amount,
+                'wallet_id' => $fromWallet->id,
+                'wallet_balance' => $fromWallet->balance,
+                'wallet_cut_amount' => $fromWallet->cut_amount,
+                'wallet_pending_amount' => $fromWallet->pending_amount,
+                'available' => $available,
+            ]);
+            
+            if ($available < $usd) {
                 throw new \Exception('Insufficient balance.');
             }
 
