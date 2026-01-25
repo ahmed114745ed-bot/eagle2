@@ -42,10 +42,10 @@ class AchievementsServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/achievements.php' => config_path('achievements.php'),
             ], 'achievements-config');
 
-            $this->publishes([
-                __DIR__ . '/../database/migrations' => database_path('migrations'),
-            ], 'achievements-migrations');
-
+//            $this->publishes([
+//                __DIR__ . '/../database/migrations' => database_path('migrations'),
+//            ], 'achievements-migrations');
+//
 //            $this->publishes([
 //                __DIR__ . '/../database/seeders' => database_path('seeders/Achievements'),
 //            ], 'achievements-seeders');

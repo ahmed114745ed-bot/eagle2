@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #2563eb;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #1e3a8a;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #3b82f6;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #1e40af;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #dbeafe;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>🏆 Achievements Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Achievements package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: January 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Setup</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#verification">6. Verification</a></li>
+            <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+            <li><a href="#api-reference">8. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+    
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>1.8+</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Required Contracts</h2>
+    <p>The following contracts must exist in your application's <code>app/Contracts/</code> directory:</p>
+    <ul>
+        <li><code>AchievementContract.php</code></li>
+        <li><code>AchievementLevelContract.php</code></li>
+        <li><code>UserAchievementContract.php</code></li>
+    </ul>
+
+    <h2>1.3 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    <ul>
+        <li><code>achievements</code> - Main achievements table (Recharge, Room, Gift targets)</li>
+        <li><code>achievement_levels</code> - Achievement level definitions with targets</li>
+        <li><code>gift_achievements</code> - Gift-based achievement tracking</li>
+        <li><code>user_achievements</code> - User progress tracking per achievement</li>
+        <li><code>user_achievement_levels</code> - User earned achievement levels/medals</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>achievements</code> folder to your project:</p>
+        <pre><code>packages/Utd/achievements</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/achievements"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/achievements</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Migrations</span>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Run Database Seeders</span>
+        <p>Run the Achievement seeders to set up achievement types and levels:</p>
+        <pre><code>php artisan db:seed --class=Utd\\Achievements\\Database\\Seeders\\AchievementDatabaseSeeder</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">6</span>
+        <span class="step-title">Update Admin Permissions</span>
+        <p>Run the permissions seeder to add Achievement permissions:</p>
+        <pre><code>php artisan db:seed --class=PermissionTypeSeeder</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">7</span>
+        <span class="step-title">Clear Cache</span>
+        <pre><code>php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=achievements-config</code></pre>
+
+    <h2>3.2 Configuration File</h2>
+    <p>After publishing, you can edit the configuration in <code>config/achievements.php</code>:</p>
+
+    <pre><code>&lt;?php
+
+return [
+    'routes' => [
+        'api_enabled' => true,
+        'web_enabled' => true,
+        'utd_enabled' => true,
+    ],
+];</code></pre>
+
+    <h2>3.3 Achievement Types</h2>
+    <p>The package supports three achievement types:</p>
+    <table>
+        <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Tracking Method</th>
+        </tr>
+        <tr>
+            <td>RECHARGE_TARGET</td>
+            <td>User recharge/charging achievements</td>
+            <td>Total coins charged</td>
+        </tr>
+        <tr>
+            <td>ROOM_TARGET</td>
+            <td>Room activity achievements</td>
+            <td>Room coins earned</td>
+        </tr>
+        <tr>
+            <td>GIFT_TARGET</td>
+            <td>Gift-based achievements</td>
+            <td>Gifts received value</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Setup</h1>
+
+    <h2>4.1 Migrations</h2>
+    <p>The package includes the following migrations:</p>
+    <ul>
+        <li><code>create_achievements_table</code> - Main achievements table</li>
+        <li><code>create_achievement_levels_table</code> - Level definitions</li>
+        <li><code>create_gift_achievements_table</code> - Gift achievement relations</li>
+        <li><code>create_user_achievements_table</code> - User progress tracking</li>
+        <li><code>create_user_achievement_levels_table</code> - User earned medals</li>
+    </ul>
+
+    <h2>4.2 Entity Relationships</h2>
+    <pre><code>Achievement
+├── hasMany: AchievementLevel
+└── hasMany: UserAchievement
+
+AchievementLevel
+├── belongsTo: Achievement
+└── hasMany: UserAchievementLevel
+
+UserAchievement
+├── belongsTo: User
+├── belongsTo: Achievement
+└── belongsTo: GiftAchievement (optional)
+
+UserAchievementLevel
+├── belongsTo: User
+├── belongsTo: AchievementLevel
+└── belongsTo: GiftAchievement (optional)</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 API Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievement</td>
+            <td>Get all achievements</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievement/{id}</td>
+            <td>Get achievement details</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievement/user/{id}</td>
+            <td>Get user achievement levels</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/user-achievement-select</td>
+            <td>Select/pick achievement medal</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievement-all</td>
+            <td>Get all achievements</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievements-details/{id?}</td>
+            <td>Get achievement details</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/achievements-picked/{id?}</td>
+            <td>Get picked/selected achievements</td>
+        </tr>
+    </table>
+
+    <h2>5.2 UTD API Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/achievements/all</td>
+            <td>List all achievements</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/achievements/{id}/level</td>
+            <td>Get achievement levels</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/achievements/create-level</td>
+            <td>Create achievement level</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/achievements/update-level/{id}</td>
+            <td>Update achievement level</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/achievements/show/{id}</td>
+            <td>Show achievement level</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/achievements/target-level</td>
+            <td>Get target types</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/utd/achievements/user-achievement-level</td>
+            <td>List user achievement levels</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/achievements/enable/{id}</td>
+            <td>Toggle enable status</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/utd/achievements/create/user-level</td>
+            <td>Create user achievement level</td>
+        </tr>
+    </table>
+
+    <h2>5.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr achievement</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Verification -->
+    <h1 id="verification">6. Verification</h1>
+
+    <h2>6.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/achievements</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Config Published</td>
+            <td>Check <code>config/achievements.php</code></td>
+            <td>File exists</td>
+        </tr>
+        <tr>
+            <td>3. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All achievement migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>4. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>achievement routes visible</td>
+        </tr>
+        <tr>
+            <td>5. Admin Panel</td>
+            <td>Visit /admin/achievements</td>
+            <td>Page loads without errors</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Get All Achievements
+curl -X GET "https://your-domain.com/api/achievement-all" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Get User Achievement Levels
+curl -X GET "https://your-domain.com/api/utd/achievements/user-achievement-level" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If you can access the admin panel and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Troubleshooting -->
+    <h1 id="troubleshooting">7. Troubleshooting</h1>
+
+    <h2>7.1 Common Issues</h2>
+
+    <h3>Issue: Class Not Found Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan cache:clear
+php artisan config:clear</code></pre>
+    </div>
+
+    <h3>Issue: Route Not Defined Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Clear route cache and verify routes are registered:</p>
+        <pre><code>php artisan route:clear
+php artisan route:list | findstr achievement</code></pre>
+    </div>
+
+    <h3>Issue: Contract Not Found</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure the following contracts exist in <code>app/Contracts/</code>:</p>
+        <ul>
+            <li>AchievementContract.php</li>
+            <li>AchievementLevelContract.php</li>
+            <li>UserAchievementContract.php</li>
+        </ul>
+    </div>
+
+    <h3>Issue: Null Service When Package Not Installed</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure <code>FeatureServiceProvider</code> binds null services when package is absent:</p>
+        <pre><code>if (!$this->app->bound(UserAchievementContract::class)) {
+    $this->app->singleton(UserAchievementContract::class, NullUserAchievementService::class);
+}</code></pre>
+    </div>
+
+    <h2>7.2 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: API Reference -->
+    <h1 id="api-reference">8. API Reference</h1>
+
+    <h2>8.1 Service Methods</h2>
+    
+    <h3>UserAchievementService</h3>
+    <pre><code>// Track user charging
+insertCharging(User $user, $totalCoins): void
+
+// Track room target
+roomTarget(User $user, $totalCoins): void
+
+// Track gift target
+giftTarget(Gift $gift, $total): void
+
+// Get user achievements
+getUserAchievement(User $user): Collection
+
+// Get room achievements
+roomAchievement(int $ownerId): Collection</code></pre>
+
+    <h3>AchievementLevelsService</h3>
+    <pre><code>// Assign achievement to user
+assignAchievementToUser(?Model $userAchievement): void
+
+// Assign level by admin
+assignAchievementLevelToUserByAdmin(int $userId, AchievementLevel $level): bool
+
+// Process monthly achievements
+setUserAchievementLevel(bool $isTest = false): void</code></pre>
+
+    <h2>8.2 Using Contracts</h2>
+    <pre><code>// Inject via constructor
+public function __construct(
+    private UserAchievementContract $achievementService
+) {}
+
+// Or resolve from container
+$service = app(UserAchievementContract::class);
+$service->insertCharging($user, 1000);</code></pre>
+
+    <h2>8.3 Achievement Types Enum</h2>
+    <pre><code>use Utd\Achievements\Enums\AchievementType;
+
+AchievementType::RECHARGE_TARGET  // User recharge achievements
+AchievementType::ROOM_TARGET      // Room-based achievements
+AchievementType::GIFT_TARGET      // Gift-based achievements</code></pre>
+
+    <h2>8.4 Target Types Enum</h2>
+    <pre><code>use Utd\Achievements\Enums\TargetType;
+
+TargetType::DEFAULT   // Permanent achievement
+TargetType::MONTHLY   // Monthly achievement (30 days)
+TargetType::WEEKLY    // Weekly achievement (7 days)</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your Achievements package is now ready to use.</p>
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: January 2026
+        </p>
+    </div>
+
+</body>
+</html>
