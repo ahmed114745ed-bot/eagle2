@@ -84,16 +84,75 @@ class EmojiController extends MainController
     {
         $grid = new Grid(new Emoji);
 
-        // Simple columns only
-        $grid->column('id', 'ID');
-        $grid->column('name', 'Name');
-        $grid->column('enable', 'Enable');
+        // Get the current filter from request or default to first category
+        $filterType = request()->get('filter', 'all');
+        
+        $category  = null;
+
+        if ($filterType !== 'all' && $filterType) {
+            $category = EmojiCategory::find($filterType);
+        }
+
+       
+
+        // Apply filter to the grid
+        if ($filterType !== 'all' && $filterType) {
+            $grid->model()->where('emoji_category_id', $filterType);
+        }
+
+        // Columns
+        $grid->id(__('ID'));
+        $grid->name(__('name'));
+        $grid->column('name_en', __('name_en'));
+         $grid->column('emoji', trans('emoji'))->display(function ($path) {
+            $url = getImagePath($path);
+             return handleShowImageWithTypes($this->id, $url, 50, 50);
+         });
+        $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
+
+        $this->extendGrid($grid);
 
         $grid->disableExport();
         $grid->disableCreateButton();
-        $grid->disableFilter();
-        $grid->disableRowSelector();
-        $grid->disableActions();
+
+        if ($category && $filterType != 'all') {
+            $grid->tools(function (Grid\Tools $tools) use ($filterType) {
+                $url =  url('/admin/emojis/create/' . $filterType); // Use Laravel route helper
+                $add = __('add');
+
+                $customButtonHTML = <<<HTML
+                <a href="{$url}" class="btn btn-sm btn-success" style="margi    n-right: 10px;">
+                    <i class="fa fa-plus"></i> {$add}
+                </a>
+            HTML;
+
+                $tools->append($customButtonHTML);
+            });
+        }
+
+         Admin::style("
+             .rtl .column-emoji .rtlSvga{
+                 direction: ltr;
+             }
+         ");
+         // Optional: remove table-responsive for large screens
+            Admin::script("
+                if (window.innerWidth >= 1024) {
+                    $('.table-responsive').removeClass('table-responsive');
+            }
+         ");
+        
+        $permission    = $this->permission_name;
+        $grid->actions(function ($actions) use ($permission) {
+            $model = $actions->row;
+
+            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                $actions->add(new MoveEmojiCategoryAction());
+            }
+        });
+
+      
+
         
         return $grid;
     }
@@ -105,18 +164,17 @@ class EmojiController extends MainController
      * @param mixed $id
      * @return Show
      */
-    
     protected function detail($id)
     {
         $show = new Show(Emoji::findOrFail($id));
 
-        $show->field('id', 'ID');
-        $show->field('pid', 'pid');
-        $show->field('name', 'name');
-        $show->field('emoji', 'emoji');
-        $show->field('t_length', 't_length');
-        $show->field('enable', 'enable');
-        $show->field('sort', 'sort');
+        $show->id('ID');
+        $show->pid('pid');
+        $show->name('name');
+        $show->emoji('emoji');
+        $show->t_length('t_length');
+        $show->enable('enable');
+        $show->sort('sort');
         $this->extendShow($show);
         return $show;
     }
@@ -126,8 +184,6 @@ class EmojiController extends MainController
      *
      * @return Form
      */
-
-
     protected function form()
     {
         $form = new Form(new Emoji);
