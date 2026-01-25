@@ -49,6 +49,9 @@ class TransactionLogsResource extends JsonResource
                 $title = __('withdrawal rejected');
                 break;
 
+            case 'withdraw_to_shipping_agency':
+                $title = __('withdraw_to_shipping_agency');
+                break;
 
             default:
                 $title = '';
