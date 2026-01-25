@@ -97,7 +97,7 @@ class RewardLevelIntervalController extends MainController
                 ]);
             });
         });
-        $grid->model()->where('level_interval_id', $level_interval);
+        $grid->model()->with(['ware', 'vip', 'badge'])->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
@@ -112,6 +112,28 @@ class RewardLevelIntervalController extends MainController
                 return "<img src='$value' width='80' height='80'>";
             }
         });
+
+         $grid->column('image', __('image'))->display(function ($path) {
+                if ($this->type == 'ware') {
+                    $ware = $this->ware;
+                    $path = $ware->img2 ?? ($ware->show_img ?? "");
+                } elseif ($this->type == 'vip') {
+                    $vips = $this->vip;
+                    $path = $vips->img ?? '';
+                } elseif ($this->type == 'badge') {
+                    // $vips = Badge::find($this->target);
+                    $path = @$this->badge->image ?? '';
+                } elseif ($this->type == 'achievement') {
+                    $path = $this->target;
+                } else {
+                    $path = 'coin.png';
+                }
+
+                /** @var Gift $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        
         $grid->tools(function (Grid\Tools $tools) {
             $url = '/admin/level-intervals';
             $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("back") . '</a>';

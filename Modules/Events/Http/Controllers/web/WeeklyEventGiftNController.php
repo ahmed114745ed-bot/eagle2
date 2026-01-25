@@ -129,7 +129,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -149,10 +149,10 @@ class WeeklyEventGiftNController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
