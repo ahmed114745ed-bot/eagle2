@@ -5154,5 +5154,6 @@
     "moment_viewer.refresh": "تحديث",
     "moment_viewer.loadMore": "تحميل المزيد",
     "Settings updated successfully!": "تم تحديث الإعدادات بنجاح!",
-    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
+    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا",
+    "withdrawal_request_created": "تم إنشاء طلب السحب بنجاح. الحالة: قيد الانتظار."
 }

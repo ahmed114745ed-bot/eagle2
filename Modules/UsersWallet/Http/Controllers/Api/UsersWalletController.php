@@ -110,7 +110,7 @@ class UsersWalletController extends Controller
 
             return Common::apiResponse(
                 true,
-                'Withdrawal request created successfully. Status: pending.',
+                __('withdrawal_request_created'),
                 $withdrawal
             );
         });
