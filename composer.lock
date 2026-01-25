@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c03f9ececc2c68b86e653922a3d8df6",
+    "content-hash": "2e61c7b51b0e524d50c4cff75b8832a5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14373,6 +14373,47 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/v2.4.0"
             },
             "time": "2025-12-02T11:56:42+00:00"
+        },
+        {
+            "name": "utd/achievements",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/achievements",
+                "reference": "0bac63d13b4a92191c62beccecd5046ce57c812e"
+            },
+            "require": {
+                "encore/laravel-admin": "^1.8",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Achievements\\AchievementsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Achievements\\": "src/",
+                    "Utd\\Achievements\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Achievement System Package with License Support",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "utd/moments",

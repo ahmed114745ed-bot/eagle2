@@ -16,7 +16,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Utd\\Achievements\\": "src/"
+            "Utd\\Achievements\\": "src/",
+            "Utd\\Achievements\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "extra": {

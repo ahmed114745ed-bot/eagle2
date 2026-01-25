@@ -49,6 +49,7 @@
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
+        "utd/achievements": "*",
         "utd/moments": "dev-achievmentPackage"
     },
     "require-dev": {
@@ -121,10 +122,7 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/Achievements",
-            "options": {
-                "symlink": true
-            }
+            "url": "packages/Utd/achievements"
         }
     ]
 }
