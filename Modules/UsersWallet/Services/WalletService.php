@@ -33,7 +33,7 @@ class WalletService
         $this->walletRepo = $walletRepo;
     }
 
-    public function transfer(int $fromUserId, int $toUserId, float $amount)
+    public function transfer(int $fromUserId, int $toUserId, float $amount , float $usd )
     {
 
         $app_feature = \Cache::get('host_agency');
@@ -59,7 +59,7 @@ class WalletService
                 'available' => $available,
             ]);
             
-            if ($available < $amount) {
+            if ($available < $usd) {
                 throw new \Exception('Insufficient balance.');
             }
 

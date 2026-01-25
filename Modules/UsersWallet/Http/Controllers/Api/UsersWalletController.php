@@ -75,12 +75,13 @@ class UsersWalletController extends Controller
         if (!$rate) return Common::apiResponse(0, __('please set usd_value_in_coins in configs'), 422);
         $usd = $request->amount;
         $coins = $usd * $rate;
-        return $this->handleRequest(function () use ($request, $coins) {
+        return $this->handleRequest(function () use ($request, $coins,$usd) {
             $from = $request->user();
             $result = $this->walletService->transfer(
                 Auth::id(),
                 $request->user_id,
-                $coins
+                $coins,
+                $usd 
             );
 
 
