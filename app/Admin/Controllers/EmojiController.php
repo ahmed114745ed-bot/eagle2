@@ -42,22 +42,11 @@ class EmojiController extends MainController
             $grid = $this->grid();
             Log::info('Grid created successfully');
             
-            // Log the rendered grid HTML length
-            $gridHtml = $grid->render();
-            Log::info('Grid HTML length: ' . strlen($gridHtml));
-            Log::info('Grid HTML first 500 chars: ' . substr($gridHtml, 0, 500));
-            
-            // Check if table has rows
-            if (strpos($gridHtml, '<tr') !== false) {
-                preg_match_all('/<tr/', $gridHtml, $matches);
-                Log::info('Number of <tr> tags in grid: ' . count($matches[0]));
-            } else {
-                Log::warning('No <tr> tags found in grid HTML!');
-            }
-            
             return parent::index($content
                 ->title(trans('Emojis'))
-                ->body($gridHtml));
+                ->row(function ($row) use ($grid) {
+                    $row->column(12, $grid);
+                }));
         } catch (\Exception $e) {
             Log::error('Error in EmojiController@index: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
