@@ -44,7 +44,9 @@ class EmojiController extends MainController
             
             return parent::index($content
                 ->title(trans('Emojis'))
-                ->body($grid));
+                ->row(function ($row) use ($grid) {
+                    $row->column(12, $grid);
+                }));
         } catch (\Exception $e) {
             Log::error('Error in EmojiController@index: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
@@ -121,26 +123,26 @@ class EmojiController extends MainController
 
 
         // Header tabs
-        $grid->header(function () use ($filterType) {
-            $locale = App::getLocale();
+        // $grid->header(function () use ($filterType) {
+        //     $locale = App::getLocale();
 
-            $tabs = ['all' => __('All')];
-            $categories = EmojiCategory::orderBy('id')->get();
-            foreach ($categories as $category) {
-                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-                $tabs[$category->id] = $title;
-            }
+        //     $tabs = ['all' => __('All')];
+        //     $categories = EmojiCategory::orderBy('id')->get();
+        //     foreach ($categories as $category) {
+        //         $title = $category->title[$locale] ?? $category->title['en'] ?? '';
+        //         $tabs[$category->id] = $title;
+        //     }
 
-            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-            foreach ($tabs as $key => $label) {
-                $active = $filterType == $key ? 'active' : '';
-                $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-            }
-            $html .= '</ul></div>';
+        //     $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+        //     foreach ($tabs as $key => $label) {
+        //         $active = $filterType == $key ? 'active' : '';
+        //         $url = request()->fullUrlWithQuery(['filter' => $key]);
+        //         $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+        //     }
+        //     $html .= '</ul></div>';
 
-            return $html;
-        });
+        //     return $html;
+        // });
 
         // Apply filter to the grid
         $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
@@ -186,17 +188,18 @@ class EmojiController extends MainController
             });
         }
 
-        Admin::style("
-            .rtl .column-emoji .rtlSvga{
-                direction: ltr;
-            }
-        ");
-        // Optional: remove table-responsive for large screens
-        Admin::script("
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
-        }
-    ");
+        // Admin::style("
+        //     .rtl .column-emoji .rtlSvga{
+        //         direction: ltr;
+        //     }
+        // ");
+        // // Optional: remove table-responsive for large screens
+        // Admin::script("
+        //     if (window.innerWidth >= 1024) {
+        //         $('.table-responsive').removeClass('table-responsive');
+        //     }
+        // ");
+        
         $permission    = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
