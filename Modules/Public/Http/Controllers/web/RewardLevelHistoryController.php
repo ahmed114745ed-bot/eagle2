@@ -48,14 +48,14 @@ class RewardLevelHistoryController extends MainController
                     });
                 }, __('username'))->placeholder(__('search for host by username'));
             });
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('levelInterval.type', __('type'))->select([
-                    1 => __('receiver'),
-                    2 => __('sender'),
-                    3 => __('room'),
+            // $filter->column(1 / 2, function ($filter) {
+            //     $filter->equal('levelInterval.type', __('type'))->select([
+            //         1 => __('receiver'),
+            //         2 => __('sender'),
+            //         3 => __('room'),
 
-                ]);
-            });
+            //     ]);
+            // });
 
 
             $filter->column(1 / 2, function ($filter) {
@@ -84,7 +84,9 @@ class RewardLevelHistoryController extends MainController
                 'user.profile',
                 'user.country',
                 'levelInterval',
-            ])->groupBy('user_id', 'level_interval_id', 'user_level', 'min', 'max');
+            ])->whereHas('levelInterval', function ($query) {
+                $query->where('type', 3);
+            })->groupBy('user_id', 'level_interval_id', 'user_level', 'min', 'max');
         $grid->column('id', __('Id'));
         $grid->column('superadmin', __('user'))->display(function ($name) {
 
@@ -147,9 +149,9 @@ class RewardLevelHistoryController extends MainController
         ");
 
         $grid->column('user_level', __('level'));
-        $grid->column('type', __('type'))->display(function ($value) {
-            return  $this->levelInterval->type == 3 ? __("room") : ($this->levelInterval->type == 1 ? __("receiver") : __("sender"));
-        });
+        // $grid->column('type', __('type'))->display(function ($value) {
+        //     return  $this->levelInterval->type == 3 ? __("room") : ($this->levelInterval->type == 1 ? __("receiver") : __("sender"));
+        // });
         $grid->column('created_at', __('Created at'));
         $grid->disableRowSelector();
         $grid->disableExport();
