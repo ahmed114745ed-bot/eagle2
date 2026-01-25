@@ -386,16 +386,30 @@ protected function detail($id)
         $after_amount = wallet_available_by_user($withdrawal->user->id);
 
         $walletLog = WalletLog::where('related_id', $withdrawal->id)->first();
-        $walletLog->update([
-            'wallet_id' => $wallet->id,
-            'user_id' => $withdrawal->user->id,
-            'amount' => $withdrawal->amount,
-            'operation' => 'rejected',
-            'type' => 'user',
-            'before_amount' => $available,
-            'after_amount' => $after_amount,
-            'related_id' => $withdrawal->id
-        ]);
+        if (!$walletLog) {
+            \Log::error('WalletLog not found for withdrawal', ['withdrawal_id' => $withdrawal->id]);
+            return response()->json(['success' => false, 'message' => 'WalletLog not found for this withdrawal'], 404);
+        }
+        
+        try {
+            $walletLog->update([
+                'wallet_id' => $wallet->id,
+                'user_id' => $withdrawal->user->id,
+                'amount' => $withdrawal->amount,
+                'operation' => 'rejected',
+                'type' => 'user',
+                'before_amount' => $available,
+                'after_amount' => $after_amount,
+                'related_id' => $withdrawal->id
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to update WalletLog', [
+                'withdrawal_id' => $withdrawal->id,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json(['success' => false, 'message' => 'Failed to update log: ' . $e->getMessage()], 500);
+        }
+        
         CustomNotification::withdrawalRejected($withdrawal->user, $withdrawal->amount);
 
         return response()->json(['success'=> true ,'message' => 'تم رفض الطلب وإزالة المبلغ من المعلّق']);
