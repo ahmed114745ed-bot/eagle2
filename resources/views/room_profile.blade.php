@@ -52,6 +52,14 @@
                         <span class="meta-label">{{__('Max Admins')}}:</span>
                         <span class="meta-value">{{ @$room->max_admin }}</span>
                     </div>
+
+                     <div class="meta-item">
+                        <span class="meta-label">{{__('level')}}:</span>
+                        <span class="meta-value">
+                                    <img src="{{ getImagePath(@$room->roomLevel->img) }}"
+                                         style="height: 24px;">
+                                </span>
+                    </div>
                 </div>
 
                 <div class="agency-meta">
