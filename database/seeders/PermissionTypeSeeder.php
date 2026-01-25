@@ -6,6 +6,7 @@ use App\Models\RoleCategory;
 use App\Enums\PermissionType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Utd\Achievements\Entities\Achievement;
 use Utd\Moments\Entities\Moment;
 
 
@@ -306,7 +307,7 @@ class PermissionTypeSeeder extends Seeder
                         'except' => ['create', 'delete', 'show'],
                         'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse',  'edit'],
+                            PermissionType::ADMIN->value => ['browse', 'edit'],
                         ],
                     ],
                     [
@@ -341,7 +342,7 @@ class PermissionTypeSeeder extends Seeder
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 9],
                 ],
-                'permissions' =>  [
+                'permissions' => [
                     [
                         'key' => 'app-wallet',
                         'except' => ['create', 'edit', 'delete', 'show'],
@@ -538,7 +539,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
-             [
+            [
                 'name' => 'rewards',
                 'sort' => 17,
                 'types' => [
@@ -548,11 +549,11 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'super-package-reward', 'except' => ['show'], 'additional' => ['dedicate-switch'], 'types' => [
                         PermissionType::ADMIN->value => ['dedicate-switch', 'browse', 'create', 'edit', 'delete'],
                     ],],
-                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete','show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value =>['dedicate-switch', 'browse'],
+                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse'],
                     ],],
-                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete','show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => [ 'browse', ],
+                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse',],
                     ],],
                 ],
             ],
@@ -796,24 +797,6 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
-                    ],],
-                ],
-            ],
-            [
-                'name' => 'Achievements',
-                'sort' => 28,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 28],
-                ],
-                'permissions' => [
-                    ['key' => 'achievement', 'except' => ['create', 'delete'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'edit',],
-                    ],],
-                    ['key' => 'achievement_level', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'user_achievement_level', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                 ],
             ],
@@ -1116,8 +1099,8 @@ class PermissionTypeSeeder extends Seeder
                         'except' => ['delete'],
                         'additional' => ['delete-switch', 'choose-switch', 'stop-salary-switch'],
                         'types' => [
-                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit',  'show'],
+                            PermissionType::SUPER_ADMIN->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'delete-switch', 'choose-switch', 'stop-salary-switch', 'create', 'edit', 'show'],
 
 
                         ],
@@ -1168,7 +1151,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'host', 'except' => ['create'], 'additional' => [], 'types' => [
                         PermissionType::SUPER_ADMIN->value => ['browse', 'edit', 'delete', 'show',],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'edit',  'show',],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'edit', 'show',],
                     ],],
 
                 ],
@@ -1236,6 +1219,27 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'report-moment', 'except' => ['edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'create'],
+                    ],],
+                ],
+            ];
+        }
+
+        if (class_exists(Achievement::class)) {
+            $categories[] = [
+                'name' => 'Achievements',
+                'sort' => 28,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 28],
+                ],
+                'permissions' => [
+                    ['key' => 'achievement', 'except' => ['create', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'edit',],
+                    ],],
+                    ['key' => 'achievement_level', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'user_achievement_level', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                 ],
             ];
@@ -1366,7 +1370,7 @@ class PermissionTypeSeeder extends Seeder
 
         foreach ($permissions as $permissionId) {
             DB::table('admin_role_permissions')->updateOrInsert(
-                ['role_id' =>  $role->id, 'permission_id' => $permissionId->id]
+                ['role_id' => $role->id, 'permission_id' => $permissionId->id]
             );
         }
     }
