@@ -1042,6 +1042,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'reward-level-interval', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'level-gifts-history', 'except' => ['edit', 'delete', 'show','create'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                 ],
             ],
             [

@@ -10,6 +10,7 @@ use Illuminate\Bus\Queueable;
 use App\Enums\UserCoinLogType;
 use Modules\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
+use App\Facades\CustomNotification;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Modules\Public\Entities\LevelInterval;
@@ -44,6 +45,7 @@ class RewardWinnerLevel implements ShouldQueue
 
         if ($levelInterval) {
             $rewards = RewardLevelInterval::where('level_interval_id', $levelInterval->id)->get();
+            $firstReward = $rewards->first();
             $user = User::query()->find($this->userId);
             if (!$user) return;
             foreach ($rewards as $rewad) {
@@ -91,6 +93,8 @@ class RewardWinnerLevel implements ShouldQueue
                 ];
                 WinnerLevelInterval::query()->create($data);
             }
+
+            CustomNotification::RoomLevel($user, $this->level, $firstReward->levelInterval->type);
         }
     }
 }
