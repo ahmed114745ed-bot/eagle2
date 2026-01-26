@@ -29,6 +29,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -1516,7 +1517,7 @@ class UserController extends Controller
         $currentLevel = $user->senderLevel;
 
         $expLevel             = $user->total_sender_diamonds;
-      
+
 
         if ($currentLevel) {
             $secondLevel = Vip::where('type', 2)
@@ -1526,8 +1527,8 @@ class UserController extends Controller
         } else {
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
-       
-       
+
+
         if ($secondLevel != null && $currentLevel != null) {
             $remaining       = $secondLevel?->exp - $expLevel;
             $exactlyValue    = @$secondLevel?->exp;
@@ -1553,8 +1554,13 @@ class UserController extends Controller
             $progress  = 1;
             $remaining = 0;
         }
-
-
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+        $gold_level = $user->total_sender_level ?? 0;
+        $diamondSend = $user->total_sender_diamonds ?? 0;
+        $current_gold_num = Common::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
+        $senderNum = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
+        $per = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
 
         $data = [
 
@@ -1564,7 +1570,7 @@ class UserController extends Controller
             'sender_level' => intval($user->senderLevel?->level),
             'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
             'remaining_to_next_level' => $remaining ?? 0,
-            'sender_per' => $progress ?? 1,
+            'sender_per' => Common::userLevelPer($user),
 
 
         ];
