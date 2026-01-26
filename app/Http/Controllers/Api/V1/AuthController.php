@@ -269,12 +269,35 @@ class AuthController extends Controller
             return Common::apiResponse(false, $ex->getMessage(), null, 422);
         }
 
+        if (!$this->canLogin($user)) {
+            return Common::apiResponse(false, 'you are blocked', [], 422);
+        }
+
         $user->auth_token = $token;
 
-        event(new DeviceTokenSent($user->id, $user->device_token));
-        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        try {
+            if ($user->device_token) {
+                event(new DeviceTokenSent($user->id, $user->device_token));
+            }
+        } catch (\Throwable $e) {
+            // Ignore event errors
+        }
 
-        return Common::apiResponse(true, '', new MyDataResource($user), 200);
+        try {
+            AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        } catch (\Throwable $e) {
+            // Ignore device link errors
+        }
+
+        return Common::apiResponse(
+            true,
+            __('api_responses.logged'),
+            [
+                'id'            => $user->id,
+                'is_first'      => (bool) ($user->is_points_first ?? false),
+                'auth_token'    => $user->auth_token
+            ]
+        );
     }
 
 
