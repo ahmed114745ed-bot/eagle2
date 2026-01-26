@@ -75,11 +75,9 @@ class RemainingDiamondUsersCommand extends Command
                         if (!$user || $diamonds <= 0) {
                             continue;
                         }
-
-                        // Prevent double processing in same month
                         $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)
-                            ->whereMonth('created_at', $dt->month)
-                            ->whereYear('created_at', $dt->year)
+                            ->where('month', $month)
+                            ->where('year', $year)
                             ->first();
 
                         if ($remainingDiamonds) {
