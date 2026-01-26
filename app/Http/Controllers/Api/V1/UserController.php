@@ -1516,7 +1516,7 @@ class UserController extends Controller
         $currentLevel = $user->senderLevel;
 
         $expLevel             = $user->total_sender_diamonds;
-        $diamondSend = $user->total_diamond_send;
+      
 
         if ($currentLevel) {
             $secondLevel = Vip::where('type', 2)
@@ -1526,9 +1526,10 @@ class UserController extends Controller
         } else {
             $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
         }
-
+       
+       
         if ($secondLevel != null && $currentLevel != null) {
-            $remaining       = $secondLevel?->exp - $diamondSend;
+            $remaining       = $secondLevel?->exp - $expLevel;
             $exactlyValue    = @$secondLevel?->exp;
             $progressCurrent = $expLevel - $currentLevel->exp;
             $progressNext    = $secondLevel->exp - $currentLevel->exp;
