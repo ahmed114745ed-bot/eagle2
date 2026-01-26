@@ -492,7 +492,7 @@
                 </div>
             </div>
 
-            @if(\App\Support\DynamicReals::modelExists())
+            @if(\App\Support\DynamicReals::isAvailable())
             <div class="feature-card">
                 <div class="feature-header">
                     <div class="feature-icon">

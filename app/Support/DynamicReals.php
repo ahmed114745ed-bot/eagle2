@@ -195,9 +195,4 @@ class DynamicReals
         $class = self::getReportRealsClass();
         return $class ? $class::query() : null;
     }
-
-    public static function modelExists(): bool
-    {
-        return class_exists(Real::class);
-    }
 }
