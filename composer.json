@@ -50,7 +50,8 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "dev-achievmentPackage",
-        "utd/moments": "dev-achievmentPackage"
+        "utd/moments": "dev-achievmentPackage",
+        "utd/shipping-agency": "dev-achievmentPackage"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -123,6 +124,10 @@
         {
             "type": "path",
             "url": "packages/Utd/achievements"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/ShippingAgency"
         }
     ]
 }

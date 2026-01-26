@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Admin;
 use App\Models\Agency;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;

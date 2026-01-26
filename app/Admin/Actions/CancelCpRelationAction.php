@@ -8,7 +8,7 @@ use App\Models\Setting;
 use Modules\CP\Entities\Cp;
 use Illuminate\Http\Request;
 use App\Models\ChargeInvoice;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Admin as Script;

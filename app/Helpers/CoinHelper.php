@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\User;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\CoinLog;
 use Modules\Public\Http\Services\UserCounterServices;
 

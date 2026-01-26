@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\CoinLog;
 use App\Helpers\UserCommon;

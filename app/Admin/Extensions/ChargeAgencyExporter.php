@@ -2,7 +2,7 @@
 
 namespace App\Admin\Extensions;
 
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\AgencySallary;

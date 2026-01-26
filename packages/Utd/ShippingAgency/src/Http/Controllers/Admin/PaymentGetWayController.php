@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\ShippingAgency\Http\Controllers\Admin;
 
 
+use App\Admin\Controllers\MainController;
+use App\Models\PaymentGateway;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\PaymentGateway;
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\AdminController;
+use Encore\Admin\Show;
 
 class PaymentGetWayController extends MainController
 {
@@ -62,7 +61,7 @@ class PaymentGetWayController extends MainController
             ->body($this->form()));
     }
 
-    
+
 
     /**
      * Make a grid builder.

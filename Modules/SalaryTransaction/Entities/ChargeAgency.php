@@ -2,7 +2,7 @@
 
 namespace Modules\SalaryTransaction\Entities;
 
-use App\Models\ShippingAgency as ModelsAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency as ModelsAgency;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

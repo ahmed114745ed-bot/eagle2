@@ -3,7 +3,7 @@
 namespace App\Bd\Controllers;
 
 use App\Enums\UserCoinLogType;
-use App\Helpers\ShippingAgencyHelper;
+use Utd\ShippingAgency\Helpers\ShippingAgencyHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Bd;
@@ -18,7 +18,7 @@ use App\Helpers\Common;
 use App\Models\BDSallary;
 use App\Models\UserWallet;
 use Illuminate\Http\Request;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Services\WalletService;
 use Encore\Admin\Layout\Content;
 use App\Models\WalletTransaction;

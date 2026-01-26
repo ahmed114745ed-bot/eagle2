@@ -1,8 +1,18 @@
 <?php
 
-namespace App\Models;
+namespace Utd\ShippingAgency\Entities;
 
-use App\Models\Scopes\ShippingAgencyScope;
+use App\Models\Admin;
+use App\Models\AdminUser;
+use App\Models\Agency;
+use App\Models\AgencyJoinRequest;
+use App\Models\AgencySallary;
+use App\Models\AgencyUserJob;
+use App\Models\Charge;
+use App\Models\CoinLog;
+use App\Models\Country;
+use App\Models\User;
+use App\Models\UserTarget;
 use App\Traits\CreatedByTrait;
 use App\Traits\PaymentGetWayTrait;
 use App\Traits\TimestampsWithTimezone;
@@ -14,10 +24,11 @@ use Modules\AgencyApp\Traits\AgencyAdditionalInfoTraits;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
+use Utd\ShippingAgency\Scopes\ShippingAgencyScope;
 
 class ShippingAgency extends Model
 {
-    use AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone ,CreatedByTrait;
+    use AgencyAdditionalInfoTraits, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait;
 
     protected $table = 'agencies';
 
@@ -39,16 +50,17 @@ class ShippingAgency extends Model
 
     public function charges()
     {
-        return $this->hasMany(Charge::class, 'user_id','id')->where('charger_type','agency');
+        return $this->hasMany(Charge::class, 'user_id', 'id')->where('charger_type', 'agency');
     }
+
     public function senderCharges()
     {
-        return $this->hasMany(Charge::class, 'charger_id','id')->where('charger_type','agency');
+        return $this->hasMany(Charge::class, 'charger_id', 'id')->where('charger_type', 'agency');
     }
 
     public function receiveShippingAgencyCharges()
     {
-        return $this->hasMany(Charge::class, 'user_id','id')->where('user_type','agency');
+        return $this->hasMany(Charge::class, 'user_id', 'id')->where('user_type', 'agency');
     }
 
     public function Countries()
@@ -210,7 +222,7 @@ class ShippingAgency extends Model
 
     public function salaries()
     {
-        return $this->hasMany(UserSallary::class, 'sallary');
+        return $this->hasMany(\App\Models\UserSallary::class, 'sallary');
     }
 
     public function agencySalaries()
@@ -228,7 +240,7 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -247,7 +259,7 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -280,14 +292,13 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySallary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        return      round($agencySallary, 2);
-
+        return round($agencySallary, 2);
     }
 
     public function getSalary($month = null, $year = null)

@@ -10,7 +10,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
 use App\Models\Charge;
 use App\Models\ReturnCharge;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\UserSallary;
 use Encore\Admin\Actions\Action;
 use Auth;

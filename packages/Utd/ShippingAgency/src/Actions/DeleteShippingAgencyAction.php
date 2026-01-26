@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Admin\Actions;
+namespace Utd\ShippingAgency\Actions;
 
 use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agency;
-use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteShippingAgencyAction extends RowAction
@@ -21,6 +18,7 @@ class DeleteShippingAgencyAction extends RowAction
         $this->name = __("dashboard.delete");
         parent::__construct();
     }
+
     public function handle(Model $model, Request $request)
     {
         try {
@@ -39,9 +37,7 @@ class DeleteShippingAgencyAction extends RowAction
 
     public function dialog()
     {
-      //  $this->confirm(__('dashboard.chickDelete'), '', []);
-
-      $this->confirm(__('dashboard.chickDelete'), __('messages.deleteShipping'), [
+        $this->confirm(__('dashboard.chickDelete'), __('messages.deleteShipping'), [
             'icon' => 'warning',
             'showCancelButton' => true,
             'confirmButtonText' => __('messages.yes'),

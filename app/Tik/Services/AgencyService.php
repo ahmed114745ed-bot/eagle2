@@ -44,7 +44,7 @@ use App\Tik\Repositories\ChargeAgencyRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
-use App\Tik\Repositories\ShippingAgencyRepository;
+use Utd\ShippingAgency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;

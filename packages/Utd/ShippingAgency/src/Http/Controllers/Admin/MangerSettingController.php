@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\ShippingAgency\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Config;
 use App\Models\Language;
 use App\Models\PaymentGateway;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
-use Encore\Admin\Form;
-
-use Request;
 
 class MangerSettingController extends MainController
 {

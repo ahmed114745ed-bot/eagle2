@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Helpers;
+namespace Utd\ShippingAgency\Helpers;
 
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 
 class ShippingAgencyHelper
 {
@@ -10,7 +10,6 @@ class ShippingAgencyHelper
     {
         return settings()->get('transfer_salary_reliable_shipping_agency') == 1;
     }
-
 
     public static function isVerifiedChargeForAgency(ShippingAgency $agency): bool
     {

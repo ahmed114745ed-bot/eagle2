@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Selectables;
+namespace Utd\ShippingAgency\Selectables;
 
 use Encore\Admin\Grid\Filter;
-use App\Models\ShippingAgency;
-use Modules\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
 use Illuminate\Support\Facades\Auth;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 
 class ShippingAgencies extends Selectable
 {
-
     public $model = ShippingAgency::class;
 
     public function make()
@@ -21,7 +19,6 @@ class ShippingAgencies extends Selectable
         $this->column('id');
         $this->column('name', __('name'));
         $this->column('img', __('img'))->display(function ($path) {
-            /** @var OVip $this */
             $url = getImagePath($path);
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });

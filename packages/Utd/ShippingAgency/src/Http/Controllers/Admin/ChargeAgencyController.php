@@ -1,9 +1,9 @@
 <?php
 
-namespace Modules\SalaryTransaction\Http\Controllers;
+namespace Utd\ShippingAgency\Http\Controllers\Admin;
 
 use App\Admin\Controllers\MainController;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

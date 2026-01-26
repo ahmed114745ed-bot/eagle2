@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\ShippingAgency\Http\Controllers\Admin;
 
 use App\Models\Charge;
 use App\Models\CoinLog;
@@ -12,7 +12,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\AgencySallary;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\DeleteShippingAgencyAction;
+use Utd\ShippingAgency\Actions\DeleteShippingAgencyAction;
 use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
@@ -56,7 +56,7 @@ class AppearChargerAgencyController extends MainController
 
         return (new Box(
             title: __('admin.Actions'),
-            content: view('admin.grid.users.reliable_shipping_agency', compact(['transfer_salary'])),
+            content: view('shipping-agency::admin.grid.reliable_shipping_agency', compact(['transfer_salary'])),
         ));
     }
 
@@ -210,7 +210,7 @@ class AppearChargerAgencyController extends MainController
         );
 
         return $content->title(__('agency profile'))
-            ->view('agency_profile', $data);
+            ->view('shipping-agency::admin.agency_profile', $data);
     }
 
     /**
@@ -584,7 +584,7 @@ class AppearChargerAgencyController extends MainController
         $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
 
         return $content->title(__('agency profile'))
-            ->view('shippingAgencyProfile', compact(
+            ->view('shipping-agency::admin.shippingAgencyProfile', compact(
                 'agency',
                 'resiveds',
                 'coinLogs',
@@ -593,5 +593,10 @@ class AppearChargerAgencyController extends MainController
                 'totalReceive',
                 'totalSend'
             ));
+    }
+
+    public function filterCharges($id, Request $request, Content $content)
+    {
+        return $this->shippingProfile($id, $request, $content);
     }
 }

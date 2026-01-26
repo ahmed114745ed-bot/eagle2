@@ -13,7 +13,7 @@ use App\Models\CoinLog;
 use App\Models\GiftLog;
 use Illuminate\Http\Request;
 use App\Models\AgencySallary;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\DeleteShippingAgencyAction;
+use Utd\ShippingAgency\Actions\DeleteShippingAgencyAction;
 
 
 class AppearChargerAgencyController extends MainController

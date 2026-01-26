@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Scopes;
+namespace Utd\ShippingAgency\Scopes;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

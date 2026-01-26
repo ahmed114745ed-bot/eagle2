@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d763e7e4cd9747810fd59243bbb2c549",
+    "content-hash": "6a365e4bc4f6f6a830ab351081e3b5a2",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14380,7 +14380,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/achievements",
-                "reference": "0bac63d13b4a92191c62beccecd5046ce57c812e"
+                "reference": "93b4976488dc5e5d9a9a37248d438330facc3448"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14451,6 +14451,46 @@
                 }
             ],
             "description": "Moments Laravel Package",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/shipping-agency",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/ShippingAgency",
+                "reference": "68a2eee9fc03251815d8369b78b1c7195e64f471"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\ShippingAgency\\ShippingAgencyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\ShippingAgency\\": "src/",
+                    "Utd\\ShippingAgency\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Shipping Agency Laravel Package",
             "transport-options": {
                 "relative": true
             }
@@ -15229,7 +15269,8 @@
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
         "utd/achievements": 20,
-        "utd/moments": 20
+        "utd/moments": 20,
+        "utd/shipping-agency": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
