@@ -284,15 +284,15 @@
 }</code>
             </div>
 
-            <p class="step-desc" style="margin-top: 20px;"><strong>ج) أضف في قسم "autoload" → "psr-4":</strong></p>
-            <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
-                <code>"Utd\\Reals\\": "packages/Utd/Reals/src/"</code>
-            </div>
-
             <div class="success">
                 ✅ <strong>ملاحظة هامة:</strong> المشروع يستخدم <code>RealsPackageServiceProvider</code> الذي يتحقق تلقائياً من وجود الحزمة.
-                لا تحتاج لتعديل <code>config/app.php</code> - الحزمة ستُكتشف تلقائياً!
+                لا تحتاج لتعديل <code>config/app.php</code> أو إضافة autoload يدوياً - الحزمة ستُكتشف وتُحمّل تلقائياً!
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ج) ثم نفذ الأمر:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>composer update utd/reals</code>
             </div>
         </div>
 

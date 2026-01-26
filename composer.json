@@ -50,7 +50,8 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "dev-reelsPackage",
-        "utd/moments": "dev-reelsPackage"
+        "utd/moments": "dev-reelsPackage",
+        "utd/reals": "@dev"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -62,8 +63,7 @@
             "App\\": "app/",
             "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/",
-            "Utd\\Reals\\": "packages/Utd/Reals/src/"
+            "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
             "app/helpers.php",

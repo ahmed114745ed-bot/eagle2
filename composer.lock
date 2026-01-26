@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5f34d4dde9928e2c121302092f75346e",
+    "content-hash": "ce3bd413d83c0b91b0a8046a774a2057",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14458,6 +14458,58 @@
             }
         },
         {
+            "name": "utd/reals",
+            "version": "dev-reelsPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Reals",
+                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
+            },
+            "require": {
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/http": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Reals\\RealsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Reals\\": "src/",
+                    "Utd\\Reals\\Database\\Seeders\\": "database/Seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Utd\\Reals\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Reels/Reals Feature Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15231,7 +15283,8 @@
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
         "utd/achievements": 20,
-        "utd/moments": 20
+        "utd/moments": 20,
+        "utd/reals": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
