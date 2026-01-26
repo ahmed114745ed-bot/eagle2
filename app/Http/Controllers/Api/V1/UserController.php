@@ -1563,16 +1563,13 @@ class UserController extends Controller
         $per = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
 
         $data = [
-
             'receiver_img' => $user->receiverLevel?->img ?? '',
             'exp_receiver' => $user->receiverLevel?->exp ?? 0,
             'sender_img'   => $user->senderLevel?->img ?? '',
             'sender_level' => intval($user->senderLevel?->level),
             'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
             'remaining_to_next_level' => $remaining ?? 0,
-            'sender_per' => Common::userLevelPer($user),
-
-
+            'sender_per' => round(Common::userLevelPer($user), 2),
         ];
         return Common::apiResponse(true, 'success', $data);
     }
