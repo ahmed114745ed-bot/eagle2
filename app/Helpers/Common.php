@@ -512,6 +512,22 @@ class Common
     public static function uploadProfileUser($folder, $file, $id, $count)
     {
         $extension = $file->getClientOriginalExtension();
+        if (!$extension) {
+            $mime = $file->getMimeType();
+
+            $extension = match ($mime) {
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+                default      => 'jpg',
+            };
+
+            Log::warning('File extension missing, fallback used', [
+                'mime' => $mime,
+                'used_extension' => $extension,
+            ]);
+        }
         $fileName = $id . '_' . $count . '.' . $extension;
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
         return $folder . DIRECTORY_SEPARATOR . $fileName;
@@ -1106,7 +1122,7 @@ class Common
             } else {
                 if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
-              
+
 
                 SendFirebaseNotificationJob::dispatch(
                     tokens: $tokens,
@@ -1178,9 +1194,7 @@ class Common
             $resultDecoded = json_decode($result->body());
 
             if ($result->successful()) {
-             
             } else {
-           
             }
 
             // Remove group with $key if is group
@@ -1589,7 +1603,7 @@ class Common
             }
             return $promises;
         } catch (\Exception $e) {
-          //  Log::error($e->getMessage());
+            //  Log::error($e->getMessage());
         }
     }
 
