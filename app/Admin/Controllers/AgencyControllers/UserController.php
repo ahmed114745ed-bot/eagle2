@@ -29,7 +29,7 @@ use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
 use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class UserController extends MainController
 {

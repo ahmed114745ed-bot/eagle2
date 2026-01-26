@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\AreaManager\Entities\Region;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class SuperAdminDedicateRewardAction extends Action
 {
@@ -206,13 +206,15 @@ function pu(val) {
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'region_manager_dedicate');
                 break;
             case "achievement":
-                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
-                $attributes = [
-                    'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
-                    'end_at' => $dateTimestamp,
-                ];
-                UserAchievementLevel::create($attributes);
+                if (class_exists(UserAchievementLevel::class)) {
+                    $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                    $attributes = [
+                        'user_id'       => $user->id,
+                        'custom_image' => $reward->target,
+                        'end_at' => $dateTimestamp,
+                    ];
+                    UserAchievementLevel::create($attributes);
+                }
                 break;
         }
     }

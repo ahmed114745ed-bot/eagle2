@@ -18,7 +18,7 @@ use App\Models\SuperPackageReward;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Illuminate\Support\Facades\DB;
 
 
@@ -237,7 +237,9 @@ class DedicateAdminPackageReward extends Action
                     'custom_image' => $reward->target,
                     'end_at' => $dateTimestamp,
                 ];
-                UserAchievementLevel::create($attributes);
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::create($attributes);
+                }
                 break;
         }
     }

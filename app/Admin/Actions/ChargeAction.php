@@ -2,7 +2,7 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
@@ -15,7 +15,7 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 class ChargeAction extends Action
 {
@@ -145,7 +145,7 @@ class ChargeAction extends Action
             }
             $this->createChargeRecord($request, $user, null, $amount, $usdAmount, $request->amount);
 
-            (new UserAchievementService())->insertCharging($user, $request->amount);
+            app(UserAchievementContract::class)->insertCharging($user, $request->amount);
         });
 
         return $this->response()->success('Success')->refresh();

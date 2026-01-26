@@ -18,7 +18,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Jobs\RewardWinnerLevelInterval;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 
 class UpgradeLevelServices

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fcf2b05f375e320df4c35e44b800bc29",
+    "content-hash": "f4145ee3b30ebc26bc83880b2b1a96bd",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14380,7 +14380,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
-                "reference": "b012e1cf0a4733660241e73e7c9047ae64697325"
+                "reference": "73e243a67837210559d41cbb0e72f4fd92d4cb5b"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14392,15 +14392,13 @@
                 "laravel": {
                     "providers": [
                         "Utd\\Achievements\\AchievementsServiceProvider"
-                    ],
-                    "aliases": {
-                        "Achievement": "Utd\\Achievements\\Facades\\Achievement"
-                    }
+                    ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Utd\\Achievements\\": "src/"
+                    "Utd\\Achievements\\": "src/",
+                    "Utd\\Achievements\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
@@ -14454,6 +14452,57 @@
                 }
             ],
             "description": "Moments Laravel Package",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/reals",
+            "version": "dev-reelsPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Reals",
+                "reference": "b1362dc29b6fc1935806aea356e131b210461a60"
+            },
+            "require": {
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/http": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Reals\\RealsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Reals\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Utd\\Reals\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Reels/Reals Feature Package with License Support",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -15233,7 +15282,8 @@
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
         "utd/achievements": 20,
-        "utd/moments": 20
+        "utd/moments": 20,
+        "utd/reals": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

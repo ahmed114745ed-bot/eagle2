@@ -6,7 +6,7 @@ namespace App\Admin\Controllers;
 use App\Models\Charge;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Layout\Content;
 use App\Enums\Charges\UserTypeEnum;
 use App\Admin\Controllers\MainController;

@@ -6,7 +6,7 @@ use App\Models\Pack;
 use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Events\Entities\RewardWinnerPk;
 use Modules\Events\Entities\WinnerReward;
 use Modules\Events\Services\LoseWinnerRewards;

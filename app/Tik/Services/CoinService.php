@@ -2,7 +2,7 @@
 
 namespace App\Tik\Services;
 
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Services\CodapayService;
 use App\Services\FawryPaymentServiceV2;
 use App\Services\FawryService;

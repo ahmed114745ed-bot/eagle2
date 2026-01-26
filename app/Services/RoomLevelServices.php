@@ -10,7 +10,7 @@ use App\Models\UserGameChallange;
 use App\Models\Room;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class RoomLevelServices
 {

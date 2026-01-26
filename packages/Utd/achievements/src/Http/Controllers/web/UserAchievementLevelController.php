@@ -178,7 +178,7 @@ class UserAchievementLevelController extends MainController
 
         // $form->number('user_id', __('User id'));
         // // $form->select('achievement_level_id', __('Achievement'))
-        // ->options(\Modules\Achievement\Entities\::pluck('name', 'id'));
+        // ->options(\Utd\Achievements\Entities\AchievementLevel::pluck('name', 'id'));
         // $form->number('gift_achievement_id', __('Gift achievement id'));
         $form->switch('is_enable', trans('enable'))->states (Common::getSwitchStates ());
 

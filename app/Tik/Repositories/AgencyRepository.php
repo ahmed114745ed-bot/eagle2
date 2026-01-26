@@ -6,7 +6,7 @@ use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\AgencyUserJob;
 use App\Models\Scopes\HostAgencyScope;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\UsersJoinedAgency;
 
 class AgencyRepository extends AbstractRepository

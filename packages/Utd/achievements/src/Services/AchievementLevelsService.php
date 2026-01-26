@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
@@ -17,18 +18,19 @@ class AchievementLevelsService implements AchievementLevelContract
     private Collection $userAchievementLevels;
     private int $countTargets = 2;
 
-    public function __construct() { }
+    public function __construct()
+    {
+    }
 
     /**
-     * @param int $userId
-     * @param int $achievement_id
+     * @param UserAchievement|Model|null $userAchievement
      * @return void
      */
-    public function assignAchievementToUser( ?UserAchievement $userAchievement): void
+    public function assignAchievementToUser(?Model $userAchievement): void
     {
         if (!$userAchievement) return;
         $month = now()->month;
-        $year  = now()->year;
+        $year = now()->year;
 
         /*$userAchievement = UserAchievement::query()
                                           ->selectRaw('target, total_target, user_id, achievement_id')
@@ -48,11 +50,11 @@ class AchievementLevelsService implements AchievementLevelContract
     }
 
     /**
-     * @param UserAchievement|null $userAchievement
+     * @param UserAchievement|Model|null $userAchievement
      * @param array|null $notificationIds
      * @return array
      */
-    public function approveAchievement(?UserAchievement $userAchievement, ?array $notificationIds = null): array
+    public function approveAchievement(?Model $userAchievement, ?array $notificationIds = null): array
     {
 
         if ($notificationIds == null) $notificationIds = array_fill(0, $this->countTargets, []);
@@ -78,18 +80,18 @@ class AchievementLevelsService implements AchievementLevelContract
     }
 
     /**
-     * @param UserAchievement $userAchievement
-     * @return string|null
+     * @param UserAchievement|Model|null $userAchievement
+     * @return TargetType|null
      */
-    public function getAchievement(UserAchievement $userAchievement): ?TargetType
+    public function getAchievement(?Model $userAchievement): ?TargetType
     {
-        $achievement       = $userAchievement->achievement;
+        $achievement = $userAchievement->achievement;
         $achievementLevels = $achievement->levels;
-        $levelIds          = $this->getLevelsIds($achievementLevels);
-        $defaultIds        = $this->getDefaultLevelsIds($achievementLevels);
+        $levelIds = $this->getLevelsIds($achievementLevels);
+        $defaultIds = $this->getDefaultLevelsIds($achievementLevels);
 
         $currentTarget = $userAchievement->target;
-        $totalTarget   = $userAchievement->total_target;
+        $totalTarget = $userAchievement->total_target;
 
 
         $achievementLevel =
@@ -99,8 +101,8 @@ class AchievementLevelsService implements AchievementLevelContract
                 $achievementLevels->where('target', '<=', $currentTarget)->where('target_type', '!=', TargetType::DEFAULT)->sortByDesc('target')->first();
         }
 
-        $user                        = $userAchievement->user;
-        $userId                      = $user->id;
+        $user = $userAchievement->user;
+        $userId = $user->id;
         $this->userAchievementLevels = $this->getUserAchievementLevels($userId, $levelIds);
 
         if ($achievementLevel != null) {
@@ -110,7 +112,7 @@ class AchievementLevelsService implements AchievementLevelContract
 
             if ($ifGreaterThan) {
                 try {
-                    $this->assignAchievement($userId, $achievementLevel, $levelIds, $defaultIds,@$userAchievement?->gift_achievement_id);
+                    $this->assignAchievement($userId, $achievementLevel, $levelIds, $defaultIds, @$userAchievement?->gift_achievement_id);
 
                 } catch (\Exception $e) {
                     //dd($e->getMessage());
@@ -149,13 +151,13 @@ class AchievementLevelsService implements AchievementLevelContract
     public function getUserAchievementLevels(int $userId, array $levelIds): array|Collection
     {
         return UserAchievementLevel::query()
-                                   ->where('user_id', $userId)
-                                   ->where('is_enable', true)
-                                   ->whereIn('achievement_level_id', $levelIds)
-                                   ->where(function ($query) {
-                                       $query->where('end_at', '>=', today())->orWhere('end_at', null);
-                                   })
-                                   ->orderByDesc('id')->get();
+            ->where('user_id', $userId)
+            ->where('is_enable', true)
+            ->whereIn('achievement_level_id', $levelIds)
+            ->where(function ($query) {
+                $query->where('end_at', '>=', today())->orWhere('end_at', null);
+            })
+            ->orderByDesc('id')->get();
     }
 
     /**
@@ -174,7 +176,7 @@ class AchievementLevelsService implements AchievementLevelContract
             return array_search($item['achievement_level_id'], $levelIds);
         })->last();
         if ($userId != null) {
-            $data=$this->checkIfLevelExpiredInMonth($userId,$targetId);
+            $data = $this->checkIfLevelExpiredInMonth($userId, $targetId);
             if ($data) {
                 return false;
             }
@@ -191,13 +193,13 @@ class AchievementLevelsService implements AchievementLevelContract
      */
     public function isGreater($achievementLevelId, array $levelIds, int $targetId): bool
     {
-        $prevIndex    = array_search($achievementLevelId, $levelIds);
+        $prevIndex = array_search($achievementLevelId, $levelIds);
         $currentIndex = array_search($targetId, $levelIds);
 
         return $currentIndex === false || ($currentIndex > $prevIndex);
     }
 
-    public function assignAchievement(int $userId, AchievementLevel $achievementLevel, array $levelIds, array $defaultIds,$giftId=null): void
+    public function assignAchievement(int $userId, AchievementLevel $achievementLevel, array $levelIds, array $defaultIds, $giftId = null): void
     {
         if (!isset($this->userAchievementLevels)) {
             $this->userAchievementLevels = $this->getUserAchievementLevels($userId, $levelIds);
@@ -205,18 +207,18 @@ class AchievementLevelsService implements AchievementLevelContract
         // if ($this->userAchievementLevels->count() != 0) {
         //     $this->userAchievementLevels->toQuery()->whereNotIn('achievement_level_id', $defaultIds)->update(['is_enable' => false]);
         // }
-        $userAchievementAll=UserAchievementLevel::where("user_id",$userId)->where(fn($q)=> $q->where('end_at', '>=', today())->orWhere('end_at', null))->where('achievement_level_id', '!=', null)->pluck("achievement_level_id")->toArray();
-        $all_achievements=AchievementLevel::where("target" , '<=',$achievementLevel->target)
-                            ->where("target_type",$achievementLevel->target_type)
-                            ->where("achievement_id",$achievementLevel->achievement_id)
-                             ->whereNotIn("id",$userAchievementAll)
-                            ->get();
+        $userAchievementAll = UserAchievementLevel::where("user_id", $userId)->where(fn($q) => $q->where('end_at', '>=', today())->orWhere('end_at', null))->where('achievement_level_id', '!=', null)->pluck("achievement_level_id")->toArray();
+        $all_achievements = AchievementLevel::where("target", '<=', $achievementLevel->target)
+            ->where("target_type", $achievementLevel->target_type)
+            ->where("achievement_id", $achievementLevel->achievement_id)
+            ->whereNotIn("id", $userAchievementAll)
+            ->get();
         // create $user achievement
 
         foreach ($all_achievements as $achievementLevel) {
 
             $attributes = [
-                'user_id'              => $userId,
+                'user_id' => $userId,
                 'achievement_level_id' => $achievementLevel->id,
                 'gift_achievement_id' => $giftId,
             ];
@@ -245,11 +247,11 @@ class AchievementLevelsService implements AchievementLevelContract
         if ($notificationIds == null || count($notificationIds) < $this->countTargets) return;
 
         if (count($notificationIds[0]) > 0) {
-            Common::send_firebase_notification($notificationIds[0], config('app.name_en'), 'Congratulation you achieve new monthly achievement ends at ' . Carbon::now()->endOfMonth()->shortAbsoluteDiffForHumans());
+            Common::send_firebase_notification($notificationIds[0], config('app.name_en'), __('Congratulations! You achieved a new monthly achievement ending at') . ' ' . Carbon::now()->endOfMonth()->shortAbsoluteDiffForHumans());
         }
 
         if (count($notificationIds[1]) > 0) {
-            Common::send_firebase_notification($notificationIds[1],config('app.name_ar'), 'تهانينا لقد ربحت وسام جديد دائم 🥇');
+            Common::send_firebase_notification($notificationIds[1], config('app.name_ar'), __('Congratulations! You won a new permanent medal') . ' 🥇');
         }
     }
 
@@ -257,25 +259,25 @@ class AchievementLevelsService implements AchievementLevelContract
     {
         if (!$isTest) {
             $lastMonth = now()->subMonth()->month;
-            $lastYear  = now()->subMonth()->year;
+            $lastYear = now()->subMonth()->year;
         } else {
             $lastMonth = now()->month;
-            $lastYear  = now()->year;
+            $lastYear = now()->year;
         }
 
         // select all from this month
         // else user didn't have all live achievement then check monthly achievement
         $userAchievements = UserAchievement::query()
-                                           ->selectRaw('target, total_target, user_id, achievement_id')
-                                           ->where('month', $lastMonth)
-                                           ->where('year', $lastYear)
-                                           ->with([
-                                                      'achievement.levels', 'user' => function ($query) {
-                                                   $query->withoutAppends()->select(['id', 'name', 'notification_id']);
-                                               }
-                                                  ])
-                                           ->get()
-                                           ->chunk(1000);
+            ->selectRaw('target, total_target, user_id, achievement_id')
+            ->where('month', $lastMonth)
+            ->where('year', $lastYear)
+            ->with([
+                'achievement.levels', 'user' => function ($query) {
+                    $query->withoutAppends()->select(['id', 'name', 'notification_id']);
+                }
+            ])
+            ->get()
+            ->chunk(1000);
 
         foreach ($userAchievements as $userAchievementChunks) {
             $notificationIds = null;
@@ -294,8 +296,8 @@ class AchievementLevelsService implements AchievementLevelContract
         $achievement = $achievementLevel->achievement;
 
         $achievementLevels = $achievement->levels;
-        $levelIds          = $this->getLevelsIds($achievementLevels);
-        $defaultIds        = $this->getDefaultLevelsIds($achievementLevels);
+        $levelIds = $this->getLevelsIds($achievementLevels);
+        $defaultIds = $this->getDefaultLevelsIds($achievementLevels);
 
         $ifGreaterThan = $this->checkIfComingLevelGreaterThanExists($achievementLevel->id, $userId, $levelIds);
 
@@ -314,33 +316,33 @@ class AchievementLevelsService implements AchievementLevelContract
     public function getExpiredUserAchievementLevels(int $userId, int $levelId): array|Collection
     {
         return UserAchievementLevel::query()
-                                   ->where([
-                                               'user_id'              => $userId,
-                                               'is_enable'            => false,
-                                               'achievement_level_id' => $levelId
-                                           ])
-                                   ->orderByDesc('id')->get();
+            ->where([
+                'user_id' => $userId,
+                'is_enable' => false,
+                'achievement_level_id' => $levelId
+            ])
+            ->orderByDesc('id')->get();
     }
 
     private function checkIfLevelExpired(int $levelId, int $userId): bool
     {
         return UserAchievementLevel::query()
-                                   ->where([
-                                               'user_id'              => $userId,
-                                               'is_enable'            => false,
-                                               'achievement_level_id' => $levelId
-                                           ])->exists();
+            ->where([
+                'user_id' => $userId,
+                'is_enable' => false,
+                'achievement_level_id' => $levelId
+            ])->exists();
     }
 
-    private function checkIfLevelExpiredInMonth(int $userId,int $levelId): bool
+    private function checkIfLevelExpiredInMonth(int $userId, int $levelId): bool
     {
         return UserAchievementLevel::query()
-                                    ->whereMonth("created_at",date("m"))
-                                    ->whereYear("created_at",date("Y"))
-                                    ->where('user_id',$userId)
-                                    ->where( 'is_enable',false)
-                                    ->where( 'achievement_level_id',$levelId)
-                                    ->exists();
+            ->whereMonth("created_at", date("m"))
+            ->whereYear("created_at", date("Y"))
+            ->where('user_id', $userId)
+            ->where('is_enable', false)
+            ->where('achievement_level_id', $levelId)
+            ->exists();
     }
 
 }

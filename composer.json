@@ -50,7 +50,8 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "dev-reelsPackage",
-        "utd/moments": "dev-reelsPackage"
+        "utd/moments": "dev-reelsPackage",
+        "utd/reals": "dev-reelsPackage"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -69,7 +70,6 @@
             "app/helper/helpers.php",
             "app/helper/helperType.php",
             "app/Helpers/UserCoinLogHelper.php"
-
         ]
     },
     "autoload-dev": {
@@ -106,7 +106,7 @@
         }
     },
     "config": {
-         "audit": {
+        "audit": {
             "block-insecure": false
         },
         "optimize-autoloader": true,
@@ -126,13 +126,6 @@
         {
             "type": "path",
             "url": "packages/Utd/Achievements",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/Utd/Reals",
             "options": {
                 "symlink": true
             }

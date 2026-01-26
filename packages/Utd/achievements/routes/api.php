@@ -12,22 +12,24 @@
 */
 
 use Illuminate\Support\Facades\Route;
+use Utd\Achievements\Http\Controllers\AchievementController;
+use Utd\Achievements\Http\Controllers\AchievementLevelController;
 use Utd\Achievements\Services\AchievementLevelsService;
 
 Route::middleware(['auth:sanctum','appFeatureEnable:achievement' ,'update.last.seen'])->group(function () {
-    Route::get('/test/achievement', function () {
-        (new AchievementLevelsService())->setUserAchievementLevel(true);
-        return response()->json('Success');
-    });
+//    Route::get('/test/achievement', function () {
+//        (new AchievementLevelsService())->setUserAchievementLevel(true);
+//        return response()->json('Success');
+//    });
     Route::prefix('achievement')->group(function () {
-        Route::get('/{id}', 'AchievementController@get_all');
-        Route::get('/', 'AchievementController@get_all');
-        Route::get('/user/{id}', 'AchievementLevelController@show');
+        Route::get('/{id}', [AchievementController::class, 'get_all']);
+        Route::get('/', [AchievementController::class, 'get_all']);
+        Route::get('/user/{id}', [AchievementLevelController::class, 'show']);
     });
 
-    Route::post('/user-achievement-select', 'AchievementController@achivement_select');
-    Route::get('/achievement-all', 'AchievementController@get_all');
-    Route::get('/achievements-details/{id?}', 'AchievementController@get_details');
-    Route::get('/achievements-picked/{id?}', 'AchievementController@get_all_select');
+    Route::post('/user-achievement-select', [AchievementController::class, 'achivement_select']);
+    Route::get('/achievement-all', [AchievementController::class, 'get_all']);
+    Route::get('/achievements-details/{id?}', [AchievementController::class, 'get_details']);
+    Route::get('/achievements-picked/{id?}', [AchievementController::class, 'get_all_select']);
 
 });

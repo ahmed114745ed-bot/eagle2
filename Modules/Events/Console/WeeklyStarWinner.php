@@ -14,7 +14,7 @@ use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
 use Modules\Events\Entities\WeeklyStar;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class WeeklyStarWinner extends Command
 {
@@ -81,15 +81,17 @@ class WeeklyStarWinner extends Command
                             $ware = Ware::query()->find($reward->target);
                             UserCommon::addWareToUser($entry->sender, $ware, $reward->expire, null, 'weekly-star');
                         } elseif ($reward->type == "achievement") {
-                            // $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
-                            $dateTimestamp = optional(Carbon::make($reward->expire))->format('Y-m-d H:i:s');
-                            $attributes = [
-                                'user_id'       => $entry->sender_id,
-                                'custom_image' => $reward->target,
-                                'end_at' => $dateTimestamp,
-                            ];
+                            if (class_exists(UserAchievementLevel::class)) {
+                                // $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                                $dateTimestamp = optional(Carbon::make($reward->expire))->format('Y-m-d H:i:s');
+                                $attributes = [
+                                    'user_id'       => $entry->sender_id,
+                                    'custom_image' => $reward->target,
+                                    'end_at' => $dateTimestamp,
+                                ];
 
-                            UserAchievementLevel::create($attributes);
+                                UserAchievementLevel::create($attributes);
+                            }
                         } elseif ($reward->type == 'badge') {
                             Common::userBadge($entry->sender_id, $reward->target,$reward->expire, 'weekly-star');
                         } else {

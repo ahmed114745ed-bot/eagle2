@@ -48,15 +48,15 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\InvitationEarningResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
-use App\Tik\Repositories\ShippingAgencyRepository;
+use Utd\ShippingAgency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
-use Modules\Achievement\Transformers\UserAchievementLevelsResource;
+use App\Contracts\UserAchievementContract;
+use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class UserService
 {
@@ -65,7 +65,7 @@ class UserService
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
-        private readonly  GiftLogRepository $giftLogRepository,
+        private readonly GiftLogRepository $giftLogRepository,
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
@@ -758,7 +758,7 @@ class UserService
             });
 
         $i = $l = 0;
-        $achivement      = new UserAchievementService();
+        $achivement      = app(UserAchievementContract::class);
 
         foreach ($data as $k => &$v) {
             $user = User::find($v->sender_id);
@@ -787,7 +787,10 @@ class UserService
             $v->manger_type = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
             $v->vip = @Common::ovip_center($user);
             $v->has_color_name = Common::hasInPack($user->id, 18, true);
-            $v->data_achivement = UserAchievementLevelsResource::collection($achivement->getUserAchievement($user));
+            $achievements = $achivement->getUserAchievement($user);
+            $v->data_achivement = class_exists(UserAchievementLevelsResource::class)
+                ? UserAchievementLevelsResource::collection($achievements)
+                : $achievements;
 
             if ($v->sender_id == $user_id) {
                 $l = $i;

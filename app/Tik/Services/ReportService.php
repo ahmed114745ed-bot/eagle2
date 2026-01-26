@@ -14,7 +14,7 @@ use App\Http\Resources\AgencyReportResource;
 use App\Tik\Repositories\AdminUsersRepository;
 use Modules\Events\Services\LoseWinnerRewards;
 use App\Http\Resources\AdminUserReportResource;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class ReportService
 {
@@ -82,7 +82,9 @@ class ReportService
                     'custom_image' => $winner_reward->reward->target,
                 ];
 
-                UserAchievementLevel::query()->where($attributes)->delete();
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::query()->where($attributes)->delete();
+                }
             }
             $winner_reward->delete();
         }

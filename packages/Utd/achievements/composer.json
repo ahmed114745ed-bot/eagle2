@@ -16,17 +16,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Utd\\Achievements\\": "src/"
+            "Utd\\Achievements\\": "src/",
+            "Utd\\Achievements\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Utd\\Achievements\\AchievementsServiceProvider"
-            ],
-            "aliases": {
-                "Achievement": "Utd\\Achievements\\Facades\\Achievement"
-            }
+            ]
         }
     },
     "minimum-stability": "stable"

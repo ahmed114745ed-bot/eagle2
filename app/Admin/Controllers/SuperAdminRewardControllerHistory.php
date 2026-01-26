@@ -19,6 +19,7 @@ use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
+use Utd\Achievements\Entities\Achievement;
 
 class SuperAdminRewardControllerHistory extends MainController
 {
@@ -308,7 +309,11 @@ class SuperAdminRewardControllerHistory extends MainController
         $form = new Form(new SuperAdminReward());
 
         $this->addSuperAdminField($form);
-        $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
+        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
                 $form->number('expire', __('expire'))->default(1);

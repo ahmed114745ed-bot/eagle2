@@ -3,21 +3,21 @@
 namespace App\Services\Null;
 
 use App\Contracts\AchievementLevelContract;
-use Utd\Achievements\Entities\UserAchievement;
+use Illuminate\Database\Eloquent\Model;
 
 class NullAchievementLevelService implements AchievementLevelContract
 {
-    public function assignAchievementToUser(?UserAchievement $userAchievement): void
+    public function assignAchievementToUser(?Model $userAchievement): void
     {
         // Do nothing when achievement feature is disabled
     }
 
-    public function approveAchievement(?UserAchievement $userAchievement, ?array $notificationIds = null): array
+    public function approveAchievement(?Model $userAchievement, ?array $notificationIds = null): array
     {
         return [];
     }
 
-    public function getAchievement(UserAchievement $userAchievement)
+    public function getAchievement(?Model $userAchievement)
     {
         return null;
     }

@@ -13,6 +13,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\TribeReward\Entities\TribeReward;
 use Modules\Vip\Entities\OVip;
+use Utd\Achievements\Entities\Achievement;
 
 class TribeRewardController extends MainController
 {
@@ -129,11 +130,14 @@ class TribeRewardController extends MainController
                 $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
             })
             ->when('share_rewards', function (Form $form) {
-                $form->select('target_type', trans('Target Type'))->options([
+                $targetTypeOptions = [
                     "ware" => __('ware'),
                     "vip" => __('vip'),
-                    "achievement" => __('achievement')
-                ])
+                ];
+                if (class_exists(Achievement::class)) {
+                    $targetTypeOptions['achievement'] = __('achievement');
+                }
+                $form->select('target_type', trans('Target Type'))->options($targetTypeOptions)
                     ->when("ware", function (Form $form) {
                         $form->belongsTo('target1', Wares::class, trans('wares'))->rules('required');
                     })
@@ -148,6 +152,7 @@ class TribeRewardController extends MainController
                         })->rules('required');
                     })
                     ->when("achievement", function (Form $form) {
+                        if (!class_exists(Achievement::class)) return;
                         $form->image("target4", __('image'))->name(function ($file) {
                             return now()->timestamp . '.' . $file->guessExtension();
                         })->disk('gcs');

@@ -27,7 +27,7 @@ use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
-use Utd\Achievements\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 
 class rankingServiceV2
@@ -38,7 +38,7 @@ class rankingServiceV2
         RankingRepositoryV2 $rankingRepo,
         private readonly GiftLogRepository $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
-        public UserAchievementService $achievementService,
+        public UserAchievementContract $achievementService,
         RepositoriesCpRepository $cpRepository
     ) {
         $this->cpRepository = $cpRepository;
@@ -100,9 +100,10 @@ class rankingServiceV2
         $item->manger_type = $user->mangerType ? new MangerTypeResource($user->mangerType) : null;
         $item->vip = Common::ovip_center($user);
         $item->has_color_name = Common::hasInPack($user->id, 18, true);
-        $item->data_achivement = UserAchievementLevelsResource::collection(
-            $this->achievementService->getUserAchievement($user)
-        );
+        $achievements = $this->achievementService->getUserAchievement($user);
+        $item->data_achivement = class_exists(UserAchievementLevelsResource::class)
+            ? UserAchievementLevelsResource::collection($achievements)
+            : $achievements;
     }
 
     public function getRanking22(int $class, int $type, $user, int $limit)

@@ -11,7 +11,7 @@ use App\Helpers\Common;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Enums\PermissionType;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
 use App\Enums\Charges\UserTypeEnum;

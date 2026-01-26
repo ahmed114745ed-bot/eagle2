@@ -7,8 +7,8 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Admin\Controllers\MainController;
-use Modules\Achievement\Entities\Achievement;
-use Modules\Achievement\Enums\AchievementType;
+use Utd\Achievements\Entities\Achievement;
+use Utd\Achievements\Enums\AchievementType;
 use Modules\CP\Entities\CpRelation;
 use Encore\Admin\Layout\Content;
 

@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Achievement;
 use App\Http\Controllers\Controller;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\AchievementLevel;
+use Utd\Achievements\Entities\AchievementLevel;
 
 class AdminAchievementLevelsController extends Controller
 {

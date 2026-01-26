@@ -16,6 +16,7 @@ use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
+use Utd\Achievements\Entities\Achievement;
 
 class DailyPrizeController extends MainController
 {
@@ -231,14 +232,17 @@ class DailyPrizeController extends MainController
             7 => __('seventh_day'),
         ])->rules('required|unique:daily_gifts,order,' . $orderId . ',id,type,' . $typeId);
 
+        $giftTypeOptions = [
+            "ware"        => __('ware'),
+            "vip"         => __('vip'),
+            "coins"       => __('coins'),
+            "badge" => __('badge'),
+        ];
+        if (class_exists(Achievement::class)) {
+            $giftTypeOptions['achievement'] = __('achievement');
+        }
         $form->select('gift_type', __('Gift type'))
-            ->options([
-                "ware"        => __('ware'),
-                "vip"         => __('vip'),
-                "coins"       => __('coins'),
-                "badge" => __('badge'),
-                "achievement" => __('achievement'),
-            ])
+            ->options($giftTypeOptions)
             ->when('ware', function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
                 $form->number('expire', __('expire'));

@@ -18,7 +18,7 @@ use App\Models\CoinGameUser;
 use App\Models\UserLuckyGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Achievement\Enums\AchievementType;
+use Utd\Achievements\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 
 class RankingRepositoryV2
@@ -166,18 +166,16 @@ class RankingRepositoryV2
             'receiverLevel:id,level,type,img',
             'country:id,name,iso,flag',
             'profile:user_id,avatar,birthday',
-    
+
             'medals' => fn($q) => $q->select(['achievement_level_id', 'picked', 'custom_image', 'user_id'])
                 ->where('picked', true)
-                ->with([
+                ->when(class_exists(AchievementType::class), fn($q) => $q->with([
                     'achievementLevel' => fn($q) => $q->select(['id', 'valid_image'])
                         ->with('achievement:id,name,type')
                         ->whereHas('achievement', fn($q) => $q->where('type', '!=', AchievementType::ROOM_TARGET->value))
-                ])
+                ]))
                 ->limit(5),
         ];
-    
-      
     
         return $relations;
     }

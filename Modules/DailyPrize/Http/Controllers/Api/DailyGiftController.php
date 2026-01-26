@@ -15,17 +15,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Support\Renderable;
-use Modules\Achievement\Entities\Achievement;
+use Utd\Achievements\Entities\Achievement;
 use Modules\DailyPrize\Entities\DailyUserGift;
 use Modules\DailyPrize\Entities\DailyGiftCount;
-use Modules\Achievement\Entities\UserAchievement;
+use Utd\Achievements\Entities\UserAchievement;
 use Modules\DailyPrize\Transformers\WeeklyStarGift;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\DailyPrize\Http\Services\DailyPrizeService;
-use Modules\Achievement\Http\Services\AchievementService;
-use Modules\Achievement\Transformers\AchievementResource;
-use Modules\Achievement\Transformers\AchievementDetailResource;
-use Modules\Achievement\Transformers\AchievementOneLevelsResource;
 
 class DailyGiftController extends Controller
 {
@@ -155,12 +151,14 @@ class DailyGiftController extends Controller
 
             if ($ware) UserCommon::addWareToUser($user, $ware, $expire, null, 'daily-gifts');
         } elseif ($type == "achievement") {
-            $attributes = [
-                'user_id'      => $user->id,
-                'custom_image' => $target,
-                'end_at' =>  Carbon::parse($expire)->format("Y-m-d H:i:s"),
-            ];
-            UserAchievementLevel::create($attributes);
+            if (class_exists(UserAchievementLevel::class)) {
+                $attributes = [
+                    'user_id'      => $user->id,
+                    'custom_image' => $target,
+                    'end_at' =>  Carbon::parse($expire)->format("Y-m-d H:i:s"),
+                ];
+                UserAchievementLevel::create($attributes);
+            }
         } elseif ($type == 'badge') {
             Common::userBadge($user->id, $target, $expire, 'daily-gifts');
         }

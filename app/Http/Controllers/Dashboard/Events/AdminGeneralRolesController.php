@@ -7,7 +7,7 @@ use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
 use App\Models\Pack;
 use Modules\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Events\Entities\GeneralRole;
 use Modules\Events\Entities\RewardWinnerPk;
 use Modules\Events\Entities\UserChargeEvent;
@@ -114,7 +114,9 @@ class AdminGeneralRolesController extends Controller
                     'custom_image' => $winner_reward->reward->target,
                 ];
 
-                UserAchievementLevel::query()->where($attributes)->delete();
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::query()->where($attributes)->delete();
+                }
             }
             $winner_reward->delete();
         }

@@ -56,7 +56,7 @@ class MomentsServiceProvider extends ServiceProvider
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../routes/web.php');
 
-        Route::prefix('api/Utd')
+        Route::prefix('api/utd')
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../routes/utd.php');
@@ -107,15 +107,15 @@ class MomentsServiceProvider extends ServiceProvider
 //            $this->publishes([
 //                __DIR__ . '/../database/migrations' => database_path('migrations'),
 //            ], 'moments');
-
+//
 //            $this->publishes([
 //                __DIR__ . '/../database/seeders' => database_path('seeders/Moments'),
 //            ], 'moments');
-
+//
 //            $this->publishes([
 //                __DIR__ . '/../resources/views' => resource_path('views/vendor/moments'),
 //            ], 'moments');
-
+//
 //            $this->publishes([
 //                __DIR__ . '/../resources/lang' => lang_path('vendor/moments'),
 //            ], 'moments');

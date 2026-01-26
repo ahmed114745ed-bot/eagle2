@@ -27,7 +27,7 @@ use App\Models\ChargeWinner;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
 use Modules\Vip\Entities\Vip;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Illuminate\Support\Carbon;
 use App\Models\OfficialMessage;
 use Encore\Admin\Facades\Admin;

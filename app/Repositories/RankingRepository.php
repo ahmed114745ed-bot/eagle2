@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\CoinGameUserArchive;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CoinGameUserMergedMonthly;
-use Modules\Achievement\Enums\AchievementType;
+use Utd\Achievements\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\LuckyBox\Entities\UserLuckyGift;
 

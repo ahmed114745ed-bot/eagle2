@@ -10,7 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Entities\MilestoneReward;
 
@@ -125,11 +125,13 @@ class MilestoneHelper
                 break;
 
             case 'achievement':
-                UserAchievementLevel::create([
-                    'user_id' => $user->id,
-                    'custom_image' => $mr->reward,
-                    'receive_type' => $receiveType,
-                ]);
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::create([
+                        'user_id' => $user->id,
+                        'custom_image' => $mr->reward,
+                        'receive_type' => $receiveType,
+                    ]);
+                }
                 break;
         }
     }
@@ -178,10 +180,12 @@ class MilestoneHelper
                 break;
 
             case 'achievement':
-                UserAchievementLevel::where('user_id', $user->id)
-                    ->where('custom_image', $extra['reward'] ?? null)
-                    ->where('receive_type', $receiveType)
-                    ->delete();
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::where('user_id', $user->id)
+                        ->where('custom_image', $extra['reward'] ?? null)
+                        ->where('receive_type', $receiveType)
+                        ->delete();
+                }
                 break;
         }
     }

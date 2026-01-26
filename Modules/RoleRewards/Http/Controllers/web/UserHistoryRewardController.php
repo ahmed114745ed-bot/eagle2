@@ -9,9 +9,9 @@ use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\RoleRewards\Entities\VUserHistoryReward;
+use Utd\Achievements\Entities\Achievement;
 
 
 class UserHistoryRewardController extends MainController
@@ -61,7 +61,7 @@ class UserHistoryRewardController extends MainController
 
         $grid->column('reward', __('Rewards'))->display(function () {
             if ($this->reward_value) {
-                if ($this->rewardable_type === \Modules\Achievement\Entities\Achievement::class) {
+                if ($this->rewardable_type === Achievement::class) {
                     $path = $this->reward_value ?? 'achievement.png';
                     $imgTag = handleShowImageWithTypes($this->id, getImagePath($path), 50, 50);
                     return $imgTag ;

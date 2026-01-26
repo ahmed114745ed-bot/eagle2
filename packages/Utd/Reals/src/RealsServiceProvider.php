@@ -79,25 +79,25 @@ class RealsServiceProvider extends ServiceProvider
             __DIR__ . '/../config/reals.php' => config_path('reals.php'),
         ], 'reals-config');
 
-        // نشر الـ Migrations
-        $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
-        ], 'reals-migrations');
-
-        // نشر الـ Views
-        $this->publishes([
-            __DIR__ . '/../resources/views' => resource_path('views/vendor/reals'),
-        ], 'reals-views');
-
-        // نشر الـ Public Assets (JS, CSS)
-        $this->publishes([
-            __DIR__ . '/../public' => public_path('modules/reals'),
-        ], 'reals-assets');
+//        // نشر الـ Migrations
+//        $this->publishes([
+//            __DIR__ . '/../database/migrations' => database_path('migrations'),
+//        ], 'reals-migrations');
+//
+//        // نشر الـ Views
+//        $this->publishes([
+//            __DIR__ . '/../resources/views' => resource_path('views/vendor/reals'),
+//        ], 'reals-views');
+//
+//        // نشر الـ Public Assets (JS, CSS)
+//        $this->publishes([
+//            __DIR__ . '/../public' => public_path('modules/reals'),
+//        ], 'reals-assets');
 
         // نشر كل شيء
         $this->publishes([
             __DIR__ . '/../config/reals.php' => config_path('reals.php'),
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
+//            __DIR__ . '/../database/migrations' => database_path('migrations'),
             __DIR__ . '/../public' => public_path('modules/reals'),
         ], 'reals');
     }

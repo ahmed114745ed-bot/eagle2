@@ -15,6 +15,7 @@ use Encore\Admin\Form\Request;
 use Modules\CP\Entities\CpLevelGift;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Layout\Content;
+use Utd\Achievements\Entities\Achievement;
 
 class TaskRewardController extends AdminController
 {
@@ -123,12 +124,15 @@ class TaskRewardController extends AdminController
                 ->required();
         }
 
-        $form->select('type', trans('type'))->options([
+        $typeOptions = [
             "ware" => __('ware'),
             "vip" => __('vip'),
             "coins" => __('coins'),
-            "achievement" => __('achievement')
-        ])
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)
         ->when("ware", function () use ($form) {
             $form->select('target', trans('wares'))->options(function () {
                 $ops = [0 => ''];

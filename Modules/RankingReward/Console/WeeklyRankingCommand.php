@@ -16,7 +16,7 @@ use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\WinnerRanking;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use App\Jobs\SendFirebaseNotificationIndividualUserJob;
 use Illuminate\Support\Facades\Log;
 
@@ -307,11 +307,13 @@ class WeeklyRankingCommand extends Command
 
             // Achievement
             elseif ($reward->target_type == "achievement") {
-                UserAchievementLevel::create([
-                    "user_id"     => $user->id,
-                    "custom_image" => $reward->target,
-                    "end_at"      => now()->addDays($reward->expire_days),
-                ]);
+                if (class_exists(UserAchievementLevel::class)) {
+                    UserAchievementLevel::create([
+                        "user_id"     => $user->id,
+                        "custom_image" => $reward->target,
+                        "end_at"      => now()->addDays($reward->expire_days),
+                    ]);
+                }
             }
 
             // Badge

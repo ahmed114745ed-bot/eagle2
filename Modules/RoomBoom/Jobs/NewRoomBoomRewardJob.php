@@ -21,7 +21,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Collection;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomGift;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
@@ -331,7 +331,7 @@ class NewRoomBoomRewardJob implements ShouldQueue
         if (!empty($this->giftInsertData)) {
             UserGift::insert($this->giftInsertData);
         }
-        if (!empty($this->achievementInsertData)) {
+        if (!empty($this->achievementInsertData) && class_exists(UserAchievementLevel::class)) {
             UserAchievementLevel::insert($this->achievementInsertData);
         }
     }

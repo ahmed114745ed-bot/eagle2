@@ -91,7 +91,9 @@
     }
 
     $moduleGuards = [
-        'moment' => 'Moment',
+        'moment' => \Utd\Moments\Entities\Moment::class,
+        'achievement' => \Utd\Achievements\Entities\Achievement::class,
+        'reels' => \Utd\Reals\Entities\Real::class,
     ];
 
     $moduleAllowed = true;
@@ -101,11 +103,11 @@
         strtolower($normalizedTitle),
     ];
 
-    foreach ($moduleGuards as $keyword => $module) {
+    foreach ($moduleGuards as $keyword => $moduleClass) {
         foreach ($checkStrings as $value) {
             if ($value && str_contains($value, $keyword)) {
-                $moduleAllowed = class_exists(\Utd\Moments\Entities\Moment::class);
-                break;
+                $moduleAllowed = class_exists($moduleClass);
+                break 2;
             }
         }
     }

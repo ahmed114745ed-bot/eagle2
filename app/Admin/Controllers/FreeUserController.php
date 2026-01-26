@@ -32,7 +32,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentGallery;
 use App\Support\DynamicReals;
@@ -292,7 +292,7 @@ class FreeUserController extends MainController
         });
 
         $grid->column('achievements', __('achievements'))->modal(__('achievements'), function ($model) {
-            $achivement      = new UserAchievementService();
+            $achivement      = app(UserAchievementContract::class);
             $data_achivement = $achivement->getUserAchievement($model);
 
             $filtered = $data_achivement->map(function ($user) {

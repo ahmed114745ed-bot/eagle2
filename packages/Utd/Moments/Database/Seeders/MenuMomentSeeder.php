@@ -2,7 +2,6 @@
 
 namespace Utd\Moments\Database\Seeders;
 
-use App\Models\AdminMenu;
 use Encore\Admin\Auth\Database\Menu;
 use Illuminate\Database\Seeder;
 

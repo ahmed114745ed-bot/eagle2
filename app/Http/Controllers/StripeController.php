@@ -9,14 +9,14 @@ use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
 use App\Models\Setting;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Services\StripeService;
 use App\Traits\User\PaymentTrait;
 use Database\Seeders\config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Stripe;
@@ -232,7 +232,7 @@ class StripeController extends Controller
     
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
     
-        (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
+        app(UserAchievementContract::class)->insertCharging($user, $coinLog->obtained_coins);
     
     }
 

@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 use Session;
 
 class AgencyUserController extends MainController

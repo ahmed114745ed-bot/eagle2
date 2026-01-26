@@ -51,7 +51,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
+use Utd\Achievements\Jobs\CalculateAchievement;
 use App\Http\Services\RoomAchievementTargetService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;

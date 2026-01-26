@@ -65,7 +65,7 @@ use App\Http\Controllers\Api\V1\StorageUploadController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
-use Modules\Achievement\Http\Controllers\AchievementController;
+use Utd\Achievements\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;

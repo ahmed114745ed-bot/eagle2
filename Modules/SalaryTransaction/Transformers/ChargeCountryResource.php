@@ -4,9 +4,6 @@ namespace Modules\SalaryTransaction\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
-use Modules\Achievement\Entities\AchievementLevel;
-use Modules\Achievement\Entities\UserAchievement;
-use Modules\Achievement\Entities\UserAchievementLevel;
 
 class ChargeCountryResource extends JsonResource
 {

@@ -17,7 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomReward;
 use Modules\RoomBoom\Transformers\RoomBoomRewardResource;
@@ -162,6 +162,9 @@ class OldRoomBoomRewardJob implements ShouldQueue
                 UserCommon::addEvintsWareToUser($user, $ware, $expire,null,'room-boom');
             }
             if ($reward['target_type'] == 'achieve') {
+                if (!class_exists(UserAchievementLevel::class)) {
+                    return;
+                }
                 $target = $reward->target;
                 $dateTimestamp = $expire ? Carbon::parse($expire)->format('Y-m-d H:i:s') : null;
                 $title = __('Achievement Reward');

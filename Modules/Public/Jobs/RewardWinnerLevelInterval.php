@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Vip\Entities\OVip;
 
 class RewardWinnerLevelInterval implements ShouldQueue
@@ -64,12 +64,14 @@ class RewardWinnerLevelInterval implements ShouldQueue
                         $ware = Ware::query()->find($rewad->target);
                         if ($ware) UserCommon::addWareToUser($user, $ware, $rewad->expire,null,'reward-winner-interval');
                     } elseif ($rewad->type == "achievement") {
-                        $attributes = [
-                            'user_id'       => $user->id,
-                            'custom_image' => $rewad->target,
-                        ];
+                        if (class_exists(UserAchievementLevel::class)) {
+                            $attributes = [
+                                'user_id'       => $user->id,
+                                'custom_image' => $rewad->target,
+                            ];
 
-                        UserAchievementLevel::create($attributes);
+                            UserAchievementLevel::create($attributes);
+                        }
                     } else {
                         continue;
                     }

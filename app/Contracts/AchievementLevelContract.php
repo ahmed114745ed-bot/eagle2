@@ -2,13 +2,13 @@
 
 namespace App\Contracts;
 
-use Utd\Achievements\Entities\UserAchievement;
+use Illuminate\Database\Eloquent\Model;
 
 interface AchievementLevelContract
 {
-    public function assignAchievementToUser(?UserAchievement $userAchievement): void;
+    public function assignAchievementToUser(?Model $userAchievement): void;
     
-    public function approveAchievement(?UserAchievement $userAchievement, ?array $notificationIds = null): array;
+    public function approveAchievement(?Model $userAchievement, ?array $notificationIds = null): array;
     
-    public function getAchievement(UserAchievement $userAchievement);
+    public function getAchievement(?Model $userAchievement);
 }

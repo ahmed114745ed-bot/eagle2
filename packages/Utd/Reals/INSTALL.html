@@ -327,6 +327,32 @@
             </div>
         </div>
 
+        <!-- Step 4: Seeders -->
+        <div class="step">
+            <span class="step-number">4</span>
+            <h2 class="step-title">تشغيل الـ Seeders</h2>
+            <p class="step-desc">قم بتشغيل الـ seeders لإعداد قوائم الأدمن:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan db:seed --class=Utd\\Reals\\Database\\Seeders\\RealDatabaseSeeder</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ثم قم بتحديث الصلاحيات:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan db:seed --class=PermissionTypeSeeder</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>ملاحظة:</strong> الـ seeders تقوم بـ:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>إضافة قوائم الريلز في لوحة التحكم</li>
+                    <li>إضافة صلاحيات إدارة الريلز للمشرفين</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- Database Tables -->
         <div class="step">
             <span class="step-number">🗄️</span>

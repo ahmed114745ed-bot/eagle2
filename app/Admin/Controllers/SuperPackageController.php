@@ -19,6 +19,7 @@ use App\Models\SuperPackageReward;
 use Illuminate\Support\MessageBag;
 use App\Admin\Controllers\MainController;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Utd\Achievements\Entities\Achievement;
 
 
 
@@ -314,13 +315,16 @@ class SuperPackageController extends MainController
 
         $form->html('<div class="form-divider full-column-width"> <span>' . __('Rewards') . '</span> </div>');
 
-        $form->select('type', trans('type'))->options([
+        $typeOptions = [
             "ware" => __('ware'),
             "badge" => __('badge'),
             "vip" => __('vip'),
             "coin" => __('coins'),
-            "achievement" => __('achievement')
-        ])
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
+        $form->select('type', trans('type'))->options($typeOptions)
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
                 $form->number('expire', __('expire'))->default(1);

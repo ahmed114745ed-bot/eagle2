@@ -26,7 +26,7 @@ use Modules\Public\Events\UnreadCounterGroup;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Events\UnreadCounterIndividual;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Chat\Entities\ChatMessage;
 
 class UserCounterServices

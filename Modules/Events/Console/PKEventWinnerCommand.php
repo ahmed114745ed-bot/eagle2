@@ -14,7 +14,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\PkEvent;
 use Modules\Events\Entities\PkWinner;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 
 class PKEventWinnerCommand extends Command
 {
@@ -122,13 +122,15 @@ class PKEventWinnerCommand extends Command
                     Common::userBadge($user->id, $reward->target, $reward->expire, 'pk-event');
                     break;
                 case "achievement":
-                    $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
-                    $attributes = [
-                        'user_id'       => $user->id,
-                        'custom_image' => $reward->target,
-                        'end_at' => $dateTimestamp,
-                    ];
-                    UserAchievementLevel::create($attributes);
+                    if (class_exists(UserAchievementLevel::class)) {
+                        $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                        $attributes = [
+                            'user_id'       => $user->id,
+                            'custom_image' => $reward->target,
+                            'end_at' => $dateTimestamp,
+                        ];
+                        UserAchievementLevel::create($attributes);
+                    }
                     break;
             }
         }

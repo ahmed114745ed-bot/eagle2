@@ -18,7 +18,7 @@ use App\Models\UserTarget;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;

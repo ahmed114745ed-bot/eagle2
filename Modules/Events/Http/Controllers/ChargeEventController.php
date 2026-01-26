@@ -18,7 +18,7 @@ use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\ChargeTargetEvent;
 use Modules\Events\Transformers\TargetsResource;
 use Modules\Events\Transformers\UserChargeResource;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Events\Transformers\TopUserChargeResource;
 
 class ChargeEventController extends Controller
@@ -156,11 +156,13 @@ class ChargeEventController extends Controller
                 $ware = Ware::query()->find($reward->target);
                 UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
             } elseif ($reward->type == "achievement") {
-                $attributes = [
-                    'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
-                ];
-                UserAchievementLevel::create($attributes);
+                if (class_exists(UserAchievementLevel::class)) {
+                    $attributes = [
+                        'user_id'       => $user->id,
+                        'custom_image' => $reward->target,
+                    ];
+                    UserAchievementLevel::create($attributes);
+                }
             } elseif ($reward->type == 'badge') {
                 Common::userBadge($user->id, $reward->target, $reward->expire, 'charge-event');
             }

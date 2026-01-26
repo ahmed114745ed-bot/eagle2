@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Ware;
 use Carbon\Carbon;
 use Exception;
-use Modules\Achievement\Entities\UserAchievementLevel;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\TribeReward\Entities\AgencyReward;
 use Modules\TribeReward\Entities\TribePeriod;
 use Modules\Vip\Entities\OVip;
@@ -110,6 +110,9 @@ class TribeService
                         UserCommon::addWareToUser($user, $ware, $AgencyReward->expire_days, $userOwnAgency,'tribe');
                         break;
                     case "achievement":
+                        if (!class_exists(UserAchievementLevel::class)) {
+                            break;
+                        }
                         $dateTimestamp = Carbon::parse($AgencyReward->expire_days)->format("Y-m-d H:i:s");
                         $attributes = [
                             'user_id'       => $user->id,

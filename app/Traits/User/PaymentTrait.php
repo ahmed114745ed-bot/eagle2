@@ -7,13 +7,13 @@ use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\Coin;
-use App\Models\ShippingAgency;
+use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\CoinLog;
 use App\Helpers\UserCommon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Modules\Achievement\Http\Services\UserAchievementService;
+use App\Contracts\UserAchievementContract;
 
 
 trait PaymentTrait
@@ -146,7 +146,7 @@ trait PaymentTrait
 
         UserCommon::addChargeLevel($user->id, $coinLog->obtained_coins);
 
-        (new UserAchievementService())->insertCharging($user, $coinLog->obtained_coins);
+        app(UserAchievementContract::class)->insertCharging($user, $coinLog->obtained_coins);
 
     }
 

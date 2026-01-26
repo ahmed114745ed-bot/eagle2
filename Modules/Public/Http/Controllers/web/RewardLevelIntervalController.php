@@ -12,6 +12,7 @@ use App\Selectables\Wares;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Entities\RewardLevelInterval;
+use Utd\Achievements\Entities\Achievement;
 
 class RewardLevelIntervalController extends MainController
 {
@@ -150,13 +151,16 @@ class RewardLevelIntervalController extends MainController
 
         $form->hidden('level_interval_id')->value(request('level_interval_id'));
 
+        $typeOptions = [
+            "ware"        => __('ware'),
+            "vip"         => __('vip'),
+            "coins"       => __('coins'),
+        ];
+        if (class_exists(Achievement::class)) {
+            $typeOptions['achievement'] = __('achievement');
+        }
         $form->select('type', __('Gift type'))
-            ->options([
-                "ware"        => __('ware'),
-                "vip"         => __('vip'),
-                "coins"       => __('coins'),
-                "achievement" => __('achievement'),
-            ])
+            ->options($typeOptions)
             ->when('ware', function () use ($form) {
                 $form->belongsTo('target1', Wares::class, trans('wares'));
                 $form->number('expire', __('expire'));
