@@ -3,14 +3,15 @@
 namespace App\Support;
 
 use Illuminate\Support\Facades\Schema;
+use Utd\Reals\Entities\Real;
 
 class DynamicReals
 {
- 
+
     private static ?bool $packageAvailable = null;
     private static ?bool $tablesExist = null;
 
- 
+
     private static function packageExists(): bool
     {
         if (self::$packageAvailable === null) {
@@ -38,7 +39,7 @@ class DynamicReals
         self::$tablesExist = null;
     }
 
-   
+
     public static function getRealClass(): ?string
     {
         if (self::packageExists() && class_exists('Utd\Reals\Entities\Real', false)) {
@@ -59,7 +60,7 @@ class DynamicReals
         return null;
     }
 
-   
+
     public static function getRealUserLikeClass(): ?string
     {
         if (self::packageExists() && class_exists('Utd\Reals\Entities\RealUserLike')) {
@@ -83,7 +84,7 @@ class DynamicReals
         return null;
     }
 
-  
+
     public static function getReportRealsClass(): ?string
     {
         if (self::packageExists() && class_exists('Utd\Reals\Entities\ReportReals')) {
@@ -107,7 +108,7 @@ class DynamicReals
         return null;
     }
 
-    
+
     public static function getRealsServiceClass(): ?string
     {
         if (self::packageExists() && class_exists('Utd\Reals\Services\RealsService')) {
@@ -193,5 +194,10 @@ class DynamicReals
     {
         $class = self::getReportRealsClass();
         return $class ? $class::query() : null;
+    }
+
+    public static function modelExists(): bool
+    {
+        return class_exists(Real::class);
     }
 }
