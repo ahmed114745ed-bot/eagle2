@@ -4,6 +4,7 @@ namespace Modules\FixedTarget\Classes;
 
 use App\Helpers\Common;
 use App\Models\Target;
+use App\Support\DynamicReals;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Modules\FixedTarget\Interfaces\TargetInterface;
@@ -44,8 +45,11 @@ class RegularTarget implements TargetInterface
         }
         // logger('targetMoment Achieved:', [$per]);
 
-        if (((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0))) {
-            $per += (((int)Common::getSettingsValue('reels')) ?? 0) / 100;
+        // حساب نسبة الريلز فقط عند وجود الحزمة
+        if (DynamicReals::isAvailable()) {
+            if (((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0)) && ((@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0)) && ((@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0))) {
+                $per += (((int)Common::getSettingsValue('reels')) ?? 0) / 100;
+            }
         }
         // logger('targetReel Achieved:', [$per]);
 
@@ -87,9 +91,11 @@ class RegularTarget implements TargetInterface
         }
         // logger('targetMoment Achieved:', [$per]);
 
-        if ((@$targetReel[0] ?? 0) <= $extras['reel']['upload'] && (@$targetReel[1] ?? 0) <= $extras['reel']['likes'] && (@$targetReel[2] ?? 0) <= $extras['reel']['comments']) {
-            $per += (((int) Common::getSettingsValue('reels')) ?? 0) / 100;
-
+        // حساب نسبة الريلز فقط عند وجود الحزمة
+        if (DynamicReals::isAvailable()) {
+            if ((@$targetReel[0] ?? 0) <= ($extras['reel']['upload'] ?? 0) && (@$targetReel[1] ?? 0) <= ($extras['reel']['likes'] ?? 0) && (@$targetReel[2] ?? 0) <= ($extras['reel']['comments'] ?? 0)) {
+                $per += (((int) Common::getSettingsValue('reels')) ?? 0) / 100;
+            }
         }
         // logger('targetReel Achieved:', [$per]);
 

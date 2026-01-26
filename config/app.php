@@ -235,10 +235,8 @@ return [
         Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
         App\Providers\FeatureServiceProvider::class,
 
-        /*
-         * UTD Package Service Providers...
-         */
-        Utd\Reals\RealsServiceProvider::class,
+      
+        App\Providers\RealsPackageServiceProvider::class,
 
     ],
 

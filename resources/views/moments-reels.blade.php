@@ -1,6 +1,7 @@
 @php
     $moment = $extras['moment'] ?? [];
     $reel   = $extras['reel'] ?? [];
+    $realsAvailable = \App\Support\DynamicReals::isAvailable();
 @endphp
 
 <div style="line-height:1.6">
@@ -11,10 +12,12 @@
         <li><b>{{ __('Comments') }}:</b> {{ $moment['comments'] ?? '-' }}</li>
     </ul>
 
+    @if($realsAvailable)
     <b>{{ __('Reels') }}</b>
     <ul>
         <li><b>{{ __('Uploads') }}:</b> {{ $reel['upload'] ?? '-' }}</li>
         <li><b>{{ __('Likes') }}:</b> {{ $reel['likes'] ?? '-' }}</li>
         <li><b>{{ __('Comments') }}:</b> {{ $reel['comments'] ?? '-' }}</li>
     </ul>
+    @endif
 </div>

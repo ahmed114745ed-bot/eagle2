@@ -4,6 +4,7 @@ namespace Utd\Reals\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -20,8 +21,25 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // لا تسجل الـ routes إذا لم تكن الجداول موجودة
+        if (!$this->tablesExist()) {
+            return;
+        }
+
         $this->mapApiRoutes();
         $this->mapWebRoutes();
+    }
+
+    /**
+     * التحقق من وجود جداول الريلز
+     */
+    protected function tablesExist(): bool
+    {
+        try {
+            return Schema::hasTable('reals');
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**

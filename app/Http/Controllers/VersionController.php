@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use App\Support\DynamicReals;
 
 class VersionController extends Controller
 {
@@ -96,7 +97,7 @@ class VersionController extends Controller
                 //intro - frames - extradata - emoji
             ],
             'enable_chat'  => settings()->get('chat_status') == "on",
-            'reel_status'    => (bool) ($settings['reel_status'] ?? true),
+            'reel_status'    => DynamicReals::isAvailable() && (bool) ($settings['reel_status'] ?? true),
             'youtube_status' => (bool) ($settings['youtube_status'] ?? true),
             'live_status'    => (bool) ($settings['live_status'] ?? true),
             'zego_feature'    => (bool) ($settings['zego_feature'] ?? true),

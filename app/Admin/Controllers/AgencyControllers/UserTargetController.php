@@ -12,6 +12,7 @@ use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;
+use App\Support\DynamicReals;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -153,18 +154,37 @@ class UserTargetController extends MainController
             $momentLikes = $extras['moment']['likes'] ?? '-';
             $momentComments = $extras['moment']['comments'] ?? '-';
 
-            $reelUpload = $extras['reel']['upload'] ?? '-';
-            $reelLikes = $extras['reel']['likes'] ?? '-';
-            $reelComments = $extras['reel']['comments'] ?? '-';
-
             $labelMoments = __('Moments');
-            $labelReels = __('Reels');
             $labelUploads = __('Uploads:');
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
+            
+            // قسم الريلز يظهر فقط عند وجود الحزمة
+            $realsAvailable = DynamicReals::isAvailable();
+            $reelSection = '';
+            
+            if ($realsAvailable) {
+                $reelUpload = $extras['reel']['upload'] ?? '-';
+                $reelLikes = $extras['reel']['likes'] ?? '-';
+                $reelComments = $extras['reel']['comments'] ?? '-';
+                $labelReels = __('Reels');
+                
+                if (request()->filled('_export_')) {
+                    $reelSection = "\nReels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
+                } else {
+                    $reelSection = <<<HTML
+                    <div><b>{$labelReels}</b></div>
+                    <ul style="margin-left: 8px;width: 149px;">
+                        <li><b>{$labelUploads}</b> {$reelUpload}</li>
+                        <li><b>{$labelLikes}</b> {$reelLikes}</li>
+                        <li><b>{$labelComments}</b> {$reelComments}</li>
+                    </ul>
+HTML;
+                }
+            }
+            
             if (request()->filled('_export_')) {
-                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n" .
-                    "Reels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
+                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments" . $reelSection;
             }
             return <<<HTML
                 <div style="line-height: 1.6;">
@@ -174,12 +194,7 @@ class UserTargetController extends MainController
                         <li><b>{$labelLikes}</b> {$momentLikes}</li>
                         <li><b>{$labelComments}</b> {$momentComments}</li>
                     </ul>
-                    <div><b>{$labelReels}</b></div>
-                    <ul style="margin-left: 8px;width: 149px;">
-                        <li><b>{$labelUploads}</b> {$reelUpload}</li>
-                        <li><b>{$labelLikes}</b> {$reelLikes}</li>
-                        <li><b>{$labelComments}</b> {$reelComments}</li>
-                    </ul>
+                    {$reelSection}
                 </div>
             HTML;
         });

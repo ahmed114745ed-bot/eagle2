@@ -2,97 +2,119 @@
 
 namespace App\Support;
 
-/**
- * Dynamic Reals Helper
- * 
- * يوفر طريقة آمنة للوصول إلى كلاسات الريلز
- * يعمل بشكل طبيعي عند وجود الحزمة
- * ويرجع null أو fallback عند عدم وجودها
- */
+use Illuminate\Support\Facades\Schema;
+
 class DynamicReals
 {
-    /**
-     * Get Real Entity class
-     */
+ 
+    private static ?bool $packageAvailable = null;
+    private static ?bool $tablesExist = null;
+
+ 
+    private static function packageExists(): bool
+    {
+        if (self::$packageAvailable === null) {
+            self::$packageAvailable = file_exists(base_path('packages/Utd/Reals/src/Entities/Real.php'));
+        }
+        return self::$packageAvailable;
+    }
+
+    private static function tablesExist(): bool
+    {
+        if (self::$tablesExist === null) {
+            try {
+                self::$tablesExist = Schema::hasTable('reals');
+            } catch (\Throwable $e) {
+                self::$tablesExist = false;
+            }
+        }
+        return self::$tablesExist;
+    }
+
+
+    public static function resetCache(): void
+    {
+        self::$packageAvailable = null;
+        self::$tablesExist = null;
+    }
+
+   
     public static function getRealClass(): ?string
     {
-        // Try new package first
-        if (class_exists(\Utd\Reals\Entities\Real::class)) {
-            return \Utd\Reals\Entities\Real::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Entities\Real', false)) {
+            return 'Utd\Reals\Entities\Real';
         }
-        // Fallback to old module
-        if (class_exists(\Modules\Reals\Entities\Real::class)) {
-            return \Modules\Reals\Entities\Real::class;
+        if (self::packageExists()) {
+            try {
+                if (class_exists('Utd\Reals\Entities\Real')) {
+                    return 'Utd\Reals\Entities\Real';
+                }
+            } catch (\Throwable $e) {
+                // Ignore
+            }
+        }
+        if (class_exists('Modules\Reals\Entities\Real', false) || class_exists('Modules\Reals\Entities\Real')) {
+            return 'Modules\Reals\Entities\Real';
         }
         return null;
     }
 
-    /**
-     * Get RealUserLike Entity class
-     */
+   
     public static function getRealUserLikeClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Entities\RealUserLike::class)) {
-            return \Utd\Reals\Entities\RealUserLike::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Entities\RealUserLike')) {
+            return 'Utd\Reals\Entities\RealUserLike';
         }
-        if (class_exists(\Modules\Reals\Entities\RealUserLike::class)) {
-            return \Modules\Reals\Entities\RealUserLike::class;
+        if (class_exists('Modules\Reals\Entities\RealUserLike')) {
+            return 'Modules\Reals\Entities\RealUserLike';
         }
         return null;
     }
 
-    /**
-     * Get RealUserComment Entity class
-     */
+
     public static function getRealUserCommentClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Entities\RealUserComment::class)) {
-            return \Utd\Reals\Entities\RealUserComment::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Entities\RealUserComment')) {
+            return 'Utd\Reals\Entities\RealUserComment';
         }
-        if (class_exists(\Modules\Reals\Entities\RealUserComment::class)) {
-            return \Modules\Reals\Entities\RealUserComment::class;
+        if (class_exists('Modules\Reals\Entities\RealUserComment')) {
+            return 'Modules\Reals\Entities\RealUserComment';
         }
         return null;
     }
 
-    /**
-     * Get ReportReals Entity class
-     */
+  
     public static function getReportRealsClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Entities\ReportReals::class)) {
-            return \Utd\Reals\Entities\ReportReals::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Entities\ReportReals')) {
+            return 'Utd\Reals\Entities\ReportReals';
         }
-        if (class_exists(\Modules\Reals\Entities\ReportReals::class)) {
-            return \Modules\Reals\Entities\ReportReals::class;
+        if (class_exists('Modules\Reals\Entities\ReportReals')) {
+            return 'Modules\Reals\Entities\ReportReals';
         }
         return null;
     }
 
-    /**
-     * Get FfmpegService class
-     */
+
     public static function getFfmpegServiceClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Http\Services\FfmpegService::class)) {
-            return \Utd\Reals\Http\Services\FfmpegService::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Http\Services\FfmpegService')) {
+            return 'Utd\Reals\Http\Services\FfmpegService';
         }
-        if (class_exists(\Modules\Reals\Http\Services\FfmpegService::class)) {
-            return \Modules\Reals\Http\Services\FfmpegService::class;
+        if (class_exists('Modules\Reals\Http\Services\FfmpegService')) {
+            return 'Modules\Reals\Http\Services\FfmpegService';
         }
         return null;
     }
 
-    /**
-     * Get RealsService class
-     */
+    
     public static function getRealsServiceClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Services\RealsService::class)) {
-            return \Utd\Reals\Services\RealsService::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Services\RealsService')) {
+            return 'Utd\Reals\Services\RealsService';
         }
-        if (class_exists(\Modules\Reals\Http\Services\RealsService::class)) {
-            return \Modules\Reals\Http\Services\RealsService::class;
+        if (class_exists('Modules\Reals\Http\Services\RealsService')) {
+            return 'Modules\Reals\Http\Services\RealsService';
         }
         return null;
     }
@@ -102,11 +124,11 @@ class DynamicReals
      */
     public static function getInterventionImageClass(): ?string
     {
-        if (class_exists(\Utd\Reals\Http\Services\InterventionImage::class)) {
-            return \Utd\Reals\Http\Services\InterventionImage::class;
+        if (self::packageExists() && class_exists('Utd\Reals\Http\Services\InterventionImage')) {
+            return 'Utd\Reals\Http\Services\InterventionImage';
         }
-        if (class_exists(\Modules\Reals\Http\Services\InterventionImage::class)) {
-            return \Modules\Reals\Http\Services\InterventionImage::class;
+        if (class_exists('Modules\Reals\Http\Services\InterventionImage')) {
+            return 'Modules\Reals\Http\Services\InterventionImage';
         }
         return null;
     }
@@ -116,7 +138,7 @@ class DynamicReals
      */
     public static function isAvailable(): bool
     {
-        return self::getRealClass() !== null;
+        return self::packageExists() && self::tablesExist() && self::getRealClass() !== null;
     }
 
     /**

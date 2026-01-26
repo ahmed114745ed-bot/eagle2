@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use function Doctrine\Common\Cache\Psr6\get;
+use App\Support\DynamicReals;
 
 class TestTestController extends MainController
 {
@@ -94,23 +95,26 @@ class TestTestController extends MainController
         $form->number('days', __('days'));
 //        $form->text('img', 'img');
         $form->decimal('agency_share', __('agency share').'(%)');
-        $form->html('',('<h1>Reel</h1>'));
-        $form->hidden('reel', 'reel');
-        $form->number('reel1', __('uploadReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
-            $str    = @explode(',', $reel)[0];
-            return $str == null || $str == '' ? 0: $str;
-        });
-        $form->number('reel2', __('LikeReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+        // حقول الريلز - تظهر فقط عند وجود الحزمة
+        if (DynamicReals::isAvailable()) {
+            $form->html('',('<h1>Reel</h1>'));
+            $form->hidden('reel', 'reel');
+            $form->number('reel1', __('uploadReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
+                $str    = @explode(',', $reel)[0];
+                return $str == null || $str == '' ? 0: $str;
+            });
+            $form->number('reel2', __('LikeReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel )[1] ?? 0;
-        });;
-        $form->number('reel3', __('commentReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+                return @explode(',', $reel )[1] ?? 0;
+            });
+            $form->number('reel3', __('commentReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel )[2] ?? 0;
-        });
+                return @explode(',', $reel )[2] ?? 0;
+            });
+        }
         $form->html('',('<h1>Moment</h1>'));
         $form->hidden('moment', 'moment');
 

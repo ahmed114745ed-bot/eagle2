@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Request as HttpRequest;
 use Encore\Admin\Controllers\HasResourceActions;
 use Utd\Moments\Entities\Moment;
+use App\Support\DynamicReals;
 
 class TargetController extends MainController
 {
@@ -647,24 +648,27 @@ class TargetController extends MainController
         });
 
 
-        $form->html('<h1>' . __('Reel') . '</h1>');
+        // حقول الريلز - تظهر فقط عند وجود الحزمة
+        if (DynamicReals::isAvailable()) {
+            $form->html('<h1>' . __('Reel') . '</h1>');
 
-        $form->hidden('reel', 'reel');
-        $form->number('reel1', __('uploadReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
-            $str = @explode(',', $reel)[0];
-            return $str == null || $str == '' ? 0 : $str;
-        });
-        $form->number('reel2', __('LikeReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+            $form->hidden('reel', 'reel');
+            $form->number('reel1', __('uploadReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
+                $str = @explode(',', $reel)[0];
+                return $str == null || $str == '' ? 0 : $str;
+            });
+            $form->number('reel2', __('LikeReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel)[1] ?? 0;
-        });;
-        $form->number('reel3', __('commentReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+                return @explode(',', $reel)[1] ?? 0;
+            });
+            $form->number('reel3', __('commentReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel)[2] ?? 0;
-        });
+                return @explode(',', $reel)[2] ?? 0;
+            });
+        }
 
         if (class_exists(Moment::class)) {
             $form->html('<h1>' . __('Moment') . '</h1>');

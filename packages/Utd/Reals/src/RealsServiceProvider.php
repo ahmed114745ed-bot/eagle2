@@ -62,6 +62,8 @@ class RealsServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         $this->commands([
+            Console\InstallRealsCommand::class,
+            Console\UninstallRealsCommand::class,
             // Console\CleanupOldRealsCommand::class,
             // Console\GenerateThumbnailsCommand::class,
         ]);

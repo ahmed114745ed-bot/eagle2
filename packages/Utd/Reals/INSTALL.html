@@ -232,35 +232,7 @@
     <div class="container">
         <h1>🎬 تثبيت حزمة Utd/Reals</h1>
 
-        <!-- Important Notice -->
-        <div class="highlight-box">
-            <h3>⚡ نظام ديناميكي ذكي</h3>
-            <p class="step-desc">
-                هذه الحزمة تعمل بنظام <strong>DynamicReals</strong> الذكي. هذا يعني:
-            </p>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <div class="icon">✅</div>
-                    <strong>عند وجود الحزمة</strong>
-                    <p style="font-size: 0.9rem; color: #8b949e;">تظهر كل حقول الريلز وتعمل بشكل كامل</p>
-                </div>
-                <div class="feature-item">
-                    <div class="icon">🔒</div>
-                    <strong>عند إزالة الحزمة</strong>
-                    <p style="font-size: 0.9rem; color: #8b949e;">تختفي الحقول تلقائياً بدون أخطاء</p>
-                </div>
-                <div class="feature-item">
-                    <div class="icon">🔄</div>
-                    <strong>التارجت والنسب</strong>
-                    <p style="font-size: 0.9rem; color: #8b949e;">تتكيف تلقائياً مع وجود الحزمة</p>
-                </div>
-                <div class="feature-item">
-                    <div class="icon">🛡️</div>
-                    <strong>لا أخطاء</strong>
-                    <p style="font-size: 0.9rem; color: #8b949e;">التطبيق يعمل بدون الحزمة</p>
-                </div>
-            </div>
-        </div>
+  
 
         <!-- Step 1 -->
         <div class="step">
@@ -317,6 +289,11 @@
                 <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
                 <code>"Utd\\Reals\\": "packages/Utd/Reals/src/"</code>
             </div>
+
+            <div class="success">
+                ✅ <strong>ملاحظة هامة:</strong> المشروع يستخدم <code>RealsPackageServiceProvider</code> الذي يتحقق تلقائياً من وجود الحزمة.
+                لا تحتاج لتعديل <code>config/app.php</code> - الحزمة ستُكتشف تلقائياً!
+            </div>
         </div>
 
         <!-- Step 3 -->
@@ -329,67 +306,91 @@
                 <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
                 <code>composer dump-autoload && php artisan optimize:clear && php artisan package:discover</code>
             </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ثم قم بتشغيل أمر التثبيت:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan reals:install</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>ملاحظة:</strong> أمر التثبيت يقوم بـ:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>إنشاء جميع الجداول المطلوبة</li>
+                    <li>إضافة الأعمدة للجداول المشتركة (مثل users)</li>
+                    <li>نشر الـ assets للمجلد public</li>
+                </ul>
+            </div>
             
             <div class="success">
                 ✅ بعد تنفيذ هذا الأمر، ستظهر جميع حقول الريلز في التارجت وغيرها تلقائياً!
             </div>
         </div>
 
-        <!-- Dynamic System Explanation -->
+        <!-- Database Tables -->
         <div class="step">
-            <span class="step-number">🔄</span>
-            <h2 class="step-title">كيف يعمل النظام الديناميكي؟</h2>
-            <p class="step-desc">
-                المشروع يستخدم class اسمه <code>DynamicReals</code> في المسار:
-            </p>
-            <div class="file-path">app/Support/DynamicReals.php</div>
+            <span class="step-number">🗄️</span>
+            <h2 class="step-title">جداول قاعدة البيانات</h2>
+            <p class="step-desc">الحزمة تنشئ الجداول التالية:</p>
             
-            <p class="step-desc" style="margin-top: 20px;">هذا الـ class يفحص وجود الحزمة قبل استخدامها:</p>
-            
-            <div class="code-block">
-                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
-                <code>// التحقق من وجود الحزمة
-if (DynamicReals::isAvailable()) {
-    // الريلز متاحة - اعرض الحقول
-    $reelsCount = DynamicReals::queryReal()->count();
-} else {
-    // الريلز غير متاحة - لا تعرض شيء
-    $reelsCount = 0;
-}</code>
-            </div>
-
-            <table style="margin-top: 20px;">
+            <table>
                 <thead>
                     <tr>
-                        <th>الدالة</th>
-                        <th>الوظيفة</th>
-                        <th>عند عدم وجود الحزمة</th>
+                        <th>الجدول</th>
+                        <th>الوصف</th>
+                        <th>النوع</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><code>DynamicReals::isAvailable()</code></td>
-                        <td>تحقق من وجود الحزمة</td>
-                        <td>ترجع <code>false</code></td>
+                        <td><code>reals</code></td>
+                        <td>الجدول الرئيسي للريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
                     </tr>
                     <tr>
-                        <td><code>DynamicReals::queryReal()</code></td>
-                        <td>استعلام جدول الريلز</td>
-                        <td>ترجع <code>null</code></td>
+                        <td><code>real_categories</code></td>
+                        <td>تصنيفات الريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
                     </tr>
                     <tr>
-                        <td><code>DynamicReals::getRealClass()</code></td>
-                        <td>الحصول على class الريلز</td>
-                        <td>ترجع <code>null</code></td>
+                        <td><code>real_user_likes</code></td>
+                        <td>إعجابات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
                     </tr>
                     <tr>
-                        <td><code>DynamicReals::newFfmpegService()</code></td>
-                        <td>خدمة معالجة الفيديو</td>
-                        <td>ترجع <code>null</code></td>
+                        <td><code>real_user_comments</code></td>
+                        <td>تعليقات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>real_user_views</code></td>
+                        <td>مشاهدات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>report_reals</code></td>
+                        <td>بلاغات الريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>reels_user_settings</code></td>
+                        <td>إعدادات المستخدم للريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>users.reel_following_type</code></td>
+                        <td>نوع متابعة الريلز للمستخدم</td>
+                        <td><span class="badge badge-dynamic">عمود مضاف</span></td>
                     </tr>
                 </tbody>
             </table>
+
+            <div class="warning">
+                ⚠️ <strong>ملاحظة:</strong> العمود <code>reel_following_type</code> يُضاف لجدول <code>users</code> المشترك ويُزال تلقائياً عند إلغاء التثبيت.
+            </div>
         </div>
+
+
 
         <!-- What Happens When Package is Removed -->
         <div class="step">
@@ -448,47 +449,6 @@ if (DynamicReals::isAvailable()) {
             </div>
         </div>
 
-        <!-- Files Using DynamicReals -->
-        <div class="step">
-            <span class="step-number">📂</span>
-            <h2 class="step-title">الملفات التي تستخدم DynamicReals</h2>
-            <p class="step-desc">هذه الملفات تتكيف تلقائياً مع وجود الحزمة:</p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>الملف</th>
-                        <th>الوظيفة</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>Modules/FixedTarget/Services/FixedTargetService.php</code></td>
-                        <td>حساب التارجت والراتب</td>
-                    </tr>
-                    <tr>
-                        <td><code>app/Helpers/UserCommon.php</code></td>
-                        <td>إحصائيات المستخدم</td>
-                    </tr>
-                    <tr>
-                        <td><code>app/Tik/Repositories/ReelsRepository.php</code></td>
-                        <td>استعلامات الريلز</td>
-                    </tr>
-                    <tr>
-                        <td><code>app/Admin/Services/FileService.php</code></td>
-                        <td>معالجة ملفات الفيديو</td>
-                    </tr>
-                    <tr>
-                        <td><code>app/Http/Controllers/Dashboard/Posts/AdminReelsController.php</code></td>
-                        <td>لوحة التحكم</td>
-                    </tr>
-                    <tr>
-                        <td><code>app/Models/User.php</code></td>
-                        <td>علاقات المستخدم مع الريلز</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
 
         <!-- How to Remove Package -->
         <div class="step">
@@ -496,6 +456,30 @@ if (DynamicReals::isAvailable()) {
             <h2 class="step-title">كيفية إزالة الحزمة</h2>
             <p class="step-desc">لإزالة الحزمة بأمان:</p>
             
+            <p class="step-desc" style="margin-top: 15px;"><strong>الطريقة 1: استخدام الأمر (مُوصى به):</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># إلغاء التثبيت مع حذف جميع البيانات:
+php artisan reals:uninstall
+
+# إلغاء التثبيت مع الاحتفاظ بالجداول (حذف الأعمدة المشتركة فقط):
+php artisan reals:uninstall --keep-data
+
+# إلغاء التثبيت بدون تأكيد:
+php artisan reals:uninstall --force</code>
+            </div>
+
+            <div class="danger">
+                ⚠️ <strong>تحذير:</strong> أمر <code>reals:uninstall</code> سيحذف:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>جميع جداول الريلز وبياناتها</li>
+                    <li>عمود <code>reel_following_type</code> من جدول users</li>
+                    <li>سجلات الـ migrations من جدول migrations</li>
+                    <li>مجلد <code>public/modules/reals</code></li>
+                </ul>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>الطريقة 2: الإزالة اليدوية:</strong></p>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
                 <code># 1. أزل من composer.json:
@@ -511,63 +495,10 @@ rm -rf packages/Utd/Reals</code>
             </div>
 
             <div class="warning">
-                ⚠️ <strong>تنبيه:</strong> البيانات في قاعدة البيانات (جدول reels) لن تُحذف. فقط الكود سيُزال.
+                ⚠️ <strong>تنبيه:</strong> الإزالة اليدوية لا تحذف البيانات من قاعدة البيانات. استخدم الأمر للإزالة الكاملة.
             </div>
         </div>
 
-        <!-- Namespace Reference -->
-        <div class="step">
-            <span class="step-number">📚</span>
-            <h2 class="step-title">مرجع الـ Namespaces</h2>
-            <p class="step-desc">جميع الـ classes تستخدم namespace الجديد:</p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>النوع</th>
-                        <th>Namespace</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Service Provider</td>
-                        <td><code>Utd\Reals\RealsServiceProvider</code></td>
-                    </tr>
-                    <tr>
-                        <td>Entities</td>
-                        <td><code>Utd\Reals\Entities\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Controllers</td>
-                        <td><code>Utd\Reals\Http\Controllers\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Web Controllers</td>
-                        <td><code>Utd\Reals\Http\Controllers\Web\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Services</td>
-                        <td><code>Utd\Reals\Services\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Requests</td>
-                        <td><code>Utd\Reals\Http\Requests\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Transformers</td>
-                        <td><code>Utd\Reals\Transformers\</code></td>
-                    </tr>
-                    <tr>
-                        <td>Traits</td>
-                        <td><code>Utd\Reals\Traits\</code></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="info">
-                💡 <strong>ملاحظة:</strong> الـ namespace القديم <code>Modules\Reals\</code> لا يزال مدعوماً كـ fallback في <code>DynamicReals</code>
-            </div>
-        </div>
 
         <!-- Quick Commands -->
         <div class="step">
@@ -577,7 +508,13 @@ rm -rf packages/Utd/Reals</code>
             <p class="step-desc"><strong>تثبيت الحزمة:</strong></p>
             <div class="code-block">
                 <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
-                <code>composer dump-autoload && php artisan optimize:clear && php artisan package:discover</code>
+                <code>composer dump-autoload && php artisan optimize:clear && php artisan package:discover && php artisan reals:install</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>إلغاء تثبيت الحزمة:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan reals:uninstall --force</code>
             </div>
 
             <p class="step-desc" style="margin-top: 20px;"><strong>التحقق من التثبيت:</strong></p>
@@ -610,29 +547,142 @@ rm -rf packages/Utd/Reals</code>
                         <td>Class "Utd\Reals\Entities\Real" not found</td>
                         <td><code>composer dump-autoload</code></td>
                     </tr>
-                    <tr>
-                        <td>Declaration must be compatible</td>
-                        <td>تأكد من توقيع الدوال يتوافق مع الـ parent class</td>
-                    </tr>
+
                     <tr>
                         <td>Route not found</td>
                         <td><code>php artisan route:clear</code></td>
                     </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 
+        <div class="step">
+            <span class="step-number">💾</span>
+            <h2 class="step-title">النسخ الاحتياطي والتحديث</h2>
+            
+            <p class="step-desc"><strong>📦 أخذ نسخة احتياطية قبل التحديث:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># نسخ احتياطي للجداول
+php artisan db:table reals --export > backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_likes --export >> backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_comments --export >> backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_views --export >> backup_reals_$(date +%Y%m%d).sql
+
+# أو نسخ احتياطي كامل لقاعدة البيانات
+mysqldump -u $DB_USERNAME -p $DB_DATABASE > backup_full_$(date +%Y%m%d).sql</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>⬆️ التحديث إلى الإصدار 2.0:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># 1. أخذ نسخة احتياطية أولاً
+mysqldump -u root -p eagle_db > backup_before_upgrade.sql
+
+# 2. تحديث ملفات الحزمة (استبدال المجلد القديم)
+rm -rf packages/Utd/Reals
+# ثم نقل المجلد الجديد إلى packages/Utd/Reals
+
+# 3. تحديث الـ autoload وتشغيل الـ migrations الجديدة
+composer dump-autoload
+php artisan migrate --path=packages/Utd/Reals/database/migrations
+
+# 4. مسح الكاش
+php artisan optimize:clear</code>
+            </div>
+
+            <div class="warning">
+                ⚠️ <strong>تحذير:</strong> تأكد من أخذ نسخة احتياطية قبل أي تحديث. الإصدار 2.0 يتضمن تغييرات في هيكل الجداول.
+            </div>
+        </div>
+Backup & Upgrade -->
+        <!-- License Key -->
+        <div class="step">
+            <span class="step-number">🔑</span>
+            <h2 class="step-title">مفتاح التوثيق</h2>
+            
+            <p class="step-desc">أضف مفتاح التوثيق في ملف <code>.env</code>:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># Reals Package License
+REALS_LICENSE_KEY=your-license-key-here
+REALS_ENABLED=true</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>للحصول على مفتاح التوثيق:</strong> تواصل مع الدعم الفني عبر البريد الإلكتروني أو الواتساب.
+            </div>
+        </div>
+
+        <!-- Version History -->
+        <div class="step">
+            <span class="step-number">📝</span>
+            <h2 class="step-title">سجل الإصدارات</h2>
+            
+            <table>
+                <thead>
                     <tr>
-                        <td>حقول الريلز لا تظهر في التارجت</td>
-                        <td>تأكد من <code>DynamicReals::isAvailable()</code> ترجع <code>true</code></td>
+                        <th>الإصدار</th>
+                        <th>التاريخ</th>
+                        <th>التغييرات الرئيسية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-required">2.0.0</span></td>
+                        <td>يناير 2026</td>
+                        <td>Package مستقل، Admin Panel، License System، أوامر التثبيت/إلغاء التثبيت</td>
                     </tr>
                     <tr>
-                        <td>Git merge conflicts</td>
-                        <td><code>git checkout --theirs [file] && git add [file]</code></td>
+                        <td><span class="badge badge-optional">1.5.0</span></td>
+                        <td>أكتوبر 2025</td>
+                        <td>Custom Images، Picked Column، تحسينات الأداء</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-dynamic">1.0.0</span></td>
+                        <td>أغسطس 2023</td>
+                        <td>الإصدار الأول - نظام الريلز الأساسي</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+        <!-- Support -->
+        <div class="step">
+            <span class="step-number">📞</span>
+            <h2 class="step-title">الدعم الفني</h2>
+            
+            <p class="step-desc">للحصول على المساعدة والدعم:</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">📧</div>
+                    <div><strong>البريد الإلكتروني</strong></div>
+                    <div style="color: #00d9ff;">support@utd-company.com</div>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">💬</div>
+                    <div><strong>واتساب</strong></div>
+                    <div style="color: #28a745;">+XX XXX XXX XXXX</div>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">📖</div>
+                    <div><strong>التوثيق</strong></div>
+                    <div style="color: #a371f7;">docs.utd-company.com/reals</div>
+                </div>
+            </div>
+
+            <div class="info" style="margin-top: 20px;">
+                🕐 <strong>ساعات الدعم:</strong> من الأحد إلى الخميس، 9 صباحاً - 6 مساءً (توقيت مكة المكرمة)
+            </div>
+        </div>
+
         <footer>
             <p>📦 Utd/Reals Package v1.0 | Laravel Package</p>
             <p>نظام ديناميكي - يعمل مع أو بدون الحزمة</p>
+            <p>© 2023-2026 UTD Company. جميع الحقوق محفوظة.</p>
             <p>آخر تحديث: يناير 2026</p>
         </footer>
     </div>

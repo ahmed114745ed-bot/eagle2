@@ -1576,7 +1576,9 @@
                                 <th>{{ __('days') }}</th>
                                 <th>{{ __('hours') }}</th>
                                 <th>{{ __('Moments') }}</th>
+                                @if(\App\Support\DynamicReals::isAvailable())
                                 <th>{{ __('Reels') }}</th>
+                                @endif
                                 <th>{{ __('diamonds') }}</th>
                                 <th>{{ __('date') }}</th>
 
@@ -1645,8 +1647,8 @@
                                                     <li><b>{{ __('Likes:') }}</b> {{ $momentLikes }}</li>
                                                     <li><b>{{ __('Comments:') }}</b> {{ $momentComments }}</li>
                                                 </ul>
-                                            </div>
                                         </td>
+                                        @if(\App\Support\DynamicReals::isAvailable())
                                         <td>
                                             <div style="line-height: 1.6;">
                                                 <ul style="margin-left: 8px;">
@@ -1656,6 +1658,7 @@
                                                 </ul>
                                             </div>
                                         </td>
+                                        @endif
                                         <td>{{ $salary->achieved_diamond }}</td>
                                         <td>{{ $salary->month .'/'. $salary->year }}</td>
                                     </tr>
