@@ -319,6 +319,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/friends', [UserController::class, 'friends']);
                 Route::get('/data', [UserController::class, 'dataUser']);
 
+                 Route::get('/level', [UserController::class, 'userLevelDetails']);
+
                 Route::get('/stats/{id?}', [UserController::class, 'stats']);
                 Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
                 Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
