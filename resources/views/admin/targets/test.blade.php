@@ -41,8 +41,9 @@
                                             </tr>
                                             
                                             <!-- Reel Information -->
+                                            @if(\App\Support\DynamicReals::isAvailable())
                                             @php
-                                                $reel = explode(',', $target->reel);
+                                                $reel = explode(',', $target->reel ?? '');
                                                 $update = isset($reel[0]) ? $reel[0] : 0;
                                                 $like = isset($reel[1]) ? $reel[1] : 0;
                                                 $comment = isset($reel[2]) ? $reel[2] : 0;
@@ -59,10 +60,12 @@
                                                 <th>{{ __('Reel Comments:') }}</th>
                                                 <td>{{ $comment }}</td>
                                             </tr>
+                                            @endif
                                     
                                             <!-- Moment Information -->
+                                            @if(class_exists(\Utd\Moments\Entities\Moment::class))
                                             @php
-                                                $moment = explode(',', $target->moment);
+                                                $moment = explode(',', $target->moment ?? '');
                                                 $moment_update = isset($moment[0]) ? $moment[0] : 0;
                                                 $moment_like = isset($moment[1]) ? $moment[1] : 0;
                                                 $moment_comment = isset($moment[2]) ? $moment[2] : 0;
@@ -79,6 +82,7 @@
                                                 <th>{{ __('Moment Comments:') }}</th>
                                                 <td>{{ $moment_comment }}</td>
                                             </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                     

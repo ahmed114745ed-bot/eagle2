@@ -4,6 +4,7 @@ namespace App\Tik\Services;
 
 
 use App\Helpers\Common;
+use App\Support\DynamicReals;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GroupChatRepository;
 
@@ -49,9 +50,18 @@ class GroupChatService
 
     public function countReel($data)
     {
+        if (!DynamicReals::isAvailable()) {
+            return true;
+        }
+
+        $realClass = DynamicReals::getRealClass();
+        if (!$realClass) {
+            return true;
+        }
+
         $parts = explode(':', str_replace("\n", ':', $data));
         $reelId = $parts[4] ?? null;
-        $reel = Real::find($reelId);
+        $reel = $realClass::find($reelId);
         if (!$reel) return true;
         $reel->share_num += 1;
         $reel->save();

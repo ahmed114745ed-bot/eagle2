@@ -18,6 +18,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
 use App\Admin\Controllers\MainController;
+use App\Support\DynamicReals;
 use Nwidart\Modules\Facades\Module;
 use Utd\Moments\Entities\Moment;
 
@@ -382,23 +383,25 @@ class ReportController extends MainController
             });
         }
 
-        $grid->column('reels', __('Reels'))->display(function () {
-            $userId = $this->id;
-            $month  = request('month', now()->month);
-            $year   = request('year', now()->year);
+        if (DynamicReals::isAvailable()) {
+            $grid->column('reels', __('Reels'))->display(function () {
+                $userId = $this->id;
+                $month  = request('month', now()->month);
+                $year   = request('year', now()->year);
 
-            return <<<HTML
-                <div
-                    class="reels-data"
-                    data-user="{$userId}"
-                    data-month="{$month}"
-                    data-year="{$year}"
-                    style="cursor:pointer;color:#3c8dbc"
-                >
-                    <i class="fa fa-spinner fa-spin"></i> Loading...
-                </div>
-            HTML;
-        });
+                return <<<HTML
+                    <div
+                        class="reels-data"
+                        data-user="{$userId}"
+                        data-month="{$month}"
+                        data-year="{$year}"
+                        style="cursor:pointer;color:#3c8dbc"
+                    >
+                        <i class="fa fa-spinner fa-spin"></i> Loading...
+                    </div>
+                HTML;
+            });
+        }
 
         Admin::script(<<<JS
             $('.Moments-data').each(function () {

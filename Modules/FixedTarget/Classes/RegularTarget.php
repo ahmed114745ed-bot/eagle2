@@ -20,7 +20,7 @@ class RegularTarget implements TargetInterface
     public function calculateUsdFromTarget(Model $target, float $hours, int $days, array $extra): float
     {
        
-        $targetReel =  explode(',', $target->reel);
+        $targetReel = DynamicReals::isAvailable() ? explode(',', $target->reel ?? '') : [];
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;
@@ -64,7 +64,7 @@ class RegularTarget implements TargetInterface
 
     public function calculatePercentageAchieved(Model $target, float $hours, int $days, array $extra): float
     {
-        $targetReel =  explode(',', $target->reel);
+        $targetReel = DynamicReals::isAvailable() ? explode(',', $target->reel ?? '') : [];
         $targetMoment = explode(',', $target->moment);
         $extras = $extra;
         // $per = 0.50;

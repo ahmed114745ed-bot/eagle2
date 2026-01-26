@@ -28,8 +28,12 @@
                     <th>{{ __('usd') }}</th>
                     <th>{{ __('hours') }}</th>
                     <th>{{ __('days') }}</th>
+                    @if(\App\Support\DynamicReals::isAvailable())
                     <th>{{ __('reel') }}</th>
+                    @endif
+                    @if(class_exists(\Utd\Moments\Entities\Moment::class))
                     <th>{{ __('Moment') }}</th>
+                    @endif
                     <th>{{ __('agency share') }} (%)</th>
                 </tr>
             </thead>
@@ -42,9 +46,10 @@
                         <td>{{ $target->usd }}</td>
                         <td>{{ $target->hours }}</td>
                         <td>{{ $target->days }}</td>
+                        @if(\App\Support\DynamicReals::isAvailable())
                         <td>
                             @php
-                                $reel = explode(',', $target->reel);
+                                $reel = explode(',', $target->reel ?? '');
                                 $update = $reel[0] != '' && $reel[0] != null ? $reel[0] : 0;
                                 $like = $reel[1] ?? 0;
                                 $comment = $reel[2] ?? 0;
@@ -53,9 +58,11 @@
                             <span style="color: #000f;">{{ __('admin.like') }} {{ $like }}</span><br>
                             <span style="color: #000f;">{{ __('admin.comment') }} {{ $comment }}</span>
                         </td>
+                        @endif
+                        @if(class_exists(\Utd\Moments\Entities\Moment::class))
                         <td>
                             @php
-                                $moment = explode(',', $target->moment);
+                                $moment = explode(',', $target->moment ?? '');
                                 $update = $moment[0] != '' && $moment[0] != null ? $moment[0] : 0;
                                 $like = $moment[1] ?? 0;
                                 $comment = $moment[2] ?? 0;
@@ -64,6 +71,7 @@
                             <span style="color: #000f;">{{ __('admin.like') }} {{ $like }}</span><br>
                             <span style="color: #000f;">{{ __('admin.comment') }} {{ $comment }}</span>
                         </td>
+                        @endif
                         <td>{{ number_format($target->agency_share, 2) }}</td>
                     </tr>
                 @endforeach

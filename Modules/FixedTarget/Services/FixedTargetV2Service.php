@@ -283,7 +283,8 @@ class FixedTargetV2Service
                 }
 
 
-                $targetReel  = explode(',', $target->reel);
+                $hasRealsModule = DynamicReals::isAvailable();
+                $targetReel = $hasRealsModule ? explode(',', $target->reel ?? '') : [];
 
                 $hasMomentModule = class_exists(Moment::class);
                 $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];

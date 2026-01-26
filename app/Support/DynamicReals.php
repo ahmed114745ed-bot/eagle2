@@ -42,7 +42,7 @@ class DynamicReals
 
     public static function getRealClass(): ?string
     {
-        if (self::packageExists() && class_exists('Utd\Reals\Entities\Real', false)) {
+        if (self::packageExists() && class_exists('Utd\Reals\Entities\Real')) {
             return 'Utd\Reals\Entities\Real';
         }
         if (self::packageExists()) {
@@ -54,7 +54,7 @@ class DynamicReals
                 // Ignore
             }
         }
-        if (class_exists('Modules\Reals\Entities\Real', false) || class_exists('Modules\Reals\Entities\Real')) {
+        if (class_exists('Modules\Reals\Entities\Real') || class_exists('Modules\Reals\Entities\Real')) {
             return 'Modules\Reals\Entities\Real';
         }
         return null;
