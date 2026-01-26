@@ -190,8 +190,9 @@ class RoomRepository extends AbstractRepository
             ->pluck('user_id');
 
         $result = $this->model->withLuckyBoxFlag($user->id)
-            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
+            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'level_id', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
             ->with([
+                'roomLevel',
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'defaultBackground:id,img',
                 'lastPk:id,room_id',
@@ -533,9 +534,11 @@ class RoomRepository extends AbstractRepository
                 'room_background',
                 'type',
                 'mode',
+                'level_id',
                 'created_at'
             ])
             ->with([
+                'roomLevel',
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
                 'background:id,img',
@@ -561,7 +564,7 @@ class RoomRepository extends AbstractRepository
 
     private function baseRoomQueryMine($user)
     {
-        $authUserId = auth()->id();
+        $authUserId = request()->user()->id ?? $user->id;
 
         return $this->model
             ->where('uid', $user->id)

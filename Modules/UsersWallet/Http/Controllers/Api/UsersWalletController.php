@@ -31,6 +31,7 @@ class UsersWalletController extends Controller
         try {
             return $callback();
         } catch (\Exception $e) {
+            
             return Common::apiResponse(false, $e->getMessage(), null, 500);
         }
     }

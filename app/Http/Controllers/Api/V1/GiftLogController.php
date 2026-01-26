@@ -2,59 +2,28 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\Cp;
-use App\Models\Pk;
 use Carbon\Carbon;
-use App\Models\Gift;
-use App\Models\Room;
 use App\Models\User;
-use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\GiftLog;
-use App\Models\AppFeature;
-use App\Models\CoreWallet;
-use App\Helpers\UserCommon;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
-use GuzzleHttp\Promise\Utils;
 use App\Jobs\CleanGiftLogsJob;
-use App\Events\GiftBannerEvent;
 use App\Models\RemainingDiamond;
-use App\Services\LuckyGiftService;
-use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Jobs\UpdatePkAndSendToZigo;
-use App\Services\Gifts\GiftService;
-use App\Services\RoomLevelServices;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Tik\Services\GiftLogService;
 use App\Models\MonthlyDiamondReceive;
-use Illuminate\Support\Facades\Redis;
-use App\Classes\Gifts\SendGiftService;
-use Illuminate\Support\Facades\Config;
-use Modules\CP\Http\Services\CpService;
-use App\Exceptions\NotInfMoneyException;
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use App\Jobs\UpdateUserDataWhenSendGift;
-use Modules\CP\Http\Services\CpServices;
-
 use Illuminate\Support\Facades\Validator;
-
 use App\Http\Resources\GiftLogUtdResource;
-use App\Traits\Gifts\LuckyGiftProbability;
-
-use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
-use Modules\Achievement\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 
 class GiftLogController extends Controller

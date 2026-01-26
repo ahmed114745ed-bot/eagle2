@@ -98,6 +98,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Override admin.pjax middleware for Swoole/Octane compatibility
+        $this->overridePjaxMiddleware();
+        
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
@@ -360,5 +363,14 @@ class AppServiceProvider extends ServiceProvider
         foreach ($probabilities as $index => $value) {
             Cache::put('probability_times_' . ($index + 1), $value, now()->addMinutes(60));
         }
+    }
+
+    /**
+     * Override admin.pjax middleware to avoid exit() which breaks Swoole/Octane
+     */
+    protected function overridePjaxMiddleware(): void
+    {
+        $router = $this->app['router'];
+        $router->aliasMiddleware('admin.pjax', \App\Admin\Middleware\PjaxOverride::class);
     }
 }

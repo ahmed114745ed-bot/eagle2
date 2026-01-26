@@ -430,6 +430,41 @@ trait CalcsTrait
 
         return $nextData;
     }
+
+    public static function getNextLevelDataFromCacheII($type, $currentLevel, $vipsData)
+    {
+        if (
+            !$vipsData ||
+            !isset($vipsData[$type]) ||
+            !is_iterable($vipsData[$type])
+        ) {
+            return ['next_exp' => 0, 'next_level' => 0];
+        }
+
+        $data = $vipsData[$type];
+        $nextData = ['next_exp' => 0, 'next_level' => 0];
+
+        foreach ($data as $row) {
+            if (!$row || !isset($row->level)) {
+                continue;
+            }
+
+            if ($row->level > $currentLevel) {
+                $nextData['next_exp']   = $row->exp ?? 0;
+                $nextData['next_level'] = $row->level ?? 0;
+                break;
+            }
+        }
+
+        if ($nextData['next_exp'] == 0) {
+            $last = $data->last();
+            $nextData['next_exp']   = $last->exp ?? 0;
+            $nextData['next_level'] = $last->level ?? 0;
+        }
+
+        return $nextData;
+    }
+
     public static function getCurrentLevelFromCache($type = null, $level = 0, $field = null, $vipsData = [])
     {
         if (!$type || !$field || !isset($vipsData[$type])) return 0;
@@ -543,6 +578,36 @@ trait CalcsTrait
         }
 
         return $data;
+    }
+
+    public static function userLevelPer($user)
+    {
+        $gold_level             = $user->total_sender_level;
+        $vipsData = Vip::collectionBuilder()->get();
+
+        $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+
+        $nextGoldData = self::getNextLevelDataFromCacheII(2, $gold_level, $vipsData);
+
+        $diamondSend             = $user->total_sender_diamonds;
+
+        $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
+
+        $next_gold_num = $nextGoldData['next_exp'];
+
+        $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+       
+        $st = (int)$next_gold_num - (int)($current_gold_num);
+        $sc = (int)$senderNum - (int)($current_gold_num);
+
+
+
+        if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
+            $data['sender_per'] = (float)($sc / $st);
+        } else {
+            $data['sender_per'] = (float)0.00;
+        }
+        return $data['sender_per'];
     }
 
 

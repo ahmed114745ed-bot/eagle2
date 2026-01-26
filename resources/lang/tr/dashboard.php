@@ -32,7 +32,13 @@ return [
     'confirm_enable_frozen_wallet'  => 'Dondurulmuş cüzdanı etkinleştirmek istediğinizden emin misiniz?',
     'confirm_disable_frozen_wallet' => 'Dondurulmuş cüzdanı devre dışı bırakmak istediğinizden emin misiniz?',
 
-
+    'all'         => 'Tümü',
+    'popular'     => 'Popüler',
+    'new'         => 'Yeni',
+    'pk'          => 'PK',
+    'close_room'  => 'Kapalı Odalar',
+    'hide_room'   => 'Gizli Odalar',
+    'country'     => 'Ülkeler',
     'user_setting'          => 'Kullanıcı Ayarları',
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',

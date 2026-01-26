@@ -368,6 +368,9 @@ console.log('✅ sidebar js loaded');
     }
 
     function handleMenuItemHover(e) {
+        // Guard against non-element targets
+        if (!e.target || typeof e.target.closest !== 'function') return;
+        
         const link = e.target.closest('.crs-link') || e.target.closest('.crs-item')?.querySelector('.crs-link');
         if (!link) return;
 

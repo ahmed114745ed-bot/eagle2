@@ -63,7 +63,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
+        $room = Room::with(['owner.profile', 'roomLevel','roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -259,7 +259,7 @@ class RoomController extends MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-            $grid->header(fn() => $this->buildTabsHeader($filterType));
+        $grid->header(fn() => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -277,13 +277,21 @@ class RoomController extends MainController
     {
         return Cache::remember("tabs_header_$filterType", now()->addMinutes(10), function () use ($filterType) {
             $tabs = [
-                'all'         => __('All'),
-                'popular'     => __('Popular'),
-                'last_create' => __('New'),
-                'pk'          => __('PK'),
-                'close_room'  => __('close room'),
-                'hide_room'   => __('hide room'),
-                'country'     => __('countries'),
+                // 'all'         => __('All'),
+                // 'popular'     => __('Popular'),
+                // 'last_create' => __('New'),
+                // 'pk'          => __('PK'),
+                // 'close_room'  => __('close room'),
+                // 'hide_room'   => __('hide room'),
+                // 'country'     => __('countries'),
+
+                'all'         => __('dashboard.all'),
+                'popular'     => __('dashboard.popular'),
+                'last_create' => __('dashboard.new'),
+                'pk'          => __('dashboard.pk'),
+                'close_room'  => __('dashboard.close_room'),
+                'hide_room'   => __('dashboard.hide_room'),
+                'country'     => __('dashboard.country'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -335,6 +343,8 @@ class RoomController extends MainController
                 'rooms.room_name',
                 'rooms.room_cover',
                 'rooms.room_admin',
+                'rooms.level',
+                'rooms.level_id',
                 \DB::raw("
         CASE rooms.room_status
             WHEN 1 THEN 100
@@ -348,6 +358,7 @@ class RoomController extends MainController
             )
 
             ->with([
+                'roomLevel',
                 'owner' => fn($q)  => $q->with([
                     'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
@@ -610,12 +621,24 @@ class RoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
+                 //dd( $this->roomLevel);
+            $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
+            $levelImageHtml = '';
+
+            if ($levelimage) {
+                $levelImageHtml = "
+                    <div style='margin-top:4px;'>
+                        <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
+                    </div>
+                ";
+            }
             return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                         <div>
                             <span style='cursor: pointer;'>$name</span><br>
                             <span style='cursor: pointer;'>ID: $id</span>
+                             {$levelImageHtml}
                         </div>
                     </div>
                 ";

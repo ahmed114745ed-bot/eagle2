@@ -13,13 +13,15 @@ class CreateRankingRangesTable extends Migration
      */
     public function up()
     {
-        Schema::create('ranking_ranges', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('ranking_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->smallInteger('min');
-            $table->smallInteger('max')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ranking_ranges')) {
+            Schema::create('ranking_ranges', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('ranking_type_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+                $table->smallInteger('min');
+                $table->smallInteger('max')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

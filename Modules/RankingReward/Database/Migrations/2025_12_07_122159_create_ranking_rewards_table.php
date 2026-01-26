@@ -13,14 +13,16 @@ class CreateRankingRewardsTable extends Migration
      */
     public function up()
     {
-        Schema::create('ranking_rewards', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('ranking_range_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('target_type');
-            $table->string('target');
-            $table->integer('expire_days')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('ranking_rewards')) {
+            Schema::create('ranking_rewards', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('ranking_range_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+                $table->string('target_type');
+                $table->string('target');
+                $table->integer('expire_days')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**

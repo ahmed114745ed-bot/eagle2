@@ -42,6 +42,11 @@ class VipService
         return $this->vipRepository->getByType($type);
     }
 
+    public function backgroundImage()
+    {
+        return $this->ovipRepository->getOvip();
+    }
+
     public function vipList()
     {
         $privileges = $this->vipPrivilegeRepository->all();
@@ -195,7 +200,7 @@ class VipService
         return $this->wareRepository->getByTypeAndLevel($vipPrivilege->type, $vip->level);
     }
 
-    public function badges($type)
+    public function     badges($type)
     {
         return $this->vipRepository->badgesVip($type);
     }
@@ -362,5 +367,10 @@ class VipService
     public function getLevelGroups(): array
     {
         return $this->vipRepository->getLevelGroups();
+    }
+
+    public function getRoomLevel(): array
+    {
+        return $this->vipRepository->getRoomLevel();
     }
 }

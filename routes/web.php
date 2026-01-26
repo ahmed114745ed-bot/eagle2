@@ -1377,10 +1377,10 @@ Route::get('/debug/test-gift-banner', function () {
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
     } catch (\Throwable $e) {
-        Log::error('GiftBannerEvent failed', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
+        // Log::error('GiftBannerEvent failed', [
+        //     'error' => $e->getMessage(),
+        //     'trace' => $e->getTraceAsString(),
+        // ]);
 
         return response()->json([
             'success' => false,
@@ -1438,11 +1438,11 @@ Route::get('/debug/test-user-online', function () {
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
     } catch (\Throwable $e) {
-        Log::error('UserOnline failed', [
-            'error' => $e->getMessage(),
-            'user_id' => $user->id,
-            'trace' => $e->getTraceAsString(),
-        ]);
+        // Log::error('UserOnline failed', [
+        //     'error' => $e->getMessage(),
+        //     'user_id' => $user->id,
+        //     'trace' => $e->getTraceAsString(),
+        // ]);
 
         return response()->json([
             'success' => false,
