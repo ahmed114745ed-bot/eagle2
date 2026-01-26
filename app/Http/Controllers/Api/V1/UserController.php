@@ -19,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
+use Modules\Vip\Entities\Vip;
 use App\Enums\UserCoinLogType;
 use App\helper\TryCatchHelper;
 use App\Helpers\UserPackHelper;
@@ -1511,6 +1512,49 @@ class UserController extends Controller
     public function userLevelDetails(Request $request)
     {
         $user         = $request->user();
+
+        $currentLevel = $user->senderLevel;
+
+        $expLevel             = $user->total_sender_diamonds;
+        $diamondSend = $user->total_diamond_send;
+
+        if ($currentLevel) {
+            $secondLevel = Vip::where('type', 2)
+                ->where('level', '>', $currentLevel->level)
+                ->orderBy('level')
+                ->first();
+        } else {
+            $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
+        }
+
+        if ($secondLevel != null && $currentLevel != null) {
+            $remaining       = $secondLevel?->exp - $diamondSend;
+            $exactlyValue    = @$secondLevel?->exp;
+            $progressCurrent = $expLevel - $currentLevel->exp;
+            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } elseif ($currentLevel != null) {
+            $exactlyValue    = $secondLevel?->exp ?? 0;
+            $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
+            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
+
+            $progress  = 1;
+            $remaining = 0;
+        } else {
+            $progress  = 1;
+            $remaining = 0;
+        }
+
+
+
         $data = [
 
             'receiver_img' => $user->receiverLevel?->img ?? '',
@@ -1518,13 +1562,15 @@ class UserController extends Controller
             'sender_img'   => $user->senderLevel?->img ?? '',
             'sender_level' => intval($user->senderLevel?->level),
             'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
-            'remaining_to_next_level' => floatval($user->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
-            'sender_per' => Common::userLevelPer($user),
+            'remaining_to_next_level' => $remaining ?? 0,
+            'sender_per' => $progress ?? 1,
 
 
         ];
         return Common::apiResponse(true, 'success', $data);
     }
+
+
 
     public function syncBD()
     {
