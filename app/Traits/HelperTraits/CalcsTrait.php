@@ -583,31 +583,24 @@ trait CalcsTrait
     public static function userLevelPer($user)
     {
         $gold_level             = $user->total_sender_level;
-        $vipsData = Vip::collectionBuilder()->get();
+        $vipsData = DB::table('vips')->get()->groupBy('type');
 
         $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
 
-        $nextGoldData = self::getNextLevelDataFromCacheII(2, $gold_level, $vipsData);
+        $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
 
         $diamondSend             = $user->total_sender_diamonds;
 
         $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
 
-        $next_gold_num = $nextGoldData['next_exp'];
-
         $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
-       
-        $st = (int)$next_gold_num - (int)($current_gold_num);
-        $sc = (int)$senderNum - (int)($current_gold_num);
 
 
+        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
 
-        if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
-            $data['sender_per'] = (float)($sc / $st);
-        } else {
-            $data['sender_per'] = (float)0.00;
-        }
-        return $data['sender_per'];
+
+        $data = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
+        return  $data;
     }
 
 
