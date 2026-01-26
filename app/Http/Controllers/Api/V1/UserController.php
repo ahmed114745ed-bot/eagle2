@@ -1512,16 +1512,16 @@ class UserController extends Controller
     {
         $user         = $request->user();
         $data = [
-            'level' => [
-                'receiver_img' => $user->receiverLevel?->img ?? '',
-                'exp_receiver' => $user->receiverLevel?->exp ?? 0,
-                'sender_img'   => $user->senderLevel?->img ?? '',
-                'sender_level' => intval($user->senderLevel?->level),
-                'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
-                'remaining_to_next_level' => floatval($user->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
-                'sender_per' => Common::userLevelPer($user),
 
-            ],
+            'receiver_img' => $user->receiverLevel?->img ?? '',
+            'exp_receiver' => $user->receiverLevel?->exp ?? 0,
+            'sender_img'   => $user->senderLevel?->img ?? '',
+            'sender_level' => intval($user->senderLevel?->level),
+            'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
+            'remaining_to_next_level' => floatval($user->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
+            'sender_per' => Common::userLevelPer($user),
+
+
         ];
         return Common::apiResponse(true, 'success', $data);
     }
