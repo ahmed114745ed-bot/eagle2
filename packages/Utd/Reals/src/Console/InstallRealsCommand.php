@@ -113,12 +113,53 @@ class InstallRealsCommand extends Command
             $this->info("  ℹ️  تم حذف المجلد القديم");
         }
 
-        // إنشاء symlink
-        if (symlink($packagePublicPath, $targetPath)) {
-            $this->info("  ✅ تم إنشاء رابط رمزي: public/modules/reals -> packages/Utd/Reals/public");
-        } else {
-            $this->error("  ❌ فشل في إنشاء الرابط الرمزي");
+        // محاولة إنشاء symlink أولاً، وإذا فشل (مثل Windows بدون صلاحيات admin) ننسخ الملفات
+        try {
+            if (@symlink($packagePublicPath, $targetPath)) {
+                $this->info("  ✅ تم إنشاء رابط رمزي: public/modules/reals -> packages/Utd/Reals/public");
+                return;
+            }
+        } catch (\Exception $e) {
+            // symlink failed, will try copy instead
         }
+
+        // إذا فشل symlink، ننسخ الملفات (للتوافق مع Windows)
+        $this->info("  ⚠️  لا يمكن إنشاء رابط رمزي، سيتم نسخ الملفات بدلاً من ذلك...");
+        
+        if ($this->copyDirectory($packagePublicPath, $targetPath)) {
+            $this->info("  ✅ تم نسخ الملفات إلى: public/modules/reals");
+        } else {
+            $this->error("  ❌ فشل في نسخ الملفات");
+        }
+    }
+
+    /**
+     * نسخ مجلد بمحتوياته
+     */
+    protected function copyDirectory(string $source, string $destination): bool
+    {
+        if (!is_dir($source)) {
+            return false;
+        }
+
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        $files = array_diff(scandir($source), ['.', '..']);
+
+        foreach ($files as $file) {
+            $sourcePath = $source . DIRECTORY_SEPARATOR . $file;
+            $destPath = $destination . DIRECTORY_SEPARATOR . $file;
+
+            if (is_dir($sourcePath)) {
+                $this->copyDirectory($sourcePath, $destPath);
+            } else {
+                copy($sourcePath, $destPath);
+            }
+        }
+
+        return true;
     }
 
     /**

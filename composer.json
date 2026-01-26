@@ -62,7 +62,8 @@
             "App\\": "app/",
             "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Utd\\Reals\\": "packages/Utd/Reals/src/"
         },
         "files": [
             "app/helpers.php",
@@ -125,6 +126,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Achievements",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Reals",
             "options": {
                 "symlink": true
             }

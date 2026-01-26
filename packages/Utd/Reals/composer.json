@@ -21,7 +21,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Utd\\Reals\\": "src/"
+            "Utd\\Reals\\": "src/",
+            "Utd\\Reals\\Database\\Seeders\\": "database/Seeders/"
         }
     },
     "autoload-dev": {
