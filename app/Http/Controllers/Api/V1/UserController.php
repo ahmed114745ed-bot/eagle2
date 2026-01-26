@@ -1570,6 +1570,13 @@ class UserController extends Controller
             'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
             'remaining_to_next_level' => $remaining ?? 0,
             'sender_per' => round(Common::userLevelPer($user), 2),
+            // DEBUG - remove after testing
+            'debug' => [
+                'total_diamond_send' => $user->total_diamond_send,
+                'sub_sender_num' => $user->sub_sender_num,
+                'total_sender_diamonds' => $user->total_sender_diamonds,
+                'total_sender_level' => $user->total_sender_level,
+            ],
         ];
         return Common::apiResponse(true, 'success', $data);
     }
