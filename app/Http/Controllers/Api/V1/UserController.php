@@ -1512,7 +1512,7 @@ class UserController extends Controller
 
     public function userLevelDetails(Request $request)
     {
-        $user         = $request->user();
+        $user = $request->user()->fresh();  // Refresh to get latest data from DB
 
         $currentLevel = $user->senderLevel;
 
