@@ -283,6 +283,11 @@ class AuthService
             }
 
             $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
+
+            Log::info('Uploaded profile image', [
+                'imageType' => $imageType,
+                'image_path' => $newImagePass,
+            ]);
             $profile->avatar = $newImagePass;
             $profile->save();
 
