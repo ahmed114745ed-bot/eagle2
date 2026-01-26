@@ -303,6 +303,77 @@ class AuthService
 
             return $profile;
         }
+
+        // Handle image URLs from Google, Apple, etc.
+        if (isset($request['image']) && is_string($request['image']) && !empty($request['image'])) {
+            try {
+                $imageUrl = $request['image'];
+                
+                // Download the image from URL
+                $response = Http::get($imageUrl);
+                if (!$response->successful()) {
+                    Log::warning('Failed to download image from URL', ['url' => $imageUrl]);
+                    return null;
+                }
+                
+                $imageContent = $response->body();
+                if (empty($imageContent)) {
+                    Log::warning('Image content is empty from URL', ['url' => $imageUrl]);
+                    return null;
+                }
+
+                // Determine the file extension from URL
+                $extension = 'jpg'; // default
+                if (preg_match('/\.([a-z]+)(?:\?|$)/i', $imageUrl, $matches)) {
+                    $ext = strtolower($matches[1]);
+                    // Validate extension
+                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        $extension = $ext;
+                    }
+                }
+
+                $user->profile_count += 1;
+                $user->save();
+                $user->load('profile');
+                $profile = $user->profile;
+                if (!$profile) {
+                    $profile = Profile::create([
+                        'gender' => null,
+                        'birthday' => null,
+                        'province' => null,
+                        'city' => null,
+                        'country' => null,
+                        'user_id' => @$user->id,
+                    ]);
+                }
+
+                // Create the filename with proper extension
+                $fileName = $profile->id . '_' . $user->profile_count . '.' . $extension;
+                $filePath = 'profile' . DIRECTORY_SEPARATOR . $fileName;
+                
+                // Store the image directly
+                Storage::put($filePath, $imageContent, config('filesystems.default'));
+
+                Log::info('Downloaded and stored profile image from URL', [
+                    'imageUrl' => $imageUrl,
+                    'extension' => $extension,
+                    'image_path' => $filePath,
+                ]);
+
+                $profile->avatar = $filePath;
+                $profile->save();
+
+                return $profile;
+            } catch (\Exception $e) {
+                Log::error('Failed to store image from URL', [
+                    'user_id' => $user->id ?? null,
+                    'image_url' => $request['image'] ?? null,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't rethrow - continue without image
+                return null;
+            }
+        }
     }
 
     //     public function loginWithApple($request, $unique_id)
