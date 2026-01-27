@@ -100,16 +100,31 @@ class CoinReportController extends MainController
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            // ->selectRaw(
+            //     'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
+            //         'SUM(user_lucky_gifts.number) as total_number, ' .
+            //         'user_lucky_gifts.gift_id, ' .
+            //         'user_lucky_gifts.user_id, ' .
+            //         'MAX(users.name) as user_name, ' . // Aggregated using MAX
+            //         'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
+            //         'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
+            //         'user_lucky_gifts.gift_price, ' .
+            //         'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win',
+            //     'SUM(CASE WHEN user_lucky_gifts.value > 0 THEN user_lucky_gifts.value ELSE 0 END) as total_win_value ' .
+            //         'SUM(CASE WHEN user_lucky_gifts.value < 0 THEN ABS(user_lucky_gifts.value) ELSE 0 END) as total_lose_value'
+            // )
             ->selectRaw(
                 'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                     'SUM(user_lucky_gifts.number) as total_number, ' .
                     'user_lucky_gifts.gift_id, ' .
                     'user_lucky_gifts.user_id, ' .
-                    'MAX(users.name) as user_name, ' . // Aggregated using MAX
-                    'MAX(gifts.img) as gift_img, ' . // Aggregated using MAX
-                    'MAX(gifts.name) as gift_name, ' . // Aggregated using MAX
+                    'MAX(users.name) as user_name, ' .
+                    'MAX(gifts.img) as gift_img, ' .
+                    'MAX(gifts.name) as gift_name, ' .
                     'user_lucky_gifts.gift_price, ' .
-                    'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win'
+                    'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win, ' .
+                    'SUM(CASE WHEN user_lucky_gifts.value > 0 THEN user_lucky_gifts.value ELSE 0 END) as total_win_value, ' .
+                    'SUM(CASE WHEN user_lucky_gifts.value < 0 THEN ABS(user_lucky_gifts.value) ELSE 0 END) as total_lose_value'
             )
             ->leftJoin('users', 'user_lucky_gifts.user_id', '=', 'users.id')
             ->leftJoin('gifts', 'user_lucky_gifts.gift_id', '=', 'gifts.id')
@@ -140,7 +155,7 @@ class CoinReportController extends MainController
                 }, __('to_date'), 'to_date')->date();
             });
             $filter->column(1 / 2, function ($filter) {
-                
+
                 $filter->equal('user_id', __('user'))->select()->ajax('/api/search/users2', 'id', 'name');
             });
         });
@@ -179,12 +194,21 @@ class CoinReportController extends MainController
         });
 
         $grid->column('total_number', __('number'));
-        $grid->column(__('cost'))->display(function () {
-            return $this->total_number * $this->gift_price;
-        });
+        // $grid->column(__('cost'))->display(function () {
+        //     return $this->total_number * $this->gift_price;
+        // });
+        // $grid->column(__('win'))->display(function () {
+        //     return $this->total_number_win * $this->gift_price;
+        // });
+
         $grid->column(__('win'))->display(function () {
-            return $this->total_number_win * $this->gift_price;
+            return $this->total_win_value;  // sum of positive 'value'
         });
+
+        $grid->column(__('lose'))->display(function () {
+            return $this->total_lose_value; // sum of negative 'value' as positive
+        });
+
         $grid->column('earliest_created_at', __('created at'));
 
         return $grid;
@@ -239,10 +263,9 @@ class CoinReportController extends MainController
 
                     $query->whereDate('coin_game_users.created_at', '<=', $datt);
                 }, __('to_date'), 'to_date')->date();
-
             });
             $filter->column(1 / 2, function ($filter) {
-                
+
                 $filter->equal('user_id', __('user'))->select()->ajax('/api/search/users2', 'id', 'name');
             });
 
