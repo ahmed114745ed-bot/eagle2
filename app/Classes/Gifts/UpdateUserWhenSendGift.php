@@ -92,6 +92,10 @@ class UpdateUserWhenSendGift
                 ->get();
 
             foreach ($users as $user) {
+                if (!$user || !isset($user->id)) {
+                    // log, skip, or continue silently
+                    continue;
+                }
                 DB::table('users')->where('id', $user->id)->update([
                     'total_diamond_received'   => $user->total_diamond_received + $totalCoins,
                     'exchange_diamonds'        => $user->agency_id == 0
