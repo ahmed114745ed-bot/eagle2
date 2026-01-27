@@ -2,7 +2,7 @@
 
 namespace Modules\LuckyBox\Entities;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;

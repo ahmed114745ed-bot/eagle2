@@ -2,7 +2,7 @@
 
 namespace Modules\TaskStream\Entities;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

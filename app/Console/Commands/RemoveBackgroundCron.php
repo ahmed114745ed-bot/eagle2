@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Room;
-use App\Models\Background;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\Background;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 

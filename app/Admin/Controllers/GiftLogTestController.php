@@ -15,13 +15,13 @@ use App\Http\Resources\Api\V1\UserResourceSerche;
 use App\Http\Resources\Api\V1\UserResourceSearchV2;
 use App\Http\Resources\Api\V1\UserVisitorResource;
 use App\Models\Ban;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Repositories\Community\SearchRepository;
 use App\Services\ProfileService;
 use App\Services\UserService;
 use App\Tik\Services\GiftLogService;
-use App\Tik\Services\RoomRepoService;
+use Utd\Room\Services\RoomService;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ class GiftLogTestController extends Controller
         private readonly GiftLogService $giftLogService,
         private readonly UserService $userService,
         private readonly ProfileService $profileService,
-        private readonly RoomRepoService $roomService,
+        private readonly RoomService $roomService,
     )
     {
     }

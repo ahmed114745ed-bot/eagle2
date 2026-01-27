@@ -3,9 +3,9 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\UserPackHelper;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;

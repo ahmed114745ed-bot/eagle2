@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-use App\Tik\Services\RoomCategoryService;
+use Utd\Room\Services\RoomCategoryService;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomCategoryResource;
 

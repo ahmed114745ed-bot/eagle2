@@ -2,7 +2,7 @@
 
 namespace App\Tik\DTO;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 class ReceiverGiftDTO
 {

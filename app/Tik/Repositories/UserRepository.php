@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;

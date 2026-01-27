@@ -4,10 +4,10 @@ namespace App\Classes\Gifts;
 
 use App\Enums\UserDiamondLogType;
 use App\Helpers\UserDiamondLogHelper;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Family;
 use App\Helpers\Common;

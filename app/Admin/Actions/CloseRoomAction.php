@@ -2,9 +2,9 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
-use App\Models\BanRoom;
+use Utd\Room\Entities\BanRoom;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;

@@ -2,8 +2,8 @@
 namespace App\Repositories\Room;
 use App\Helpers\CacheHelper;
 use App\Helpers\Common;
-use App\Models\EnteredRoom;
-use App\Models\Room;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Traits\HelperTraits\PusherTrait;

@@ -7,7 +7,7 @@ use App\Helpers\UserCommon;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserGameChallange;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\Vip\Entities\Vip;
 use App\Models\Ware;
 use Utd\Achievements\Entities\UserAchievementLevel;

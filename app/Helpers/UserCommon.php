@@ -11,7 +11,7 @@ use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;

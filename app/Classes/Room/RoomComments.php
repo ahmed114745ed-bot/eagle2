@@ -8,7 +8,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Repositories\Room\RoomRepoInterface;
 use Illuminate\Validation\ValidationException;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard\Room;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Room\AdminRoomsResource;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

@@ -3,7 +3,7 @@
 namespace Modules\RoomCup\Http\Controllers\web;
 
 use App\Models\User;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;

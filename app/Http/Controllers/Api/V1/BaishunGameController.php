@@ -9,7 +9,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\AllGame;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use DB;
 use App\Models\User;
 use App\Models\GameWallet;

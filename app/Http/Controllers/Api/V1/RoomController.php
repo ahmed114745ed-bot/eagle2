@@ -4,18 +4,18 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use Exception;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\AllGame;
 use App\Models\LiveTime;
 use App\Models\KickRecord;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
-use App\Services\RoomService;
+use App\Services\RoomService as AppRoomService;
 use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
 use App\Jobs\EnterRoomZigoRequest;
@@ -24,10 +24,10 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
-use App\Tik\Services\RoomRepoService;
+use Utd\Room\Services\RoomService;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Requests\EditRoomRequest;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Modules\CP\Entities\CpRoomHistory;
 use App\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
@@ -58,8 +58,8 @@ class RoomController extends Controller
 
     public function __construct(
         RoomRepoInterface $repo,
-        RoomRepoService $roomService,
-        RoomService $roomServiceMain,
+        RoomService $roomService,
+        AppRoomService $roomServiceMain,
 
     ) {
         $this->repo = $repo;

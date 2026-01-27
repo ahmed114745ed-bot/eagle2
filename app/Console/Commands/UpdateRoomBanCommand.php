@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 

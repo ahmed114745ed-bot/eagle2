@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard\Room;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Room\AdminBackgroundRequestsResource;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Illuminate\Http\Request;
 
 class AdminBackgroundRequestController extends Controller

@@ -577,7 +577,7 @@ class UserController extends MainController
                         // 'receiver.profile',
                         // 'sender.profile',
                         'gift:id,name,price',
-                        'room:id,room_name',
+                        'room',
                         'agency:id,name',
                     ])
                     ->orderByDesc('id')

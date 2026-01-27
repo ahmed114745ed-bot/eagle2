@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 
 class PkRepository extends AbstractRepository
 {

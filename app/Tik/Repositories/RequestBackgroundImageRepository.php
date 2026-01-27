@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Carbon\Carbon;
 
 class RequestBackgroundImageRepository extends AbstractRepository

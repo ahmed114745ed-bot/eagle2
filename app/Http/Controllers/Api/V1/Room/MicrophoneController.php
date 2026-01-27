@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api\V1\Room;
 
 use Exception;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use Carbon\CarbonInterval;
 use App\Facades\RoomHelper;
-use App\Models\EnteredRoom;
+use Utd\Room\Entities\EnteredRoom;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Tik\Services\MicService;

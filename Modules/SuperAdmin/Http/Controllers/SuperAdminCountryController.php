@@ -14,7 +14,7 @@ use App\Models\CoinGameUserMergedMonthly;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\User;
 use Carbon\Carbon;

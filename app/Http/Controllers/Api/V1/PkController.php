@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 
 use Exception;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Utils;

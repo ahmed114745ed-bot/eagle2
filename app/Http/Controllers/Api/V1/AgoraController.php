@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Repositories\Room\RoomRepository;
 use App\Repositories\User\UserRepository;
-use App\Tik\Services\EnteranceRoomServices;
+use Utd\Room\Services\RoomVisitorService;
 use Illuminate\Http\Request;
 use Log;
 
@@ -16,7 +16,7 @@ class AgoraController extends Controller
 {
     protected $enteranceRoomService;
 
-    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, EnteranceRoomServices $enteranceRoomService)
+    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, RoomVisitorService $enteranceRoomService)
     {
         $this->enteranceRoomService = $enteranceRoomService;
     }

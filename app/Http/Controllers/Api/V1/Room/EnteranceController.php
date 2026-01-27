@@ -5,20 +5,20 @@ namespace App\Http\Controllers\Api\V1\Room;
 use App\Facades\UserHandling;
 use App\Helpers\WebPHelper;
 use App\Models\AllGame;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Jobs\ResetCharisma;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditRoomRequest;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 
 use App\Repositories\Room\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
@@ -27,7 +27,7 @@ use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
-use App\Tik\Services\EnteranceRoomServices;
+use Utd\Room\Services\RoomVisitorService;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
@@ -38,7 +38,7 @@ class EnteranceController extends Controller
     protected $repo;
     protected $enteranceRoomService;
 
-    public function __construct(RoomRepoInterface $repo, EnteranceRoomServices $enteranceRoomService)
+    public function __construct(RoomRepoInterface $repo, RoomVisitorService $enteranceRoomService)
     {
         $this->repo = $repo;
         $this->enteranceRoomService = $enteranceRoomService;

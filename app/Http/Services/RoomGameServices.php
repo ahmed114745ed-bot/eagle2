@@ -4,10 +4,10 @@ namespace App\Http\Services;
 
 use App\Helpers\Common;
 use App\Models\Banner;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\RoomSalaries;
-use App\Models\RoomSalary;
-use App\Models\RoomTarget;
+use Utd\Room\Entities\RoomSalary;
+use Utd\Room\Entities\RoomTarget;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 

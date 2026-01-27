@@ -1,47 +1,52 @@
 <?php
+
 namespace App\Support;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Utd\Achievements\Entities\Achievement;
+use Utd\Moments\Entities\Moment;
+use Utd\Reals\Entities\Real;
+use Utd\Room\Entities\Room;
 
 class PackageHelper
 {
+    private static array $packages = [
+        'achievement' => Achievement::class,
+        'moment' => Moment::class,
+        'real' => Real::class,
+        'room' => Room::class,
+    ];
+
     /**
      * Check if a package is installed
      */
     public static function isInstalled(string $package): bool
     {
-        $packages = [
-            'achievements' => 'Utd\\Achievements\\AchievementsServiceProvider',
-            'vip' => 'Utd\\Vip\\VipServiceProvider',
-            'wallet' => 'Utd\\Wallet\\WalletServiceProvider',
-        ];
-        return isset($packages[$package]) && class_exists($packages[$package]);
+        return isset(self::$packages[$package]) && class_exists(self::$packages[$package]);
     }
 
     /**
-     * Get entity class if package installed
+     * Get model class if package installed
      */
-    public static function getEntity(string $package, string $entity): ?string
+    public static function getEntity(string $package): ?string
     {
         if (!self::isInstalled($package)) {
             return null;
         }
-        $entities = [
-            'achievements' => [
-                'Achievement' => 'Utd\\Achievements\\Entities\\Achievement',
-                'UserAchievementLevel' => 'Utd\\Achievements\\Entities\\UserAchievementLevel',
-            ],
-        ];
-        return $entities[$package][$entity] ?? null;
+
+        return self::$packages[$package] ?? null;
     }
 
     /**
-     * Query entity safely
+     * Query model safely
      */
-    public static function query(string $package, string $entity)
+    public static function checkRelation(Model $model, string $package): ?HasOne
     {
-        $class = self::getEntity($package, $entity);
-        if (!$class) {
-            return collect([]); // Return empty collection
+        if (!self::isInstalled($package)) {
+            return $model->hasOne($model::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        return $class::query();
+
+        return null;
     }
 }

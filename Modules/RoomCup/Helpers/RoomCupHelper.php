@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Modules\RoomBoom\Entities\TotalRoomGift;
-use App\Models\EnteredRoom;
+use Utd\Room\Entities\EnteredRoom;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use App\Models\Config as ConfigModel;
+use App\Support\PackageHelper;
 use App\Traits\DynamicAchievementTrait;
 use App\Traits\DynamicRealsTrait;
 use App\Traits\FollowTrait;
@@ -40,6 +41,8 @@ use Modules\UsersWallet\Entities\UserWallet;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomSalary;
 
 /**
  * @method static withoutAppends()
@@ -908,17 +911,20 @@ class User extends Authenticatable
 
     public function getSalaryAttribute()
     {
-        $userSalary = UserSallary::query()
+        $roomSalary = 0;
 
+        $userSalary = UserSallary::query()
             ->where('user_id', $this->id)
             ->orderByDesc('id')
             ->sum(DB::raw('sallary - cut_amount'));
 
-        $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
-            $q->where('uid', $this->id);
-        })
-            ->orderByDesc('id')
-            ->sum(DB::raw('salary - cut_amount'));
+        if (PackageHelper::isInstalled('room')){
+            $roomSalary = RoomSalary::query()->whereHas('room', function ($q) {
+                $q->where('uid', $this->id);
+            })
+                ->orderByDesc('id')
+                ->sum(DB::raw('salary - cut_amount'));
+        }
 
         $total = $userSalary + $roomSalary;
         // $total = wallet_available_by_user($this->id);
@@ -1704,7 +1710,6 @@ class User extends Authenticatable
         if ($this->type_user == 2) {
             $applicableTypes[2] = $types[2];
         }
-
 
         if (ShippingAgency::where('app_owner_id', $this->id)->exists()) {
             $applicableTypes[3] = $types[3];

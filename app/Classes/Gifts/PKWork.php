@@ -4,8 +4,8 @@ namespace App\Classes\Gifts;
 
 use App\Helpers\Common;
 use App\Interfaces\RoomJobInterface;
-use App\Models\Pk;
-use App\Models\Room;
+use Utd\Room\Entities\Pk;
+use Utd\Room\Entities\Room;
 use Carbon\Carbon;
 use Modules\Charizma\Http\Services\UserCharismaService;
 

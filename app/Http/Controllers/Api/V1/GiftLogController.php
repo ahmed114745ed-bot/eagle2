@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Cp;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Agency;
 use App\Helpers\Common;

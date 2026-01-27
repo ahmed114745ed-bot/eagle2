@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\PackageHelper;
 use App\Traits\HostLevelTrait;
 use Modules\CP\Traits\CpGiftLog;
-use Modules\Moment\Entities\Moment;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Utd\Moments\Entities\Moment;
+use Utd\Room\Entities\Room;
 
 class GiftLog extends Model
 {
@@ -39,7 +41,8 @@ class GiftLog extends Model
 
     public function room()
     {
-        return $this->belongsTo(Room::class, 'room_id');
+        return PackageHelper::checkRelation($this, 'room') ??
+            $this->belongsTo(Room::class, 'room_id');
     }
 
     public function moment(): BelongsTo

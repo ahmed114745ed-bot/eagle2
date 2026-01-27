@@ -3,16 +3,16 @@
 namespace Modules\AreaManager\Http\Controllers;
 
 
-use App\Models\Pk;
-use App\Models\Room;
+use Utd\Room\Entities\Pk;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\KickRecord;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;

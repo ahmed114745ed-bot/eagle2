@@ -3,7 +3,7 @@
 namespace Modules\Chat\Http\Services;
 
 use App\Models\GiftLog;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

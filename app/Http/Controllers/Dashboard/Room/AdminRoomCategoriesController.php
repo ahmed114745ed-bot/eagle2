@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Room;
 
 use App\Http\Controllers\Controller;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\RoomCategory;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

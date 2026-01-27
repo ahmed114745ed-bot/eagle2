@@ -4,7 +4,7 @@ namespace App\Repositories\Community;
 
 use App\Http\Resources\Api\V1\CommunityResource;
 use App\Models\OfficialMessage;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;

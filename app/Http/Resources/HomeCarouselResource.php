@@ -3,7 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\Common;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Modules\Events\Entities\GeneralRole;
 use Illuminate\Http\Resources\Json\JsonResource;
 

@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\Background;
+use Utd\Room\Entities\Background;
 
 
 

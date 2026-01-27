@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\PK;
+use Utd\Room\Entities\Pk;
 
 class PKObserver
 {

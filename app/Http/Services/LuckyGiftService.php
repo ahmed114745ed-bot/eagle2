@@ -4,7 +4,7 @@ namespace App\Http\Services;
 
 use App\Jobs\UpdatePkAndSendToZigo;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Exception;
 use Modules\Vip\Entities\Vip;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;

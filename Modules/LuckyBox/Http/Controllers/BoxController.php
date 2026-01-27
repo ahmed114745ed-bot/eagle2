@@ -3,13 +3,13 @@
 namespace Modules\LuckyBox\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 
 use App\Enums\TypeBox;
 use App\Helpers\Common;
 use App\Jobs\OpenBoxJob;
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\RoomVisitor;
 use Illuminate\Http\Request;
 
 use App\Facades\RedisService;

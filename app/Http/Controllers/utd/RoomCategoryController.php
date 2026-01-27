@@ -4,7 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
 
 class RoomCategoryController extends Controller

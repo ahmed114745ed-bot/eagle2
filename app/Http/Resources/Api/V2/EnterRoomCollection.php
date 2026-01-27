@@ -2,13 +2,13 @@
 
 namespace App\Http\Resources\Api\V2;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\configesModel;
 use Illuminate\Support\Facades\DB;
 use Modules\LuckyBox\Entities\BoxUse;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use App\Http\Resources\Api\V1\PkCollection;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Resources\Api\V1\AllGameResource;

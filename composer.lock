@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce3bd413d83c0b91b0a8046a774a2057",
+    "content-hash": "df05374b494232f1e1d33dd346082291",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14376,7 +14376,7 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
@@ -14418,7 +14418,7 @@
         },
         {
             "name": "utd/moments",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
@@ -14459,11 +14459,11 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
-                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
+                "reference": "62bf966f616bc3ac25632b5bcba722b717cf4751"
             },
             "require": {
                 "illuminate/database": "^10.0|^11.0",
@@ -14504,6 +14504,47 @@
                 }
             ],
             "description": "Reels/Reals Feature Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/room",
+            "version": "dev-room-package",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Room",
+                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Room\\RoomServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Room\\": "src/",
+                    "Utd\\Room\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Room Laravel Package - Core room functionality including microphones, visitors, categories, and more",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -15282,9 +15323,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20,
-        "utd/moments": 20,
-        "utd/reals": 20
+        "utd/room": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

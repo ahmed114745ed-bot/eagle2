@@ -5,8 +5,8 @@ namespace App\Http\Resources\Api\V1;
 use App\Helpers\Common;
 
 use App\Models\configesModel;
-use App\Models\Pk;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\Pk;
+use Utd\Room\Entities\RequestBackgroundImage;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;

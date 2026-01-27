@@ -5,7 +5,7 @@ namespace App\Tik\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Tik\Repositories\PkRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 
 
 class PkService

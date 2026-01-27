@@ -3,7 +3,7 @@
 namespace Modules\Charizma\Jobs;
 
 use App\Helpers\Common;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -9,7 +9,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Gift;
 use App\Models\GiftLog;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\UserGift;
 use App\Models\Ware;

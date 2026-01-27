@@ -2,7 +2,7 @@
 
 namespace App\Admin\Actions;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Encore\Admin\Actions\Action;
 
 

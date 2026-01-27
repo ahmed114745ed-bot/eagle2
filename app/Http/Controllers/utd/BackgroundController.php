@@ -4,7 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\Background;
+use Utd\Room\Entities\Background;
 use Illuminate\Http\Request;
 
 class BackgroundController extends Controller

@@ -4,8 +4,8 @@ namespace App\Http\Services;
 
 use App\Exceptions\RoomUserHandling\PermissionNotAllow;
 use App\Facades\RoomHelper;
-use App\Models\RequestBackgroundImage;
-use App\Models\Room;
+use Utd\Room\Entities\RequestBackgroundImage;
+use Utd\Room\Entities\Room;
 use Illuminate\Support\Facades\DB;
 
 class RoomService

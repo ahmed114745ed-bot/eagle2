@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Police;
 use App\Http\Resources\CountryResource;
 use Illuminate\Http\Resources\Json\JsonResource;

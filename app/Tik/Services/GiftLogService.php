@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;

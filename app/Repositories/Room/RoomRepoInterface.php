@@ -1,6 +1,6 @@
 <?php
 namespace App\Repositories\Room;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 interface RoomRepoInterface{
     public function all($req);

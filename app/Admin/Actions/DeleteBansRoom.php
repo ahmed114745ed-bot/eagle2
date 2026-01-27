@@ -4,8 +4,8 @@ namespace App\Admin\Actions;
 
 use App\Facades\CustomNotification;
 use App\Models\Ban;
-use App\Models\BanRoom;
-use App\Models\Room;
+use Utd\Room\Entities\BanRoom;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Actions\RowAction;

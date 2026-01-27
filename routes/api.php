@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Dashboard\StatisticsController;
 use App\Http\Controllers\TestDiamondController;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use Illuminate\Http\Request;

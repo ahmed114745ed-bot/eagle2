@@ -7,7 +7,7 @@ use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\Family;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyDataForAgancyResource extends JsonResource

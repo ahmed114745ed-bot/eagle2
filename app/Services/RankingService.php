@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Pk;;
+use Utd\Room\Entities\Pk;;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;

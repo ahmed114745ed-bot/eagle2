@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Cp;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Agency;
 
 use App\Models\GiftLog;

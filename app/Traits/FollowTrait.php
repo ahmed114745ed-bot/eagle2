@@ -3,7 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Follow;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 

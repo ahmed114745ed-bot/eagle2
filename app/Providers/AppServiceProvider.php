@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Emoji;
@@ -61,6 +61,7 @@ use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastManager;
+use App\Support\PackageHelper;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -340,11 +341,13 @@ class AppServiceProvider extends ServiceProvider
         Gift::observe(GiftObserver::class);
         Emoji::observe(EmojiObserver::class);
         Ware::observe(WareObserver::class);
-        Room::observe(RoomObserver::class);
+        if (PackageHelper::isInstalled('room')) {
+            Room::observe(RoomObserver::class);
+            Pk::observe(PKObserver::class);
+        }
         UserSallary::observe(UserSallaryObserver::class);
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);
-        Pk::observe(PKObserver::class);
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);

@@ -7,7 +7,7 @@ use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
 use App\Models\Cp;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Repositories\Room\RoomTopUsersRepository;
 use Illuminate\Bus\Queueable;

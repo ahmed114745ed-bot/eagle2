@@ -13,7 +13,7 @@ use Carbon\Carbon;
 use Modules\RoomCup\Entities\RoomCupTarget;
 use Modules\RoomBoom\Entities\TotalRoomGift;
 use Modules\RoomCup\Entities\RoomCupReward;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 use Symfony\Component\Console\Command\Command as EnumCommand;

@@ -2,11 +2,11 @@
 
 namespace App\Helpers;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
@@ -18,8 +18,8 @@ use GuzzleHttp\Client;
 use App\Models\GiftLog;
 use App\Models\PackLog;
 use App\Models\Setting;
-use App\Models\Background;
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\Background;
+use Utd\Room\Entities\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
@@ -1943,7 +1943,7 @@ class Common
     }
 
 
-    public static function kickOfAllUsersRoom(\App\Models\Room $room)
+    public static function kickOfAllUsersRoom(\Utd\Room\Entities\Room $room)
     {
         $usersIdInRooms = RoomVisitor::query()->where(['room_id' => $room->id])->pluck('user_id')->toArray();
         User::whereIn('id', $usersIdInRooms)->update(['now_room_uid' => 0]);

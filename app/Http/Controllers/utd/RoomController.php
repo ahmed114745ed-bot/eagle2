@@ -4,9 +4,9 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\WebPHelper;
 use Exception;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RoomResource;

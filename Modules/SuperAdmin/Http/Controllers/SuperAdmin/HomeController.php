@@ -9,7 +9,7 @@ use App\Models\CoinLog;
 use App\Models\GameChargeHistory;
 use App\Models\GameWallet;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\GiftLog;

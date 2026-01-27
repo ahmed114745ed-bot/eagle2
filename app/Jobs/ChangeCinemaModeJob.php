@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;

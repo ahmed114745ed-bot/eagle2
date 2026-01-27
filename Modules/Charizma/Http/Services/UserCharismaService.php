@@ -6,7 +6,7 @@ namespace Modules\Charizma\Http\Services;
 use Modules\Charizma\Entities\ExtraDataInRoom;
 use Illuminate\Http\Request;
 use App\models\User;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Charizma\Transformers\CharismaResource;

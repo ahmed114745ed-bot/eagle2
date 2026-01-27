@@ -4,7 +4,7 @@ namespace Modules\RoomCup\Http\Controllers\Api;
 
 use App\Models\Setting;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;

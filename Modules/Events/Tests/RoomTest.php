@@ -2,8 +2,8 @@
 
 namespace Modules\Events\Tests;
 
-use App\Models\Background;
-use App\Models\Room;
+use Utd\Room\Entities\Background;
+use Utd\Room\Entities\Room;
 use Tests\TestCase;
 
 class RoomTest extends TestCase

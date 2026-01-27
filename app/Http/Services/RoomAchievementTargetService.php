@@ -5,7 +5,7 @@ namespace App\Http\Services;
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\GiftLog;
 use App\Models\AppFeature;

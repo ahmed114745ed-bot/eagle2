@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Helpers\LogHelper;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Tests\TestCase;
 use Mockery;
 use App\Models\User;

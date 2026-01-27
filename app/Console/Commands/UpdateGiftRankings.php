@@ -50,7 +50,7 @@ class UpdateGiftRankings extends Command
                 break;
 
             case 'roomId':
-                $rankerType = \App\Models\Room::class;
+                $rankerType = \Utd\Room\Entities\Room::class;
                 break;
             default:
                 $rankerType = \App\Models\User::class;

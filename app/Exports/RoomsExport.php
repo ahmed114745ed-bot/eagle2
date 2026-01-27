@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 

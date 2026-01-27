@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Room;
-use App\Models\RoomGame;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomGame;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
