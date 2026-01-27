@@ -274,6 +274,10 @@ class AuthController extends Controller
             return Common::apiResponse(false, 'you are blocked', [], 422);
         }
 
+        if (!$this->canLogin($user)) {
+            return Common::apiResponse(false, 'you are blocked', [], 422);
+        }
+
         $user->auth_token = $token;
 
         try {

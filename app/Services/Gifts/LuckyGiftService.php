@@ -2,27 +2,28 @@
 
 namespace App\Services\Gifts;
 
-use App\Classes\Gifts\SendGiftService;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Enums\UserCoinLogType;
-use App\Exceptions\NotInfMoneyException;
-use App\Facades\RedisService;
-use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
-use App\Jobs\LogUserCoinProfit;
-use App\Jobs\LogUserCumulativeCoinProfit;
-use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
 use App\Models\Room;
 use App\Models\User;
-use App\Traits\Gifts\LuckyGiftProbability;
+use App\Helpers\Common;
+use App\Models\CoreWallet;
+use App\Facades\RedisService;
+use InvalidArgumentException;
+use App\Enums\UserCoinLogType;
+use App\Jobs\LogUserCoinProfit;
+use App\Helpers\UserCoinLogHelper;
 use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
-use InvalidArgumentException;
+use App\Classes\Gifts\SendGiftService;
 use Modules\CP\Http\Services\CpService;
+use App\Exceptions\NotInfMoneyException;
+use App\Jobs\LogUserCumulativeCoinProfit;
+use App\Traits\Gifts\LuckyGiftProbability;
+use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Illuminate\Validation\ValidationException;
+use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 
 class LuckyGiftService
 {
@@ -72,16 +73,16 @@ class LuckyGiftService
 
 
 
-        if (isset($ownerId)){
+        if (isset($ownerId)) {
             $room = Room::withoutAppends()
-            ->where('uid', $ownerId)
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
-        }else{
+                ->where('uid', $ownerId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->first();
+        } else {
             $room = Room::withoutAppends()
-            ->where('id', $roomId )
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
+                ->where('id', $roomId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,total_diamond,level,type,level_id,microphone,charizma_status')
+                ->first();
             $ownerId = $room?->uid;
         }
 
@@ -106,7 +107,7 @@ class LuckyGiftService
 
 
 
-//        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        //        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
@@ -121,7 +122,7 @@ class LuckyGiftService
             -abs($totalPrice),
             $amountBefore,
             UserCoinLogType::LUCKY_GIFT,
-            $gift?->name ,
+            $gift?->name,
         );
 
         $totalPrice = $giftPrice * $number * $receiversCount;
@@ -135,7 +136,7 @@ class LuckyGiftService
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
-           
+
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
@@ -161,10 +162,10 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
-        
+
                 if ($isPopular) {
 
-                  
+
 
                     $this->sendPopularToZego($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
@@ -262,7 +263,24 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-  
+
+        // \Log::info('sendLuckyGift2 - Room Type Check', [
+        //     'room_id' => $room->id,
+        //     'room_type' => $room->type,
+        //     'total_diamond' => $room->total_diamond,
+        //     'totalPrice' => $totalPrice,
+        // ]);
+
+        if ($room->type == 'audio') {
+            $serviceLevel  = new UpgradeRoomLevelServices();
+            // \Log::info('sendLuckyGift2 - Upgrading Room Level', [
+            //     'room_id' => $room->id,
+            //     'diamonds' => $totalPrice,
+            //     'type' => $room->type,
+            // ]);
+            $serviceLevel->sendGift($room, $totalPrice);
+        }
+
         return  $responseData;
     }
 
@@ -284,7 +302,7 @@ class LuckyGiftService
         $total_cashback_percentage = 0;
 
 
-        $gift = Gift::query()->select(['id', 'name', 'e_name','type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
+        $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
@@ -307,16 +325,16 @@ class LuckyGiftService
 
 
 
-        if (isset($ownerId)){
+        if (isset($ownerId)) {
             $room = Room::withoutAppends()
-            ->where('uid', $ownerId)
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
-        }else{
+                ->where('uid', $ownerId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type,total_diamond,level,level_id')
+                ->first();
+        } else {
             $room = Room::withoutAppends()
-            ->where('id', $roomId )
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
+                ->where('id', $roomId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status,type,total_diamond,level,level_id')
+                ->first();
             $ownerId = $room?->uid;
         }
 
@@ -339,7 +357,7 @@ class LuckyGiftService
 
 
 
-//        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        //        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
@@ -354,7 +372,7 @@ class LuckyGiftService
             -abs($totalPrice),
             $amountBefore,
             UserCoinLogType::LUCKY_GIFT,
-            $gift?->name ,
+            $gift?->name,
         );
 
         $totalPrice = $giftPrice * $number * $receiversCount;
@@ -368,7 +386,7 @@ class LuckyGiftService
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
-           
+
             $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
             $appWalletCoins = $appWallet->coins;
@@ -394,7 +412,7 @@ class LuckyGiftService
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
-        
+
                 if ($isPopular) {
 
                     //  \Log::info('🚀 Sending Popular To Zego...', [
@@ -472,7 +490,7 @@ class LuckyGiftService
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;
-        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ??$gift->name;
+        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ?? $gift->name;
 
         //update user coins and diamond and sender level
         $totalDiamond           = $totalPrice * $count;
@@ -499,11 +517,29 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-       
+
+        // \Log::info('sendLuckyGift2V2 - Room Type Check', [
+        //     'room_id' => $room->id,
+        //     'room_type' => $room->type,
+        //     'total_diamond' => $room->total_diamond,
+        //     'totalPrice' => $totalPrice,
+        // ]);
+
+        // Upgrade room level for audio rooms
+        if ($room->type == 'audio') {
+            $serviceLevel = new UpgradeRoomLevelServices();
+            // \Log::info('sendLuckyGift2V2 - Upgrading Room Level', [
+            //     'room_id' => $room->id,
+            //     'diamonds' => $totalPrice,
+            //     'type' => $room->type,
+            // ]);
+            $serviceLevel->sendGift($room, $totalPrice);
+        }
+
         return  $responseData;
     }
 
-     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
@@ -519,7 +555,7 @@ class LuckyGiftService
         $total_cashback_percentage = 0;
 
 
-        $gift = Gift::query()->select(['id', 'name', 'e_name','type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
+        $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
             ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
@@ -541,16 +577,16 @@ class LuckyGiftService
 
 
 
-        if (isset($ownerId)){
+        if (isset($ownerId)) {
             $room = Room::withoutAppends()
-            ->where('uid', $ownerId)
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
-        }else{
+                ->where('uid', $ownerId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->first();
+        } else {
             $room = Room::withoutAppends()
-            ->where('id', $roomId )
-            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
-            ->first();
+                ->where('id', $roomId)
+                ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+                ->first();
             $ownerId = $room?->uid;
         }
 
@@ -575,7 +611,7 @@ class LuckyGiftService
 
 
 
-//        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
+        //        $responseData = $this->getResponseData($gift, $room->microphone, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
         $responseData = $this->getResponseData2($gift, $room, $user, $receiversIds, $this->getReceiverName($isToRoom, $receiverName));
 
         $index = $count;
@@ -591,7 +627,7 @@ class LuckyGiftService
             -abs($totalPrice),
             $amountBefore,
             UserCoinLogType::LUCKY_GIFT,
-            $gift?->name ,
+            $gift?->name,
         );
 
         $totalPrice = $giftPrice * $number * $receiversCount;
@@ -638,7 +674,7 @@ class LuckyGiftService
 
                     //send to zigo this data to show in all rooms if cashback percentage > 20
                     $isPopular = $this->isPopular($cashback_percentage);
-            
+
                     if ($isPopular) {
                         $iterationPopular = true;
                         $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
@@ -661,7 +697,7 @@ class LuckyGiftService
                     'win_coins'       => $current_win,
                     'is_win'          => $current_win > 0,
                     'is_popular'      => $isPopular,
-                    'cashback_percent'=> $cashback_percentage,
+                    'cashback_percent' => $cashback_percentage,
                 ];
             }
 
@@ -722,7 +758,7 @@ class LuckyGiftService
         $responseData['total_price'] = $totalPrice;
         $responseData['cashback_percentage'] = $total_cashback_percentage;
         $responseData['total_user_win'] = $total_user_win;
-        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ??$gift->name;
+        $responseData['gift_name'] = app()->getLocale() === 'ar' ? $gift->name ?? $gift->e_name : $gift->e_name ?? $gift->name;
         $responseData['summary'] = [
             'total_win'       => $total_user_win,
             'max_single_win'  => $max_single_win,
@@ -754,7 +790,25 @@ class LuckyGiftService
         }
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
-     
+
+        // \Log::info('sendLuckyGift2V3 - Room Type Check', [
+        //     'room_id' => $room->id,
+        //     'room_type' => $room->type,
+        //     'total_diamond' => $room->total_diamond,
+        //     'totalPrice' => $totalPrice,
+        // ]);
+
+        // Upgrade room level for audio rooms
+        if ($room->type == 'audio') {
+            $serviceLevel = new UpgradeRoomLevelServices();
+            // \Log::info('sendLuckyGift2V3 - Upgrading Room Level', [
+            //     'room_id' => $room->id,
+            //     'diamonds' => $totalPrice,
+            //     'type' => $room->type,
+            // ]);
+            $serviceLevel->sendGift($room, $totalPrice);
+        }
+
         return  $responseData;
     }
     public function sendLuckyGift3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
@@ -992,7 +1046,7 @@ class LuckyGiftService
             ->all();
 
         $missingReceivers = array_diff($receiversIds, $microphones->pluck('user_id')->all());
-        
+
 
         if (!empty($missingReceivers)) {
             $positions[] = -1;
@@ -1016,8 +1070,8 @@ class LuckyGiftService
     public function getCoreWallets(): array
     {
         $collection = CoreWallet::query()
-        ->whereIn('name', ['app_wallet', 'owner_wallet'])
-        ->get();
+            ->whereIn('name', ['app_wallet', 'owner_wallet'])
+            ->get();
 
         $wallets = $collection->sortBy('id')->values();
 
@@ -1104,12 +1158,12 @@ class LuckyGiftService
             'cache_value'  => ceil($cashbackValue ?? 0.0),
             'room_name'   => $room->room_name ?: '',
             'room_cover'   => $room->room_cover ?? '',
-            'room_background'   =>$room->final_room_image ?? '',
+            'room_background'   => $room->final_room_image ?? '',
             'room_mode'   =>  $room->mode,
             'room_uuid'   => $room->owner?->uuid ?: 0,
             'room_owner_id'   => $room->uid ?: 0,
             'is_password'   =>  (bool)(@$room->room_pass),
-            'room_type'   =>  (@$room->type),
+            'room_type'   => (@$room->type),
 
         ];
         $this->sendToZegoLuckyGift($zigoData);
@@ -1129,12 +1183,12 @@ class LuckyGiftService
             'cache_value'  => ceil($cashbackValue ?? 0.0),
             'room_name'   => $room->room_name ?: '',
             'room_cover'   => $room->room_cover ?? '',
-            'room_background'   =>$room->final_room_image ?? '',
+            'room_background'   => $room->final_room_image ?? '',
             'room_mode'   =>  $room->mode,
             'room_uuid'   => $room->owner?->uuid ?: 0,
             'room_owner_id'   => $room->uid ?: 0,
             'is_password'   =>  (bool)(@$room->room_pass),
-            'room_type'   =>  (@$room->type),
+            'room_type'   => (@$room->type),
 
         ];
         $this->sendToZegoLuckyGiftV2($zigoData);
@@ -1199,11 +1253,10 @@ class LuckyGiftService
         WHERE name IN ("owner_wallet", "app_wallet")
             ';
 
-            \DB::update($sql, [
-                'owner_wallet' => $diffOwnerWallet,
-                'app_wallet' => $diffAppWallet,
-            ]);
-
+        \DB::update($sql, [
+            'owner_wallet' => $diffOwnerWallet,
+            'app_wallet' => $diffAppWallet,
+        ]);
     }
 
     /**

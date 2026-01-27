@@ -21,6 +21,7 @@ return [
     "buyVip" => 'Anda tidak dapat membeli ini sebelum membeli VIP :level',
     'admins_greater_than' => 'Jumlah admin harus lebih dari :limit.',
     'last_active_title'    => 'Aktif Terakhir',
+    "room_level" => "Kamar Anda telah mencapai level VIP baru :level dan Anda mendapatkan hadiah :reward",
     'visit_title'          => 'Kunjungan',
     'room_title'           => 'Sembunyikan Ruang',
     'spechEfeect_title'    => 'Efek Khusus',

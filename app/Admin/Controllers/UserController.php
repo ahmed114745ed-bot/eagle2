@@ -10,18 +10,15 @@ use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\Profile;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
-use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
-use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
@@ -47,7 +44,6 @@ use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Actions\CanPlaySwitchAction;
 
 class UserController extends MainController
 {
@@ -469,7 +465,7 @@ class UserController extends MainController
         /* =========================
      | USER (ONE QUERY ONLY) — conditional eager loading + select
      ========================= */
-        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user','country_id', 'di']);
+        $userQuery = User::query()->select(['id', 'name', 'uuid', 'special_id', 'type_user', 'country_id', 'di']);
 
         $with = [
             'profile:id,user_id,avatar',
@@ -541,7 +537,7 @@ class UserController extends MainController
                     ->when($chargeTabType === 'receiver', fn($q) => $q->where('user_id', $id)->where('user_type', 'user'))
                     ->when($chargeTabType === 'charger', fn($q) => $q->where('charger_id', $id)->where('charger_type', 'user'))
                     ->orderByDesc('id')
-                    ->paginate(10, ['*'], 'charges_page');
+                    ->paginate(10, ['*'], $chargeTabType === 'receiver' ? 'receiver_page' : 'charger_page');
                 break;
 
             case 'gift-log':

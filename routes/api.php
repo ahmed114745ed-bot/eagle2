@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Dashboard\StatisticsController;
-use App\Http\Controllers\TestDiamondController;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -29,6 +27,8 @@ use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
+use App\Http\Controllers\TestDiamondController;
+use Modules\Vip\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -62,6 +62,7 @@ use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
+use App\Http\Controllers\Dashboard\StatisticsController;
 use App\Http\Controllers\Api\V1\Room\EnteranceController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
 use App\Http\Controllers\Api\V1\Room\MicrophoneController;
@@ -229,6 +230,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('check-room', [RoomController::class, 'check_room']);
 
             Route::prefix('rooms')->group(function () {
+                Route::get('level-badges', [VipController::class, 'roomBadges']);
                 Route::get('/room-user', [RoomController::class, 'userRooms']);
                 Route::get('/mine', [RoomController::class, 'mine']);
                 Route::get('/user/{id}', [RoomController::class, 'userRoom']);
@@ -316,6 +318,8 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/online', [UserController::class, 'online']);
                 Route::get('/friends', [UserController::class, 'friends']);
                 Route::get('/data', [UserController::class, 'dataUser']);
+
+                 Route::get('/level', [UserController::class, 'userLevelDetails']);
 
                 Route::get('/stats/{id?}', [UserController::class, 'stats']);
                 Route::get('/rooms/{id?}', [UserController::class, 'rooms']);
@@ -514,18 +518,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
             // end ranking
 
-            // start vips
-            // Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-            //     Route::get('/list', [VipController::class, 'vipList']);
-            //     Route::get('/user/list', [VipController::class, 'vipUserList']);
-            //     Route::post('/buyVip', [VipController::class, 'buyVip']);
-            //     Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
-            //     Route::post('/use', [VipController::class, 'vip_use']);
-            //     Route::post('/use-pack', [VipController::class, 'pack_use']);
-            //     Route::post('/send-to-user', [VipController::class, 'vip_send']);
-            // });
-            // Route::get('levels/badges', [VipController::class, 'badges']);
-            // Route::get('levels', [VipController::class, 'index']);
             Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
             // end vips
 

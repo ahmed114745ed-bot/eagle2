@@ -1131,8 +1131,8 @@
             <div class="agency-meta">
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
-                    {{-- <span class="meta-value">{{@$user->userType() }}</span>  --}}
-                    {!! @$user->userTypeBadge() !!}
+                   
+                    {!! @$user->userTypeBadge() !!}{!! @$user->userBadgeTop() !!}
                 </div>
 
             </div>
@@ -1666,10 +1666,9 @@
                         @if($salaries)
                             <div class="pagination-container">
                                 {{ $salaries->appends([
-                                    'pack_page' => $packs?->currentPage(),
-                                    'vip_page' => $userVips?->currentPage(),
-                                    'gift_page' => $giftSLogs?->currentPage(),
-
+                                    'tab' => 'salary',
+                                    'year' => request('year'),  // preserve filters
+                                    'month' => request('month'),
                                 ])->links('vendor.pagination.bootstrap-4') }}
                             </div>
                         @endif
@@ -1925,6 +1924,7 @@
 
             <div class="pagination-wrapper">
                 {{ $badges?->appends([
+                    'tab'         => 'badges',
                      'type'        => $type,
                     'badges_page' => $badges?->currentPage(),
                 ])->links('vendor.pagination.default') }}
@@ -2326,10 +2326,10 @@
                 <div class="pagination-container mt-3">
                     {{ $charges->appends([
                         'tab' => 'charge',
-                        'pack_page' => $packs?->currentPage(),
-                        'vip_page' => $userVips?->currentPage(),
-                        'salary_page' => $salaries?->currentPage(),
-                        'gift_page' => $giftSLogs?->currentPage(),
+                        'type' => $chargeTabType,
+                        'receiver_page' => request('receiver_page'),
+                        'charger_page' => request('charger_page'),
+                        // other tabs' pages if needed
                     ])->links('vendor.pagination.bootstrap-4') }}
                 </div>
             @endif

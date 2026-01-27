@@ -140,7 +140,7 @@ class EmojiController extends MainController
          });
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
 
-        $this->extendGrid($grid);
+        // $this->extendGrid($grid);
 
         $grid->disableExport();
         $grid->disableCreateButton();
@@ -185,6 +185,7 @@ class EmojiController extends MainController
             }
         });
 
+   
         $grid->batchActions(function ($batch) {
             try {
                 $batch->disableDelete();

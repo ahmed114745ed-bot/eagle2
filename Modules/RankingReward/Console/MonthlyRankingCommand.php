@@ -190,7 +190,7 @@ class MonthlyRankingCommand extends Command
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
 
         if (empty($userIds)) {
-            Log::warning('No user IDs found for notification');
+           
             return;
         }
 

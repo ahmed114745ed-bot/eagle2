@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('badges', function (Blueprint $table) {
-            $table->string('show_image')->nullable();
-        });
+        if (!Schema::hasColumn('badges', 'show_image')) {
+            Schema::table('badges', function (Blueprint $table) {
+                $table->string('show_image')->nullable();
+            });
+        }
     }
 
     /**

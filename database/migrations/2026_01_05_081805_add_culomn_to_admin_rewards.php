@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('admin_rewards', function (Blueprint $table) {
-            $table->unsignedBigInteger('package_id')->nullable();
-        });
+        if (!Schema::hasColumn('admin_rewards', 'package_id')) {
+            Schema::table('admin_rewards', function (Blueprint $table) {
+                $table->unsignedBigInteger('package_id')->nullable();
+            });
+        }
     }
 
     /**

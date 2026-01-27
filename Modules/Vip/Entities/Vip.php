@@ -36,8 +36,8 @@ class Vip extends Model
         return new VipCollectionBuilderService();
     }
 
-    /*public function gifts()
-    {
-        return $this->hasMany(GiftRoomLevel::class,'level_id');
-    }*/
+    // public function gifts()
+    // {
+    //     return $this->hasMany(GiftRoomLevel::class,'level_id');
+    // }
 }
