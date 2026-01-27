@@ -227,28 +227,57 @@ class CoinReportController extends MainController
 
         $grid->disableRowSelector();
 
+        // $grid->model()
+        //     ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+        //     ->with([
+        //         'game',
+        //         'user',
+        //         'user.country',
+        //         'user.senderLevel',
+        //         'user.receiverLevel',
+        //         'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        //     ])
+        //     ->selectRaw('
+        //     MIN(coin_game_users.created_at) as earliest_created_at,
+        //     coin_game_users.user_id,
+        //     MAX(users.name) as user_name,
+        //     games.name as game_name,
+        //     SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win,
+        //     SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+        // ')
+        //     ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
+        //     ->leftJoin('games', 'coin_game_users.game_id', '=', 'games.id')
+        //     ->groupBy('coin_game_users.user_id', 'games.name')
+        //     ->orderByDesc('earliest_created_at');
+
         $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->when(
+                $countryID,
+                fn($q) =>
+                $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
+            )
             ->with([
                 'game',
                 'user',
                 'user.country',
                 'user.senderLevel',
                 'user.receiverLevel',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+                'user.packs' => fn($q) =>
+                $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
             ])
             ->selectRaw('
-            MIN(coin_game_users.created_at) as earliest_created_at,
-            coin_game_users.user_id,
-            MAX(users.name) as user_name,
-            all_games.name as game_name,
-            SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win,
-            SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
-        ')
+        MIN(coin_game_users.created_at) as earliest_created_at,
+        coin_game_users.user_id,
+        MAX(users.name) as user_name,
+        MAX(all_games.name) as game_name,
+        SUM(CASE WHEN coin_game_users.type = 1 THEN coin_game_users.coins ELSE 0 END) as total_coins_win,
+        SUM(CASE WHEN coin_game_users.type = 0 THEN coin_game_users.coins ELSE 0 END) as total_coins_lose
+    ')
             ->leftJoin('users', 'coin_game_users.user_id', '=', 'users.id')
             ->leftJoin('all_games', 'coin_game_users.game_id', '=', 'all_games.id')
             ->groupBy('coin_game_users.user_id', 'all_games.id')
             ->orderByDesc('earliest_created_at');
+
 
         $grid->filter(function ($filter) {
             $filter->expand();
