@@ -42,7 +42,7 @@ class VipBackgroundImageSeeder extends Seeder
             // 'gcs' = google cloud disk name (change if different)
 
             // Update ovip record
-            DB::table('ovips')
+            DB::table('o_vips')
                 ->where('level', $level)
                 ->update([
                     'background_img' => $newPath
