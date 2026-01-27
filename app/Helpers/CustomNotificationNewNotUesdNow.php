@@ -391,7 +391,7 @@ class CustomNotificationNewNotUesdNow
                 );
             } else {
                 // Optionally log missing notification token
-                \Log::warning("User {$msg->user_id} has no notification ID.");
+              //  \Log::warning("User {$msg->user_id} has no notification ID.");
             }
         }
     }

@@ -14,7 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
@@ -97,16 +97,16 @@ class AuthService
                     'status' => 1
                 ];
 
-                if ($iso){
+                if ($iso) {
                     $country = Country::where('iso', strtoupper($iso))->first();
                     if ($country) {
                         $countryId = $country->id;
                     }
                 }
 
-//                if (!$countryId && $lat && $long){
-//                    $countryId = getCountryIdFromLatLong($lat, $long);
-//                }
+                //                if (!$countryId && $lat && $long){
+                //                    $countryId = getCountryIdFromLatLong($lat, $long);
+                //                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;
@@ -118,10 +118,10 @@ class AuthService
             if (request('tags') && is_array(request('tags'))) {
                 $user->tags()->attach(request('tags'));
             }
-//            if (!$request->country_id) {
-//                $country = $this->countryRepository->findByPhoneCode('101');
-//                $user->country_id = @$country->id;
-//            }
+            //            if (!$request->country_id) {
+            //                $country = $this->countryRepository->findByPhoneCode('101');
+            //                $user->country_id = @$country->id;
+            //            }
             $user->is_points_first = 1;
             $user->save();
             $token = $user->createToken('api_token')->plainTextToken;
@@ -173,7 +173,7 @@ class AuthService
         if (!$google_id) {
             return Common::apiResponse(false, 'Google ID not found in token or request', [], 422);
         }
-        
+
         $user = $this->userRepository->findByGoogleId($request['google_id']);
         $is_new = false;
         if (!$user) {
@@ -187,7 +187,7 @@ class AuthService
                     'status' => true,
                     'email' => $request['email'],
                     'name' => $request['name'],
-                    'firebase_uuid' =>$request['uuid'],
+                    'firebase_uuid' => $request['uuid'],
 
                 ];
             } else {
@@ -201,7 +201,7 @@ class AuthService
                     'country_id' => @$country->id ?: null,
                     'is_points_first' => 1,
                     'status' => true,
-                    'firebase_uuid' =>$request['uuid'],
+                    'firebase_uuid' => $request['uuid'],
 
                 ];
 
@@ -210,7 +210,7 @@ class AuthService
                 $iso = $request['iso'];
                 $countryId = null;
 
-                if ($iso){
+                if ($iso) {
                     $country = Country::where('iso', strtoupper($iso))->first();
                     if ($country) {
                         $countryId = $country->id;
@@ -259,10 +259,20 @@ class AuthService
      */
     public function storeImage($request, $data, $user)
     {
-
+        // Handle UploadedFile instances
         if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
             $img = $request['image'];
             $imageType = $img->getClientOriginalExtension();
+            if (!$imageType) {
+                $mime = $img->getMimeType();
+                $imageType = match ($mime) {
+                    'image/jpeg' => 'jpg',
+                    'image/png'  => 'png',
+                    'image/gif'  => 'gif',
+                    'image/webp' => 'webp',
+                    default      => 'jpg',
+                };
+            }
             if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
                 throw new \Exception(__('api_responses.gifImage'));
             }
@@ -283,87 +293,163 @@ class AuthService
             }
 
             $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
+
+            Log::info('Uploaded profile image', [
+                'imageType' => $imageType,
+                'image_path' => $newImagePass,
+            ]);
             $profile->avatar = $newImagePass;
             $profile->save();
 
             return $profile;
         }
+
+        // Handle image URLs from Google, Apple, etc.
+        if (isset($request['image']) && is_string($request['image']) && !empty($request['image'])) {
+            try {
+                $imageUrl = $request['image'];
+                
+                // Download the image from URL
+                $response = Http::get($imageUrl);
+                if (!$response->successful()) {
+                    Log::warning('Failed to download image from URL', ['url' => $imageUrl]);
+                    return null;
+                }
+                
+                $imageContent = $response->body();
+                if (empty($imageContent)) {
+                    Log::warning('Image content is empty from URL', ['url' => $imageUrl]);
+                    return null;
+                }
+
+                // Determine the file extension from URL
+                $extension = 'jpg'; // default
+                if (preg_match('/\.([a-z]+)(?:\?|$)/i', $imageUrl, $matches)) {
+                    $ext = strtolower($matches[1]);
+                    // Validate extension
+                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                        $extension = $ext;
+                    }
+                }
+
+                $user->profile_count += 1;
+                $user->save();
+                $user->load('profile');
+                $profile = $user->profile;
+                if (!$profile) {
+                    $profile = Profile::create([
+                        'gender' => null,
+                        'birthday' => null,
+                        'province' => null,
+                        'city' => null,
+                        'country' => null,
+                        'user_id' => @$user->id,
+                    ]);
+                }
+
+                // Create the filename with proper extension
+                $fileName = $profile->id . '_' . $user->profile_count . '.' . $extension;
+                $filePath = 'profile' . DIRECTORY_SEPARATOR . $fileName;
+                
+                // Store the image directly
+                Storage::put($filePath, $imageContent, config('filesystems.default'));
+
+                Log::info('Downloaded and stored profile image from URL', [
+                    'imageUrl' => $imageUrl,
+                    'extension' => $extension,
+                    'image_path' => $filePath,
+                ]);
+
+                $profile->avatar = $filePath;
+                $profile->save();
+
+                return $profile;
+            } catch (\Exception $e) {
+                Log::error('Failed to store image from URL', [
+                    'user_id' => $user->id ?? null,
+                    'image_url' => $request['image'] ?? null,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't rethrow - continue without image
+                return null;
+            }
+        }
     }
 
-//     public function loginWithApple($request, $unique_id)
-//     {
-//         $user = $this->userRepository->findByAppleId($unique_id);
-//         if (!$user) {
-//             $data = [
-//                 'name' => implode('@', explode('@', $request['email'], -1)),
-//                 'email' => @$request['email'],
-//                 'apple_id' => $unique_id,
-//             ];
+    //     public function loginWithApple($request, $unique_id)
+    //     {
+    //         $user = $this->userRepository->findByAppleId($unique_id);
+    //         if (!$user) {
+    //             $data = [
+    //                 'name' => implode('@', explode('@', $request['email'], -1)),
+    //                 'email' => @$request['email'],
+    //                 'apple_id' => $unique_id,
+    //             ];
 
-//             $lat = $request['lat'];
-//             $long = $request['long'];
-//             $iso = $request['iso'];
-//             $countryId = null;
+    //             $lat = $request['lat'];
+    //             $long = $request['long'];
+    //             $iso = $request['iso'];
+    //             $countryId = null;
 
-//             if ($iso){
-//                 $country = Country::where('iso', strtoupper($iso))->first();
-//                 if ($country) {
-//                     $countryId = $country->id;
-//                 }
-//             }
+    //             if ($iso){
+    //                 $country = Country::where('iso', strtoupper($iso))->first();
+    //                 if ($country) {
+    //                     $countryId = $country->id;
+    //                 }
+    //             }
 
-// //            if (!$countryId && $lat && $long){
-// //                $countryId = getCountryIdFromLatLong($lat, $long);
-// //            }
+    // //            if (!$countryId && $lat && $long){
+    // //                $countryId = getCountryIdFromLatLong($lat, $long);
+    // //            }
 
-//             if ($countryId) {
-//                 $data['country_id'] = $countryId;
-//             }
+    //             if ($countryId) {
+    //                 $data['country_id'] = $countryId;
+    //             }
 
-//             $user = $this->userRepository->create($data);
-//         }
-//         $this->rule($user, '', @$request['device_token'], $request);
+    //             $user = $this->userRepository->create($data);
+    //         }
+    //         $this->rule($user, '', @$request['device_token'], $request);
 
-//         $token = $user->createToken('api_token')->plainTextToken;
-//         $this->userRepository->updateIsLogout($user, 0);
-//         return [$user, $token];
-//     }
+    //         $token = $user->createToken('api_token')->plainTextToken;
+    //         $this->userRepository->updateIsLogout($user, 0);
+    //         return [$user, $token];
+    //     }
 
-public function loginWithApple($request, $unique_id)
-{
-    $appleUser = $this->userRepository->findByAppleId($unique_id);
+    public function loginWithApple($request, $unique_id)
+    {
+        $appleUser = $this->userRepository->findByAppleId($unique_id);
 
-    if ($appleUser) {
+        if ($appleUser) {
 
-        if (!$request['email']) {
-            $request['email'] = $appleUser->email;
+            if (!$request['email']) {
+                $request['email'] = $appleUser->email;
+            }
+
+            return $this->finishLogin($appleUser, $request);
         }
 
-        return $this->finishLogin($appleUser, $request);
+        $email = $request['email'];
+        $name  = $request['name'] ?? ($email ? explode("@", $email)[0] : "AppleUser-" . rand(1000, 9999));
+
+        if ($email && $this->userRepository->emailExists($email)) {
+            $email = null;
+        }
+
+        $data = [
+            'name' => $name,
+            'email' => $email,
+            'apple_id' => $unique_id,
+        ];
+
+        if (!empty($request['iso'])) {
+            $country = Country::where('iso', strtoupper($request['iso']))->first();
+            if ($country) $data['country_id'] = $country->id;
+        }
+
+        $newUser = $this->userRepository->create($data);
+
+        return $this->finishLogin($newUser, $request);
     }
-
-    $email = $request['email'];
-    $name  = $request['name'] ?? ($email ? explode("@", $email)[0] : "AppleUser-" . rand(1000,9999));
-
-    if ($email && $this->userRepository->emailExists($email)) {
-        $email = null;
-    }
-
-    $data = [
-        'name' => $name,
-        'email' => $email,
-        'apple_id' => $unique_id,
-    ];
-
-    if (!empty($request['iso'])) {
-        $country = Country::where('iso', strtoupper($request['iso']))->first();
-        if ($country) $data['country_id'] = $country->id;
-    }
-
-    $newUser = $this->userRepository->create($data);
-
-    return $this->finishLogin($newUser, $request);
-}
 
 
     private function finishLogin($user, $request)
@@ -403,16 +489,16 @@ public function loginWithApple($request, $unique_id)
                 $iso = $data['iso'];
                 $countryId = null;
 
-                if ($iso){
+                if ($iso) {
                     $country = Country::where('iso', strtoupper($iso))->first();
                     if ($country) {
                         $countryId = $country->id;
                     }
                 }
 
-//                if (!$countryId && $lat && $long){
-//                    $countryId = getCountryIdFromLatLong($lat, $long);
-//                }
+                //                if (!$countryId && $lat && $long){
+                //                    $countryId = getCountryIdFromLatLong($lat, $long);
+                //                }
 
                 if ($countryId) {
                     $data['country_id'] = $countryId;

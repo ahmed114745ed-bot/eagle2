@@ -89,10 +89,10 @@ class BadgeController extends MainController
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
-         $form->image('show_image', trans('img'))->name(function ($file) {
+        $form->image('show_image', trans('img'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         });
-        
+
         $form->file('image', __('Default Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
         })->required();
@@ -102,6 +102,7 @@ class BadgeController extends MainController
             ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
         $form->select('image_type', __('Image Type'))
             ->options(ImageType::options())
+            ->default(ImageType::Image->value)
             ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
 
         $form->number('priority', __('Priority'))->min(0)->default(0)->required();

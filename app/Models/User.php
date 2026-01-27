@@ -2421,6 +2421,14 @@ class User extends Authenticatable
 
     public function getUserWalletBalanceAttribute()
     {
-        return $this->userWallet->balance - $this->userWallet->cut_amount - $this->userWallet->pending_amount;
+        $wallet = $this->userWallet;
+
+        if (!$wallet) {
+            return 0;
+        }
+        
+        return (float)($wallet->balance ?? 0)
+            - (float)($wallet->cut_amount ?? 0)
+            - (float)($wallet->pending_amount ?? 0);
     }
 }

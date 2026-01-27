@@ -149,7 +149,14 @@ if (!function_exists('decryptToArray')) {
     {
         $iv = substr($key, 0, 16);
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
-        return json_decode($decrypted, true);
+        
+        if ($decrypted === false) {
+            return [];
+        }
+        
+        $result = json_decode($decrypted, true);
+        
+        return is_array($result) ? $result : [];
     }
 }
 
@@ -792,39 +799,34 @@ if (!function_exists('showSvgaImage')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-
         Admin::script("
-                    var $model = new SVGA.Player('#$model');
-                    $model.loops = 100;
-                    $model.clearsAfterStop = false;
+                    (function initSvga_{$model}() {
+                        var el = document.getElementById('$model');
+                        if (!el) {
+                            // Element not ready, retry after a short delay
+                            setTimeout(initSvga_{$model}, 50);
+                            return;
+                        }
+                        
+                        try {
+                            var $model = new SVGA.Player('#$model');
+                            $model.loops = 100;
+                            $model.clearsAfterStop = false;
 
-                    var $model2 = new SVGA.Parser('#$model');
+                            var $model2 = new SVGA.Parser('#$model');
 
-                    function pauseAnimation() {
-                        $model.pauseAnimation();
-                    }
+                            $model2.load('$url', function(videoItem) {
+                                $model.setVideoItem(videoItem);
+                                $model.startAnimation();
 
-                    function stopAnimation() {
-                        $model.stopAnimation();
-                    }
-                ");
-
-        // Load SVGA animation and handle potential errors
-        Admin::script("
-                    try {
-                        $model2.load('$url', function(videoItem) {
-                            $model.setVideoItem(videoItem);
-                            $model.startAnimation();
-
-                            $model.onFinished(function() {
-                                // Code for when the animation finishes
+                                $model.onFinished(function() {
+                                    // Code for when the animation finishes
+                                });
                             });
-                        });
-                    } catch (error) {
-                        console.error('An error occurred:', error.message);
-                    } finally {
-                        console.log('Try...catch has finished executing.');
-                    }
+                        } catch (error) {
+                            console.error('SVGA Error for $model:', error.message);
+                        }
+                    })();
                 ");
         return $model;
     }
@@ -839,39 +841,34 @@ if (!function_exists('showSvgaImage2')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-
         Admin::script("
-                    var $model = new SVGA.Player('#$model');
-                    $model.loops = 100;
-                    $model.clearsAfterStop = false;
+                    (function initSvga2_{$model}() {
+                        var el = document.getElementById('$model');
+                        if (!el) {
+                            // Element not ready, retry after a short delay
+                            setTimeout(initSvga2_{$model}, 50);
+                            return;
+                        }
+                        
+                        try {
+                            var $model = new SVGA.Player('#$model');
+                            $model.loops = 100;
+                            $model.clearsAfterStop = false;
 
-                    var $model2 = new SVGA.Parser('#$model');
+                            var $model2 = new SVGA.Parser('#$model');
 
-                    function pauseAnimation() {
-                        $model.pauseAnimation();
-                    }
+                            $model2.load('$url', function(videoItem) {
+                                $model.setVideoItem(videoItem);
+                                $model.startAnimation();
 
-                    function stopAnimation() {
-                        $model.stopAnimation();
-                    }
-                ");
-
-        // Load SVGA animation and handle potential errors
-        Admin::script("
-                    try {
-                        $model2.load('$url', function(videoItem) {
-                            $model.setVideoItem(videoItem);
-                            $model.startAnimation();
-
-                            $model.onFinished(function() {
-                                // Code for when the animation finishes
+                                $model.onFinished(function() {
+                                    // Code for when the animation finishes
+                                });
                             });
-                        });
-                    } catch (error) {
-                        console.error('An error occurred:', error.message);
-                    } finally {
-                        console.log('Try...catch has finished executing.');
-                    }
+                        } catch (error) {
+                            console.error('SVGA Error for $model:', error.message);
+                        }
+                    })();
                 ");
         return $model;
     }
@@ -883,17 +880,23 @@ if (typeof initSvgaPlayers === 'undefined') {
     function initSvgaPlayers(context = document) {
         context.querySelectorAll('.svga-player').forEach(el => {
             if (el.dataset.loaded) return;
+            if (!el || !el.id) return; // Skip if element is not valid
+            
             el.dataset.loaded = true;
 
-            const player = new SVGA.Player(el);
-            const parser = new SVGA.Parser(el);
+            try {
+                const player = new SVGA.Player(el);
+                const parser = new SVGA.Parser(el);
 
-            parser.load(el.dataset.url, videoItem => {
-                player.setVideoItem(videoItem);
-                player.loops = 100;
-                player.clearsAfterStop = false;
-                player.startAnimation();
-            });
+                parser.load(el.dataset.url, videoItem => {
+                    player.setVideoItem(videoItem);
+                    player.loops = 100;
+                    player.clearsAfterStop = false;
+                    player.startAnimation();
+                });
+            } catch (error) {
+                console.error('SVGA init error:', error.message);
+            }
         });
     }
 }
