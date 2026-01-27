@@ -123,7 +123,7 @@ class CoinReportController extends MainController
                     'MAX(gifts.name) as gift_name, ' .
                     'user_lucky_gifts.gift_price, ' .
                     'SUM(CASE WHEN user_lucky_gifts.type = 1 THEN user_lucky_gifts.number ELSE 0 END) as total_number_win, ' .
-                    'SUM(CASE WHEN user_lucky_gifts.value > 0 THEN user_lucky_gifts.value ELSE 0 END) as total_win_value, ' .
+                    'SUM(total_win) as total_win_value, '  .
                     'SUM(CASE WHEN user_lucky_gifts.value < 0 THEN ABS(user_lucky_gifts.value) ELSE 0 END) as total_lose_value'
             )
             ->leftJoin('users', 'user_lucky_gifts.user_id', '=', 'users.id')
