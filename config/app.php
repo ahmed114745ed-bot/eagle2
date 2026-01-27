@@ -233,7 +233,10 @@ return [
         //        App\Providers\ChatServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class,
-        App\Providers\FeatureServiceProvider::class
+        App\Providers\FeatureServiceProvider::class,
+
+      
+        App\Providers\RealsPackageServiceProvider::class,
 
     ],
 

@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use App\Admin\Controllers\MainController;
 use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
+use App\Support\DynamicReals;
 use Encore\Admin\Controllers\HasResourceActions;
 
 

@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Request as HttpRequest;
 use Encore\Admin\Controllers\HasResourceActions;
 use Utd\Moments\Entities\Moment;
+use App\Support\DynamicReals;
 
 class TargetController extends MainController
 {
@@ -108,7 +109,9 @@ class TargetController extends MainController
         $this->addDbPercentageColumn($grid, $coins);
         // $this->addAppProfitColumn($grid, $coins);
         $this->addHoursDaysColumns($grid);
-        $this->addReelColumn($grid);
+        if (DynamicReals::isAvailable()) {
+            $this->addReelColumn($grid);
+        }
         if (class_exists(Moment::class)) {
             $this->addMomentColumn($grid);
         }
@@ -303,6 +306,10 @@ class TargetController extends MainController
 
     protected function addReelColumn($grid)
     {
+        if (!DynamicReals::isAvailable()) {
+            return;
+        }
+
         $grid->column('reel', __('Reel'))
             ->display(function ($value) {
                 $old = explode(',', $value);
@@ -647,24 +654,27 @@ class TargetController extends MainController
         });
 
 
-        $form->html('<h1>' . __('Reel') . '</h1>');
+        // حقول الريلز - تظهر فقط عند وجود الحزمة
+        if (DynamicReals::isAvailable()) {
+            $form->html('<h1>' . __('Reel') . '</h1>');
 
-        $form->hidden('reel', 'reel');
-        $form->number('reel1', __('uploadReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
-            $str = @explode(',', $reel)[0];
-            return $str == null || $str == '' ? 0 : $str;
-        });
-        $form->number('reel2', __('LikeReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+            $form->hidden('reel', 'reel');
+            $form->number('reel1', __('uploadReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
+                $str = @explode(',', $reel)[0];
+                return $str == null || $str == '' ? 0 : $str;
+            });
+            $form->number('reel2', __('LikeReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel)[1] ?? 0;
-        });;
-        $form->number('reel3', __('commentReel'))->default(function ($form) {
-            $reel = $form->model()->reel;
+                return @explode(',', $reel)[1] ?? 0;
+            });
+            $form->number('reel3', __('commentReel'))->default(function ($form) {
+                $reel = $form->model()->reel;
 
-            return @explode(',', $reel)[2] ?? 0;
-        });
+                return @explode(',', $reel)[2] ?? 0;
+            });
+        }
 
         if (class_exists(Moment::class)) {
             $form->html('<h1>' . __('Moment') . '</h1>');
@@ -763,8 +773,11 @@ class TargetController extends MainController
                     'db_percentage' => $form->db_percentage,
                     'hours' => $form->hours,
                     'days' => $form->days,
-                    'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
                 ];
+
+                if (DynamicReals::isAvailable()) {
+                    $editData['reel'] = $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3;
+                }
 
                 if (class_exists(Moment::class)) {
                     $editData['moment'] = $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3;
@@ -799,7 +812,7 @@ class TargetController extends MainController
     public function update($id)
     {
         $data = \request()->all();
-        if (isset($data['reel1'])) {
+        if (DynamicReals::isAvailable() && isset($data['reel1'])) {
             $reel1 = $data['reel1'];
             $reel2 = $data['reel2'];
             $reel3 = $data['reel3'];
@@ -838,17 +851,19 @@ class TargetController extends MainController
     {
 
         $data = \request()->all();
-        $values = [
-            $data['reel1'],
-            $data['reel2'],
-            $data['reel3'],
-        ];
+        if (DynamicReals::isAvailable() && isset($data['reel1'])) {
+            $values = [
+                $data['reel1'],
+                $data['reel2'],
+                $data['reel3'],
+            ];
 
-        $data = array_merge($data, ['reel' => implode(" ,", $values)]);
+            $data = array_merge($data, ['reel' => implode(" ,", $values)]);
 
-        unset($data['reel1']);
-        unset($data['reel2']);
-        unset($data['reel3']);
+            unset($data['reel1']);
+            unset($data['reel2']);
+            unset($data['reel3']);
+        }
 
         if (class_exists(Moment::class)) {
             if (isset($data['moment1'])) {
@@ -879,8 +894,8 @@ class TargetController extends MainController
 
             $targets = Target::orderBy('diamonds')->get()->map(function ($target) {
                 // Convert reel and moment string fields into arrays for view
-                $target->reel_parts = array_map('trim', explode(',', $target->reel));
-                $target->moment_parts = array_map('trim', explode(',', $target->moment));
+                $target->reel_parts = DynamicReals::isAvailable() ? array_map('trim', explode(',', $target->reel ?? '')) : [];
+                $target->moment_parts = class_exists(Moment::class) ? array_map('trim', explode(',', $target->moment ?? '')) : [];
                 return $target;
             });
             //            $targets = Target::orderBy('diamonds')->get();

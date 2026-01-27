@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a365e4bc4f6f6a830ab351081e3b5a2",
+    "content-hash": "ce3bd413d83c0b91b0a8046a774a2057",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2478,16 +2478,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.429.0",
+            "version": "v0.430.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "9dd334c8e6d3f25f91efcab86454c6bc0bc928c1"
+                "reference": "b936a8bb717af0367c6ebd45d3dcb69642fce340"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/9dd334c8e6d3f25f91efcab86454c6bc0bc928c1",
-                "reference": "9dd334c8e6d3f25f91efcab86454c6bc0bc928c1",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/b936a8bb717af0367c6ebd45d3dcb69642fce340",
+                "reference": "b936a8bb717af0367c6ebd45d3dcb69642fce340",
                 "shasum": ""
             },
             "require": {
@@ -2516,9 +2516,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.429.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.430.0"
             },
-            "time": "2026-01-19T01:08:26+00:00"
+            "time": "2026-01-26T00:56:27+00:00"
         },
         {
             "name": "google/auth",
@@ -14376,11 +14376,11 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-achievmentPackage",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
-                "url": "packages/Utd/achievements",
-                "reference": "93b4976488dc5e5d9a9a37248d438330facc3448"
+                "url": "packages/Utd/Achievements",
+                "reference": "73e243a67837210559d41cbb0e72f4fd92d4cb5b"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14412,16 +14412,17 @@
             ],
             "description": "Achievement System Package with License Support",
             "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },
         {
             "name": "utd/moments",
-            "version": "dev-achievmentPackage",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
-                "reference": "e36dc1e02a19932aac8d656491975db9232824b9"
+                "reference": "ed1a9236e70257dbf92528425e1a2cee0c8a37b4"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14452,37 +14453,49 @@
             ],
             "description": "Moments Laravel Package",
             "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },
         {
-            "name": "utd/shipping-agency",
-            "version": "dev-achievmentPackage",
+            "name": "utd/reals",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
-                "url": "packages/Utd/ShippingAgency",
-                "reference": "68a2eee9fc03251815d8369b78b1c7195e64f471"
+                "url": "packages/Utd/Reals",
+                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
             },
             "require": {
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/http": "^10.0|^11.0",
                 "illuminate/support": "^10.0|^11.0",
                 "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0",
+                "phpunit/phpunit": "^10.0"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "Utd\\ShippingAgency\\ShippingAgencyServiceProvider"
+                        "Utd\\Reals\\RealsServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Utd\\ShippingAgency\\": "src/",
-                    "Utd\\ShippingAgency\\Database\\": "Database/"
+                    "Utd\\Reals\\": "src/",
+                    "Utd\\Reals\\Database\\Seeders\\": "database/Seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Utd\\Reals\\Tests\\": "tests/"
                 }
             },
             "license": [
-                "MIT"
+                "proprietary"
             ],
             "authors": [
                 {
@@ -14490,8 +14503,9 @@
                     "email": "dev@utd.com"
                 }
             ],
-            "description": "Shipping Agency Laravel Package",
+            "description": "Reels/Reals Feature Package with License Support",
             "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },
@@ -15270,7 +15284,7 @@
         "fruitcake/laravel-cors": 20,
         "utd/achievements": 20,
         "utd/moments": 20,
-        "utd/shipping-agency": 20
+        "utd/reals": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

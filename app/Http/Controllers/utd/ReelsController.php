@@ -5,7 +5,6 @@ namespace App\Http\Controllers\utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RealResource;
-use Modules\Reals\Entities\Real;
 use App\Tik\Services\ReelsService;
 use Illuminate\Http\Request;
 use Exception;

@@ -11,7 +11,6 @@ use App\Models\Agency;
 use App\Models\Family;
 use App\Models\Setting;
 use App\Models\OfficialMessage;
-use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use Modules\Moment\Entities\Moment;
 use App\Models\NotificationTemplate;

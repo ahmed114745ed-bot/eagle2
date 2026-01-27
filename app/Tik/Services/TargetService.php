@@ -2,6 +2,7 @@
 
 namespace App\Tik\Services;
 
+use App\Support\DynamicReals;
 use App\Tik\Repositories\TargetRepository;
 use Nwidart\Modules\Facades\Module;
 use Utd\Moments\Entities\Moment;
@@ -25,7 +26,7 @@ class TargetService
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
         }
-        if (isset($request->reel)) {
+        if (isset($request->reel) && DynamicReals::isAvailable()) {
             $arrayReel = array_values(json_decode($request->reel));
             // Convert the values to a comma-separated string
             $reel = implode(', ', $arrayReel);
@@ -57,7 +58,7 @@ class TargetService
             // Convert the values to a comma-separated string
             $moment = implode(',', $arrayMoment);
         }
-        if (isset($request->reel)) {
+        if (isset($request->reel) && DynamicReals::isAvailable()) {
             $arrayReel = array_values(json_decode($request->reel));
             // Convert the values to a comma-separated string
             $reel = implode(', ', $arrayReel);

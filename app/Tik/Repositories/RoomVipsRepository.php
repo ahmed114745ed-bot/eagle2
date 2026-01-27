@@ -5,7 +5,6 @@ namespace App\Tik\Repositories;
 use Modules\Vip\Entities\Vip;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Reals\Entities\Real;
 
 class RoomVipsRepository extends AbstractRepository
 {

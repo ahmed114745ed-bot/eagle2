@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Models\Family;
 use Modules\Vip\Entities\Vip;
-use Modules\Reals\Entities\Real;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserOfficialMessage;
 use Modules\Moment\Entities\Moment;

@@ -1108,7 +1108,9 @@
                             <tr>
                                 <th>#</th>
                                 <th>{{ __('Member') }}</th>
+                                @if(\App\Support\DynamicReals::isAvailable())
                                 <th>{{ __('Reals') }}</th>
+                                @endif
                                 <th>{{ __('Moments') }}</th>
                                 <th>{{ __('Live Hours') }}</th>
                                 <th>{{ __('Monthly DI') }}</th>
@@ -1153,6 +1155,7 @@
                                             <small>UID: {{ @$member->uuid ?? '' }}</small>
                                         </div>
                                     </td>
+                                                @if(\App\Support\DynamicReals::isAvailable())
                                                 <td>
                                                     <div style="line-height: 1.6;">
                                                         <ul style="margin-left: 8px; width: 141px;">
@@ -1162,6 +1165,7 @@
                                                         </ul>
                                                     </div>
                                                 </td>
+                                                @endif
                                                 <td>
                                                     <div style="line-height: 1.6;">
                                                         <ul style="margin-left: 8px; width: 141px;">
@@ -1698,7 +1702,9 @@
                                             <th width="12%">{{ __('Days') }}</th>
                                             <th width="12%">{{ __('Hours') }}</th>
                                             <th>{{ __('Moments') }}</th>
+                                            @if(\App\Support\DynamicReals::isAvailable())
                                             <th>{{ __('Reels') }}</th>
+                                            @endif
                                             <th width="16%">{{ __('Supporters') }}</th>
                                         </tr>
                                     </thead>
@@ -1780,6 +1786,7 @@
                                                                 </ul>
                                                             </div>
                                                         </td>
+                                                        @if(\App\Support\DynamicReals::isAvailable())
                                                         <td>
                                                             <div style="line-height: 1.6;">
                                                                 <ul style="margin-left: 8px; width: 141px;">
@@ -1789,6 +1796,7 @@
                                                                 </ul>
                                                             </div>
                                                         </td>
+                                                        @endif
                                                     <td>
                                                         <div class="supporters-avatars">
                                                             @foreach($memberTarget->topSupporters ?? [] as $supporter)

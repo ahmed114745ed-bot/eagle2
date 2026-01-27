@@ -18,7 +18,6 @@ use Modules\Chat\Http\Resources\ChatRoomResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\Chat\Jobs\SendMessageToAllUsers;
 use Illuminate\Database\Eloquent\Builder;
-use Modules\Reals\Entities\Real;
 
 class ChatRoomService
 {

@@ -6,7 +6,6 @@ use App\Http\Resources\Dashboard\Posts\AdminReelsResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Reals\Entities\Real;
 
 class AdminReealsReports extends JsonResource
 {

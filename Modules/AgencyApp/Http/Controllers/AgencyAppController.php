@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\Notification;
 use Modules\AgencyApp\Emails\SendAgencyEmail;
-use Modules\Reals\Http\Services\RealsService;
+use App\Support\DynamicReals;
 use Modules\AgencyApp\Entities\AdditionalInfo;
 use Modules\AgencyApp\Notifications\AgencyMail;
 use Modules\AgencyApp\Http\Requests\CreateAgencyRequest;
@@ -411,7 +411,13 @@ class AgencyAppController extends Controller
         $user = User::query()->searchByUuid($request->user_id)->first();
         if ($request->hasFile('video')) {
             $data        = $request->file('video');
-            $video = RealsService::upload($data);
+            $realsService = DynamicReals::getRealsServiceClass();
+            if ($realsService && method_exists($realsService, 'upload')) {
+                $video = $realsService::upload($data);
+            } else {
+                // Fallback: upload as regular file
+                $video = upload($data);
+            }
         }
         $additionalInfo = AdditionalInfo::create([
             'agency_id' => $agency->id,

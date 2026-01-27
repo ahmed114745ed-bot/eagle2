@@ -35,7 +35,7 @@ use Illuminate\Validation\Rule;
 use App\Contracts\UserAchievementContract;
 use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentGallery;
-use Modules\Reals\Entities\Real;
+use App\Support\DynamicReals;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\Vip\Entities\UserVip;
 

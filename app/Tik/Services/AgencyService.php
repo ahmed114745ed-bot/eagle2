@@ -35,7 +35,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
-use Modules\Reals\Http\Services\RealsService;
+use App\Support\DynamicReals;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\Milestones\Helpers\MilestoneHelper;
@@ -468,7 +468,13 @@ class AgencyService
 
         if ($request->hasFile('video')) {
             $data        = $request->file('video');
-            $video = RealsService::upload($data);
+            $realsService = DynamicReals::getRealsServiceClass();
+            if ($realsService && method_exists($realsService, 'upload')) {
+                $video = $realsService::upload($data);
+            } else {
+                // Fallback: upload as regular file
+                $video = upload($data);
+            }
         }
         $dataInfo = [
             'agency_id' => $agency->id,

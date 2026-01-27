@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Moments\Entities\Moment;
+use Utd\Reals\Entities\Real;
 
 
 class PermissionTypeSeeder extends Seeder
@@ -885,21 +886,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Reels',
-                'sort' => 33,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 33],
-                ],
-                'permissions' => [
-                    ['key' => 'Real', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'report-real', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'delete'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Employees and Permissions',
                 'sort' => 35,
                 'types' => [
@@ -1240,6 +1226,24 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'user_achievement_level', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ];
+        }
+
+        if (class_exists(Real::class)) {
+            $categories[] =             [
+                'name' => 'Reels',
+                'sort' => 33,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 33],
+                ],
+                'permissions' => [
+                    ['key' => 'Real', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'report-real', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'delete'],
                     ],],
                 ],
             ];

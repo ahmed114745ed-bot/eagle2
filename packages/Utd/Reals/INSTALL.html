@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تثبيت حزمة Utd/Reals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #e4e4e4;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #00d9ff;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+        .step {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 217, 255, 0.2);
+        }
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00d9ff, #0099cc);
+            border-radius: 50%;
+            color: #1a1a2e;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-left: 15px;
+        }
+        .step-title {
+            display: inline;
+            font-size: 1.3rem;
+            color: #fff;
+        }
+        .step-desc {
+            margin-top: 15px;
+            color: #b0b0b0;
+            line-height: 1.8;
+        }
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            position: relative;
+            overflow-x: auto;
+        }
+        .code-block code {
+            color: #58a6ff;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.3s;
+        }
+        .copy-btn:hover {
+            background: #2ea043;
+        }
+        .copy-btn.copied {
+            background: #0099cc;
+        }
+        .file-path {
+            background: #161b22;
+            color: #8b949e;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            color: #ffc107;
+        }
+        .success {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            color: #28a745;
+        }
+        .info {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid #00d9ff;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            color: #00d9ff;
+        }
+        .danger {
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid #f85149;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            color: #f85149;
+        }
+        .structure {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            font-family: monospace;
+            color: #8b949e;
+            line-height: 1.6;
+        }
+        .structure .folder {
+            color: #79c0ff;
+        }
+        .structure .file {
+            color: #a5d6ff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: right;
+            border: 1px solid #30363d;
+        }
+        th {
+            background: #161b22;
+            color: #00d9ff;
+        }
+        td {
+            background: #0d1117;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .badge-required {
+            background: #f85149;
+            color: white;
+        }
+        .badge-optional {
+            background: #238636;
+            color: white;
+        }
+        .badge-dynamic {
+            background: #a371f7;
+            color: white;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #6e7681;
+            font-size: 0.9rem;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(163, 113, 247, 0.1), rgba(0, 217, 255, 0.1));
+            border: 2px solid #a371f7;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .highlight-box h3 {
+            color: #a371f7;
+            margin-bottom: 15px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .feature-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .feature-item .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 تثبيت حزمة Utd/Reals</h1>
+
+  
+
+        <!-- Step 1 -->
+        <div class="step">
+            <span class="step-number">1</span>
+            <h2 class="step-title">نقل مجلد الحزمة</h2>
+            <p class="step-desc">
+                <strong>ستقوم بنقل مجلد Reals الكامل</strong> (الذي يحتوي على composer.json و src وغيرها) إلى المسار التالي:
+            </p>
+            <div class="file-path">packages/Utd/Reals/</div>
+            
+            <div class="info">
+                💡 <strong>ملاحظة:</strong> المجلد المنقول يحتوي بالفعل على <code>composer.json</code> - لا تحتاج لإنشائه!
+            </div>
+
+            <div class="structure">
+                <span class="folder">📁 packages/</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="folder">📁 Utd/</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder">📁 Reals/</span> ← انقل المجلد الكامل هنا<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 composer.json</span> ✓ موجود<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">📄 INSTALL.html</span> ✓ موجود<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder">📁 src/</span> ✓ موجود<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder">📁 routes/</span> ✓ موجود<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder">📁 resources/</span> ✓ موجود<br>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step">
+            <span class="step-number">2</span>
+            <h2 class="step-title">تعديل composer.json الرئيسي</h2>
+            <p class="step-desc">أضف الحزمة إلى ملف composer.json الرئيسي للمشروع:</p>
+            <div class="file-path">composer.json</div>
+            
+            <p class="step-desc" style="margin-top: 20px;"><strong>أ) أضف في قسم "require":</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>"utd/reals": "@dev"</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ب) أضف في قسم "repositories":</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>{
+    "type": "path",
+    "url": "packages/Utd/Reals",
+    "options": {
+        "symlink": true
+    }
+}</code>
+            </div>
+
+            <div class="success">
+                ✅ <strong>ملاحظة هامة:</strong> المشروع يستخدم <code>RealsPackageServiceProvider</code> الذي يتحقق تلقائياً من وجود الحزمة.
+                لا تحتاج لتعديل <code>config/app.php</code> أو إضافة autoload يدوياً - الحزمة ستُكتشف وتُحمّل تلقائياً!
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ج) ثم نفذ الأمر:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>composer update utd/reals</code>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step">
+            <span class="step-number">3</span>
+            <h2 class="step-title">تثبيت الحزمة</h2>
+            <p class="step-desc">قم بتنفيذ الأوامر التالية:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>composer dump-autoload && php artisan optimize:clear && php artisan package:discover</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ثم قم بتشغيل أمر التثبيت:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan reals:install</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>ملاحظة:</strong> أمر التثبيت يقوم بـ:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>إنشاء جميع الجداول المطلوبة</li>
+                    <li>إضافة الأعمدة للجداول المشتركة (مثل users)</li>
+                    <li>نشر الـ assets للمجلد public</li>
+                </ul>
+            </div>
+            
+            <div class="success">
+                ✅ بعد تنفيذ هذا الأمر، ستظهر جميع حقول الريلز في التارجت وغيرها تلقائياً!
+            </div>
+        </div>
+
+        <!-- Step 4: Seeders -->
+        <div class="step">
+            <span class="step-number">4</span>
+            <h2 class="step-title">تشغيل الـ Seeders</h2>
+            <p class="step-desc">قم بتشغيل الـ seeders لإعداد قوائم الأدمن:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan db:seed --class="Utd\Reals\Database\Seeders\RealDatabaseSeeder"</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>ثم قم بتحديث الصلاحيات:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan db:seed --class=PermissionTypeSeeder</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>ملاحظة:</strong> الـ seeders تقوم بـ:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>إضافة قوائم الريلز في لوحة التحكم</li>
+                    <li>إضافة صلاحيات إدارة الريلز للمشرفين</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Database Tables -->
+        <div class="step">
+            <span class="step-number">🗄️</span>
+            <h2 class="step-title">جداول قاعدة البيانات</h2>
+            <p class="step-desc">الحزمة تنشئ الجداول التالية:</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>الجدول</th>
+                        <th>الوصف</th>
+                        <th>النوع</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>reals</code></td>
+                        <td>الجدول الرئيسي للريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>real_categories</code></td>
+                        <td>تصنيفات الريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>real_user_likes</code></td>
+                        <td>إعجابات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>real_user_comments</code></td>
+                        <td>تعليقات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>real_user_views</code></td>
+                        <td>مشاهدات المستخدمين</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>report_reals</code></td>
+                        <td>بلاغات الريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>reels_user_settings</code></td>
+                        <td>إعدادات المستخدم للريلز</td>
+                        <td><span class="badge badge-required">رئيسي</span></td>
+                    </tr>
+                    <tr>
+                        <td><code>users.reel_following_type</code></td>
+                        <td>نوع متابعة الريلز للمستخدم</td>
+                        <td><span class="badge badge-dynamic">عمود مضاف</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning">
+                ⚠️ <strong>ملاحظة:</strong> العمود <code>reel_following_type</code> يُضاف لجدول <code>users</code> المشترك ويُزال تلقائياً عند إلغاء التثبيت.
+            </div>
+        </div>
+
+
+
+        <!-- What Happens When Package is Removed -->
+        <div class="step">
+            <span class="step-number">❌</span>
+            <h2 class="step-title">ماذا يحدث عند إزالة الحزمة؟</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>العنصر</th>
+                        <th>عند وجود الحزمة ✅</th>
+                        <th>عند إزالتها ❌</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>حقول الريلز في التارجت</td>
+                        <td>تظهر (upload, likes, comments)</td>
+                        <td><span class="badge badge-dynamic">تختفي تلقائياً</span></td>
+                    </tr>
+                    <tr>
+                        <td>نسبة الريلز في حساب الراتب</td>
+                        <td>تُحسب ضمن النسبة</td>
+                        <td><span class="badge badge-dynamic">تُتجاهل (0%)</span></td>
+                    </tr>
+                    <tr>
+                        <td>صفحة /admin/reels</td>
+                        <td>تعمل بشكل كامل</td>
+                        <td><span class="badge badge-dynamic">404 Not Found</span></td>
+                    </tr>
+                    <tr>
+                        <td>صفحة /admin/view/reels</td>
+                        <td>تعمل بشكل كامل</td>
+                        <td><span class="badge badge-dynamic">404 Not Found</span></td>
+                    </tr>
+                    <tr>
+                        <td>API /api/reels</td>
+                        <td>يعمل بشكل كامل</td>
+                        <td><span class="badge badge-dynamic">404 Not Found</span></td>
+                    </tr>
+                    <tr>
+                        <td>إحصائيات المستخدم</td>
+                        <td>تشمل الريلز</td>
+                        <td><span class="badge badge-dynamic">بدون ريلز</span></td>
+                    </tr>
+                    <tr>
+                        <td>باقي التطبيق</td>
+                        <td>يعمل بشكل طبيعي</td>
+                        <td><span class="badge badge-optional">يعمل بشكل طبيعي</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="success">
+                ✅ <strong>لا أخطاء!</strong> التطبيق يعمل بشكل طبيعي سواء كانت الحزمة موجودة أم لا.
+            </div>
+        </div>
+
+
+        <!-- How to Remove Package -->
+        <div class="step">
+            <span class="step-number">🗑️</span>
+            <h2 class="step-title">كيفية إزالة الحزمة</h2>
+            <p class="step-desc">لإزالة الحزمة بأمان:</p>
+            
+            <p class="step-desc" style="margin-top: 15px;"><strong>الطريقة 1: استخدام الأمر (مُوصى به):</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># إلغاء التثبيت مع حذف جميع البيانات:
+php artisan reals:uninstall
+
+# إلغاء التثبيت مع الاحتفاظ بالجداول (حذف الأعمدة المشتركة فقط):
+php artisan reals:uninstall --keep-data
+
+# إلغاء التثبيت بدون تأكيد:
+php artisan reals:uninstall --force</code>
+            </div>
+
+            <div class="danger">
+                ⚠️ <strong>تحذير:</strong> أمر <code>reals:uninstall</code> سيحذف:
+                <ul style="margin-top: 10px; padding-right: 20px;">
+                    <li>جميع جداول الريلز وبياناتها</li>
+                    <li>عمود <code>reel_following_type</code> من جدول users</li>
+                    <li>سجلات الـ migrations من جدول migrations</li>
+                    <li>مجلد <code>public/modules/reals</code></li>
+                </ul>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>الطريقة 2: الإزالة اليدوية:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># 1. أزل من composer.json:
+# - احذف "utd/reals": "@dev" من require
+# - احذف repository الخاص بالحزمة
+# - احذف "Utd\\Reals\\" من autoload
+
+# 2. نفذ الأوامر:
+composer dump-autoload && php artisan optimize:clear
+
+# 3. (اختياري) احذف مجلد الحزمة:
+rm -rf packages/Utd/Reals</code>
+            </div>
+
+            <div class="warning">
+                ⚠️ <strong>تنبيه:</strong> الإزالة اليدوية لا تحذف البيانات من قاعدة البيانات. استخدم الأمر للإزالة الكاملة.
+            </div>
+        </div>
+
+
+        <!-- Quick Commands -->
+        <div class="step">
+            <span class="step-number">⚡</span>
+            <h2 class="step-title">الأوامر السريعة</h2>
+            
+            <p class="step-desc"><strong>تثبيت الحزمة:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>composer dump-autoload && php artisan optimize:clear && php artisan package:discover && php artisan reals:install</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>إلغاء تثبيت الحزمة:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan reals:uninstall --force</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>التحقق من التثبيت:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan tinker --execute="echo Utd\Reals\Entities\Real::count();"</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>مسح الكاش بالكامل:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code>php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear && composer dump-autoload</code>
+            </div>
+        </div>
+
+        <!-- Troubleshooting -->
+        <div class="step">
+            <span class="step-number">🔧</span>
+            <h2 class="step-title">حل المشاكل الشائعة</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>المشكلة</th>
+                        <th>الحل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Class "Utd\Reals\Entities\Real" not found</td>
+                        <td><code>composer dump-autoload</code></td>
+                    </tr>
+
+                    <tr>
+                        <td>Route not found</td>
+                        <td><code>php artisan route:clear</code></td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 
+        <div class="step">
+            <span class="step-number">💾</span>
+            <h2 class="step-title">النسخ الاحتياطي والتحديث</h2>
+            
+            <p class="step-desc"><strong>📦 أخذ نسخة احتياطية قبل التحديث:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># نسخ احتياطي للجداول
+php artisan db:table reals --export > backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_likes --export >> backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_comments --export >> backup_reals_$(date +%Y%m%d).sql
+php artisan db:table real_user_views --export >> backup_reals_$(date +%Y%m%d).sql
+
+# أو نسخ احتياطي كامل لقاعدة البيانات
+mysqldump -u $DB_USERNAME -p $DB_DATABASE > backup_full_$(date +%Y%m%d).sql</code>
+            </div>
+
+            <p class="step-desc" style="margin-top: 20px;"><strong>⬆️ التحديث إلى الإصدار 2.0:</strong></p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># 1. أخذ نسخة احتياطية أولاً
+mysqldump -u root -p eagle_db > backup_before_upgrade.sql
+
+# 2. تحديث ملفات الحزمة (استبدال المجلد القديم)
+rm -rf packages/Utd/Reals
+# ثم نقل المجلد الجديد إلى packages/Utd/Reals
+
+# 3. تحديث الـ autoload وتشغيل الـ migrations الجديدة
+composer dump-autoload
+php artisan migrate --path=packages/Utd/Reals/database/migrations
+
+# 4. مسح الكاش
+php artisan optimize:clear</code>
+            </div>
+
+            <div class="warning">
+                ⚠️ <strong>تحذير:</strong> تأكد من أخذ نسخة احتياطية قبل أي تحديث. الإصدار 2.0 يتضمن تغييرات في هيكل الجداول.
+            </div>
+        </div>
+Backup & Upgrade -->
+        <!-- License Key -->
+        <div class="step">
+            <span class="step-number">🔑</span>
+            <h2 class="step-title">مفتاح التوثيق</h2>
+            
+            <p class="step-desc">أضف مفتاح التوثيق في ملف <code>.env</code>:</p>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+                <code># Reals Package License
+REALS_LICENSE_KEY=your-license-key-here
+REALS_ENABLED=true</code>
+            </div>
+
+            <div class="info">
+                💡 <strong>للحصول على مفتاح التوثيق:</strong> تواصل مع الدعم الفني عبر البريد الإلكتروني أو الواتساب.
+            </div>
+        </div>
+
+        <!-- Version History -->
+        <div class="step">
+            <span class="step-number">📝</span>
+            <h2 class="step-title">سجل الإصدارات</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>الإصدار</th>
+                        <th>التاريخ</th>
+                        <th>التغييرات الرئيسية</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-required">2.0.0</span></td>
+                        <td>يناير 2026</td>
+                        <td>Package مستقل، Admin Panel، License System، أوامر التثبيت/إلغاء التثبيت</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-optional">1.5.0</span></td>
+                        <td>أكتوبر 2025</td>
+                        <td>Custom Images، Picked Column، تحسينات الأداء</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-dynamic">1.0.0</span></td>
+                        <td>أغسطس 2023</td>
+                        <td>الإصدار الأول - نظام الريلز الأساسي</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Support -->
+        <div class="step">
+            <span class="step-number">📞</span>
+            <h2 class="step-title">الدعم الفني</h2>
+            
+            <p class="step-desc">للحصول على المساعدة والدعم:</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="icon">📧</div>
+                    <div><strong>البريد الإلكتروني</strong></div>
+                    <div style="color: #00d9ff;">support@utd-company.com</div>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">💬</div>
+                    <div><strong>واتساب</strong></div>
+                    <div style="color: #28a745;">+XX XXX XXX XXXX</div>
+                </div>
+                <div class="feature-item">
+                    <div class="icon">📖</div>
+                    <div><strong>التوثيق</strong></div>
+                    <div style="color: #a371f7;">docs.utd-company.com/reals</div>
+                </div>
+            </div>
+
+            <div class="info" style="margin-top: 20px;">
+                🕐 <strong>ساعات الدعم:</strong> من الأحد إلى الخميس، 9 صباحاً - 6 مساءً (توقيت مكة المكرمة)
+            </div>
+        </div>
+
+        <footer>
+            <p>📦 Utd/Reals Package v1.0 | Laravel Package</p>
+            <p>نظام ديناميكي - يعمل مع أو بدون الحزمة</p>
+            <p>© 2023-2026 UTD Company. جميع الحقوق محفوظة.</p>
+            <p>آخر تحديث: يناير 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement.querySelector('code');
+            const text = codeBlock.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'تم النسخ ✓';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = 'نسخ';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

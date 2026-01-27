@@ -7,7 +7,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
+use App\Support\DynamicReals;
 use Modules\Public\Http\Services\UserCounterServices;
 
 class WareSaveService
@@ -95,7 +95,10 @@ class WareSaveService
                 $videoPath = getDriverUrl() . '/' . $urlVideo;
                 $wareId = $form->model()->id;
 
-                (new FfmpegService())->extractByDuration($videoPath, $wareId);
+                $ffmpeg = DynamicReals::newFfmpegService();
+                if ($ffmpeg) {
+                    $ffmpeg->extractByDuration($videoPath, $wareId);
+                }
 
                 $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
                 $response = Http::attach(

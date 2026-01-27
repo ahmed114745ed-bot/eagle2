@@ -21,11 +21,11 @@ use App\Http\Resources\Dashboard\Wares\AdminSpecialHistoryResource;
 use App\Models\Ban;
 use App\Models\GroupChat;
 use App\Models\Profile;
+use App\Support\DynamicReals;
 use App\Traits\Dashboard\DashBoardTrait;
 use Carbon\Carbon;
 use DB;
 use Modules\Moment\Entities\Moment;
-use Modules\Reals\Entities\Real;
 use Modules\SpecialId\Entities\SpecialHistory;
 
 class UsersDashboard extends Controller
@@ -158,7 +158,11 @@ class UsersDashboard extends Controller
 
     public function user_reels(Request $request, $id)
     {
-        $data = Real::where('user_id',$id)->orderBy('id','desc')->with('comments','likes')->paginate(10);
+        $realQuery = DynamicReals::queryReal();
+        if (!$realQuery) {
+            return response()->json(['data' => [], 'message' => 'Reals feature not available'], 200);
+        }
+        $data = $realQuery->where('user_id',$id)->orderBy('id','desc')->with('comments','likes')->paginate(10);
         return  AdminReelsResource::collection($data);
     }
 

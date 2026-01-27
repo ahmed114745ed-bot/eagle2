@@ -93,6 +93,7 @@
     $moduleGuards = [
         'moment' => \Utd\Moments\Entities\Moment::class,
         'achievement' => \Utd\Achievements\Entities\Achievement::class,
+        'reels' => \Utd\Reals\Entities\Real::class,
     ];
 
     $moduleAllowed = true;

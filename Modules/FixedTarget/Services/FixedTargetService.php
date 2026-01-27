@@ -12,18 +12,17 @@ use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
 use App\Models\UserSallary;
-use Modules\Reals\Entities\Real;
-use Modules\Moment\Entities\Moment;
+use App\Support\DynamicReals;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Moment\Entities\MomentLikes;
-use Modules\Reals\Entities\RealUserLike;
 use Modules\FixedTarget\Enums\TargetType;
 use Modules\Moment\Entities\MomentCommint;
-use Modules\Reals\Entities\RealUserComment;
 use Modules\FixedTarget\Entities\SpecialUser;
 use Modules\FixedTarget\Classes\RegularTarget;
 use Modules\FixedTarget\Classes\FixedTargetClass;
 use Modules\FixedTarget\Interfaces\TargetInterface;
+use Nwidart\Modules\Facades\Module;
+use Utd\Moments\Entities\Moment;
 
 class FixedTargetService
 {
@@ -70,7 +69,7 @@ class FixedTargetService
 
     public function calculateTarget($month = null, $year = null)
     {
-        
+
         $user           = $this->user;
         $month_received = $user->getMonthlyDiamondReceived($month, $year);
 
@@ -113,10 +112,14 @@ class FixedTargetService
                 Carbon::now()->endOfMonth()
             ])->count();
 
-            $countReels         = Real::query()->where('user_id', $user->id)->whereBetween('created_at', [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth()
-            ])->count();
+            $realQuery = DynamicReals::queryReal();
+            $countReels = 0;
+            if ($realQuery) {
+                $countReels = $realQuery->where('user_id', $user->id)->whereBetween('created_at', [
+                    Carbon::now()->startOfMonth(),
+                    Carbon::now()->endOfMonth()
+                ])->count();
+            }
 
 
             $userTarget = UserTarget::where('user_id', $user->id)->first();
@@ -255,23 +258,20 @@ class FixedTargetService
             $target = $this->targetInstance->getTarget($month_received);
                 // logger('month_received Achieved:', [$month_received]);
                 // logger('target Achieved:', [$target]);
-
             if ($target) {
-
-
                 $times = $this->getUserLiveTime($user);
                 $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
 
+                $hasRealsModule = DynamicReals::isAvailable();
+                $targetReel = $hasRealsModule ? explode(',', $target->reel ?? '') : [];
 
-
-                $targetReel  = explode(',', $target->reel);
-                $targetMoment = explode(',', $target->moment);
+                $hasMomentModule = class_exists(Moment::class);
+                $targetMoment = $hasMomentModule ? explode(',', $target->moment ?? '') : [];
 
                 $startDate = $this->startDate > $this->joinDate ? $this->startDate : $this->joinDate;
 
                 $extra = UserCommon::UserStatistic($user->id, type: 1, startDate: $startDate, endDate: $this->endDate);
-
 
                 $t                = $this->targetInstance->calculateUsdFromTarget($target, $hours ?? 0, $days, $extra);
                 $percentageAchieved  = $this->targetInstance->calculatePercentageAchieved($target, $hours ?? 0, $days, $extra);;
@@ -296,15 +296,11 @@ class FixedTargetService
                     ],
                 ];
 
-
-
                 $this->updateSalaries($user, $t, $ap, $hours, $target, $days, $month_received, $this->userTargetType, $extras, $appProfit, $db, $percentageAchieved);
             } else {
-
                 $times = $this->getUserLiveTime($user);
                 $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
-
 
                 UserSallary::updateOrCreate(
                     [

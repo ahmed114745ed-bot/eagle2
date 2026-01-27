@@ -16,7 +16,7 @@ use Yasser\AgoraToken\RtmTokenBuilder;
 use BoogieFromZk\AgoraToken\RtcTokenBuilder2;;
 
 use Illuminate\Validation\ValidationException;
-use Modules\Reals\Http\Services\FfmpegService;
+use App\Support\DynamicReals;
 
 
 const LUCKY_REDIS_KEY = "thresholds_lucky_prices";
@@ -1124,7 +1124,10 @@ if (! function_exists('validateUploadedFileType')) {
         if ($ext === 'mp4' && $itemId) {
             $urlVideo = upload($file);
             $videoPath = getDriverUrl() . '/' . $urlVideo;
-            (new FfmpegService())->extractByDuration($videoPath, $itemId);
+            $ffmpeg = DynamicReals::newFfmpegService();
+            if ($ffmpeg) {
+                $ffmpeg->extractByDuration($videoPath, $itemId);
+            }
             $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $itemId . '.jpg';
             $response = Http::attach(
                 'image',
