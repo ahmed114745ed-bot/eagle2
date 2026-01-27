@@ -295,11 +295,7 @@ class CoinReportController extends MainController
                 }
                 return app(UserService::class)->adminUserAvatar($user);
             });
-        $grid->column('game', __('game name'))->display(function ($name) {
-           
-            return app()->getLocale() === 'ar' ? (@$this->game->name ?? @$this->game->name_en) : (@$this->game->name_en ?? @$this->game->name);
-           
-        });
+        $grid->column('game_name', __('game name'));
         $grid->column('total_coins_lose', __('loser'));
         $grid->column('total_coins_win', __('win'));
         $grid->column('earliest_created_at', __('created at'));
