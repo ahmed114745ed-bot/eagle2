@@ -29,7 +29,7 @@ class RealsResource extends JsonResource
             'updated_at'     => $this->updated_at,
             'likes_count'    => $this->likes_count,
             'comments_count' => $this->comments_count,
-            'likes_exists'   => RealUserLike::where(['user_id' => $user->id, 'real_id' => $this->id])->exists() ?? false,
+            'likes_exists'   => $this->likes_exists ?? false,
             'user'           => new UserResource($this->user),
             'share_count'    => $this->share_num,
         ];

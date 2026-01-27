@@ -11,5 +11,5 @@ class RealCategory extends Model
 
     protected $fillable = [];
 
-    protected $table = 'reals_categories';
+    protected $table = 'real_categories';
 }

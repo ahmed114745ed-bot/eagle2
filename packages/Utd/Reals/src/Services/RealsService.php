@@ -18,12 +18,12 @@ use Utd\Reals\Entities\ReportReals;
 use Utd\Reals\Services\BaseModelService;
 use Utd\Reals\Services\FfmpegService;
 
-define('PAGINATION', 10);
-define('REEL_PAGINATION', 10);
-
 
 class RealsService extends BaseModelService implements RealsContract
 {
+    private const PAGINATION = 10;
+    private const REEL_PAGINATION = 10;
+
     public function __construct(Model $model = null)
     {
         parent::__construct($model ?? new Real());
@@ -90,7 +90,7 @@ class RealsService extends BaseModelService implements RealsContract
             ->inRandomOrder($user->following_unique_value);
 
         $countInterested = $reels->count();
-        $pagination = REEL_PAGINATION;
+        $pagination = self::REEL_PAGINATION;
 
         $reels = $reels->paginate($pagination);
         $allData = collect($reels->items());
@@ -125,15 +125,22 @@ class RealsService extends BaseModelService implements RealsContract
                     $query->withoutAppends()->isFollow($userId)->with('profile');
                 }
             ])->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }
+            ])
             ->inRandomOrder($user->real_type);
 
         if ($filter === 'following') {
-            $followedUserIds = auth()->user()->friendsFollowedId();
+            /** @var User|null $authUser */
+            $authUser = auth()->user();
+            $followedUserIds = $authUser?->friendsFollowedId() ?? [];
             $reals->whereIn('user_id', $followedUserIds);
         }
 
         $countInterested = $reals->count();
-        $pagination = 10;
+        $pagination = self::PAGINATION;
 
         $reals = $reals->paginate($pagination);
         $allData = collect($reals->items());
@@ -168,13 +175,18 @@ class RealsService extends BaseModelService implements RealsContract
                 $query->withoutAppends()->isFollow($userId)->with('profile');
             }
         ])->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }
+            ])
             ->whereDoesntHave('likes', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })->where('reals.id', '<=', ($user->last_all_reel_id ?? PHP_INT_MAX))
             ->inRandomOrder($user->real_type);
 
         $countInterested = $reals->count();
-        $pagination = REEL_PAGINATION;
+        $pagination = self::REEL_PAGINATION;
 
         $reals = $reals->paginate($pagination);
         $allData = collect($reals->items());
@@ -501,7 +513,7 @@ class RealsService extends BaseModelService implements RealsContract
         $videoName = $outPutPath . DIRECTORY_SEPARATOR . uniqid() . '.mp4';
 
         $videoPath = getDriverUrl() . DIRECTORY_SEPARATOR . $videoPath;
-        $pythonScriptPath = base_path('/packages/Utd/Reals/src/Http/Services/script.py');
+        $pythonScriptPath = base_path('packages/Utd/Reals/scripts/script.py');
         $videoPath = str_replace('\\', '/', $videoPath);
 
         $path = null;
@@ -539,6 +551,11 @@ class RealsService extends BaseModelService implements RealsContract
                 ]);
             }
         ])->withCount(['likes', 'comments'])
+            ->withExists([
+                'likes' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                }
+            ])
             ->whereDoesntHave('likes', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })->where('reals.id', '<=', $lastId);
@@ -579,7 +596,7 @@ class RealsService extends BaseModelService implements RealsContract
     {
         if ($lastId === null) $lastId = PHP_INT_MAX;
         $currentPage = request()->page ?? 1;
-        $pagination = REEL_PAGINATION;
+        $pagination = self::REEL_PAGINATION;
 
         $diffCountWithPage = $this->getDiffCountWithPage($countInterested, $pagination, $currentPage);
         $countNotInterest = 0;

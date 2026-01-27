@@ -5,7 +5,6 @@ namespace Utd\Reals\Services;
 use FFMpeg\FFProbe;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 
-
 class FfmpegService
 {
 

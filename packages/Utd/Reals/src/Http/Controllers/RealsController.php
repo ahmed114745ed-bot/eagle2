@@ -4,7 +4,6 @@ namespace Utd\Reals\Http\Controllers;
 
 use App\Models\User;
 use App\Helpers\Common;
-use App\Contracts\RealsContract;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -28,6 +27,7 @@ class RealsController extends Controller
      */
     public function index()
     {
+        /** @var User $user */
         $user = Auth::user();
         $filter = request('filter');
         if (!request("page") || request("page") == 1) {
@@ -46,6 +46,7 @@ class RealsController extends Controller
     {
         try {
             if ($user_id == null) {
+                /** @var User $user */
                 $user = Auth::user();
             } else {
                 $user = User::query()->withoutAppends()->findOrFail($user_id);
@@ -61,7 +62,9 @@ class RealsController extends Controller
 
     public function getMyReals()
     {
-        $user_id = Auth::user()->id;
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        $user_id = $authUser->id;
         try {
             $user = User::query()->withoutAppends()->findOrFail($user_id);
         } catch (\Exception $e) {
@@ -79,6 +82,7 @@ class RealsController extends Controller
      */
     public function getUserFollowersReals(): \Illuminate\Http\JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
         if (!request("page") || request("page") == 1) {
             $user->following_unique_value = $user->id . random_int(10000, 99999);
@@ -98,12 +102,12 @@ class RealsController extends Controller
     {
         $user = $request->user();
         $real = $this->realsService->create($request->all(), Auth::id());
-        
+
         // UpgradeLevel if module exists
         if (class_exists(UpgradeLevelServices::class)) {
             (new UpgradeLevelServices())->uploadReel($user);
         }
-        
+
         return Common::apiResponse(1, 'success', new RealsResource($real));
     }
 

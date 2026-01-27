@@ -14,27 +14,27 @@ use Utd\Reals\Http\Controllers\ReportController;
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])
     ->group(function () {
-        
+
         Route::prefix('reals')->middleware('appFeatureEnable:reel')->group(function () {
-            
+
             // قراءة ريلز المستخدم
             Route::get('user/{user_id?}', [RealsController::class, 'getUserReals'])
                 ->middleware('ban.user.actions:reals/user');
-            
+
             // ريلزي
             Route::get('my-reals', [RealsController::class, 'getMyReals']);
-            
+
             // ريلز المتابَعين
             Route::get('user-followers', [RealsController::class, 'getUserFollowersReals']);
-            
+
             // CRUD للريلز
-            Route::apiResource('/', RealsController::class)
+            Route::apiResource('', RealsController::class)
                 ->middleware('ban.user.actions:reals')
                 ->parameters(['' => 'real']);
-            
+
             // تحديث ريل
             Route::post('update/{id}', [RealsController::class, 'update']);
-            
+
             // التعليقات
             Route::apiResource('{real_id}/comment', RealsUserCommentController::class)
                 ->names([
@@ -44,7 +44,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
                     'update' => 'reals.comment.update',
                     'destroy' => 'reals.comment.destroy',
                 ]);
-            
+
             // الإعجابات
             Route::apiResource('{real_id}/like', RealsUserLikesController::class)
                 ->names([
@@ -55,7 +55,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
                     'destroy' => 'reals.like.destroy',
                 ]);
         });
-        
+
         // التقارير
         Route::apiResource('report', ReportController::class)
             ->middleware('appFeatureEnable:reel');

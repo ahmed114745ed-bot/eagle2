@@ -19,8 +19,6 @@ class ReportReals extends Model
         return $this->hasOne(Real::class, 'id', 'real_id');
     }
 
-    // protected $table = ['Report_reals'];
-
     public function reporter()
     {
         return $this->belongsTo(User::class, 'Reporter_id');
