@@ -2,11 +2,13 @@
 
 namespace App\Tik\Services;
 
-use App\Models\Country;
 use DB;
 use Google_Client;
+use App\Models\User;
+use function request;
 use Mockery\Exception;
 use App\Helpers\Common;
+use App\Models\Country;
 use App\Models\Profile;
 use Illuminate\Support\Arr;
 use App\Facades\UserHandling;
@@ -14,14 +16,13 @@ use Illuminate\Http\UploadedFile;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use App\Exceptions\CValidationException;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;
-use function request;
 
 class AuthService
 {
@@ -257,124 +258,243 @@ class AuthService
     /**
      * @throws \Exception
      */
-    public function storeImage($request, $data, $user)
-    {
-        // Handle UploadedFile instances
-        if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
-            $img = $request['image'];
-            $imageType = $img->getClientOriginalExtension();
-            if (!$imageType) {
-                $mime = $img->getMimeType();
-                $imageType = match ($mime) {
-                    'image/jpeg' => 'jpg',
-                    'image/png'  => 'png',
-                    'image/gif'  => 'gif',
-                    'image/webp' => 'webp',
-                    default      => 'jpg',
-                };
-            }
-            if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
-                throw new \Exception(__('api_responses.gifImage'));
-            }
+    // public function storeImage($request, $data, $user)
+    // {
+    //     // Handle UploadedFile instances
+    //     if (isset($request['image']) && $request['image'] instanceof UploadedFile) {
+    //         $img = $request['image'];
+    //         $imageType = $img->getClientOriginalExtension();
+    //         if (!$imageType) {
+    //             $mime = $img->getMimeType();
+    //             $imageType = match ($mime) {
+    //                 'image/jpeg' => 'jpg',
+    //                 'image/png'  => 'png',
+    //                 'image/gif'  => 'gif',
+    //                 'image/webp' => 'webp',
+    //                 default      => 'jpg',
+    //             };
+    //         }
+    //         if ($imageType == 'gif' && !Common::hasInPack($user->id, 22, false)) {
+    //             throw new \Exception(__('api_responses.gifImage'));
+    //         }
 
-            $user->profile_count += 1;
-            $user->save();
-            $user->load('profile');
-            $profile = $user->profile;
-            if (!$profile) {
-                $profile = Profile::create([
-                    'gender' => null,
-                    'birthday' => null,
-                    'province' => null,
-                    'city' => null,
-                    'country' => null,
-                    'user_id' => @$user->id,
-                ]);
-            }
+    //         $user->profile_count += 1;
+    //         $user->save();
+    //         $user->load('profile');
+    //         $profile = $user->profile;
+    //         if (!$profile) {
+    //             $profile = Profile::create([
+    //                 'gender' => null,
+    //                 'birthday' => null,
+    //                 'province' => null,
+    //                 'city' => null,
+    //                 'country' => null,
+    //                 'user_id' => @$user->id,
+    //             ]);
+    //         }
 
-            $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
+    //         $newImagePass = Common::uploadProfileUser('profile', $img, $profile->id, $user->profile_count);
 
-            Log::info('Uploaded profile image', [
-                'imageType' => $imageType,
-                'image_path' => $newImagePass,
-            ]);
-            $profile->avatar = $newImagePass;
-            $profile->save();
+    //         Log::info('Uploaded profile image', [
+    //             'imageType' => $imageType,
+    //             'image_path' => $newImagePass,
+    //         ]);
+    //         $profile->avatar = $newImagePass;
+    //         $profile->save();
 
-            return $profile;
+    //         return $profile;
+    //     }
+
+    //     // Handle image URLs from Google, Apple, etc.
+    //     if (isset($request['image']) && is_string($request['image']) && !empty($request['image'])) {
+    //         try {
+    //             $imageUrl = $request['image'];
+                
+    //             // Download the image from URL
+    //             $response = Http::get($imageUrl);
+    //             if (!$response->successful()) {
+    //                 Log::warning('Failed to download image from URL', ['url' => $imageUrl]);
+    //                 return null;
+    //             }
+                
+    //             $imageContent = $response->body();
+    //             if (empty($imageContent)) {
+    //                 Log::warning('Image content is empty from URL', ['url' => $imageUrl]);
+    //                 return null;
+    //             }
+
+    //             // Determine the file extension from URL
+    //             $extension = 'jpg'; // default
+    //             if (preg_match('/\.([a-z]+)(?:\?|$)/i', $imageUrl, $matches)) {
+    //                 $ext = strtolower($matches[1]);
+    //                 // Validate extension
+    //                 if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+    //                     $extension = $ext;
+    //                 }
+    //             }
+
+    //             $user->profile_count += 1;
+    //             $user->save();
+    //             $user->load('profile');
+    //             $profile = $user->profile;
+    //             if (!$profile) {
+    //                 $profile = Profile::create([
+    //                     'gender' => null,
+    //                     'birthday' => null,
+    //                     'province' => null,
+    //                     'city' => null,
+    //                     'country' => null,
+    //                     'user_id' => @$user->id,
+    //                 ]);
+    //             }
+
+    //             // Create the filename with proper extension
+    //             $fileName = $profile->id . '_' . $user->profile_count . '.' . $extension;
+    //             $filePath = 'profile' . DIRECTORY_SEPARATOR . $fileName;
+                
+    //             // Store the image directly
+    //             Storage::put($filePath, $imageContent, config('filesystems.default'));
+
+    //             Log::info('Downloaded and stored profile image from URL', [
+    //                 'imageUrl' => $imageUrl,
+    //                 'extension' => $extension,
+    //                 'image_path' => $filePath,
+    //             ]);
+
+    //             $profile->avatar = $filePath;
+    //             $profile->save();
+
+    //             return $profile;
+    //         } catch (\Exception $e) {
+    //             Log::error('Failed to store image from URL', [
+    //                 'user_id' => $user->id ?? null,
+    //                 'image_url' => $request['image'] ?? null,
+    //                 'error' => $e->getMessage()
+    //             ]);
+    //             // Don't rethrow - continue without image
+    //             return null;
+    //         }
+    //     }
+    // }
+
+    public function storeImage(array $request, array $data, User $user): ?Profile
+{
+    if (!isset($request['image'])) {
+        return null;
+    }
+
+    if ($request['image'] instanceof UploadedFile) {
+        return $this->storeUploadedImage($request['image'], $user);
+    }
+
+    if (is_string($request['image']) && !empty($request['image'])) {
+        return $this->storeImageFromUrl($request['image'], $user);
+    }
+
+    return null;
+}
+
+private function storeUploadedImage(UploadedFile $image, User $user): Profile
+{
+    $extension = $this->getImageExtension($image);
+
+    if ($extension === 'gif' && !Common::hasInPack($user->id, 22, false)) {
+        throw new \Exception(__('api_responses.gifImage'));
+    }
+
+    $profile = $this->getOrCreateProfile($user);
+
+    $path = Common::uploadProfileUser(
+        'profile',
+        $image,
+        $profile->id,
+        $user->profile_count
+    );
+
+    Log::info('Uploaded profile image', [
+        'extension' => $extension,
+        'path' => $path,
+    ]);
+
+    $profile->update(['avatar' => $path]);
+
+    return $profile;
+}
+private function storeImageFromUrl(string $url, User $user): ?Profile
+{
+    try {
+        $response = Http::get($url);
+
+        if (!$response->successful() || empty($response->body())) {
+            Log::warning('Failed to download image', ['url' => $url]);
+            return null;
         }
 
-        // Handle image URLs from Google, Apple, etc.
-        if (isset($request['image']) && is_string($request['image']) && !empty($request['image'])) {
-            try {
-                $imageUrl = $request['image'];
-                
-                // Download the image from URL
-                $response = Http::get($imageUrl);
-                if (!$response->successful()) {
-                    Log::warning('Failed to download image from URL', ['url' => $imageUrl]);
-                    return null;
-                }
-                
-                $imageContent = $response->body();
-                if (empty($imageContent)) {
-                    Log::warning('Image content is empty from URL', ['url' => $imageUrl]);
-                    return null;
-                }
+        $extension = $this->getExtensionFromUrl($url);
+        $profile   = $this->getOrCreateProfile($user);
 
-                // Determine the file extension from URL
-                $extension = 'jpg'; // default
-                if (preg_match('/\.([a-z]+)(?:\?|$)/i', $imageUrl, $matches)) {
-                    $ext = strtolower($matches[1]);
-                    // Validate extension
-                    if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        $extension = $ext;
-                    }
-                }
+        $fileName = "{$profile->id}_{$user->profile_count}.{$extension}";
+        $path     = "profile/{$fileName}";
 
-                $user->profile_count += 1;
-                $user->save();
-                $user->load('profile');
-                $profile = $user->profile;
-                if (!$profile) {
-                    $profile = Profile::create([
-                        'gender' => null,
-                        'birthday' => null,
-                        'province' => null,
-                        'city' => null,
-                        'country' => null,
-                        'user_id' => @$user->id,
-                    ]);
-                }
+        Storage::put($path, $response->body(), config('filesystems.default'));
 
-                // Create the filename with proper extension
-                $fileName = $profile->id . '_' . $user->profile_count . '.' . $extension;
-                $filePath = 'profile' . DIRECTORY_SEPARATOR . $fileName;
-                
-                // Store the image directly
-                Storage::put($filePath, $imageContent, config('filesystems.default'));
+        Log::info('Stored profile image from URL', [
+            'url' => $url,
+            'path' => $path,
+        ]);
 
-                Log::info('Downloaded and stored profile image from URL', [
-                    'imageUrl' => $imageUrl,
-                    'extension' => $extension,
-                    'image_path' => $filePath,
-                ]);
+        $profile->update(['avatar' => $path]);
 
-                $profile->avatar = $filePath;
-                $profile->save();
+        return $profile;
 
-                return $profile;
-            } catch (\Exception $e) {
-                Log::error('Failed to store image from URL', [
-                    'user_id' => $user->id ?? null,
-                    'image_url' => $request['image'] ?? null,
-                    'error' => $e->getMessage()
-                ]);
-                // Don't rethrow - continue without image
-                return null;
-            }
+    } catch (\Throwable $e) {
+        Log::error('Image URL upload failed', [
+            'user_id' => $user->id,
+            'url' => $url,
+            'error' => $e->getMessage(),
+        ]);
+
+        return null;
+    }
+}
+private function getOrCreateProfile(User $user): Profile
+{
+    $user->increment('profile_count');
+    $user->load('profile');
+
+    return $user->profile ?? Profile::create([
+        'user_id'  => $user->id,
+        'gender'   => null,
+        'birthday' => null,
+        'province' => null,
+        'city'     => null,
+        'country'  => null,
+    ]);
+}
+private function getImageExtension(UploadedFile $image): string
+{
+    return $image->getClientOriginalExtension()
+        ?: match ($image->getMimeType()) {
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+            default      => 'jpg',
+        };
+}
+private function getExtensionFromUrl(string $url): string
+{
+    if (preg_match('/\.([a-z]+)(?:\?|$)/i', $url, $matches)) {
+        $ext = strtolower($matches[1]);
+        if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+            return $ext;
         }
     }
+
+    return 'jpg';
+}
+
+
 
     //     public function loginWithApple($request, $unique_id)
     //     {
