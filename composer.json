@@ -49,8 +49,8 @@
         "spatie/laravel-google-cloud-storage": "^2.2",
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
-        "utd/achievements": "dev-reelsPackage",
-        "utd/moments": "dev-reelsPackage",
+        "utd/achievements": "@dev",
+        "utd/moments": "@dev",
         "utd/reals": "@dev"
     },
     "require-dev": {
@@ -119,6 +119,20 @@
         {
             "type": "path",
             "url": "packages/Utd/Moments",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Achievements",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Reals",
             "options": {
                 "symlink": true
             }
