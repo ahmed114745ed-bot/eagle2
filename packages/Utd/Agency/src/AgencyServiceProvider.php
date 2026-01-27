@@ -20,16 +20,26 @@ class AgencyServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../Config/agency.php', 'agency-package');
 
-        // Register Services
+        // Register Services - Safe binding (returns null if not exists)
         $this->app->bind(
             \Utd\Agency\Contracts\AgencyServiceInterface::class,
-            \Utd\Agency\Services\AgencyService::class
+            function ($app) {
+                if (class_exists(\Utd\Agency\Services\AgencyService::class)) {
+                    return $app->make(\Utd\Agency\Services\AgencyService::class);
+                }
+                return null;
+            }
         );
 
-        // Register Repositories
+        // Register Repositories - Safe binding (returns null if not exists)
         $this->app->bind(
             \Utd\Agency\Contracts\AgencyRepositoryInterface::class,
-            \Utd\Agency\Repositories\AgencyRepository::class
+            function ($app) {
+                if (class_exists(\Utd\Agency\Repositories\AgencyRepository::class)) {
+                    return $app->make(\Utd\Agency\Repositories\AgencyRepository::class);
+                }
+                return null;
+            }
         );
     }
 
