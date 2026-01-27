@@ -122,20 +122,6 @@
             "options": {
                 "symlink": true
             }
-        },
-        {
-            "type": "path",
-            "url": "packages/Utd/Achievements",
-            "options": {
-                "symlink": true
-            }
-        },
-        {
-            "type": "path",
-            "url": "packages/Utd/Reals",
-            "options": {
-                "symlink": true
-            }
         }
     ]
 }
