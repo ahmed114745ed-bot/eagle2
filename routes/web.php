@@ -48,6 +48,7 @@ use App\Http\Controllers\addTOjesonController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Admin\Controllers\UsersChargeController;
+use App\Admin\Controllers\V2\SalariesController;
 use App\Admin\Controllers\HomeCarouselController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Admin\Controllers\MangerSettingController;
@@ -245,7 +246,12 @@ Route::get('/clear_clear', function () {
 Route::get('/update-banner-display', [HomeCarouselController::class, 'updateBannerDisplay']);
 Route::get('/owner-agency-users', [AgencyController::class, 'usersAgency']);
 Route::get('/update-user-type', [AgencyController::class, 'UpdateTypeUserAgency']);
- Route::get('remove-repetition-form-templates',[FormTemplateController::class,'removeRepetition'] );
+Route::get('remove-repetition-form-templates', [FormTemplateController::class, 'removeRepetition']);
+Route::get('/update-user-cut-amount', [SalariesController::class, 'updateUserCutAmount']);
+Route::get('/count-user-cut-amount', [SalariesController::class, 'countUserCutAmount']);
+
+
+
 
 Route::get('/seed', function () {
 
@@ -1371,10 +1377,10 @@ Route::get('/debug/test-gift-banner', function () {
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
     } catch (\Throwable $e) {
-        Log::error('GiftBannerEvent failed', [
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString(),
-        ]);
+        // Log::error('GiftBannerEvent failed', [
+        //     'error' => $e->getMessage(),
+        //     'trace' => $e->getTraceAsString(),
+        // ]);
 
         return response()->json([
             'success' => false,
@@ -1432,11 +1438,11 @@ Route::get('/debug/test-user-online', function () {
             'timestamp' => now()->toDateTimeString(),
         ], 200, [], JSON_PRETTY_PRINT);
     } catch (\Throwable $e) {
-        Log::error('UserOnline failed', [
-            'error' => $e->getMessage(),
-            'user_id' => $user->id,
-            'trace' => $e->getTraceAsString(),
-        ]);
+        // Log::error('UserOnline failed', [
+        //     'error' => $e->getMessage(),
+        //     'user_id' => $user->id,
+        //     'trace' => $e->getTraceAsString(),
+        // ]);
 
         return response()->json([
             'success' => false,

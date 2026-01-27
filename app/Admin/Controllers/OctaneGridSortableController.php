@@ -82,10 +82,10 @@ class OctaneGridSortableController extends Controller
             $status  = false;
             $message = $exception->getMessage();
             
-            Log::error('❌ Octane Grid Sortable Failed', [
-                'error' => $exception->getMessage(),
-                'trace' => $exception->getTraceAsString()
-            ]);
+        //    Log:: error('❌ Octane Grid Sortable Failed', [
+        //         'error' => $exception->getMessage(),
+        //         'trace' => $exception->getTraceAsString()
+        //     ]);
         }
 
         return response()->json(compact('status', 'message'));

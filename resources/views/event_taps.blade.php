@@ -36,6 +36,16 @@
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
     margin: 0 auto;
 }
+
+.box.box-solid .settings-menu button.active {
+    background: #fff !important;
+    color: #000 !important;
+}
+
+/* Optional hover */
+.settings-menu button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
 </style>
 
 <div class="box box-solid">

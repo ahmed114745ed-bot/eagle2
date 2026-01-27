@@ -47,7 +47,7 @@ class Room extends Model
         return $this->belongsTo(User::class, 'uid');
     }
 
-    public function level()
+    public function roomLevel()
     {
         return $this->belongsTo(Vip::class, 'level_id');
     }

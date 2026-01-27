@@ -79,7 +79,8 @@ class AgencyController extends Controller
     {
         $app_feature = Cache::get('host_agency');
         if (!$app_feature) {
-            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+            //throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+            return Common::apiResponse(0, __('Agency Feature is Disabled, Contact the administration'), null, 400);
         }
 
         try {
@@ -96,7 +97,9 @@ class AgencyController extends Controller
         $user = $request->user();
         $app_feature = Cache::get('host_agency');
         if (!$app_feature) {
-            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+            // throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+
+            return Common::apiResponse(0, __('Agency Feature is Disabled, Contact the administration'), null, 400);
         }
 
         try {

@@ -37,9 +37,9 @@ class WeeklyRankingCommand extends Command
             $rankingList = $this->getRankingList($rankingType);
 
             if (!$rankingList || $rankingList->isEmpty()) {
-                Log::warning('Ranking list is empty', [
-                    'ranking_type_id' => $rankingType->id,
-                ]);
+            //    Log:: warning('Ranking list is empty', [
+            //         'ranking_type_id' => $rankingType->id,
+            //     ]);
                 continue;
             }
 

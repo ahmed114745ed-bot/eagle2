@@ -917,7 +917,7 @@ class TargetController extends MainController
                 $this->applyPendingEdit($target);
                 \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
             } catch (\Throwable $e) {
-                \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
+              //  \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
             }
         }
         admin_toastr(__('update_start'), 'info');
