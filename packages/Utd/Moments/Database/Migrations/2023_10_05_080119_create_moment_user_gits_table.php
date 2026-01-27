@@ -13,16 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('moment_user_gifts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
-            $table->bigInteger('user_id')->unsigned()->index();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('gift_id')->unsigned()->index();
-            $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
-            $table->integer('num');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('moment_user_gifts')) {
+            Schema::create('moment_user_gifts', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
+                $table->bigInteger('user_id')->unsigned()->index();
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->integer('gift_id')->unsigned()->index();
+                $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
+                $table->integer('num');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

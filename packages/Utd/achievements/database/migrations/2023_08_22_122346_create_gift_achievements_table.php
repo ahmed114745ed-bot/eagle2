@@ -13,15 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('gift_achievements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('achievement_id')->constrained('achievements');
-            $table->integer('gift_id')->unsigned()->index();
-            $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
-            $table->bigInteger('user_id')->unsigned()->index();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('gift_achievements')) {
+            Schema::create('gift_achievements', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('achievement_id')->constrained('achievements');
+                $table->integer('gift_id')->unsigned()->index();
+                $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
+                $table->bigInteger('user_id')->unsigned()->index();
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

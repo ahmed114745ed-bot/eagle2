@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_achievement_levels', function (Blueprint $table) {
+        if (!Schema::hasColumn('user_achievement_levels', 'file')) {
+            Schema::table('user_achievement_levels', function (Blueprint $table) {
           
-            $table->string('file')->nullable();
+                $table->string('file')->nullable();
 
-        });
+            });
+        }
     }
     
     /**

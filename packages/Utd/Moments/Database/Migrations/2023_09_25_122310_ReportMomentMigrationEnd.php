@@ -13,15 +13,17 @@ class ReportMomentMigrationEnd extends Migration
      */
     public function up()
     {
-        Schema::create('report_moments', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('moment_id');
-            $table->bigInteger('Reporter_id');
-            $table->bigInteger('Reported_id');
-            $table->string('description');
-            $table->string('type');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('report_moments')) {
+            Schema::create('report_moments', function (Blueprint $table) {
+                $table->id();
+                $table->bigInteger('moment_id');
+                $table->bigInteger('Reporter_id');
+                $table->bigInteger('Reported_id');
+                $table->string('description');
+                $table->string('type');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

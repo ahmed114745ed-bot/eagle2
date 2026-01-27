@@ -13,13 +13,15 @@ class AddMomentUserLikesTable extends Migration
      */
     public function up()
     {
-        Schema::create('moment_user_likes', function (Blueprint $table) {
+        if (!Schema::hasTable('moment_user_likes')) {
+            Schema::create('moment_user_likes', function (Blueprint $table) {
 
-            $table->id();
-            $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->timestamps();
-        });
+                $table->id();
+                $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

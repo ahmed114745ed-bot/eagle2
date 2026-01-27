@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('user_achievement_levels', function (Blueprint $table) {
-            $table->foreignId('achievement_id')->nullable()->constrained('achievements')->cascadeOnDelete()->after('achievement_level_id');
-            $table->string('custom_image')->nullable();
-        });
+        if (!Schema::hasColumn('user_achievement_levels', 'achievement_id')) {
+            Schema::table('user_achievement_levels', function (Blueprint $table) {
+                $table->foreignId('achievement_id')->nullable()->constrained('achievements')->cascadeOnDelete()->after('achievement_level_id');
+                $table->string('custom_image')->nullable();
+            });
+        }
     }
 
     /**

@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('moment', function (Blueprint $table) {
-            $table->string('img')->default('');
+        if (!Schema::hasColumn('moment', 'img')) {
+            Schema::table('moment', function (Blueprint $table) {
+                $table->string('img')->default('');
 
-        });
+            });
+        }
     }
 
     /**

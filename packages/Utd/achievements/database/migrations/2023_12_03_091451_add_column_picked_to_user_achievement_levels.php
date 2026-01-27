@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('user_achievement_levels', function (Blueprint $table) {
-            $table->boolean('picked')->nullable()->default(false);
-        });
+        if (!Schema::hasColumn('user_achievement_levels', 'picked')) {
+            Schema::table('user_achievement_levels', function (Blueprint $table) {
+                $table->boolean('picked')->nullable()->default(false);
+            });
+        }
     }
 
     /**

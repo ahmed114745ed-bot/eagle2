@@ -13,16 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('achievements', function (Blueprint $table) {
-            $table->id();
-            $table->string('type');
-            $table->string('name')->nullable();
-            $table->string('valid_image')->nullable();
-            $table->string('invalid_image')->nullable();
-            $table->integer('target')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (!Schema::hasTable('achievements')) {
+            Schema::create('achievements', function (Blueprint $table) {
+                $table->id();
+                $table->string('type');
+                $table->string('name')->nullable();
+                $table->string('valid_image')->nullable();
+                $table->string('invalid_image')->nullable();
+                $table->integer('target')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

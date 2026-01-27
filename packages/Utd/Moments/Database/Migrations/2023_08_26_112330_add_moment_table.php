@@ -13,14 +13,16 @@ class AddMomentTable extends Migration
      */
     public function up()
     {
-        Schema::create('moment', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('description')->default('');
-            $table->integer('comment_num')->default(0);
-            $table->integer('like_num')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('moment')) {
+            Schema::create('moment', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->string('description')->default('');
+                $table->integer('comment_num')->default(0);
+                $table->integer('like_num')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

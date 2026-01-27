@@ -13,17 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('user_achievement_levels', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('achievement_level_id')->nullable()->constrained('achievement_levels')->cascadeOnDelete();
-            $table->bigInteger('user_id')->unsigned()->index();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreignId('gift_achievement_id')->nullable()->constrained('gift_achievements')->onDelete('cascade');
-            $table->string('unique_value')->nullable();
-            $table->timestamp('end_at')->nullable();
-            $table->boolean('is_enable')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('user_achievement_levels')) {
+            Schema::create('user_achievement_levels', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('achievement_level_id')->nullable()->constrained('achievement_levels')->cascadeOnDelete();
+                $table->bigInteger('user_id')->unsigned()->index();
+                $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreignId('gift_achievement_id')->nullable()->constrained('gift_achievements')->onDelete('cascade');
+                $table->string('unique_value')->nullable();
+                $table->timestamp('end_at')->nullable();
+                $table->boolean('is_enable')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

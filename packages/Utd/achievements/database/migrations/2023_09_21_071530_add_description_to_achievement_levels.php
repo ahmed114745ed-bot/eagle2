@@ -13,10 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('achievement_levels', function (Blueprint $table) {
-            $table->text('ar_description')->nullable();
-            $table->text('en_description')->nullable();
-        });
+        if (!Schema::hasColumn('achievement_levels', 'ar_description')) {
+            Schema::table('achievement_levels', function (Blueprint $table) {
+                $table->text('ar_description')->nullable();
+                $table->text('en_description')->nullable();
+            });
+        }
     }
 
     /**
