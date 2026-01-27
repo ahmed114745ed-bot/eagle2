@@ -13,7 +13,7 @@ class WalletTemplateResource extends JsonResource
             'title' => $this->title,
             'type' => $this->type,
             'minimum' => $this->minimum,
-            'transfer_fee' => $this->transfer_fee,
+            'transfer_fee' => (string) $this->transfer_fee,
             'fields' => WalletFieldResource::collection($this->whenLoaded('fields')),
         ];
     }

@@ -41,14 +41,14 @@ class VipController extends Controller
         );
     }
 
-    public function background($ovipId)
+    public function background()
     {
-        $vips = $this->vipService->backgroundImage($ovipId);
+        $vips = $this->vipService->backgroundImage();
 
         return Common::apiResponse(
             true,
             'successfully fetched.',
-            new BackgroundResource($vips)
+            BackgroundResource::collection($vips)
         );
     }
 
@@ -144,6 +144,15 @@ class VipController extends Controller
         return $this->wrap(function () use ($request) {
             $this->vipService->badges($request->type);
             $groups = $this->vipService->getLevelGroups();
+            return Common::apiResponse(true, 'success', $groups);
+        });
+    }
+
+    public function roomBadges()
+    {
+        return $this->wrap(function () {
+            $this->vipService->badges(4);
+            $groups = $this->vipService->getRoomLevel();
             return Common::apiResponse(true, 'success', $groups);
         });
     }

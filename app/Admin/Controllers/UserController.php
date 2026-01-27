@@ -10,18 +10,15 @@ use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\Profile;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
-use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
-use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
@@ -47,7 +44,6 @@ use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Actions\CanPlaySwitchAction;
 
 class UserController extends MainController
 {
@@ -854,9 +850,9 @@ class UserController extends MainController
             });
         </script>');
         }
-
-        $form->belongsTo('image_color_id', ImageColors::class, __('Color'))->setElementName('full-column-width');
-
+        $form->html('<div class="full-column-width">');
+        $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
+        $form->html('</div>');
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
             $model = $form->model();

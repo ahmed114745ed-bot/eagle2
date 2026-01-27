@@ -27,9 +27,9 @@ class EmojiController extends MainController
     }
     public function index(Content $content)
     {
-        return parent::index($content
+        return $content
             ->title(trans('Emojis'))
-            ->body($this->grid()));
+            ->body($this->grid());
     }
 
     /**
@@ -83,56 +83,64 @@ class EmojiController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Emoji);
-      //  $grid->sortable();
 
         // Get the current filter from request or default to first category
         $filterType = request()->get('filter', 'all');
-        $category  = [];
+        
+        $category  = null;
 
-        if (request('filter') != 'all') {
-            $category = EmojiCategory::find(request('filter'));
+        if ($filterType !== 'all' && $filterType) {
+            $category = EmojiCategory::find($filterType);
         }
-
-
 
         // Header tabs
         $grid->header(function () use ($filterType) {
-            $locale = App::getLocale();
+            try {
+                $locale = App::getLocale();
 
-            $tabs = ['all' => __('All')];
-            $categories = EmojiCategory::orderBy('id')->get();
-            foreach ($categories as $category) {
-                $title = $category->title[$locale] ?? $category->title['en'] ?? '';
-                $tabs[$category->id] = $title;
+                $tabs = ['all' => __('All')];
+                $categories = EmojiCategory::orderBy('id')->get();
+                foreach ($categories as $cat) {
+                    // Handle both array and JSON string
+                    $titleData = $cat->title;
+                    if (is_string($titleData)) {
+                        $titleData = json_decode($titleData, true) ?? [];
+                    }
+                    $title = $titleData[$locale] ?? $titleData['en'] ?? $cat->id;
+                    $tabs[$cat->id] = $title;
+                }
+
+                $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
+                foreach ($tabs as $key => $label) {
+                    $active = ($filterType == $key || ($filterType === 'all' && $key === 'all')) ? 'active' : '';
+                    $url = request()->fullUrlWithQuery(['filter' => $key]);
+                    $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
+                }
+                $html .= '</ul></div>';
+
+                return $html;
+            } catch (\Exception $e) {
+                \Log::error('EmojiController header error: ' . $e->getMessage());
+                return ''; // Return empty string on error
             }
-
-            $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
-            foreach ($tabs as $key => $label) {
-                $active = $filterType == $key ? 'active' : '';
-                $url = request()->fullUrlWithQuery(['filter' => $key]);
-                $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
-            }
-            $html .= '</ul></div>';
-
-            return $html;
         });
 
         // Apply filter to the grid
-        $grid->model()->when($filterType !== 'all', function ($q) use ($filterType) {
-            $q->where('emoji_category_id', $filterType);
-        });
+        if ($filterType !== 'all' && $filterType) {
+            $grid->model()->where('emoji_category_id', $filterType);
+        }
 
         // Columns
         $grid->id(__('ID'));
         $grid->name(__('name'));
         $grid->column('name_en', __('name_en'));
-        $grid->column('emoji', trans('emoji'))->display(function ($path) {
+         $grid->column('emoji', trans('emoji'))->display(function ($path) {
             $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+             return handleShowImageWithTypes($this->id, $url, 50, 50);
+         });
         $grid->column('enable', trans('enable'))->switch(Common::getSwitchStates());
 
-        $this->extendGrid($grid);
+        // $this->extendGrid($grid);
 
         $grid->disableExport();
         $grid->disableCreateButton();
@@ -152,29 +160,41 @@ class EmojiController extends MainController
             });
         }
 
-        Admin::style("
-            .rtl .column-emoji .rtlSvga{
-                direction: ltr;
+         Admin::style("
+             .rtl .column-emoji .rtlSvga{
+                 direction: ltr;
+             }
+         ");
+         // Optional: remove table-responsive for large screens
+            Admin::script("
+                if (window.innerWidth >= 1024) {
+                    $('.table-responsive').removeClass('table-responsive');
             }
-        ");
-        // Optional: remove table-responsive for large screens
-        Admin::script("
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
-        }
-    ");
+         ");
+        
         $permission    = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
-            $model = $actions->row;
+            try {
+                $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new MoveEmojiCategoryAction());
+                if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))) {
+                    $actions->add(new MoveEmojiCategoryAction());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController actions error: ' . $e->getMessage());
             }
         });
 
+   
         $grid->batchActions(function ($batch) {
-            $batch->disableDelete();
-            $batch->add(new MoveGroupEmoji());
+            try {
+                $batch->disableDelete();
+                if (class_exists(MoveGroupEmoji::class)) {
+                    $batch->add(new MoveGroupEmoji());
+                }
+            } catch (\Exception $e) {
+                \Log::error('EmojiController batchActions error: ' . $e->getMessage());
+            }
         });
 
         return $grid;

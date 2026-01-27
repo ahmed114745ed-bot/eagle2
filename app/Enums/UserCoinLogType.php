@@ -20,6 +20,7 @@ enum UserCoinLogType: string
     case BACKGROUND_IMAGES = 'background_images';
     case DAILY_GIFT = 'daily_gift';
     case PK = 'pk_event';
+    case ROOM_LEVEL = 'room_level';
     case WEEKLY_STAR = 'weekly_star';
     case CHARGE_EVENT = 'charge_event';
     case LUCK_BOX = 'lucky_box';
@@ -134,6 +135,12 @@ enum UserCoinLogType: string
             ],
             self::PK => [
                 'sub_type' => 'pk_events',
+                'item_name' => 'rewards',
+                'queue_job' => null,
+            ],
+
+            self::ROOM_LEVEL => [
+                'sub_type' => 'room_levels',
                 'item_name' => 'rewards',
                 'queue_job' => null,
             ],

@@ -136,7 +136,7 @@ class MomentViewerController extends MainController
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error loading moments: ' . $e->getMessage());
+            //\Log::error('Error loading moments: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error loading moments: ' . $e->getMessage()

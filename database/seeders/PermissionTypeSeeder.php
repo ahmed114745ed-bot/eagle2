@@ -537,7 +537,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
-             [
+            [
                 'name' => 'rewards',
                 'sort' => 17,
                 'types' => [
@@ -547,11 +547,11 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'super-package-reward', 'except' => ['show'], 'additional' => ['dedicate-switch'], 'types' => [
                         PermissionType::ADMIN->value => ['dedicate-switch', 'browse', 'create', 'edit', 'delete'],
                     ],],
-                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete','show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value =>['dedicate-switch', 'browse'],
+                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse'],
                     ],],
-                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete','show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => [ 'browse', ],
+                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse',],
                     ],],
                 ],
             ],
@@ -751,6 +751,9 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit'],
+                    ],],
+                    ['key' => 'room-level-history', 'except' => ['edit', 'delete', 'show', 'create'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
                     ],],
                 ],
             ],
@@ -1042,6 +1045,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'reward-level-interval', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+
                 ],
             ],
             [

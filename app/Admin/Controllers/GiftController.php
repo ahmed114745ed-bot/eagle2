@@ -8,21 +8,22 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\LuckyGift;
-//use Encore\Admin\Admin;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use App\Models\GiftCategory;
-use Encore\Admin\Layout\Row;
+use Illuminate\Support\MessageBag;
 use App\Admin\Forms\TabsFrom;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
 use App\Admin\Actions\MoveGiftCategory;
-
+use Illuminate\Validation\ValidationException;
 use App\Admin\Actions\Grid\MoveGroupsGifts;
 use App\Models\Setting;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
+use App\Admin\Services\FileService;
 
 class GiftController extends MainController
 {
@@ -105,7 +106,7 @@ class GiftController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Gift);
-       
+
         $filterType = request('filter', 'all');
         $category  = [];
         if (request('filter') != 'all') {
@@ -118,10 +119,10 @@ class GiftController extends MainController
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
             // ->orderByDesc('enable')   // 1️⃣ enabled first
             // ->orderBy('sort', 'asc');
-        ->orderBy('use_count', 'desc')
-        ->orderBy('type')
-        ->orderByRaw('ISNULL(`sort`), `sort`')
-        ->orderBy('price');
+            ->orderBy('use_count', 'desc')
+            ->orderBy('type')
+            ->orderByRaw('ISNULL(`sort`), `sort`')
+            ->orderBy('price');
 
         $grid->paginate(20);
         $grid->header(function () use ($filterType) {
@@ -281,130 +282,52 @@ class GiftController extends MainController
 
 
 
-
-
-
-        //  $form->select('type', __('type'))->options(
-        // translate(TYPE_GIFT)
-        // )
-
-        //     ->when(6, function () use ($form) {
-
-        //         $type = old('type', $form->model()->type ?? null);
-        //         $form->number('luckyGift.win_probability', __('win probability'))
-        //             ->min(1)->max(100)
-        //             ->placeholder(__('Enter win probability'))
-        //             ->attribute(['id' => 'win_probability']);
-
-        //         $probabilityTimes1 = \Cache::get('probability_times_1', []);
-        //         $probabilityTimes2 = \Cache::get('probability_times_2', []);
-        //         $probabilityTimes3 = \Cache::get('probability_times_3', []);
-
-        //         $form->decimal('luckyGift.min_percentag', __('min percentage') . ' (%)')
-        //             ->help('<span id="min_percent_display">' . '[' . implode(', ', $probabilityTimes1) . '] - ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
-
-        //         $form->decimal('luckyGift.mid_percentag', __('mid percentage') . ' (%)')
-        //             ->help('<span id="mid_percent_display">' . '[' . implode(', ', $probabilityTimes2) . ' ]- ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
-
-        //         $form->decimal('luckyGift.max_percentag', __('max percentage') . ' (%)')
-        //             ->help('<span id="max_percent_display">' . '[' . implode(', ', $probabilityTimes3) . '] - ' . __('scope for multiplies') .  '</span>')
-        //             ->rules('min:0|max:100')
-        //             ->default(0)
-        //             ->required();
-        //         if ($type == 6 || !$form->isEditing()) {
-
-        //             $form->html(<<<'HTML'
-        //             <script>
-
-        //                 (function () {
-        //                     const fields = ['min_percentag', 'mid_percentag', 'max_percentag'];
-
-        //                     function getVal(field) {
-        //                         return parseFloat($(`input[name="luckyGift[${field}]"]`).val()) || 0;
-        //                     }
-
-        //                     function setVal(field, val) {
-        //                         val = Math.max(0, Math.min(100, val));
-        //                         $(`input[name="luckyGift[${field}]"]`).val(val.toFixed(2));
-        //                     }
-
-        //                     function updateDisplays() {
-        //                         // $('#min_percent_display').text('🔹 النسبة الحالية: ' + getVal('min_percentag') + '%');
-        //                         // $('#mid_percent_display').text('🔸 النسبة الحالية: ' + getVal('mid_percentag') + '%');
-        //                         // $('#max_percent_display').text('🟣 النسبة الحالية: ' + getVal('max_percentag') + '%');
-        //                     }
-
-        //                     function enforceLimit(changed) {
-        //                         const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
-        //                         if (total > 100) {
-        //                             let current = getVal(changed);
-        //                             let overflow = total - 100;
-        //                             setVal(changed, current - overflow);
-        //                         }
-        //                     }
-        //                     window.percent_error_message = ' . json_encode(trans('admin.percent_error')) . ';
-
-        //                     function checkBeforeSubmit(e) {
-        //                         const total = getVal('min_percentag') + getVal('mid_percentag') + getVal('max_percentag');
-        //                         if (Math.round(total) !== 100) {
-        //                             alert(window.percent_error_message + total.toFixed(2) + '%');
-        //                             e.preventDefault();
-        //                             return false;
-        //                         }
-        //                     }
-
-        //                     $(document).ready(function () {
-        //                         fields.forEach(function(field) {
-        //                             $(document).on('input', `input[name="luckyGift[${field}]"]`, function () {
-        //                                 let val = parseFloat($(this).val()) || 0;
-        //                                 if (val < 0) val = 0;
-        //                                 if (val > 100) val = 100;
-        //                                 $(this).val(val.toFixed(2));
-
-        //                                 enforceLimit(field);
-        //                                 updateDisplays();
-        //                             });
-        //                         });
-
-        //                         $('form').on('submit', checkBeforeSubmit);
-        //                         updateDisplays();
-        //                     });
-        //                 })();
-        //                 </script>
-
-        //             HTML);
-        //         }
-        //     })
-        //     ->when(9, function () use ($form) {
-        //         $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
-        //     });
-
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
         //  $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
 
-        $form->file('img', __('img'));
-        $form->file('show_img', __('show_img'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        })->required();
+        $form->file('img', __('img')) ->name(function ($file) {
+                // الحصول على الامتداد الحقيقي مع fallback
+                $extension = $file->getClientOriginalExtension();
+                if (empty($extension)) {
+                    $extension = $file->guessExtension();
+                }
+                return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+            })
+            ->default('1.png');
+        // $form->file('show_img', __('show_img'))->name(function ($file) {
+        //     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        // })->required();
+
+        $form->file('show_img', __('show_img')) ->name(function ($file) {
+                // الحصول على الامتداد الحقيقي مع fallback
+                $extension = $file->getClientOriginalExtension();
+                if (empty($extension)) {
+                    $extension = $file->guessExtension();
+                }
+
+                // تطبيع الامتدادات
+                $extension = strtolower($extension);
+                if ($extension === 'svg') {
+                    return 'svga_' . Str::random(8) . '.svg';
+                }
+
+                return 'animation_' . Str::random(8) . '.' . $extension;
+            })->required();
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
                 'mp4' => __('mp4'),
                 'vap' => __('vap'),
+                'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
+
             ]
         )->required();
 
         $form->switch('music_gift', trans('music_gift'))->states(Common::getSwitchStatesGiftMucic());
-        
+
 
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
@@ -442,6 +365,57 @@ class GiftController extends MainController
             }
         });
 
+         $form->saving(function (Form $form) {
+                $hasShowImg = $form->show_img || $form->model()->show_img;
+                $img2 = $form->img;
+                $wareId = $form->model()->id;
+
+       
+
+                $hasImg2 = $img2 || $form->model()->img;
+
+                if (!$hasShowImg && !$hasImg2) {
+                    $error = new MessageBag([
+                        'title'   => 'Error',
+                        'message' => 'Please upload at least one image',
+                    ]);
+                    return back()->with(compact('error'));
+                }
+
+                // معالجة show_img
+                if ($form->img instanceof UploadedFile) {
+                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+
+                    // الحصول على الامتداد الحقيقي
+                    $originalExt = strtolower($form->img->getClientOriginalExtension());
+                    $guessedExt = strtolower($form->img->guessExtension());
+
+                    // إعطاء الأولوية للامتداد الأصلي
+                    $ext = !empty($originalExt) ? $originalExt : $guessedExt;
+
+               
+
+                    if (!in_array($ext, $allowedExtensions)) {
+                        throw ValidationException::withMessages([
+                            'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
+                        ]);
+                    }
+
+                    $form->image_type = $ext;
+                }
+
+                // معالجة img2 - الحل الرئيسي للمشكلة
+                if ($hasShowImg instanceof UploadedFile) {
+                    /** @var FileService $fileService*/
+                    $fileService = app( FileService::class);
+                    $ext = $fileService->getExtension($hasShowImg, $wareId, getFromService: true);
+
+                    // $form->input('detected_profile_frame_type', $ext);
+                    $form->image_type = $ext;
+                   
+                }
+            });
+
         // After saving, create or update LuckyGift
         $form->saved(function (Form $form) {
             $categoryId = $form->model()->gift_category_id;
@@ -469,7 +443,7 @@ class GiftController extends MainController
         if (!Admin::user()->can('*')) {
             Permission::check('browse-' . 'lucky-gift-setting');
         }
-        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins','host_lucky_gift'])->pluck('value', 'key')->toArray();
+        $config = Setting::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
         return $content->view('lucky_gift', compact('config'));
     }
 }
