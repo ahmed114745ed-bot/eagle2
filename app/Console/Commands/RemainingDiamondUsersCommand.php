@@ -76,9 +76,9 @@ class RemainingDiamondUsersCommand extends Command
                             continue;
                         }
                         $remainingDiamonds = RemainingDiamond::where('user_id', $user->id)
-                            ->where('month', $month)
-                            ->where('year', $year)
-                            ->first();
+                             ->whereMonth('created_at', $dt->month)
+                             ->whereYear('created_at', $dt->year)
+                             ->first();
 
                         if ($remainingDiamonds) {
                             continue;
