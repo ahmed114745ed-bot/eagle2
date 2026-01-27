@@ -26,20 +26,6 @@ use Utd\Achievements\Transformers\AchievementOneLevelsResource;
 
 class AchievementController extends Controller
 {
-
-    // public function __construct(private AchievementService $achievementService) { }
-
-    /**
-     * Display a listing of the resource.
-     * @return \Illuminate\Http\JsonResponse
-     */
-    // public function index()
-    // {
-    //     $user = Auth::user();
-    //     $data = $this->achievementService->show($user);
-    //     return Common::apiResponse(1, 'successfully', $data);
-    // }
-
     public function achivement_select(Request $request)
     {
         $user = $request->user();
@@ -59,9 +45,8 @@ class AchievementController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
-     * @return Renderable
+     * @param null $id
+     * @return \Illuminate\Http\JsonResponse
      */
     public function get_all_select($id = null)
     {
@@ -91,10 +76,8 @@ class AchievementController extends Controller
         return Common::apiResponse(1, 'successfully', AchievementResource::collection($achievements));
     }
 
-
     public function get_all($id = null)
     {
-
         if (isset($id) && ($id != 4)) {
             $achievements = Achievement::where('id', $id)->with([
                 'levels' => function ($query) {
@@ -125,7 +108,6 @@ class AchievementController extends Controller
             $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
                 $query->where('type', 'achievement');
             }])->get();
-
 
             $append = [
                 "achievement_id" => 1,
@@ -166,11 +148,6 @@ class AchievementController extends Controller
                 "target_type" => null,
             ]];
 
-                /*['weekly_star' => $weeklyStar,
-                  'pk_event' => $pkEvent,
-                  'charge_event' => $chargeEvent,
-
-                ]*/;
             return Common::apiResponse(1, 'successfully', $data);
         }
         $user = Auth::user();
@@ -179,34 +156,6 @@ class AchievementController extends Controller
         })->get();
         return Common::apiResponse(1, 'successfully', AchievementResource::collection($achievements));
     }
-
-    // public function get_details($id = null)
-    // {
-    //     $user=Auth::user();
-    //     if(isset($id)){
-    //         $achievements = Achievement::whereHas("userAchievments",function($q) use ($id){
-    //             $q->where("user_id",$id);
-    //         })-> with([
-    //             'levels' => function ($query) {
-    //                 $query->withCount([
-    //                     'achievementUsers as enable' => function ($query) {
-    //                         $query->where('user_id', auth()->id())
-    //                               ->where('is_enable', true);
-    //                     }
-    //                 ]);
-    //             },
-    //         ])->get();
-
-
-    //         return Common::apiResponse(1, 'successfully', AchievementOneLevelsResource::collection($achievements));
-    //     }
-
-    //     $achievements = Achievement::whereHas("userAchievments",function($q) use ($user){
-    //         $q->where("user_id",$user->id);
-    //     })-> get();
-    //     return Common::apiResponse(1, 'successfully', AchievementDetailResource::collection($achievements));
-
-    // }
 
     public function get_details($id = null)
     {

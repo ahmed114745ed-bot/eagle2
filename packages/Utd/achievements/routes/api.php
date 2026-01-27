@@ -17,10 +17,6 @@ use Utd\Achievements\Http\Controllers\AchievementLevelController;
 use Utd\Achievements\Services\AchievementLevelsService;
 
 Route::middleware(['auth:sanctum','appFeatureEnable:achievement' ,'update.last.seen'])->group(function () {
-//    Route::get('/test/achievement', function () {
-//        (new AchievementLevelsService())->setUserAchievementLevel(true);
-//        return response()->json('Success');
-//    });
     Route::prefix('achievement')->group(function () {
         Route::get('/{id}', [AchievementController::class, 'get_all']);
         Route::get('/', [AchievementController::class, 'get_all']);

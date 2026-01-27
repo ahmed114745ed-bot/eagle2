@@ -5,6 +5,7 @@ namespace Utd\Achievements\Http\Controllers;
 use App\Helpers\Common;
 use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Utd\Achievements\Services\UserAchievementService;
@@ -19,7 +20,7 @@ class AchievementLevelController extends Controller
     /**
      * Show the specified resource.
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {

@@ -27,12 +27,7 @@ class AchievementService implements AchievementContract
 
     public function show(User $user, int $page = 1)
     {
-        $userId = $user->id;
-        return Achievement::query()
-            /*->withExists(['userAchievement' => function($query) use($userId){
-                              $query->where('user_id', $userId)->where('is_achieve', true);
-                          }])*/
-            ->get();
+        return Achievement::query()->get();
     }
 
     public function all()
@@ -47,6 +42,9 @@ class AchievementService implements AchievementContract
 
     public function createAchievementLevel($request)
     {
+        $validImage = null;
+        $invalidImage = null;
+
         if ($request->hasFile('valid_image')) {
             $validImage = Common::upload('images', $request->file('valid_image'));
         }

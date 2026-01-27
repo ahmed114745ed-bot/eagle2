@@ -27,7 +27,6 @@ class UserAchievementService implements UserAchievementContract
             ->where('year', now($timezone)->year)
             ->first();
 
-
         if ($userAchievement == null) {
             $totalTarget = UserAchievement::query()
                 ->where('gift_achievement_id', null)
@@ -175,7 +174,6 @@ class UserAchievementService implements UserAchievementContract
         $usersAchievements = $usersAchievements->map(function ($item) use ($levels) {
             return ['image' => $levels->where('id', $item->achievement_level_id)?->value('valid_image') ?? $item->custom_image];
         });
-
 
         return $usersAchievements;
     }
