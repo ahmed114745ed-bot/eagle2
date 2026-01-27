@@ -254,9 +254,10 @@
                                 id="lucky_gift_coins"
                                 name="lucky_gift_coins"
                                 min="1"
-                                value="{{ $config['lucky_gift_coins'] ?? 0 }}"
+                                value="{{ (isset($config['lucky_gift_coins']) && $config['lucky_gift_coins'] != 0) ? $config['lucky_gift_coins'] : 2000 }}"
                                 class="form-control"
                                 placeholder="{{ __('Enter the lucky gift coins value') }}" required />
+                                 <small class="form-text text-muted">{{ __('Play coin sound inside the room when the win amount is greater than or equal to the added value.') }}</small>
 
 
                         </div>

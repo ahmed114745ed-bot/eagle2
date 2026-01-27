@@ -74,6 +74,7 @@ class WalletService
 
             } catch (Exception $e) {
                 DB::rollBack();
+                
                 return ['status' => 'error', 'message' => $e->getMessage()];
             }
     

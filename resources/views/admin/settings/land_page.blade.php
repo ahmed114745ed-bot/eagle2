@@ -18,7 +18,7 @@
 
         <div class="tab-content">
             <form action="{{ route('admin.app.settings.update') }}" method="POST" enctype="multipart/form-data"
-                  id="landingSettingsForm">
+                  id="landingSettingsForm" class="settings-form">
                 @csrf
                 <input type="hidden" name="current_tab" value="">
                 <div class="tab-pane show active" id="general" role="tabpanel" aria-labelledby="general-tab">
@@ -26,14 +26,18 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-6">
-                            <label>{{ __('About Us Link') }}</label>
-                            <input type="url" name="about_us_link"
-                                   value="{{ $settings['about_us_link'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('About Us Link') }}</label>
+                                <input type="url" name="about_us_link"
+                                       value="{{ $settings['about_us_link'] ?? '' }}" class="form-control">
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label>{{ __('Gallery App Link') }}</label>
-                            <input type="url" name="gallery_app_link"
-                                   value="{{ $settings['gallery_app_link'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Gallery App Link') }}</label>
+                                <input type="url" name="gallery_app_link"
+                                       value="{{ $settings['gallery_app_link'] ?? '' }}" class="form-control">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -43,20 +47,26 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-4">
-                            <label>{{ __('Number of Users') }}</label>
-                            <input type="number" name="landing_users_count"
-                                   value="{{ $settings['landing_users_count'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Number of Users') }}</label>
+                                <input type="number" name="landing_users_count"
+                                       value="{{ $settings['landing_users_count'] ?? '' }}" class="form-control" min="0">
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label>{{ __('Number of Countries') }}</label>
-                            <input type="number" name="landing_countries_count"
-                                   value="{{ $settings['landing_countries_count'] ?? '' }}"
-                                   class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Number of Countries') }}</label>
+                                <input type="number" name="landing_countries_count"
+                                       value="{{ $settings['landing_countries_count'] ?? '' }}"
+                                       class="form-control" min="0">
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label>{{ __('Number of Live Streams') }}</label>
-                            <input type="number" name="landing_live_count"
-                                   value="{{ $settings['landing_live_count'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Number of Live Streams') }}</label>
+                                <input type="number" name="landing_live_count"
+                                       value="{{ $settings['landing_live_count'] ?? '' }}" class="form-control" min="0">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -66,25 +76,33 @@
                     <hr>
                     <div class="row">
                         <div class="col-md-4">
-                            <label>{{ __('Facebook Link') }}</label>
-                            <input type="url" name="facebook_link"
-                                   value="{{ $settings['facebook_link'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Facebook Link') }}</label>
+                                <input type="url" name="facebook_link"
+                                       value="{{ $settings['facebook_link'] ?? '' }}" class="form-control">
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label>{{ __('Twitter Link') }}</label>
-                            <input type="url" name="twitter_link" value="{{ $settings['twitter_link'] ?? '' }}"
-                                   class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('Twitter Link') }}</label>
+                                <input type="url" name="twitter_link" value="{{ $settings['twitter_link'] ?? '' }}"
+                                       class="form-control">
+                            </div>
                         </div>
                         <div class="col-md-4">
-                            <label>{{ __('WhatsApp Link') }}</label>
-                            <input type="url" name="whatsapp_link"
-                                   value="{{ $settings['whatsapp_link'] ?? '' }}" class="form-control">
+                            <div class="form-group">
+                                <label>{{ __('WhatsApp Link') }}</label>
+                                <input type="url" name="whatsapp_link"
+                                       value="{{ $settings['whatsapp_link'] ?? '' }}" class="form-control">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    <button type="submit" class="btn btn-primary btn-save">
+                        <i class="fas fa-save"></i> {{ __('Save') }}
+                    </button>
                 </div>
             </form>
         </div>

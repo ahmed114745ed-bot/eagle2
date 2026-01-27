@@ -99,11 +99,6 @@ class MonthlyRankingCommand extends Command
         $timezone = getTimezone();
         $start = Carbon::now($timezone)->subMonth()->startOfMonth();
         $end   = Carbon::now($timezone)->subMonth()->endOfMonth();
-        Log::info("GiftRanking date range month", [
-
-            'start' => $start->toDateTimeString(),
-            'end'   => $end->toDateTimeString(),
-        ]);
 
         $query = User::query()
             // Join charges of this week
@@ -194,14 +189,8 @@ class MonthlyRankingCommand extends Command
         // Convert to array if it's a Collection
         $userIds = is_array($userIds) ? $userIds : $userIds->toArray();
 
-        // Log the user IDs being notified
-        Log::info('Dispatching notifications to user IDs', [
-            'user_ids' => $userIds,
-            'range'    => ['min' => $range->min, 'max' => $range->max ?? $range->min]
-        ]);
-
         if (empty($userIds)) {
-            Log::warning('No user IDs found for notification');
+           
             return;
         }
 
@@ -212,11 +201,6 @@ class MonthlyRankingCommand extends Command
             ->whereNotNull('notification_id')
             ->pluck('notification_id')
             ->toArray();
-
-        // Log the tokens that will receive notifications
-        Log::info('Notification tokens', [
-            'tokens' => $tokens
-        ]);
 
         $image = $range->generate_image;
         $icon  = getImagePath($image);

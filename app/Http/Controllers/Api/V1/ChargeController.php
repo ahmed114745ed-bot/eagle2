@@ -96,8 +96,8 @@ class ChargeController extends Controller
         $from = $request->user();
         $isRoomTarget = false;
         $to = User::find($toId);
+        if (!$to) return Common::apiResponse(0, __('user not found'), 400);
 
-        if (!$to) return Common::apiResponse(0, 'User Not Found', 400);
 
         if ($from->transfer_salary == 1) {
             return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
@@ -109,22 +109,18 @@ class ChargeController extends Controller
             return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
         }
 
-        if (!$to) Common::apiResponse(0, __('user not found'), 404);
-
-       $usd = floatval($request->usd);
+        $usd = floatval($request->usd);
 
         if ($usd <= 0) {
             return Common::apiResponse(0, 'This value is not allowed', 422);
         }
 
-        if (!$usd || !$to) {
-            return Common::apiResponse(0, 'not found', 404);
-        }
+        if (!$usd)  return Common::apiResponse(0, 'not found', 404);
+        
         $rate = Common::getCoinsValue('user_coins');
 
-        if (!$rate) {
-            return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
-        }
+        if (!$rate)  return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
+        
         $coins = $usd * $rate;
 
         $totalSalary = $from->salary;
@@ -320,7 +316,6 @@ class ChargeController extends Controller
 
         $count = $request->amount;
         $userUuid = $request->id;
-        log::info('user uuid' . $userUuid);
         // if ($user->transfer_salary == 1) {
         //     return Common::apiResponse(0, __('api.freez_charge'), 404);
         // }

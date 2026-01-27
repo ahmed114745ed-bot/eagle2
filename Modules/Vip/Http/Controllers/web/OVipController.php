@@ -2,27 +2,28 @@
 
 namespace Modules\Vip\Http\Controllers\web;
 
-use Illuminate\Validation\Rule;
-use App\Admin\Controllers\MainController;
-use App\Models\Config;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Models\Config;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Vip\Entities\VipPrivilege;
+use App\Helpers\Common;
+use Illuminate\Support\Str;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
+use Modules\Vip\Entities\OVip;
 use App\Selectables\Privileges;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Validation\Rule;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
-use Encore\Admin\Auth\Permission;
-use Illuminate\Support\Str;
 use Modules\Vip\Services\VipService;
+use Modules\Vip\Entities\VipPrivilege;
+use Illuminate\Support\Facades\Session;
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
 
 
 class OVipController extends MainController
@@ -78,6 +79,31 @@ class OVipController extends MainController
             ->body($this->form()->edit($id)));
     }
 
+    public function editBackgroundImage($id, Content $content)
+    {
+        $oVip = OVip::findOrFail($id);
+        return parent::edit($id, $content
+            ->title(trans('vip'))
+            ->body($this->backgroundImage($oVip)->edit($id)));
+    }
+
+    public function updateBackgroundImage($ovip_id)
+    {
+        $oVip = OVip::findOrFail($ovip_id);
+
+        if (request()->hasFile('background_img')) {
+
+            $image = Common::upload('images', request()->file('background_img'));
+
+            $oVip->background_img = $image;
+            $oVip->save();
+        }
+
+        admin_toastr(__('Saved successfully'), 'success');
+
+        return redirect(admin_url('ovip'));
+    }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -129,6 +155,16 @@ class OVipController extends MainController
                 $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
 
                 $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
+                return $button1;
+            });
+        }
+
+        if (Admin::user()->can('edit-' . 'vip-gift') || Admin::user()->can('*')) {
+            $grid->column(__('Theme'))->display(function () {
+
+                $url1 = url('admin/ovip-theme/' . $this->id);
+
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('Theme') . "</a>";
                 return $button1;
             });
         }
@@ -205,6 +241,35 @@ class OVipController extends MainController
 
         $form->saving(function (Form $form) {
             app(VipService::class)->handleSaving($form);
+        });
+
+        return $form;
+    }
+
+
+
+    protected function backgroundImage($model = null)
+    {
+        if ($model === null) {
+            $model = new OVip;
+        }
+
+        $form = new Form($model);
+
+        // ✅ IMPORTANT: SET FORM ACTION HERE
+        $form->setAction(admin_url('ovip-theme/' . $model->id));
+
+        // Disable default tools (view, delete, etc.)
+        $this->disableFormTools($form);
+
+        // Background image upload
+        $form->image('background_img', trans('background'))
+            ->uniqueName();
+
+        // After save
+        $form->saved(function (Form $form) {
+            admin_toastr(__('Background image updated successfully'), 'success');
+            return redirect(admin_url('ovip'));
         });
 
         return $form;

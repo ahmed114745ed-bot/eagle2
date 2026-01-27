@@ -18,15 +18,15 @@ class PaySalariesAction extends Action
     public $options = [];
     public $id;
     public $type;
-    public $salary;
+  //  public $salary;
 
     protected $selector = '.salary_pay_action';
 
-    public function __construct($id = 0, $type = 'user',$salary = 0)
+    public function __construct($id = 0, $type = 'user',)
     {
         $this->id = $id;
         $this->type = $type;
-        $this->salary = $salary;
+       // $this->salary = $salary;
         $this->name = __('cashing');
         $this->options = ['agency' => __('agency'), 'agency_users' => __('agency users')];
         parent::__construct();
@@ -115,7 +115,7 @@ class PaySalariesAction extends Action
     public function form()
     {
         $this->hidden('id', __('id'))->attribute('id', 'newvid');
-        $this->hidden('salary', __('salary'))->value($this->salary);
+       // $this->hidden('salary', __('salary'))->value($this->salary);
         if ($this->type == 'user') {
             $this->hidden('type', 'type')->value('user');
         } else {

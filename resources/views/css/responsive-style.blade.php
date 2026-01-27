@@ -11,7 +11,6 @@
         .wrapper {
             /* min-width: max-content; */
         }
-
     }
 
     @media (max-width: 1200px) {
@@ -27,6 +26,10 @@
     @media (max-width: 992px) {
         .app-class {
             margin-top: 10% !important;
+        }
+
+        html.ltr .dropdown-menu {
+            right: 10%;
         }
 
         .content {
@@ -50,6 +53,10 @@
     @media (max-width: 768px) {
         .rtl .dropdown-menu {
             left: 12%;
+        }
+
+        html.ltr .dropdown-menu {
+            right: 14%;
         }
 
         .main-sidebar, .left-side {
@@ -246,6 +253,10 @@
     @media (max-width: 576px) {
         .main-sidebar, .left-side {
             padding-top: 20% !important;
+        }
+
+        html.ltr .dropdown-menu {
+            right: 10%;
         }
 
         .box-footer {

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Modules\Form\Database\Seeders\CustomFieldWidgetSeeder;
 
 class DatabaseSeeder extends Seeder
 {

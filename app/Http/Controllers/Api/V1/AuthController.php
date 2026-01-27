@@ -44,7 +44,7 @@ class AuthController extends Controller
             [$user, $token] = $this->authService->registration($request);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         }
 
         $user->auth_token = $token;
@@ -105,10 +105,10 @@ class AuthController extends Controller
             [$user, $token] = $this->authService->loginWithPassword($fields);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         }
         if (!$this->canLogin($user)) {
-            return Common::apiResponse(false, 'you are blocked', [], 408);
+            return Common::apiResponse(false, 'you are blocked', [], 422);
         }
         try {
 
@@ -138,38 +138,34 @@ class AuthController extends Controller
     {
         try {
             [$user, $token, $resource] = $this->authService->loginWithGoogle($data);
-            // if ($resource != null) {
-            //     Common::apiResponse(false, 'email already taken', $resource, 405);
-            // }
-        } catch (\Exception $exception) {
-            return Common::apiResponse(0, $exception->getMessage(), null, 422);
-        }
-
-        if (!$this->canLogin($user)) {
-            return Common::apiResponse(false, 'you are blocked', [], 422);
-        }
-        $user->auth_token = $token;
-        try {
-
-            if ($user->device_token) {
-                event(new DeviceTokenSent($user->id, $user->device_token));
+            if (!$this->canLogin($user)) {
+                return Common::apiResponse(false, 'you are blocked', [], 422);
             }
-            // event(new DeviceTokenSent($user->id, $user->device_token));
-        } catch (\Exception $e) {
+            $user->auth_token = $token;
+            try {
+                if ($user->device_token) {
+                    event(new DeviceTokenSent($user->id, $user->device_token));
+                }
+            } catch (\Throwable $e) {
+                // Ignore event errors
+            }
+            try {
+                AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+            } catch (\Throwable $e) {
+                // Ignore device link errors
+            }
+            return Common::apiResponse(
+                true,
+                __('api_responses.logged'),
+                [
+                    'id'            => $user->id,
+                    'is_first'      => (bool) ($user->is_points_first ?? false),
+                    'auth_token'    => $user->auth_token
+                ]
+            );
+        } catch (\Throwable $exception) {
+            return Common::apiResponse(false, $exception->getMessage(), [], 422);
         }
-
-        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
-
-
-        return Common::apiResponse(
-            true,
-            __('api_responses.logged'),
-            [
-                'id'            => $user->id,
-                'is_first'      => (bool) ($user->is_points_first ?? false), //@(bool)$user->is_points_first,  
-                'auth_token'    => $user->auth_token
-            ]
-        );
     }
 
 
@@ -180,7 +176,7 @@ class AuthController extends Controller
     // {
     //     $fields = $data;
     //     $unique_id = $data['apple_id'];
-    //     if (!$unique_id)  return Common::apiResponse(0, 'missing app id', null, 400);
+    //     if (!$unique_id)  return Common::apiResponse(0, 'missing app id', null, 422);
     //     $teamId = '4WZ4BZDW8K'; // Use the correct environment variable name
     //     $keyId =  'BKD3JLV6HY'; //"PAN9HH2A6X"/*config('apple.apple_key_id')*/; // Use the correct environment variable name
     //     $clientId = 'com.moon.light.app'; //'com.tikkchat.app'; // Use the correct environment variable name
@@ -212,7 +208,7 @@ class AuthController extends Controller
     //             $claims = explode('.', $res['id_token'])[1];
     //             $data = json_decode(base64_decode($claims), true);
     //         } else {
-    //             return      Common::apiResponse(0, 'data not full', null, 400);
+    //             return      Common::apiResponse(0, 'data not full', null, 422);
     //         }
     //     } catch (\Exception $e) {
     //         return response()->json(['error' => 'wrong credential.', 'message' => $e->getMessage()], 403);
@@ -222,7 +218,7 @@ class AuthController extends Controller
     //         [$user, $token] = $this->authService->loginWithApple($data, $unique_id);
     //     } catch (\Exception $exception) {
 
-    //         return Common::apiResponse(0, $exception->getMessage(), null, 400);
+    //         return Common::apiResponse(0, $exception->getMessage(), null, 422);
     //     }
     //     // if (!$this->canLogin($user)) {
     //     //     return Common::apiResponse(false, 'you are blocked', [], 408);
@@ -238,7 +234,7 @@ class AuthController extends Controller
     protected function loginWithApple($data)
     {
         if (empty($data['id_token'])) {
-            return Common::apiResponse(false, 'missing id_token', null, 400);
+            return Common::apiResponse(false, 'missing id_token', null, 422);
         }
 
         $appleKeys = Http::get('https://appleid.apple.com/auth/keys')->json();
@@ -249,7 +245,7 @@ class AuthController extends Controller
                 JWK::parseKeySet($appleKeys)
             );
         } catch (\Exception $e) {
-            return Common::apiResponse(false, 'invalid apple token', null, 401);
+            return Common::apiResponse(false, 'invalid apple token', null, 422);
         }
 
         $appleUserId = $decoded->sub;
@@ -270,15 +266,38 @@ class AuthController extends Controller
                 $appleUserId
             );
         } catch (\Exception $ex) {
-            return Common::apiResponse(false, $ex->getMessage(), null, 400);
+            return Common::apiResponse(false, $ex->getMessage(), null, 422);
+        }
+
+        if (!$this->canLogin($user)) {
+            return Common::apiResponse(false, 'you are blocked', [], 422);
         }
 
         $user->auth_token = $token;
 
-        event(new DeviceTokenSent($user->id, $user->device_token));
-        AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        try {
+            if ($user->device_token) {
+                event(new DeviceTokenSent($user->id, $user->device_token));
+            }
+        } catch (\Throwable $e) {
+            // Ignore event errors
+        }
 
-        return Common::apiResponse(true, '', new MyDataResource($user), 200);
+        try {
+            AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);
+        } catch (\Throwable $e) {
+            // Ignore device link errors
+        }
+
+        return Common::apiResponse(
+            true,
+            __('api_responses.logged'),
+            [
+                'id'            => $user->id,
+                'is_first'      => (bool) ($user->is_points_first ?? false),
+                'auth_token'    => $user->auth_token
+            ]
+        );
     }
 
 
@@ -290,7 +309,7 @@ class AuthController extends Controller
             [$user, $token] = $this->authService->loginWithHuawei($data);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         }
         $user->auth_token = $token;
         event(new DeviceTokenSent($user->id, $user->device_token));
@@ -309,12 +328,12 @@ class AuthController extends Controller
 
     public function recallAccount(Request $request)
     {
-        if (!$request['email'] && !$request['google_id']) return Common::apiResponse(false, 'messing parameter', 400);
+        if (!$request['email'] && !$request['google_id']) return Common::apiResponse(false, 'messing parameter', 422);
         try {
             [$user, $token] = $this->authService->recallAccount($request);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return Common::apiResponse(0, $exception->getMessage(), null, 422);
         }
         $user->auth_token = $token;
         AccountHelper::linkLoginAccountWithDevice($user->id, $user->device_token);

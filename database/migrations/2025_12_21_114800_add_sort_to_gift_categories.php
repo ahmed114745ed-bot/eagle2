@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('gift_categories', function (Blueprint $table) {
-            $table->bigInteger('sort')->default(0);
-        });
+        if (!Schema::hasColumn('gift_categories', 'sort')) {
+            Schema::table('gift_categories', function (Blueprint $table) {
+                $table->bigInteger('sort')->default(0);
+            });
+        }
     }
 
     /**

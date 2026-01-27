@@ -512,6 +512,22 @@ class Common
     public static function uploadProfileUser($folder, $file, $id, $count)
     {
         $extension = $file->getClientOriginalExtension();
+        if (!$extension) {
+            $mime = $file->getMimeType();
+
+            $extension = match ($mime) {
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+                default      => 'jpg',
+            };
+
+            Log::warning('File extension missing, fallback used', [
+                'mime' => $mime,
+                'used_extension' => $extension,
+            ]);
+        }
         $fileName = $id . '_' . $count . '.' . $extension;
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
         return $folder . DIRECTORY_SEPARATOR . $fileName;
@@ -1073,6 +1089,130 @@ class Common
         return $result;
     }
 
+    /**
+     * Send Firebase notification for room sharing with image support
+     */
+    public static function send_firebase_notification_with_room_image($tokens, $title, $body, $roomImage = '', $roomId = null, $data = [], $messageType = 'share-room', $user = null)
+    {
+        try {
+            if ($tokens == null) {
+                return false;
+            }
+
+            $api_access_key = self::getGoogleAccessToken();
+            if (!$api_access_key) {
+                return false;
+            }
+
+            $isGroup = false;
+            $userData = [];
+            $key = time();
+
+            if (gettype($tokens) == 'string') {
+                $tokens = [$tokens];
+            }
+
+            $notification = [
+                'title' => $title,
+                'body' => $body,
+            ];
+
+            if (count($tokens) == 1) {
+                $token = $tokens[0];
+            } else {
+                if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
+
+
+
+                SendFirebaseNotificationJob::dispatch(
+                    tokens: $tokens,
+                    title: $title,
+                    body: $body,
+                    data: array_merge($data, [
+                        'room_id' => $roomId,
+                        'room_image' => $roomImage,
+                        'image' => $roomImage
+                    ]),
+                    messageType: $messageType,
+                    user: $user,
+                )->onQueue('notification_heavy');
+
+                return true;
+            }
+
+            if ($user) {
+                $userData = [
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'uuid' => $user->uuid,
+                    'has_color_name' => self::hasInPack($user->id, 18, true),
+                    'image' => $user->profile->avatar,
+                ];
+            }
+
+            // Merge room data with existing data
+            $mergedData = array_merge($data, [
+                'room_id' => $roomId,
+                'room_image' => $roomImage
+            ]);
+
+            $payload = [
+                'token' => $token,
+                'notification' => $notification,
+                'data' => [
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                    'message-type' => json_encode($messageType ?? ''),
+                    'data' => json_encode($mergedData),
+                ],
+            ];
+
+            if (isset($userData) && is_array($userData)) {
+                $payload['data']['user'] = json_encode($userData);
+            }
+
+            // Add room image to notification
+            if ($roomImage && !empty($roomImage)) {
+                $payload['notification']['image'] = $roomImage;
+            } else {
+                $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
+                Log::warning('send_firebase_notification_with_room_image: Using default image', [
+                    'room_image_was' => $roomImage
+                ]);
+            }
+
+            $headers = [
+                'Authorization' => 'Bearer ' . $api_access_key,
+                'Content-Type' => 'application/json',
+            ];
+
+            $projectId = env('FIREBASE_PROJECT_NAME');
+
+            $result = Http::withHeaders($headers)->post("https://fcm.googleapis.com/v1/projects/{$projectId}/messages:send", [
+                'message' => $payload
+            ]);
+
+            $resultDecoded = json_decode($result->body());
+
+            if ($result->successful()) {
+            } else {
+            }
+
+            // Remove group with $key if is group
+            if ($resultDecoded && $isGroup) {
+                self::removeGroupName($key, $token, $tokens, $api_access_key);
+            }
+
+            return $resultDecoded;
+        } catch (\Throwable $e) {
+            Log::error('send_firebase_notification_with_room_image: Exception occurred', [
+                'room_id' => $roomId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return false;
+        }
+    }
+
 
 
 
@@ -1463,7 +1603,7 @@ class Common
             }
             return $promises;
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
+            //  Log::error($e->getMessage());
         }
     }
 
@@ -1511,12 +1651,7 @@ class Common
     }
     public static function zegoData($key = null)
     {
-        Log::info(111111);
         $zegoClientId =  config('app.zego_client_id');
-        Log::info('secret key', [
-            'env client zego id' => $zegoClientId,
-        ]);
-
         $zego_token = Common::getConf('zego_token');
         $sounZego = Common::getConf('sound_library');
         $vedioZego = Common::getConf('video_library');
@@ -1525,14 +1660,8 @@ class Common
         $zego_app_id = Common::getConfig('zego_app_id');
         $app_sign = Common::getConfig('app_sign');
 
-        Log::info('ZEGO | zego config values', [
-            'zego_token' => $zego_token,
-            'sounZego' => $sounZego,
-            'vedioZego' => $vedioZego,
-        ]);
 
         if ((!$zego_token && !$zegoClientId) && ($sounZego === '3' && $vedioZego === '3')) {
-            Log::info(33333);
             $zegoData = [
                 'zego_app_id'        =>  '',
                 'zego_server_secret' =>  '',
@@ -1550,27 +1679,16 @@ class Common
             // dd($zegoData);
         } else {
             $data = decryptToArray($zego_token, $zegoClientId);
-            Log::info(66666666666);
             $zegoData = [
                 'zego_app_id'        => $data['app_id'] ?? '',
                 'zego_server_secret' => $data['server_secret'] ?? '',
                 'zego_app_sign'      => $data['app_sign'] ?? '',
             ];
-            Log::info('ZEGO | mapped zego data', [
-                'zegoData' => $zegoData,
-            ]);
-            Log::info('secret key', [
-                'zego_token' => $zegoClientId,
-            ]);
         }
 
 
         // If a key is provided, return that specific value
         if ($key) {
-            Log::info('ZEGO | keyyyyy', [
-                'zegoData' => $zegoData[$key],
-                'keyy' => $key,
-            ]);
             return $zegoData[$key] ?? null;
         }
 

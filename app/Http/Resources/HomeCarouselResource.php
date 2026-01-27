@@ -58,7 +58,9 @@ class HomeCarouselResource extends JsonResource
     {
         $roomPass  = $this->room->room_pass ?? '';
         $ownerRoom = @$this->user?->ownerAudioRoom;
-        $pks       = $ownerRoom ? @$ownerRoom->pks()->latest('created_at')->limit(2)->get() : null;
+        //  $pks       = $ownerRoom ? @$ownerRoom->pks()->latest('created_at')->limit(2)->get() : null;
+        $pks = $ownerRoom?->pks ?? collect();
+
 
         [$avatar, $cpAvatar, $nameOne, $nameTwo] = Common::switch_events($this->event_type);
 
@@ -78,13 +80,12 @@ class HomeCarouselResource extends JsonResource
             'display_live' => @$this->display_live,
             'display_country' => @$this->display_country,
 
-        
+
         ];
 
-            if (\Str::contains($this->display_at, 'country')) {
-                $data['countries'] = $this->countriesLite()->get();
-                    
-            }        
+        if (\Str::contains($this->display_at, 'country')) {
+            $data['countries'] = $this->countriesLite;
+        }
         if ($this->event_type === 'weekly_cp') {
             $data += [
                 'cp_winner_name_one' => $nameOne,

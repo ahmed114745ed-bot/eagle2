@@ -149,7 +149,14 @@ if (!function_exists('decryptToArray')) {
     {
         $iv = substr($key, 0, 16);
         $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, 0, $iv);
-        return json_decode($decrypted, true);
+        
+        if ($decrypted === false) {
+            return [];
+        }
+        
+        $result = json_decode($decrypted, true);
+        
+        return is_array($result) ? $result : [];
     }
 }
 
@@ -532,28 +539,34 @@ if (!function_exists('adjustColor')) {
 if (!function_exists('getPusherConfig')) {
     function getPusherConfig()
     {
-        return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 60 * 24, function () {
-            //            if (!isSubdomain()) {
-            //                return null;
-            //            }
-
-            $Keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
-            $configs = \App\Models\Config::whereIn('name', $Keys)->pluck('value', 'name');
-
-            $appId = !empty($configs->get('pusher_app_id')) ? $configs->get('pusher_app_id') : Config::get('broadcasting.pusher-default.app_id');
-            $appKey = !empty($configs->get('pusher_app_key')) ? $configs->get('pusher_app_key') : Config::get('broadcasting.pusher-default.key');
-            $appSecret = !empty($configs->get('pusher_app_secret')) ? $configs->get('pusher_app_secret') : Config::get('broadcasting.pusher-default.secret');
-            $appCluster = !empty($configs->get('pusher_app_cluster')) ? $configs->get('pusher_app_cluster') : Config::get('broadcasting.pusher-default.options.cluster');
-
+        // return \Illuminate\Support\Facades\Cache::remember('pusher_config', 60 * 5, function () { // 5 minutes cache
+            $keys = ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'];
+            $configs = \App\Models\Config::whereIn('name', $keys)->pluck('value', 'name');
             return [
-                'app_id' => $appId,
-                'app_key' => $appKey,
-                'app_secret' => $appSecret,
-                'app_cluster' => $appCluster,
+                'app_id' => $configs->get('pusher_app_id'),
+                'app_key' => $configs->get('pusher_app_key'),
+                'app_secret' => $configs->get('pusher_app_secret'),
+                'app_cluster' => $configs->get('pusher_app_cluster'),
             ];
-        });
+        // });
     }
 }
+
+if (!function_exists('refreshOctaneBroadcaster')) {
+    function refreshOctaneBroadcaster()
+    {
+        \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+    }
+}
+
+if (!function_exists('isRunningOctane')) {
+
+    function isRunningOctane(): bool
+    {
+        return \App\Services\OctaneBroadcasterService::isOctane();
+    }
+}
+
 if (!function_exists('nameRoute')) {
     function nameRoute(string $name): string
     {
@@ -786,39 +799,34 @@ if (!function_exists('showSvgaImage')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-
         Admin::script("
-                    var $model = new SVGA.Player('#$model');
-                    $model.loops = 100;
-                    $model.clearsAfterStop = false;
+                    (function initSvga_{$model}() {
+                        var el = document.getElementById('$model');
+                        if (!el) {
+                            // Element not ready, retry after a short delay
+                            setTimeout(initSvga_{$model}, 50);
+                            return;
+                        }
+                        
+                        try {
+                            var $model = new SVGA.Player('#$model');
+                            $model.loops = 100;
+                            $model.clearsAfterStop = false;
 
-                    var $model2 = new SVGA.Parser('#$model');
+                            var $model2 = new SVGA.Parser('#$model');
 
-                    function pauseAnimation() {
-                        $model.pauseAnimation();
-                    }
+                            $model2.load('$url', function(videoItem) {
+                                $model.setVideoItem(videoItem);
+                                $model.startAnimation();
 
-                    function stopAnimation() {
-                        $model.stopAnimation();
-                    }
-                ");
-
-        // Load SVGA animation and handle potential errors
-        Admin::script("
-                    try {
-                        $model2.load('$url', function(videoItem) {
-                            $model.setVideoItem(videoItem);
-                            $model.startAnimation();
-
-                            $model.onFinished(function() {
-                                // Code for when the animation finishes
+                                $model.onFinished(function() {
+                                    // Code for when the animation finishes
+                                });
                             });
-                        });
-                    } catch (error) {
-                        console.error('An error occurred:', error.message);
-                    } finally {
-                        console.log('Try...catch has finished executing.');
-                    }
+                        } catch (error) {
+                            console.error('SVGA Error for $model:', error.message);
+                        }
+                    })();
                 ");
         return $model;
     }
@@ -833,39 +841,34 @@ if (!function_exists('showSvgaImage2')) {
         $model = 'this' . $uniqueKey;
         $model2 = 'this2' . $uniqueKey;
 
-
         Admin::script("
-                    var $model = new SVGA.Player('#$model');
-                    $model.loops = 100;
-                    $model.clearsAfterStop = false;
+                    (function initSvga2_{$model}() {
+                        var el = document.getElementById('$model');
+                        if (!el) {
+                            // Element not ready, retry after a short delay
+                            setTimeout(initSvga2_{$model}, 50);
+                            return;
+                        }
+                        
+                        try {
+                            var $model = new SVGA.Player('#$model');
+                            $model.loops = 100;
+                            $model.clearsAfterStop = false;
 
-                    var $model2 = new SVGA.Parser('#$model');
+                            var $model2 = new SVGA.Parser('#$model');
 
-                    function pauseAnimation() {
-                        $model.pauseAnimation();
-                    }
+                            $model2.load('$url', function(videoItem) {
+                                $model.setVideoItem(videoItem);
+                                $model.startAnimation();
 
-                    function stopAnimation() {
-                        $model.stopAnimation();
-                    }
-                ");
-
-        // Load SVGA animation and handle potential errors
-        Admin::script("
-                    try {
-                        $model2.load('$url', function(videoItem) {
-                            $model.setVideoItem(videoItem);
-                            $model.startAnimation();
-
-                            $model.onFinished(function() {
-                                // Code for when the animation finishes
+                                $model.onFinished(function() {
+                                    // Code for when the animation finishes
+                                });
                             });
-                        });
-                    } catch (error) {
-                        console.error('An error occurred:', error.message);
-                    } finally {
-                        console.log('Try...catch has finished executing.');
-                    }
+                        } catch (error) {
+                            console.error('SVGA Error for $model:', error.message);
+                        }
+                    })();
                 ");
         return $model;
     }
@@ -877,17 +880,23 @@ if (typeof initSvgaPlayers === 'undefined') {
     function initSvgaPlayers(context = document) {
         context.querySelectorAll('.svga-player').forEach(el => {
             if (el.dataset.loaded) return;
+            if (!el || !el.id) return; // Skip if element is not valid
+            
             el.dataset.loaded = true;
 
-            const player = new SVGA.Player(el);
-            const parser = new SVGA.Parser(el);
+            try {
+                const player = new SVGA.Player(el);
+                const parser = new SVGA.Parser(el);
 
-            parser.load(el.dataset.url, videoItem => {
-                player.setVideoItem(videoItem);
-                player.loops = 100;
-                player.clearsAfterStop = false;
-                player.startAnimation();
-            });
+                parser.load(el.dataset.url, videoItem => {
+                    player.setVideoItem(videoItem);
+                    player.loops = 100;
+                    player.clearsAfterStop = false;
+                    player.startAnimation();
+                });
+            } catch (error) {
+                console.error('SVGA init error:', error.message);
+            }
         });
     }
 }

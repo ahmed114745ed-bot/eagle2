@@ -396,6 +396,13 @@ class FormRequestController extends MainController
                 'message' => __('user_not_found')
             ], 404);
         }
+        if ($owner->is_super_admin || $owner->is_sub_super_admin) {
+            return response()->json([
+                'success' => false,
+                'key' => 'user_is_super_admin',
+                'message' => __('user is country manager'),
+            ], 400);
+        }
 
         if ($this->checkUserAlreadyOwnsEntity($owner, Agency::class)) {
             return response()->json([
@@ -413,6 +420,8 @@ class FormRequestController extends MainController
             'country_id' => $owner->country_id,
         ]);
         $request->update(['status' => 'approved']);
+        $owner->type_user = 2;
+        $owner->save();
 
         // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
         return response()->json([
@@ -470,6 +479,14 @@ class FormRequestController extends MainController
                 'success' => false,
                 'message' => __('user_not_found')
             ], 404);
+        }
+
+        if ($owner->is_super_admin || $owner->is_sub_super_admin) {
+            return response()->json([
+                'success' => false,
+                'key' => 'user_is_super_admin',
+                'message' => __('user is country manager'),
+            ], 400);
         }
 
         if ($this->checkUserAlreadyOwnsEntity($owner, ShippingAgency::class)) {

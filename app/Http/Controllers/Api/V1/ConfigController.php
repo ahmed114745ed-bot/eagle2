@@ -16,6 +16,7 @@ use App\Tik\Services\CountryService;
 use App\Http\Resources\CountryResource;
 use App\Http\Resources\Api\V1\ConfigResource;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config as LaravelConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
@@ -146,48 +147,85 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
+        
+        // Clear all cache including rememberForever keys
+        Cache::forget('all_configs');
+        Cache::flush();
+        Artisan::call('config:cache');
+        
         admin_success('Saved Successfully');
         return Redirect::back();
     }
 
     public function updateConfigAgoraZego(Request $request)
     {
-        Cache::forget('pusher_config');
-
-        $keys = array_keys($request->all());
+        $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
+        $keys = array_diff(array_keys($request->all()), $excludeKeys);
+        
+        $updatedKeys = [];
+        $hasPusherUpdate = false;
+        
         foreach ($keys as $key) {
-            $config = Config::where('name', $key)->first();
-
-            if ($config) {
-                $config->value = $request->input($key);
-            } else {
-                $config = new Config();
-                $config->name = $key;  // Set name first
-                $config->value = $request->input($key);
+            $value = $request->input($key);
+            
+            Config::updateOrCreate(
+                ['name' => $key],
+                ['value' => $value]
+            );
+            
+            $updatedKeys[] = $key;
+            Cache::forget($key);
+            
+            if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
+                $hasPusherUpdate = true;
             }
-
-            $config->save();
         }
 
         Cache::forget('pusher_config');
-
-        Artisan::call('config:cache');
-
-        // Log::info('updateConfigAgoraZego completed and cache refreshed');
-
-        $redirectTo = $request->input('redirect_to');
-        if ($redirectTo) {
-            Log::info('updateConfigAgoraZego redirecting to provided redirect_to', [
-                'redirect_to' => $redirectTo,
-            ]);
-            return Redirect::to($redirectTo);
+        Cache::forget('all_configs');
+        Cache::flush();
+        
+        
+        if (method_exists(Cache::store('octane'), 'flush')) {
+            Cache::store('octane')->flush();
+        }
+        
+        if ($hasPusherUpdate) {
+            $pusherMapping = [
+                'pusher_app_key' => 'broadcasting.connections.pusher.key',
+                'pusher_app_secret' => 'broadcasting.connections.pusher.secret',
+                'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
+                'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
+            ];
+            
+            foreach ($pusherMapping as $key => $configKey) {
+                $value = $request->input($key);
+                if ($value !== null) {
+                    if ($key === 'pusher_app_cluster') {
+                        LaravelConfig::set($configKey, $value ?? 'mt1');
+                    } else {
+                        LaravelConfig::set($configKey, $value);
+                    }
+                }
+            }
+            
+            \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
+            
         }
 
-        $redirectBack = Redirect::back();
-        // Log::info('updateConfigAgoraZego redirecting back', [
-        //     'target' => method_exists($redirectBack, 'getTargetUrl') ? $redirectBack->getTargetUrl() : null,
-        // ]);
 
-        return $redirectBack;
+
+        $redirectUrl = url(config('admin.route.prefix') . '/settings');
+        
+        if ($request->has('current_tab')) {
+            $redirectUrl .= '?tab=' . $request->current_tab;
+            if ($request->has('inner_tab_type')) {
+                $redirectUrl .= '&type=' . $request->inner_tab_type;
+            }
+        } elseif ($request->has('redirect_to')) {
+            return Redirect::to($request->redirect_to);
+        }
+
+        return redirect($redirectUrl);
     }
 }

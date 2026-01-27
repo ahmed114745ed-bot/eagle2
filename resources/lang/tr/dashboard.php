@@ -8,6 +8,18 @@ return [
     'login.language.switch' => 'Dil Değiştir',
     'login.language.lang'   => 'Arapça',
 
+    'login_agency' => [
+        'title' => 'Ajans Yöneticisi Girişi',
+        'subtitle' => 'Ajansları, yayıncıları ve performansı yönetin',
+    ],
+    'login_area' => [
+        'title' => 'Bölge Yöneticisi Girişi',
+        'subtitle' => 'Birden fazla ülkeyi ve bölgesel operasyonları yönetin',
+    ],
+    'login_country' => [
+        'title' => 'Ülke Yöneticisi Girişi',
+        'subtitle' => 'Ülke düzeyindeki raporları ve ayarları yönetin',
+    ],
     'online'                => 'Çevrimiçi',
     'login'                 => 'Giriş Yap',
     'logout'                => 'Çıkış Yap',
@@ -20,7 +32,13 @@ return [
     'confirm_enable_frozen_wallet'  => 'Dondurulmuş cüzdanı etkinleştirmek istediğinizden emin misiniz?',
     'confirm_disable_frozen_wallet' => 'Dondurulmuş cüzdanı devre dışı bırakmak istediğinizden emin misiniz?',
 
-
+    'all'         => 'Tümü',
+    'popular'     => 'Popüler',
+    'new'         => 'Yeni',
+    'pk'          => 'PK',
+    'close_room'  => 'Kapalı Odalar',
+    'hide_room'   => 'Gizli Odalar',
+    'country'     => 'Ülkeler',
     'user_setting'          => 'Kullanıcı Ayarları',
     'avatar'                => 'Avatar',
     'list'                  => 'Liste',

@@ -19,7 +19,7 @@ return [
     'country_title'        => 'देश का शीर्षक',
     'last_active_title'    => 'अंतिम सक्रिय',
     'rankingRewardLevel' => "बधाई हो! आपने रैंकिंग स्तर :level का पुरस्कार प्राप्त किया है",
-
+    "room_level" => "आपके कमरे का नया VIP स्तर :level पहुंच गया है और आपको इनाम :reward मिला है",
     'visit_title'          => 'दौरा',
     "closeNormalBoxReturnCoins" => "आपके सामान्य लकी बॉक्स की अवधि समाप्त हो गई है और बॉक्स के :coins सिक्के आपको वापस कर दिए गए हैं",
     "lucky_box" => "लकी बॉक्स",
