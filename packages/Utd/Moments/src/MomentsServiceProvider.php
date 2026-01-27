@@ -19,7 +19,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/moments.php', 'moments');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
 
         $this->app->singleton(MomentContract::class, MomentService::class);
     }
@@ -69,7 +69,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     protected function registerViews(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'moments');
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'moments');
     }
 
     /**
@@ -79,7 +79,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     protected function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'moments');
+        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'moments');
     }
 
     /**
@@ -89,7 +89,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
     }
 
     /**
@@ -101,7 +101,7 @@ class MomentsServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/moments.php' => config_path('moments.php'),
+                __DIR__ . '/../Config/moments.php' => config_path('moments.php'),
             ], 'moments');
 
 //            $this->publishes([
