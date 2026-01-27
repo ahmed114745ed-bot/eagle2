@@ -12,10 +12,10 @@ on:
         default: 'test'
         type: string
       target_branches:
-        description: 'Target branches (comma-separated: tempoAppLive,5live,vibe,pop-live,bigo-room,lumio,ghala)'
+        description: 'Target branches (comma-separated: tempoAppLive,5live,vibe,pop-live,bigo-room,lumio,ghala,LuvMug)'
         required: true
         type: string
-        default: 'tempoAppLive,5live,vibe,pop-live,bigo-room,lumio,ghala'
+        default: 'tempoAppLive,5live,vibe,pop-live,bigo-room,lumio,ghala,LuvMug'
 
 jobs:
   prepare:

@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Helpers\UserPackHelper;
 use App\Models\Pk;
+use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\User;
@@ -14,7 +14,8 @@ use App\Models\FamilyUser;
 use App\Models\FamilyLevel;
 use App\Models\UserSetting;
 use App\Facades\UserHandling;
-use Carbon\Carbon;
+use Modules\Vip\Entities\Vip;
+use App\Helpers\UserPackHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -206,8 +207,9 @@ class MyDataResource extends JsonResource
                 'exp_receiver' => $this->receiverLevel?->exp ?? 0,
                 'sender_img'   => $this->senderLevel?->img ?? '',
                 'sender_level' => intval($this->senderLevel?->level),
-                'next_sender_level' => intval(  $this->next_sender_level_info['next_level'] ?? 0),
+                'next_sender_level' => intval($this->next_sender_level_info['next_level'] ?? 0),
                 'remaining_to_next_level' => floatval($this->next_sender_level_info['remaining_exp_ratio'] ?? 0.0),
+                'sender_per' => Common::userLevelPer($this->resource),
 
             ],
             'charge_level' =>  [
@@ -289,6 +291,33 @@ class MyDataResource extends JsonResource
             ->limit(2)
             ->get();
     }
+
+    // public function senderPer($user)
+    // {
+    //     $gold_level             = $user->total_sender_level;
+    //     $vipsData = Vip::collectionBuilder()->get();
+    //     $expPercentages  = Config::get('exp_percentages') ?? [0, 0];
+        
+    //     $nextGoldData = self::getNextLevelDataFromCache(2, $gold_level, $vipsData);
+       
+    //     $diamondSend             = $user->total_sender_diamonds;
+
+    //     $senderNum        = floor($diamondSend  * $expPercentages['exp_sender_percentage']);
+       
+    //     $next_gold_num = $nextGoldData['next_exp'];
+        
+    //     $current_gold_num = self::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+    //     $st = (int)$next_gold_num - (int)($current_gold_num);
+    //     $sc = (int)$senderNum - (int)($current_gold_num);
+
+
+
+    //     if ($st > 0 && ($sc / $st) < 1 && ($sc / $st) > 0) {
+    //         $data['sender_per'] = (float)($sc / $st);
+    //     } else {
+    //         $data['sender_per'] = (float)0.00;
+    //     }
+    // }
 
 
 

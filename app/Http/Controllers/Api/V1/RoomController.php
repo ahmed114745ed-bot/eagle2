@@ -1845,12 +1845,15 @@ class RoomController extends Controller
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
+        try {
+            $result = $this->roomService->commentStatus($roomId, $request);
 
-        $result = $this->roomService->commentStatus($roomId, $request);
+            $message = ($result == 1) ? 'comment_closed' : 'comment_opened';
 
-        $message = ($result == 1) ? 'comment_closed' : 'comment_opened';
-
-        return Common::apiResponse(true, "messages.$message", [], 200);
+            return Common::apiResponse(true, "messages.$message", [], 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 422);
+        }
     }
     protected function addBlock(Request $request)
     {

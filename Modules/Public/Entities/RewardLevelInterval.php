@@ -65,6 +65,7 @@ class RewardLevelInterval extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
+                $model->expire = 0;
             } elseif ($model->type === 'achievement') {
                 $file = request('target4', $model->target);
 
@@ -86,6 +87,7 @@ class RewardLevelInterval extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
+                $model->expire = 0;
             } elseif ($model->type === 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {
