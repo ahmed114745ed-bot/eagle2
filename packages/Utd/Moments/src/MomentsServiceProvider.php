@@ -50,16 +50,16 @@ class MomentsServiceProvider extends ServiceProvider
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/api.php');
+            ->group(__DIR__ . '/../Routes/api.php');
 
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/web.php');
+            ->group(__DIR__ . '/../Routes/web.php');
 
         Route::prefix('api/utd')
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/utd.php');
+            ->group(__DIR__ . '/../Routes/utd.php');
     }
 
     /**
