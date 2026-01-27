@@ -13,6 +13,8 @@ return [
 
 
     ],
+
+    "room_level" => "Your Room have new Vip level :level and you reached reward :reward",
     "remainingDiamondCoins" => ":coins coins were added from the remaining value from month :month to the current month",
     "remainingDiamonds"     => ":diamonds diamonds were added from the remaining value from month :month to the current month",
     'rankingRewardLevel' => "Congratulation!: you got reward ranking level :level",

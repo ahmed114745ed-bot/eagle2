@@ -1273,18 +1273,10 @@ class UserService
             }
             $progress = $exactlyValue == 0 ? 1 : $bar;
         } elseif ($currentLevel != null) {
-            // $remaining       = $secondLevel?->exp == null ? 0 : $secondLevel?->exp - $user?->total_charge_coins;
             $exactlyValue    = $secondLevel?->exp ?? 0;
             $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
             $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
-            // $prog = ($progressCurrent / $progressNext);
-            // if ($prog >= 1) {
-            //     $bar = 1;
-            // } else {
-            //     $bar = round($prog, 1);
-            // }
 
-            // $progress = $exactlyValue == 0 ? 1 : $bar;
             $progress  = 1;
             $remaining = 0;
         } else {
@@ -1307,6 +1299,69 @@ class UserService
         return  [
             'gift_level' => Common::level_center($user->id),
             'charge_level' => $chargeLevel,
+            'room_level' =>  $this->roomLevel($user),
+        ];
+    }
+
+    public function roomLevel($user)
+    {
+        $room = $user->ownerAudioRoom;
+        if (!$room) {
+            return [
+                'current_level' => 0,
+                'current_exp'   => 0,
+                'current_img'   => '',
+                'next_level'    => 0,
+                'next_exp'      => 0,
+                'next_img'      => '',
+                'remaining'     => 0,
+                'progress'      => 0,
+            ];
+        }
+        $expLevel = $room->total_diamond;
+        $currentLevel = $this->vipRepository->findByLevel(@$room->roomLevel->level, 4);
+        if ($currentLevel) {
+            $secondLevel = $this->vipRepository->nextLevel($room->roomLevel->level, 4);
+        } else {
+            $secondLevel = $this->vipRepository->findByType(4);
+        }
+
+        if ($secondLevel != null && $currentLevel != null) {
+            $remaining       = $secondLevel?->exp - $expLevel;
+            $exactlyValue    = @$secondLevel?->exp;
+            $progressCurrent = $expLevel - $currentLevel->exp;
+            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } elseif ($currentLevel != null) {
+            $exactlyValue    = $secondLevel?->exp ?? 0;
+            $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
+            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
+
+            $progress  = 1;
+            $remaining = 0;
+        } else {
+            $progress  = 1;
+            $remaining = 0;
+        }
+
+        return   [
+            'current_level' => $currentLevel->level ?? 0,
+            'current_exp'   => $currentLevel->exp ?? 0,
+            'current_img'   => $currentLevel->img ?? '',
+            'next_level'    => @$secondLevel ? @$secondLevel->level : ($currentLevel->level ?? 0),
+            'next_exp'      => @$secondLevel ?  @$secondLevel->exp ?? 0 : ($currentLevel->exp ?? 0),
+            'next_img'      => @$secondLevel ? @$secondLevel->img ?? '' : $currentLevel->img ?? '',
+            'remaining'     => @$remaining ?? 0,
+            'progress'      => (int)(@$progress ?? 0),
+
         ];
     }
 
