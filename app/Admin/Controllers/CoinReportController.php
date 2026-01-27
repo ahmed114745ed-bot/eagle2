@@ -121,7 +121,11 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $query->where('users.uuid', $this->input);
+                }, __('Uid'), 'Uid');
+            });
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -135,10 +139,10 @@ class CoinReportController extends MainController
                     $query->whereDate('user_lucky_gifts.created_at', '<=', $datt);
                 }, __('to_date'), 'to_date')->date();
             });
-            $filter->column(1 / 2, function ($filter) {
-                 $filter->equal('user_id',__('user'))->select(Common::user_filter())->ajax('/api/search/users2', 'id', 'name');
+            // $filter->column(1 / 2, function ($filter) {
+            //      $filter->equal('user_id',__('user'))->select(Common::user_filter())->ajax('/api/search/users2', 'id', 'name');
 
-            });
+            // });
         });
 
         $grid->column('name', __('Name'))
@@ -218,11 +222,11 @@ class CoinReportController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            // $filter->column(1 / 2, function ($filter) {
-            //     $filter->where(function ($query) {
-            //         $query->where('users.uuid', $this->input);
-            //     }, __('Uid'), 'Uid');
-            // });
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $query->where('users.uuid', $this->input);
+                }, __('Uid'), 'Uid');
+            });
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
@@ -237,10 +241,10 @@ class CoinReportController extends MainController
                 }, __('to_date'), 'to_date')->date();
             });
 
-             $filter->column(1 / 2, function ($filter) {
-                 $filter->equal('user_id',__('user'))->select(Common::user_filter())->ajax('/api/search/users2', 'id', 'name');
+            //  $filter->column(1 / 2, function ($filter) {
+            //      $filter->equal('user_id',__('user'))->options(Common::user_filter())->ajax('/api/search/users2', 'id', 'name');
 
-            });
+            // });
             //            $filter->column(1/2, function ($filter) {
             //                $filter->equal('game_id', __('Game Type'))
             //                    ->select([
