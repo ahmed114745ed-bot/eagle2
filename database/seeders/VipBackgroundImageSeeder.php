@@ -6,7 +6,8 @@ namespace Database\Seeders;
 use App\Helpers\Common;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\UploadedFile;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 class VipBackgroundImageSeeder extends Seeder
 {
@@ -27,8 +28,14 @@ class VipBackgroundImageSeeder extends Seeder
                 continue;
             }
 
-            // Convert local file to Laravel File object
-            $file = new File($fullPath);
+            // Convert local file to Laravel UploadedFile object
+            $file = new UploadedFile(
+                $fullPath,
+                basename($fullPath),
+                mime_content_type($fullPath),
+                null,
+                true
+            );
 
             // Upload to Google Storage using your function
             $newPath = Common::upload('images', $file);
