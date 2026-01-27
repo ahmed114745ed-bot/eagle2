@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce3bd413d83c0b91b0a8046a774a2057",
+    "content-hash": "8b3d4edf84a7539ab14109f18e9bd483",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14375,8 +14375,8 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
-            "name": "utd/achievements",
-            "version": "dev-reelsPackage",
+            "name": "utd/Achievements",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
@@ -14418,7 +14418,7 @@
         },
         {
             "name": "utd/moments",
-            "version": "dev-reelsPackage",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
@@ -14459,11 +14459,11 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-reelsPackage",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
-                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
+                "reference": "62bf966f616bc3ac25632b5bcba722b717cf4751"
             },
             "require": {
                 "illuminate/database": "^10.0|^11.0",
@@ -15293,6 +15293,6 @@
         "ext-curl": "*",
         "ext-openssl": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
