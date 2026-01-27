@@ -165,6 +165,6 @@ class RemainingDiamondUsersCommand extends Command
             'year' => $year,
         ]);
 
-        // CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
+        CustomNotification::remainingDiamonds($user, 'diamonds', $month, $diamonds);
     }
 }
