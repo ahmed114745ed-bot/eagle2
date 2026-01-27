@@ -268,6 +268,7 @@ class AuthController extends Controller
         } catch (\Exception $ex) {
             return Common::apiResponse(false, $ex->getMessage(), null, 422);
         }
+        \Log::info('Apple Login User', ['user_id' => $user->id]);
 
         if (!$this->canLogin($user)) {
             return Common::apiResponse(false, 'you are blocked', [], 422);
