@@ -18,6 +18,6 @@ jobs:
           echo "$USER"
           cd /var/www/achievmentPackage-Eagle
           source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          composer update --ignore-platform-reqs
+          composer update
           php artisan migrate --force
           php artisan optimize:clear
