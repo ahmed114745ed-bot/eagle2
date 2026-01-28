@@ -46,34 +46,26 @@ class FollowJob implements ShouldQueue
             })
             ->update(['type' => 'friends']);
         if ($this->user->followBack($this->receiver)) {
-            $receiverStatus = [
-                'friend' => $this->receiver->friend + 1,
-                'follower' => $this->receiver->follower + 1,
-            ];
-            $userStatus = [
-                'friend' => $this->user->friend + 1,
-                'following' => $this->user->following + 1,
-            ];
+
+            $this->receiver->friend += 1;
+            $this->receiver->follower += 1;
+            $this->user->friend += 1;
+            $this->user->following += 1;
+
             CustomNotification::followBack($this->receiver, $this->user);
             (new UserCounterServices)->UpgradeDateForType($this->receiver, 'friend');
             (new UserCounterServices)->eventUser($this->receiver, 'friend', 1);
         } else {
 
-            $receiverStatus = [
-                'follower' => $this->receiver->follower + 1,
-            ];
-            $userStatus = [
-                'following' => $this->user->following + 1,
-            ];
+            $this->receiver->follower += 1;
+            $this->user->following += 1;
             CustomNotification::follow($this->receiver, $this->user);
             (new UserCounterServices)->UpgradeDateForType($this->receiver, 'followeds');
             (new UserCounterServices)->eventUser($this->receiver, 'follow', 1);
         }
-
-        User::findOrFail($this->receiver->id)->update($receiverStatus);
-        User::findOrFail($this->user->id)->update($userStatus);
-        // $this->userRepository->update($receiverStatus, );
-        // $this->userRepository->update($userStatus, $user->id);
+        $this->receiver->save();
+        $this->user->save();
+        
         (new UserCounterServices)->eventUser($this->receiver, 'follower', 1);
     }
 }
