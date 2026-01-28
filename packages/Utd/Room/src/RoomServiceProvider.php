@@ -12,6 +12,7 @@ use Utd\Room\Services\BackgroundService;
 use Utd\Room\Services\MicrophoneService;
 use Utd\Room\Services\RoomSalaryService;
 use Utd\Room\Services\RoomVisitorService;
+use Utd\Room\Services\EnteranceRoomService;
 use Utd\Room\Services\RoomCategoryService;
 use Utd\Room\Repositories\PkRepository;
 use Utd\Room\Repositories\RoomRepository;
@@ -167,6 +168,7 @@ class RoomServiceProvider extends ServiceProvider
             RoomService::class,
             RoomCategoryService::class,
             RoomVisitorService::class,
+            EnteranceRoomService::class,
             MicrophoneService::class,
             BanRoomService::class,
             BackgroundService::class,
