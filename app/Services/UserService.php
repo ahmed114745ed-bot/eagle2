@@ -412,7 +412,7 @@ class UserService
         $follow = $this->followRepository->findFollow($userId, $followedUserId);
         if (!$follow) {
 
-            $this->typeRoomChat($userId, $followedUserId);
+          //  $this->typeRoomChat($userId, $followedUserId);
 
             $this->followRepository->createFollow([
                 'user_id' => $userId,
@@ -428,7 +428,7 @@ class UserService
         UserFollowHelper::updateCounts($request->user());
         UserFollowHelper::updateCounts($receiver);
 
-        return Common::apiResponse(true, 'follow done', null, 201);
+        return Common::apiResponse(true, 'follow done', null, 200);
     }
 
     public function unFollowUser($request)

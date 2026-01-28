@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\GameWallet;
 use Illuminate\Bus\Queueable;
 use App\Facades\CustomNotification;
+use Modules\Chat\Entities\ChatRoom;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,6 +34,17 @@ class FollowJob implements ShouldQueue
      */
     public function handle()
     {
+        $user_id = $this->user->id;
+        $user_id2 = $this->receiver->id;
+        $updateType = ChatRoom::where(function ($q) use ($user_id, $user_id2) {
+            $q->where('user_id', $user_id)
+                ->where('user_id2', $user_id2);
+        })
+            ->orWhere(function ($q) use ($user_id, $user_id2) {
+                $q->where('user_id', $user_id2)
+                    ->where('user_id2', $user_id);
+            })
+            ->update(['type' => 'friends']);
         if ($this->user->followBack($this->receiver)) {
             $receiverStatus = [
                 'friend' => $this->receiver->friend + 1,
