@@ -129,6 +129,7 @@ class RoomController extends Controller
         $rooms = $this->roomService->getAllLiveRooms($request);
         return Common::apiResponse(true, '', $rooms, 200);
     }
+
     public function room_countries()
     {
         $data = $this->roomService->index2();
