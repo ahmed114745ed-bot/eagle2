@@ -714,7 +714,7 @@ ease;
                                     </div> --}}
 
 
-                                    {{-- <div class="file-upload">
+                                    <div class="file-upload">
                                         <input
                                             type="file"
                                             id="{{ $inputId }}"
@@ -732,27 +732,7 @@ ease;
                                         >
                                             {{ __('upload_card_back') }}
                                         </label>
-                                    </div> --}}
-
-                                    <div class="file-upload">
-    <input
-        type="file"
-        id="{{ $inputId }}"
-        name="{{ $field->field_name }}"
-        accept="image/*"
-        class="d-none"
-        @required($field->is_required)
-        onchange="handleFileUpload(this, '{{ $labelId }}')"
-    >
-
-    <label
-        for="{{ $inputId }}"
-        id="{{ $labelId }}"
-        class="file-upload-label"
-    >
-        {{ __('upload_card_back') }}
-    </label>
-</div>
+                                    </div>
 
 
                                     {{-- <script>
