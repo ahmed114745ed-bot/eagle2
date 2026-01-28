@@ -401,6 +401,8 @@ class RoomRepository extends AbstractRepository
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->where('is_live', true)->first();
         $nowRooms  = $this->getNowRooms($user);
+          //          'now_room'             => $this->formatNowRoom(),
+
 
         return [
             'audio' => $audio
@@ -421,12 +423,13 @@ class RoomRepository extends AbstractRepository
         if (!$user->now_room_uid) return (object)[];
 
         $nowRoomOwner = $user->nowRoomOwner;
+      //  dd($nowRoomOwner);
 
         if (!$nowRoomOwner) return (object)[];
 
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-        $resource = (new NowRoomResource($this))->toArray(request());
+        $resource = (new NowRoomResource($user))->toArray(request());
 
         return empty($resource) ? (object)[] : $resource;
     }
