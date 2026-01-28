@@ -1,3 +1,4 @@
+@if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
 <div class="box box-info">
     <div class="box-header with-border">
         <h3 class="box-title">🏆 {{ __('Top Agencies by Achieved Targets') }}</h3>
@@ -86,3 +87,4 @@ function loadAgenciesTargetsChart() {
 loadAgenciesTargetsChart();
 </script>
 
+@endif

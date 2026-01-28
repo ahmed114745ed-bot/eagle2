@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Helpers\AgencyPackageHelper;
 use App\helper\RankingHelper;
 use App\helper\TimeHelper;
 use App\Helpers\Common;
@@ -11,7 +12,6 @@ use App\Models\CoinGameUserMerged;
 use App\Models\CoinGameUserMergedMonthly;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
@@ -199,6 +199,12 @@ class RankingRepositoryV2
 
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10)
     {
+        // Return empty if agency package not installed
+        $agencyClass = AgencyPackageHelper::getAgencyClass();
+        if (!$agencyClass) {
+            return collect();
+        }
+
         $query = GiftRanking::query()
             ->with([
                 'ranker' => function ($q) {
@@ -206,7 +212,7 @@ class RankingRepositoryV2
                 },
             ])
             ->where('role', $role)
-            ->where('ranker_type', Agency::class)
+            ->where('ranker_type', $agencyClass)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
 

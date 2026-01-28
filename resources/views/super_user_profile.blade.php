@@ -1080,11 +1080,13 @@
             </div>
             <div class="agency-stats">
                 <div class="agency-meta">
+                    @if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
                         <span class="meta-value">{{ @$user->salary }}</span>
 
                     </div>
+                    @endif
                     <div class="meta-item">
                         <span class="meta-label">{{__('level')}}:</span>
                         <span class="meta-value">
@@ -1161,7 +1163,7 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
-        @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+        @if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled() && (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*')))
             <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
                data-target="salary-tab">{{ __('prof_reports') }}</a>
         @endif
@@ -1170,8 +1172,10 @@
 
         <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
+        @if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
         <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
+        @endif
         @if ($user?->type_user != 1)
             <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
                data-target="user-coins-tab">{{ __('User Coins') }}</a>
@@ -1382,6 +1386,7 @@
         </div>
     </div>
 
+    @if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
     <div class="tab-content" id="salary-tab">
         <div class="card">
             <div class="card-header">
@@ -1617,8 +1622,10 @@
             </div>
         </div>
     </div>
+    @endif
 
 
+    @if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
     <div class="tab-content" id="user-agency-tab"
          style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
         <div class="card">
@@ -1786,6 +1793,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @if($activeTab == 'user-coins')
 

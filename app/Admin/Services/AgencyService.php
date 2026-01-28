@@ -2,6 +2,7 @@
 
 namespace App\Admin\Services;
 
+use App\Helpers\AgencyPackageHelper;
 use Illuminate\Support\Facades\Cache;
 
 class AgencyService
@@ -13,6 +14,11 @@ class AgencyService
      */
     function adminAgencyData($agency): string
     {
+        // Return empty if agency package not installed
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            return '';
+        }
+
         if (! @$agency) {
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>

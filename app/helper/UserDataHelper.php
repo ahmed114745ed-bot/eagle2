@@ -2,6 +2,7 @@
 
 namespace App\helper;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\NowRoomResource;
 use App\Http\Resources\UserDataRoomResource;
@@ -12,6 +13,11 @@ class UserDataHelper
 {
     public static function formatAgency(User $user): ?array
     {
+        // Safe check - return null if agency package not installed
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            return null;
+        }
+
         if (!$user->agency) return null;
 
         $owner = $user->agency->app_owner_id == $user->id
@@ -74,6 +80,11 @@ class UserDataHelper
     
     public static function formatShippingAgency(User $user): ?array
     {
+        // Safe check - return null if shipping agency package not installed
+        if (!AgencyPackageHelper::isShippingAgencyInstalled()) {
+            return null;
+        }
+
         if (!$user->shippingAgency) return null;
 
         return [

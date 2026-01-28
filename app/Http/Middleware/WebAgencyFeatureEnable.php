@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Helpers\Common;
 use App\Models\AppFeature;
 use App\Services\AppFeatureService;
@@ -18,6 +19,11 @@ class WebAgencyFeatureEnable
      */
     public function handle(Request $request, Closure $next, ...$slug): Response
     {
+        // Check if Agency package is installed first
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            abort(403, __('Agency feature is not available'));
+        }
+
         $app_feature = \Cache::get('host_agency');
 
         if (!($app_feature == '1' || $app_feature == 1)) {

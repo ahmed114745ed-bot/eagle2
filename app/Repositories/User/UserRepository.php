@@ -2,14 +2,13 @@
 
 namespace App\Repositories\User;
 
+use App\Helpers\AgencyPackageHelper;
 use Exception;
 use App\Models\Bd;
 use App\Models\User;
-use App\Models\Agency;
 use App\Models\Follow;
 use App\helper\UserDataHelper;
 use App\Models\ProfileGallary;
-use Utd\ShippingAgency\Entities\ShippingAgency;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
@@ -366,7 +365,13 @@ class UserRepository extends Repository
 
     public function searchInAgency($key, $page, $perPage)
     {
-        return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
+        // Safe check - return empty if shipping agency not installed
+        $shippingClass = AgencyPackageHelper::getShippingAgencyClass();
+        if (!$shippingClass) {
+            return collect();
+        }
+
+        return $shippingClass::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');
@@ -376,7 +381,13 @@ class UserRepository extends Repository
 
     public function superAdminAgencies($key, $page, $perPage, $countryId)
     {
-        return ShippingAgency::selectRaw('concat(name, " - ", id) as name, id')
+        // Safe check - return empty if shipping agency not installed
+        $shippingClass = AgencyPackageHelper::getShippingAgencyClass();
+        if (!$shippingClass) {
+            return collect();
+        }
+
+        return $shippingClass::selectRaw('concat(name, " - ", id) as name, id')
             // ->where('country_id', $countryId)
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
@@ -459,7 +470,13 @@ class UserRepository extends Repository
 
     public function searchInHostAgency($key, $page, $perPage)
     {
-        return Agency::selectRaw('concat(name, " - ", id) as name, id')
+        // Safe check - return empty if agency not installed
+        $agencyClass = AgencyPackageHelper::getAgencyClass();
+        if (!$agencyClass) {
+            return collect();
+        }
+
+        return $agencyClass::selectRaw('concat(name, " - ", id) as name, id')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%');

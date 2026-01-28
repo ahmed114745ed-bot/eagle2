@@ -1,3 +1,4 @@
+@if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
 <div class="stats-container">
     <div class="row g-3">
         <!-- Agencies Count -->
@@ -361,3 +362,4 @@
     });
 </script>
 
+@endif

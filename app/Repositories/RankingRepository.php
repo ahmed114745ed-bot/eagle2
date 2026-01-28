@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
+use App\Helpers\AgencyPackageHelper;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\helper\TimeHelper;
@@ -213,6 +213,12 @@ class RankingRepository
 
     public function getAgencyRanking(string $role, string $rankingType, int $perPage = 10, $type  = 1)
     {
+        // Return empty if agency package not installed
+        $agencyClass = AgencyPackageHelper::getAgencyClass();
+        if (!$agencyClass) {
+            return collect();
+        }
+
         $query = GiftRanking::query();
         $this->applyDateFiltersV2($query, $type);
         $query->with([
@@ -221,7 +227,7 @@ class RankingRepository
             },
         ])
             ->where('role', $role)
-            ->where('ranker_type', Agency::class)
+            ->where('ranker_type', $agencyClass)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts');
 

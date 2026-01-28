@@ -1,4 +1,4 @@
-@php use App\Helpers\Common;use Carbon\Carbon; @endphp
+@php use App\Helpers\Common;use Carbon\Carbon;use App\Helpers\AgencyPackageHelper; @endphp
 <style>
         :root {
             --primary-color: {{ config('themes.primaryColor') }};
@@ -1084,6 +1084,7 @@
             </div>
             <div class="agency-stats">
                 <div class="agency-meta">
+                    @if(AgencyPackageHelper::isAgencyInstalled())
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Balance') }}:</span>
 
@@ -1092,6 +1093,7 @@
                                 <span class="meta-value">{{ $availableBalance }}</span> -->
 
                     </div>
+                    @endif
                     <div class="meta-item">
                         <span class="meta-label">{{__('level')}}:</span>
                         <span class="meta-value">
@@ -1191,17 +1193,21 @@
         @if (\Encore\Admin\Facades\Admin::user()->can('level-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
             <a href="?tab=level" data-pjax class="tab-btn" data-target="level-tab">{{ __('level') }}</a>
         @endif
-        @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
-            <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
-               data-target="salary-tab">{{ __('prof_reports') }}</a>
+        @if (AgencyPackageHelper::isAgencyInstalled())
+            @if (\Encore\Admin\Facades\Admin::user()->can('salary-switch-' . 'users') || \Encore\Admin\Facades\Admin::user()->can('*'))
+                <a href="?tab=salary" data-pjax class="tab-btn {{ $activeTab == 'salary' ? 'active' : '' }}"
+                   data-target="salary-tab">{{ __('prof_reports') }}</a>
+            @endif
         @endif
         <a href="?tab=charge" data-pjax class="tab-btn {{ $activeTab == 'charge' ? 'active' : '' }}"
            data-target="charge-tab">{{ __('Charge Reports') }}</a>
 
         <a href="?tab=gift-log" data-pjax class="tab-btn {{ $activeTab == 'gift-log' ? 'active' : '' }}"
            data-target="gift-log-tab">{{ __('gifts') }}</a>
+        @if(AgencyPackageHelper::isAgencyInstalled())
         <a href="?tab=user-agency" data-pjax class="tab-btn {{ request('tab') == 'user-agency' ? 'active' : '' }}"
            data-target="user-agency-tab">{{ __('Agency join logs') }}</a>
+        @endif
         <a href="?tab=user-coins" data-pjax class="tab-btn {{ request('tab') == 'user-coins' ? 'active' : '' }}"
            data-target="user-coins-tab">{{ __('User Coins') }}</a>
         <a href="?tab=badges" data-pjax class="tab-btn {{ $activeTab == 'badges' ? 'active' : '' }}"
@@ -1511,6 +1517,7 @@
         </div>
     </div>
 
+    @if(AgencyPackageHelper::isAgencyInstalled())
     <div class="tab-content" id="salary-tab">
         <div class="card">
             <div class="card-header">
@@ -1683,6 +1690,7 @@
 
         </div>
     </div>
+    @endif
 
     <div class="tab-content" id="level-tab">
         <div class="card">
@@ -1939,6 +1947,7 @@
 
     </div>
 
+    @if(AgencyPackageHelper::isAgencyInstalled())
     <div class="tab-content" id="user-agency-tab"
          style="{{ request('tab') == 'user-agency' ? 'display: block;' : 'display: none;' }}">
         <div class="card">
@@ -2106,6 +2115,7 @@
         </div>
     </div>
 </div>
+@endif
 
 @if($activeTab == 'user-coins')
 

@@ -1,0 +1,32 @@
+{
+    "name": "utd/agency",
+    "description": "Complete Agency Laravel Package - Host Agency & Shipping Agency Management System",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "agency", "host-agency", "shipping-agency", "management"],
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Agency\\": "src/",
+            "Utd\\Agency\\Database\\": "Database/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Agency\\AgencyServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

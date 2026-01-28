@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use Carbon\Carbon;
@@ -109,6 +110,11 @@ class UserResource extends JsonResource
 
     private function formatAgency()
     {
+        // Safe check - return null if agency package not installed
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            return null;
+        }
+
         if (!$this->agency) return null;
         return [
             'id'           => $this->agency->id,
@@ -161,6 +167,11 @@ class UserResource extends JsonResource
 
     private function formatShippingAgency()
     {
+        // Safe check - return null if shipping agency package not installed
+        if (!AgencyPackageHelper::isShippingAgencyInstalled()) {
+            return null;
+        }
+
         if (!$this->shippingAgency) return null;
 
         return [

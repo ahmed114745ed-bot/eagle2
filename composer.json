@@ -64,6 +64,7 @@
             "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
+
         },
         "files": [
             "app/helpers.php",
@@ -116,6 +117,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "repositories": [
+      
         {
             "type": "path",
             "url": "packages/Utd/Moments",

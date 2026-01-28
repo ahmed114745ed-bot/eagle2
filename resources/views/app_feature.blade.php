@@ -444,6 +444,7 @@
 <div class="container-fluid" style="padding: 0;">
     <div class="container">
         <div class="features-grid">
+            @if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
             <div class="feature-card">
                 <div class="feature-header">
                     <div class="feature-icon">
@@ -491,6 +492,7 @@
                     </form>
                 </div>
             </div>
+            @endif
 
             @if(\App\Support\DynamicReals::isAvailable())
             <div class="feature-card">

@@ -2,18 +2,16 @@
 
 namespace App\Http\Resources\Api\V2;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Models\Pack;
 use App\Models\Room;
 use App\Models\Ware;
-use App\Models\Agency;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\TimeLog;
 use App\Models\FamilyUser;
 use App\Models\FamilyLevel;
 use App\Facades\UserHandling;
-use App\Models\AgencyUserJob;
-use App\Models\AgencyJoinRequest;
 use App\Models\Config;
 use App\Models\UserSetting;
 use Illuminate\Support\Facades\DB;
@@ -78,15 +76,19 @@ class MyDataResource extends JsonResource
 
         $time_log = $this->timeLog()->latest()->first();
 
-        $agency_joined = $this->agency;
-        if ($agency_joined) {
-            $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
-            $agency_joined = [
-                'id' => $agency_joined->id,
-                'name' => $agency_joined->name,
-                'status' => $agency_joined->status,
-                'owner' => $owner,
-            ];
+        // Safe agency handling - works even if package not installed
+        $agency_joined = null;
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $agency_joined = $this->agency;
+            if ($agency_joined) {
+                $owner = $agency_joined->app_owner_id == $this->id ? new \stdClass() : new MiniUserResource($agency_joined->owner);
+                $agency_joined = [
+                    'id' => $agency_joined->id,
+                    'name' => $agency_joined->name,
+                    'status' => $agency_joined->status,
+                    'owner' => $owner,
+                ];
+            }
         }
 
         $pass_status = false;
@@ -95,8 +97,9 @@ class MyDataResource extends JsonResource
             $pass_status = true;
         }
 
-        $admin = $this->agencyUserJob;
-        $owner = $this->ownAgency;
+        // Safe agency user job and own agency - works even if package not installed
+        $admin = AgencyPackageHelper::isAgencyInstalled() ? $this->agencyUserJob : null;
+        $owner = AgencyPackageHelper::isAgencyInstalled() ? $this->ownAgency : null;
 
         $dress_1_data = Common::getUserDress($this->id, $this->dress_1, 4, 'img2', true);
         $dress_1_fallback = Common::getUserDress($this->id, $this->dress_1, 4, 'img1', true);
@@ -143,7 +146,7 @@ class MyDataResource extends JsonResource
             'frame_id' => $frame ? @$this->dress_1 : 0,
             'intro_id' => $intro ? @$this->dress_3 : 0,
             'is_first' => (bool)$this->is_points_first,
-            'is_agency_request' => (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count(),
+            'is_agency_request' => AgencyPackageHelper::isAgencyInstalled() ? (bool)$this->agencyJoinRequest->where('status', '!=', 2)->count() : false,
             'has_room' => $this->hasRoom(),
             'google_bind' => (bool)@$this->google_id,
             'phone_bind' => (bool)@$this->phone,

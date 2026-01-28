@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b3d4edf84a7539ab14109f18e9bd483",
+    "content-hash": "bb0b1834e69a7da82e160a85523b3352",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -7865,16 +7865,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.61",
+            "version": "10.5.63",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "bd265b671a63b87e85a8155f885b6fbb41ee505b"
+                "reference": "33198268dad71e926626b618f3ec3966661e4d90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/bd265b671a63b87e85a8155f885b6fbb41ee505b",
-                "reference": "bd265b671a63b87e85a8155f885b6fbb41ee505b",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/33198268dad71e926626b618f3ec3966661e4d90",
+                "reference": "33198268dad71e926626b618f3ec3966661e4d90",
                 "shasum": ""
             },
             "require": {
@@ -7946,7 +7946,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.61"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.63"
             },
             "funding": [
                 {
@@ -7970,7 +7970,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-24T16:06:23+00:00"
+            "time": "2026-01-27T05:48:37+00:00"
         },
         {
             "name": "predis/predis",
@@ -14417,8 +14417,55 @@
             }
         },
         {
+            "name": "utd/agency",
+            "version": "dev-agencyPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Agency",
+                "reference": "d324920a12a5c3eec03e960fad55c044fadc076f"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Agency\\AgencyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Agency\\": "src/",
+                    "Utd\\Agency\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Complete Agency Laravel Package - Host Agency & Shipping Agency Management System",
+            "keywords": [
+                "agency",
+                "host-agency",
+                "laravel",
+                "management",
+                "shipping-agency"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "utd/moments",
-            "version": "dev-achievmentPackage",
+            "version": "dev-agencyPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",

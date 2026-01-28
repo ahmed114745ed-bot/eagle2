@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Models\WalletTransaction;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\AdminController;
@@ -121,7 +122,11 @@ class WalletTransactionController extends AdminController
         
                 case 'transfer_to_agency':
                     $agencyId = $data['agency_id'] ?? null;
-                    $agency = \App\Models\Agency::find($agencyId);
+                    $agency = null;
+                    if (AgencyPackageHelper::isAgencyInstalled()) {
+                        $agencyClass = AgencyPackageHelper::getAgencyClass();
+                        $agency = $agencyClass::find($agencyId);
+                    }
                     if ($agency) {
                         $path = $agency->image ?? null;
                         $defaultImage = asset("images/businessman-icon.jpg");
