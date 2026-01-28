@@ -79,9 +79,7 @@ class RoomServiceProvider extends ServiceProvider
      */
     protected function registerRoutes(): void
     {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->namespace)
+        Route::middleware('api')
             ->group(__DIR__ . '/../Routes/api.php');
 
         Route::middleware('web')

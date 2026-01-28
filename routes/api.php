@@ -16,14 +16,12 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\PaytabsController;
 use App\Http\Controllers\VersionController;
 use App\Http\Controllers\Api\BadgeController;
-use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\AppFeatureController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Controllers\Api\V1\PackController;
-use Utd\Room\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V2\MallController;
 use App\Http\Controllers\HealthCheckController;
@@ -62,14 +60,11 @@ use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\StorageUploadController;
-use Utd\Room\Http\Controllers\Api\EnteranceController;
 use App\Http\Controllers\Api\CountriesInPolygonController;
-use Utd\Room\Http\Controllers\Api\MicrophoneController;
 use Utd\Achievements\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
-use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MallController as ControllersMallController;
 
@@ -100,10 +95,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         return "gooooooooooooooooooooooooooooood";
     });
 
-    Route::post('update-room-count', [EnteranceController::class, 'updateRoomCountFromPusher']);
-    Route::post('update-room-count-pusher', [EnteranceController::class, 'updateRoomCountFromPusher_new']);
-
-    Route::get('update-zego-agora', [EnteranceController::class, 'libraryAgoraZego']);
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('Utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
@@ -225,78 +216,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('hide', [HomeController::class, 'hide']);
             Route::get('user-statistics', [UserController::class, 'user_statistic']);
             Route::get('user-levels', [UserController::class, 'userLevels']);
-            // rooms api
-            Route::post('check-room', [RoomController::class, 'check_room']);
 
-            Route::prefix('rooms')->group(function () {
-                Route::get('/room-user', [RoomController::class, 'userRooms']);
-                Route::get('/mine', [RoomController::class, 'mine']);
-                Route::get('/user/{id}', [RoomController::class, 'userRoom']);
-                Route::get('/', [RoomController::class, 'index']);
-                Route::get('/live-rooms', [RoomController::class, 'getAllLiveRooms']);
-                Route::get('/game-rooms', [RoomController::class, 'gameRoom']);
-                Route::post('/create', [RoomController::class, 'store']);
-                Route::get('/{id}', [RoomController::class, 'show'])->where('id', '[0-9]+');
-                Route::get('/{owner_id}/extra-data', [RoomController::class, 'extraRoomData']);
-                Route::get('/extra-data', [RoomController::class, 'extraDataRoom']);
-                Route::post('/{owner_id}/send-private-comment', [RoomController::class, 'sendPrivateComment']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
-                Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
-                Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-                Route::post('/{id}/edit', [EnteranceController::class, 'update']);
-                Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
-                Route::post('admins', [RoomController::class, 'getAdmins']);
-                Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
-                Route::post('remove_pass', [RoomController::class, 'removeRoomPass']);
-                Route::post('room_background_list', [BackgroundController::class, 'roomBackground']);
-                Route::post('quit_room', [RoomController::class, 'quit_room_2']);
-                //                Route::post('quit_room_2', [RoomController::class, 'quit_room_2']);
-                Route::post('getRoomUsers', [RoomController::class, 'getRoomUsers']);
-                Route::post('add_admin_to_room', [RoomController::class, 'is_admin']);
-                Route::post('kick_out_of_room', [RoomController::class, 'out_room']);
-                Route::post('remove_admin', [RoomController::class, 'remove_admin']);
-                Route::post('black-list', [RoomController::class, 'blackList']);
-                Route::post('remove-block', [RoomController::class, 'removeBlock']);
-                Route::post('add-block', [RoomController::class, 'addBlock']);
-                Route::post('{Room}/comment_status', [RoomController::class, 'commentStatus']);
-                Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
-                Route::post('/check-admin-owner', [RoomController::class, 'adminOwner']);
-
-                //Pk
-                Route::middleware(['appFeatureEnable:pk'])->group(function () {
-                    Route::post('create-pk', [PkController::class, 'createPK']);
-                    Route::post('close-pk', [PkController::class, 'closePK']);
-                    Route::post('show-pk', [PkController::class, 'showPK']);
-                    Route::post('hide-pk', [PkController::class, 'hidePk']);
-                });
-
-                Route::middleware(['appFeatureEnable:pk'])->prefix('pk')->group(function () {
-                    Route::post('create', [PkController::class, 'createPKWithoutZego']);
-                    Route::post('close', [PkController::class, 'closePKWithoutZego']);
-                    Route::post('show', [PkController::class, 'showPKWithoutZego']);
-                    Route::post('hide', [PkController::class, 'hidePkWithoutZego']);
-                });
-                // Microphone
-
-                Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);
-                Route::post('up-microphone', [MicrophoneController::class, 'upMicrophone2']);
-                //                Route::post('up-microphone2', [MicrophoneController::class, 'upMicrophone2']);
-                Route::post('leave-microphone', [MicrophoneController::class, 'goMicrophone2']);
-                //                Route::post('leave-microphone2', [MicrophoneController::class, 'goMicrophone2']);
-                Route::post('kick_microphone', [MicrophoneController::class, 'kickMicrophone']);
-                Route::post('mute_microphone', [MicrophoneController::class, 'mute_microphone2']);
-                //                Route::post('mute_microphone2', [MicrophoneController::class, 'mute_microphone2']);
-                Route::post('unmute_microphone', [MicrophoneController::class, 'unmute_microphone2']);
-                //                Route::post('unmute_microphone2', [MicrophoneController::class, 'unmute_microphone2']);
-                Route::post('lock_microphone_place', [MicrophoneController::class, 'shut_microphone2']);
-                //                Route::post('lock_microphone_place2', [MicrophoneController::class, 'shut_microphone2']);
-                Route::post('unlock_microphone_place', [MicrophoneController::class, 'open_microphone2']);
-                //                Route::post('unlock_microphone_place2', [MicrophoneController::class, 'open_microphone2']);
-                Route::post('enter_room', [EnteranceController::class, 'enter_room']);
-                Route::post('invite-user', [EnteranceController::class, 'invite_user']);
-            });
-            Route::post('change_room_mode', [RoomController::class, 'changeMode']);
-            Route::post('rooms/change-mic-mode', [RoomController::class, 'changeMicMode']);
             Route::post('/firebase/custom-token', [FirebaseAuthController::class, 'loginWithUid']);
             Route::prefix('coins')->group(function () {
                 Route::get('/list', [CoinController::class, 'coinList']);
@@ -322,9 +242,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::get('/vip-level/{id?}', [UserController::class, 'vipLevel']);
                 Route::get('/frames/{id?}', [UserController::class, 'frames']);
             });
-
-            Route::get('/room-countries', [RoomController::class, 'room_countries']);
-            // end rooms api
 
 
             Route::prefix('account')->group(function () {

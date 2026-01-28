@@ -26,14 +26,14 @@ class RoomResource extends JsonResource
             }
         }
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
-        $have_luck_box = $this->boxUse->where("is_closed", 0);
+        $have_luck_box = $this->boxUse?->where("is_closed", 0);
         $isHideCountry = $this?->owner?->getPackWithTypeV2(13);
 
-        if ($this->owner->relationLoaded('chatRoomsAsUser') || $this->owner->relationLoaded('chatRoomsAsUser2')) {
+        if ($this->owner?->relationLoaded('chatRoomsAsUser') || $this->owner?->relationLoaded('chatRoomsAsUser2')) {
             $chatRoom = $this->owner->chatRoomsAsUser->first() ?? $this->owner->chatRoomsAsUser2->first();
         }
 
-        $agency_joined = $this->owner->agency;
+        $agency_joined = $this->owner?->agency;
         if ($agency_joined) {
 
             $agency_joined = [
