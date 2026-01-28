@@ -8,7 +8,7 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use Utd\Room\Repositories\RoomRepository;
 use App\Repositories\User\UserRepository;
-use Utd\Room\Services\RoomVisitorService;
+use Utd\Room\Services\EnteranceRoomService;
 use Illuminate\Http\Request;
 use Log;
 
@@ -16,7 +16,7 @@ class AgoraController extends Controller
 {
     protected $enteranceRoomService;
 
-    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, RoomVisitorService $enteranceRoomService)
+    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, EnteranceRoomService $enteranceRoomService)
     {
         $this->enteranceRoomService = $enteranceRoomService;
     }

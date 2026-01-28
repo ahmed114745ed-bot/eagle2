@@ -27,7 +27,7 @@ use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
-use Utd\Room\Services\RoomVisitorService;
+use Utd\Room\Services\EnteranceRoomService;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
@@ -38,7 +38,7 @@ class EnteranceController extends Controller
     protected $repo;
     protected $enteranceRoomService;
 
-    public function __construct(RoomRepoInterface $repo, RoomVisitorService $enteranceRoomService)
+    public function __construct(RoomRepoInterface $repo, EnteranceRoomService $enteranceRoomService)
     {
         $this->repo = $repo;
         $this->enteranceRoomService = $enteranceRoomService;
