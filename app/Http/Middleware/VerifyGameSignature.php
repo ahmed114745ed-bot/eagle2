@@ -6,7 +6,6 @@ use App\Helpers\SignatureHelper;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class VerifyGameSignature
@@ -18,12 +17,6 @@ class VerifyGameSignature
      */
     public function handle(Request $request, Closure $next)
     {
-        Log::info('VerifyGameSignature', [
-            'signature' => $request->get('signature'),
-            'signature_nonce' => $request->get('signature_nonce'),
-            'timestamp' => $request->get('timestamp'),
-        ]);
-
         $signature = $request->get('signature');
         $signatureNonce = $request->get('signature_nonce');
         $timestamp = $request->get('timestamp');
