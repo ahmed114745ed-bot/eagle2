@@ -10,6 +10,7 @@ use App\Models\Code;
 use App\Models\Room;
 use App\Models\User;
 use App\Helpers\Common;
+use App\Jobs\FollowJob;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\BlackList;
@@ -21,6 +22,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
 use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
+use Illuminate\Support\Facades\Log;
 use Modules\Chat\Entities\ChatRoom;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
@@ -54,7 +56,6 @@ use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Tik\Repositories\UserDevicesHistoryRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 use Modules\Achievement\Http\Services\UserAchievementService;
 use Modules\Achievement\Transformers\UserAchievementLevelsResource;
 
@@ -418,7 +419,8 @@ class UserService
                 'followed_user_id' => $followedUserId,
                 'status' => 1
             ]);
-            $this->handleFollowBack($request->user(), $receiver);
+          //  $this->handleFollowBack($request->user(), $receiver);
+            dispatch(new FollowJob($request->user(), $receiver))->onQueue('follow-user-job');
         } else {
             $this->followRepository->updateFollowStatus($follow, 1);
         }
