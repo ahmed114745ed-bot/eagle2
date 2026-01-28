@@ -429,7 +429,7 @@ class RoomRepository extends AbstractRepository
 
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-        $resource = (new NowRoomResource($user))->toArray(request());
+        $resource = (new NowRoomResource($user->room))->toArray(request());
 
         return empty($resource) ? (object)[] : $resource;
     }
