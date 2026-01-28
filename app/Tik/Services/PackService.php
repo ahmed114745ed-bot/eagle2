@@ -7,7 +7,7 @@ use Exception;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use Illuminate\Database\Eloquent\Collection;

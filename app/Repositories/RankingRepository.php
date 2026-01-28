@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Helpers\AgencyPackageHelper;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;

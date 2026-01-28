@@ -9,7 +9,7 @@ use App\Helpers\Common;
 use App\Facades\RoomHelper;
 use App\Models\Cp;
 use App\Tik\Repositories\PkRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\TimeLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;

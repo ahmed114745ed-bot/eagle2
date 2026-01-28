@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomGift;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Modules\RoomBoom\Jobs\EndBoomPusherJob;
 use Modules\RoomBoom\Jobs\EndBoomZegoJob;
 use Modules\RoomBoom\Jobs\NewRoomBoomRewardJob;

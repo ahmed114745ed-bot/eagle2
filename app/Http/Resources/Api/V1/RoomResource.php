@@ -4,7 +4,7 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\Common;
 use App\Http\Resources\CountryResource;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

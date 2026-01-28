@@ -518,7 +518,7 @@ class GroupChatController extends MainController
     public function getRoomImage($id): JsonResponse
     {
         try {
-            $room = \App\Models\Room::find($id);
+            $room = \Utd\Room\Entities\Room::find($id);
 
             if (!$room) {
                 return response()->json([

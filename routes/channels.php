@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\RoomVisitor;
 use Illuminate\Support\Facades\Broadcast;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\Chat\Http\Services\ChatRoomService;
 
 /*

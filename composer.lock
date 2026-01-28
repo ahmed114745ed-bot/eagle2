@@ -7434,16 +7434,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.48",
+            "version": "3.0.49",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "64065a5679c50acb886e82c07aa139b0f757bb89"
+                "reference": "6233a1e12584754e6b5daa69fe1289b47775c1b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/64065a5679c50acb886e82c07aa139b0f757bb89",
-                "reference": "64065a5679c50acb886e82c07aa139b0f757bb89",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/6233a1e12584754e6b5daa69fe1289b47775c1b9",
+                "reference": "6233a1e12584754e6b5daa69fe1289b47775c1b9",
                 "shasum": ""
             },
             "require": {
@@ -7524,7 +7524,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.48"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.49"
             },
             "funding": [
                 {
@@ -7540,7 +7540,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-15T11:51:42+00:00"
+            "time": "2026-01-27T09:17:28+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -14375,8 +14375,8 @@
             "time": "2025-12-02T11:56:42+00:00"
         },
         {
-            "name": "utd/Achievements",
-            "version": "dev-achievmentPackage",
+            "name": "utd/achievements",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
@@ -14465,7 +14465,7 @@
         },
         {
             "name": "utd/moments",
-            "version": "dev-agencyPackage",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
@@ -14506,7 +14506,7 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-achievmentPackage",
+            "version": "dev-reelsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
@@ -14551,6 +14551,47 @@
                 }
             ],
             "description": "Reels/Reals Feature Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/room",
+            "version": "dev-room-package",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Room",
+                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Room\\RoomServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Room\\": "src/",
+                    "Utd\\Room\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Room Laravel Package - Core room functionality including microphones, visitors, categories, and more",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -15329,9 +15370,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20,
-        "utd/moments": 20,
-        "utd/reals": 20
+        "utd/room": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

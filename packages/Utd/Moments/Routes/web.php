@@ -24,8 +24,8 @@ Route::get('delete-moment/{moment_id}/{id}', 'MomentController@destroy_dash')->n
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
-        'namespace'  => 'web',
+        'prefix' => config('admin.route.prefix'),
+        'namespace' => 'web',
         'middleware' => [
             'web',
             'admin',
@@ -33,7 +33,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
     function () {
         Route::resource('report-moments', ReportMomentController::class);

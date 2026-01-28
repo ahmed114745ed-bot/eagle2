@@ -1,7 +1,7 @@
 <?php
 
 use App\Helpers\Common;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Http\Request;
 use Modules\LuckyBox\Http\Controllers\BoxController;
 

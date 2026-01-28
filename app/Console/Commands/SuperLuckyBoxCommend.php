@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\BoxUse;
 use App\Jobs\OpenBoxJob;
 use App\Models\PickBoxList;
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\RoomVisitor;
 use App\Models\UserBoxGift;
 use App\Facades\RedisService;
 use Illuminate\Console\Command;

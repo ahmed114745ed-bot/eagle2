@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Models\Pk;
+use App\Support\PackageHelper;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Police;
 use App\Http\Resources\CountryResource;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -80,6 +81,9 @@ class RoomSearchResource extends JsonResource
 
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
             ->where('room_id', $roomId)
             ->orderByDesc('created_at')

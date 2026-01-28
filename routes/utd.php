@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\RoleController;
-use App\Http\Controllers\Api\V1\RoomController as RoomControllerVi;
+use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
 use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -34,7 +34,6 @@ use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\AdminCheckController;
 use App\Http\Controllers\utd\AgencyController;
 use App\Http\Controllers\utd\AppearChargerAgencyController;
-use App\Http\Controllers\utd\BackgroundController;
 use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\BlackListController;
@@ -82,7 +81,7 @@ use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RoleEventController;
 use App\Http\Controllers\utd\RoomCategoryController;
 use App\Http\Controllers\utd\RoomController;
-use App\Http\Controllers\utd\RoomTargetController;
+use Utd\Room\Http\Controllers\Api\RoomTargetController;
 use App\Http\Controllers\utd\RoomVipsController;
 use App\Http\Controllers\utd\SalaryRequestController;
 use App\Http\Controllers\utd\SallariesController;
@@ -170,11 +169,11 @@ Route::middleware([])->group(function () {
 
 
     Route::prefix('backgrounds')->group(function () {
-        Route::get('/', [BackgroundController::class, 'index']);
-        Route::post('/', [BackgroundController::class, 'store']);
-        Route::post('/update/{id}', [BackgroundController::class, 'update']);
-        Route::post('/delete/{id}', [BackgroundController::class, 'destroy']);
-        Route::get('/{id}', [BackgroundController::class, 'show']);
+        Route::get('/', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'index']);
+        Route::post('/', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'store']);
+        Route::post('/update/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'update']);
+        Route::post('/delete/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'destroy']);
+        Route::get('/{id}', [\Utd\Room\Http\Controllers\Api\BackgroundController::class, 'show']);
     });
 
     Route::prefix('percentage-target')->group(function () {

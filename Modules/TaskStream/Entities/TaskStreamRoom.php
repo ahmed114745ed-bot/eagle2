@@ -2,7 +2,8 @@
 
 namespace Modules\TaskStream\Entities;
 
-use App\Models\Room;
+use App\Support\PackageHelper;
+use Utd\Room\Entities\Room;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -17,6 +18,7 @@ class TaskStreamRoom extends Model
 
     public function room(): BelongsTo
     {
-        return $this->belongsTo(Room::class);
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class);
     }
 }

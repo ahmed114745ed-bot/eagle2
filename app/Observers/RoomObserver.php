@@ -2,7 +2,7 @@
 
 namespace App\Observers;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Support\Facades\Log;
 
 class RoomObserver

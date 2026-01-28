@@ -15,7 +15,7 @@ use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
-use App\Jobs\UpdatePkAndSendToZigo;
+use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
 use App\Classes\Gifts\SendGiftService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -23,12 +23,12 @@ use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
-use App\Repositories\Room\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 
 
@@ -166,7 +166,7 @@ class GiftLogService
 
             if ($room->lastPk != null) {
 
-                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
+                dispatch(new UpdatePkAndSendToZigoJob($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
                     ->afterCommit()
                     ->onQueue('updatePk');
             }
@@ -368,7 +368,7 @@ class GiftLogService
 
             if ($room->lastPk != null) {
 
-                dispatch(new UpdatePkAndSendToZigo($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
+                dispatch(new UpdatePkAndSendToZigoJob($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room->microphone))->onQueue('updatePk');
             }
 
             if ($room->charizma_status) {

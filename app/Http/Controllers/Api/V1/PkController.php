@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api\V1;
 
 
 use Exception;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Utils;
 use App\Tik\Services\PkService;
 use App\Http\Resources\PkResource;
-use App\Http\Services\RoomService;
+use Utd\Room\Services\RoomUserService;
 use App\Http\Controllers\Controller;
 use App\Traits\Rooms\ChangeRoomMode;
 use Illuminate\Support\Facades\Auth;
@@ -147,7 +147,7 @@ class PkController extends Controller
         ];
         $json = json_encode($d);
         $jsons[] = $json;
-        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomUserService())->getRoomBackground($room));
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
 
         try {
@@ -172,7 +172,7 @@ class PkController extends Controller
                 "message" => "hidePK",
             ]
         ];
-        $d = $this->changeBackgroundResponse($room, $request->owner_id, (new RoomService())->getRoomBackground($room));
+        $d = $this->changeBackgroundResponse($room, $request->owner_id, (new RoomUserService())->getRoomBackground($room));
 
         return Common::apiResponse(1, 'done', $d, 201);
     }

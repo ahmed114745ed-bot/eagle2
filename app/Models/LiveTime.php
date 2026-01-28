@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Room\Entities\Room;
 
 class LiveTime extends Model
 {
@@ -15,7 +17,8 @@ class LiveTime extends Model
 
     public function room()
     {
-        return $this->belongsTo(Room::class, 'uid', 'id');
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class, 'uid', 'id');
     }
     public function user()
     {

@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers\Filter;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 use Illuminate\Http\Request;
 

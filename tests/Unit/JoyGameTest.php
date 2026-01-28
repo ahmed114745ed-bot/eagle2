@@ -3,10 +3,10 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 use App\Models\User;
-use App\Http\Services\RoomGameServices;
+use Utd\Room\Services\RoomGameServices;
 
 class JoyGameTest extends TestCase
 {

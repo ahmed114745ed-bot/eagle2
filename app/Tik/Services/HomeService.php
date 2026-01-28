@@ -5,12 +5,12 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;

@@ -4,7 +4,7 @@ namespace Modules\Public\Http\Services;
 
 use Modules\Public\Jobs\RewardWinnerLevel;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\Public\Entities\WinnerLevelInterval;
 
 

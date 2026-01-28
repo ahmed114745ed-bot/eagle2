@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Emoji;
@@ -22,7 +22,7 @@ use App\Models\UserSallary;
 use App\Helpers\CacheHelper;
 use Illuminate\Http\Request;
 use App\Classes\UserHandling;
-use App\Observers\PKObserver;
+use Utd\Room\Observers\PKObserver;
 use Modules\Vip\Entities\Vip;
 use App\Helpers\ManagerHelper;
 use App\Observers\VipObserver;
@@ -41,7 +41,7 @@ use App\Observers\FamilyObserver;
 use App\Observers\SettingObserver;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\CustomNotification;
-use App\Repositories\Room\RoomRepo;
+use Utd\Room\Repositories\RoomRepo;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\URL;
 use App\Observers\FamilyUserObserver;
@@ -53,7 +53,6 @@ use Illuminate\Support\ServiceProvider;
 use App\Observers\RoomBoomLevelObserver;
 use App\Services\Gifts\LuckyGiftService;
 use App\Observers\AgencyJoinRequestObserver;
-use App\Repositories\Room\RoomRepoInterface;
 use App\Repositories\User\UserRepoInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
@@ -61,6 +60,7 @@ use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastManager;
+use App\Support\PackageHelper;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -79,7 +79,6 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(TelescopeServiceProvider::class);
         }
 
-        $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
         $this->app->bind(UserRepoInterface::class, UserRepo::class);
         $this->app->bind('RedisService', fn($app) => new RedisService());
         $this->app->bind('UserHandling', fn($app) => new UserHandling());
@@ -103,7 +102,7 @@ class AppServiceProvider extends ServiceProvider
         $this->setupLanguages();
         $this->registerModelObservers();
         $this->cacheLuckyGiftProbabilities();
-        
+
         // ⭐ CRITICAL: Register Queue Job listener for Pusher config refresh
         // This ensures ALL queue jobs use fresh Pusher config from database
         $this->registerQueuePusherConfigRefresh();
@@ -120,7 +119,7 @@ class AppServiceProvider extends ServiceProvider
             });
         }
     }
-    
+
     /**
      * Register Queue Job listener to refresh Pusher config before each job
      * This is critical for ensuring broadcast events use fresh credentials
@@ -131,11 +130,11 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Queue\Events\JobProcessing::class,
             function ($event) {
                 static $lastConfigHash = null;
-                
+
                 try {
                     // Check if Pusher config changed
                     $forceUpdate = \Illuminate\Support\Facades\Cache::has('pusher_config_changed');
-                    
+
                     // Get fresh config from DB
                     $freshConfig = getPusherConfig();
                     $currentHash = md5(json_encode([
@@ -143,7 +142,7 @@ class AppServiceProvider extends ServiceProvider
                         $freshConfig['app_secret'] ?? '',
                         $freshConfig['app_id'] ?? '',
                     ]));
-                    
+
                     // Update if changed or forced
                     if ($forceUpdate || $lastConfigHash !== $currentHash) {
                         // Update Laravel runtime config
@@ -153,7 +152,7 @@ class AppServiceProvider extends ServiceProvider
                             'broadcasting.connections.pusher.app_id' => $freshConfig['app_id'],
                             'broadcasting.connections.pusher.options.cluster' => $freshConfig['app_cluster'] ?? 'mt1',
                         ]);
-                        
+
 
                             $broadcastManager = app(BroadcastManager::class);
                             $broadcastManager->forgetDrivers();
@@ -164,8 +163,8 @@ class AppServiceProvider extends ServiceProvider
                             if ($forceUpdate) {
                                 Cache::forget('pusher_config_changed');
                             }
-                 
-                        
+
+
                     }
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('Queue: Pusher config refresh failed', [
@@ -340,11 +339,13 @@ class AppServiceProvider extends ServiceProvider
         Gift::observe(GiftObserver::class);
         Emoji::observe(EmojiObserver::class);
         Ware::observe(WareObserver::class);
-        Room::observe(RoomObserver::class);
+        if (PackageHelper::isInstalled('room')) {
+            Room::observe(RoomObserver::class);
+            Pk::observe(PKObserver::class);
+        }
         UserSallary::observe(UserSallaryObserver::class);
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);
-        Pk::observe(PKObserver::class);
         Agency::observe(AgencyObserver::class);
         AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
         Vip::observe(VipObserver::class);

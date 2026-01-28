@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\EnteredRoom;
+use Utd\Room\Entities\EnteredRoom;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;

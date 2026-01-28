@@ -4,7 +4,7 @@ namespace App\Classes\Gifts;
 
 use App\Helpers\Common;
 use App\Interfaces\RoomJobInterface;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
 class CharismaWork implements RoomJobInterface

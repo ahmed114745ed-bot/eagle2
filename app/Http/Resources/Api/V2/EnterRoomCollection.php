@@ -2,19 +2,20 @@
 
 namespace App\Http\Resources\Api\V2;
 
-use App\Models\Pk;
+use App\Support\PackageHelper;
+use Utd\Room\Entities\Pk;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\configesModel;
 use Illuminate\Support\Facades\DB;
 use Modules\LuckyBox\Entities\BoxUse;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use App\Http\Resources\Api\V1\PkCollection;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Resources\Api\V1\AllGameResource;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Repositories\Room\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
 
 class EnterRoomCollection extends JsonResource
 {
@@ -99,6 +100,9 @@ class EnterRoomCollection extends JsonResource
 
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
                  ->where('room_id', $roomId)
                  ->orderByDesc('created_at')
@@ -131,10 +135,21 @@ class EnterRoomCollection extends JsonResource
      */
     public function getRoomBackground()
     {
-        return $this->mode == '3' ? 'custom_image/back-black.png' :
-            ((@RequestBackgroundImage::where('status', 1)->where('owner_room_id', $this->uid)->orderByDesc('id')->first())->img ??
-                $this->room_background ??
-                @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img);
+        if ($this->mode == '3') {
+            return 'custom_image/back-black.png';
+        }
+        
+        $customBackground = null;
+        if (PackageHelper::isInstalled('room')) {
+            $customBackground = RequestBackgroundImage::where('status', 1)
+                ->where('owner_room_id', $this->uid)
+                ->orderByDesc('id')
+                ->first()?->img;
+        }
+        
+        return $customBackground 
+            ?? $this->room_background 
+            ?? @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
     }
 
     public function getOwnerSound($ownerId, $roomSound)

@@ -17,7 +17,6 @@ use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
 use App\Admin\Controllers\BanController;
 use App\Admin\Controllers\BannerController;
-use App\Admin\Controllers\BanRoomsController;
 use App\Admin\Controllers\BanTypeController;
 use App\Admin\Controllers\BdController;
 use App\Admin\Controllers\BdSelectController;
@@ -46,7 +45,6 @@ use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\FeatureAppController;
-use App\Admin\Controllers\Filter\FilterController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\GameSettingsController;
 use App\Admin\Controllers\GiftCategoryController;
@@ -79,12 +77,6 @@ use App\Admin\Controllers\ReportFromUsersController;
 use App\Admin\Controllers\ReportUserController;
 use App\Admin\Controllers\ResetUserSalaryController;
 use App\Admin\Controllers\RoleControllerNew;
-use App\Admin\Controllers\RoomController;
-use App\Admin\Controllers\RoomGiftTargetController;
-use App\Admin\Controllers\RoomMicController;
-use App\Admin\Controllers\RoomSettingsController;
-use App\Admin\Controllers\RoomTargetController;
-use App\Admin\Controllers\RoomVipController;
 use App\Admin\Controllers\RouteController;
 use App\Admin\Controllers\ScaffoldController;
 use App\Admin\Controllers\ServerCountryController;
@@ -117,7 +109,6 @@ use App\Admin\Controllers\WithdrawController;
 use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Http\Controllers\Api\V1\UserController as UserV1Controller;
-use App\Models\Room;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
@@ -300,24 +291,7 @@ Route::group(
         Route::get('vips-cp', [VipController::class, 'cpIndex']);
         Route::get('vips-room', [VipController::class, 'roomIndex']);
         Route::get('vips-charge', [VipController::class, 'chargeIndex']);
-        Route::resource('rooms', 'RoomController', [
-            'names' => [
-                'index' => 'rooms'
-            ]
-        ]);
-        Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
-        Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
-        Route::resource('live-rooms', 'LiveRoomController');
-
-
-        Route::post('rooms/{id}/remove-admin', [RoomController::class, 'removeAdmin'])->name('rooms.remove-admin');
-        Route::post('rooms/{room}/add-visitor', [RoomController::class, 'addVisitor']);
-        Route::post('rooms/{room}/kick-visitor', [RoomController::class, 'kickVisitor']);
-        Route::post('/rooms/{room}/unban-visitor', [RoomController::class, 'unbanVisitor']);
-        Route::post('get-users', [RoomController::class, 'getUsers'])->name('get.users');
-        Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
-
-        Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
+        // Room routes moved to packages/Utd/Room/Routes/web.php
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-settings', GameSettingsController::class);
         Route::resource('game-charge-histories', GameChargeHistoryController::class)->middleware(['auth.redirect', 'clear.session']);
@@ -344,7 +318,7 @@ Route::group(
         Route::resource('report_user', ReportUserController::class)->middleware('web-agency-feature');
         // Route::resource('coupons', 'CouponController');
         Route::resource('configs', 'ConfigController');
-        Route::resource('categories', 'RoomCategoryController');
+        // categories (RoomCategoryController) moved to packages/Utd/Room/Routes/web.php
         Route::resource('countries', 'CountryController')->only(['index', 'show', 'update', 'edit']);
         Route::resource('country-categories', CountryCategoryController::class);
         Route::resource('country-requests', 'ChangeCountryRequestController')->only(['index', 'show']);
@@ -353,7 +327,7 @@ Route::group(
         Route::get('country-requests/{id}/reject', [ChangeCountryRequestController::class, 'reject']);
         Route::post("accept-change-country", [ChangeCountryRequestController::class, "changeCountry"]);
 
-        Route::resource('backgrounds', 'BackgroundController');
+        // backgrounds moved to packages/Utd/Room/Routes/web.php
         Route::resource('official_msgs', 'OfficialMessageController');
         Route::resource('emojis', 'EmojiController');
 
@@ -471,8 +445,7 @@ Route::group(
         Route::resource('wares-vips', WareVipController::class);
         // servers
         Route::resource('server-country', ServerCountryController::class);
-        Route::resource('room-gift-targets', RoomGiftTargetController::class);
-
+        // room-gift-targets moved to packages/Utd/Room/Routes/web.php
 
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         
@@ -547,8 +520,7 @@ Route::group(
         Route::post('userBd/make-default', [BdSelectController::class, 'makeDefault'])->name('make-bd-default');
         Route::get('userBd/select', [BdSelectController::class, 'index'])->name('userBd.select');
 
-        Route::get('room-mic/{room_id}/', [RoomMicController::class, 'index']);
-
+        // room-mic moved to packages/Utd/Room/Routes/web.php
 
         Route::resource('vip_privilege', 'VipPrivilegeController');
         Route::resource('tickets', 'TicketController');
@@ -556,7 +528,7 @@ Route::group(
         Route::resource('exchanges', 'ExchangeController');
 
         Route::get('filter-agencies', App\Admin\Controllers\Filter\AgencyController::class)->name('filter-agencies');
-        Route::get('filter-rooms', [FilterController::class, 'rooms'])->name('filter-rooms');
+        // filter-rooms moved to packages/Utd/Room/Routes/web.php
 
         Route::resource('reports', 'ReportController')->middleware('web-agency-feature');
         Route::get('/Moments-reels', [ReportController::class, 'momentsReels'])
@@ -591,8 +563,7 @@ Route::group(
         ]);
         Route::resource('trashed-users', TrashedUserAccountController::class);
         Route::resource('withdraw-types', WithdrawController::class);
-        Route::resource('room-vips', RoomVipController::class);
-        Route::resource('room-target', RoomTargetController::class);
+        // room-vips and room-target moved to packages/Utd/Room/Routes/web.php
 
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
 
@@ -624,10 +595,10 @@ Route::group(
         Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 
-        Route::get('/bans-rooms', [BanRoomsController::class, 'index']);
+        // bans-rooms moved to packages/Utd/Room/Routes/web.php
         Route::resource('salaries-v2', SalariesController::class)->name('index', 'sallariesV2');
 
-        Route::resource('/request-background-image', 'RequestBackgroundImageController');
+        // request-background-image moved to packages/Utd/Room/Routes/web.php
 
         Route::resource('/group-chat', 'GroupChatController');
         Route::get('chat/view', [GroupChatController::class, 'chatView'])->name('chat.view');
@@ -635,7 +606,7 @@ Route::group(
         Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
         Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
         Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
-        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
+        // rooms/{id}/image moved to packages/Utd/Room/Routes/web.php
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
@@ -704,10 +675,10 @@ Route::group(
         });
 
         Route::get('background-count', function () {
-            $backgrounds = \App\Models\Background::get();
+            $backgrounds = \Utd\Room\Entities\Background::get();
             if ($backgrounds) {
                 foreach ($backgrounds as $background) {
-                    $background_count = \App\Models\Room::where("room_background", $background->id)->count();
+                    $background_count = \Utd\Room\Entities\Room::where("room_background", $background->id)->count();
                     $background->use_count = $background_count;
                     $background->save();
                 }
@@ -728,14 +699,10 @@ Route::group(
             ->names('admin.settings');
         Route::resource('helper-links', LinkViewController::class);
 
-        Route::resource('room-settings', RoomSettingsController::class);
+        // room-settings moved to packages/Utd/Room/Routes/web.php
         Route::resource('charges-settings', ChargesSettingController::class);
         Route::post('save_image', [SettingController::class, 'save_image'])->name('save_image');
-        Route::post('rooms/{room}/pin', function (Room $room) {
-            $room->update(['pin' => !$room->pin]);
-
-            return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
-        })->name('rooms.pin');
+        // rooms/{room}/pin moved to packages/Utd/Room/Routes/web.php
         Route::resource('notification-templates', NotificationsTemplatesController::class);
         Route::get('/ware-managements/create/{type}', [WareTabController::class, 'create']);
         Route::post('/ware-managements/create', [WareTabController::class, 'store']);

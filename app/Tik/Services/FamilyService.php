@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
-use App\Tik\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\FamilyRepository;
 use App\Http\Resources\Api\V2\FamilyResource;

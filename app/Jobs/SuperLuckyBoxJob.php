@@ -7,7 +7,7 @@ use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\RoomVisitor;
 use App\Models\User;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Utils;

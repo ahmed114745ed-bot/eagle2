@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Http\Services\RoomGameServices;
+use Utd\Room\Services\RoomGameServices;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

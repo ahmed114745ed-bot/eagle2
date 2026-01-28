@@ -4,7 +4,7 @@ namespace Modules\TaskStream\Services;
 
 use App\Exceptions\CValidationException;
 use App\Models\GiftLog;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;

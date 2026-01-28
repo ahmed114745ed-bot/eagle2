@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\GroupChatResource;
 use App\Models\User;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

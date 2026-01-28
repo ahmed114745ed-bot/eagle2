@@ -4,7 +4,7 @@ namespace Modules\TaskStream\Services;
 
 use App\Exceptions\CValidationException;
 use App\Helpers\Common;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Modules\TaskStream\Repositories\TaskStreamRepository;
 use Modules\TaskStream\Repositories\TaskStreamRoomRepository;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;

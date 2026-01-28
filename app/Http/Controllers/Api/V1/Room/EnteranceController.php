@@ -5,29 +5,30 @@ namespace App\Http\Controllers\Api\V1\Room;
 use App\Facades\UserHandling;
 use App\Helpers\WebPHelper;
 use App\Models\AllGame;
-use App\Models\Room;
+use App\Support\PackageHelper;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 
 use App\Helpers\Common;
 use App\Models\LiveTime;
 use App\Jobs\ResetCharisma;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditRoomRequest;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 
-use App\Repositories\Room\RoomRepoInterface;
+use Utd\Room\Repositories\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use App\Http\Resources\Api\V1\RoomUserResource;
 use App\Http\Resources\Api\V1\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
-use App\Tik\Services\EnteranceRoomServices;
+use Utd\Room\Services\RoomVisitorService;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
@@ -38,7 +39,7 @@ class EnteranceController extends Controller
     protected $repo;
     protected $enteranceRoomService;
 
-    public function __construct(RoomRepoInterface $repo, EnteranceRoomServices $enteranceRoomService)
+    public function __construct(RoomRepoInterface $repo, RoomVisitorService $enteranceRoomService)
     {
         $this->repo = $repo;
         $this->enteranceRoomService = $enteranceRoomService;
@@ -601,12 +602,16 @@ class EnteranceController extends Controller
             }
 
             if ($request->room_type) {
-                if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
+                if (PackageHelper::isInstalled('room')) {
+                    if (!RoomCategory::query()->where('id', $request->room_type)->where('enable', 1)->exists()) return Common::apiResponse(0, 'type not found', null, 404);
+                }
                 $room->room_type = $request->room_type;
             }
 
             if ($request->room_class) {
-                if (!RoomCategory::query()->where('id', $request->room_class)->where('enable', 1)->exists()) return Common::apiResponse(0, 'class not found', null, 404);
+                if (PackageHelper::isInstalled('room')) {
+                    if (!RoomCategory::query()->where('id', $request->room_class)->where('enable', 1)->exists()) return Common::apiResponse(0, 'class not found', null, 404);
+                }
                 $room->room_type = $request->room_type;
             }
             $background_me = '';
@@ -618,15 +623,18 @@ class EnteranceController extends Controller
                 if ($request->change == 'app') {
                     $room->room_background = $request->room_background;
 
-                    RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('status', 1)->update(['status' => 3]);
+                    if (PackageHelper::isInstalled('room')) {
+                        RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('status', 1)->update(['status' => 3]);
+                    }
                 }
                 if ($request->change == 'me') {
-
-                    RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('id', '!=', $request->room_background)->where('status', 1)->update(['status' => 3]);
-                    $background_update = RequestBackgroundImage::where('id', $request->room_background)->first();
-                    $background_update->status = 1;
-                    $background_update->save();
-                    $background_me = $background_update->img;
+                    if (PackageHelper::isInstalled('room')) {
+                        RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('id', '!=', $request->room_background)->where('status', 1)->update(['status' => 3]);
+                        $background_update = RequestBackgroundImage::where('id', $request->room_background)->first();
+                        $background_update->status = 1;
+                        $background_update->save();
+                        $background_me = $background_update->img;
+                    }
                     $room->room_background = null;
                 }
             }

@@ -7,7 +7,7 @@ use App\Models\Bd;
 use App\Models\Country;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;

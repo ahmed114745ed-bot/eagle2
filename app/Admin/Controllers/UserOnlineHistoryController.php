@@ -16,7 +16,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use App\Helpers\UserCommon;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Ware;
 use Carbon\Carbon;
 use DB;

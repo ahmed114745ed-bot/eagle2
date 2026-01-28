@@ -11,7 +11,7 @@ use App\Models\Country;
 use App\Models\Family;
 use App\Models\FamilyUser;
 use App\Models\Pack;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Ware;
 use Carbon\Carbon;
 use http\Client\Curl\User;

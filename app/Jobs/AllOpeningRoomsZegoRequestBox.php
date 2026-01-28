@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Helpers\Common;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

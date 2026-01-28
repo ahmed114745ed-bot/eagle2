@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BanResource;
 use App\Models\Ban;
 use App\Models\BanType;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

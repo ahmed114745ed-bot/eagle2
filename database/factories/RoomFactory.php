@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Room>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\Utd\Room\Entities\Room>
  */
 class RoomFactory extends Factory
 {

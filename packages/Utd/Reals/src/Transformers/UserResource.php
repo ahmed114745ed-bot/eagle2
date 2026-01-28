@@ -3,7 +3,7 @@
 namespace Utd\Reals\Transformers;
 
 use App\Helpers\Common;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 

@@ -3,7 +3,7 @@
 namespace Modules\TaskStream\Jobs;
 
 use App\Models\GiftLog;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Carbon\Carbon;
 use DB;

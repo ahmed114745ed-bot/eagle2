@@ -3,13 +3,14 @@
 namespace Modules\RoomBoom\Services;
 
 use App\Helpers\Common;
+use App\Helpers\PackageHelper;
 use App\Models\GiftLog;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Modules\RoomBoom\Jobs\EndBoomPusherJob;
 use Modules\RoomBoom\Jobs\EndBoomZegoJob;
 use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
@@ -148,6 +149,9 @@ class RoomBoomGiftService
     }
 
     private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice){
+        if (!PackageHelper::isInstalled('utd/room')) {
+            return null;
+        }
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
             ->where('created_at', '>=', $todayStart)
             ->lockForUpdate()

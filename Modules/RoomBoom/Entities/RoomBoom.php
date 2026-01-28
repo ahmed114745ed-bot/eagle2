@@ -2,6 +2,7 @@
 
 namespace Modules\RoomBoom\Entities;
 
+use App\Helpers\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,6 +19,9 @@ class RoomBoom extends Model
 
     public function totalRoomGift(): BelongsTo
     {
-        return $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
+        if (!PackageHelper::isInstalled('utd/room')) {
+            return $this->belongsTo(Model::class, 'total_room_gift_id');
+        }
+        return $this->belongsTo(\Utd\Room\Entities\TotalRoomGift::class, 'total_room_gift_id');
     }
 }

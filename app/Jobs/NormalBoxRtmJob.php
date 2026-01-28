@@ -5,11 +5,11 @@ namespace App\Jobs;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 
 use App\Helpers\Common;
-use App\Models\RoomVisitor;
+use Utd\Room\Entities\RoomVisitor;
 use Illuminate\Bus\Queueable;
 use Modules\LuckyBox\Entities\BoxUse;
 use Illuminate\Queue\SerializesModels;

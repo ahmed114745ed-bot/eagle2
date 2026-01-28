@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Follow;
-use App\Models\RoomGame;
+use Utd\Room\Entities\RoomGame;
 use App\Models\GiftCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

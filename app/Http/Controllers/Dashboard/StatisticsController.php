@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\Agency;
 use Illuminate\Support\Facades\DB;
 

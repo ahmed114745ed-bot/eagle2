@@ -3,7 +3,7 @@
 namespace Modules\RoomBoom\Jobs;
 
 use App\Events\EndRoomBoomEvent;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

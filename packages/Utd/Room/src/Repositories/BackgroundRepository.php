@@ -1,0 +1,23 @@
+<?php
+
+namespace Utd\Room\Repositories;
+
+use Utd\Room\Entities\Background;
+
+class BackgroundRepository extends AbstractRepository
+{
+    public function __construct()
+    {
+        parent::__construct(new Background());
+    }
+
+    public function getEnabled()
+    {
+        return $this->model->where('enable', 1)->get();
+    }
+
+    public function getDefault()
+    {
+        return $this->model->where('enable', 1)->orderBy('id', 'asc')->first();
+    }
+}

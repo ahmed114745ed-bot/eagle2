@@ -6,7 +6,7 @@ use App\Admin\Customization\Dashboard\CustomDashboard;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\UserTarget;
 use App\Models\Ware;

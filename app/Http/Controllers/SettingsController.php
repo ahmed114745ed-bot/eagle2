@@ -7,7 +7,7 @@ use App\helper\TimeHelper;
 use Log;
 use Cache;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Config;
 use App\Models\Target;

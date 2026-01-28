@@ -7,7 +7,7 @@ use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use Modules\Vip\Entities\UserVip;
-use App\Models\RoomGame;
+use Utd\Room\Entities\RoomGame;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\RewardTarget;

@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use App\Models\User;
 use App\Models\UserTarget;
 use App\Models\UserGameChallange;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 class GameServices
 {
     public function send_reuest_paly($user ,$request){

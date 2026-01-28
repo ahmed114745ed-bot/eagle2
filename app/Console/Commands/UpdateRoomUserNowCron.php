@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Traits\HelperTraits\PusherTrait;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 
 class UpdateRoomUserNowCron extends Command
 {

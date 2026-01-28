@@ -3,19 +3,20 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\Api\V1\RoomAdminsResource;
+use App\Support\PackageHelper;
 use Exception;
-use App\Models\Pk;
+use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\AllGame;
 use App\Models\LiveTime;
 use App\Models\KickRecord;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
-use App\Services\RoomService;
+use Utd\Room\Services\RoomMainService;
 use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
 use App\Jobs\EnterRoomZigoRequest;
@@ -24,17 +25,17 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
-use App\Tik\Services\RoomRepoService;
+use Utd\Room\Services\RoomService;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Requests\EditRoomRequest;
-use App\Models\RequestBackgroundImage;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Modules\CP\Entities\CpRoomHistory;
 use App\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\RoomDetailsResource;
-use App\Repositories\Room\RoomRepoInterface;
+use Utd\Room\Repositories\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Resources\RoomCountriesResource;
 use App\Http\Services\ProfileRelationsService;
@@ -58,8 +59,8 @@ class RoomController extends Controller
 
     public function __construct(
         RoomRepoInterface $repo,
-        RoomRepoService $roomService,
-        RoomService $roomServiceMain,
+        RoomService $roomService,
+        RoomMainService $roomServiceMain,
 
     ) {
         $this->repo = $repo;
@@ -666,10 +667,12 @@ class RoomController extends Controller
         $mic  = implode(',', $mic_arr);
         $res  = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $mic]);
         $room = Room::query()->where('uid', $data['owner_id'])->first();
-        $pk   = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
-        if ($pk) {
-            $pk->mics = $mic;
-            $pk->save();
+        if (PackageHelper::isInstalled('room')) {
+            $pk   = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
+            if ($pk) {
+                $pk->mics = $mic;
+                $pk->save();
+            }
         }
 
         $user               = (array)DB::table('users')->selectRaw('id,nickname')->find($user_id);
@@ -1541,6 +1544,9 @@ class RoomController extends Controller
 
     public function createPK(Request $request)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return Common::apiResponse(0, __('Feature not available'), null, 503);
+        }
         $userId = Auth::id();
         if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         $room = Room::query()->where('uid', $request->owner_id)->where('room_status', 1)->first();
@@ -1569,6 +1575,9 @@ class RoomController extends Controller
 
     public function closePK(Request $request)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return Common::apiResponse(0, __('Feature not available'), null, 503);
+        }
 
         if (!@$request->owner_id) Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
         $room = Room::withoutAppends()->where('uid', $request->owner_id)->select('id')->first();

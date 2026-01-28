@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\RoomTopUser;
+use Utd\Room\Entities\RoomTopUser;
 use Illuminate\Console\Command;
 
 class ResetTodayTopRoomRank extends Command

@@ -16,7 +16,7 @@ use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\ChargeRepository;
 use App\Tik\Repositories\CoinLogRepository;
-use App\Tik\Repositories\RoomSalaryRepository;
+use Utd\Room\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;

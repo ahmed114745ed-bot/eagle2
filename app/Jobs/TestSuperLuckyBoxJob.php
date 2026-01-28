@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use Carbon\Carbon;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use App\Facades\CustomNotification;

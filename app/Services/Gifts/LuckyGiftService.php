@@ -14,7 +14,7 @@ use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
 use App\Models\Gift;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Traits\Gifts\LuckyGiftProbability;
 use App\Traits\Gifts\WinLuckyGift;

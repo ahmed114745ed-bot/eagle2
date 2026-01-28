@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Models\Ban;
-use App\Models\Room;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
