@@ -223,14 +223,55 @@ class DataSourceController extends Controller
 
         $forms = $query->get(['id', 'title', 'form_type']);
 
-        $formLinks = $forms->map(function ($form) use ($forms) {
+        // Prepare a web token so the mobile app can open the public form view
+        $user = $request->user();
+        $webToken = null;
+        if ($user) {
+            try {
+                $newToken = $user->createToken('form-web');
+                $webToken = $newToken->plainTextToken;
+            } catch (\Exception $e) {
+                $webToken = null;
+            }
+        }
+
+        $lang = $request->query('lang', app()->getLocale());
+
+        $formLinks = $forms->map(function ($form) use ($webToken, $lang) {
+            $tokenParam = $webToken ? urlencode($webToken) : '';
             return [
                 'form_type' => $form->form_type,
-                'link' => "/forms?type={$form->form_type}&token=&lang=",
+                'link' => "/forms?type={$form->form_type}&token={$tokenParam}&lang={$lang}",
             ];
         });
+
         return Common::apiResponse(true, 'Success', $formLinks);
 
     
     }
+
+
+    // public function formList(Request $request)
+    // {
+    //     $type = $request->query('type');
+
+    //     $query = FormTemplate::query()
+    //         ->where('is_active', true);
+
+    //     if ($type) {
+    //         $query->where('form_type', $type);
+    //     }
+
+    //     $forms = $query->get(['id', 'title', 'form_type']);
+
+    //     $formLinks = $forms->map(function ($form) use ($forms) {
+    //         return [
+    //             'form_type' => $form->form_type,
+    //             'link' => "/forms?type={$form->form_type}&token=&lang=",
+    //         ];
+    //     });
+    //     return Common::apiResponse(true, 'Success', $formLinks);
+
+    
+    // }
 }
