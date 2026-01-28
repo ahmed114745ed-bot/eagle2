@@ -26,6 +26,8 @@ class VerifyLeaderCCMiddleWare
         //     'body'     => $request->all(),
         //     'path' => $path,
         // ]);
+
+        
      
         if (!$key) {
             return response()->json([
