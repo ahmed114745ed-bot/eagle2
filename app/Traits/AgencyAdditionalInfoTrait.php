@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Agency\Traits;
+namespace App\Traits;
 
 use Utd\Agency\Entities\AdditionalInfo;
 

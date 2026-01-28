@@ -20,7 +20,7 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Utd\Agency\Traits\AgencyAdditionalInfoTrait;
+use App\Traits\AgencyAdditionalInfoTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
