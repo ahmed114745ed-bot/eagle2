@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdditionalInfo extends Model
 {
-    protected $table = 'agency_additional_info';
+    protected $table = 'additional_infos';
 
     protected $guarded = [];
 

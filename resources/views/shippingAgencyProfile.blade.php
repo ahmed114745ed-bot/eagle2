@@ -1,3 +1,4 @@
+@if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1651,3 +1652,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+@else
+    <!DOCTYPE html>
+    <html><body><div class="alert alert-warning">Agency package is not installed.</div></body></html>
+@endif

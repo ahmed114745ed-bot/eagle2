@@ -2,10 +2,9 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\KickOfAgencyAction;
+use App\Helpers\AgencyPackageHelper;
 use App\Facades\ManagerHelper;
 use App\Models\User;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -20,15 +19,26 @@ class AdminUsersController extends MainController
 
     public function show($id, Content $content)
     {
+        if (!AgencyPackageHelper::isAgencyInstalled()) {
+            return parent::show($id, $content->title(trans('admins'))->row("<div class='alert alert-warning'>" . __('Agency package is not installed.') . "</div>"));
+        }
 
         return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Agencies') . "</h3>")->row(function ($row) use ($id) {
             $row->column(12, $this->agencies($id));
         }));
     }
 
-    public function show2($id, Agency $agency, Content $content)
+    public function show2($id, $agency, Content $content)
     {
-        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . $agency->name . "</h3>")->row(function ($row) use ($id, $agency) {
+        // Get agency from package if installed
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $agencyClass = AgencyPackageHelper::getAgencyClass();
+            if (is_numeric($agency)) {
+                $agency = $agencyClass::find($agency);
+            }
+        }
+        
+        return parent::show($id, $content->title(trans('admins'))->row("<h3>" . __('Users Agencies in') . ' ' . ($agency->name ?? '') . "</h3>")->row(function ($row) use ($id, $agency) {
             $row->column(12, $this->usersGrid($agency));
         }));
     }
@@ -90,7 +100,9 @@ class AdminUsersController extends MainController
             ->whereHas('roles', fn($q) => $q->where('slug', 'like', '%_genc%_anager%'))
             ->where('app_id', '!=', 0)->with(['user' => fn($q) => $q->withCount('agencies')]);
 
-        $grid->model()->with(['managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')]);
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $grid->model()->with(['managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')]);
+        }
 
         /*$adminUser = AdminUser::load([ 'managerAgencies' => fn($q) => $q->withSum('agencySalaries as total_salaries', 'sallary')])->get();
         dd($adminUser->get(11));*/
@@ -118,19 +130,22 @@ class AdminUsersController extends MainController
             ';
         });
 
-        $grid->column('user.agencies.agencies_count', __('Agency Count'))->display(function ($agencies) {
-            $user = $this->user;
-            if ($user !== null) {
-                $wordlist = \App\Models\Agency::where('agency_manger_id', $user->id)->get();
-                return $wordlist->count();
-            }
-            return 0;
-        });
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $grid->column('user.agencies.agencies_count', __('Agency Count'))->display(function ($agencies) {
+                $user = $this->user;
+                if ($user !== null) {
+                    $agencyClass = AgencyPackageHelper::getAgencyClass();
+                    $wordlist = $agencyClass::where('agency_manger_id', $user->id)->get();
+                    return $wordlist->count();
+                }
+                return 0;
+            });
 
-        $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_) {
-            $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
-            return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
-        });
+            $grid->column('managerAgencies.total_salaries', __('salary'))->display(function ($_) {
+                $icon = asset('images/dollar-icon.png'); // Ensure this path is correct
+                return '<img src="'.$icon.'" alt="$" style="width: 20px; height: 20px; margin-right: 5px;">' . ManagerHelper::getTotalAgenciesSalary($this->managerAgencies, $this->app_id);
+            });
+        }
 
 
 
@@ -233,8 +248,8 @@ class AdminUsersController extends MainController
     {
         $AdmenUser = AdminUser::find($id);
 
-
-        $grid = new Grid(new Agency());
+        $agencyClass = AgencyPackageHelper::getAgencyClass();
+        $grid = new Grid(new $agencyClass());
         $grid->id(__('ID'));
         $grid->model()->where('agency_manger_id', $AdmenUser->app_id);
         $grid->column('app_owner_id', trans('owner id'))->modal('owner info', function ($model) {
@@ -267,7 +282,8 @@ class AdminUsersController extends MainController
     protected function usersGrid($agency)
     {
         if (gettype($agency) == 'string') {
-            $agency = Agency::find($agency);
+            $agencyClass = AgencyPackageHelper::getAgencyClass();
+            $agency = $agencyClass::find($agency);
         }
 
         $grid = new Grid(new User());
@@ -287,8 +303,8 @@ class AdminUsersController extends MainController
             $actions->disableDelete();
             $actions->disableEdit();
             $actions->disableView();
-            if ($model->agency_id >= 1 && $model->id != $agency->app_owner_id) {
-                $actions->add(new KickOfAgencyAction());
+            if (AgencyPackageHelper::isAgencyInstalled() && $model->agency_id >= 1 && $model->id != $agency->app_owner_id) {
+                $actions->add(new \Utd\Agency\Actions\KickFromAgencyAction());
             }
         });
 

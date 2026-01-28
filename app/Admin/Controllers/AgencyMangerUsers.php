@@ -10,7 +10,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 // use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
-use App\Admin\Actions\KickOfAgencyAction;
+use App\Helpers\AgencyPackageHelper;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 
@@ -136,7 +136,9 @@ class AgencyMangerUsers extends MainController
         $this->extendGrid ($grid);
 
         $grid->actions (function ($actions){
-            $actions->add(new KickOfAgencyAction());
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                $actions->add(new \Utd\Agency\Actions\KickFromAgencyAction());
+            }
             $actions->add(new KickOfFamilyAction());
         });
 

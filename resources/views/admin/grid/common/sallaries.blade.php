@@ -1,3 +1,4 @@
+@if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
 <div class="box box-solid">
     <div class="box-header with-border">
         <h3 class="box-title">{{__('Fields')}}</h3>
@@ -143,3 +144,8 @@
 
 
 </div>
+@else
+    <div class="alert alert-warning">
+        {{ __('Agency package is not installed.') }}
+    </div>
+@endif

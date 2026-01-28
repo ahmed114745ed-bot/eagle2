@@ -10,11 +10,20 @@ class DeleteAgencyAction extends RowAction
 {
     public $name = 'Delete Agency';
 
+    /**
+     * Get user model class from config
+     */
+    protected function getUserModel(): string
+    {
+        return config('agency-package.models.user', \App\Models\User::class);
+    }
+
     public function handle(Model $model, Request $request)
     {
         try {
             // Remove all members from agency
-            \App\Models\User::where('agency_id', $model->id)->update([
+            $userModel = $this->getUserModel();
+            $userModel::where('agency_id', $model->id)->update([
                 'agency_id' => null,
                 'type_user' => 0,
             ]);

@@ -2,11 +2,10 @@
 
 namespace App\Admin\Controllers;
 
-use App\Admin\Actions\ChangeAgencyAction;
+use App\Helpers\AgencyPackageHelper;
 use App\Admin\Actions\DeletePackAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
-use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Forms\ProfileForm;
 use App\Admin\Selectable\ImageColors;
@@ -356,14 +355,16 @@ class FreeUserController extends MainController
                 }
             });
 
-            if ($model->agency_id >= 1) {
-                $actions->add(new KickOfAgencyAction());
+            if (AgencyPackageHelper::isAgencyInstalled() && $model->agency_id >= 1) {
+                $actions->add(new \Utd\Agency\Actions\KickFromAgencyAction());
             }
             if ($model->family_id >= 1) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1) {
-                $actions->add(new ChangeAgencyAction($model->id));
+            if (AgencyPackageHelper::isAgencyInstalled() && $model->agency_id >= 1) {
+                if (class_exists(\Utd\Agency\Actions\ChangeAgencyAction::class)) {
+                    $actions->add(new \Utd\Agency\Actions\ChangeAgencyAction($model->id));
+                }
             }
         });
 
@@ -935,7 +936,11 @@ class FreeUserController extends MainController
                 $form->user_diamond = $oldDiamoundValue;
             }
 
-            $agancy = Agency::where('app_owner_id', $user_id)->first();
+            $agancy = null;
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                $agencyClass = AgencyPackageHelper::getAgencyClass();
+                $agancy = $agencyClass::where('app_owner_id', $user_id)->first();
+            }
             if ($agancy) {
 
 

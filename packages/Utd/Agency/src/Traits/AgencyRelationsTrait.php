@@ -14,12 +14,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait AgencyRelationsTrait
 {
+    use ConfigurableModelsTrait;
+
     /**
      * Relationship with members (users)
      */
     public function members(): HasMany
     {
-        return $this->hasMany(\App\Models\User::class, 'agency_id');
+        return $this->hasMany($this->getModelClass('user', \App\Models\User::class), 'agency_id');
     }
 
     /**
@@ -35,7 +37,7 @@ trait AgencyRelationsTrait
      */
     public function users(): HasMany
     {
-        return $this->hasMany(\App\Models\User::class, 'agency_id');
+        return $this->hasMany($this->getModelClass('user', \App\Models\User::class), 'agency_id');
     }
 
     /**
@@ -52,7 +54,7 @@ trait AgencyRelationsTrait
      */
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'app_owner_id', 'id');
+        return $this->belongsTo($this->getModelClass('user', \App\Models\User::class), 'app_owner_id', 'id');
     }
 
     /**
@@ -60,7 +62,7 @@ trait AgencyRelationsTrait
      */
     public function agencyManger(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'agency_manger_id', 'id');
+        return $this->belongsTo($this->getModelClass('user', \App\Models\User::class), 'agency_manger_id', 'id');
     }
 
     /**
@@ -68,7 +70,7 @@ trait AgencyRelationsTrait
      */
     public function dashOwner(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Admin::class, 'owner_id', 'id');
+        return $this->belongsTo($this->getModelClass('admin', \App\Models\Admin::class), 'owner_id', 'id');
     }
 
     /**
@@ -76,7 +78,7 @@ trait AgencyRelationsTrait
      */
     public function bd(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Bd::class, 'bd_id');
+        return $this->belongsTo($this->getModelClass('bd', \App\Models\Bd::class), 'bd_id');
     }
 
     /**
@@ -84,7 +86,7 @@ trait AgencyRelationsTrait
      */
     public function creator(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\AdminUser::class, 'created_by');
+        return $this->belongsTo($this->getModelClass('admin_user', \App\Models\AdminUser::class), 'created_by');
     }
 
     /**
@@ -92,7 +94,7 @@ trait AgencyRelationsTrait
      */
     public function country(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Country::class);
+        return $this->belongsTo($this->getModelClass('country', \App\Models\Country::class));
     }
 
     /**
@@ -101,7 +103,7 @@ trait AgencyRelationsTrait
     public function Countries(): BelongsToMany
     {
         return $this->belongsToMany(
-            \App\Models\Country::class,
+            $this->getModelClass('country', \App\Models\Country::class),
             'agency_countries',
             'agency_id',
             'country_id'
@@ -141,7 +143,7 @@ trait AgencyRelationsTrait
      */
     public function userSalaries(): HasMany
     {
-        return $this->hasMany(\App\Models\UserSallary::class, 'user_agency_id');
+        return $this->hasMany($this->getModelClass('user_salary', \App\Models\UserSallary::class), 'user_agency_id');
     }
 
     /**
@@ -173,7 +175,7 @@ trait AgencyRelationsTrait
      */
     public function charges(): HasMany
     {
-        return $this->hasMany(\App\Models\Charge::class, 'user_id', 'id')
+        return $this->hasMany($this->getModelClass('charge', \App\Models\Charge::class), 'user_id', 'id')
             ->where('charger_type', 'host_agency');
     }
 
@@ -182,7 +184,7 @@ trait AgencyRelationsTrait
      */
     public function senderCharges(): HasMany
     {
-        return $this->hasMany(\App\Models\Charge::class, 'charger_id', 'id')
+        return $this->hasMany($this->getModelClass('charge', \App\Models\Charge::class), 'charger_id', 'id')
             ->where('charger_type', 'host_agency');
     }
 
@@ -191,6 +193,6 @@ trait AgencyRelationsTrait
      */
     public function AgencyUsersTargets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserTarget::class, 'agency_id');
+        return $this->hasMany($this->getModelClass('user_target', \App\Models\UserTarget::class), 'agency_id');
     }
 }

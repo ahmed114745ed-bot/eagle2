@@ -19,7 +19,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/moments.php', 'moments');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
 
         $this->app->singleton(MomentContract::class, MomentService::class);
     }
@@ -50,16 +50,16 @@ class MomentsServiceProvider extends ServiceProvider
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/api.php');
+            ->group(__DIR__ . '/../Routes/api.php');
 
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/web.php');
+            ->group(__DIR__ . '/../Routes/web.php');
 
         Route::prefix('api/utd')
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/utd.php');
+            ->group(__DIR__ . '/../Routes/utd.php');
     }
 
     /**
@@ -101,7 +101,7 @@ class MomentsServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/moments.php' => config_path('moments.php'),
+                __DIR__ . '/../Config/moments.php' => config_path('moments.php'),
             ], 'moments');
 
 //            $this->publishes([

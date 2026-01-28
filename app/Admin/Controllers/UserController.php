@@ -2,11 +2,11 @@
 
 namespace App\Admin\Controllers;
 
+use App\Helpers\AgencyPackageHelper;
 use App\Models\Bd;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
-use App\Models\Agency;
 use App\Models\Charge;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -27,7 +27,6 @@ use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
 use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
-use App\Models\UsersJoinedAgency;
 use Encore\Admin\Auth\Permission;
 use Modules\UsersWallet\Entities\WalletLog;
 use Modules\Vip\Entities\UserVip;
@@ -42,10 +41,8 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
-use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
-use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
 
@@ -162,21 +159,31 @@ class UserController extends MainController
         $grid = new Grid(new User());
         $haveCoins = (request()->have_coins == 1);
 
+        // Build select columns - conditionally include agency_id
+        $selectColumns = ['id', 'name', 'sender_level', 'received_level', 'device_token', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'];
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $selectColumns[] = 'agency_id';
+        }
+
+        // Build eager loading - conditionally include agency
+        $eagerLoads = [
+            'profile',
+            'userSetting',
+            'country',
+            'senderLevel',
+            'receiverLevel',
+            'monthlyDiamondReceive',
+            'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+        ];
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $eagerLoads['agency'] = fn($q) => $q;
+        }
+
         // Optimize eager loading
         $grid->model()
             // ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
-            ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
-            ->with([
-                'profile',
-                'agency',
-                'userSetting',
-                'country',
-                //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
-                'senderLevel',
-                'receiverLevel',
-                'monthlyDiamondReceive',
-                'packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
-            ])->withCount('sameDeviceUsers');
+            ->select($selectColumns)
+            ->with($eagerLoads)->withCount('sameDeviceUsers');
 
         if (request()->signups == 'today') {
             $grid->model()->whereDate('created_at', today());
@@ -210,7 +217,7 @@ class UserController extends MainController
             $grid->model()->has('chatMessages');
         }
 
-        if (request()->agencyMembers == 1) {
+        if (request()->agencyMembers == 1 && AgencyPackageHelper::isAgencyInstalled()) {
             $grid->model()->where('agency_id', '!=', 0)
                 ->whereHas('agency', function ($q) use ($countryID) {
                     $q->where('country_id', $countryID);
@@ -274,16 +281,18 @@ class UserController extends MainController
 
         $arrowIcon = asset('images/arrows.png'); // Path to the arrows.png image
 
+        // Only show agency column if agency package is installed
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            $grid->column('agency_id', __('Agency'))
+                ->display(function () {
+                    $agency = $this->agency;
+                    if (!$agency) {
+                        return '';
+                    }
 
-        $grid->column('agency_id', __('Agency'))
-            ->display(function () {
-                $agency = $this->agency;
-                if (!$agency) {
-                    return '';
-                }
-
-                return app(AgencyService::class)->adminAgencyData($agency);
-            });
+                    return app(AgencyService::class)->adminAgencyData($agency);
+                });
+        }
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style("
@@ -361,14 +370,22 @@ class UserController extends MainController
 
                 $actions->add(new \App\Admin\Actions\CanPlaySwitchAction($row['can_play']));
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new KickOfAgencyAction());
+            // Only show agency actions if package is installed
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+                    $actions->add(new \Utd\Agency\Actions\KickFromAgencyAction());
+                }
             }
             if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
-                $actions->add(new ChangeAgencyAction($model->id));
+            // Only show change agency action if package is installed
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+                    if (class_exists(\Utd\Agency\Actions\ChangeAgencyAction::class)) {
+                        $actions->add(new \Utd\Agency\Actions\ChangeAgencyAction($model->id));
+                    }
+                }
             }
             if ($model->phone == '+201000100010') {
                 $actions->disableDelete();
@@ -884,7 +901,11 @@ class UserController extends MainController
                 $form->user_diamond = $oldDiamoundValue;
             }
 
-            $agancy = Agency::where('app_owner_id', $user_id)->first();
+            $agancy = null;
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                $agencyClass = AgencyPackageHelper::getAgencyClass();
+                $agancy = $agencyClass::where('app_owner_id', $user_id)->first();
+            }
             if ($agancy) {
 
 

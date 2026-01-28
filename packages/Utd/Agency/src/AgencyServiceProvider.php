@@ -5,6 +5,8 @@ namespace Utd\Agency;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Utd\Agency\Console\InstallAgencyCommand;
+use Utd\Agency\Console\UninstallAgencyCommand;
 
 class AgencyServiceProvider extends ServiceProvider
 {
@@ -18,6 +20,7 @@ class AgencyServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->registerCommands();
         $this->mergeConfigFrom(__DIR__ . '/../Config/agency.php', 'agency-package');
 
         // Register Services - Safe binding (returns null if not exists)
@@ -65,19 +68,28 @@ class AgencyServiceProvider extends ServiceProvider
      */
     protected function registerRoutes(): void
     {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/api.php');
+        // API Routes
+        if (config('agency-package.routes.api_enabled', true)) {
+            Route::prefix('api')
+                ->middleware('api')
+                ->namespace($this->namespace)
+                ->group(__DIR__ . '/../Routes/api.php');
+        }
 
-        Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/web.php');
+        // Web/Admin Routes (requires Laravel Admin)
+        if (config('agency-package.routes.web_enabled', true) && $this->isLaravelAdminInstalled()) {
+            Route::middleware('web')
+                ->namespace($this->namespace)
+                ->group(__DIR__ . '/../Routes/web.php');
+        }
 
-        Route::prefix('api/utd')
-            ->middleware(['api', 'localization'])
-            ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/utd.php');
+        // UTD API Routes
+        if (config('agency-package.routes.utd_enabled', true)) {
+            Route::prefix('api/utd')
+                ->middleware(['api', 'localization'])
+                ->namespace($this->namespace)
+                ->group(__DIR__ . '/../Routes/utd.php');
+        }
     }
 
     /**
@@ -87,19 +99,38 @@ class AgencyServiceProvider extends ServiceProvider
      */
     protected function registerShippingRoutes(): void
     {
-        Route::prefix('api')
-            ->middleware('api')
-            ->namespace($this->shippingNamespace)
-            ->group(__DIR__ . '/../Routes/shipping-api.php');
+        // Shipping API Routes
+        if (config('agency-package.routes.shipping_api_enabled', true)) {
+            Route::prefix('api')
+                ->middleware('api')
+                ->namespace($this->shippingNamespace)
+                ->group(__DIR__ . '/../Routes/shipping-api.php');
+        }
 
-        Route::middleware('web')
-            ->namespace($this->shippingNamespace)
-            ->group(__DIR__ . '/../Routes/shipping-web.php');
+        // Shipping Web/Admin Routes (requires Laravel Admin)
+        if (config('agency-package.routes.shipping_web_enabled', true) && $this->isLaravelAdminInstalled()) {
+            Route::middleware('web')
+                ->namespace($this->shippingNamespace)
+                ->group(__DIR__ . '/../Routes/shipping-web.php');
+        }
 
-        Route::prefix('api/utd')
-            ->middleware(['api', 'localization'])
-            ->namespace($this->shippingNamespace)
-            ->group(__DIR__ . '/../Routes/shipping-utd.php');
+        // Shipping UTD API Routes
+        if (config('agency-package.routes.shipping_utd_enabled', true)) {
+            Route::prefix('api/utd')
+                ->middleware(['api', 'localization'])
+                ->namespace($this->shippingNamespace)
+                ->group(__DIR__ . '/../Routes/shipping-utd.php');
+        }
+    }
+
+    /**
+     * Check if Laravel Admin (Encore) is installed.
+     *
+     * @return bool
+     */
+    protected function isLaravelAdminInstalled(): bool
+    {
+        return class_exists(\Encore\Admin\Admin::class);
     }
 
     /**
@@ -169,5 +200,20 @@ class AgencyServiceProvider extends ServiceProvider
             \Utd\Agency\Contracts\AgencyServiceInterface::class,
             \Utd\Agency\Contracts\AgencyRepositoryInterface::class,
         ];
+    }
+
+    /**
+     * Register the package's console commands.
+     *
+     * @return void
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                InstallAgencyCommand::class,
+                UninstallAgencyCommand::class,
+            ]);
+        }
     }
 }

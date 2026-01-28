@@ -1,8 +1,0 @@
-{{-- 
-    Shipping Agency Profile View
-    
-    This view is loaded from the main resources/views folder.
-    The package references views using: view('shippingAgencyProfile')
-    
-    For package-specific views, use: view('shipping-agency::viewname')
---}}

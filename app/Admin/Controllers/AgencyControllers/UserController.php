@@ -5,6 +5,7 @@ namespace App\Admin\Controllers\AgencyControllers;
 use Session;
 use App\Models\User;
 use App\Models\Agency;
+use App\Helpers\AgencyPackageHelper;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -421,7 +422,11 @@ class UserController extends MainController
                 $form->user_diamond = $oldDiamoundValue;
             }
 
-            $agancy = Agency::where('app_owner_id', $user_id)->first();
+            $agancy = null;
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                $agencyClass = AgencyPackageHelper::getAgencyClass();
+                $agancy = $agencyClass::where('app_owner_id', $user_id)->first();
+            }
             if ($agancy) {
 
 

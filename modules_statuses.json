@@ -12,7 +12,7 @@
     "SwitchAccount": true,
     "Chat": true,
     "Public": true,
-    "AgencyApp": true,
+    "AgencyApp": false,
     "Whatsapp": true,
     "CP": true,
     "ConfigApp": true,

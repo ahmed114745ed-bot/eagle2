@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\AgencyPackageHelper;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -35,7 +36,10 @@ class UpdateGiftRankings extends Command
             $this->updateRanking($type, 'sender', 'sender_id', $startDate);
             $this->updateRanking($type, 'receiver', 'receiver_id', $startDate);
             $this->updateRanking($type, 'roomOwner', 'roomowner_id', $startDate);
-            $this->updateRanking($type, 'agency', 'agency_id', $startDate);
+            // Only update agency ranking if package is installed
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                $this->updateRanking($type, 'agency', 'agency_id', $startDate);
+            }
             $this->updateRanking($type, 'roomId', 'room_id', $startDate);
         }
     }
@@ -46,7 +50,7 @@ class UpdateGiftRankings extends Command
 
         switch ($role) {
             case 'agency':
-                $rankerType = \App\Models\Agency::class;
+                $rankerType = AgencyPackageHelper::getAgencyClass() ?? \App\Models\Agency::class;
                 break;
 
             case 'roomId':

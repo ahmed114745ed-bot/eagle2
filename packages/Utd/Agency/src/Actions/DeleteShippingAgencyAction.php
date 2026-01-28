@@ -2,12 +2,10 @@
 
 namespace Utd\Agency\Actions;
 
-use App\Models\User;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class DeleteShippingAgencyAction extends RowAction
 {
@@ -19,12 +17,40 @@ class DeleteShippingAgencyAction extends RowAction
         parent::__construct();
     }
 
+    /**
+     * Get user model class from config
+     */
+    protected function getUserModel(): string
+    {
+        return config('agency-package.models.user', \App\Models\User::class);
+    }
+
+    /**
+     * Check if milestones module is enabled and get helper
+     */
+    protected function getMilestoneHelper(): ?string
+    {
+        if (!config('agency-package.modules.milestones.enabled', false)) {
+            return null;
+        }
+        
+        $helperClass = config('agency-package.modules.milestones.helper');
+        return class_exists($helperClass) ? $helperClass : null;
+    }
+
     public function handle(Model $model, Request $request)
     {
         try {
             DB::beginTransaction();
-            $owner = User::find($model->app_owner_id);
-            MilestoneHelper::removeReward($owner, 'charge-agency-owner');
+            
+            $userModel = $this->getUserModel();
+            $owner = $userModel::find($model->app_owner_id);
+            
+            // Remove milestone reward if module is available
+            $milestoneHelper = $this->getMilestoneHelper();
+            if ($milestoneHelper && $owner) {
+                $milestoneHelper::removeReward($owner, 'charge-agency-owner');
+            }
 
             $model->delete();
             DB::commit();

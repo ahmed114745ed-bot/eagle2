@@ -207,6 +207,7 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Nwidart\Modules\LaravelModulesServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         App\Bd\BdServiceProvider::class,
         App\Providers\TimeServiceProvider::class,

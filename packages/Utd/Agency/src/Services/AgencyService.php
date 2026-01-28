@@ -13,10 +13,13 @@ use Utd\Agency\Repositories\AgencySalaryRepository;
 use Utd\Agency\Repositories\LeaveAgencyRequestRepository;
 use Utd\Agency\Repositories\UsersJoinedAgencyRepository;
 use Utd\Agency\Repositories\AdditionalInfoRepository;
+use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Illuminate\Support\Facades\DB;
 
 class AgencyService implements AgencyServiceInterface
 {
+    use ConfigurableModelsTrait;
+
     public function __construct(
         protected AgencyRepository $agencyRepository,
         protected AgencyJoinRequestRepository $agencyJoinRequestRepository,
@@ -26,6 +29,32 @@ class AgencyService implements AgencyServiceInterface
         protected UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
         protected AdditionalInfoRepository $additionalInfoRepository,
     ) {}
+
+    /**
+     * Get user model class from config
+     */
+    protected function getUserModel(): string
+    {
+        return $this->getModelClass('user');
+    }
+
+    /**
+     * Find user by ID
+     */
+    protected function findUser($userId)
+    {
+        $userModel = $this->getUserModel();
+        return $userModel::find($userId);
+    }
+
+    /**
+     * Find user by UUID
+     */
+    protected function findUserByUuid($uuid)
+    {
+        $userModel = $this->getUserModel();
+        return $userModel::where('uuid', $uuid)->first();
+    }
 
     /**
      * Join agency
@@ -178,10 +207,10 @@ class AgencyService implements AgencyServiceInterface
         
         try {
             // Update user's agency
-            $user = \App\Models\User::find($userId);
+            $user = $this->findUser($userId);
             
             if (!$user) {
-                throw new Exception(__('api_responses.user_not_found'));
+                throw new Exception(__('agency::messages.user_not_found', [], 'api_responses.user_not_found'));
             }
             
             $user->agency_id = $agencyId;
@@ -216,10 +245,10 @@ class AgencyService implements AgencyServiceInterface
         DB::beginTransaction();
         
         try {
-            $user = \App\Models\User::find($userId);
+            $user = $this->findUser($userId);
             
             if (!$user) {
-                throw new Exception(__('api_responses.user_not_found'));
+                throw new Exception(__('agency::messages.user_not_found', [], 'api_responses.user_not_found'));
             }
             
             $agencyId = $user->agency_id;
@@ -296,7 +325,8 @@ class AgencyService implements AgencyServiceInterface
             }
             
             // Remove all members from agency
-            \App\Models\User::where('agency_id', $agencyId)->update([
+            $userModel = $this->getUserModel();
+            $userModel::where('agency_id', $agencyId)->update([
                 'agency_id' => null,
                 'type_user' => 0,
             ]);
@@ -336,7 +366,7 @@ class AgencyService implements AgencyServiceInterface
      */
     public function historyLastThirtyDays($userUuid)
     {
-        $user = \App\Models\User::where('uuid', $userUuid)->first();
+        $user = $this->findUserByUuid($userUuid);
         
         if (!$user) {
             return [];
@@ -426,7 +456,7 @@ class AgencyService implements AgencyServiceInterface
             $this->usersJoinedAgencyRepository->recordLeave($request->user_id, $request->agency_id);
             
             // Remove from agency
-            $user = \App\Models\User::find($request->user_id);
+            $user = $this->findUser($request->user_id);
             if ($user) {
                 $user->agency_id = null;
                 $user->type_user = 0;

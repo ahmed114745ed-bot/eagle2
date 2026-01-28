@@ -93,6 +93,12 @@
     $moduleGuards = [
         'moment' => \Utd\Moments\Entities\Moment::class,
         'achievement' => \Utd\Achievements\Entities\Achievement::class,
+        'agency' => \Utd\Agency\Models\Agency::class,
+        'agencies' => \Utd\Agency\Models\Agency::class,
+        'sallary' => \Utd\Agency\Models\Agency::class,
+        'sallaries' => \Utd\Agency\Models\Agency::class,
+        'salary' => \Utd\Agency\Models\Agency::class,
+        'salaries' => \Utd\Agency\Models\Agency::class,
     ];
 
     $moduleAllowed = true;

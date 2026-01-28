@@ -1,6 +1,7 @@
 <?php
 
 use KevinSoft\MultiLanguage\MultiLanguage;
+use App\Helpers\AgencyPackageHelper;
 
 use Modules\AreaManager\Http\Controllers\BdController;
 use Modules\AreaManager\Http\Controllers\AuthController;
@@ -8,18 +9,15 @@ use Modules\AreaManager\Http\Controllers\HomeController;
 use Modules\AreaManager\Http\Controllers\RoleController;
 use Modules\AreaManager\Http\Controllers\RoomController;
 use Modules\AreaManager\Http\Controllers\UserController;
-use Modules\AreaManager\Http\Controllers\AgencyController;
 use Modules\AreaManager\Http\Controllers\ChargeController;
 use Modules\AreaManager\Http\Controllers\WalletController;
 use Modules\AreaManager\Http\Controllers\LiveRoomController;
 use Modules\AreaManager\Http\Controllers\AdminUserController;
-use Modules\AreaManager\Http\Controllers\AgencyUserController;
 use Modules\AreaManager\Http\Controllers\BdSalariesController;
 use Modules\AreaManager\Http\Controllers\SuperAdminController;
 use Modules\AreaManager\Http\Controllers\AdminRewardController;
 use Modules\AreaManager\Http\Controllers\ProfessionalBdController;
 use Modules\AreaManager\Http\Controllers\OfficialMessageController;
-use Modules\AreaManager\Http\Controllers\AppearChargerAgencyController;
 use Modules\AreaManager\Http\Controllers\DedicateRewardHistoryController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeController;
 use Modules\AreaManager\Http\Controllers\Admin\AreaManagerChargeReportController;
@@ -119,16 +117,18 @@ Route::group(
         Route::resource('roles', RoleController::class);
         Route::resource('auth-users', AdminUserController::class);
 
-        //        //agencies
-        Route::resource('/agencies', AgencyController::class);
-        Route::resource('charge-agencies', AppearChargerAgencyController::class)->middleware('web-agency-feature');
-        Route::get('profile-shipping-agency/{id}', [AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
-        Route::get('profile-agency/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-        //        Route::resource('/request-agencies', RequestAgencyController::class);
-        Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
-            Route::resource('users', AgencyUserController::class);
-            Route::get('professional/users', [AgencyUserController::class, 'indexProfessionals']);
-        });
+        //        //agencies - only if package installed
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('/agencies', \Modules\AreaManager\Http\Controllers\AgencyController::class);
+            Route::resource('charge-agencies', \Modules\AreaManager\Http\Controllers\AppearChargerAgencyController::class)->middleware('web-agency-feature');
+            Route::get('profile-shipping-agency/{id}', [\Modules\AreaManager\Http\Controllers\AppearChargerAgencyController::class, 'shippingProfile'])->name('shipping.agency.profile');
+            Route::get('profile-agency/{id}', [\Modules\AreaManager\Http\Controllers\AgencyController::class, 'profile'])->name('agency.profile');
+            //        Route::resource('/request-agencies', RequestAgencyController::class);
+            Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
+                Route::resource('users', \Modules\AreaManager\Http\Controllers\AgencyUserController::class);
+                Route::get('professional/users', [\Modules\AreaManager\Http\Controllers\AgencyUserController::class, 'indexProfessionals']);
+            });
+        }
         Route::resource('live-rooms', LiveRoomController::class);
         Route::resource('official-message', OfficialMessageController::class);
 
@@ -166,12 +166,14 @@ Route::group(
             Route::get('distribution-rooms', [HomeController::class, 'distributionRooms']);
             Route::get('top-room-gifts', [HomeController::class, 'topRoomGifts']);
             Route::get('active-rooms', [HomeController::class, 'averageActiveRooms']);
-            Route::get('agency-target', [HomeController::class, 'agencyTarget']);
+            if (AgencyPackageHelper::isAgencyInstalled()) {
+                Route::get('agency-target', [HomeController::class, 'agencyTarget']);
+                Route::get('comparison-agencies-target', [HomeController::class, 'comparisonAgencyTarget']);
+                Route::get('agency-stats', [HomeController::class, 'getStats']);
+            }
             Route::get('top-sender', [HomeController::class, 'topSender']);
             Route::get('top-receiver', [HomeController::class, 'topReceiver']);
-            Route::get('comparison-agencies-target', [HomeController::class, 'comparisonAgencyTarget']);
             Route::get('room-stats', [HomeController::class, 'roomStats']);
-            Route::get('agency-stats', [HomeController::class, 'getStats']);
             Route::get('bd-stats', [HomeController::class, 'getBdStats']);
             Route::get('balance-data', [HomeController::class, 'getBalanceData']);
             Route::get('stats-data', [HomeController::class, 'getStatsData']);

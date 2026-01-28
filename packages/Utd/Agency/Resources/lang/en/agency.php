@@ -33,4 +33,21 @@ return [
     'target' => 'Target',
     'join_requests' => 'Join Requests',
     'leave_requests' => 'Leave Requests',
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Messages (replaces api_responses.*)
+    |--------------------------------------------------------------------------
+    */
+    'messages' => [
+        'agency' => 'Agency not found',
+        'agencyDown' => 'This agency is currently inactive',
+        'shippingAgency' => 'This is a shipping agency, you cannot join it as a host',
+        'you_are_already_under_agency' => 'You are already a member of an agency',
+        'you_already_send_request_to_this_agency' => 'You have already sent a request to this agency',
+        'user_not_found' => 'User not found',
+        'pending_leave_request' => 'You already have a pending leave request',
+        'already_admin' => 'User is already an admin',
+        'request_not_found' => 'Request not found',
+    ],
 ];

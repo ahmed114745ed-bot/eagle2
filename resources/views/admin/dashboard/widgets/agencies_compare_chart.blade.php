@@ -1,3 +1,4 @@
+@if(\App\Helpers\AgencyPackageHelper::isAgencyInstalled())
 {{-- <div class="box box-warning">
     <div class="box-header with-border">
         <h3 class="box-title">🏁 {{ __('Agencies Target Comparison') }}</h3>
@@ -106,3 +107,4 @@ function loadAgenciesCompareChart() {
 // Load immediately - no DOM waiting, no multiple event listeners
 loadAgenciesCompareChart();
 </script>
+@endif

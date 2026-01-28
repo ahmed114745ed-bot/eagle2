@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6a365e4bc4f6f6a830ab351081e3b5a2",
+    "content-hash": "bb0b1834e69a7da82e160a85523b3352",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2478,16 +2478,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.429.0",
+            "version": "v0.430.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "9dd334c8e6d3f25f91efcab86454c6bc0bc928c1"
+                "reference": "b936a8bb717af0367c6ebd45d3dcb69642fce340"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/9dd334c8e6d3f25f91efcab86454c6bc0bc928c1",
-                "reference": "9dd334c8e6d3f25f91efcab86454c6bc0bc928c1",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/b936a8bb717af0367c6ebd45d3dcb69642fce340",
+                "reference": "b936a8bb717af0367c6ebd45d3dcb69642fce340",
                 "shasum": ""
             },
             "require": {
@@ -2516,9 +2516,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.429.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.430.0"
             },
-            "time": "2026-01-19T01:08:26+00:00"
+            "time": "2026-01-26T00:56:27+00:00"
         },
         {
             "name": "google/auth",
@@ -7865,16 +7865,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.61",
+            "version": "10.5.63",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "bd265b671a63b87e85a8155f885b6fbb41ee505b"
+                "reference": "33198268dad71e926626b618f3ec3966661e4d90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/bd265b671a63b87e85a8155f885b6fbb41ee505b",
-                "reference": "bd265b671a63b87e85a8155f885b6fbb41ee505b",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/33198268dad71e926626b618f3ec3966661e4d90",
+                "reference": "33198268dad71e926626b618f3ec3966661e4d90",
                 "shasum": ""
             },
             "require": {
@@ -7946,7 +7946,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.61"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.63"
             },
             "funding": [
                 {
@@ -7970,7 +7970,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-24T16:06:23+00:00"
+            "time": "2026-01-27T05:48:37+00:00"
         },
         {
             "name": "predis/predis",
@@ -14376,11 +14376,11 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-achievmentPackage",
+            "version": "dev-agencyPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/achievements",
-                "reference": "93b4976488dc5e5d9a9a37248d438330facc3448"
+                "reference": "0bac63d13b4a92191c62beccecd5046ce57c812e"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14416,12 +14416,59 @@
             }
         },
         {
+            "name": "utd/agency",
+            "version": "dev-agencyPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Agency",
+                "reference": "d324920a12a5c3eec03e960fad55c044fadc076f"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Agency\\AgencyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Agency\\": "src/",
+                    "Utd\\Agency\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Complete Agency Laravel Package - Host Agency & Shipping Agency Management System",
+            "keywords": [
+                "agency",
+                "host-agency",
+                "laravel",
+                "management",
+                "shipping-agency"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "utd/moments",
-            "version": "dev-achievmentPackage",
+            "version": "dev-agencyPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
-                "reference": "e36dc1e02a19932aac8d656491975db9232824b9"
+                "reference": "a20d44d7a5a6212c4544657b83ddeb8e02cee856"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14451,46 +14498,6 @@
                 }
             ],
             "description": "Moments Laravel Package",
-            "transport-options": {
-                "relative": true
-            }
-        },
-        {
-            "name": "utd/shipping-agency",
-            "version": "dev-achievmentPackage",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/ShippingAgency",
-                "reference": "68a2eee9fc03251815d8369b78b1c7195e64f471"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\ShippingAgency\\ShippingAgencyServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\ShippingAgency\\": "src/",
-                    "Utd\\ShippingAgency\\Database\\": "Database/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Shipping Agency Laravel Package",
             "transport-options": {
                 "relative": true
             }
@@ -15267,10 +15274,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20,
-        "utd/moments": 20,
-        "utd/shipping-agency": 20
+        "fruitcake/laravel-cors": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

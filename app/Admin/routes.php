@@ -223,13 +223,16 @@ Route::group(
 
         Route::resource('rooms-preview', TestController::class); //
 
-        Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
-        Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
-        Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
-        Route::post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
-        Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
-        Route::get('agency-statistic', 'AgencyStatisticController@index');
-        //    Route::get('agency-settings', 'AgencySettingController@index');
+        // Agency routes - only load if package is installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
+            Route::get('agency-user-job/{agency_id}/create', 'AgencyUserJobController@create');
+            Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
+            Route::post('agency-user-job/{agency_id}', 'AgencyUserJobController@store');
+            Route::get('agency-user-job/{agency_id}/{id}/edit', 'AgencyUserJobController@edit');
+            Route::get('agency-statistic', 'AgencyStatisticController@index');
+            //    Route::get('agency-settings', 'AgencySettingController@index');
+        }
 
         Route::resource('test-test', 'TestTestController');
         Route::get('profile', [AdminAuthController::class, 'index']);
@@ -247,7 +250,10 @@ Route::group(
             'update' => 'auth.users.update',
             'destroy' => 'auth.users.destroy',
         ]);
-        Route::resource('/agencies/managers', AdminAgencyMangerController::class);
+        // Agency managers route - only if package is installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('/agencies/managers', AdminAgencyMangerController::class);
+        }
 
         Route::resource('auth/roles', RoleControllerNew::class);
         Route::get('super-roles', [SuperRoleController::class, 'index']);
@@ -360,22 +366,37 @@ Route::group(
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
-        Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
-        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-        // Shipping agency routes moved to packages/Utd/ShippingAgency/Routes/admin.php
-        Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
-        Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
-        Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
-        Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
+        
+        // Agency routes - wrapped with package check
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
+            Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
+            // Shipping agency routes moved to packages/Utd/ShippingAgency/Routes/admin.php
+            Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
+            Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
+            Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
+            Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
+        }
+        
         Route::resource('families', 'FamilyController');
-        Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
-        Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
-        Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
-        Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel'])->middleware('web-agency-feature');
+        
+        // Target routes - only if agency installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('targets', 'TargetController')->middleware('web-agency-feature');
+            Route::get('/targets-confirm', [TargetController::class, 'confirm'])->name('targets.confirm');
+            Route::get('/download-target-pdf', [TargetController::class, 'downloadTargetPdf'])->name('download.target.pdf')->middleware('web-agency-feature');
+            Route::get('download-target-excel', [TargetController::class, 'downloadTargetExcel'])->middleware('web-agency-feature');
+        }
+        
         Route::resource('polices', PoliceController::class);
         Route::resource('offers', OfferController::class);
         Route::resource('payment-coins', PaymentCoinController::class);
-        Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
+        
+        // Shipping agency payment coins - only if shipping package installed
+        if (\App\Helpers\AgencyPackageHelper::isShippingAgencyInstalled()) {
+            Route::resource('shipping-agency-payment-coins', ShippingAgencyPaymentCoinController::class);
+        }
+        
         Route::resource('charges', 'ChargeController');
         Route::get('/area-manager-charges-reports', [AdminAreaManagerChargeController::class, 'index']);
         Route::resource('charges-details', 'ChargesDetailsController', [
@@ -454,11 +475,21 @@ Route::group(
 
 
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
-        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
+        
+        // Agency home - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
+        }
+        
         Route::resource('manger-types', 'MangerTypeController');
         Route::resource('userscharg', chargUsersSleemController::class);
         Route::resource('image-colors', ImageColorController::class);
-        Route::resource('agency_join_requests', 'AgencyJoinRequestController')->middleware('web-agency-feature');
+        
+        // Agency join requests - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('agency_join_requests', 'AgencyJoinRequestController')->middleware('web-agency-feature');
+        }
+        
         Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
         Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
         Route::resource('special-id-requests', 'SpecialIdRequestController');
@@ -565,20 +596,22 @@ Route::group(
 
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
 
+        // Agency controllers group - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
+                Route::get('/', 'HomeController@infoBox')->name('home');
+                Route::resource('/users', UserController::class);
+                Route::get('professional/users', [UserController::class, 'indexProfessionals']);
 
-        Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
-            Route::get('/', 'HomeController@infoBox')->name('home');
-            Route::resource('/users', UserController::class);
-            Route::get('professional/users', [UserController::class, 'indexProfessionals']);
-
-            Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
-            // Route::get('/users/{id}/edit', 'UserController@edit');
-            // Route::get('/users/{id}', 'UserController@show');
-            Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
-            Route::get('/target', 'AgencyTargetController@index')->name('targets');
-            Route::get('/charges', 'ChargeController@index')->name('charges');
-            Route::resource('/ag-req', 'AgencyJoinRequestController');
-        });
+                Route::get('/host-diamonds', [HostDiamondController::class, 'index'])->name('hsot-diamond');
+                // Route::get('/users/{id}/edit', 'UserController@edit');
+                // Route::get('/users/{id}', 'UserController@show');
+                Route::get('/userTarget', 'UserTargetController@index')->name('userTarget');
+                Route::get('/target', 'AgencyTargetController@index')->name('targets');
+                Route::get('/charges', 'ChargeController@index')->name('charges');
+                Route::resource('/ag-req', 'AgencyJoinRequestController');
+            });
+        }
 
         Route::prefix('ch')->name('charger.')->namespace('ChargerControllers')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
@@ -609,14 +642,29 @@ Route::group(
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
         Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
-        Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
-        Route::resource('agency-manger-users', AgencyMangerUsers::class);
+        
+        // Agency manager routes - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
+            Route::resource('agency-manger-users', AgencyMangerUsers::class);
+        }
+        
         Route::resource('core-wallets', CoreWalletsController::class);
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
-        Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
+        
+        // Change agency manager - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
+        }
+        
         // Route::resource('charge-agencies', ...) moved to packages/Utd/ShippingAgency/Routes/admin.php
-        Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
+        
+        // Users joined agencies - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
+        }
+        
         Route::resource('super-package-rewards', SuperPackageController::class);
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);
         Route::get('admin-rewards-histories/{id}', [SuperAdminRewardControllerHistory::class, 'getRewards']);
@@ -636,7 +684,11 @@ Route::group(
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
         Route::resource('custom-zego-messages', CustomZegoMessageController::class);
-        Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
+        
+        // Agency settings - only if package installed
+        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('agency-settings', AgencySettingsController::class)->middleware('web-agency-feature');
+        }
         Route::resource('app-feature', FeatureAppController::class);
         Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);

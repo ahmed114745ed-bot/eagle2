@@ -10,10 +10,9 @@ use App\Bd\Controllers\WalletController;
 // use App\Bd\Controllers\RequestAgencyController;
 // use App\Bd\Controllers\ChargeController;
 // use App\Bd\Controllers\BdSalariesController;
-use App\Bd\Controllers\AgencyController;
 use App\Bd\Controllers\UserController;
 use KevinSoft\MultiLanguage\MultiLanguage;
-use App\Bd\Controllers\RequestAgencyController;
+use App\Helpers\AgencyPackageHelper;
 
 
 
@@ -70,17 +69,21 @@ Route::group(
 
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
-        Route::resource('/agencies', AgencyController::class);
+        
+        // Agency routes - only if package installed
+        if (AgencyPackageHelper::isAgencyInstalled()) {
+            Route::resource('/agencies', \App\Bd\Controllers\AgencyController::class);
+            Route::get('agencies/profile/{id}', [\App\Bd\Controllers\AgencyController::class, 'profile'])->name('agency.profile');
+            Route::resource('/request-agencies', \App\Bd\Controllers\RequestAgencyController::class);
+        }
+        
         Route::resource('/salaries', BdSalariesController::class);
         Route::resource('/charges', ChargeController::class);
         // Route::resource('/wallet', 'WalletController');
         Route::post('wallet/charge', [WalletController::class, 'charge'])->name('wallet.charge');
         Route::post('salary/transfer', [WalletController::class, 'transfer'])->name('salary.transfer');
-        Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
 
         Route::post('/locale', MultiLanguageController::class . '@locale');
-
-        Route::resource('/request-agencies', RequestAgencyController::class);
     }
 );
