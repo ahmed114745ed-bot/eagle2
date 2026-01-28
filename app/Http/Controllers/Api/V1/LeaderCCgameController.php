@@ -44,6 +44,13 @@ class LeaderCCgameController extends Controller
 
     public function userInformation(Request $request)
     {
+        Log::info('LeaderCCgameController@userInformation', [
+            'uid' => $request->uid,
+            'gameId' => $request->gameId,
+            'token' => $request->token,
+            'all' => $request->all(),
+        ]);
+
         return $this->safe(function () use ($request) {
 
             if (!$request->uid || !$request->gameId || !$request->token) {
@@ -75,6 +82,16 @@ class LeaderCCgameController extends Controller
 
     public function updateGameCoin(Request $request)
     {
+        Log::info('LeaderCCgameController@updateGameCoin', [
+            'orderId' => $request->orderId,
+            'gameId' => $request->gameId,
+            'roundId' => $request->roundId,
+            'uid' => $request->uid,
+            'coin' => $request->coin,
+            'type' => $request->type,
+            'all' => $request->all(),
+        ]);
+
         return $this->safe(function () use ($request) {
 
             $required = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
@@ -157,6 +174,15 @@ class LeaderCCgameController extends Controller
 
     public function makeUpOrders(Request $request)
     {
+        Log::info('LeaderCCgameController@makeUpOrders', [
+            'orderId' => $request->orderId,
+            'gameId' => $request->gameId,
+            'roundId' => $request->roundId,
+            'uid' => $request->uid,
+            'coin' => $request->coin,
+            'all' => $request->all(),
+        ]);
+
         return $this->safe(function () use ($request) {
 
             $validator = Validator::make($request->all(), [
