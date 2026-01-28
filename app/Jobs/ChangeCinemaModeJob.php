@@ -6,7 +6,7 @@ use Utd\Room\Entities\Room;
 
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
-use App\Http\Services\RoomService;
+use Utd\Room\Services\RoomUserService;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,7 +35,7 @@ class ChangeCinemaModeJob implements ShouldQueue
 
 
 
-            $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
+            $jsons[] = $this->changeBackground($room, $room->uid, (new RoomUserService())->getRoomBackground($room));
             //  \Log::info("cinema mode");
             Common::sendToZego3('SendCustomCommand', $room->id, $room->uid, $jsons);
         }

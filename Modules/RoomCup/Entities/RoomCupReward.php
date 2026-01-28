@@ -2,11 +2,12 @@
 
 namespace Modules\RoomCup\Entities;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Room;
+use Utd\Room\Entities\TotalRoomGift;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Modules\RoomBoom\Entities\TotalRoomGift;
 
 class RoomCupReward extends Model
 {
@@ -32,6 +33,7 @@ class RoomCupReward extends Model
     }
     public function room(): BelongsTo
     {
-        return $this->belongsTo(Room::class, 'room_id');
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class, 'room_id');
     }
 }

@@ -25,7 +25,7 @@ use App\Services\LuckyGiftService;
 use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Jobs\UpdatePkAndSendToZigo;
+use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
 use App\Services\Gifts\GiftService;
 use App\Services\RoomLevelServices;
 use Illuminate\Support\Facades\Log;
@@ -50,9 +50,9 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
-use App\Repositories\Room\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
 use Utd\Achievements\Jobs\CalculateAchievement;
-use App\Http\Services\RoomAchievementTargetService;
+use Utd\Room\Services\RoomAchievementTargetService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 

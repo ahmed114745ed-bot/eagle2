@@ -15,21 +15,14 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use Utd\Room\Entities\EnteredRoom;
 use Utd\Room\Entities\RoomCategory;
-use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-
 use Encore\Admin\Facades\Admin;
 use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\RoomPinAction;
-use App\Admin\Actions\CloseRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Log;
 use Modules\LuckyBox\Entities\BoxUse;
 
 class LiveRoomController extends \App\Admin\Controllers\MainController
@@ -524,12 +517,12 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
-                
+
                     $locale = app()->getLocale(); // 'ar', 'en', etc.
                     $column = $locale === 'ar' ? 'name' : 'e_name';
 
                     $countries =\App\Models\Country::query()->pluck($column, 'id');
-                
+
 
                 $filter->where(function ($query) {
                     if ($this->input) {

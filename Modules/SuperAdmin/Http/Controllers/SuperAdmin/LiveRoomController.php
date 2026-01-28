@@ -18,6 +18,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use App\Support\PackageHelper;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
@@ -139,10 +140,12 @@ class LiveRoomController extends MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = Pk::where('room_id', $room->id)
-            ->with(['team1Boss.profile', 'team2Boss.profile'])
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        $pks = PackageHelper::isInstalled('room')
+            ? Pk::where('room_id', $room->id)
+                ->with(['team1Boss.profile', 'team2Boss.profile'])
+                ->orderByDesc('created_at')
+                ->paginate(15)
+            : collect();
 
         $currentPage = request()->get('page', 1);
         $perPage = 15;
@@ -179,7 +182,7 @@ class LiveRoomController extends MainController
 
         $boxes = $query->orderByDesc('created_at')->paginate(15);
 
-        $roomTypes = RoomCategory::where('enable', 1)->get();
+        $roomTypes = PackageHelper::isInstalled('room') ? RoomCategory::where('enable', 1)->get() : collect([]);
 
         $roomModes = [
             '0' => 10,
@@ -375,6 +378,9 @@ class LiveRoomController extends MainController
     {
         switch ($filterType) {
             case 'boss':
+                if (!PackageHelper::isInstalled('room')) {
+                    break;
+                }
                 $cacheKey = "user:{$user->id}:rooms:boss";
                 $roomIds = Cache::remember($cacheKey, 60, function () use ($user) {
                     return EnteredRoom::query()
@@ -430,6 +436,9 @@ class LiveRoomController extends MainController
                 break;
 
             case 'interested':
+                if (!PackageHelper::isInstalled('room')) {
+                    break;
+                }
                 $cacheKey = "user:{$user->id}:rooms:interested";
                 $roomTypes = Cache::remember($cacheKey, 60, function () use ($user) {
                     return EnteredRoom::query()
@@ -813,22 +822,24 @@ class LiveRoomController extends MainController
         $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
         $form->hidden('is_afk', __('owner in'));
         $form->hidden('type', __(' '))->default('live');
-        $form->select('room_class')->options(function () {
-            $options = [];
-            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
-            foreach ($cats as $cat) {
-                $options[$cat->id] = $cat->name;
-            }
-            return $options;
-        });
-        $form->select('room_type', __('room type'))->options(function () {
-            $options = [];
-            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
-            foreach ($cats as $cat) {
-                $options[$cat->id] = $cat->name;
-            }
-            return $options;
-        });
+        if (PackageHelper::isInstalled('room')) {
+            $form->select('room_class')->options(function () {
+                $options = [];
+                $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
+                foreach ($cats as $cat) {
+                    $options[$cat->id] = $cat->name;
+                }
+                return $options;
+            });
+            $form->select('room_type', __('room type'))->options(function () {
+                $options = [];
+                $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
+                foreach ($cats as $cat) {
+                    $options[$cat->id] = $cat->name;
+                }
+                return $options;
+            });
+        }
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'));
 

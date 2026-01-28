@@ -28,7 +28,7 @@ use App\Repositories\FollowRepository;
 use App\Tik\Repositories\BdRepository;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
-use App\Http\Services\RoomGameServices;
+use Utd\Room\Services\RoomGameServices;
 use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;

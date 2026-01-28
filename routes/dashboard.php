@@ -19,11 +19,10 @@ use App\Http\Controllers\Dashboard\Levels\AdminLevelssController;
 use App\Http\Controllers\Dashboard\OfficalMssages\AdminOfficalMssagesController;
 use App\Http\Controllers\Dashboard\Profile\ProfileDashboardController;
 use App\Http\Controllers\Dashboard\Room\AdminBackgroundRequestController;
-use App\Http\Controllers\Dashboard\Room\AdminBackgroundRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminEmojeRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminGiftRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminRoomCategoriesController;
-use App\Http\Controllers\Dashboard\Room\AdminRoomsController;
+use Utd\Room\Http\Controllers\Dashboard\AdminRoomsController;
 use App\Http\Controllers\Dashboard\Users\UsersDashboard;
 use App\Http\Controllers\Dashboard\Vips\AdminPrivilegeVipsController;
 use App\Http\Controllers\Dashboard\Vips\AdminVipsController;
@@ -100,14 +99,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     });
 
     //********************** Start Rooms ********************** \\
-        //bacground
-        Route::controller(AdminBackgroundRoomController::class)->group(function(){
-            Route::resource('room-background', AdminBackgroundRoomController::class);
-            route::get('/enable-room-background/{id}/{status}','enable_Background');
-            route::get('/Sort-background/{main_type}','sort');
-            route::post('/Change-Sort-background','change_sort');
-        });
-
+        //bacground - moved to Room package (packages/Utd/Room/Routes/dashboard.php)
         Route::resource('background-requests', AdminBackgroundRequestController::class);
 
         //Categories

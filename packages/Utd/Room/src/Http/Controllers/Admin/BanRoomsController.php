@@ -2,16 +2,16 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Grid;
 use Utd\Room\Entities\BanRoom;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Actions\BanRoomAction;
-use App\Admin\Controllers\MainController;
+use Utd\Room\Admin\Actions\BanRoomAction;
 use Encore\Admin\Controllers\HasResourceActions;
 
 
-class BanRoomsController extends \App\Admin\Controllers\MainController
+class BanRoomsController extends MainController
 {
     use HasResourceActions;
     public $permission_name = 'close-room';
@@ -183,7 +183,7 @@ class BanRoomsController extends \App\Admin\Controllers\MainController
         });
         if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('Delete'))->display(function () {
-                return (new \App\Admin\Actions\DeleteBansRoom($this->id))->render();
+                return (new \Utd\Room\Admin\Actions\DeleteBansRoom($this->id))->render();
             });
         }
 

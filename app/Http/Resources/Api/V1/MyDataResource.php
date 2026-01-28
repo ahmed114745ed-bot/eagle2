@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Helpers\UserPackHelper;
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
@@ -283,6 +284,9 @@ class MyDataResource extends JsonResource
     }
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
             ->where('room_id', $roomId)
             ->orderByDesc('created_at')

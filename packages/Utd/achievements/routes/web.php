@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
@@ -32,7 +32,7 @@ Route::group(
             'multiLanguage',
             'appFeatureEnable:achievement',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix') . '.',
     ],
     function () {
         Route::resource('achievements', AchievementsController::class);

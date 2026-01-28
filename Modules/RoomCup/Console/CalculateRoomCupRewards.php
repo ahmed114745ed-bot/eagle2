@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Modules\RoomCup\Entities\RoomCupTarget;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Modules\RoomCup\Entities\RoomCupReward;
 use Utd\Room\Entities\Room;
 use App\Models\User;

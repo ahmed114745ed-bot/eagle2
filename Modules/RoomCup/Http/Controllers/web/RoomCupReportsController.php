@@ -2,13 +2,14 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
+use App\Helpers\PackageHelper;
 use App\Models\User;
 use Utd\Room\Entities\Room;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Modules\RoomCup\Entities\RoomCupReward;
-use Modules\RoomCup\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
 

@@ -20,6 +20,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Carbon;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use App\Support\PackageHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use App\Admin\Services\UserService;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Support\PackageHelper;
 
 class RoomController extends MainController
 {
@@ -141,10 +143,12 @@ class RoomController extends MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = Pk::where('room_id', $room->id)
-            ->with(['team1Boss.profile', 'team2Boss.profile'])
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        $pks = PackageHelper::isInstalled('room')
+            ? Pk::where('room_id', $room->id)
+                ->with(['team1Boss.profile', 'team2Boss.profile'])
+                ->orderByDesc('created_at')
+                ->paginate(15)
+            : collect();
 
         $currentPage = request()->get('page', 1);
         $perPage = 15;
@@ -181,7 +185,7 @@ class RoomController extends MainController
 
         $boxes = $query->orderByDesc('created_at')->paginate(15);
 
-        $roomTypes = RoomCategory::where('enable', 1)->get();
+        $roomTypes = PackageHelper::isInstalled('room') ? RoomCategory::where('enable', 1)->get() : collect([]);
 
         $roomModes = [
             '0' => 10,
@@ -373,6 +377,9 @@ class RoomController extends MainController
     {
         switch ($filterType) {
             case 'boss':
+                if (!PackageHelper::isInstalled('room')) {
+                    break;
+                }
                 $cacheKey = "user:{$user->id}:rooms:boss";
                 $roomIds = Cache::remember($cacheKey, 60, function () use ($user) {
                     return EnteredRoom::query()
@@ -428,6 +435,9 @@ class RoomController extends MainController
                 break;
 
             case 'interested':
+                if (!PackageHelper::isInstalled('room')) {
+                    break;
+                }
                 $cacheKey = "user:{$user->id}:rooms:interested";
                 $roomTypes = Cache::remember($cacheKey, 60, function () use ($user) {
                     return EnteredRoom::query()
@@ -870,22 +880,24 @@ class RoomController extends MainController
         $form->text('room_intro', __('room intro'));
         $form->text('room_pass', __('room pass'))->rules('nullable|integer|digits:6');
         $form->hidden('is_afk', __('owner in'));
-        $form->select('room_class')->options(function () {
-            $options = [];
-            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
-            foreach ($cats as $cat) {
-                $options[$cat->id] = $cat->name;
-            }
-            return $options;
-        });
-        $form->select('room_type', __('room type'))->options(function () {
-            $options = [];
-            $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
-            foreach ($cats as $cat) {
-                $options[$cat->id] = $cat->name;
-            }
-            return $options;
-        });
+        if (PackageHelper::isInstalled('room')) {
+            $form->select('room_class')->options(function () {
+                $options = [];
+                $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', 0)->get();
+                foreach ($cats as $cat) {
+                    $options[$cat->id] = $cat->name;
+                }
+                return $options;
+            });
+            $form->select('room_type', __('room type'))->options(function () {
+                $options = [];
+                $cats = RoomCategory::query()->where('enable', 1)->where('parent_id', $this->room_class)->get();
+                foreach ($cats as $cat) {
+                    $options[$cat->id] = $cat->name;
+                }
+                return $options;
+            });
+        }
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'));
 

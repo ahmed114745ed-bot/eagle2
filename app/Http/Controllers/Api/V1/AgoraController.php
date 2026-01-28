@@ -6,7 +6,7 @@ use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Repositories\Room\RoomRepository;
+use Utd\Room\Repositories\RoomRepository;
 use App\Repositories\User\UserRepository;
 use Utd\Room\Services\RoomVisitorService;
 use Illuminate\Http\Request;

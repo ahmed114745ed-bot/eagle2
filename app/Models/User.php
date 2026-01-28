@@ -31,8 +31,7 @@ use Modules\Badge\Entities\UserBadge;
 use Modules\Chat\Traits\ChatUserTrait;
 use Modules\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
-use Modules\Moment\Entities\Moment;
-use Modules\Moment\Entities\MomentUserGift;
+use Modules\LuckyBox\Entities\UserLuckyGift;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
@@ -41,8 +40,11 @@ use Modules\UsersWallet\Entities\UserWallet;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
+use Utd\Moments\Entities\Moment;
+use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Entities\Room;
 use Utd\Room\Entities\RoomSalary;
+use Utd\Room\Entities\RoomVisitor;
 
 /**
  * @method static withoutAppends()
@@ -441,7 +443,8 @@ class User extends Authenticatable
 
     public function requestBackgroundImages()
     {
-        return $this->hasMany(RequestBackgroundImage::class, 'owner_room_id');
+        return PackageHelper::checkRelation($this, 'room', 'hasMany') ??
+            $this->hasMany(RequestBackgroundImage::class, 'owner_room_id');
     }
 
     public function giftLogsSender()
@@ -605,7 +608,8 @@ class User extends Authenticatable
 
     public function rooms()
     {
-        return $this->hasMany(Room::class, 'uid');
+        return PackageHelper::checkRelation($this, 'room', 'hasMany') ??
+            $this->hasMany(Room::class, 'uid');
     }
 
     public function agency()
@@ -802,22 +806,28 @@ class User extends Authenticatable
 
     public function hasRoom()
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return false;
+        }
         return Room::query()->where('uid', $this->id)->exists();
     }
 
     public function ownerRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'id');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'uid', 'id');
     }
 
     public function ownerAudioRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'uid', 'id')->where('type', 'audio');
     }
 
     public function ownerLiveRoom()
     {
-        return $this->hasOne(Room::class, 'uid', 'id')->where('type', 'live');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'uid', 'id')->where('type', 'live');
     }
 
     public function familyType()
@@ -1005,21 +1015,25 @@ class User extends Authenticatable
 
     public function room()
     {
-        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'id', 'now_room_uid');
     }
 
     public function nowRoom()
     {
-        return $this->hasOne(Room::class, 'id', 'now_room_uid');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'id', 'now_room_uid');
     }
 
     public function nowAudioRoom()
     {
-        return $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'id', 'now_room_uid')->where('type', 'audio');
     }
     public function myroom()
     {
-        return $this->hasOne(Room::class, 'uid', 'id');
+        return PackageHelper::checkRelation($this, 'room', 'hasOne') ??
+            $this->hasOne(Room::class, 'uid', 'id');
     }
 
     public function color_image()

@@ -3,13 +3,14 @@
 namespace Modules\RoomBoom\Services;
 
 use App\Helpers\Common;
+use App\Helpers\PackageHelper;
 use Cache;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Entities\RoomBoomLevel;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Modules\RoomBoom\Jobs\EndBoomPusherJob;
 use Modules\RoomBoom\Jobs\EndBoomZegoJob;
 use Modules\RoomBoom\Jobs\RoomBoomRewardJob;
@@ -169,6 +170,9 @@ class BoomGiftService
      */
     private function incrementTodayRoomGift($roomId, $todayStart, $totalPrice)
     {
+        if (!PackageHelper::isInstalled('utd/room')) {
+            return 0;
+        }
         return DB::transaction(function () use ($roomId, $todayStart, $totalPrice) {
             $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
                 ->where('created_at', '>=', $todayStart)

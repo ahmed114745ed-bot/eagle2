@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
@@ -13,12 +14,9 @@ use App\Models\Agency;
 use App\Models\Config;
 use App\Models\Follow;
 use App\Models\Target;
-use Encore\Admin\Show;
 use GuzzleHttp\Client;
 use App\Models\GiftLog;
-use App\Models\PackLog;
 use App\Models\Setting;
-use Utd\Room\Entities\Background;
 use Utd\Room\Entities\RoomVisitor;
 use App\Models\UserCoinLog;
 use App\Models\UserSallary;
@@ -48,7 +46,7 @@ use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\InfoTrait;
-use App\Traits\HelperTraits\RoomTrait;
+use Utd\Room\Traits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
 use App\Traits\HelperTraits\AdminTrait;
@@ -64,7 +62,6 @@ use App\Traits\HelperTraits\AttributesTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Classes\Facades\Agency as FacadesAgency;
 use Modules\AreaManager\Entities\SubAreaManager;
 use Modules\Charizma\Http\Services\UserCharismaService;
 
@@ -168,20 +165,6 @@ class Common
         $data['sender_img'] = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
 
         return $data;
-    }
-    public static function backgroundCount($oldBackgroundId = 0, $newBackGroundId = 0)
-    {
-        $oldBackground = Background::where("id", $oldBackgroundId)->orWhere("img", $oldBackgroundId)->first();
-        if ($oldBackground != null) {
-            $oldBackground->use_count -= 1;
-            $oldBackground->save();
-        }
-
-        $newBackground = Background::find($newBackGroundId);
-        if ($newBackground != null) {
-            $newBackground->use_count += 1;
-            $newBackground->save();
-        }
     }
 
     public static function getLevels($levels): Collection
@@ -1106,7 +1089,7 @@ class Common
             } else {
                 if ($tokens instanceof \Illuminate\Support\Collection) $tokens = $tokens->toArray();
 
-              
+
 
                 SendFirebaseNotificationJob::dispatch(
                     tokens: $tokens,
@@ -1178,9 +1161,9 @@ class Common
             $resultDecoded = json_decode($result->body());
 
             if ($result->successful()) {
-             
+
             } else {
-           
+
             }
 
             // Remove group with $key if is group
@@ -1979,7 +1962,9 @@ class Common
         if ($room->room_admin == null) {
             $room->update(['is_afk' => 0]);
         }
-        Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
+        if (PackageHelper::isInstalled('room')) {
+            Pk::where('room_id', $room->id)->where('status', 1)->update(['status' => 0]);
+        }
     }
 
     private function handleCharismaStatusOnLogout($room, $users, $ownerId)

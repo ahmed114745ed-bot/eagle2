@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
+use Utd\Room\Entities\Pk;
 use Utd\Room\Entities\Room;
 
 class PackageHelper
@@ -16,6 +17,7 @@ class PackageHelper
         'moment' => Moment::class,
         'real' => Real::class,
         'room' => Room::class,
+        'pk' => Pk::class,
     ];
 
     /**
@@ -41,10 +43,10 @@ class PackageHelper
     /**
      * Query model safely
      */
-    public static function checkRelation(Model $model, string $package): ?HasOne
+    public static function checkRelation(Model $model, string $package, string $relationType)
     {
         if (!self::isInstalled($package)) {
-            return $model->hasOne($model::class, 'id', 'id')->whereRaw('1 = 0');
+            return $model->$relationType($model::class, 'id', 'id')->whereRaw('1 = 0');
         }
 
         return null;

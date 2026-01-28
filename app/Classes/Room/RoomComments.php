@@ -10,7 +10,7 @@ use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Repositories\Room\RoomRepoInterface;
+use Utd\Room\Repositories\RoomRepoInterface;
 use Illuminate\Validation\ValidationException;
 
 class RoomComments

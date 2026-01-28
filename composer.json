@@ -52,7 +52,7 @@
         "utd/achievements": "*",
         "utd/moments": "*",
         "utd/reals": "*",
-        "utd/room": "dev-room-package"
+        "utd/room": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

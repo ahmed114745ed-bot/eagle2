@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Room\Entities\Room;
@@ -80,6 +81,9 @@ class RoomSearchResource extends JsonResource
 
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
             ->where('room_id', $roomId)
             ->orderByDesc('created_at')

@@ -31,4 +31,21 @@ class PkRepository extends AbstractRepository
     {
         return $this->update(['status' => 0], $pkId);
     }
+
+    public function getPk($roomId)
+    {
+        return $this->model->query()->where('room_id', $roomId)->where('status', 1)->first();
+    }
+
+    public function findById($id)
+    {
+        return $this->model->query()->where('id', $id)->where('status', 1)->orderByDesc('id')->first();
+    }
+
+    public function roomPks($userId, $perPage, $page)
+    {
+        return $this->model->whereHas('room', function ($q) use ($userId) {
+            $q->where('uid', $userId);
+        })->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+    }
 }

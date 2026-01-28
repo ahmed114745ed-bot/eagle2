@@ -23,6 +23,8 @@ use Utd\Room\Repositories\RoomVisitorRepository;
 use Utd\Room\Repositories\EnteredRoomRepository;
 use Utd\Room\Repositories\RoomCategoryRepository;
 use Utd\Room\Repositories\RoomMicrophoneRepository;
+use Utd\Room\Repositories\RoomRepo;
+use Utd\Room\Repositories\RoomRepoInterface;
 
 class RoomServiceProvider extends ServiceProvider
 {
@@ -36,6 +38,9 @@ class RoomServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../Config/room.php', 'room');
+
+        // Bind the repository interface to the implementation
+        $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
     }
 
     /**
@@ -50,6 +55,21 @@ class RoomServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerMigrations();
         $this->registerPublishing();
+        $this->registerCommands();
+    }
+
+    /**
+     * Register the package commands.
+     *
+     * @return void
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Utd\Room\Console\Commands\RemoveBackgroundCron::class,
+            ]);
+        }
     }
 
     /**
@@ -72,6 +92,10 @@ class RoomServiceProvider extends ServiceProvider
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
             ->group(__DIR__ . '/../Routes/utd.php');
+
+        Route::prefix('api/dashboard')
+            ->middleware(['api'])
+            ->group(__DIR__ . '/../Routes/dashboard.php');
     }
 
     /**

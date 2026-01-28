@@ -9,7 +9,7 @@ use App\Models\Cp;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Repositories\Room\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

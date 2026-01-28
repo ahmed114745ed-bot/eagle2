@@ -2,7 +2,7 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
-use App\Models\RoomGiftTarget;
+use Utd\Room\Entities\RoomGiftTarget;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

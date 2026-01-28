@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;;
 use App\Models\User;
 use App\Helpers\Common;
@@ -459,6 +460,9 @@ class RankingService
     }
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
             ->where('room_id', $roomId)
             ->orderByDesc('created_at')

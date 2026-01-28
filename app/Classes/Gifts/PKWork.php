@@ -4,6 +4,7 @@ namespace App\Classes\Gifts;
 
 use App\Helpers\Common;
 use App\Interfaces\RoomJobInterface;
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Carbon\Carbon;
@@ -18,8 +19,9 @@ class PKWork implements RoomJobInterface
         if(!$room) throw \Exception('Room not found');
         $userIds = unserialize($roomJob->data);
         $earnedCoinsPerUser = $roomJob->coins;
-        $lastPk =
-            Pk::query()->where('room_id', $room->id)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first();
+        $lastPk = PackageHelper::isInstalled('room')
+            ? Pk::query()->where('room_id', $room->id)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first()
+            : null;
         $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk,$userIds, $earnedCoinsPerUser, $room);
         return ['room_id'=> $room->id, ...$data];
     }

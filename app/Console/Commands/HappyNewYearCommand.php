@@ -3,11 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\AllOpeningRoomsZegoRequest;
-use Utd\Room\Entities\Background;
-use Utd\Room\Entities\RequestBackgroundImage;
-use Utd\Room\Entities\Room;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class HappyNewYearCommand extends Command
 {

@@ -2,30 +2,13 @@
 
 namespace Database\Seeders;
 
-use Utd\Room\Entities\RoomGame;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Utd\Room\Database\Seeders\RoomGameSeeder as PackageRoomGameSeeder;
 
-class RoomGameSeeder extends Seeder
+/**
+ * @deprecated Use Utd\Room\Database\Seeders\RoomGameSeeder instead
+ */
+class RoomGameSeeder extends PackageRoomGameSeeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        RoomGame::create([
-            'name' => 'RPS',
-            'type' => 'two_player'
-        ]);
-        RoomGame::create([
-            'name' => 'dice',
-            'type' => 'two_player'
-        ]);
-        RoomGame::create([
-            'name' => 'spin',
-            'type' => 'multi_player'
-        ]);
-    }
+    // This class is deprecated and will be removed in a future version.
+    // All functionality has been moved to the Room package.
 }

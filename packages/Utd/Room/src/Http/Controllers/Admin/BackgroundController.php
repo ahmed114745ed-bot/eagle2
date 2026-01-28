@@ -4,7 +4,6 @@ namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Helpers\Common;
 use Utd\Room\Entities\Background;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;

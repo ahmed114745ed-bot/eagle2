@@ -2,6 +2,7 @@
 
 namespace Modules\LuckyBox\Entities;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
@@ -32,11 +33,13 @@ class BoxUse extends Model
 
     public function room()
     {
-        return $this->belongsTo(Room::class, 'room_uid', 'uid');
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class, 'room_uid', 'uid');
     }
     public function roomV2()
     {
-        return $this->belongsTo(Room::class, 'room_id', 'id');
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class, 'room_id', 'id');
     }
 
     public function userBoxGifts()

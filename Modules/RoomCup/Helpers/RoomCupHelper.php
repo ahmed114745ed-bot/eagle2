@@ -5,15 +5,20 @@ namespace Modules\RoomCup\Helpers;
 use App\Helpers\Common;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Utd\Room\Entities\EnteredRoom;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
+use App\Support\PackageHelper;
 
 class RoomCupHelper
 {
     public static function updateRoomVisitors(int $roomId): void
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return;
+        }
+
         $timezone = Common::timeZone();
         $today    = Carbon::now($timezone)->startOfDay();
         $tomorrow = (clone $today)->endOfDay();

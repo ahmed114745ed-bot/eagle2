@@ -6,6 +6,7 @@ use App\helper\RankingHelper;
 use App\Http\Resources\RankingGameCollectionResource;
 use App\Http\Resources\RankingUserV2Resource;
 use App\Http\Resources\TopUserResource;
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Pk;;
 
 use App\Models\User;
@@ -455,6 +456,9 @@ class rankingServiceV2
     }
     private function getRoomTwoLastPk(int $roomId)
     {
+        if (!PackageHelper::isInstalled('room')) {
+            return collect();
+        }
         return Pk::query()
             ->where('room_id', $roomId)
             ->orderByDesc('created_at')

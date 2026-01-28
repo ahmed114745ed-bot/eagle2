@@ -41,7 +41,7 @@ class GiftLog extends Model
 
     public function room()
     {
-        return PackageHelper::checkRelation($this, 'room') ??
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
             $this->belongsTo(Room::class, 'room_id');
     }
 

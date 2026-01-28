@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Jobs\UpdatePkAndSendToZigo;
+use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use App\Repositories\Room\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 class LuckyGiftService
@@ -101,7 +101,7 @@ class LuckyGiftService
         $user = User::withoutAppends()->find($userId);
         if (!$user) return;
         if ($room->lastPk) {
-            dispatch(new UpdatePkAndSendToZigo($userId, $room->id, $receiversIds, ($price), $room->microphone))->onQueue('updatePkAndSendToZigo');
+            dispatch(new UpdatePkAndSendToZigoJob($userId, $room->id, $receiversIds, ($price), $room->microphone))->onQueue('updatePkAndSendToZigo');
         }else if ($room->charizma_status){
             dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receiversIds, $price, $userId))->onQueue('default');
         }

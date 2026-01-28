@@ -2,6 +2,7 @@
 
 namespace Modules\RoomCup\Http\Controllers\Api;
 
+use App\Helpers\PackageHelper;
 use App\Models\Setting;
 use Carbon\Carbon;
 use Utd\Room\Entities\Room;
@@ -11,7 +12,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Modules\RoomCup\Entities\RoomCupReward;
-use Modules\RoomBoom\Entities\TotalRoomGift;
+use Utd\Room\Entities\TotalRoomGift;
 use Illuminate\Support\Facades\Storage;
 use Modules\RoomCup\Entities\RoomCupTarget;
 use Modules\RoomCup\Http\Resources\RoomCupRewardResource;
