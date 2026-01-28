@@ -462,7 +462,7 @@ class UserService
         UserFollowHelper::updateCounts($unFollower);
 
         $this->followRepository->deleteFollow($auth->id, $unFollower->id);
-        return Common::apiResponse(true, 'unFollow done', null, 201);
+        return Common::apiResponse(true, 'unFollow done', null, 200);
     }
 
     protected function handleFollowBack($user, $receiver)
