@@ -694,11 +694,12 @@ ease;
                                         $labelId = $field->field_name . '_label';
                                     @endphp
 
-                                    {{-- <div class="file-upload" style="position: relative; display: inline-block;">
+                                    <div class="file-upload" style="position: relative; display: inline-block;">
                                         <input type="file"
                                             id="{{ $inputId }}"
                                             name="{{ $field->field_name }}"
                                             accept="image/*"
+                                            capture="environment"
                                             class="file-input"
                                             @required($field->is_required)
                                             onchange="handleFileUpload(this, '{{ $labelId }}')"
@@ -711,29 +712,7 @@ ease;
                                              style="border: 2px dashed #ccc; border-radius: 10px;   text-align: center; cursor: pointer; transition: 0.3s;">
                                         {{ __('upload_card_back') }}
                                         </label>
-                                    </div> --}}
-
-
-                                    <div class="file-upload">
-                                        <input
-                                            type="file"
-                                            id="{{ $inputId }}"
-                                            name="{{ $field->field_name }}"
-                                            accept="image/*"
-                                            class="file-input d-none"
-                                            @required($field->is_required)
-                                            onchange="handleFileUpload(this, '{{ $labelId }}')"
-                                        >
-
-                                        <label
-                                            for="{{ $inputId }}"
-                                            id="{{ $labelId }}"
-                                            class="file-upload-label d-flex align-items-center justify-content-center flex-column"
-                                        >
-                                            {{ __('upload_card_back') }}
-                                        </label>
                                     </div>
-
 
                                     {{-- <script>
                                     function handleFileUpload(input, labelId) {
