@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
-use Utd\Room\Services\RoomService;
+use Utd\Room\Services\RoomRepoService;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Http\Requests\EditRoomRequest;
 use Utd\Room\Entities\RequestBackgroundImage;
@@ -58,9 +58,8 @@ class RoomController extends Controller
 
     public function __construct(
         RoomRepoInterface $repo,
-        RoomService $roomService,
+        RoomRepoService $roomService,
         RoomMainService $roomServiceMain,
-
     ) {
         $this->repo = $repo;
         $this->roomService = $roomService;

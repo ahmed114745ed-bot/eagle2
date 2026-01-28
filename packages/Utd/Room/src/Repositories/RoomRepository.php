@@ -8,6 +8,8 @@ use App\Models\User;
 use Utd\Room\Entities\Room;
 use Utd\Room\Entities\EnteredRoom;
 use Utd\Room\Entities\RoomPrivateMessages;
+use App\Http\Resources\Api\V1\NowRoomResource;
+use App\Http\Resources\Api\V1\RoomResource;
 
 /**
  * @property Room $model
@@ -243,5 +245,445 @@ class RoomRepository extends AbstractRepository
                     ->orWhere('expire', '>=', now()->timestamp);
             })
             ->pluck('user_id');
+    }
+
+    public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
+    {
+        return RoomPrivateMessages::query()->create([
+            'from_user_id' => $fromUserId,
+            'to_user_id' => $toUserId,
+            'message' => $message,
+            'price' => $price
+        ]);
+    }
+
+    public function all($req, $ids = [])
+    {
+        $roomType = $req->room_type ?? 'audio';
+        $user = $req?->user();
+        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+
+        $blockedUserIds = $this->getBlockedUserIds();
+
+        $result = $this->model->withLuckyBoxFlag($user->id)
+            ->select(['id', 'uid', 'room_name', 'room_background', 'room_cover', 'room_intro', 'room_status', 'room_pass', 'room_admin', 'room_visitor', 'room_black', 'room_speak', 'room_sound', 'microphone', 'free_mic', 'max_admin', 'is_recommended', 'is_popular', 'is_live', 'hot', 'pin', 'top_room', 'hour_hot', 'type', 'mode', 'created_at'])
+            ->with([
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'defaultBackground:id,img',
+                'lastPk:id,room_id',
+                'background:id,img',
+                'roomVisitorUsers' => fn($q) => $q->with('profile')->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors',
+                'boxUse',
+                'owner.agency.owner',
+                'owner' => [
+                    'enabledMedals',
+                    'agency',
+                    'country',
+                    'color_image',
+                    'specialId.ware',
+                    'eligiblePacks.ware',
+                    'profile',
+                    'medals.achievementLevel.achievement'
+                ],
+            ])
+            ->withCount('roomVisitors')
+            ->whereHas('owner')
+            ->whereNotIn('uid', $blockedUserIds)
+            ->where('room_status', 1);
+
+        $result->orderByDesc('pin');
+
+        if ($topRooms && $roomType != 'live') {
+            $result->orderByRaw('is_top = 1 DESC');
+        } else {
+            $result->where(function ($query) {
+                $query->whereHas('roomVisitors')->orWhere('pin', 1);
+            });
+        }
+        $result->orderByDesc('room_visitors_count');
+        $result->orderByDesc('hour_hot');
+
+        if (!is_null($req->country_id)) {
+            $result->whereHas('owner', function ($q) use ($req) {
+                $q->where('country_id', $req->country_id);
+            });
+        }
+
+        switch ($req->filter) {
+            case 'boss':
+                $roomIds = EnteredRoom::query()
+                    ->where('uid', $user->id)
+                    ->orderByDesc('entered_at')
+                    ->pluck('rid')
+                    ->toArray();
+                $result->whereIn('id', $roomIds);
+                break;
+
+            case 'trend':
+                $result->orderBy('top_room', 'DESC')
+                    ->orderByDesc('session');
+                break;
+
+            case 'popular':
+                $result->orderByDesc('top_room');
+                break;
+
+            case 'last_create':
+                $result->whereDate('created_at', '>=', Carbon::now()->subDays(3))
+                    ->orderByDesc('id');
+                break;
+
+            case 'pk':
+                $result->has('lastPk');
+                break;
+
+            case 'party':
+                $result->whereHas('roomCategory', function ($query) {
+                    $query->where('type', 'party');
+                });
+                break;
+
+            case 'recently':
+            case 'festival':
+                $result->orderByDesc('top_room')
+                    ->orderByDesc('session');
+                break;
+
+            case 'interested':
+                $roomTypes = EnteredRoom::query()
+                    ->where('uid', $user->id)
+                    ->where('entered_at', '>=', Carbon::now()->subDay())
+                    ->with('room')
+                    ->get()
+                    ->pluck('room.room_type')
+                    ->unique();
+
+                $result->whereIn("room_type", $roomTypes)
+                    ->orderByDesc('top_room')
+                    ->orderByDesc('session');
+                break;
+
+            case 'following':
+                $result->whereIn('uid', $user->followeds_ids())
+                    ->orderByDesc('top_room')
+                    ->orderByDesc('session');
+                break;
+
+            case 'friends':
+                $result->whereIn('uid', $user->friends_ids())
+                    ->orderByDesc('top_room')
+                    ->orderByDesc('session');
+                break;
+
+            case 'nearby':
+                $userLat = $user->lat;
+                $userLong = $user->long;
+
+                $result->selectRaw(
+                    'rooms.*,
+                    ( 6371 * acos( cos( radians(?) ) * cos( radians( owner.lat ) ) * cos( radians( owner.long ) - radians(?) ) + sin( radians(?) ) * sin( radians( owner.lat ) ) ) ) AS distance',
+                    [$userLat, $userLong, $userLat]
+                )
+                    ->join('users as owner', 'rooms.uid', '=', 'owner.id')
+                    ->orderBy('distance');
+                break;
+        }
+
+        if (count($ids) > 0) {
+            $result = $result->whereIn('uid', $ids);
+        }
+
+        return $result->when($roomType != 'live', function ($q) use ($roomType) {
+            $q->where('type', $roomType);
+        })->when($roomType == 'live', function ($q) use ($roomType) {
+            $q->whereIn('type', ['single_live', 'multi_live']);
+        })->paginate(10);
+    }
+
+    public function mine($req, $id)
+    {
+        $user = User::find($id);
+        $query = $this->baseRoomQueryMyMine($user);
+
+        $audio = (clone $query)->where('type', 'audio')->first();
+        $live = (clone $query)->where('type', 'live')->first();
+
+        return [
+            'audio' => $audio
+                ? new RoomResource($audio)
+                : (object)[],
+
+            'live' => $live
+                ? new RoomResource($live)
+                : (object)[],
+        ];
+    }
+
+    public function getUserRooms($req, $id)
+    {
+        $user = User::find($id);
+        $query = $this->baseRoomQueryMine($user);
+
+        $audio = (clone $query)->where('type', 'audio')->first();
+        $live = (clone $query)->where('type', 'live')->where('is_live', true)->first();
+        $nowRooms = $this->getNowRooms($user);
+
+        return [
+            'audio' => $audio
+                ? new RoomResource($audio)
+                : (object)[],
+
+            'live' => $live
+                ? new RoomResource($live)
+                : (object)[],
+            'now_room' => $nowRooms
+                ? $nowRooms
+                : (object)[],
+        ];
+    }
+
+    private function getNowRooms($user)
+    {
+        if (!$user->now_room_uid) return (object)[];
+
+        $nowRoomOwner = $user->nowRoomOwner;
+
+        if (!$nowRoomOwner) return (object)[];
+
+        if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
+
+        $resource = (new NowRoomResource($this))->toArray(request());
+
+        return empty($resource) ? (object)[] : $resource;
+    }
+
+    private function baseRoomQuery($user, $blockedUserIds)
+    {
+        return $this->model
+            ->where('type', 'live')
+            ->where('is_live', true)
+            ->select([
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'type',
+                'mode',
+                'created_at'
+            ])
+            ->with([
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'lastPk:id,room_id',
+                'background:id',
+                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors.user.packs',
+                'owner.enabledMedals',
+                'owner.country',
+                'owner.eligiblePacks.ware',
+                'owner.profile',
+                'owner.medals.achievementLevel.achievement',
+                'boxUse',
+            ])
+            ->withCount('roomVisitors')
+            ->whereHas('owner')
+            ->whereNotIn('uid', $blockedUserIds)
+            ->whereHas('roomVisitors', function ($query) {
+                $query->whereColumn('user_id', 'rooms.uid');
+            })
+            ->where('room_status', 1)
+            ->orderByDesc('pin')
+            ->orderByDesc('room_visitors_count')
+            ->orderByDesc('hour_hot');
+    }
+
+    private function baseRoomQueryMyMine($user)
+    {
+        return $this->model
+            ->where('uid', $user->id)
+            ->select([
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'room_background',
+                'type',
+                'mode',
+                'created_at'
+            ])
+            ->with([
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'lastPk:id,room_id',
+                'background:id,img',
+                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors.user.packs',
+                'owner.enabledMedals',
+                'owner.country',
+                'owner.eligiblePacks.ware',
+                'owner.profile',
+                'owner.medals.achievementLevel.achievement',
+                'boxUse',
+                'taskStream',
+                'taskStreamRoom'
+            ])
+            ->withCount('roomVisitors')
+            ->orderByDesc('pin')
+            ->orderByDesc('room_visitors_count')
+            ->orderByDesc('hour_hot');
+    }
+
+    private function baseRoomQueryMine($user)
+    {
+        $authUserId = auth()->id();
+
+        return $this->model
+            ->where('uid', $user->id)
+            ->select([
+                'id',
+                'uid',
+                'room_name',
+                'room_cover',
+                'room_intro',
+                'room_status',
+                'room_pass',
+                'room_admin',
+                'room_visitor',
+                'room_black',
+                'room_speak',
+                'room_sound',
+                'microphone',
+                'free_mic',
+                'max_admin',
+                'is_recommended',
+                'is_popular',
+                'is_live',
+                'hot',
+                'pin',
+                'top_room',
+                'hour_hot',
+                'room_background',
+                'type',
+                'mode',
+                'created_at'
+            ])
+            ->with([
+                'backgroundImage:request_background_images.id,owner_room_id,img',
+                'lastPk:id,room_id',
+                'background:id,img',
+                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'myClass',
+                'roomCategory:id,type',
+                'myType',
+                'roomVisitors.user.packs',
+                'owner.enabledMedals',
+                'owner.country',
+                'owner.eligiblePacks.ware',
+                'owner.profile',
+                'owner.medals.achievementLevel.achievement',
+                'boxUse',
+                'owner.chatRoomsAsUser' => function ($q) use ($authUserId) {
+                    $q->where('user_id2', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
+                'owner.chatRoomsAsUser2' => function ($q) use ($authUserId) {
+                    $q->where('user_id', $authUserId)
+                        ->withCount(['messages as unread_messages_count' => function ($query) use ($authUserId) {
+                            $query->where('user_id', '<>', $authUserId)
+                                ->where('status', '<>', 'seen');
+                        }]);
+                },
+            ])
+            ->withCount('roomVisitors')
+            ->where('room_status', 1)
+            ->orderByDesc('pin')
+            ->orderByDesc('room_visitors_count')
+            ->orderByDesc('hour_hot');
+    }
+
+    private function applyTopRoomsOrder($query, $topRooms)
+    {
+        if ($topRooms) {
+            $query->orderByRaw('is_top = 1 DESC');
+        } else {
+            $query->where(function ($q) {
+                $q->whereHas('roomVisitors')->orWhere('pin', 1);
+            });
+        }
+    }
+
+    private function applyCountryFilter($query, $countryId)
+    {
+        $query->whereHas('owner', fn($q) => $q->where('country_id', $countryId));
+    }
+
+    public function liveRooms($req, $ids = [])
+    {
+        $user = $req?->user();
+        $topRooms = false;
+
+        $blockedUserIds = $this->getBlockedUserIds();
+
+        $query = $this->baseRoomQuery($user, $blockedUserIds);
+
+        $this->applyTopRoomsOrder($query, $topRooms);
+
+        if (!is_null($req->country_id)) {
+            $this->applyCountryFilter($query, $req->country_id);
+        }
+
+        if (!empty($ids)) {
+            $query->whereIn('uid', $ids);
+        }
+        return RoomResource::collection(
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
+        );
     }
 }

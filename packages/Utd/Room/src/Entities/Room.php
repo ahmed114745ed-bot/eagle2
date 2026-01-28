@@ -13,12 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Modules\LuckyBox\Traits\RoomBoxes;
 
 /**
  * @method static withoutAppends()
  */
 class Room extends Model
 {
+    use RoomBoxes;
     /**
      * To enable and disable observer saving and updating methods
      */
@@ -164,6 +166,11 @@ class Room extends Model
             ->where('status', 1)
             ->where('end_at', '>=', now())
             ->orderByDesc('id');
+    }
+
+    public function boxUse(): HasOne
+    {
+        return $this->hasOne(\Modules\LuckyBox\Entities\BoxUse::class, 'room_uid', 'uid');
     }
 
     public function getSessionStringAttribute(): string

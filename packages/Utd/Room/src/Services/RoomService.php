@@ -218,4 +218,13 @@ class RoomService
 
         return $room;
     }
+
+    /**
+     * Get room background image
+     */
+    public function getRoomBackground(?Room $room): string
+    {
+        if ($room == null) return '';
+        return $room->final_room_image ?? '';
+    }
 }
