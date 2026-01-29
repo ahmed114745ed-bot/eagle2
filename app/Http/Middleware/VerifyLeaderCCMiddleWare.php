@@ -240,6 +240,7 @@ class VerifyLeaderCCMiddleWare
             'match' => $signMatch,
         ]);
 
+        
         if (!$signMatch) {
             Log::channel('daily')->error('LeaderCC: FAILED - Signature mismatch', [
                 'path' => $path,
