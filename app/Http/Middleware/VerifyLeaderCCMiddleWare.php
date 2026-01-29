@@ -108,73 +108,7 @@ class VerifyLeaderCCMiddleWare
         }
 
 
-        Log::channel('daily')->info('===== LeaderCC FULL DEBUG START =====');
 
-$key = config('games.leader_CC_game_key');
-$token = $request->input('token');
-$roomId = $request->input('roomId');
-$uid = $request->input('uid');
-$gameId = $request->input('gameId');
-
-Log::channel('daily')->info('ENV DEBUG', [
-    'app_env' => config('app.env'),
-    'app_debug' => config('app.debug'),
-    'php_version' => phpversion(),
-]);
-
-Log::channel('daily')->info('KEY DEBUG', [
-    'value' => $key,
-    'length' => strlen($key),
-    'hex' => bin2hex($key),
-]);
-
-Log::channel('daily')->info('REQUEST RAW DEBUG', [
-    'full_url' => $request->fullUrl(),
-    'method' => $request->method(),
-    'content_type' => $request->header('Content-Type'),
-    'raw_body' => $request->getContent(),
-]);
-
-Log::channel('daily')->info('FIELDS DEBUG', [
-    'gameId' => [
-        'value' => $gameId,
-        'length' => strlen($gameId),
-        'hex' => bin2hex($gameId),
-    ],
-    'uid' => [
-        'value' => $uid,
-        'length' => strlen($uid),
-        'hex' => bin2hex($uid),
-    ],
-    'token' => [
-        'value' => $token,
-        'length' => strlen($token),
-        'hex' => bin2hex($token),
-    ],
-    'roomId' => [
-        'value' => $roomId,
-        'length' => strlen($roomId),
-        'hex' => bin2hex($roomId),
-    ],
-]);
-
-$rawString =
-    $gameId .
-    $uid .
-    $token .
-    $roomId .
-    $key;
-
-Log::channel('daily')->info('SIGNATURE BUILD DEBUG', [
-    'raw_string' => $rawString,
-    'raw_length' => strlen($rawString),
-    'raw_hex' => bin2hex($rawString),
-    'expected_md5' => md5($rawString),
-    'received_sign' => $request->input('sign'),
-    'received_sign_length' => strlen($request->input('sign')),
-]);
-
-Log::channel('daily')->info('===== LeaderCC FULL DEBUG END =====');
 
         $expectedSign = md5($rawString);
 
