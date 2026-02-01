@@ -12,6 +12,7 @@ class RankingGameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        \Log::info($this->user);
         return [
             'exp' => numToString(ceil($this->exp)),
             'exp_diff' => $this->exp_diff,
