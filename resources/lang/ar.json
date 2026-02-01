@@ -5174,5 +5174,11 @@
     "moment_viewer.refresh": "تحديث",
     "moment_viewer.loadMore": "تحميل المزيد",
     "Settings updated successfully!": "تم تحديث الإعدادات بنجاح!",
-    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
+    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا",
+   "Super Package Reward": "الباقة",
+"Browse super package reward": "عرض الباقات",
+"Dedicate switch super package reward": "تخصيص الباقة",
+"Create super package reward": "إنشاء باقة",
+"Delete super package reward": "حذف باقة",
+"Edit super package reward": "تعديل الباقة"
 }

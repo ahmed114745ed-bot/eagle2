@@ -4103,5 +4103,11 @@
 "Superadmin Settings": "सेटिंग्स",
 "Browse superadmin settings": "सेटिंग्स ब्राउज़ करें",
 "Restore Super Admin": "देश प्रबंधक पुनर्स्थापित करें",
-"Browse restore super admin": "पुनर्स्थापित देश प्रबंधक ब्राउज़ करें"
+"Browse restore super admin": "पुनर्स्थापित देश प्रबंधक ब्राउज़ करें",
+"Super Package Reward": "पैकेज",
+"Browse super package reward": "पैकेज देखें",
+"Dedicate switch super package reward": "पैकेज समर्पित करें",
+"Create super package reward": "पैकेज बनाएं",
+"Delete super package reward": "पैकेज हटाएं",
+"Edit super package reward": "पैकेज संपादित करें"
   }

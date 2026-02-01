@@ -3131,7 +3131,13 @@
 "Superadmin Settings": "Pengaturan",
 "Browse superadmin settings": "Lihat Pengaturan",
 "Restore Super Admin": "Pulihkan Manajer Negara",
-"Browse restore super admin": "Lihat Manajer Negara yang Dipulihkan"
+"Browse restore super admin": "Lihat Manajer Negara yang Dipulihkan",
+"Super Package Reward": "Paket",
+  "Browse super package reward": "Lihat Paket",
+  "Dedicate switch super package reward": "Tentukan Paket",
+  "Create super package reward": "Buat Paket",
+  "Delete super package reward": "Hapus Paket",
+  "Edit super package reward": "Edit Paket"
 
 
 
