@@ -26,7 +26,7 @@ class AddTopRoomToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('top_room');
         });
     }
 }

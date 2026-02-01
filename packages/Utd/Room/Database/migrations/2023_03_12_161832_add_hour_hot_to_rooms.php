@@ -26,7 +26,7 @@ class AddHourHotToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('hour_hot');
         });
     }
 }

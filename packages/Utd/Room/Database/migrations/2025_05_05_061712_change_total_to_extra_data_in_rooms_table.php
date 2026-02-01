@@ -22,8 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('extra_data_in_rooms', function (Blueprint $table) {
-            //
-        });
+        // Note: Reverting decimal precision changes requires doctrine/dbal
+        // Original column definition would need to be known
     }
 };

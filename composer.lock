@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "6fc551a3b4d14499c806220fcdcfeb48",
-=======
-    "content-hash": "0fd14eb5f7d6d5a8ce4914f38c3c8c2d",
->>>>>>> 140ad3607962ad3dc268e807568ef41e0f1d5580
+    "content-hash": "df05374b494232f1e1d33dd346082291",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14380,11 +14376,7 @@
         },
         {
             "name": "utd/achievements",
-<<<<<<< HEAD
             "version": "dev-room-package",
-=======
-            "version": "dev-achievmentPackage",
->>>>>>> 140ad3607962ad3dc268e807568ef41e0f1d5580
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
@@ -14425,61 +14417,8 @@
             }
         },
         {
-<<<<<<< HEAD
             "name": "utd/moments",
             "version": "dev-room-package",
-=======
-            "name": "utd/agency",
-            "version": "dev-achievmentPackage",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/Agency",
-                "reference": "141050ca5f41809305c3af195a6af13bf497509a"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\Agency\\AgencyServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\Agency\\": "src/",
-                    "Utd\\Agency\\Database\\": "Database/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Complete Agency Laravel Package - Host Agency & Shipping Agency Management System",
-            "keywords": [
-                "agency",
-                "host-agency",
-                "laravel",
-                "management",
-                "shipping-agency"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "utd/moments",
-            "version": "dev-achievmentPackage",
->>>>>>> 140ad3607962ad3dc268e807568ef41e0f1d5580
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
@@ -14520,11 +14459,7 @@
         },
         {
             "name": "utd/reals",
-<<<<<<< HEAD
             "version": "dev-room-package",
-=======
-            "version": "dev-achievmentPackage",
->>>>>>> 140ad3607962ad3dc268e807568ef41e0f1d5580
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
@@ -14575,14 +14510,12 @@
             }
         },
         {
-<<<<<<< HEAD
-=======
             "name": "utd/room",
-            "version": "dev-achievmentPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Room",
-                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+                "reference": "012a8034366286d904db4c251a8bd7ce6a129145"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14602,6 +14535,14 @@
                     "Utd\\Room\\Database\\": "Database/"
                 }
             },
+            "scripts": {
+                "room:install": [
+                    "@php artisan migrate",
+                    "@php artisan db:seed --class=Utd\\Room\\Database\\Seeders\\RoomDatabaseSeeder",
+                    "@php artisan db:seed --class=PermissionTypeSeeder",
+                    "@php artisan optimize:clear"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -14618,7 +14559,6 @@
             }
         },
         {
->>>>>>> 140ad3607962ad3dc268e807568ef41e0f1d5580
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15390,7 +15330,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20
+        "fruitcake/laravel-cors": 20,
+        "utd/room": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

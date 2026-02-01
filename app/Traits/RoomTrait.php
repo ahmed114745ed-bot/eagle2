@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Room\Traits;
+namespace App\Traits;
 
 use App\Helpers\Common;
 use App\Http\Resources\Api\V1\UserResource;
@@ -367,7 +367,7 @@ trait RoomTrait
             // Log::warning("Room not found for UID: {$uid}");
             return 0;
         }
-    
+
         $micSeat = $room->microphones()
             ->where('user_id', $user_id)
             ->first();
@@ -379,33 +379,33 @@ trait RoomTrait
             // Log::warning("User ID {$user_id} is not on microphone in Room UID: {$uid}");
             return 0;
         }
-    
+
         // Log::info("Deleting microphone seat for User ID {$user_id} in Room UID: {$uid}");
         $micSeat->delete();
-    
+
         $micString = $room->microphones()
             ->orderBy('position')
             ->get()
             ->map(function ($mic) {
                 $userId = $mic->user_id ?? 0;
                 $status = $mic->status ?? 0;
-    
+
                 return $userId > 0 ? "{$userId}#{$status}" : (string)$status;
             })
             ->implode(',');
-    
+
         // Log::info("Updated microphone string for Room UID {$uid}: {$micString}");
-    
+
         $pk = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
         if ($pk) {
             $pk->mics = $micString;
             $pk->save();
             // Log::info("Updated PK mics for Room ID {$room->id}");
         }
-    
+
         DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $user_id])->delete();
         // Log::info("Deleted time_logs for User ID {$user_id} in Room UID {$uid}");
-    
+
         return 1;
     }
 

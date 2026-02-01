@@ -136,21 +136,21 @@ class RoomServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             // Config
-            $this->publishes([
-                __DIR__ . '/../Config/room.php' => config_path('room.php'),
-            ], 'room-config');
-
-            // Views
-            $this->publishes([
-                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
-            ], 'room-views');
-
-            // Translations
-            $this->publishes([
-                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
-            ], 'room-lang');
-
-            // Migrations
+//
+//            // Views
+//            $this->publishes([
+//                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
+//            ], 'room-views');
+//
+//            // Translations
+//            $this->publishes([
+//                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
+//            ], 'room-lang');
+//
+//            // Migrations
+//            $this->publishes([
+//                __DIR__ . '/../Database/migrations' => database_path('migrations'),
+//            ], 'room-migrations');
             $this->publishes([
                 __DIR__ . '/../Database/migrations' => database_path('migrations'),
             ], 'room-migrations');

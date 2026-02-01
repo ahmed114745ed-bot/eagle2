@@ -26,7 +26,7 @@ class AddCountUserSocketToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('count_room_socket');
         });
     }
 }

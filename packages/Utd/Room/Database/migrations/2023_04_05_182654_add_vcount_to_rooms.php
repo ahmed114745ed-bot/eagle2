@@ -26,7 +26,7 @@ class AddVcountToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('visitor_count');
         });
     }
 }

@@ -46,7 +46,7 @@ use Modules\Badge\Entities\UserBadge;
 use Modules\Events\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\InfoTrait;
-use Utd\Room\Traits\RoomTrait;
+use App\Traits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Twilio\Rest\Client as TwilioClint;
 use App\Traits\HelperTraits\AdminTrait;

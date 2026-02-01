@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->dropColumn('max_admin');
+            $table->integer('max_admin')->default(100)->change();
         });
     }
 };

@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            //
+            $table->unsignedInteger('room_id')->change();
         });
     }
 };
