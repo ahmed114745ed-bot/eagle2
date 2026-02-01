@@ -319,7 +319,7 @@ class OvipGiftTapController extends MainController
         }
 
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
-            dd(request());
+          //  dd(request());
 
             // if ($form->key_json && is_array($form->key_json)) {
             //     // Remove any keys where value is null or empty
@@ -328,21 +328,17 @@ class OvipGiftTapController extends MainController
             //     });
             // }
 
-            $form->saving(function (Form $form) {
-                // Make sure key_json is an array
-                if (is_array($form->key_json)) {
-                    // Remove keys with null or empty string
-                    $form->key_json = array_filter($form->key_json, fn($value) => $value !== null && $value !== '');
 
-                    // If array is empty, set to null to delete from DB
-                    if (empty($form->key_json)) {
-                        $form->key_json = null;
-                    }
-                } else {
-                    // If not an array (null, string, etc.), delete from DB
-                    $form->key_json = null;
+            if (isset($form->key_json) && is_array($form->key_json)) {
+                $form->key_json = array_filter($form->key_json, fn($value) => $value !== null && $value !== '');
+                if (empty($form->key_json)) {
+                    $form->key_json = null; // empty array becomes null
                 }
-            });
+            } else {
+                // If key_json not in request, or not an array, set null
+                $form->key_json = null;
+            }
+
 
             $hasShowImg = $form->show_img || $form->model()->show_img;
             $hasImg2 = $form->img2 || $form->model()->img2;
