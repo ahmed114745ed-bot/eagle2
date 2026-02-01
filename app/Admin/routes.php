@@ -114,6 +114,7 @@ use Illuminate\Support\Facades\Route;
 use KevinSoft\MultiLanguage\MultiLanguage;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
+use Utd\Agency\Http\Controllers\Admin\PackageController;
 
 Route::group(
     [
@@ -193,6 +194,10 @@ Route::group(
         'as' => config('admin.route.prefix') . '.',
     ],
     function () {
+
+        Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
+    Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
+
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
         Route::resource('reset-salary', ResetUserSalaryController::class);

@@ -37,8 +37,6 @@ Route::group([
 ], function () {
 
     // Package Management
-    Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
-    Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
 
     if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
         // Main Agency CRUD
@@ -90,3 +88,6 @@ Route::group([
         });
     }
 });
+
+
+
