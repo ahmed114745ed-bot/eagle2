@@ -52,8 +52,7 @@
         "utd/achievements": "*",
         "utd/moments": "*",
         "utd/reals": "*",
-        "utd/room": "*",
-        "utd/agency": "*"
+        "utd/room": "*"
 
     },
     "require-dev": {
@@ -148,13 +147,7 @@
             "options": {
                 "symlink": true
             }
-        },
-        {
-            "type": "path",
-            "url": "packages/Utd/Agency",
-            "options": {
-                "symlink": true
-            }
         }
+    
     ]
 }
