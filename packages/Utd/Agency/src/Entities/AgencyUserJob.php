@@ -5,8 +5,12 @@ namespace Utd\Agency\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Utd\Agency\Traits\ConfigurableModelsTrait;
+
 class AgencyUserJob extends Model
 {
+    use ConfigurableModelsTrait;
+
     protected $table = 'agency_user_jobs';
 
     protected $guarded = [];
@@ -37,7 +41,7 @@ class AgencyUserJob extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo($this->getModelClass('user'), 'user_id');
     }
 
     /**

@@ -10,7 +10,7 @@ use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Utd\Agency\Repositories\ShippingAgencyRepository;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\UserRepository;

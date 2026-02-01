@@ -9,7 +9,7 @@ use App\Models\Agency;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Modules\AgencyApp\Entities\AdditionalInfo;
+use Utd\Agency\Entities\AdditionalInfo;
 use Illuminate\Support\Facades\Notification;
 use App\Facades\CustomNotification;
 use App\Notifications\AcceptAgency;

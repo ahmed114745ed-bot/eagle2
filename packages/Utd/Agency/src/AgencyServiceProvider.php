@@ -59,6 +59,19 @@ class AgencyServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerMigrations();
         $this->registerPublishing();
+
+        // Apply Host Filter Global Scope for Admin Dashboard
+        try {
+            if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+                if (request()->is(config('admin.route.prefix') . '*')) {
+                    \App\Models\User::addGlobalScope('is_host', function (\Illuminate\Database\Eloquent\Builder $builder) {
+                        $builder->where('is_host', 1);
+                    });
+                }
+            }
+        } catch (\Exception $e) {
+            // Prevent boot failures if helper or config is missing
+        }
     }
 
     /**
@@ -209,11 +222,9 @@ class AgencyServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallAgencyCommand::class,
-                UninstallAgencyCommand::class,
-            ]);
-        }
+        $this->commands([
+            InstallAgencyCommand::class,
+            UninstallAgencyCommand::class,
+        ]);
     }
 }

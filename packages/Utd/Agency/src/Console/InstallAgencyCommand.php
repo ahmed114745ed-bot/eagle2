@@ -51,6 +51,7 @@ class InstallAgencyCommand extends Command
         // Step 2: Publish config
         $this->info('📦 Step 2/5: Publishing configuration...');
         $this->publishConfig();
+        $this->fixSchema();
         $this->info('   ✅ Configuration published.');
 
         // Step 3: Clear caches
@@ -102,12 +103,62 @@ class InstallAgencyCommand extends Command
      */
     protected function runMigrations(): void
     {
+        // 0. Reset migration history for this package to ensure "all" run as requested
+        $this->resetMigrationHistory();
+
         $this->call('migrate', [
             '--path' => 'packages/Utd/Agency/Database/Migrations',
             '--force' => true,
         ]);
+
     }
 
+    /**
+     * Clear migration repository for package migrations to force them to be re-evaluated.
+     */
+    protected function resetMigrationHistory(): void
+    {
+        $migrationPath = base_path('packages/Utd/Agency/Database/Migrations');
+        if (!is_dir($migrationPath)) {
+            return;
+        }
+
+        $files = glob($migrationPath . '/*.php');
+        $migrationsToReset = [];
+
+        foreach ($files as $file) {
+            $migrationsToReset[] = basename($file, '.php');
+        }
+
+        if (!empty($migrationsToReset)) {
+            $this->info('🔄 Resetting migration history for ' . count($migrationsToReset) . ' files...');
+            \Illuminate\Support\Facades\DB::table('migrations')->whereIn('migration', $migrationsToReset)->delete();
+        }
+    }
+
+    /**
+     * Fix missing columns/tables that usually cause installation issues.
+     */
+    protected function fixSchema(): void
+    {
+        $this->info('🔧 Fixing potential schema issues...');
+
+        // 1. Fix 'is_host' on users table
+        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'is_host')) {
+            $this->info('   - Adding missing column: users.is_host');
+            Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->boolean('is_host')->default(0)->after('id');
+            });
+        }
+
+        // 2. Fix 'deleted_at' on agencies table
+        if (Schema::hasTable('agencies') && !Schema::hasColumn('agencies', 'deleted_at')) {
+            $this->info('   - Adding missing column: agencies.deleted_at');
+            Schema::table('agencies', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->softDeletes();
+            });
+        }
+    }
     /**
      * Publish the package configuration.
      */

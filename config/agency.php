@@ -462,4 +462,34 @@ return [
             ]
         ]
     ],
+
+
+    'models' => [
+
+            'user' => App\Models\User::class,
+            'admin' => App\Models\Admin::class,
+            'admin_user' => App\Models\AdminUser::class,
+            'country' => App\Models\Country::class,
+            'charge' => App\Models\Charge::class,
+            'coin_log' => App\Models\CoinLog::class,
+
+            'agency' => App\Models\Agency::class,
+            'agency_salary' => App\Models\AgencySallary::class,
+            'agency_user_job' => App\Models\AgencyUserJob::class,
+            'agency_join_request' => App\Models\AgencyJoinRequest::class,
+
+            'user_target' => App\Models\UserTarget::class,
+            'user_salary' => App\Models\UserSallary::class,
+
+        ],
+
+        'traits' => [
+
+            'created_by' => App\Traits\CreatedByTrait::class,
+            'payment_gateway' => App\Traits\PaymentGetWayTrait::class,
+            'timestamps_timezone' => App\Traits\TimestampsWithTimezone::class,
+
+        ]
+
+
 ];
