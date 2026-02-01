@@ -319,6 +319,14 @@ class OvipGiftTapController extends MainController
         }
 
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
+
+            if ($form->key_json && is_array($form->key_json)) {
+                // Remove any keys where value is null or empty
+                $form->key_json = array_filter($form->key_json, function ($value) {
+                    return $value !== null && $value !== '';
+                });
+            }
+            
             $hasShowImg = $form->show_img || $form->model()->show_img;
             $hasImg2 = $form->img2 || $form->model()->img2;
             $type = $form->model()->type ?? request('type');
@@ -334,7 +342,7 @@ class OvipGiftTapController extends MainController
                 }
             }
 
-            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm','alpha','vap'];
+            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'alpha', 'vap'];
             if ($form->show_img instanceof UploadedFile) {
                 // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
                 $ext = strtolower($form->show_img->guessExtension());
