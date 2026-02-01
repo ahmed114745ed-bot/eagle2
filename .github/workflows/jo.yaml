@@ -42,7 +42,7 @@ jobs:
           cd /var/www/jo
           pwd
           #source /home/${{ secrets.USERNAME }}/scripts/hub.sh
-          docker build -t jo:${{ github.sha }} -f Dockerfile-octan .
+          docker build -t jo:${{ github.sha }} -f Dockerfile-octana .
           docker service update --image jo:${{ github.sha }} jo-octa
 
           # Get container ID of task 5live-app.1
