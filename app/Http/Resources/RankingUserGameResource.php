@@ -14,12 +14,8 @@ class RankingUserGameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        \Log::info('profile', ['profile' => $this->profile]);
-        \Log::info('profile->avatar', ['avatar' => $this->profile?->avatar]);
-        \Log::info('user->avatar attribute', ['avatar' => $this->avatar]);
-        
+
         $finalAvatar = $this->profile?->avatar ?? $this->avatar;
-        \Log::info('final avatar', ['avatar' => $finalAvatar]);
         
         return [
             'id' => $this->id,
