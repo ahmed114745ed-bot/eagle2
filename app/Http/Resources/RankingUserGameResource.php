@@ -14,13 +14,19 @@ class RankingUserGameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        \Log::info('avatar => ' . $this->avatar);
+        \Log::info('profile', ['profile' => $this->profile]);
+        \Log::info('profile->avatar', ['avatar' => $this->profile?->avatar]);
+        \Log::info('user->avatar attribute', ['avatar' => $this->avatar]);
+        
+        $finalAvatar = $this->profile?->avatar ?? $this->avatar;
+        \Log::info('final avatar', ['avatar' => $finalAvatar]);
+        
         return [
             'id' => $this->id,
             'user_id' => $this->id,
             'color_name' => $this->color_name,
             'name' => $this->name,
-            'avatar' => $this->avatar,
+            'avatar' => $finalAvatar,
             'frame' => $this->frame,
             'frame_id' => $this->frame_id,
             'type_user' => $this->type_user,
