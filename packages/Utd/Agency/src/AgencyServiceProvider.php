@@ -209,11 +209,9 @@ class AgencyServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InstallAgencyCommand::class,
-                UninstallAgencyCommand::class,
-            ]);
-        }
+        $this->commands([
+            InstallAgencyCommand::class,
+            UninstallAgencyCommand::class,
+        ]);
     }
 }
