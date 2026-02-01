@@ -381,6 +381,21 @@ class WeeklyEventGiftNController extends MainController
                 $form->number('expire', __('expire'))->default(1);
             })->rules('required');
 
+            $form->html('
+            <style>
+            .file-input .input-group.file-caption-main {
+                display: flex !important;
+            }
+                 .file-input .input-group.file-caption-main .btn-file {
+            padding: 5px 15px !important;
+            border-radius: 6px !important;
+            font-size: 12px !important;
+            margin-left: -3333% !important;
+        }
+            </style>
+        ');
+    
+
         $form->saved(function (Form $form) {
             $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));
             return redirect($route);
