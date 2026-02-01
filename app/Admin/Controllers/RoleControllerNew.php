@@ -96,7 +96,6 @@ class RoleControllerNew extends MainController
             $grid->model()->where('admin_id', $roleAuthId);
         } else {
             $grid->model()->where('admin_id', null);
-
         }
         $grid->column('id', 'ID')->sortable();
         $grid->column('slug', trans('admin.slug'));
@@ -200,8 +199,6 @@ class RoleControllerNew extends MainController
         $form = new Form(new $roleModel());
         $this->disableFormTools($form);
 
-        // $form->text('slug', trans('admin.slug'))->rules('required|unique:admin_roles,slug,{{id}}');
-
         $form->text('name', trans('role name'))->rules(function ($form) {
             // Get the record ID if editing, otherwise null
             $id = $form->model()?->id ?? null;
@@ -211,23 +208,20 @@ class RoleControllerNew extends MainController
 
             // Default to empty string if not found (avoids SQL issues)
             $type = $type ?? '';
-
-            // Build unique rule with type condition
             return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
         });
 
-        // Hide default listbox and use custom tabbed permission UI
-        // $form->listbox('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
-
+        $form->html('<div class="full-column-width">');
         // Custom tabbed view
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
             'selectedPermissions' => $id != null ? Role::where('id', $id)->first()->permissions->pluck('id')->toArray() : [],
         ])->render());
-
+        $form->html('</div>');
         $form->text('desc_en', __('Description en'));
         $form->text('desc_ar', __('Description ar'));
         $form->image('image', __('Image'))->help('');
+
 
         $form->saving(function (Form $form) {
             $form->ignore('permissions');
