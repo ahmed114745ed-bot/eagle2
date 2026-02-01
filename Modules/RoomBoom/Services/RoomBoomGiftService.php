@@ -3,8 +3,8 @@
 namespace Modules\RoomBoom\Services;
 
 use App\Helpers\Common;
-use App\Helpers\PackageHelper;
 use App\Models\GiftLog;
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
@@ -149,7 +149,7 @@ class RoomBoomGiftService
     }
 
     private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice){
-        if (!PackageHelper::isInstalled('utd/room')) {
+        if (!PackageHelper::isInstalled('room')) {
             return null;
         }
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
