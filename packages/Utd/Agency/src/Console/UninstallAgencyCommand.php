@@ -41,7 +41,7 @@ class UninstallAgencyCommand extends Command
             $this->warn('⚠️  WARNING: This will remove all Agency package data!');
             $this->warn('   This action cannot be undone.');
             $this->info('');
-            
+
             if (!$this->confirm('Are you sure you want to uninstall the Agency package?')) {
                 $this->info('Uninstallation cancelled.');
                 return Command::SUCCESS;
@@ -63,6 +63,11 @@ class UninstallAgencyCommand extends Command
             $this->info('🗑️  Step 3/4: Removing agency tables...');
             $this->removeTables();
             $this->info('   ✅ Tables removed.');
+
+            // Step 3b: Remove migration history
+            $this->info('🗑️  Step 3b: Removing migration history...');
+            $this->removeMigrationHistory();
+            $this->info('   ✅ Migration entries removed.');
         } else {
             $this->info('⏭️  Skipping data removal (--keep-data option)');
         }
@@ -79,7 +84,8 @@ class UninstallAgencyCommand extends Command
             $this->info('   ✅ Admin menu removed.');
         } else {
             $this->info('⏭️  Skipping admin menu removal (--keep-menu option)');
-        };
+        }
+        ;
 
         $this->info('');
         $this->info('╔════════════════════════════════════════════════════════════╗');
@@ -169,7 +175,7 @@ class UninstallAgencyCommand extends Command
         ];
 
         Schema::disableForeignKeyConstraints();
-        
+
         foreach ($tables as $table) {
             if (Schema::hasTable($table)) {
                 try {
@@ -179,7 +185,7 @@ class UninstallAgencyCommand extends Command
                 }
             }
         }
-        
+
         Schema::enableForeignKeyConstraints();
     }
 
@@ -233,6 +239,32 @@ class UninstallAgencyCommand extends Command
         foreach ($children as $childId) {
             $ids[] = $childId;
             $this->getChildMenuIds($childId, $ids);
+        }
+    }
+
+    /**
+     * Remove migration history from the migrations table.
+     */
+    protected function removeMigrationHistory(): void
+    {
+        $migrationPath = base_path('packages/Utd/Agency/Database/Migrations');
+        if (!is_dir($migrationPath)) {
+            return;
+        }
+
+        $files = glob($migrationPath . '/*.php');
+        $migrationsToRemove = [];
+
+        foreach ($files as $file) {
+            $migrationsToRemove[] = basename($file, '.php');
+        }
+
+        if (!empty($migrationsToRemove)) {
+            $affected = \Illuminate\Support\Facades\DB::table('migrations')
+                ->whereIn('migration', $migrationsToRemove)
+                ->delete();
+
+            $this->info("   ℹ️  Removed {$affected} migration entries.");
         }
     }
 }
