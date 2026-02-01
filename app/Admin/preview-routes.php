@@ -29,7 +29,7 @@ use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\MomentSettingsController;
 use App\Admin\Controllers\MultiLanguageController;
 use App\Admin\Controllers\OfferController;
-use App\Admin\Controllers\OVipController;
+// use App\Admin\Controllers\OVipController;
 use App\Admin\Controllers\ParentUsersController;
 use App\Admin\Controllers\PoliceController;
 use App\Admin\Controllers\QuestionController;
@@ -61,13 +61,18 @@ use Utd\ShippingAgency\Http\Controllers\Admin\PaymentGetWayController;
 
 
 Admin::routes();
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => [
-    'web',
-    'admin',
-    'prevent-delete',
-    'adminIp',
-    'multiLanguage',
-], 'as' => config('admin.route.prefix') . '.',], function () {
+Route::group([
+    'prefix' => config('admin.route.prefix'),
+    'namespace' => config('admin.route.namespace'),
+    'middleware' => [
+        'web',
+        'admin',
+        'prevent-delete',
+        'adminIp',
+        'multiLanguage',
+    ],
+    'as' => config('admin.route.prefix') . '.',
+], function () {
     // Route::post('_handle_form_', 'HandleController@handleForm')->name('admin.handle-form');
     // Route::post('_handle_action_', 'HandleController@handleAction')->name('admin.handle-action');
     // Route::get('_handle_selectable_', 'HandleController@handleSelectable')->name('admin.handle-selectable');
@@ -75,23 +80,33 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
 });
 
 
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => '', 'middleware' => [
-    'web',
-   // 'admin',
-    'multiLanguage',
-], 'as' => config('admin.route.prefix') . '.',], function () {
+Route::group([
+    'prefix' => config('admin.route.prefix'),
+    'namespace' => '',
+    'middleware' => [
+        'web',
+        // 'admin',
+        'multiLanguage',
+    ],
+    'as' => config('admin.route.prefix') . '.',
+], function () {
     Route::post('login', App\Admin\Controllers\Preview\AuthController::class . '@postLogin');
     Route::get('login', [App\Admin\Controllers\Preview\AuthController::class, 'getLogin']);
 });
 
 
-Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('admin.route.namespace'), 'middleware' => [
-    'web',
-    'admin',
-    'prevent-delete',
-    'adminIp',
-    'multiLanguage',
-], 'as' => config('admin.route.prefix') . '.',], function () {
+Route::group([
+    'prefix' => config('admin.route.prefix'),
+    'namespace' => config('admin.route.namespace'),
+    'middleware' => [
+        'web',
+        'admin',
+        'prevent-delete',
+        'adminIp',
+        'multiLanguage',
+    ],
+    'as' => config('admin.route.prefix') . '.',
+], function () {
     Route::post('/locale', MultiLanguageController::class . '@locale');
 
     Route::resource('questions', QuestionController::class);
@@ -124,7 +139,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::resource('agency-settings', AgencySettingsController::class);
     Route::get('agency-settings', 'AgencySettingController@index');
     Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
-    Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
+    // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
     Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
     Route::resource('moment-settings', MomentSettingsController::class);
     Route::resource('reel-settings', ReelSettingsController::class);
@@ -212,7 +227,7 @@ Route::group(['prefix' => config('admin.route.prefix'), 'namespace' => config('a
     Route::resource('family_levels', 'FamilyLevelController');
     Route::resource('silver', 'SilverController');
     Route::resource('coins', 'CoinController');
-    Route::resource('ovip', 'OVipController');
+    // Route::resource('ovip', 'OVipController');
     Route::resource('vip_privilege', 'VipPrivilegeController');
     Route::resource('tickets', 'TicketController');
     Route::resource('pages', 'PageController');
