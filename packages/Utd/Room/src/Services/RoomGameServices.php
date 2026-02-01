@@ -2,14 +2,10 @@
 
 namespace Utd\Room\Services;
 
-use App\Helpers\Common;
-use App\Models\Banner;
 use Utd\Room\Entities\Room;
-use App\Models\RoomSalaries;
 use Utd\Room\Entities\RoomSalary;
 use Utd\Room\Entities\RoomTarget;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 class RoomGameServices
 {
