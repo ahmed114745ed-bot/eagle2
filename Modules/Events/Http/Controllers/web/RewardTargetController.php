@@ -24,7 +24,12 @@ class RewardTargetController extends MainController
     public $permission_name = 'gift-target-event';
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("target_events");
+        try {
+            (new AppFeatureService)->validateStatusEnable("target_events");
+        } catch (\Throwable $e) {
+            \Log::warning('AppFeatureService validateStatusEnable failed: ' . $e->getMessage());
+            abort(404);
+        }
     }
     public function index(Content $content)
     {
@@ -159,11 +164,12 @@ class RewardTargetController extends MainController
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
-                        $ops[$vip->id] = $vip->name;
-                    }
-                    return $ops;
+                        $ops = [];
+                        $vips = OVip::query()->select('id', 'name')->get();
+                        foreach ($vips as $vip) {
+                            $ops[$vip->id] = $vip->name;
+                        }
+                        return $ops;
                 })->rules('required');
             })->when("badge", function () use ($form) {
                 $this->addBadgeField($form);
