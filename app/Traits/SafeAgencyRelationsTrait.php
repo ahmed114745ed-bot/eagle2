@@ -31,7 +31,7 @@ trait SafeAgencyRelationsTrait
      */
     public static function isAgencyAppModuleInstalled(): bool
     {
-        return class_exists(\Modules\AgencyApp\Entities\AdditionalInfo::class);
+        return class_exists(\Utd\Agency\Entities\AdditionalInfo::class);
     }
 
     /**

@@ -1,4 +1,9 @@
 @php
+    // DEBUG at start - check if Agency System reaches here
+    if (\Illuminate\Support\Arr::get($item, 'id') == 168) {
+        \Log::info('MENU DEBUG: Agency System reached blade', ['item' => $item['title'] ?? 'no title']);
+    }
+    
     $anyChild = false;
     $permissionExists = false;
             $roles = \Illuminate\Support\Arr::get($item, 'roles', []);
@@ -62,11 +67,19 @@
     $allPermission = Admin::user()->can('*');
     $isVisible = ($hasRoles || $hasPermission|| $allPermission || $anyChildExists );
 
-    // if (Arr::get($item, 'id') == '13'){
-    //     dump(Admin::user()->can(Arr::get($item, 'permission')));
-
-    //         dump($isVisible, $hasRoles , $hasPermission, $allPermission , $anyChildExists);
-    //     }
+    // DEBUG: Agency System menu
+    if (Arr::get($item, 'id') == 168){
+        dump('Agency System Debug:', [
+            'id' => Arr::get($item, 'id'),
+            'title' => Arr::get($item, 'title'),
+            'hasRoles' => $hasRoles,
+            'hasPermission' => $hasPermission,
+            'allPermission' => $allPermission,
+            'anyChildExists' => $anyChildExists,
+            'isVisible' => $isVisible,
+            'roles_count' => count($roles ?? []),
+        ]);
+    }
 @endphp
 
 @if($isVisible)

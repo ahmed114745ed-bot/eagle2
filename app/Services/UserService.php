@@ -48,7 +48,7 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\InvitationEarningResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
-use Utd\ShippingAgency\Repositories\ShippingAgencyRepository;
+use Utd\Agency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;

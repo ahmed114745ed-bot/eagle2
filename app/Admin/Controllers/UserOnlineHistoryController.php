@@ -21,7 +21,7 @@ use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
 use Encore\Admin\Widgets\InfoBox;
-use Modules\AgencyApp\Entities\AgencyUserJob;
+use Utd\Agency\Entities\AgencyUserJob;
 
 class UserOnlineHistoryController extends MainController
 {

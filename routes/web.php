@@ -414,7 +414,7 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
-        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\AuthController::class, 'getSetting']);
+        Route::get('auth/setting', [\Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController::class, 'getSetting']);
     }
 );
 

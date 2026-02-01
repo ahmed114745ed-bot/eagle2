@@ -6,7 +6,7 @@ use Exception;
 use App\Helpers\Common;
 use  Modules\Vip\Repositories\OvipRepository;
 use  Modules\Vip\Repositories\VipPrivilegeRepository;
-use App\Tik\Repositoris\WareRepository;
+use App\Tik\Repositories\WareRepository;
 
 
 class OvipService

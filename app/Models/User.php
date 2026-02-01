@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
-use Modules\AgencyApp\Entities\AdditionalInfo;
+use Utd\Agency\Entities\AdditionalInfo;
 use Modules\Badge\Entities\Badge;
 use Modules\Badge\Entities\UserBadge;
 use Modules\Chat\Traits\ChatUserTrait;

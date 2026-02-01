@@ -49,6 +49,13 @@
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
 
+    // DEBUG: Log every menu item
+    $itemId = Arr::get($item, 'id');
+    $itemTitle = Arr::get($item, 'title');
+    if ($itemId == 168) {
+        \Log::info('DEBUG Agency System', ['id' => $itemId, 'title' => $itemTitle]);
+    }
+
     /* -------------------------------
      | URI / BD Visibility
      |-------------------------------*/
@@ -117,11 +124,14 @@
         }
     }
 
+    // Check permission - if empty, allow access; otherwise check user can
+    $hasPermission = empty($permission) || Admin::user()->can($permission);
+
     $isVisible =
         !$shouldHideBd &&
         Admin::user()->visible($roles) &&
         $moduleAllowed &&
-        Admin::user()->can($permission) &&
+        $hasPermission &&
         (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 
     $badgeCount = 0;

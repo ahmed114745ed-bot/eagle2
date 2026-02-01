@@ -20,7 +20,7 @@ use App\Tik\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
-use Utd\ShippingAgency\Repositories\ShippingAgencyRepository;
+use Utd\Agency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use App\Contracts\UserAchievementContract;

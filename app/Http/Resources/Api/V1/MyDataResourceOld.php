@@ -17,7 +17,7 @@ use App\Http\Resources\Api\V1\MangerTypeResource;
 use Modules\Public\Http\Services\UserCounterServices;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Models\Agency;
-use Modules\AgencyApp\Entities\AgencyUserJob;
+use Utd\Agency\Entities\AgencyUserJob;
 
 class MyDataResourceOld extends JsonResource
 {

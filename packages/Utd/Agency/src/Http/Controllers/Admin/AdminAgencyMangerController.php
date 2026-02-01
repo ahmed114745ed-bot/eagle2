@@ -1,0 +1,302 @@
+<?php
+
+namespace Utd\Agency\Http\Controllers\Admin;
+
+use App\Helpers\Common;
+use App\Models\Admin;
+use App\Models\Agency;
+use App\Models\Country;
+use App\Models\User;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Encore\Admin\Facades\Admin as LaravelAdmin;
+use function Doctrine\Common\Cache\Psr6\get;
+
+class  AdminAgencyMangerController extends MainController
+{
+
+    public $permission_name = 'managers';
+
+    protected $model;
+
+    public function __construct()
+    {
+        $userModel = Admin::class;
+        $this->model = new $userModel;
+    }
+
+
+
+    public function index(Content $content)
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!($app_feature == '1' || $app_feature == 1)) {
+            admin_error(__('Agency Feature is Disabled, Contact the administration'));
+
+            return redirect()->back();
+        }
+
+        return parent::index($content
+            ->title(trans('Managers'))
+            ->body($this->grid()));
+    }
+
+    /**
+     * Show interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function show($id, Content $content)
+    {
+        return parent::show($id, $content
+            ->title(trans('Managers'))
+            ->body($this->detail($id)));
+    }
+
+    /**
+     * Edit interface.
+     *
+     * @param mixed $id
+     * @param Content $content
+     * @return Content
+     */
+    public function edit($id, Content $content)
+    {
+        return parent::edit($id, $content
+            ->title(trans('Managers'))
+            ->body($this->form()->edit($id)));
+    }
+
+    public function create(Content $content)
+    {
+        return parent::create($content
+            ->title(trans('Managers'))
+            ->body($this->form()));
+    }
+
+
+
+    protected function grid()
+    {
+        $userModel = config('admin.database.users_model');
+        $grid = new Grid(new Admin);
+        $grid->model()->whereHas('roles', function ($query) {
+            $query->whereRoleId(13);
+        })->withCount('agencies');
+
+        $grid->column('name', __('Agency Manager'))->display(function ($name) {
+            $uid = @$this->username;
+            $path = $this->avatar;
+            $defaultImage = asset("images/businessman-icon.jpg");
+            $url = $path ?? $defaultImage;
+
+            //  Check if the image exists
+            if (!isImageExists($url)) {
+                $url = $defaultImage;
+            }
+            $image = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "
+            <div style='display: flex; align-items: center; gap: 10px;'>
+                $image
+                <div>
+                    <strong>$name</strong><br>
+                    <span style='color: #aaa; font-size: smaller;'>UID: $uid</span>
+                </div>
+            </div>
+        ";
+        });
+        $grid->column('agencies_count', __('Agencies'))->sortable();
+
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            if ($actions->getKey() == 1) {
+                $actions->disableDelete();
+            }
+        });
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->batch(function (Grid\Tools\BatchActions $actions) {
+                $actions->disableDelete();
+            });
+        });
+
+        return $grid;
+    }
+
+
+    public function update($id)
+    {
+        $user = Admin::query()->findOrFail($id);
+        if (\request('password') != $user->password) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+        return parent::update($id);
+    }
+
+    public function destroy($id)
+    {
+        $user = $this->model->find($id);
+        if ($user) {
+            if ($user->isRole('admin') || $user->isRole('developer')) {
+                return response()->json(['error' => '', 'message' => __('admin cant be deleted')]);
+            }
+        }
+        Agency::query()->where('owner_id', $id)->delete();
+        return parent::destroy($id);
+    }
+
+    public function form()
+    {
+        $userModel = config('admin.database.users_model');
+        $permissionModel = config('admin.database.permissions_model');
+        $roleModel = config('admin.database.roles_model');
+
+        $form = new Form(new $userModel());
+
+        $userTable = config('admin.database.users_table');
+        $connection = config('admin.database.connection');
+
+        //$form->display('id', 'ID');
+        $form->text('username', trans('admin.username'))
+            ->creationRules(['required', "unique:{$connection}.{$userTable}"])
+            ->updateRules(['required', "unique:{$connection}.{$userTable},username,{{id}}"]);
+
+        $form->text('name', trans('admin.name'))->rules('required');
+        $form->image('avatar', trans('admin.avatar'));
+        $form->password('password', trans('admin.password'))->rules('required|confirmed');
+        $form->password('password_confirmation', trans('admin.password_confirmation'))->rules('required')
+            ->default(function ($form) {
+                return $form->model()->password;
+            });
+
+        $form->ignore(['password_confirmation']);
+
+        //$form->multipleSelect('roles', trans('admin.roles'))->options($roleModel::all()->pluck('name', 'id'));
+        //$form->multipleSelect('permissions', trans('admin.permissions'))->options($permissionModel::all()->pluck('name', 'id'));
+
+        $form->display('created_at', trans('admin.created_at'));
+        $form->display('updated_at', trans('admin.updated_at'));
+
+        $form->select('app_id', __('Agency Manger app Id'))->options(function ($value) {
+            $opsAgencyManger = [];
+            foreach (User::Where('id', $value)->get() as $user) {
+                $opsAgencyManger[$user->id] = $user->uuid . '_' . $user->name;
+            }
+            return $opsAgencyManger;
+        })->ajax('/api/search/app-manger', 'id', 'name')->required();
+
+
+
+        $form->saving(function (Form $form) {
+            if ($form->password && $form->model()->password != $form->password) {
+                $form->password = Hash::make($form->password);
+            }
+            User::where('id', @request()->app_id)->update([
+                'is_manger' => true,
+            ]);
+            $form->Agency_manger = true;
+            $newAppId = $form->input('app_id');
+            $originalAppId = $form->model()->getOriginal('app_id');
+
+            if ($form->model()->exists && $newAppId != $originalAppId) {
+                Agency::where('agency_manger_id', $originalAppId)?->update([
+                    'agency_manger_id' => $newAppId,
+                ]);
+            }
+        });
+        $form->saved(function (Form $form) {
+            $form->model()->roles()->attach(['role_id' => 13, 'user_id' => $form->model()->getAttribute('id')]);
+        });
+
+        return $form;
+    }
+
+    /*
+    protected function detail($id) {
+        $userModel = config('admin.database.users_model');
+
+        $show = new Show($userModel::findOrFail($id));
+
+        $show->field('id', 'ID');
+        $show->field('username', trans('admin.username'));
+        $show->field('name', trans('admin.name'));
+
+
+        return $show;
+    }
+    */
+
+    protected function detail($id)
+    {
+        $userModel = config('admin.database.users_model');
+        $admin = Admin::find($id);
+        $show = new Show($userModel::findOrFail($id));
+
+        $show->field('id', 'ID');
+        $show->field('username', trans('admin.username'));
+        $show->field('name', trans('admin.name'));
+
+
+        $grid = new Grid(new Agency());
+        $grid->model()->where('agency_manger_id', $admin->id);
+
+        $grid->column('id', 'ID')->sortable();
+        $grid->column('username', trans('admin.username'));
+        $grid->column('name', trans('admin.name'));
+        $grid->column('created_at', trans('admin.created_at'));
+        $grid->column('updated_at', trans('admin.updated_at'));
+
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            if ($actions->getKey() == 1) {
+                $actions->disableDelete();
+            }
+        });
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->batch(function (Grid\Tools\BatchActions $actions) {
+                $actions->disableDelete();
+            });
+        });
+
+
+
+        return $show->render() . $grid->render();
+    }
+
+    protected function relatedItemsGrid($id)
+    {
+        $admin = Admin::find($id);
+        $userModel = config('admin.database.users_model');
+        $grid = new Grid(new Agency());
+        $grid->model()->where('agency_manager_id', $admin->id);
+
+        $grid->column('id', 'ID')->sortable();
+        $grid->column('username', trans('admin.username'));
+        $grid->column('name', trans('admin.name'));
+        $grid->column('created_at', trans('admin.created_at'));
+        $grid->column('updated_at', trans('admin.updated_at'));
+
+        $grid->actions(function (Grid\Displayers\Actions $actions) {
+            if ($actions->getKey() == 1) {
+                $actions->disableDelete();
+            }
+        });
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->batch(function (Grid\Tools\BatchActions $actions) {
+                $actions->disableDelete();
+            });
+        });
+
+        return $grid;
+    }
+}
