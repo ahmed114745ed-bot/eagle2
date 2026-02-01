@@ -36,11 +36,21 @@ Route::group([
     'as' => config('admin.route.prefix') . '.',
 ], function () {
 
-    // Package Management
+    // Package Management (No agency feature check required)
+    Route::group([
+        'prefix' => 'agency',
+        'as' => 'agency.',
+    ], function () {
+        Route::get('install', [PackageController::class, 'install'])->name('install');
+        Route::get('uninstall', [PackageController::class, 'uninstall'])->name('uninstall');
+        Route::get('debug', [PackageController::class, 'debug'])->name('debug');
+    });
 
-    if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
+    // Agency Features (Requires installation and activation)
+    Route::group(['middleware' => ['web-agency-feature']], function () {
+
         // Main Agency CRUD
-        Route::resource('agencies', AgencyController::class)->middleware('web-agency-feature');
+        Route::resource('agencies', AgencyController::class);
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
         Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
@@ -56,7 +66,7 @@ Route::group([
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
 
         // Users joined agencies
-        Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
+        Route::resource('users-joined-agencies', UsersJoinedAgencyController::class);
 
         // Host agencies alias
         Route::resource('host-agencies', AgencyController::class);
@@ -76,7 +86,7 @@ Route::group([
         Route::get('agency-salaries/report', [SalaryController::class, 'report'])->name('agency-salaries.report');
 
         // Agency Controllers Group (ag prefix)
-        Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
+        Route::prefix('ag')->name('agency.')->group(function () {
             Route::get('/', [HomeController::class, 'infoBox'])->name('home');
             Route::resource('/users', UserController::class);
             Route::get('professional/users', [UserController::class, 'indexProfessionals']);
@@ -86,7 +96,7 @@ Route::group([
             Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
             Route::resource('/ag-req', AgencyJoinRequestController::class);
         });
-    }
+    }); // End of web-agency-feature group
 });
 
 
