@@ -3,7 +3,7 @@
 namespace App\Support;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\TaskStream\Entities\TaskStream;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
@@ -18,6 +18,7 @@ class PackageHelper
         'real' => Real::class,
         'room' => Room::class,
         'pk' => Pk::class,
+        'taskStream' => TaskStream::class,
     ];
 
     /**
