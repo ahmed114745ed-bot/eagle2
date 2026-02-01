@@ -198,7 +198,7 @@ class RoleControllerNew extends MainController
 
         $form = new Form(new $roleModel());
         $this->disableFormTools($form);
-
+        $form->html('<div class="full-column-width">');
         $form->text('name', trans('role name'))->rules(function ($form) {
             // Get the record ID if editing, otherwise null
             $id = $form->model()?->id ?? null;
@@ -211,7 +211,7 @@ class RoleControllerNew extends MainController
             return "required|unique:admin_roles,name," . ($id ?? 'NULL') . ",id,type," . $type;
         });
 
-        $form->html('<div class="full-column-width">');
+
         // Custom tabbed view
         $form->html(view('admin.permissions-tabs', [
             'permissions' => $permissions,
