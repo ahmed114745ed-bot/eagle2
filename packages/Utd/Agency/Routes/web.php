@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Utd\Agency\Http\Controllers\Admin\AgencyController;
+use Utd\Agency\Http\Controllers\Admin\PackageController;
 use Utd\Agency\Http\Controllers\Admin\JoinRequestController;
 use Utd\Agency\Http\Controllers\Admin\SalaryController;
 use Utd\Agency\Http\Controllers\Admin\AgencyMangerAgencyesController;
@@ -34,7 +35,11 @@ Route::group([
     ],
     'as' => config('admin.route.prefix') . '.',
 ], function () {
-  
+
+    // Package Management
+    Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
+    Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
+
     if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
         // Main Agency CRUD
         Route::resource('agencies', AgencyController::class)->middleware('web-agency-feature');
@@ -43,35 +48,35 @@ Route::group([
         Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
-        
+
         // Agency Manager Routes
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
         Route::resource('agency-manger-target', AgencyMangerTaregetController::class);
-        
+
         // Change agency manager
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        
+
         // Users joined agencies
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
-        
+
         // Host agencies alias
         Route::resource('host-agencies', AgencyController::class);
         Route::get('host-agencies/profile/{id}', [AgencyController::class, 'profile'])->name('host-agencies.profile');
         Route::post('host-agencies/{id}/accept-join', [AgencyController::class, 'acceptJoin'])->name('host-agencies.accept-join');
         Route::post('host-agencies/{id}/reject-join', [AgencyController::class, 'rejectJoin'])->name('host-agencies.reject-join');
         Route::post('host-agencies/{id}/kick', [AgencyController::class, 'kick'])->name('host-agencies.kick');
-        
+
         // Join requests
         Route::resource('agency-join-requests', JoinRequestController::class)->only(['index']);
         Route::post('agency-join-requests/{id}/accept', [JoinRequestController::class, 'accept'])->name('agency-join-requests.accept');
         Route::post('agency-join-requests/{id}/reject', [JoinRequestController::class, 'reject'])->name('agency-join-requests.reject');
-        
+
         // Salaries
         Route::get('agency-salaries', [SalaryController::class, 'index'])->name('agency-salaries.index');
         Route::post('agency-salaries/{id}/mark-paid', [SalaryController::class, 'markAsPaid'])->name('agency-salaries.mark-paid');
         Route::get('agency-salaries/report', [SalaryController::class, 'report'])->name('agency-salaries.report');
-        
+
         // Agency Controllers Group (ag prefix)
         Route::prefix('ag')->name('agency.')->middleware('web-agency-feature')->group(function () {
             Route::get('/', [HomeController::class, 'infoBox'])->name('home');
