@@ -110,7 +110,6 @@ class InstallAgencyCommand extends Command
             '--force' => true,
         ]);
 
-        $this->fixSchema();
     }
 
     /**
@@ -133,6 +132,30 @@ class InstallAgencyCommand extends Command
         if (!empty($migrationsToReset)) {
             $this->info('🔄 Resetting migration history for ' . count($migrationsToReset) . ' files...');
             \Illuminate\Support\Facades\DB::table('migrations')->whereIn('migration', $migrationsToReset)->delete();
+        }
+    }
+
+    /**
+     * Fix missing columns/tables that usually cause installation issues.
+     */
+    protected function fixSchema(): void
+    {
+        $this->info('🔧 Fixing potential schema issues...');
+
+        // 1. Fix 'is_host' on users table
+        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'is_host')) {
+            $this->info('   - Adding missing column: users.is_host');
+            Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->boolean('is_host')->default(0)->after('id');
+            });
+        }
+
+        // 2. Fix 'deleted_at' on agencies table
+        if (Schema::hasTable('agencies') && !Schema::hasColumn('agencies', 'deleted_at')) {
+            $this->info('   - Adding missing column: agencies.deleted_at');
+            Schema::table('agencies', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->softDeletes();
+            });
         }
     }
     /**
