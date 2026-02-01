@@ -7,6 +7,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Events\Entities\GeneralRole;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Utd\Room\Entities\Room;
 
 class HomeCarousel extends Model
 {
@@ -23,8 +24,6 @@ class HomeCarousel extends Model
         'display_live' => 'integer',
         'display_country' => 'integer',
         'display_at' => 'array',
-
-
     ];
 
 
