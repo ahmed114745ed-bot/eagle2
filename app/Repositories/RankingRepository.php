@@ -191,6 +191,20 @@ class RankingRepository
 
         return  $query->whereHas('ranker')
             ->where('role', $role)
+            ->when($role == 'roomId', function ($query) {
+                return $query->where('ranker_type', Room::class)->with([
+                    'ranker' => function ($q) {
+                        $q->with('owner')->select(['id', 'room_name', 'uid', 'room_cover']);
+                    },
+                ]);
+            })
+            ->when($role != 'roomId', function ($query) use ($role) {
+                return $query->where('ranker_type', User::class)->with([
+                    'ranker' => fn($q) => $q->with($this->rankerRelations($role))
+                        ->when($role === 'roomOwner', fn($q) => $q->with('ownerRoom:id,uid,room_cover'))
+                ]);
+            })
+
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts')
             ->take($perPage)
