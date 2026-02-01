@@ -21,12 +21,12 @@ class VerifyLeaderCCMiddleWare
     
         $path = ltrim(str_replace('api/', '', $request->path()), '/');
         $key = config('games.leader_CC_game_key');
-         Log::channel('daily')->info('LeaderCC Request Timing', [
-             'url'      => $request->fullUrl(),
-             'method'   => $request->method(),
-             'body'     => $request->all(),
-             'path' => $path,
-         ]);
+        //  Log::channel('daily')->info('LeaderCC Request Timing', [
+        //      'url'      => $request->fullUrl(),
+        //      'method'   => $request->method(),
+        //      'body'     => $request->all(),
+        //      'path' => $path,
+        //  ]);
      
         if (!$key) {
             return response()->json([
@@ -59,17 +59,10 @@ class VerifyLeaderCCMiddleWare
         switch ($path) {
             case 'leader-cc-game/change-balance':
                 $requiredParams = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
-                  \Log::channel('daily')->info('=== change-balance endpoint hit ===', [
-            'path' => $path,
-            'method' => $request->method(),
-            'all_input' => $request->all()
-        ]);
+       
                 foreach ($requiredParams as $p) {
                     if (!$request->has($p)) {
-                          \Log::channel('daily')->warning('Missing parameter in change-balance', [
-                    'missing_param' => $p,
-                    'received_params' => array_keys($request->all())
-                ]);
+               
                         return response()->json([
                             'errorCode' => 4005,
                             'errorMsg' => 'Missing signature parameters'
@@ -120,12 +113,9 @@ class VerifyLeaderCCMiddleWare
 
 
         $expectedSign = md5($rawString);
-\Log::channel('daily')->info('Signature comparison', [
-            'received_sign' => $request->sign,
-            'generated_sign' => md5($rawString)
-        ]);
+
         if (!hash_equals(strtolower($expectedSign), strtolower($request->input('sign')))) {
-        Log::channel('daily')->info('===== LeaderCC hash_equals Not END =====');
+        // Log::channel('daily')->info('===== LeaderCC hash_equals Not END =====');
     
         return response()->json([
                 'errorCode' => 10004,
