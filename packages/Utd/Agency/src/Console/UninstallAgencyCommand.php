@@ -121,11 +121,10 @@ class UninstallAgencyCommand extends Command
     protected function removeColumns(): void
     {
         $columns = [
-            'users' => ['agency_id', 'type_user', 'is_manger', 'is_host'],
-            'gift_logs' => ['agency_id'],
-            'charges' => ['agency_id'],
-            'user_sallaries' => ['user_agency_id'],
-            'usd_transfers' => ['agency_id'],
+            // 'gift_logs' => ['agency_id'],
+            // 'charges' => ['agency_id'],
+            // 'user_sallaries' => ['user_agency_id'],
+            // 'usd_transfers' => ['agency_id'],
         ];
 
         foreach ($columns as $table => $cols) {
