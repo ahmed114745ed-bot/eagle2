@@ -330,14 +330,48 @@ class OvipGiftTapController extends MainController
 
 
             if (isset($form->key_json) && is_array($form->key_json)) {
-                $form->key_json = array_filter($form->key_json, fn($value) => $value !== null && $value !== '');
-                if (empty($form->key_json)) {
-                    // Keep as an empty array to avoid null array access in KeyValue field
-                    $form->key_json = [];
+                // Normalize posted structure to ['keys' => [...], 'values' => [...]]
+                // Handle both formats: the KeyValue widget posts ['keys'=>[], 'values'=>[]]
+                // but $form->key_json may also be an associative map like ['k'=>'v'] when coming from model.
+                if (array_key_exists('keys', $form->key_json) && array_key_exists('values', $form->key_json)) {
+                    $keys = $form->key_json['keys'] ?? [];
+                    $values = $form->key_json['values'] ?? [];
+
+                    $newKeys = [];
+                    $newValues = [];
+                    foreach ($keys as $i => $k) {
+                        $v = $values[$i] ?? null;
+                        if ($k !== null && $k !== '' || $v !== null && $v !== '') {
+                            $newKeys[] = $k;
+                            $newValues[] = $v;
+                        }
+                    }
+
+                    if (empty($newKeys)) {
+                        $form->key_json = ['keys' => [], 'values' => []];
+                    } else {
+                        $form->key_json = ['keys' => $newKeys, 'values' => $newValues];
+                    }
+                } else {
+                    // Convert associative map to keys/values arrays
+                    $newKeys = [];
+                    $newValues = [];
+                    foreach ($form->key_json as $k => $v) {
+                        if ($k !== null && $k !== '' || $v !== null && $v !== '') {
+                            $newKeys[] = $k;
+                            $newValues[] = $v;
+                        }
+                    }
+
+                    if (empty($newKeys)) {
+                        $form->key_json = ['keys' => [], 'values' => []];
+                    } else {
+                        $form->key_json = ['keys' => $newKeys, 'values' => $newValues];
+                    }
                 }
             } else {
-                dd(123);
-                $form->key_json = [];
+                // Ensure the field has the expected structure for KeyValue
+                $form->key_json = ['keys' => [], 'values' => []];
             }
 
 
