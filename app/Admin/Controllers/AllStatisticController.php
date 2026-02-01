@@ -876,7 +876,7 @@ class AllStatisticController extends MainController
             $user = \App\Models\User::find($u->user_id);
 
             $defaultImage = asset('images/businessman-icon.jpg');
-            $path = $user->profile?->avatar;
+            $path = @$user->profile?->avatar ?? '';
 
             $url = getImagePath($path) ?? $defaultImage;
 
