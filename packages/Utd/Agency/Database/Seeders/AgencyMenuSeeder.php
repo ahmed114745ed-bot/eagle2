@@ -74,34 +74,46 @@ class AgencyMenuSeeder extends Seeder
                 'permission' => 'browse-hosts',
             ],
             [
+                'title' => 'Host Diamonds',
+                'icon' => 'fa-diamond',
+                'uri' => 'ag/host-diamonds',
+                'permission' => 'browse-host-diamond',
+            ],
+            [
                 'title' => 'Hosts Target',
                 'icon' => 'fa-blind',
-                'uri' => 'userTarget',
+                'uri' => 'ag/userTarget',
                 'permission' => 'browse-hosts-target',
             ],
             [
-                'title' => 'Users Wallet',
+                'title' => 'Agency Target',
+                'icon' => 'fa-target',
+                'uri' => 'ag/target',
+                'permission' => 'browse-agency-target',
+            ],
+            [
+                'title' => 'Users Salaries',
                 'icon' => 'fa-shopping-bag',
-                'uri' => '/sallaries',
+                'uri' => 'agency-salaries',
                 'permission' => 'browse-users-Wallet',
             ],
             [
-                'title' => 'Agency Hosts Reports',
-                'icon' => 'fa-bars',
-                'uri' => '/report_user',
-                'permission' => 'browse-host-agencies-report',
+                'title' => 'Charges',
+                'icon' => 'fa-money',
+                'uri' => 'ag/charges',
+                'permission' => 'browse-agency-charges',
             ],
             [
                 'title' => 'Achieved Target',
                 'icon' => 'fa-anchor',
-                'uri' => 'userTarget',
+                'uri' => 'ag/userTarget',
                 'permission' => 'browse-achieved-Target',
             ],
             [
-                'title' => 'Reports',
-                'icon' => 'fa-bars',
-                'uri' => '/reports',
-                'permission' => 'browse-reports',
+                'title' => 'Users Joined Agencies',
+                'icon' => 'fa-users',
+                'uri' => 'users-joined-agencies',
+                'permission' => 'browse-users-joined-agencies',
             ],
         ];
 
@@ -139,10 +151,16 @@ class AgencyMenuSeeder extends Seeder
                 'permission' => 'browse-agencies-join-requests',
             ],
             [
-                'title' => 'Request agencies',
+                'title' => 'Agency Requests (ag-req)',
                 'icon' => 'fa-tags',
-                'uri' => 'request-agencies',
-                'permission' => 'browse-request-agencies',
+                'uri' => 'ag/ag-req',
+                'permission' => 'browse-agency-requests',
+            ],
+            [
+                'title' => 'Change Agency Manager',
+                'icon' => 'fa-exchange',
+                'uri' => 'change_agencies_manger',
+                'permission' => 'browse-change-agency-manger',
             ],
         ];
 
@@ -227,16 +245,22 @@ class AgencyMenuSeeder extends Seeder
         // Agency Manager children
         $agencyManagerChildren = [
             [
-                'title' => 'BD',
-                'icon' => 'fa-bars',
-                'uri' => 'usersBd',
-                'permission' => 'browse-BD',
+                'title' => 'Agency Manager Agencies',
+                'icon' => 'fa-building',
+                'uri' => 'agencies-agency-manger',
+                'permission' => 'browse-agency-manger-agencies',
             ],
             [
-                'title' => 'Setting Agency Manager',
-                'icon' => 'fa-bars',
-                'uri' => 'usersBd-settings',
-                'permission' => null,
+                'title' => 'Agency Manager Users',
+                'icon' => 'fa-users',
+                'uri' => 'agency-manger-users',
+                'permission' => 'browse-agency-manger-users',
+            ],
+            [
+                'title' => 'Agency Manager Target',
+                'icon' => 'fa-bullseye',
+                'uri' => 'agency-manger-target',
+                'permission' => 'browse-agency-manger-target',
             ],
         ];
 

@@ -5,8 +5,12 @@ namespace Utd\Agency\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Utd\Agency\Traits\ConfigurableModelsTrait;
+
 class LeaveAgencyRequest extends Model
 {
+    use ConfigurableModelsTrait;
+
     protected $table = 'leave_agency_requests';
 
     protected $guarded = [];
@@ -37,7 +41,7 @@ class LeaveAgencyRequest extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo($this->getModelClass('user'), 'user_id');
     }
 
     /**

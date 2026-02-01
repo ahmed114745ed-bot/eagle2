@@ -4,10 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-/**
- * ملف migration شامل لضمان وجود جميع جداول الوكالات
- * يتحقق من كل جدول قبل إنشائه لتجنب الأخطاء
- */
+
 return new class extends Migration
 {
     /**
@@ -15,7 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. جدول الوكالات الرئيسي
         if (!Schema::hasTable('agencies')) {
             Schema::create('agencies', function (Blueprint $table) {
                 $table->id();
@@ -83,7 +79,6 @@ return new class extends Migration
             });
         }
 
-        // 4. جدول طلبات الانضمام للوكالة
         if (!Schema::hasTable('agency_join_requests')) {
             Schema::create('agency_join_requests', function (Blueprint $table) {
                 $table->id();
@@ -100,7 +95,6 @@ return new class extends Migration
             });
         }
 
-        // 5. جدول الأهداف
         if (!Schema::hasTable('targets')) {
             Schema::create('targets', function (Blueprint $table) {
                 $table->id();
@@ -113,7 +107,6 @@ return new class extends Migration
             });
         }
 
-        // 6. جدول مديري الوكالة المحذوفين
         if (!Schema::hasTable('agency_manger_deleteds')) {
             Schema::create('agency_manger_deleteds', function (Blueprint $table) {
                 $table->id();
@@ -127,7 +120,6 @@ return new class extends Migration
             });
         }
 
-        // 7. جدول سحوبات مديري الوكالة
         if (!Schema::hasTable('agency_manger_pulling_out')) {
             Schema::create('agency_manger_pulling_out', function (Blueprint $table) {
                 $table->id();
@@ -141,7 +133,6 @@ return new class extends Migration
             });
         }
 
-        // 8. جدول نسبة مدير الوكالة
         if (!Schema::hasTable('percentage_agency_manger')) {
             Schema::create('percentage_agency_manger', function (Blueprint $table) {
                 $table->id();
@@ -153,7 +144,6 @@ return new class extends Migration
             });
         }
 
-        // 9. جدول المعلومات الإضافية
         if (!Schema::hasTable('additional_infos')) {
             Schema::create('additional_infos', function (Blueprint $table) {
                 $table->id();
@@ -166,7 +156,6 @@ return new class extends Migration
             });
         }
 
-        // 10. جدول دعوات الهوست للوكالة
         if (!Schema::hasTable('agency_host_invites')) {
             Schema::create('agency_host_invites', function (Blueprint $table) {
                 $table->id();
@@ -182,7 +171,6 @@ return new class extends Migration
             });
         }
 
-        // 11. جدول طلبات مغادرة الوكالة
         if (!Schema::hasTable('leave_agency_requests')) {
             Schema::create('leave_agency_requests', function (Blueprint $table) {
                 $table->id();
@@ -197,7 +185,6 @@ return new class extends Migration
             });
         }
 
-        // 12. جدول وظائف المستخدمين في الوكالة
         if (!Schema::hasTable('agency_user_jobs')) {
             Schema::create('agency_user_jobs', function (Blueprint $table) {
                 $table->id();
@@ -210,7 +197,6 @@ return new class extends Migration
             });
         }
 
-        // 13. جدول المستخدمين المنضمين للوكالات
         if (!Schema::hasTable('users_joined_agencies')) {
             Schema::create('users_joined_agencies', function (Blueprint $table) {
                 $table->id();
@@ -230,7 +216,6 @@ return new class extends Migration
             });
         }
 
-        // 14. جدول رواتب BD
         if (!Schema::hasTable('bd_sallaries')) {
             Schema::create('bd_sallaries', function (Blueprint $table) {
                 $table->id();
@@ -250,7 +235,6 @@ return new class extends Migration
             });
         }
 
-        // 15. جدول رواتب هوستات BD
         if (!Schema::hasTable('bd_agency_host_sallaries')) {
             Schema::create('bd_agency_host_sallaries', function (Blueprint $table) {
                 $table->id();
@@ -267,7 +251,6 @@ return new class extends Migration
             });
         }
 
-        // 16. جدول BD salaries
         if (!Schema::hasTable('bd_salaries')) {
             Schema::create('bd_salaries', function (Blueprint $table) {
                 $table->id();

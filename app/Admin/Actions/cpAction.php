@@ -16,7 +16,7 @@ use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
-use Modules\AgencyApp\Entities\AdditionalInfo;
+use Utd\Agency\Entities\AdditionalInfo;
 
 class cpAction extends RowAction
 {

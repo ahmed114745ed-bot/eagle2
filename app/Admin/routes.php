@@ -141,7 +141,7 @@ Route::group([
     ],
 ], function () {
 
-    Route::get('change-password-view', [AuthController::class, 'changePasswordView'])
+    Route::get('change-password-view', [App\Admin\Controllers\AuthController::class, 'changePasswordView'])
         ->name('admin.change-password-view');
 });
 
@@ -241,10 +241,7 @@ Route::group(
             'update' => 'auth.users.update',
             'destroy' => 'auth.users.destroy',
         ]);
-        // Agency managers route - only if package is installed
-        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
-            Route::resource('/agencies/managers', AdminAgencyMangerController::class);
-        }
+
 
         Route::resource('auth/roles', RoleControllerNew::class);
         Route::get('super-roles', [SuperRoleController::class, 'index']);
@@ -341,16 +338,7 @@ Route::group(
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
         
-        // Agency routes - wrapped with package check
-        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
-            Route::resource('agencies', 'AgencyController')->middleware('web-agency-feature');
-            Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
-            // Shipping agency routes moved to packages/Utd/ShippingAgency/Routes/admin.php
-            Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
-            Route::post('agencies/reject_join/{id}', [AgencyController::class, 'rejectJoin']);
-            Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
-            Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
-        }
+   
         
         Route::resource('families', 'FamilyController');
         
@@ -615,26 +603,13 @@ Route::group(
         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
         
         // Agency manager routes - only if package installed
-        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
-            Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
-            Route::resource('agency-manger-users', AgencyMangerUsers::class);
-        }
+    
         
         Route::resource('core-wallets', CoreWalletsController::class);
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
         Route::post('/admin/wallet-transfer/submit', [CoreWalletsController::class, 'submitTransfer'])->name('wallet.transfer.submit');
         
-        // Change agency manager - only if package installed
-        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
-            Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
-        }
-        
-        // Route::resource('charge-agencies', ...) moved to packages/Utd/ShippingAgency/Routes/admin.php
-        
-        // Users joined agencies - only if package installed
-        if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
-            Route::resource('users-joined-agencies', UsersJoinedAgencyController::class)->middleware('web-agency-feature');
-        }
+   
         
         Route::resource('super-package-rewards', SuperPackageController::class);
         Route::get('admin-rewards-histories', [SuperAdminRewardControllerHistory::class, 'index']);

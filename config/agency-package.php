@@ -207,6 +207,7 @@ return [
             'enabled' => true,
             'charge_agency' => \Modules\SalaryTransaction\Entities\ChargeAgency::class,
             'salary_request' => \Modules\SalaryTransaction\Entities\SalaryRequest::class,
+            'agency_transfer_salary' => \Modules\SalaryTransaction\Entities\AgencyTransferSalary::class,
         ],
         'milestones' => [
             'enabled' => true,

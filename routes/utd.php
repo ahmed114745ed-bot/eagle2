@@ -12,7 +12,7 @@ use App\Http\Controllers\Api\V1\AllGameController;
 use App\Http\Controllers\Api\V1\CoinController;
 use App\Http\Controllers\Api\V1\ConfigController;
 use App\Http\Controllers\Api\V1\CoreWalletsController;
-use App\Http\Controllers\Api\V1\ExchangeController as ExchangeDiamondController;
+use Modules\UsersWallet\Http\Controllers\Api\ExchangeController as ExchangeDiamondController;
 use App\Http\Controllers\Api\V1\GameReportController;
 use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\GiftLogController;

@@ -49,6 +49,13 @@
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
 
+    // DEBUG: Log every menu item
+    $itemId = Arr::get($item, 'id');
+    $itemTitle = Arr::get($item, 'title');
+    if ($itemId == 168) {
+        \Log::info('DEBUG Agency System', ['id' => $itemId, 'title' => $itemTitle]);
+    }
+
     /* -------------------------------
      | URI / BD Visibility
      |-------------------------------*/
@@ -93,13 +100,12 @@
     $moduleGuards = [
         'moment' => \Utd\Moments\Entities\Moment::class,
         'achievement' => \Utd\Achievements\Entities\Achievement::class,
-        'reels' => \Utd\Reals\Entities\Real::class,
-        'agency' => \Utd\Agency\Models\Agency::class,
-        'agencies' => \Utd\Agency\Models\Agency::class,
-        'sallary' => \Utd\Agency\Models\Agency::class,
-        'sallaries' => \Utd\Agency\Models\Agency::class,
-        'salary' => \Utd\Agency\Models\Agency::class,
-        'salaries' => \Utd\Agency\Models\Agency::class,
+        'agency' => \Utd\Agency\Entities\Agency::class,
+        'agencies' => \Utd\Agency\Entities\Agency::class,
+        'sallary' => \Utd\Agency\Entities\Agency::class,
+        'sallaries' => \Utd\Agency\Entities\Agency::class,
+        'salary' => \Utd\Agency\Entities\Agency::class,
+        'salaries' => \Utd\Agency\Entities\Agency::class,
     ];
 
     $moduleAllowed = true;
@@ -118,11 +124,14 @@
         }
     }
 
+    // Check permission - if empty, allow access; otherwise check user can
+    $hasPermission = empty($permission) || Admin::user()->can($permission);
+
     $isVisible =
         !$shouldHideBd &&
         Admin::user()->visible($roles) &&
         $moduleAllowed &&
-        Admin::user()->can($permission) &&
+        $hasPermission &&
         (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 
     $badgeCount = 0;
