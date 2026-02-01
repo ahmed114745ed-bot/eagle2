@@ -3,7 +3,7 @@
 namespace Modules\RoomBoom\Services;
 
 use App\Helpers\Common;
-use App\Helpers\PackageHelper;
+use App\Support\PackageHelper;
 use Cache;
 use Carbon\Carbon;
 use DB;
@@ -170,7 +170,7 @@ class BoomGiftService
      */
     private function incrementTodayRoomGift($roomId, $todayStart, $totalPrice)
     {
-        if (!PackageHelper::isInstalled('utd/room')) {
+        if (!PackageHelper::isInstalled('room')) {
             return 0;
         }
         return DB::transaction(function () use ($roomId, $todayStart, $totalPrice) {
@@ -186,7 +186,7 @@ class BoomGiftService
                 ]);
             } else {
                 $totalRoomGift->increment('current_total', $totalPrice);
-                $totalRoomGift->refresh(); 
+                $totalRoomGift->refresh();
             }
 
             return $totalRoomGift->current_total;
