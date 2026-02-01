@@ -336,7 +336,7 @@ class OvipGiftTapController extends MainController
                     $form->key_json = [];
                 }
             } else {
-                // Ensure the field is an array (not null) so the KeyValue field won't try to access offsets on null
+                dd(123);
                 $form->key_json = [];
             }
 
