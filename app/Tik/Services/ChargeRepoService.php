@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Agency;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
+use Utd\Agency\Repositories\ShippingAgencyRepository;
 use Utd\ShippingAgency\Entities\ShippingAgency;
 use App\Services\WalletService;
 use Illuminate\Support\Facades\DB;
@@ -20,9 +21,7 @@ use Utd\Room\Repositories\RoomSalaryRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
-use Utd\ShippingAgency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 use App\Contracts\UserAchievementContract;
 
 class ChargeRepoService
@@ -307,7 +306,7 @@ class ChargeRepoService
             $amountBefore,
             UserCoinLogType::APP_CHARGE,
         );
-    
+
         // $type = $receiver->user_type;
         $this->userRepository->incrementUserCoins($receiver, $amount);
         $data = [
@@ -362,7 +361,7 @@ class ChargeRepoService
 
     public function chargeAgency($sender, Agency|ShippingAgency $receiver, $chargeType, $amount, $usd = null, $transferred = false)
     {
-   
+
 
         $receiver->increment('coins', $amount);
 
@@ -534,7 +533,7 @@ class ChargeRepoService
             throw new Exception(__('balance not enough'));
         }
 
-   
+
 
         $authAgency->decrement('coins', $amount);
         $chargeAgency->increment('coins', $amount);
