@@ -6,10 +6,10 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\Region;
-use Modules\AreaManager\Entities\RegionCountry;
 use Modules\SalaryTransaction\Entities\ChargeCountry;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Modules\SuperAdmin\Entities\SuperAdmin;
+use Utd\Room\Entities\Room;
 
 class Country extends Model
 {
@@ -57,7 +57,7 @@ class Country extends Model
     {
         return $this->hasMany(SuperAdmin::class,'country_id');
     }
-  
+
 
     public function scopeNonDefaultOrUnassigned($query)
     {
@@ -74,7 +74,7 @@ class Country extends Model
         parent::boot();
 
         static::saved(function ($country) {
-      
+
         });
     }
 
@@ -82,22 +82,22 @@ class Country extends Model
     {
         return $this->belongsToMany(
             Region::class,
-            'region_countries', 
+            'region_countries',
             'country_id',
             'region_id'
         );
     }
-    
-    
+
+
     public function areaManagers()
     {
         return $this->hasManyThrough(
-            AreaManager::class, 
-            Region::class, 
-            'id',            
-            'id',            
-            'id',            
-            'manager_id' 
+            AreaManager::class,
+            Region::class,
+            'id',
+            'id',
+            'id',
+            'manager_id'
         );
     }
     public function getRegionManagerIdAttribute()
