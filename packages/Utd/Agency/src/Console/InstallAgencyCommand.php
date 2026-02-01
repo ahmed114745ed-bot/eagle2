@@ -102,12 +102,39 @@ class InstallAgencyCommand extends Command
      */
     protected function runMigrations(): void
     {
+        // 0. Reset migration history for this package to ensure "all" run as requested
+        $this->resetMigrationHistory();
+
         $this->call('migrate', [
             '--path' => 'packages/Utd/Agency/Database/Migrations',
             '--force' => true,
         ]);
+
+        $this->fixSchema();
     }
 
+    /**
+     * Clear migration repository for package migrations to force them to be re-evaluated.
+     */
+    protected function resetMigrationHistory(): void
+    {
+        $migrationPath = base_path('packages/Utd/Agency/Database/Migrations');
+        if (!is_dir($migrationPath)) {
+            return;
+        }
+
+        $files = glob($migrationPath . '/*.php');
+        $migrationsToReset = [];
+
+        foreach ($files as $file) {
+            $migrationsToReset[] = basename($file, '.php');
+        }
+
+        if (!empty($migrationsToReset)) {
+            $this->info('🔄 Resetting migration history for ' . count($migrationsToReset) . ' files...');
+            \Illuminate\Support\Facades\DB::table('migrations')->whereIn('migration', $migrationsToReset)->delete();
+        }
+    }
     /**
      * Publish the package configuration.
      */
