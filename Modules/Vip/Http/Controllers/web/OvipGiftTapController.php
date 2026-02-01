@@ -321,12 +321,19 @@ class OvipGiftTapController extends MainController
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
 
             if ($form->key_json && is_array($form->key_json)) {
-                // Remove any keys where value is null or empty
+                // Remove empty keys
                 $form->key_json = array_filter($form->key_json, function ($value) {
                     return $value !== null && $value !== '';
                 });
+
+                // If array is empty after filtering, set to null to delete from DB
+                if (empty($form->key_json)) {
+                    $form->key_json = null;
+                }
+            } else {
+                // If not an array or null, also make sure DB is cleared
+                $form->key_json = null;
             }
-            
             $hasShowImg = $form->show_img || $form->model()->show_img;
             $hasImg2 = $form->img2 || $form->model()->img2;
             $type = $form->model()->type ?? request('type');
