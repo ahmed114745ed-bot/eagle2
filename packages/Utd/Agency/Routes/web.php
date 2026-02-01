@@ -31,7 +31,6 @@ Route::group([
         'admin',
         'adminIp',
         'multiLanguage',
-        'web-agency-feature',
     ],
     'as' => config('admin.route.prefix') . '.',
 ], function () {
