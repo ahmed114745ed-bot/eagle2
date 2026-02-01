@@ -319,7 +319,7 @@ class OvipGiftTapController extends MainController
         }
 
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
-          //  dd(request());
+            //  dd(request());
 
             // if ($form->key_json && is_array($form->key_json)) {
             //     // Remove any keys where value is null or empty
@@ -332,10 +332,9 @@ class OvipGiftTapController extends MainController
             if (isset($form->key_json) && is_array($form->key_json)) {
                 $form->key_json = array_filter($form->key_json, fn($value) => $value !== null && $value !== '');
                 if (empty($form->key_json)) {
-                    $form->key_json = null; // empty array becomes null
+                    $form->key_json = null;
                 }
             } else {
-                // If key_json not in request, or not an array, set null
                 $form->key_json = null;
             }
 
