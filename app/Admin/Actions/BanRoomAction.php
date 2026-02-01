@@ -100,7 +100,7 @@ class BanRoomAction extends Action
 
     public function html()
     {
-        $banText = __('create bans'); // Laravel translation
+        $banText = __('close room'); // Laravel translation
         return <<<HTML
     <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white" 
        style="background-color: #28a745; border-color: #28a745; color: white;">
