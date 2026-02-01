@@ -51,9 +51,7 @@
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "*",
         "utd/moments": "*",
-        "utd/reals": "*",
-        "utd/agency": "*",
-        "utd/room": "*"
+        "utd/reals": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

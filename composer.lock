@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bb0b1834e69a7da82e160a85523b3352",
+    "content-hash": "6fc551a3b4d14499c806220fcdcfeb48",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14376,7 +14376,7 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
@@ -14417,55 +14417,8 @@
             }
         },
         {
-            "name": "utd/agency",
-            "version": "dev-agencyPackage",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/Agency",
-                "reference": "d324920a12a5c3eec03e960fad55c044fadc076f"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\Agency\\AgencyServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\Agency\\": "src/",
-                    "Utd\\Agency\\Database\\": "Database/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Complete Agency Laravel Package - Host Agency & Shipping Agency Management System",
-            "keywords": [
-                "agency",
-                "host-agency",
-                "laravel",
-                "management",
-                "shipping-agency"
-            ],
-            "transport-options": {
-                "relative": true
-            }
-        },
-        {
             "name": "utd/moments",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
@@ -14506,7 +14459,7 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-reelsPackage",
+            "version": "dev-room-package",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
@@ -14551,47 +14504,6 @@
                 }
             ],
             "description": "Reels/Reals Feature Package with License Support",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "utd/room",
-            "version": "dev-room-package",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/Room",
-                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\Room\\RoomServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\Room\\": "src/",
-                    "Utd\\Room\\Database\\": "Database/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Room Laravel Package - Core room functionality including microphones, visitors, categories, and more",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -15369,8 +15281,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20,
-        "utd/room": 20
+        "fruitcake/laravel-cors": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
@@ -15379,6 +15290,6 @@
         "ext-curl": "*",
         "ext-openssl": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
