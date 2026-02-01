@@ -329,16 +329,15 @@ class OvipGiftTapController extends MainController
             // }
 
 
-            if (!is_array($form->key_json)) {
-                $form->key_json = null;
-            }
-
-            // If array, remove empty keys
-            if (is_array($form->key_json)) {
+            if (isset($form->key_json) && is_array($form->key_json)) {
                 $form->key_json = array_filter($form->key_json, fn($value) => $value !== null && $value !== '');
                 if (empty($form->key_json)) {
-                    $form->key_json = null;
+                    // Keep as an empty array to avoid null array access in KeyValue field
+                    $form->key_json = [];
                 }
+            } else {
+                // Ensure the field is an array (not null) so the KeyValue field won't try to access offsets on null
+                $form->key_json = [];
             }
 
 
