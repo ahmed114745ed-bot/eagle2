@@ -98,8 +98,7 @@ class OvipGiftTapController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('gift'))
-            ->body($this->detail($id)));
+            ->title(trans('gift')));
     }
 
     public function edit($id, Content $content)
