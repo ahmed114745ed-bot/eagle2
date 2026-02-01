@@ -182,6 +182,19 @@ class RewardTargetController extends MainController
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'))->default(1);
+        $form->html('
+            <style>
+            .file-input .input-group.file-caption-main {
+                display: flex !important;
+            }
+                 .file-input .input-group.file-caption-main .btn-file {
+            padding: 5px 15px !important;
+            border-radius: 6px !important;
+            font-size: 12px !important;
+            margin-left: -3333% !important;
+        }
+            </style>
+        ');
         return $form;
     }
 
