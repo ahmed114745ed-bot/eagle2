@@ -351,6 +351,8 @@ class PkEventGiftController extends MainController
         $form->hidden('pk_type')->value(request('pk_type'));
 
         $form->hidden('level')->value(request()->route('level'));
+        $form->html('<div class="full-column-width">');
+
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
@@ -374,20 +376,20 @@ class PkEventGiftController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
-        $form->number('expire', __('expire'));
-         $form->html('
-            <style>
-            .file-input .input-group.file-caption-main {
-                display: flex !important;
-            }
-                 .file-input .input-group.file-caption-main .btn-file {
-            padding: 5px 15px !important;
-            border-radius: 6px !important;
-            font-size: 12px !important;
-            margin-left: -3333% !important;
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
         }
-            </style>
-        ');
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
+        $form->number('expire', __('expire'));
+
 
         $form->saved(function (Form $form) {
 
