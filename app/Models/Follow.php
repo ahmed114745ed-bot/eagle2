@@ -5,7 +5,8 @@ namespace App\Models;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Moment\Entities\Moment;
+use Utd\Moments\Entities\Moment;
+use Utd\Room\Entities\Room;
 
 class Follow extends Model
 {
