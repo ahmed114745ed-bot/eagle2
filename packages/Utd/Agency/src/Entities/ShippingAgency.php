@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Entities;
 
+use App\Traits\AgencyAdditionalInfoTrait;
 use Utd\Agency\Entities\Agency;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Entities\AgencySalary;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Utd\Agency\Traits\AgencyAdditionalInfoTrait;
 use Utd\Agency\Scopes\ShippingAgencyScope;
 
 
