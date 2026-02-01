@@ -112,7 +112,7 @@
     }
 
     .rtl .fields-group .form-group {
-    /* display: flex !important; */
+    display: block !important;
 }
 </style>
 
