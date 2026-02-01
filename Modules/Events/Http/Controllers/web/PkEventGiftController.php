@@ -376,6 +376,8 @@ class PkEventGiftController extends MainController
                     return now()->timestamp . '.' . $file->guessExtension();
                 })->disk('gcs');
             });
+        $form->number('expire', __('expire'));
+
         $form->html('</div>');
 
         Admin::style('
@@ -388,7 +390,6 @@ class PkEventGiftController extends MainController
             width: 50% !important;
         }
     ');
-        $form->number('expire', __('expire'));
 
 
         $form->saved(function (Form $form) {
