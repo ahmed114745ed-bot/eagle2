@@ -33,6 +33,11 @@
 "registration forms": "نماذج التسجيل",
 "addons": "الإضافات",
     "filter_month": "شهر",
+ "difference": "حاصل الفرق",
+  "total_win": "مجموع win",
+  "total_lose": "مجموع lose",
+  "total_cost": "مجموع cost",
+
     "this agency does not have owner": "هذه الوكالة ليس لديها مالك",
     "Play coin sound inside the room when the win amount is greater than or equal to the added value.":"تشغيل صوت الكوينات داخل الغرفه عندما تكون قيمه المكسب اكبر من او تساوى القيمه المضافه",
     "filter_year": "سنة",

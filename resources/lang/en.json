@@ -30,7 +30,10 @@
     "Charge switch area manager": "Frozen Wallet Button area manager",
 "total_balance": "Total Target",
   "top_users_shipping":"Top Users Shipping",
-
+ "difference": "Difference Result",
+  "total_win": "Total Win",
+  "total_lose": "Total Lose",
+  "total_cost": "Total Cost",
   "pending_balance": "Total Shipments",
   "available_balance": "Total Payment Gateway Transactions",
   "today_balance": "Today Gifts",

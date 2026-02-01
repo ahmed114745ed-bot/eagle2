@@ -167,7 +167,6 @@ class UserController extends MainController
                 'agency',
                 'userSetting',
                 'country',
-                //            'sameDeviceUsers:id,name,uuid,special_id,sender_level,received_level',
                 'senderLevel',
                 'receiverLevel',
                 'monthlyDiamondReceive',
