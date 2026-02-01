@@ -4,7 +4,7 @@ on:
     branches: ["jo"]
 jobs:
   run_jo_hub:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted] #ubuntu-latest
     steps:
     - name: print out jo
       uses: appleboy/ssh-action@v1.2.1
