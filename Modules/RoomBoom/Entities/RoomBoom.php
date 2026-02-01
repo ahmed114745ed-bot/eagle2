@@ -2,7 +2,7 @@
 
 namespace Modules\RoomBoom\Entities;
 
-use App\Helpers\PackageHelper;
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
