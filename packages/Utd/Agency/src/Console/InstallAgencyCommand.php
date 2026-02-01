@@ -51,6 +51,7 @@ class InstallAgencyCommand extends Command
         // Step 2: Publish config
         $this->info('📦 Step 2/5: Publishing configuration...');
         $this->publishConfig();
+        $this->fixSchema();
         $this->info('   ✅ Configuration published.');
 
         // Step 3: Clear caches
