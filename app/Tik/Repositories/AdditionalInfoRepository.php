@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use Modules\AgencyApp\Entities\AdditionalInfo;
+use Utd\Agency\Entities\AdditionalInfo;
 
 class AdditionalInfoRepository extends AbstractRepository
 {

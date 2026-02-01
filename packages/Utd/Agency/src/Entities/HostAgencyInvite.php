@@ -5,8 +5,12 @@ namespace Utd\Agency\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use Utd\Agency\Traits\ConfigurableModelsTrait;
+
 class HostAgencyInvite extends Model
 {
+    use ConfigurableModelsTrait;
+
     protected $table = 'host_agency_invites';
 
     protected $guarded = [];
@@ -37,7 +41,7 @@ class HostAgencyInvite extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsTo($this->getModelClass('user'), 'user_id');
     }
 
     /**
@@ -45,7 +49,7 @@ class HostAgencyInvite extends Model
      */
     public function inviter(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'inviter_id');
+        return $this->belongsTo($this->getModelClass('user'), 'inviter_id');
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use Modules\AgencyApp\Entities\AgencyHostInvite;
+use Utd\Agency\Entities\AgencyHostInvite;
 
 class AgencyHostInviteRepository extends AbstractRepository
 {

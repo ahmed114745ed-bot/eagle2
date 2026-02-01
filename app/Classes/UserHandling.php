@@ -19,7 +19,7 @@ use App\Models\RealtimeProject;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
-use Modules\AgencyApp\Entities\AgencyUserJob;
+use Utd\Agency\Entities\AgencyUserJob;
 use Modules\Vip\Helpers\VipCommon;
 
 class UserHandling

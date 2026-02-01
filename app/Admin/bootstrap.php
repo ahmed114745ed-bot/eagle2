@@ -38,7 +38,7 @@ Admin::js(asset('js/laravel_admin.js'));
 
 app('view')->prependNamespace('admin', resource_path('views/admin'));
 view()->composer('admin::partials.menu', function (Illuminate\View\View $view) {
-    $view->setPath(resource_path('views/admin/views/partials/menu.blade.php'));
+    $view->setPath(resource_path('views/vendor/admin/partials/menu.blade.php'));
 });
 view()->composer('admin::partials.footer', function (Illuminate\View\View $view) {
     $view->setPath(resource_path('views/admin/views/partials/footer.blade.php'));

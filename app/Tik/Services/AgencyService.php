@@ -34,15 +34,17 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Tik\Repositories\AgencyUserJobRepository;
 use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use Utd\Agency\Repositories\ShippingAgencyRepository;
+use App\Http\Resources\Api\V1\SenderGiftLogResource;
 use App\Tik\Repositories\AgencyJoinRequestRepository;
 use App\Tik\Repositories\UsersJoinedAgencyRepository;
 use App\Tik\Repositories\LeaveAgencyRequestRepository;
-use Modules\AgencyApp\Transformers\AgencyHostResource;
+use Utd\Agency\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use Modules\AgencyApp\Transformers\AgencyMonthlyHostResource;
-use Utd\Agency\Repositories\ShippingAgencyRepository;
+use Utd\Agency\Transformers\AgencyMonthlyHostResource;
+
 
 
 class AgencyService

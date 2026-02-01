@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use Modules\AgencyApp\Entities\AgencyUserJob;
+use Utd\Agency\Entities\AgencyUserJob;
 
 
 /** @property AgencyUserJob $model*/
