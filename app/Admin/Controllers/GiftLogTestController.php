@@ -21,7 +21,7 @@ use App\Repositories\Community\SearchRepository;
 use App\Services\ProfileService;
 use App\Services\UserService;
 use App\Tik\Services\GiftLogService;
-use Utd\Room\Services\RoomService;
+use App\Contracts\RoomServiceContract;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -38,7 +38,7 @@ class GiftLogTestController extends Controller
         private readonly GiftLogService $giftLogService,
         private readonly UserService $userService,
         private readonly ProfileService $profileService,
-        private readonly RoomService $roomService,
+        private readonly RoomServiceContract $roomService,
     )
     {
     }
@@ -173,7 +173,7 @@ class GiftLogTestController extends Controller
 
     public function getAdmins(Request $request)
     {
-        $admins = $this->roomService->roomAdmins(1075);
+        $admins = $this->roomService->getRoomAdmins(1075);
 
         $data = RoomAdminsResource::collection($admins);
 

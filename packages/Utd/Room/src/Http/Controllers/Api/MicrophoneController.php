@@ -14,7 +14,7 @@ use App\Facades\RoomHelper;
 use Utd\Room\Entities\EnteredRoom;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
-use App\Tik\Services\MicService;
+use Utd\Room\Services\MicService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;

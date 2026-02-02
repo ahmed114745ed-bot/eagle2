@@ -7,7 +7,7 @@ use Exception;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
-use Utd\Room\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryContract;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,7 +20,7 @@ class PackService
     public function __construct(
         private readonly PackRepository $packRepository,
         private readonly WareRepository $wareRepository,
-        private readonly RoomRepository $roomRepository,
+        private readonly RoomRepositoryContract $roomRepository,
         private readonly UserVipRepository $userVipRepository,
         private readonly UserRepository $userRepository,
     ) {}

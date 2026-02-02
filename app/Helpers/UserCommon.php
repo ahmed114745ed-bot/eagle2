@@ -36,8 +36,6 @@ use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
-use App\Traits\HelperTraits\InfoTrait;
-use Utd\Room\Traits\RoomTrait;
 use App\Traits\HelperTraits\ZegoTrait;
 use Modules\Vip\Helpers\VipCommon;
 use Twilio\Rest\Client as TwilioClint;

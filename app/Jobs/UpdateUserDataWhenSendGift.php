@@ -9,7 +9,7 @@ use App\Models\Cp;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use Utd\Room\Repositories\RoomTopUsersRepository;
+use App\Contracts\RoomTopUsersRepositoryContract;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,7 +28,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
      */
     public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null,private $totalNumWin,private $totalUserWin)
     {
-        $this->roomTopUsersRepository = new RoomTopUsersRepository();
+        $this->roomTopUsersRepository = app(RoomTopUsersRepositoryContract::class);
 
     }
 
@@ -94,8 +94,10 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
      */
     public function updateRoomCoinsToUser( $user, $room, $totalPrice): void
     {
-        $topUser        = $this->roomTopUsersRepository->findOrCreate($room->id, $user->id);
-        $topUser->coins += $totalPrice;
-        $topUser->save();
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $user->id);
+        if ($topUser) {
+            $topUser->coins += $totalPrice;
+            $topUser->save();
+        }
     }
 }

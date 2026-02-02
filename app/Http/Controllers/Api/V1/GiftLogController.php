@@ -50,7 +50,7 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
-use Utd\Room\Repositories\RoomTopUsersRepository;
+use App\Contracts\RoomTopUsersRepositoryContract;
 use Utd\Achievements\Jobs\CalculateAchievement;
 use Utd\Room\Services\RoomAchievementTargetService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
@@ -62,7 +62,7 @@ class GiftLogController extends Controller
 
     private $roomTopUsersRepository;
     public function __construct(
-        RoomTopUsersRepository $roomTopUsersRepository,
+        RoomTopUsersRepositoryContract $roomTopUsersRepository,
         private GiftLogService $giftLogService,
     ) {
 
@@ -353,9 +353,11 @@ class GiftLogController extends Controller
      */
     public function updateRoomCoinsToUser($userId, $room, $totalPrice): void
     {
-        $topUser         = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
-        $topUser->coins  += $totalPrice;
-        $topUser->save();
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
+        if ($topUser) {
+            $topUser->coins += $totalPrice;
+            $topUser->save();
+        }
     }
 
 

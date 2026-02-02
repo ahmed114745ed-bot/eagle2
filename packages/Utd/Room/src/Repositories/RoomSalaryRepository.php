@@ -2,9 +2,10 @@
 
 namespace Utd\Room\Repositories;
 
+use App\Contracts\RoomSalaryRepositoryContract;
 use Utd\Room\Entities\RoomSalary;
 
-class RoomSalaryRepository extends AbstractRepository
+class RoomSalaryRepository extends AbstractRepository implements RoomSalaryRepositoryContract
 {
     public function __construct()
     {
@@ -40,5 +41,10 @@ class RoomSalaryRepository extends AbstractRepository
     public function markAsPaid($salaryId)
     {
         return $this->update(['is_paid' => 1], $salaryId);
+    }
+
+    public function findById($id)
+    {
+        return $this->model->find($id);
     }
 }

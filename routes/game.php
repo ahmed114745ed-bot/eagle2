@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\LeaderCCgameController;
+use Utd\Room\Http\Controllers\Api\EnteranceController;
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'generalBan', 'update.last.seen'])
     ->group(function () {
@@ -11,8 +12,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'userBan', 'ip', 'general
         });
     });
 
-Route::post('update-room-count-zego', [\App\Http\Controllers\Api\V1\Room\EnteranceController::class, 'updateRoomCountFromZego2']);
-//Route::post('update-room-count-zego-2', [\App\Http\Controllers\Api\V1\Room\EnteranceController::class, 'updateRoomCountFromZego2']);
+Route::post('update-room-count-zego', [EnteranceController::class, 'updateRoomCountFromZego2']);
 
 
 // BAISHUN games

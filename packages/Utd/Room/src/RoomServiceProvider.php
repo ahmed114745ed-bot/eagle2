@@ -2,30 +2,25 @@
 
 namespace Utd\Room;
 
+use App\Contracts\EnteranceRoomContract;
+use App\Contracts\RoomGameContract;
+use App\Contracts\RoomServiceContract;
+use App\Contracts\RoomRepositoryContract;
+use App\Contracts\RoomSalaryRepositoryContract;
+use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Contracts\RoomVisitorRepositoryContract;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Utd\Room\Services\RoomService;
-use Utd\Room\Services\PkService;
-use Utd\Room\Services\BanRoomService;
-use Utd\Room\Services\BackgroundService;
-use Utd\Room\Services\MicrophoneService;
-use Utd\Room\Services\RoomSalaryService;
-use Utd\Room\Services\RoomVisitorService;
 use Utd\Room\Services\EnteranceRoomService;
-use Utd\Room\Services\RoomCategoryService;
-use Utd\Room\Repositories\PkRepository;
-use Utd\Room\Repositories\RoomRepository;
-use Utd\Room\Repositories\BanRoomRepository;
-use Utd\Room\Repositories\BackgroundRepository;
-use Utd\Room\Repositories\RoomSalaryRepository;
-use Utd\Room\Repositories\RoomTargetRepository;
-use Utd\Room\Repositories\RoomVisitorRepository;
-use Utd\Room\Repositories\EnteredRoomRepository;
-use Utd\Room\Repositories\RoomCategoryRepository;
-use Utd\Room\Repositories\RoomMicrophoneRepository;
+use Utd\Room\Services\RoomGameServices;
 use Utd\Room\Repositories\RoomRepo;
 use Utd\Room\Repositories\RoomRepoInterface;
+use Utd\Room\Repositories\RoomRepository;
+use Utd\Room\Repositories\RoomSalaryRepository;
+use Utd\Room\Repositories\RoomTopUsersRepository;
+use Utd\Room\Repositories\RoomVisitorRepository;
 
 class RoomServiceProvider extends ServiceProvider
 {
@@ -42,6 +37,27 @@ class RoomServiceProvider extends ServiceProvider
 
         // Bind the repository interface to the implementation
         $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
+
+        // Bind EnteranceRoomContract so external code can use it
+        $this->app->singleton(EnteranceRoomContract::class, EnteranceRoomService::class);
+
+        // Bind RoomGameContract so external code can use it
+        $this->app->singleton(RoomGameContract::class, RoomGameServices::class);
+
+        // Bind RoomServiceContract so external code can use it
+        $this->app->singleton(RoomServiceContract::class, RoomService::class);
+
+        // Bind RoomRepositoryContract so external code can use it
+        $this->app->singleton(RoomRepositoryContract::class, RoomRepository::class);
+
+        // Bind RoomSalaryRepositoryContract so external code can use it
+        $this->app->singleton(RoomSalaryRepositoryContract::class, RoomSalaryRepository::class);
+
+        // Bind RoomTopUsersRepositoryContract so external code can use it
+        $this->app->singleton(RoomTopUsersRepositoryContract::class, RoomTopUsersRepository::class);
+
+        // Bind RoomVisitorRepositoryContract so external code can use it
+        $this->app->singleton(RoomVisitorRepositoryContract::class, RoomVisitorRepository::class);
     }
 
     /**
@@ -139,41 +155,21 @@ class RoomServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../Config/room.php' => config_path('room.php'),
             ], 'room-config');
-
-            // Views
-            $this->publishes([
-                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
-            ], 'room-views');
-
-            // Translations
-            $this->publishes([
-                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
-            ], 'room-lang');
-
-            // Migrations
-            $this->publishes([
-                __DIR__ . '/../Database/migrations' => database_path('migrations'),
-            ], 'room-migrations');
+//
+//            // Views
+//            $this->publishes([
+//                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
+//            ], 'room-views');
+//
+//            // Translations
+//            $this->publishes([
+//                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
+//            ], 'room-lang');
+//
+//            // Migrations
+//            $this->publishes([
+//                __DIR__ . '/../Database/migrations' => database_path('migrations'),
+//            ], 'room-migrations');
         }
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides(): array
-    {
-        return [
-            RoomService::class,
-            RoomCategoryService::class,
-            RoomVisitorService::class,
-            EnteranceRoomService::class,
-            MicrophoneService::class,
-            BanRoomService::class,
-            BackgroundService::class,
-            RoomSalaryService::class,
-            PkService::class,
-        ];
     }
 }

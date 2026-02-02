@@ -54,7 +54,6 @@ use App\Http\Controllers\Api\V1\UploadLinkController;
 use App\Http\Controllers\Api\V1\ChargeLevelController;
 use App\Http\Controllers\Api\V1\GiftCategoryController;
 use App\Http\Controllers\Api\V1\HomeCarouselController;
-use App\Http\Controllers\Api\V1\RoomCategoryController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
 use App\Http\Controllers\Api\V1\GooglePaymentController;
 use App\Http\Controllers\Api\V1\PaymentGetWayController;
@@ -335,12 +334,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // user controller
             Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
 
-
-            Route::prefix('room_category')->group(function () {
-                Route::get('classes', [RoomCategoryController::class, 'allClasses']);
-                Route::get('types', [RoomCategoryController::class, 'getTypes']);
-                Route::get('types_by_class/{id}', [RoomCategoryController::class, 'getClassChildren']);
-            });
 
             Route::prefix('backgrounds')->group(function () {
                 Route::get('/', [BackgroundController::class, 'allBackgrounds']);

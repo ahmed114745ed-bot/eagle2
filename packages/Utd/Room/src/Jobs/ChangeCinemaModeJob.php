@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Jobs;
+namespace Utd\Room\Jobs;
 
 use Utd\Room\Entities\Room;
-
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
 use Utd\Room\Services\RoomUserService;
@@ -11,7 +10,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Modules\FixedTarget\Services\FixedTargetV2Service;
 
 
 class ChangeCinemaModeJob implements ShouldQueue

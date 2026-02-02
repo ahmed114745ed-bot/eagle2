@@ -1,60 +1,47 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\Room\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\RoomVipResource;
 use Utd\Room\Services\RoomVipsService;
-use App\Tik\Services\ReelsService;
 use Illuminate\Http\Request;
 use Exception;
 
 class RoomVipsController extends Controller
 {
     public function __construct(private RoomVipsService $roomVipsService) {}
+
     public function index(Request $request)
     {
-
         try {
             $roomVips = $this->roomVipsService->index($request->per_page, $request->Page);
-            return Common::apiResponse(true, 'success',RoomVipResource::collection($roomVips));
+            return Common::apiResponse(true, 'success', RoomVipResource::collection($roomVips));
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-
-    
     }
-    public function show( $id,Request $request)
-    {
 
+    public function show($id, Request $request)
+    {
         try {
             $roomVip = $this->roomVipsService->show($id);
             return Common::apiResponse(true, 'success', $roomVip);
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
     }
 
-    public function search( $key,Request $request)
+    public function search($key, Request $request)
     {
-
         try {
             $roomVip = $this->roomVipsService->search($key);
             return Common::apiResponse(true, 'success', $roomVip);
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-     
     }
-
-
-    
-
 
     public function destroy($id)
     {
@@ -62,28 +49,22 @@ class RoomVipsController extends Controller
             $roomVip = $this->roomVipsService->delete($id);
             return Common::apiResponse(true, 'success', null);
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-       
-
     }
-    public function store(Request $request){
 
-     
+    public function store(Request $request)
+    {
         try {
-           $data = $this->roomVipsService->store($request);
-            return Common::apiResponse(true, 'created successfully',$data);
+            $data = $this->roomVipsService->store($request);
+            return Common::apiResponse(true, 'created successfully', $data);
         } catch (Exception $exception) {
-
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-
     }
 
-    public function update(Request $request, $id){
-
-      
+    public function update(Request $request, $id)
+    {
         $roomVip = $this->roomVipsService->show($id);
         if (!$roomVip) throw new \Exception('not found');
 
@@ -108,7 +89,5 @@ class RoomVipsController extends Controller
         $roomVip->save();
 
         return Common::apiResponse(1, 'Room Vip updated successfully');
-
-
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\ZegoFeatureEvent;
 use App\helper\TimeHelper;
+use App\Support\PackageHelper;
 use Log;
 use Cache;
 use Carbon\Carbon;
@@ -21,7 +22,7 @@ use Illuminate\Support\Str;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
-use App\Jobs\ChangeCinemaModeJob;
+use Utd\Room\Jobs\ChangeCinemaModeJob;
 use App\Models\Language;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\File;
@@ -218,8 +219,9 @@ class SettingsController extends Controller
             }
 
             if ($request->youtube_status == 0) {
-                dispatch(new ChangeCinemaModeJob());
-
+                if (PackageHelper::isInstalled('room')) {
+                    dispatch(new ChangeCinemaModeJob());
+                }
                 // Room::where('mode', 5)->update(['mode' => 1]);
             }
 

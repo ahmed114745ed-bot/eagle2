@@ -3,10 +3,8 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Utd\Room\Entities\Room;
-
 use App\Models\User;
-use Utd\Room\Services\RoomGameServices;
+use App\Contracts\RoomGameContract;
 
 class JoyGameTest extends TestCase
 {
@@ -18,6 +16,6 @@ class JoyGameTest extends TestCase
 
         $user = User::where('id',525)->first();
 
-        (new RoomGameServices())->updateRoomCoins($user , (-100));
+        app(RoomGameContract::class)->updateRoomCoins($user , (-100));
     }
 }

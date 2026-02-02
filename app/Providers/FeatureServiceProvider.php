@@ -1,11 +1,25 @@
 <?php
 namespace App\Providers;
 
+use App\Contracts\EnteranceRoomContract;
+use App\Contracts\RoomGameContract;
+use App\Contracts\RoomServiceContract;
+use App\Contracts\RoomRepositoryContract;
+use App\Contracts\RoomSalaryRepositoryContract;
+use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Contracts\RoomVisitorRepositoryContract;
 use App\Contracts\MomentContract;
 use App\Contracts\AchievementContract;
 use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
 use App\Contracts\RealsContract;
+use App\Services\Null\NullEnteranceRoomService;
+use App\Services\Null\NullRoomGameService;
+use App\Services\Null\NullRoomService;
+use App\Services\Null\NullRoomRepository;
+use App\Services\Null\NullRoomSalaryRepository;
+use App\Services\Null\NullRoomTopUsersRepository;
+use App\Services\Null\NullRoomVisitorRepository;
 use App\Services\Null\NullMomentService;
 use App\Services\Null\NullAchievementService;
 use App\Services\Null\NullAchievementLevelService;
@@ -53,6 +67,62 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 RealsContract::class,
                 NullRealsService::class
+            );
+        }
+
+        // Room Enterance Feature
+        if (!$this->app->bound(EnteranceRoomContract::class)) {
+            $this->app->singleton(
+                EnteranceRoomContract::class,
+                NullEnteranceRoomService::class
+            );
+        }
+
+        // Room Game Feature
+        if (!$this->app->bound(RoomGameContract::class)) {
+            $this->app->singleton(
+                RoomGameContract::class,
+                NullRoomGameService::class
+            );
+        }
+
+        // Room Service Feature
+        if (!$this->app->bound(RoomServiceContract::class)) {
+            $this->app->singleton(
+                RoomServiceContract::class,
+                NullRoomService::class
+            );
+        }
+
+        // Room Repository Feature
+        if (!$this->app->bound(RoomRepositoryContract::class)) {
+            $this->app->singleton(
+                RoomRepositoryContract::class,
+                NullRoomRepository::class
+            );
+        }
+
+        // Room Salary Repository Feature
+        if (!$this->app->bound(RoomSalaryRepositoryContract::class)) {
+            $this->app->singleton(
+                RoomSalaryRepositoryContract::class,
+                NullRoomSalaryRepository::class
+            );
+        }
+
+        // Room Top Users Repository Feature
+        if (!$this->app->bound(RoomTopUsersRepositoryContract::class)) {
+            $this->app->singleton(
+                RoomTopUsersRepositoryContract::class,
+                NullRoomTopUsersRepository::class
+            );
+        }
+
+        // Room Visitor Repository Feature
+        if (!$this->app->bound(RoomVisitorRepositoryContract::class)) {
+            $this->app->singleton(
+                RoomVisitorRepositoryContract::class,
+                NullRoomVisitorRepository::class
             );
         }
     }

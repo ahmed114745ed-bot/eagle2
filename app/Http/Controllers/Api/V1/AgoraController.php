@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Contracts\EnteranceRoomContract;
+use App\Contracts\RoomRepositoryContract;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use Utd\Room\Repositories\RoomRepository;
 use App\Repositories\User\UserRepository;
-use Utd\Room\Services\EnteranceRoomService;
 use Illuminate\Http\Request;
 use Log;
 
@@ -16,7 +16,7 @@ class AgoraController extends Controller
 {
     protected $enteranceRoomService;
 
-    public function __construct(public RoomRepository $roomRepository, public UserRepository $userRepository, EnteranceRoomService $enteranceRoomService)
+    public function __construct(public RoomRepositoryContract $roomRepository, public UserRepository $userRepository, EnteranceRoomContract $enteranceRoomService)
     {
         $this->enteranceRoomService = $enteranceRoomService;
     }

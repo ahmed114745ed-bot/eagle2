@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Utd\Room\Services;
 
 use Exception;
 
@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Facades\RoomHelper;
 use App\Models\Cp;
-use App\Tik\Repositories\PkRepository;
+use Utd\Room\Repositories\PkRepository;
 use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\TimeLogRepository;

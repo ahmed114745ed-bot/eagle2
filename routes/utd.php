@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use App\Http\Controllers\Api\V1\PkController;
+use Utd\Room\Http\Controllers\Api\PkController;
 use App\Http\Controllers\Api\V1\RoleController;
 use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
 use App\Http\Controllers\Api\V1\TargetController;
@@ -79,10 +79,9 @@ use App\Http\Controllers\utd\RequestBackgroundImageController;
 use App\Http\Controllers\utd\RequestTakeSalaryController;
 use App\Http\Controllers\utd\RewardLevelIntervalController;
 use App\Http\Controllers\utd\RoleEventController;
-use App\Http\Controllers\utd\RoomCategoryController;
-use App\Http\Controllers\utd\RoomController;
+use Utd\Room\Http\Controllers\Api\RoomCategoryController;
+use Utd\Room\Http\Controllers\Utd\RoomController;
 use Utd\Room\Http\Controllers\Api\RoomTargetController;
-use App\Http\Controllers\utd\RoomVipsController;
 use App\Http\Controllers\utd\SalaryRequestController;
 use App\Http\Controllers\utd\SallariesController;
 use App\Http\Controllers\utd\SallariesHistoryController;
@@ -710,15 +709,6 @@ Route::middleware([])->group(function () {
         Route::post('/reelConfig/{id}', [ReelsController::class, 'reelConfig']);
     });
 
-
-    Route::prefix('room-vips')->group(function () {
-        Route::get('/all', [RoomVipsController::class, 'index']);
-        Route::post('/show/{id}', [RoomVipsController::class, 'show']);
-        Route::post('/search/{key}', [RoomVipsController::class, 'search']);
-        Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
-        Route::post('create', [RoomVipsController::class, 'store']);
-        Route::post('update/{id}', [RoomVipsController::class, 'update']);
-    });
     Route::get('users-search', [UserController::class, 'search']);
     Route::get('users-search2', [UserController::class, 'search2_new']);
     Route::get('users-search3', [UserController::class, 'userAgency']);

@@ -2,9 +2,10 @@
 
 namespace Utd\Room\Repositories;
 
+use App\Contracts\RoomTopUsersRepositoryContract;
 use Utd\Room\Entities\RoomTopUser;
 
-class RoomTopUsersRepository
+class RoomTopUsersRepository implements RoomTopUsersRepositoryContract
 {
 
     public function findOrCreate($roomId, $userId)

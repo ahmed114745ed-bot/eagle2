@@ -2,7 +2,6 @@
 
 namespace Utd\Room\Services;
 
-use App\Http\Resources\Api\V1\EnterRoomLiveCollection;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -18,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Jobs\SendNotificationToAllFollowers;
-use App\Http\Resources\Api\V1\EnterRoomCollection;
+use Utd\Room\Http\Resources\EnterRoomCollection;
 use Illuminate\Support\Facades\Schema;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Chat\Entities\ChatMessage;
@@ -31,12 +30,12 @@ use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\CP\Entities\CpRoomHistory;
 use Modules\RoomCup\Helpers\RoomCupHelper;
 use Modules\TaskStream\Services\TaskStreamService;
+use App\Contracts\EnteranceRoomContract;
 
-class EnteranceRoomService
+class EnteranceRoomService implements EnteranceRoomContract
 {
     protected $roomRepository;
     protected $userRepository;
-
     public function __construct(RoomRepository $roomRepository, UserRepository $userRepository)
     {
         $this->roomRepository = $roomRepository;
@@ -402,7 +401,7 @@ class EnteranceRoomService
 
     ///////////////////////////////
 
-    public function enterRoom($user, $request, $room_pass, Room $room)
+    public function enterRoom($user, $request, $room_pass, $room)
     {
         $owner_id = $room->uid;
         if ($request->sub_type == 'random') {
@@ -582,7 +581,7 @@ class EnteranceRoomService
         return Common::apiResponse(1, 'تم الارسال بنجاح');
     }
 
-    public function enterLiveRoom($user, Request $request, $roomPass, Room $room)
+    public function enterLiveRoom($user, Request $request, $roomPass, $room)
     {
         $ownerId = $this->getOwnerId($request, $room);
         if (!$ownerId) {

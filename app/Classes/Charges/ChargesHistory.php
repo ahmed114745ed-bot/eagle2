@@ -8,7 +8,6 @@ use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
 use App\Models\Charge;
 use App\Models\User;
-use Utd\Room\Repositories\RoomRepoInterface;
 use Illuminate\Validation\ValidationException;
 
 class ChargesHistory

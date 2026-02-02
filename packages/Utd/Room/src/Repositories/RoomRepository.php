@@ -10,11 +10,12 @@ use Utd\Room\Entities\EnteredRoom;
 use Utd\Room\Entities\RoomPrivateMessages;
 use App\Http\Resources\Api\V1\NowRoomResource;
 use App\Http\Resources\Api\V1\RoomResource;
+use App\Contracts\RoomRepositoryContract;
 
 /**
  * @property Room $model
  */
-class RoomRepository extends AbstractRepository
+class RoomRepository extends AbstractRepository implements RoomRepositoryContract
 {
     public function __construct()
     {

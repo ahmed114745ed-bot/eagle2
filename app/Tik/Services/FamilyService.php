@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
-use Utd\Room\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryContract;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\FamilyRepository;
 use App\Http\Resources\Api\V2\FamilyResource;
@@ -25,7 +25,7 @@ class FamilyService
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly UserRepository $userRepository,
         private readonly FamilyRankRepository $familyRankRepository,
-        private readonly RoomRepository $roomRepository
+        private readonly RoomRepositoryContract $roomRepository
     ) {}
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Classes\Room;
+namespace Utd\Room\Classes;
 
 use App\Enums\UserCoinLogType;
 use App\Exceptions\NotInfCoins;

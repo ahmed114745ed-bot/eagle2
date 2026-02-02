@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use Utd\Room\Services\RoomGameServices;
+use App\Contracts\RoomGameContract;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,7 +25,7 @@ class JoyPlayCoinGame implements ShouldQueue
 
     public function handle()
     {
-            (new RoomGameServices())->updateRoomCoins($this->user , $this->coins);
+            app(RoomGameContract::class)->updateRoomCoins($this->user , $this->coins);
     }
 
 

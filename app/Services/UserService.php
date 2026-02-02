@@ -29,7 +29,7 @@ use App\Repositories\FollowRepository;
 use App\Tik\Repositories\BdRepository;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Config;
-use Utd\Room\Services\RoomGameServices;
+use App\Contracts\RoomGameContract;
 use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
@@ -43,7 +43,7 @@ use Modules\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
-use Utd\Room\Repositories\RoomVisitorRepository;
+use App\Contracts\RoomVisitorRepositoryContract;
 use App\Tik\Repositories\UserSettingRepository;
 use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
@@ -74,7 +74,7 @@ class UserService
         private readonly AgencyRepository $agencyRepository,
 //        private readonly ShippingAgencyRepository $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
-        private readonly RoomVisitorRepository $roomVisitorRepository,
+        private readonly RoomVisitorRepositoryContract $roomVisitorRepository,
         private readonly BdRepository $bdRepository,
         private readonly CpRepository $cpRepository,
         private readonly WareRepository $wareRepository,
@@ -625,7 +625,7 @@ class UserService
                 }
             }
             if ($user->ownerRoom != null) {
-                $roomTarget = new RoomGameServices();
+                $roomTarget = app(RoomGameContract::class);
                 $roomTarget->CalculateRoomSalaries($user->ownerRoom);
             }
         }

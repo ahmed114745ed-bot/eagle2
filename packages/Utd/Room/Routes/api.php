@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 use Utd\Room\Http\Controllers\Api\RoomController;
 use Utd\Room\Http\Controllers\Api\EnteranceController;
 use Utd\Room\Http\Controllers\Api\MicrophoneController;
+use Utd\Room\Http\Controllers\Api\RoomCategoryController;
+use Utd\Room\Http\Controllers\Api\PkController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\PkController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 
 /*
@@ -98,4 +99,11 @@ Route::prefix('api')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBa
 
     // Room countries
     Route::get('/room-countries', [RoomController::class, 'room_countries']);
+
+    // Room categories
+    Route::prefix('room_category')->group(function () {
+        Route::get('classes', [RoomCategoryController::class, 'allClasses']);
+        Route::get('types', [RoomCategoryController::class, 'getTypes']);
+        Route::get('types_by_class/{id}', [RoomCategoryController::class, 'getClassChildren']);
+    });
 });

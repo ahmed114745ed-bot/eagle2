@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\Room\Http\Controllers\Utd;
 
 use App\Helpers\WebPHelper;
 use Exception;
 use Utd\Room\Entities\Room;
 use App\Helpers\Common;
-use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\RoomResource;
+use Utd\Room\Http\Resources\RoomResource;
 use Illuminate\Support\Facades\Validator;
 
 class RoomController extends Controller

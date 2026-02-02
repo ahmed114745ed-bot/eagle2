@@ -2,12 +2,13 @@
 
 namespace Utd\Room\Services;
 
+use App\Contracts\RoomGameContract;
 use Utd\Room\Entities\Room;
 use Utd\Room\Entities\RoomSalary;
 use Utd\Room\Entities\RoomTarget;
 use App\Models\User;
 
-class RoomGameServices
+class RoomGameServices implements RoomGameContract
 {
     public function updateRoomCoins(User $user, $coins)
     {
@@ -20,7 +21,7 @@ class RoomGameServices
         }
     }
 
-    public function CalculateRoomSalaries(Room $room)
+    public function CalculateRoomSalaries($room)
     {
         $user = $room->owner;
         if ($user->type_user == 1) {

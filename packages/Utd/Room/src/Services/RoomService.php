@@ -5,11 +5,12 @@ namespace Utd\Room\Services;
 use Exception;
 use App\Models\User;
 use Utd\Room\Entities\Room;
+use App\Contracts\RoomServiceContract;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Room\Repositories\RoomVisitorRepository;
 use Utd\Room\Repositories\RoomMicrophoneRepository;
 
-class RoomService
+class RoomService implements RoomServiceContract
 {
     public function __construct(
         protected RoomRepository $roomRepository,

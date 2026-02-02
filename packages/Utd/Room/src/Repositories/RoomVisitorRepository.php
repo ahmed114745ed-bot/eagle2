@@ -2,9 +2,10 @@
 
 namespace Utd\Room\Repositories;
 
+use App\Contracts\RoomVisitorRepositoryContract;
 use Utd\Room\Entities\RoomVisitor;
 
-class RoomVisitorRepository extends AbstractRepository
+class RoomVisitorRepository extends AbstractRepository implements RoomVisitorRepositoryContract
 {
     public function __construct()
     {

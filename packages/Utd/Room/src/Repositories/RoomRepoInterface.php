@@ -2,8 +2,6 @@
 
 namespace Utd\Room\Repositories;
 
-use Utd\Room\Entities\Room;
-
 interface RoomRepoInterface
 {
     public function all($req);

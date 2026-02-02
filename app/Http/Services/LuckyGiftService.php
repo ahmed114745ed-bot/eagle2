@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Classes\Gifts\SendGiftService;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
-use Utd\Room\Repositories\RoomTopUsersRepository;
+use App\Contracts\RoomTopUsersRepositoryContract;
 use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 class LuckyGiftService
@@ -19,7 +19,7 @@ class LuckyGiftService
 
     public function __construct()
     {
-        $this->roomTopUsersRepository = new RoomTopUsersRepository();
+        $this->roomTopUsersRepository = app(RoomTopUsersRepositoryContract::class);
 
     }
 
@@ -122,9 +122,11 @@ class LuckyGiftService
      */
     public function updateRoomCoinsToUser($userId, $room, $totalPrice): void
     {
-        $topUser        = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
-        $topUser->coins += $totalPrice;
-        $topUser->save();
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
+        if ($topUser) {
+            $topUser->coins += $totalPrice;
+            $topUser->save();
+        }
     }
 
 }

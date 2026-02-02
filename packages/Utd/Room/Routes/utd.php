@@ -5,6 +5,7 @@ use Utd\Room\Http\Controllers\RoomController;
 use Utd\Room\Http\Controllers\BackgroundController;
 use Utd\Room\Http\Controllers\MicrophoneController;
 use Utd\Room\Http\Controllers\RoomCategoryController;
+use Utd\Room\Http\Controllers\Api\RoomVipsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,4 +45,14 @@ Route::middleware(['auth:sanctum'])->prefix('room')->group(function () {
 
     // Backgrounds
     Route::post('/{roomId}/background', [BackgroundController::class, 'setBackground']);
+});
+
+// Room VIPs
+Route::middleware(['auth:sanctum'])->prefix('room-vips')->group(function () {
+    Route::get('/all', [RoomVipsController::class, 'index']);
+    Route::post('/show/{id}', [RoomVipsController::class, 'show']);
+    Route::post('/search/{key}', [RoomVipsController::class, 'search']);
+    Route::post('/delete/{id}', [RoomVipsController::class, 'destroy']);
+    Route::post('create', [RoomVipsController::class, 'store']);
+    Route::post('update/{id}', [RoomVipsController::class, 'update']);
 });

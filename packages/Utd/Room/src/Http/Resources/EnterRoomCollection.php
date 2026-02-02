@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
+namespace Utd\Room\Http\Resources;
 
 use App\Helpers\Common;
 

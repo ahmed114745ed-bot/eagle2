@@ -23,12 +23,12 @@ use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
-use Utd\Room\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryContract;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
-use Utd\Room\Repositories\RoomTopUsersRepository;
+use App\Contracts\RoomTopUsersRepositoryContract;
 use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 
 
@@ -37,8 +37,8 @@ class GiftLogService
 
     public function __construct(
         private readonly GiftRepository $giftRepository,
-        private readonly RoomTopUsersRepository $roomTopUsersRepository,
-        private readonly RoomRepository $repository,
+        private readonly RoomTopUsersRepositoryContract $roomTopUsersRepository,
+        private readonly RoomRepositoryContract $repository,
         private readonly UserRepository $UserRepository,
         private readonly GiftLogRepository $giftLogRepository,
     ) {}
@@ -669,9 +669,11 @@ class GiftLogService
 
     public function updateRoomCoinsToUser($userId, $room, $totalPrice): void
     {
-        $topUser         = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
-        $topUser->coins  += $totalPrice;
-        $topUser->save();
+        $topUser = $this->roomTopUsersRepository->findOrCreate($room->id, $userId);
+        if ($topUser) {
+            $topUser->coins += $totalPrice;
+            $topUser->save();
+        }
     }
 
     public function userGiftIfo($id, $type, $startDate, $endDate, $perPage, $page)
