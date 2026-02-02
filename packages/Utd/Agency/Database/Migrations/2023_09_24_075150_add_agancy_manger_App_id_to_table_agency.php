@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('agencies') || Schema::hasColumn('agencies', 'agency_dash_manger_id')) return;
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->integer('agency_dash_manger_id')->unsigned()->index()->nullable();
-        });
+        if (!Schema::hasTable('agencies')) return;
+        if (!Schema::hasColumn('agencies', 'agency_dash_manger_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->integer('agency_dash_manger_id')->unsigned()->index()->nullable();
+            });
+        }
     }
 
     /**

@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('admin_users') || Schema::hasColumn('admin_users', 'transfer_salary')) return;
-        Schema::table('admin_users', function (Blueprint $table) {
-            $table->boolean('transfer_salary')->default(false); 
-        });
+        if (!Schema::hasTable('admin_users')) return;
+        if (!Schema::hasColumn('admin_users', 'transfer_salary')) {
+            Schema::table('admin_users', function (Blueprint $table) {
+                $table->boolean('transfer_salary')->default(false);
+            });
+        }
     }
 
     public function down(): void

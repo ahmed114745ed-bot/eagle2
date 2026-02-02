@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->unsignedInteger('country_id')->nullable();
-            $table->foreign('country_id')->references('id')->on('countries')->cascadeOnDelete()->cascadeOnUpdate();
-        });
+        if (!Schema::hasColumn('agencies', 'country_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedInteger('country_id')->nullable();
+                $table->foreign('country_id')->references('id')->on('countries')->cascadeOnDelete()->cascadeOnUpdate();
+            });
+        }
     }
 
     /**

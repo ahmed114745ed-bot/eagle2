@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('bd_agency_host_sallaries') || Schema::hasColumn('bd_agency_host_sallaries', 'bd_user_id')) return;
-        Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
-            $table->unsignedBigInteger('bd_user_id')->nullable(); 
-        });
+        if (!Schema::hasTable('bd_agency_host_sallaries')) return;
+        if (!Schema::hasColumn('bd_agency_host_sallaries', 'bd_user_id')) {
+            Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
+                $table->unsignedBigInteger('bd_user_id')->nullable();
+            });
+        }
     }
 
     public function down(): void

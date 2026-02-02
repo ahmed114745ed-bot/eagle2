@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->double('pending_dollar')->default(0);
-        });
+        if (!Schema::hasColumn('user_sallaries', 'pending_dollar')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->double('pending_dollar')->default(0);
+            });
+        }
     }
 
     /**
