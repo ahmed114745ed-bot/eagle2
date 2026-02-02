@@ -182,10 +182,10 @@ class GiftCategoryController extends MainController
         } catch (\Exception $e) {
             \DB::rollBack();
             
-            \Log::error('GiftCategory Sort Update Failed', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // \Log::error('GiftCategory Sort Update Failed', [
+            //     'error' => $e->getMessage(),
+            //     'trace' => $e->getTraceAsString()
+            // ]);
             
             return response()->json([
                 'status' => false,

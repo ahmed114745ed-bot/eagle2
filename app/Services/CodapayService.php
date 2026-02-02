@@ -116,10 +116,10 @@ class CodapayService
         $computedChecksum = md5($txnId . $secretKey . $orderId . $resultCode);
 
         if ($checksum !== $computedChecksum) {
-            \Log::warning('Codapay checksum failed', [
-                'expected' => $computedChecksum,
-                'received' => $checksum,
-            ]);
+            // \Log::warning('Codapay checksum failed', [
+            //     'expected' => $computedChecksum,
+            //     'received' => $checksum,
+            // ]);
             return response()->json(['error' => 'Invalid checksum'], 403);
         }
 

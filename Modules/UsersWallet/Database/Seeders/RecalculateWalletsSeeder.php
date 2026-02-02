@@ -158,7 +158,7 @@ class RecalculateWalletsSeeder extends Seeder
                     // bd_id refers to admin_users.id (Bd). We need the related app user id (app_id) to credit the correct wallet
                     $bd = \App\Models\Bd::find($b->bd_id);
                     if (! $bd || ! $bd->app_id) {
-                        Log::warning('RecalculateWalletsSeeder: bd record missing or not linked to an app user for bd_salary '.$b->id, ['bd_id' => $b->bd_id]);
+                      //  Log::warning('RecalculateWalletsSeeder: bd record missing or not linked to an app user for bd_salary '.$b->id, ['bd_id' => $b->bd_id]);
                         continue;
                     }
 
@@ -324,18 +324,18 @@ class RecalculateWalletsSeeder extends Seeder
                         $bdSallariesRows = !empty($bdIds) ? DB::table('bd_salaries')->whereIn('bd_id', $bdIds)->get() : collect();
                         $bdHostRows = !empty($bdIds) ? DB::table('bd_agency_host_sallaries')->whereIn('bd_id', $bdIds)->get() : collect();
 
-                        Log::error('RecalculateWalletsSeeder mismatch details', [
-                            'user' => $uid,
-                            'expected' => [$expectedBalance, $expectedCut, $expectedPending],
-                            'actual' => [$actualBalance, $actualCut, $actualPending],
-                            'wallet_logs' => $logs,
-                            'wallet_log_sums' => $logSums,
-                            'user_sallaries' => $userSallariesRows,
-                            'agency_sallaries' => $agencySallariesRows,
-                            'bd_ids' => $bdIds,
-                            'bd_sallaries' => $bdSallariesRows,
-                            'bd_hosts' => $bdHostRows,
-                        ]);
+                        // Log::error('RecalculateWalletsSeeder mismatch details', [
+                        //     'user' => $uid,
+                        //     'expected' => [$expectedBalance, $expectedCut, $expectedPending],
+                        //     'actual' => [$actualBalance, $actualCut, $actualPending],
+                        //     'wallet_logs' => $logs,
+                        //     'wallet_log_sums' => $logSums,
+                        //     'user_sallaries' => $userSallariesRows,
+                        //     'agency_sallaries' => $agencySallariesRows,
+                        //     'bd_ids' => $bdIds,
+                        //     'bd_sallaries' => $bdSallariesRows,
+                        //     'bd_hosts' => $bdHostRows,
+                        // ]);
                     } catch (\Throwable $e) {
                         Log::error('RecalculateWalletsSeeder failed collecting debug for user '.$uid, ['err' => $e->getMessage()]);
                     }
@@ -351,7 +351,7 @@ class RecalculateWalletsSeeder extends Seeder
         });
 
         if (count($errors) > 0) {
-            Log::error('RecalculateWalletsSeeder verification failed. First mismatches: '.json_encode(array_slice($errors,0,10)));
+          //  Log::error('RecalculateWalletsSeeder verification failed. First mismatches: '.json_encode(array_slice($errors,0,10)));
             throw new \Exception('RecalculateWalletsSeeder verification failed: wallets do not match sums.');
         }
 

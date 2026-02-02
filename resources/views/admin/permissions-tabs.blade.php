@@ -110,6 +110,10 @@
     [dir="rtl"] .permission-group-title {
         flex-direction: row-reverse;
     }
+
+    .rtl .fields-group .form-group {
+    display: block !important;
+}
 </style>
 
 <input type="hidden" name="permissions_all" id="permissions_all">

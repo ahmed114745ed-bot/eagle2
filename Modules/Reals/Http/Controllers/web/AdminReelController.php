@@ -182,9 +182,9 @@ class AdminReelController extends MainController
             
             return response()->json(['reels' => $reels]);
         } catch (\Exception $e) {
-            \Log::error('Error fetching batch counts', [
-                'error' => $e->getMessage()
-            ]);
+            // \Log::error('Error fetching batch counts', [
+            //     'error' => $e->getMessage()
+            // ]);
             
             return response()->json(['reels' => []], 500);
         }
@@ -224,10 +224,10 @@ class AdminReelController extends MainController
                 ]
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating reel', [
-                'reel_id' => $id,
-                'error' => $e->getMessage()
-            ]);
+            // \Log::error('Error updating reel', [
+            //     'reel_id' => $id,
+            //     'error' => $e->getMessage()
+            // ]);
             
             return response()->json([
                 'success' => false,
@@ -253,10 +253,10 @@ class AdminReelController extends MainController
                 'message' => 'تم حذف الريل بنجاح'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error deleting reel', [
-                'reel_id' => $id,
-                'error' => $e->getMessage()
-            ]);
+            // \Log::error('Error deleting reel', [
+            //     'reel_id' => $id,
+            //     'error' => $e->getMessage()
+            // ]);
             
             return response()->json([
                 'success' => false,
