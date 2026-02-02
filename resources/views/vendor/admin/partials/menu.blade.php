@@ -141,25 +141,7 @@
     @endphp
 
     @if(!isset($item['children']))
-        <li class="crs-item" data-crs-id="{{ $itemId }}">
-            <a href="{{ $href }}" class="crs-link crs-leaf">
-                @if(str_contains($item['icon'] ?? '', 'fa-'))
-                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
-                @else
-                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
-                @endif
-                <span class="crs-title">
-                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        : $normalizedTitle
-                    }}
-                </span>
-
-                @if($badgeCount > 0)
-                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
-                @endif
-            </a>
-        </li>
+       
     @else
         <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
             <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false"
