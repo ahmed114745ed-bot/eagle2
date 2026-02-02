@@ -12,17 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('bd_sallaries')) return;
-        Schema::table('bd_sallaries', function (Blueprint $table) {
-            if (!Schema::hasColumn('bd_sallaries', 'total_agency_sallary')) {
+        
+        if (!Schema::hasColumn('bd_sallaries', 'total_agency_sallary')) {
+            Schema::table('bd_sallaries', function (Blueprint $table) {
                 $table->decimal('total_agency_sallary', 15, 2)->default(0);
-            }
-            if (!Schema::hasColumn('bd_sallaries', 'total_users_sallary')) {
+            });
+        }
+        
+        if (!Schema::hasColumn('bd_sallaries', 'total_users_sallary')) {
+            Schema::table('bd_sallaries', function (Blueprint $table) {
                 $table->decimal('total_users_sallary', 15, 2)->default(0);
-            }
-            if (!Schema::hasColumn('bd_sallaries', 'total_diamond')) {
+            });
+        }
+        
+        if (!Schema::hasColumn('bd_sallaries', 'total_diamond')) {
+            Schema::table('bd_sallaries', function (Blueprint $table) {
                 $table->decimal('total_diamond', 15, 2)->default(0);
-            }
-        });
+            });
+        }
     }
     
     public function down()

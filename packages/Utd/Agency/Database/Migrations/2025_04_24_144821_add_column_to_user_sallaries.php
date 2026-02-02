@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('user_sallaries')) return;
-        Schema::table('user_sallaries', function (Blueprint $table) {
-           if (!Schema::hasColumn('user_sallaries', 'dB')) {
-               $table->double('dB')->nullable();
-           }
-           if (!Schema::hasColumn('user_sallaries', 'app_profit')) {
-               $table->double('app_profit')->nullable();
-           }
-        });
+        
+        if (!Schema::hasColumn('user_sallaries', 'dB')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->double('dB')->nullable();
+            });
+        }
+        
+        if (!Schema::hasColumn('user_sallaries', 'app_profit')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->double('app_profit')->nullable();
+            });
+        }
     }
 
     /**
