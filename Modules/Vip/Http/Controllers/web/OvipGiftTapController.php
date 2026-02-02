@@ -98,8 +98,7 @@ class OvipGiftTapController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('gift'))
-            ->body($this->detail($id)));
+            ->title(trans('gift')));
     }
 
     public function edit($id, Content $content)
@@ -389,7 +388,8 @@ class OvipGiftTapController extends MainController
                     ]);
                 }
             }
-            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm','alpha','vap'];
+
+            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'alpha', 'vap'];
             if ($form->show_img instanceof UploadedFile) {
                 // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
                 $ext = strtolower($form->show_img->guessExtension());

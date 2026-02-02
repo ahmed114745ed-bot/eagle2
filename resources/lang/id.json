@@ -27,6 +27,8 @@
     "this agency does not have owner": "Agensi ini tidak memiliki pemilik",
     "Theme": "Tema",
     "regions system": "Sistem Wilayah",
+    "Packages": "Paket",
+"Gifts Rewards": "Hadiah & Penghargaan",
 "countries system": "Sistem Negara",
 "difference": "hasil selisih",
   "total_win": "total kemenangan",
@@ -3120,7 +3122,23 @@
 "Delete wallet fields": "Hapus bidang dompet",
 "Edit wallet fields": "Edit bidang dompet",
 "Show wallet fields": "Tampilkan bidang dompet",
-"accounts number": "Jumlah akun"
+"accounts number": "Jumlah akun",
+"Superadmin": "Manajer Negara",
+"Browse superadmin": "Lihat Manajer Negara",
+"Create superadmin": "Buat Manajer Negara",
+"Edit superadmin": "Edit Manajer Negara",
+"Delete superadmin": "Hapus Manajer Negara",
+"Superadmin Settings": "Pengaturan",
+"Browse superadmin settings": "Lihat Pengaturan",
+"Restore Super Admin": "Pulihkan Manajer Negara",
+"Browse restore super admin": "Lihat Manajer Negara yang Dipulihkan",
+"Super Package Reward": "Paket",
+  "Browse super package reward": "Lihat Paket",
+  "Dedicate switch super package reward": "Tentukan Paket",
+  "Create super package reward": "Buat Paket",
+  "Delete super package reward": "Hapus Paket",
+  "Edit super package reward": "Edit Paket",
+  "close room": "Tutup Ruangan"
 
 
 

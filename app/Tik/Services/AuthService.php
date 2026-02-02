@@ -411,10 +411,10 @@ private function storeUploadedImage(UploadedFile $image, User $user): Profile
         $user->profile_count
     );
 
-    Log::info('Uploaded profile image', [
-        'extension' => $extension,
-        'path' => $path,
-    ]);
+//    Log:: info('Uploaded profile image', [
+//         'extension' => $extension,
+//         'path' => $path,
+//     ]);
 
     $profile->update(['avatar' => $path]);
 
@@ -438,10 +438,10 @@ private function storeImageFromUrl(string $url, User $user): ?Profile
 
         Storage::put($path, $response->body(), config('filesystems.default'));
 
-        Log::info('Stored profile image from URL', [
-            'url' => $url,
-            'path' => $path,
-        ]);
+    //    Log:: info('Stored profile image from URL', [
+    //         'url' => $url,
+    //         'path' => $path,
+    //     ]);
 
         $profile->update(['avatar' => $path]);
 

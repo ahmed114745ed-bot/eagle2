@@ -164,7 +164,7 @@ class LeaderCCgameController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('updateGameCoin error: ' . $e->getMessage());
+           // Log::error('updateGameCoin error: ' . $e->getMessage());
 
             return response()->json([
                 'errorCode' => 500,

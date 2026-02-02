@@ -160,7 +160,7 @@ class UserController extends MainController
 
         // Optimize eager loading
         $grid->model()
-            // ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['id', 'name', 'sender_level', 'received_level', 'device_token', 'agency_id', 'family_id', 'uuid', 'special_id', 'di', 'can_play', 'huawei_version', 'android_version', 'ios_version', 'country_id', 'transfer_salary', 'is_bd'])
             ->with([
                 'profile',
@@ -246,6 +246,19 @@ class UserController extends MainController
                     }, __('User'))->placeholder(__('Search by name , UUID , nickname and email'));
 
                     $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
+                });
+
+                $filter->column(1 / 2, function ($filter) {
+                    $locale = app()->getLocale(); // 'ar', 'en', etc.
+                    $column = $locale === 'ar' ? 'name' : 'e_name';
+
+                    $countries = \App\Models\Country::query()->pluck($column, 'id');
+
+                    $filter->where(function ($query) {
+                        if ($this->input) {
+                            $query->where('country_id', $this->input);
+                        }
+                    }, __('Country'))->select($countries);
                 });
             });
         });

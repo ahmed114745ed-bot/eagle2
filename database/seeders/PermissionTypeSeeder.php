@@ -44,228 +44,11 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-            [
-                'name' => 'host level',
+             [
+                'name' => 'Fast orders',
                 'sort' => 2,
                 'types' => [
                     PermissionType::ADMIN->value => ['sort' => 2],
-                ],
-                'permissions' => [
-                    [
-                        'key' => 'host-level',
-                        'except' => [],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-
-                        ],
-                    ],
-                    [
-                        'key' => 'host-level-settings',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'host-level-reward',
-                        'except' => [],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'Area manager',
-                'sort' => 3,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 3],
-                ],
-                'permissions' => [
-                    [
-                        'key' => 'area-manager',
-                        'except' => [],
-                        'additional' => ['charge-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['charge-switch', 'create', 'edit', 'delete', 'show', 'browse'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'charge-to-area-manager',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-
-                        ],
-                    ],
-                ],
-            ],
-
-            [
-                'name' => 'SuperAdmin',
-                'sort' => 4,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 4],
-                    PermissionType::AREA_MANAGER->value => ['sort' => 2],
-                ],
-                'permissions' => [
-                    [
-                        'key' => 'superadmin',
-                        'except' => [],
-                        'additional' => ['charge-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch', 'show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'superadmin-banners',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => ['add-switch', 'history-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'restore-super-admin',
-                        'except' => ['show', 'create', 'edit', 'delete'],
-                        'additional' => ['restore-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'charge-to-superadmin',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => ['add-switch', 'history-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
-                            // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'superadmin-settings',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'super-admin-reward',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => ['dedicate-switch', 'history-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'history-switch'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'super-package-reward',
-                        'except' => ['show'],
-                        'additional' => ['dedicate-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'edit', 'create', 'delete'],
-
-                        ],
-                    ],
-                    [
-                        'key' => 'super-admin-reward-history',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-                        ],
-                    ],
-                ],
-            ],
-
-            [
-                'name' => 'Gifts packages',
-                'sort' => 5,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 5],
-                ],
-                'permissions' => [
-
-                    [
-                        'key' => 'super-package-reward',
-                        'except' => ['edit', 'delete', 'show'],
-                        'additional' => ['dedicate-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'dedicate-switch', 'create'],
-
-                        ],
-                    ],
-
-                ],
-            ],
-            [
-                'name' => 'Games',
-                'sort' => 6,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 6],
-                ],
-                'permissions' => [
-                    [
-                        'key' => 'games',
-                        'except' => [],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-                        ],
-                    ],
-                    [
-                        'key' => 'coin-game-users-report',
-                        'except' => ['show', 'edit', 'create', 'delete'],
-                        'additional' => ['details-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'details-switch'],
-                        ],
-                    ],
-                    [
-                        'key' => 'game-settings',
-                        'except' => ['create', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'edit'],
-                        ],
-                    ],
-                ],
-            ],
-            [
-                'name' => 'badge',
-                'sort' => 7,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 7],
-                ],
-                'permissions' => [
-                    ['key' => 'badges', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'dedicate-badges', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
-                    ],],
-
-                ],
-            ],
-            [
-                'name' => 'Fast orders',
-                'sort' => 8,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 8],
                 ],
                 'permissions' => [
                     [
@@ -334,6 +117,196 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
+           
+            [
+                'name' => 'regions system',
+                'sort' => 3,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 3],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'area-manager',
+                        'except' => [],
+                        'additional' => ['charge-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['charge-switch', 'create', 'edit', 'delete', 'show', 'browse'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'charge-to-area-manager',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                ],
+            ],
+
+            [
+                'name' => 'countries system',
+                'sort' => 4,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 4],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 2],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'superadmin',
+                        'except' => [],
+                        'additional' => ['charge-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch', 'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'superadmin-banners',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'restore-super-admin',
+                        'except' => ['show', 'create', 'edit', 'delete'],
+                        'additional' => ['restore-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'charge-to-superadmin',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => ['add-switch', 'history-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'add-switch', 'history-switch'],
+                            // PermissionType::AREA_MANAGER->value => ['browse', 'add-switch', 'history-switch'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'superadmin-settings',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                ],
+            ],
+              [
+                'name' => 'Gifts Rewards',
+                'sort' => 5,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 5],
+                ],
+                'permissions' => [
+                    ['key' => 'super-package-reward', 'except' => ['show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse', 'create', 'edit', 'delete'],
+                    ],],
+                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse'],
+                    ],],
+                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse',],
+                    ],],
+                ],
+            ],
+            [
+                'name' => 'Games',
+                'sort' => 6,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 6],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'games',
+                        'except' => [],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],
+                    ],
+                    [
+                        'key' => 'coin-game-users-report',
+                        'except' => ['show', 'edit', 'create', 'delete'],
+                        'additional' => ['details-switch'],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'details-switch'],
+                        ],
+                    ],
+                    [
+                        'key' => 'game-settings',
+                        'except' => ['create', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse', 'edit'],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name' => 'badge',
+                'sort' => 7,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 7],
+                ],
+                'permissions' => [
+                    ['key' => 'badges', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'dedicate-badges', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'dedicate-switch'],
+                    ],],
+
+                ],
+            ],
+             [
+                'name' => 'host level',
+                'sort' => 8,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 8],
+                ],
+                'permissions' => [
+                    [
+                        'key' => 'host-level',
+                        'except' => [],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+
+                        ],
+                    ],
+                    [
+                        'key' => 'host-level-settings',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+
+                        ],
+                    ],
+                    [
+                        'key' => 'host-level-reward',
+                        'except' => [],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+
+                        ],
+                    ],
+                ],
+            ],
+           
             [
                 'name' => 'Wallet',
                 'sort' => 9,
@@ -537,24 +510,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
-            [
-                'name' => 'rewards',
-                'sort' => 17,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 17],
-                ],
-                'permissions' => [
-                    ['key' => 'super-package-reward', 'except' => ['show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse', 'create', 'edit', 'delete'],
-                    ],],
-                    ['key' => 'admin-reward', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['dedicate-switch', 'browse'],
-                    ],],
-                    ['key' => 'admin-reward-history', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['dedicate-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse',],
-                    ],],
-                ],
-            ],
+          
             [
                 'name' => 'Agency System',
                 'sort' => 18,
