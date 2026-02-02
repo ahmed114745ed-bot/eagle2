@@ -143,31 +143,38 @@ class InstallAgencyCommand extends Command
     {
         $this->info('🔧 Fixing potential schema issues...');
 
-        // 1. Fix 'is_host' on users table
+        // Fix 'is_host' on users table (if not exists)
         if (Schema::hasTable('users') && !Schema::hasColumn('users', 'is_host')) {
             $this->info('   - Adding missing column: users.is_host');
             Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->boolean('is_host')->default(0)->after('id');
             });
         }
-
-        // 2. Fix 'deleted_at' on agencies table
-        if (Schema::hasTable('agencies') && !Schema::hasColumn('agencies', 'deleted_at')) {
-            $this->info('   - Adding missing column: agencies.deleted_at');
-            Schema::table('agencies', function (\Illuminate\Database\Schema\Blueprint $table) {
-                $table->softDeletes();
-            });
-        }
+        
+        // Other missing columns will be added by migrations automatically
     }
     /**
      * Publish the package configuration.
      */
     protected function publishConfig(): void
     {
-        $this->call('vendor:publish', [
-            '--tag' => 'agency-config',
-            '--force' => $this->option('force'),
-        ]);
+        // Check if config file already exists
+        $configPath = config_path('agency-package.php');
+        
+        if (file_exists($configPath) && !$this->option('force')) {
+            $this->info('   ⏭️  Config file already exists, skipping...');
+            return;
+        }
+        
+        try {
+            $this->call('vendor:publish', [
+                '--tag' => 'agency-config',
+                '--force' => $this->option('force'),
+            ]);
+        } catch (\Exception $e) {
+            $this->warn('   ⚠️  Could not publish config file: ' . $e->getMessage());
+            $this->info('   ℹ️  You can manually copy the config file if needed.');
+        }
     }
 
     /**
