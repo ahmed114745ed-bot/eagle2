@@ -555,8 +555,8 @@
     .settings-sidebar {
         width: 280px;
         flex-shrink: 0;
-         background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));
-
+         /* background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06)); */
+        background: var(--bg-secondary);
         border-radius: var(--radius-lg);
         padding: 1.5rem;
         box-shadow: var(--shadow-lg);
