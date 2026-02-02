@@ -223,7 +223,7 @@ class RoomService implements RoomServiceContract
     /**
      * Get room background image
      */
-    public function getRoomBackground(?Room $room): string
+    public function getRoomBackground($room = null): string
     {
         if ($room == null) return '';
         return $room->final_room_image ?? '';
