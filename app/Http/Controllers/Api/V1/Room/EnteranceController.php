@@ -292,7 +292,7 @@ class EnteranceController extends Controller
             throw new \Exception(__('Zego Feature is Disabled, Contact the administration'));
         }
         $user     = $request->user();
-        $roomId   = $request->input('room_id');
+        $roomId   = (int)$request->input('room_id');
         $roomPass = $request->input('room_pass');
 
         if (!$roomId) {

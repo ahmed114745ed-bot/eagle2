@@ -118,12 +118,12 @@ class SendLuckyGift2FeatureTest extends TestCase
                      ]);
 
         } catch (\Exception $e) {
-            Log::error('Test Exception:', [
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // Log::error('Test Exception:', [
+            //     'message' => $e->getMessage(),
+            //     'file' => $e->getFile(),
+            //     'line' => $e->getLine(),
+            //     'trace' => $e->getTraceAsString()
+            // ]);
             throw $e;
         }
 

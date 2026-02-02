@@ -2,17 +2,18 @@
 
 namespace App\Tik\Repositories;
 
-use App\Http\Resources\Api\V1\NowRoomResource;
-use App\Http\Resources\Api\V1\RoomResource;
-use App\Models\EnteredRoom;
-use App\Models\Pack;
-use App\Models\Room;
-use App\Models\RoomPrivateMessages;
-use App\Models\User;
 use Auth;
 use Carbon\Carbon;
+use App\Models\Pack;
+use App\Models\Room;
+use App\Models\User;
+use App\Models\EnteredRoom;
+use App\Models\RoomPrivateMessages;
 use Illuminate\Database\Eloquent\Builder;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\NowRoomResource;
 use phpDocumentor\Reflection\PseudoTypes\True_;
+use App\Http\Resources\Api\V1\NowRoomUserResource;
 
 /** @property Room $model*/
 class RoomRepository extends AbstractRepository
@@ -401,6 +402,8 @@ class RoomRepository extends AbstractRepository
         $audio = (clone $query)->where('type', 'audio')->first();
         $live  = (clone $query)->where('type', 'live')->where('is_live', true)->first();
         $nowRooms  = $this->getNowRooms($user);
+          //          'now_room'             => $this->formatNowRoom(),
+
 
         return [
             'audio' => $audio
@@ -421,12 +424,13 @@ class RoomRepository extends AbstractRepository
         if (!$user->now_room_uid) return (object)[];
 
         $nowRoomOwner = $user->nowRoomOwner;
+      //  dd($nowRoomOwner);
 
         if (!$nowRoomOwner) return (object)[];
 
         if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
 
-        $resource = (new NowRoomResource($this))->toArray(request());
+        $resource = (new NowRoomUserResource($user->room))->toArray(request());
 
         return empty($resource) ? (object)[] : $resource;
     }

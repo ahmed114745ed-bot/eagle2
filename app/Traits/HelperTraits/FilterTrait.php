@@ -33,6 +33,17 @@ trait FilterTrait
         return $ops;
     }
 
+    public static function user_filter()
+    {
+        $ops = [0 => 'no user'];
+
+        $users = User::get();
+        foreach ($users as $user) {
+            $ops[$user->id] = $user->name;
+        }
+        return $ops;
+    }
+
     public static function by_agency_filter_with_owner_id()
     {
         $ops = [0 => 'no agency'];

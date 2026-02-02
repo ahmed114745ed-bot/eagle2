@@ -2,19 +2,66 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use App\Helpers\Common;
-use App\Http\Resources\CountryResource;
-use App\Models\Room;
 use App\Models\User;
-use App\Models\Request;
+use App\Helpers\Common;
+use Illuminate\Http\Request;
+use App\Http\Resources\CountryResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class RoomResource extends JsonResource
+class NowRoomUserResource extends JsonResource
 {
-    public function toArray($request)
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    // public function toArray($request)
+    // {
+    //     $pass_status = false;
+    //     $now_room    = @$this->room;
+    //     if ($now_room) {
+    //         if ($now_room->room_pass) {
+    //             $pass_status = true;
+    //         }
+    //     }
+
+    //     if (!@$now_room->is_live &&  @$now_room->type  == 'live') {
+    //         return [];
+    //     }
+
+
+    //     return [
+    //         'is_in_room'      => @$this->now_room_uid != 0,
+    //         'uid'             => @(int)$this->now_room_uid,
+    //         'is_mine'         => @$this->id == @$this->now_room_uid,
+    //         'password_status' => $pass_status,
+    //         "id"              => @$now_room->id,
+    //         "room_name"       => @$now_room->room_name,
+    //         "room_cover"      => @$now_room->room_cover,
+    //         "room_background" => @$now_room->final_room_image,
+    //         "mode"            => @$now_room->mode,
+    //         'giftPrice'       => @$now_room->session_string,
+    //         'room_type'       => @$now_room->type ?? '',
+    //         'is_live'       => (boolean)@$now_room->is_live ?? 0,
+    //     ];
+
+    // }
+
+
+     public function toArray($request)
     {
         // Common::setHourHot($this->uid);
+        $pass_status = false;
+    //     $now_room    = @$this->room;
+    //     if ($now_room) {
+    //         if ($now_room->room_pass) {
+    //             $pass_status = true;
+    //         }
+    //     }
 
+    //     if (!@$now_room->is_live &&  @$now_room->type  == 'live') {
+    //         return [];
+    //     }
         $userId = \Auth::id();
         $pk = $this->lastPk;
         $achievement_images = [];
@@ -94,6 +141,7 @@ class RoomResource extends JsonResource
                     'lang' => '',
                     'phone_code' => ''
                 ],
+                
             'have_luck_box' => (bool) $have_luck_box,
             'achievement_images' => $achievement_images,
             /** refactored */
