@@ -13,10 +13,10 @@ class MissingTableHandler
     /**
      * Handle missing table exceptions
      * 
-     * @param \Exception $exception
+     * @param \Throwable $exception
      * @return bool Returns true if exception was handled
      */
-    public static function handle(\Exception $exception): bool
+    public static function handle(\Throwable $exception): bool
     {
         if ($exception instanceof QueryException) {
             $errorCode = $exception->getCode();
@@ -44,10 +44,10 @@ class MissingTableHandler
     /**
      * Check if the exception is a missing table exception
      * 
-     * @param \Exception $exception
+     * @param \Throwable $exception
      * @return bool
      */
-    public static function isMissingTableException(\Exception $exception): bool
+    public static function isMissingTableException(\Throwable $exception): bool
     {
         if ($exception instanceof QueryException) {
             $errorCode = $exception->getCode();
