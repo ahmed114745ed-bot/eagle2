@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('type')->comment('1:owner , 2:host ');
             $table->dateTime('join_date');
             $table->dateTime('leave_date')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }
