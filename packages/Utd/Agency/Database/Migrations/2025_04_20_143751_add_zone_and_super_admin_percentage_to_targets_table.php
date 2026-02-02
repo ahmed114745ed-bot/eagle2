@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
-            Schema::table('targets', function (Blueprint $table) {
+        Schema::table('targets', function (Blueprint $table) {
+            if (!Schema::hasColumn('targets', 'app_profit_percentage')) {
                 $table->decimal('app_profit_percentage', 5, 2)->default(0);
+            }
+            if (!Schema::hasColumn('targets', 'db_percentage')) {
                 $table->decimal('db_percentage', 5, 2)->default(0);
-            });
-        }
+            }
+        });
+    }
     
         public function down(): void
         {

@@ -14,9 +14,15 @@ class AddUsdToAgencies extends Migration
     public function up()
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->double ('old_usd')->nullable ();
-            $table->double ('target_usd')->nullable ();
-            $table->double ('target_token_usd')->nullable ();
+            if (!Schema::hasColumn('agencies', 'old_usd')) {
+                $table->double('old_usd')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'target_usd')) {
+                $table->double('target_usd')->nullable();
+            }
+            if (!Schema::hasColumn('agencies', 'target_token_usd')) {
+                $table->double('target_token_usd')->nullable();
+            }
         });
     }
 

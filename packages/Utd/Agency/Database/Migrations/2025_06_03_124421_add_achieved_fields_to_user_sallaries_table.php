@@ -12,9 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->integer('achieved_diamond')->default(0)->after('diamond');
-            $table->integer('achieved_days')->default(0)->after('achieved_diamond');
-            $table->integer('achieved_hours')->default(0)->after('achieved_days');
+            if (!Schema::hasColumn('user_sallaries', 'achieved_diamond')) {
+                $table->integer('achieved_diamond')->default(0)->after('diamond');
+            }
+            if (!Schema::hasColumn('user_sallaries', 'achieved_days')) {
+                $table->integer('achieved_days')->default(0)->after('achieved_diamond');
+            }
+            if (!Schema::hasColumn('user_sallaries', 'achieved_hours')) {
+                $table->integer('achieved_hours')->default(0)->after('achieved_days');
+            }
         });
     }
 
