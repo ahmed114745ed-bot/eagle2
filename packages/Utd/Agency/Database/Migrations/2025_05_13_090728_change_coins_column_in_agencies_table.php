@@ -14,7 +14,12 @@ return new class extends Migration
         // First check if column exists, if not create it
         if (!Schema::hasColumn('agencies', 'coins')) {
             Schema::table('agencies', function (Blueprint $table) {
-                $table->unsignedBigInteger('coins')->default(0)->after('pending_dollar');
+                // Add after pending_dollar if it exists, otherwise just add it
+                if (Schema::hasColumn('agencies', 'pending_dollar')) {
+                    $table->unsignedBigInteger('coins')->default(0)->after('pending_dollar');
+                } else {
+                    $table->unsignedBigInteger('coins')->default(0);
+                }
             });
         } else {
             // Only change type if column exists
