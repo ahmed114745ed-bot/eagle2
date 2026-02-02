@@ -912,7 +912,7 @@ class AgencyController extends MainController
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
-                    'status' => 'Joined',
+                    'status' => 1,
                 ]);
             }
         });
@@ -1080,7 +1080,7 @@ class AgencyController extends MainController
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' => 'Joined',
+                'status' => 1,
             ];
             UsersJoinedAgency::create($joinAgencyData);
         }
