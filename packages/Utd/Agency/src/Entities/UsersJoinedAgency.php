@@ -19,6 +19,7 @@ class UsersJoinedAgency extends Model
     protected $casts = [
         'join_date' => 'datetime',
         'leave_date' => 'datetime',
+        'status' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
