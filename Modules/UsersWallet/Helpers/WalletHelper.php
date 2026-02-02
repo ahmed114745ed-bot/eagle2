@@ -96,7 +96,7 @@ class WalletHelper
          WalletLog::create([
             'wallet_id' => $wallet->id,
             'user_id' => $userId,
-            'amount' => $amount,
+            'amount' => -$amount,
             'operation' => 'withdrawal_pending',
             'type' => 'user',
             'before_amount' => $before ,
