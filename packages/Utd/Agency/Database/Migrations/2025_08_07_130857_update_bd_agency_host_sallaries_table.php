@@ -12,15 +12,18 @@ return new class extends Migration
     public function up()
     {
         if (!Schema::hasTable('bd_agency_host_sallaries')) return;
-        Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
-            if (!Schema::hasColumn('bd_agency_host_sallaries', 'salary')) {
+        
+        if (!Schema::hasColumn('bd_agency_host_sallaries', 'salary')) {
+            Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
                 $table->decimal('salary', 12, 4)->nullable();
-            }
+            });
+        }
 
-            if (Schema::hasColumn('bd_agency_host_sallaries', 'user_sallary')) {
+        if (Schema::hasColumn('bd_agency_host_sallaries', 'user_sallary')) {
+            Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
                 $table->dropColumn(['user_sallary', 'agency_sallary']);
-            }
-        });
+            });
+        }
     }
 
     public function down()
