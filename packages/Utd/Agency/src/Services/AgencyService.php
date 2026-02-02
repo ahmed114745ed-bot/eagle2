@@ -81,8 +81,6 @@ class AgencyService implements AgencyServiceInterface
             throw new Exception(__('api_responses.you_are_already_under_agency'));
         }
         
-        $countRequest = $this->agencyJoinRequestRepository->countByMonth($user->id);
-        
         $agency_request = $this->agencyJoinRequestRepository->countByAgency($user->id, $agencyId);
         if ($agency_request > 0) {
             throw new Exception(__('api_responses.you_already_send_request_to_this_agency'));
@@ -210,7 +208,8 @@ class AgencyService implements AgencyServiceInterface
             $user = $this->findUser($userId);
             
             if (!$user) {
-                throw new Exception(__('agency::messages.user_not_found', [], 'api_responses.user_not_found'));
+                throw new Exception(__('agency::messages.user_not_found') ?:
+                __('api_responses.user_not_found'));
             }
             
             $user->agency_id = $agencyId;

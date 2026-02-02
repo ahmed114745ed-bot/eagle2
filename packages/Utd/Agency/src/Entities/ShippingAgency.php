@@ -37,37 +37,37 @@ class ShippingAgency extends Model
 
     protected function userModel()
     {
-        return config('agency.models.user');
+        return config('agency-package.models.user');
     }
 
     protected function adminModel()
     {
-        return config('agency.models.admin');
+        return config('agency-package.models.admin');
     }
 
     protected function countryModel()
     {
-        return config('agency.models.country');
+        return config('agency-package.models.country');
     }
 
     protected function chargeModel()
     {
-        return config('agency.models.charge');
+        return config('agency-package.models.charge');
     }
 
     protected function salaryModel()
     {
-        return config('agency.models.agency_salary');
+        return config('agency-package.models.user_salary');
     }
 
     protected function userTargetModel()
     {
-        return config('agency.models.user_target');
+        return config('agency-package.models.user_target');
     }
 
     protected function agencyUserJobModel()
     {
-        return config('agency.models.agency_user_job');
+        return \Utd\Agency\Entities\AgencyUserJob::class;
     }
 
     public function chargeAgency()
