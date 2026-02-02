@@ -393,8 +393,7 @@ class AgencyController extends MainController
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
-            ->selectRaw('COALESCE((SELECT SUM(sallary - cut_amount) FROM agency_salaries WHERE agency_salaries.agency_id = agencies.id), 0) as salary')
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'agencySalaries', 'creator', 'country'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'creator', 'country'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -523,9 +522,14 @@ class AgencyController extends MainController
         ";
         })->sortable();
 
-        // --- Salary column (using withSum preload) ---
+        // --- Salary column ---
         $grid->column('salary', __('Agency wallet'))->display(function () {
-            $coin = truncateAndTrim($this->current_salary ?? 0);
+            $salary = 0;
+            if (\Schema::hasTable('agency_salaries')) {
+                $salary = \Utd\Agency\Entities\AgencySallary::where('agency_id', $this->id)
+                    ->sum(\DB::raw('sallary - cut_amount'));
+            }
+            $coin = truncateAndTrim($salary);
             $icon = asset('images/dollar.jpg');
             return "<div style='display: flex; align-items: center; gap: 5px;'>
                 <span>{$coin}</span>

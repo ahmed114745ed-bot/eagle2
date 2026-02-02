@@ -16,12 +16,12 @@ class CreateAgencySallariesTable extends Migration
         if (Schema::hasTable('agency_sallaries')) return;
         Schema::create('agency_sallaries', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedBigInteger('agency_id')->default (0);
-            $table->float('sallary')->default (0);
-            $table->float('cut_amount')->default (0);
-            $table->integer('month')->default (0);
-            $table->integer('year')->default (0);
-            $table->boolean('is_paid')->default (0);
+            $table->unsignedBigInteger('agency_id')->default(0);
+            $table->decimal('sallary', 20, 4)->default(0);
+            $table->decimal('cut_amount', 20, 4)->default(0);
+            $table->integer('month')->default(0);
+            $table->integer('year')->default(0);
+            $table->boolean('is_paid')->default(0);
             $table->timestamps();
         });
     }
