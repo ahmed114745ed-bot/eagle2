@@ -48,7 +48,6 @@
 @php
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
-    use Illuminate\Support\Facades\Cache;
 
     /* -------------------------------
      | URI / BD Visibility
@@ -66,9 +65,12 @@
      | Normalize title
      |-------------------------------*/
     $rawTitle = Arr::get($item, 'title', '');
+
     if (is_array($rawTitle)) {
+        // Pick current locale or first available
         $rawTitle = $rawTitle[app()->getLocale()] ?? reset($rawTitle);
     }
+
     $normalizedTitle = is_string($rawTitle) ? $rawTitle : '';
 
     /* -------------------------------
@@ -84,91 +86,52 @@
      |-------------------------------*/
     $permission = Arr::get($item, 'permission');
     if (is_array($permission)) {
+        // pick first permission if it's an array
         $permission = reset($permission);
     }
 
-    /* -------------------------------
-     | CHILD VISIBILITY CHECK
-     |-------------------------------*/
-    $hasVisibleChild = false;
-
-    if (isset($item['children']) && is_array($item['children'])) {
-        foreach ($item['children'] as $child) {
-            $childRoles = Arr::get($child, 'roles', []);
-            $childPermission = Arr::get($child, 'permission');
-
-            if (is_array($childPermission)) {
-                $childPermission = reset($childPermission);
-            }
-
-            if (
-                Admin::user()->visible($childRoles) &&
-                (
-                    empty($childPermission) ||
-                    Admin::user()->can($childPermission)
-                )
-            ) {
-                $hasVisibleChild = true;
-                break;
-            }
-        }
-    }
-
-    /* -------------------------------
-     | FINAL VISIBILITY RULE
-     |-------------------------------*/
     $isVisible =
         !$shouldHideBd &&
         Admin::user()->visible($roles) &&
-        (
-            !isset($item['children'])
-                ? (empty($permission) || Admin::user()->can($permission))
-                : $hasVisibleChild
-        ) &&
+        Admin::user()->can($permission) &&
         (!is_null($itemId) && !in_array($itemId, $renderedMenu));
 
-    /* -------------------------------
-     | BADGE LOGIC
-     |-------------------------------*/
     $badgeCount = 0;
 
     $badgeConfig = [
-        'form-requests' => fn() => Cache::remember('menu_badge_form_requests', 60, fn() =>
-            \Modules\Form\Entities\FormRequest::where('status', 'pending')->count()
-        ),
-        'superadmin-banner-requests' => fn() => Cache::remember('menu_badge_banner_requests', 60, fn() =>
-            \Modules\SuperAdmin\Entities\SuperadminBannerRequest::where('status', 'pending')->count()
-        ),
-        'country-requests' => fn() => Cache::remember('menu_badge_country_requests', 60, fn() =>
-            \App\Models\ChangeCountryRequest::where('status', 'pending')->count()
-        ),
+        'form-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_form_requests', 60, fn() => \Modules\Form\Entities\FormRequest::where('status', 'pending')->count()),
+        'superadmin-banner-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_banner_requests', 60, fn() => \Modules\SuperAdmin\Entities\SuperadminBannerRequest::where('status', 'pending')->count()),
+        'country-requests' => fn() => \Illuminate\Support\Facades\Cache::remember('menu_badge_country_requests', 60, fn() => \App\Models\ChangeCountryRequest::where('status', 'pending')->count()),
     ];
 
-    $getBadgeCount = function ($uri) use ($badgeConfig) {
-        foreach ($badgeConfig as $badgeUri => $callback) {
+    $getBadgeCount = function($uri) use ($badgeConfig) {
+        foreach ($badgeConfig as $badgeUri => $countCallback) {
             if (Str::contains($uri, $badgeUri)) {
-                return $callback();
+                return $countCallback();
             }
         }
         return 0;
     };
 
-    $getChildrenBadgeCount = function ($children) use (&$getChildrenBadgeCount, $getBadgeCount) {
+    $getChildrenBadgeCount = function($children) use ($getBadgeCount, &$getChildrenBadgeCount) {
         $total = 0;
         foreach ($children as $child) {
-            $total += $getBadgeCount(Arr::get($child, 'uri', ''));
-            if (isset($child['children'])) {
+            $childUri = Arr::get($child, 'uri', '');
+            $total += $getBadgeCount($childUri);
+
+            if (isset($child['children']) && is_array($child['children'])) {
                 $total += $getChildrenBadgeCount($child['children']);
             }
         }
         return $total;
     };
 
-    if (isset($item['children'])) {
+    if (isset($item['children']) && is_array($item['children'])) {
         $badgeCount = $getChildrenBadgeCount($item['children']);
     } else {
         $badgeCount = $getBadgeCount($uri);
     }
+
 @endphp
 
 @if($isVisible)
@@ -220,84 +183,6 @@
             </a>
 
             <ul id="crs-sub-{{ $itemId }}" class="crs-submenu" data-crs-parent="{{ $itemId }}">
-                @foreach($item['children'] as $child)
-                    @include('vendor.admin.partials.menu', [
-                        'item' => $child,
-                        'renderedMenu' => $renderedMenu
-                    ])
-                @endforeach
-            </ul>
-        </li>
-    @endif
-@endif
-
-
-
-
-
-
-
-@if($isVisible)
-    @php
-        $renderedMenu[] = $itemId;
-        $href = url()->isValidUrl($uri) ? $uri : admin_url($uri);
-        $isRtl = app()->getLocale() === 'ar';
-    @endphp
-
-    {{-- LEAF MENU --}}
-    @if(!isset($item['children']))
-        <li class="crs-item" data-crs-id="{{ $itemId }}">
-            <a href="{{ $href }}" class="crs-link crs-leaf">
-
-                {{-- ICON --}}
-                @if(str_contains($item['icon'] ?? '', 'fa-'))
-                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
-                @else
-                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
-                @endif
-
-                {{-- TITLE --}}
-                <span class="crs-title">
-                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        : $normalizedTitle
-                    }}
-                </span>
-
-                @if($badgeCount > 0)
-                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
-                @endif
-            </a>
-        </li>
-
-    {{-- PARENT MENU --}}
-    @else
-        <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
-            <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false">
-
-                {{-- ICON --}}
-                @if(str_contains($item['icon'] ?? '', 'fa-'))
-                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
-                @else
-                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
-                @endif
-
-                {{-- TITLE --}}
-                <span class="crs-title">
-                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
-                        : $normalizedTitle
-                    }}
-                </span>
-
-                @if($badgeCount > 0)
-                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
-                @endif
-
-                <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow"></i>
-            </a>
-
-            <ul class="crs-submenu">
                 @foreach($item['children'] as $child)
                     @include('vendor.admin.partials.menu', [
                         'item' => $child,
