@@ -351,6 +351,8 @@ class PkEventGiftController extends MainController
         $form->hidden('pk_type')->value(request('pk_type'));
 
         $form->hidden('level')->value(request()->route('level'));
+        $form->html('<div class="full-column-width">');
+
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
@@ -375,6 +377,20 @@ class PkEventGiftController extends MainController
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'));
+
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
+
 
         $form->saved(function (Form $form) {
 

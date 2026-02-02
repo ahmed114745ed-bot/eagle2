@@ -523,10 +523,10 @@ class Common
                 default      => 'jpg',
             };
 
-            Log::warning('File extension missing, fallback used', [
-                'mime' => $mime,
-                'used_extension' => $extension,
-            ]);
+            // Log::warning('File extension missing, fallback used', [
+            //     'mime' => $mime,
+            //     'used_extension' => $extension,
+            // ]);
         }
         $fileName = $id . '_' . $count . '.' . $extension;
         $file->storeAs($folder . DIRECTORY_SEPARATOR, $fileName, config('filesystems.default'));
@@ -1175,9 +1175,9 @@ class Common
                 $payload['notification']['image'] = $roomImage;
             } else {
                 $payload['notification']['image'] = 'https://kita.rstar-soft.com/storage/images/kitaimg.jpg';
-                Log::warning('send_firebase_notification_with_room_image: Using default image', [
-                    'room_image_was' => $roomImage
-                ]);
+                // Log::warning('send_firebase_notification_with_room_image: Using default image', [
+                //     'room_image_was' => $roomImage
+                // ]);
             }
 
             $headers = [
@@ -1204,11 +1204,11 @@ class Common
 
             return $resultDecoded;
         } catch (\Throwable $e) {
-            Log::error('send_firebase_notification_with_room_image: Exception occurred', [
-                'room_id' => $roomId,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            // Log::error('send_firebase_notification_with_room_image: Exception occurred', [
+            //     'room_id' => $roomId,
+            //     'error' => $e->getMessage(),
+            //     'trace' => $e->getTraceAsString()
+            // ]);
             return false;
         }
     }
