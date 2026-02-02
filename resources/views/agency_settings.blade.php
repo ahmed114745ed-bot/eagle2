@@ -96,11 +96,11 @@
         backdrop-filter: blur(6px);
     }
     h3 {
-    color: #000;
+    color:var(--text-secondary-color);
 }
 
     label {
-        display: block;
+        display: var(--text-secondary-color);
         margin: 10px 0 5px;
     }
 
