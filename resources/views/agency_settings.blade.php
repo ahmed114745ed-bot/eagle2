@@ -12,12 +12,7 @@
         --radius: 12px;
         --container-gap: 20px;
     }
-    form {
-    background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));
 
-    padding: 20px;
-    border-radius: 5px;
-}
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -91,9 +86,14 @@
 
     /* تنسيق النماذج */
     form {
-        background: #222;
-        padding: 20px;
-        border-radius: 5px;
+       
+
+         background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));
+        color: #071124;
+        border-radius: var(--radius);
+        padding:18px;
+        box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+        backdrop-filter: blur(6px);
     }
 
     label {
