@@ -23,6 +23,12 @@ class AgencyServiceProvider extends ServiceProvider
         $this->registerCommands();
         $this->mergeConfigFrom(__DIR__ . '/../Config/agency.php', 'agency-package');
 
+        // Register Model Aliases
+        $this->app->alias(
+            \Utd\Agency\Entities\UsersJoinedAgency::class,
+            'App\Models\UsersJoinedAgency'
+        );
+
         // Register Services - Safe binding (returns null if not exists)
         $this->app->bind(
             \Utd\Agency\Contracts\AgencyServiceInterface::class,
@@ -53,6 +59,14 @@ class AgencyServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
+        // Register class alias for backward compatibility
+        if (!class_exists('App\Models\UsersJoinedAgency')) {
+            class_alias(
+                \Utd\Agency\Entities\UsersJoinedAgency::class,
+                'App\Models\UsersJoinedAgency'
+            );
+        }
+
         $this->registerRoutes();
         $this->registerShippingRoutes();
         $this->registerViews();
