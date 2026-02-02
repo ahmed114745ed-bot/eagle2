@@ -53,10 +53,16 @@ class GiftLog extends Model
         return $this->belongsTo(Moment::class, 'moent_id');
     }
 
-
-
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id');
+        $agencyClass = \App\Helpers\AgencyPackageHelper::getAgencyClass();
+        
+        if (!$agencyClass) {
+            // Return a stub relationship using a safe empty model pattern
+            // Using NullAgency class to avoid column mismatch errors
+            return $this->belongsTo(\App\Models\NullAgency::class, 'agency_id', 'id')->whereRaw('1 = 0');
+        }
+        
+        return $this->belongsTo($agencyClass, 'agency_id');
     }
 }

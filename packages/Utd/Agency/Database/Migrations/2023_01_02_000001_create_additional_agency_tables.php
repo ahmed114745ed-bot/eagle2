@@ -73,7 +73,6 @@ return new class extends Migration
             });
         }
         
-        // 5. جدول تحويلات رواتب الوكالات
         if (!Schema::hasTable('agency_transfer_salaries')) {
             Schema::create('agency_transfer_salaries', function (Blueprint $table) {
                 $table->id();

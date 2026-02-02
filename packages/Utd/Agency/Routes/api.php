@@ -16,27 +16,27 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
         // Get active agencies
         Route::get('/', [AgencyController::class, 'activeAgencies']);
         
+        // Get user history (must be before /{id} route to avoid conflict)
+        Route::get('/history', [AgencyController::class, 'history']);
+        
         // Get agency details
-        Route::get('/{id}', [AgencyController::class, 'show']);
+        Route::get('/{id}', [AgencyController::class, 'show'])->where('id', '[0-9]+');
         
         // Get agency members
-        Route::get('/{id}/members', [AgencyController::class, 'members']);
+        Route::get('/{id}/members', [AgencyController::class, 'members'])->where('id', '[0-9]+');
         
         // Get agency target
-        Route::get('/{id}/target', [AgencyController::class, 'target']);
+        Route::get('/{id}/target', [AgencyController::class, 'target'])->where('id', '[0-9]+');
         
         // Get agency stars
-        Route::get('/{id}/stars', [AgencyController::class, 'stars']);
+        Route::get('/{id}/stars', [AgencyController::class, 'stars'])->where('id', '[0-9]+');
         
         // Get agency heroes
-        Route::get('/{id}/heroes', [AgencyController::class, 'heroes']);
+        Route::get('/{id}/heroes', [AgencyController::class, 'heroes'])->where('id', '[0-9]+');
         
         // Join agency
         Route::post('/join', [AgencyController::class, 'joinRequest']);
         
         // Leave agency
         Route::post('/leave', [AgencyController::class, 'leaveAgency']);
-        
-        // Get user history
-        Route::get('/history', [AgencyController::class, 'history']);
     });
