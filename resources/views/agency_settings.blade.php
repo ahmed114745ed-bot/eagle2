@@ -11,6 +11,21 @@
         --glass: rgba(255,255,255,0.025);
         --radius: 12px;
         --container-gap: 20px;
+
+
+         --primary-color: {{ config('themes.primaryColor') ?: '#2563eb' }};
+        --secondary-color: {{ config('themes.secondaryColor') ?: '#1f2937' }};
+        --green-color: {{ config('themes.greenColor') ?: '#10b981' }};
+        --text-primary-color: {{ config('themes.textPrimaryColor') ?: '#ffffff' }};
+        --text-secondary-color: {{ config('themes.textSecondaryColor') ?: '#9ca3af' }};
+        --box-background-color: {{ config('themes.boxBackgroundColor') ?: '#ffffff' }};
+        --table-background-color: {{ config('themes.tableBackGroundColor') ?: '#f9fafb' }};
+        --background-image: {{ config('themes.backgroundImage') ?: 'none' }};
+        --brand_background-image: url({{ getImagePath(config('themes.brandBackgroundImage')) ?: '' }});
+        --second-alpha: rgba(31, 41, 55, 0.1);
+        --primary-hover-alpha: rgba(37, 99, 235, 0.1);
+        --scroll-second-color: rgba(255, 255, 255, 0.8);
+        --scroll-first-color: rgba(37, 99, 235, 0.2);
     }
 
     body {
