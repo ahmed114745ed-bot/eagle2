@@ -110,6 +110,11 @@ class AgencyController extends MainController
                     ->find($id);
             });
         }
+        
+        if (!$agency) {
+            abort(404, 'Agency not found.');
+        }
+        
         $adminUser = DB::table('admin_users')->where('id', $agency->created_by)->first() ?? $agency->owner;
         $pathAdmin = $adminUser?->avatar;
         $defaultImageAdmin = asset('images/businessman-icon.jpg');
