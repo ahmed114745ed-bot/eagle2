@@ -34,7 +34,7 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Extensions\Permission;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
-use App\Helpers\MilestoneHelper;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use App\Helpers\CustomNotification;
 use App\Helpers\UserHandling;
 
