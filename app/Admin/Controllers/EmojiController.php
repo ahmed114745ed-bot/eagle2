@@ -120,7 +120,7 @@ class EmojiController extends MainController
 
                 return $html;
             } catch (\Exception $e) {
-                \Log::error('EmojiController header error: ' . $e->getMessage());
+                //\Log::error('EmojiController header error: ' . $e->getMessage());
                 return ''; // Return empty string on error
             }
         });

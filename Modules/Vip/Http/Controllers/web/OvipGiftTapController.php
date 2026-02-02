@@ -98,8 +98,7 @@ class OvipGiftTapController extends MainController
     public function show($id, Content $content)
     {
         return parent::show($id, $content
-            ->title(trans('gift'))
-            ->body($this->detail($id)));
+            ->title(trans('gift')));
     }
 
     public function edit($id, Content $content)
@@ -319,6 +318,62 @@ class OvipGiftTapController extends MainController
         }
 
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
+            //  dd(request());
+
+            // if ($form->key_json && is_array($form->key_json)) {
+            //     // Remove any keys where value is null or empty
+            //     $form->key_json = array_filter($form->key_json, function ($value) {
+            //         return $value !== null && $value !== '';
+            //     });
+            // }
+
+
+            if (isset($form->key_json) && is_array($form->key_json)) {
+                // Normalize posted structure to ['keys' => [...], 'values' => [...]]
+                // Handle both formats: the KeyValue widget posts ['keys'=>[], 'values'=>[]]
+                // but $form->key_json may also be an associative map like ['k'=>'v'] when coming from model.
+                if (array_key_exists('keys', $form->key_json) && array_key_exists('values', $form->key_json)) {
+                    $keys = $form->key_json['keys'] ?? [];
+                    $values = $form->key_json['values'] ?? [];
+
+                    $newKeys = [];
+                    $newValues = [];
+                    foreach ($keys as $i => $k) {
+                        $v = $values[$i] ?? null;
+                        if ($k !== null && $k !== '' || $v !== null && $v !== '') {
+                            $newKeys[] = $k;
+                            $newValues[] = $v;
+                        }
+                    }
+
+                    if (empty($newKeys)) {
+                        $form->key_json = ['keys' => [], 'values' => []];
+                    } else {
+                        $form->key_json = ['keys' => $newKeys, 'values' => $newValues];
+                    }
+                } else {
+                    // Convert associative map to keys/values arrays
+                    $newKeys = [];
+                    $newValues = [];
+                    foreach ($form->key_json as $k => $v) {
+                        if ($k !== null && $k !== '' || $v !== null && $v !== '') {
+                            $newKeys[] = $k;
+                            $newValues[] = $v;
+                        }
+                    }
+
+                    if (empty($newKeys)) {
+                        $form->key_json = ['keys' => [], 'values' => []];
+                    } else {
+                        $form->key_json = ['keys' => $newKeys, 'values' => $newValues];
+                    }
+                }
+            } else {
+                // Ensure the field has the expected structure for KeyValue
+                $form->key_json = ['keys' => [], 'values' => []];
+            }
+
+
             $hasShowImg = $form->show_img || $form->model()->show_img;
             $hasImg2 = $form->img2 || $form->model()->img2;
             $type = $form->model()->type ?? request('type');
@@ -334,7 +389,7 @@ class OvipGiftTapController extends MainController
                 }
             }
 
-            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm','alpha','vap'];
+            $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'alpha', 'vap'];
             if ($form->show_img instanceof UploadedFile) {
                 // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
                 $ext = strtolower($form->show_img->guessExtension());
