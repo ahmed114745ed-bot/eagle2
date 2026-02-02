@@ -869,12 +869,10 @@ class AgencyController extends MainController
                 uploadMonthlyDiamondReceive($originalOwnerId, 0);
             }
 
-            User::where('id', intval($appOwnerId))->update([
-                'type_user' => 2,
-                'is_host' => 1,
-                'agency_id' => $form->model()->id,
-            ]);
-
+            // تعيين created_by عند الإنشاء فقط
+            if (!$form->model()->exists) {
+                $form->model()->created_by = Auth::id();
+            }
 
             if (!request('bd_id') && $isEditing) {
                 $admin =  Bd::where('default', 1)->first();
@@ -917,7 +915,7 @@ class AgencyController extends MainController
                     'agency_id' => $form->model()->id,
                     'type' => 1,
                     'join_date' => now(),
-                    'status' => 1,
+                    'status' => 'Joined',
                 ]);
             }
         });
