@@ -13,47 +13,61 @@ class AddMissingColumnsToAgenciesTable extends Migration
      */
     public function up()
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            // Add status column (in case it's missing)
-            if (!Schema::hasColumn('agencies', 'status')) {
+        // Add status column (in case it's missing)
+        if (!Schema::hasColumn('agencies', 'status')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedTinyInteger('status')->default(1)->after('notice')->comment('1=active, 0=inactive');
-            }
-            
-            // Add created_by column
-            if (!Schema::hasColumn('agencies', 'created_by')) {
+            });
+        }
+        
+        // Add created_by column
+        if (!Schema::hasColumn('agencies', 'created_by')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('created_by')->nullable()->after('status')->comment('Admin user who created this agency');
-            }
-            
-            // Add deleted_at for soft deletes
-            if (!Schema::hasColumn('agencies', 'deleted_at')) {
+            });
+        }
+        
+        // Add deleted_at for soft deletes
+        if (!Schema::hasColumn('agencies', 'deleted_at')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->softDeletes();
-            }
-            
-            // Add pending_dollar column
-            if (!Schema::hasColumn('agencies', 'pending_dollar')) {
+            });
+        }
+        
+        // Add pending_dollar column
+        if (!Schema::hasColumn('agencies', 'pending_dollar')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->decimal('pending_dollar', 15, 2)->default(0)->after('status')->comment('المبلغ المعلق بالدولار');
-            }
-            
-            // Add coins column
-            if (!Schema::hasColumn('agencies', 'coins')) {
+            });
+        }
+        
+        // Add coins column
+        if (!Schema::hasColumn('agencies', 'coins')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->decimal('coins', 15, 2)->default(0)->after('pending_dollar')->comment('الكوينز/العملات');
-            }
-            
-            // Add phone_code column
-            if (!Schema::hasColumn('agencies', 'phone_code')) {
+            });
+        }
+        
+        // Add phone_code column
+        if (!Schema::hasColumn('agencies', 'phone_code')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->string('phone_code', 10)->nullable()->after('phone')->comment('Phone country code');
-            }
-            
-            // Add country_id column
-            if (!Schema::hasColumn('agencies', 'country_id')) {
+            });
+        }
+        
+        // Add country_id column
+        if (!Schema::hasColumn('agencies', 'country_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('country_id')->nullable()->after('phone_code')->comment('Country ID');
-            }
-            
-            // Add is_frozen column
-            if (!Schema::hasColumn('agencies', 'is_frozen')) {
+            });
+        }
+        
+        // Add is_frozen column
+        if (!Schema::hasColumn('agencies', 'is_frozen')) {
+            Schema::table('agencies', function (Blueprint $table) {
                 $table->boolean('is_frozen')->default(0)->after('status')->comment('Is agency frozen/blocked');
-            }
-        });
+            });
+        }
     }
 
     /**
