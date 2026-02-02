@@ -892,7 +892,9 @@ class AgencyController extends MainController
 
             $user = User::find($appOwnerId);
 
-            MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+            if ($user) {
+                MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
+            }
 
             $exists = UsersJoinedAgency::where([
                 'user_id' => $appOwnerId,
