@@ -1715,7 +1715,8 @@
     "moment_viewer.refresh": "Refresh",
     "moment_viewer.loadMore": "Load More",
     "share_room_message": "Hello, come and join me in this room, it's really fun",
-    "withdrawal_request_created": "Withdrawal request created successfully. Status: pending."
+    "withdrawal_request_created": "Withdrawal request created successfully. Status: pending.",
+    "withdrawn": "The withdrawal request has been approved via"
 }
 
 
