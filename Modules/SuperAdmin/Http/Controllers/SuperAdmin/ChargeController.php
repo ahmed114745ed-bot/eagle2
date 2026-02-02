@@ -13,7 +13,7 @@ use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Enums\PermissionType;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;

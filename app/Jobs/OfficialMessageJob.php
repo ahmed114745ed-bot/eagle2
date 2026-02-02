@@ -8,7 +8,7 @@ use App\Models\Agency;
 use App\Models\Family;
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;

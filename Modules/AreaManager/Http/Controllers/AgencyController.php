@@ -15,7 +15,7 @@ use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\UserSallary;
 use App\Models\AgencySallary;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;

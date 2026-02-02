@@ -4,7 +4,7 @@ namespace Modules\SalaryTransaction\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Models\PaymentGateway;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Modules\SalaryTransaction\Helpers\TransactionCustomNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Agency;

@@ -15,7 +15,7 @@ use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use App\Models\AgencySallary;
 use Encore\Admin\Widgets\Box;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Models\AgencyJoinRequest;
@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
-use Utd\ShippingAgency\Actions\DeleteShippingAgencyAction;
+use Utd\Agency\Actions\DeleteShippingAgencyAction;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class AppearChargerAgencyController extends MainController

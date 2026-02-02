@@ -23,7 +23,7 @@ trait SafeAgencyRelationsTrait
      */
     public static function isShippingAgencyPackageInstalled(): bool
     {
-        return class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class);
+        return class_exists(\Utd\Agency\Entities\ShippingAgency::class);
     }
 
     /**
@@ -57,8 +57,8 @@ trait SafeAgencyRelationsTrait
      */
     protected function getShippingAgencyModelClass(): ?string
     {
-        if (class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
-            return \Utd\ShippingAgency\Entities\ShippingAgency::class;
+        if (class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
+            return \Utd\Agency\Entities\ShippingAgency::class;
         }
         
         return null;

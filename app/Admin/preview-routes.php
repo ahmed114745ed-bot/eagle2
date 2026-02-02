@@ -55,9 +55,9 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\Route;
-use Utd\ShippingAgency\Http\Controllers\Admin\AppearChargerAgencyController;
-use Utd\ShippingAgency\Http\Controllers\Admin\MangerSettingController;
-use Utd\ShippingAgency\Http\Controllers\Admin\PaymentGetWayController;
+use Utd\Agency\Http\Controllers\Admin\AppearChargerAgencyController;
+use Utd\Agency\Http\Controllers\Admin\MangerSettingController;
+use Utd\Agency\Http\Controllers\Admin\PaymentGetWayController;
 
 
 Admin::routes();

@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;

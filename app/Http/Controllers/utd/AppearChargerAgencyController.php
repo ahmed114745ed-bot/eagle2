@@ -4,7 +4,7 @@ namespace App\Http\Controllers\utd;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\ShippingAgency\Http\Resources\AppearChargerAgencyResource;
+use Utd\Agency\Http\Resources\AppearChargerAgencyResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 

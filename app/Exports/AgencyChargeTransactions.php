@@ -4,7 +4,7 @@ namespace App\Exports;
 
 use App\Models\Agency;
 use App\Models\Charge;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 

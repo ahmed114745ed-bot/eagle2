@@ -2,7 +2,7 @@
 
 namespace App\Admin\Actions;
 
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;

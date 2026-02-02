@@ -4,7 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\CoinLog;
 use App\Models\User;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;

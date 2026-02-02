@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Utd\ShippingAgency\Helpers\ShippingAgencyHelper;
+use Utd\Agency\Helpers\ShippingAgencyHelper;
 use Exception;
 use App\Models\User;
 use App\Helpers\Common;

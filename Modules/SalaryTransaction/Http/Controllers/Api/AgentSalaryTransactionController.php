@@ -5,7 +5,7 @@ namespace Modules\SalaryTransaction\Http\Controllers\Api;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\ChargeAgentResource;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Tik\Repositories\UserRepository;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\ChargeResourceforAgencyCharge;

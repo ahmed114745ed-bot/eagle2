@@ -12,7 +12,7 @@ use App\Models\AdminUser;
 use App\Models\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\ManagerHelper;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;

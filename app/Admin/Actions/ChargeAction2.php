@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\ChargeInvoice;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Admin as Script;

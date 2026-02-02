@@ -17,7 +17,7 @@ use App\Jobs\OfficialMessageJob;
 use Encore\Admin\Layout\Content;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
-use Utd\ShippingAgency\Selectables\ShippingAgencies;
+use Utd\Agency\Selectables\ShippingAgencies;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Models\OfficialMessageAdmin as OfficialMessage;
 use Modules\AreaManager\Entities\AreaManager;
