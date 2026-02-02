@@ -84,5 +84,5 @@ interface RoomServiceContract
     /**
      * Get room background image
      */
-    public function getRoomBackground($room): string;
+    public function getRoomBackground($room = null): string;
 }
