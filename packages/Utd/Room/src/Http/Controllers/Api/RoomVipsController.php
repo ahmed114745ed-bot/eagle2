@@ -4,7 +4,7 @@ namespace Utd\Room\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\RoomVipResource;
+use Utd\Room\Http\Resources\RoomVipResource;
 use Utd\Room\Services\RoomVipsService;
 use Illuminate\Http\Request;
 use Exception;

@@ -41,7 +41,7 @@ use App\Http\Services\ProfileRelationsService;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use Utd\Room\Http\Resources\EnterRoomCollection;
-use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use Utd\Room\Http\Resources\RoomVisitorsResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Contracts\UserAchievementContract;
 use Modules\RoomBoom\Entities\RoomBoom;

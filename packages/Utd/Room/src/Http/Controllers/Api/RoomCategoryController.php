@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use Utd\Room\Entities\RoomCategory;
 use Utd\Room\Services\RoomCategoryService;
 use Illuminate\Http\Request;
-use App\Http\Resources\Api\V1\RoomCategoryResource;
+use Utd\Room\Http\Resources\RoomCategoryResource;
 
 class RoomCategoryController extends Controller
 {

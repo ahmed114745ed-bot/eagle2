@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
+namespace Utd\Room\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Api\V1\MangerTypeResource;
 
 class RoomVisitorsResource extends JsonResource
 {

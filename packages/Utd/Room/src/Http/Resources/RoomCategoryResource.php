@@ -1,9 +1,7 @@
 <?php
 
-namespace App\Http\Resources\Api\V1;
+namespace Utd\Room\Http\Resources;
 
-use App\Models\Police;
-use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomCategoryResource extends JsonResource

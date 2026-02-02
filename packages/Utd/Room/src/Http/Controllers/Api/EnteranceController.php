@@ -24,7 +24,7 @@ use Utd\Room\Repositories\RoomRepoInterface;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\MiniUserResource;
-use App\Http\Resources\Api\V1\RoomUserResource;
+use Utd\Room\Http\Resources\RoomUserResource;
 use Utd\Room\Http\Resources\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
 use Utd\Room\Services\EnteranceRoomService;
