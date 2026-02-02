@@ -466,7 +466,7 @@ class RoomRepoService
         $json = json_encode($ms);
         $jsons[] = $json;
 
-        $jsons[] = $this->changeBackground($room, $room->uid, (new RoomService())->getRoomBackground($room));
+        $jsons[] = $this->changeBackground($room, $room->uid, app(RoomService::class)->getRoomBackground($room));
 
         $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
         try {
