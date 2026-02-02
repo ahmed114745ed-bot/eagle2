@@ -15,10 +15,19 @@ class UpdateDefaultValuesForAgenciesColumns extends Migration
     {
         Schema::table('agencies', function (Blueprint $table) {
             $table->unsignedBigInteger('owner_id')->default(0)->change();
-            $table->unsignedBigInteger('Shipping_agency')->default(false);
-            $table->unsignedBigInteger('Host_agency')->default(false);
-
         });
+        
+        if (!Schema::hasColumn('agencies', 'Shipping_agency')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedBigInteger('Shipping_agency')->default(false);
+            });
+        }
+        
+        if (!Schema::hasColumn('agencies', 'Host_agency')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedBigInteger('Host_agency')->default(false);
+            });
+        }
     }
 
     /**

@@ -12,14 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('admin_users')) return;
-        Schema::table('admin_users', function (Blueprint $table) {
-            if (!Schema::hasColumn('admin_users', 'Agency_manger')) {
+        
+        if (!Schema::hasColumn('admin_users', 'Agency_manger')) {
+            Schema::table('admin_users', function (Blueprint $table) {
                 $table->boolean('Agency_manger')->default(false);
-            }
-            if (!Schema::hasColumn('admin_users', 'app_id')) {
+            });
+        }
+        
+        if (!Schema::hasColumn('admin_users', 'app_id')) {
+            Schema::table('admin_users', function (Blueprint $table) {
                 $table->bigInteger('app_id')->default(0);
-            }
-        });
+            });
+        }
     }
 
     /**

@@ -8,11 +8,12 @@ class AlterUserSallariesTable extends Migration
 {
     public function up()
     {
-        if (!Schema::hasTable('user_sallaries') || Schema::hasColumn('user_sallaries', 'owner_pide')) return;
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            // Modify the existing column
-            $table->unsignedBigInteger('owner_pide')->nullable();
-        });
+        if (!Schema::hasTable('user_sallaries')) return;
+        if (!Schema::hasColumn('user_sallaries', 'owner_pide')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->unsignedBigInteger('owner_pide')->nullable();
+            });
+        }
     }
 
     public function down()
