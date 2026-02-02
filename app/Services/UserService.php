@@ -7,7 +7,8 @@ use Cache;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Code;
-use App\Models\Room;
+//use Utd\Agency\Repositories\ShippingAgencyRepository;
+use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\Country;
@@ -72,7 +73,7 @@ class UserService
         private readonly UserTargetRepository $userTargetRepository,
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
-        private readonly ShippingAgencyRepository $shippingAgencyRepository,
+//        private readonly ShippingAgencyRepository $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
         private readonly BdRepository $bdRepository,
