@@ -195,7 +195,7 @@ Route::group(
     ],
     function () {
 
-//         Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
+         Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
         // Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
 
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
