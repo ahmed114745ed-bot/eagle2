@@ -95,6 +95,9 @@
         box-shadow: 0 6px 30px rgba(2,6,23,0.6);
         backdrop-filter: blur(6px);
     }
+    h3 {
+    color: #000;
+}
 
     label {
         display: block;
