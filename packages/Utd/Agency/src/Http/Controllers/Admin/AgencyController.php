@@ -73,7 +73,13 @@ class AgencyController extends Controller
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('name', __('Name'));
+        $grid->column('type', __('Type'))->display(function ($type) {
+            return $type == 1 ? '<span class="label label-primary">Host</span>' : '<span class="label label-info">Shipping</span>';
+        });
         $grid->column('owner.name', __('Owner'));
+        $grid->column('bd.name', __('BD'))->display(function () {
+            return $this->bd ? $this->bd->name : '-';
+        });
         $grid->column('phone', __('Phone'));
         $grid->column('status', __('Status'))->display(function ($status) {
             return $status == 1 ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
@@ -86,6 +92,13 @@ class AgencyController extends Controller
         $grid->filter(function ($filter) {
             $filter->disableIdFilter();
             $filter->like('name', __('Name'));
+            $filter->equal('type', __('Type'))->select([
+                1 => 'Host Agency',
+                2 => 'Shipping Agency',
+            ]);
+            $filter->equal('bd_id', __('BD'))->select(
+                \App\Models\Bd::pluck('name', 'id')->toArray()
+            );
             $filter->equal('status', __('Status'))->select([
                 0 => 'Inactive',
                 1 => 'Active',
@@ -124,11 +137,52 @@ class AgencyController extends Controller
     {
         $form = new Form(new Agency());
 
+        // Owner selection (required)
+        $form->select('owner_id', __('Owner'))
+            ->options(function () {
+                return \App\Models\User::where('is_host', 1)
+                    ->pluck('name', 'id');
+            })
+            ->rules('required')
+            ->help('Select the owner of this agency');
+
+        // BD selection (optional)
+        $form->select('bd_id', __('BD'))
+            ->options(function () {
+                return \App\Models\Bd::pluck('name', 'id');
+            })
+            ->help('Select the BD (Business Developer) for this agency');
+
+        // Agency type
+        $form->select('type', __('Type'))
+            ->options([
+                1 => 'Host Agency',
+                2 => 'Shipping Agency',
+            ])
+            ->default(1)
+            ->rules('required');
+
         $form->text('name', __('Name'))->rules('required');
-        $form->textarea('notice', __('Notice'));
-        $form->text('phone', __('Phone'));
-        $form->image('img', __('Image'));
+        $form->textarea('notice', __('Notice'))->placeholder('Welcome message');
+        $form->mobile('phone', __('Phone'));
+        $form->image('img', __('Image'))->uniqueName();
         $form->switch('status', __('Status'))->default(1);
+
+        // Save hook to ensure required fields
+        $form->saving(function (Form $form) {
+            // Ensure owner_id is set
+            if (!$form->owner_id) {
+                throw new \Exception('Owner is required');
+            }
+            
+            // Set default values for missing columns
+            if (!isset($form->pending_dollar)) {
+                $form->model()->pending_dollar = 0;
+            }
+            if (!isset($form->coins)) {
+                $form->model()->coins = 0;
+            }
+        });
 
         return $form;
     }
