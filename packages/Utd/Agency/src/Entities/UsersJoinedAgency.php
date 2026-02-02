@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Utd\Agency\Traits\ConfigurableModelsTrait;
+use Utd\Agency\Traits\TimestampsWithTimezone;
 
 class UsersJoinedAgency extends Model
 {
-    use ConfigurableModelsTrait;
+    use ConfigurableModelsTrait, TimestampsWithTimezone;
 
-    protected $table = 'users_joined_agency';
+    protected $table = 'users_joined_agencies';
 
     protected $guarded = [];
 
@@ -36,6 +37,22 @@ class UsersJoinedAgency extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo($this->getModelClass('user'), 'user_id');
+    }
+
+    /**
+     * Relationship with kicked by admin
+     */
+    public function kickedByAdmin(): BelongsTo
+    {
+        return $this->belongsTo($this->getModelClass('admin'), 'kicked_by_admin');
+    }
+
+    /**
+     * Relationship with kicked by app user
+     */
+    public function kickedByApp(): BelongsTo
+    {
+        return $this->belongsTo($this->getModelClass('user'), 'kicked_by_app');
     }
 
     /**

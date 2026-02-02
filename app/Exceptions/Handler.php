@@ -35,6 +35,17 @@ class Handler extends ExceptionHandler
     // Render method to handle all exceptions
     public function render($request, Throwable $e): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
+        // Handle missing table exceptions
+        if (MissingTableHandler::isMissingTableException($e)) {
+            MissingTableHandler::handle($e);
+            
+            if ($request->is('api/*')) {
+                return Common::apiResponse(0, 'Service temporarily unavailable. Please try again later.', null, 503);
+            }
+            
+            // For web requests, show a friendly error page or return empty response
+            return response()->view('errors.503', [], 503);
+        }
 
         if ($request->is('api/*')) {
             if ($e instanceof CValidationException) {
