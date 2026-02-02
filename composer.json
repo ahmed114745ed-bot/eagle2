@@ -50,7 +50,10 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "*",
-        "utd/moments": "*"
+        "utd/agency": "dev-achievmentPackage",
+        "utd/moments": "*",
+        "utd/reals": "*",
+        "utd/room": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

@@ -1742,8 +1742,8 @@ class User extends Authenticatable
         }
 
         // Safe shipping agency check - only if package is installed
-        if (class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
-            if (\Utd\ShippingAgency\Entities\ShippingAgency::where('app_owner_id', $this->id)->exists()) {
+        if (class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
+            if (\Utd\Agency\Entities\ShippingAgency::where('app_owner_id', $this->id)->exists()) {
                 $applicableTypes[3] = $types[3];
             }
         }
@@ -1830,15 +1830,15 @@ class User extends Authenticatable
 
     public function shippingAgency()
     {
-        if (!class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
+        if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        return $this->hasOne(\Utd\ShippingAgency\Entities\ShippingAgency::class, 'app_owner_id');
+        return $this->hasOne(\Utd\Agency\Entities\ShippingAgency::class, 'app_owner_id');
     }
 
     public function hasShippingAgency()
     {
-        if (!class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
+        if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             return false;
         }
         return $this->shippingAgency()->exists();
@@ -1915,7 +1915,7 @@ class User extends Authenticatable
         }
 
         // Safe shipping agency check - only if package is installed
-        if (class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
+        if (class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             if ($this->relationLoaded('shippingAgency')) {
                 if ($this->shippingAgency) {
                     $userTypes[] = 3;

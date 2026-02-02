@@ -61,7 +61,7 @@ class AgencyPackageHelper
      */
     public static function isShippingAgencyInstalled(): bool
     {
-        return class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class);
+        return class_exists(\Utd\Agency\Entities\ShippingAgency::class);
     }
 
     /**
@@ -111,8 +111,8 @@ class AgencyPackageHelper
      */
     public static function getShippingAgencyClass(): ?string
     {
-        if (class_exists(\Utd\ShippingAgency\Entities\ShippingAgency::class)) {
-            return \Utd\ShippingAgency\Entities\ShippingAgency::class;
+        if (class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
+            return \Utd\Agency\Entities\ShippingAgency::class;
         }
 
         return null;

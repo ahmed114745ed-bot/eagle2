@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Helpers\Common;
 use App\Models\PaymentCoin;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

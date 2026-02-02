@@ -9,7 +9,7 @@ use App\Helpers\UserCommon;
 use App\Models\Coin;
 use App\Models\CoinLog;
 use App\Models\Setting;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use App\Models\User;
 use App\Services\StripeService;
 use App\Traits\User\PaymentTrait;

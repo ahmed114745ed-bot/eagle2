@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Resources\PaymentCoinResource;
-use Utd\ShippingAgency\Entities\ShippingAgency;
+use Utd\Agency\Entities\ShippingAgency;
 use Exception;
 use App\Models\Coin;
 use App\Helpers\Common;

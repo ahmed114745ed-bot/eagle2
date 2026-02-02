@@ -204,9 +204,9 @@ Route::group(
     ],
     function () {
 
-        // Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
+//         Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
         // Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
-    
+
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
         Route::resource('reset-salary', ResetUserSalaryController::class);
@@ -227,7 +227,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-    
+
         // Agency routes - only load if package is installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
             Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -288,7 +288,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-    
+
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -588,7 +588,7 @@ Route::group(
         Route::resource('room-target', RoomTargetController::class);
 
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
-    
+
         // Agency controllers group - only if package installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
             Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
@@ -637,7 +637,7 @@ Route::group(
         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
 
         // Agency manager routes - only if package installed
-    
+
 
         Route::resource('core-wallets', CoreWalletsController::class);
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
@@ -656,9 +656,9 @@ Route::group(
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
         //             ->icon('fa-file');
         //     }));
-    
+
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    
+
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);

@@ -42,8 +42,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\Vip\Entities\VipPrivilege;
 use Symfony\Component\Process\Process;
-use Utd\ShippingAgency\Http\Controllers\Admin\AppearChargerAgencyController;
-use Utd\ShippingAgency\Http\Controllers\Admin\MangerSettingController;
+use Utd\Agency\Http\Controllers\Admin\AppearChargerAgencyController;
+use Utd\Agency\Http\Controllers\Admin\MangerSettingController;
 
 /*
 |--------------------------------------------------------------------------

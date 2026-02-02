@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use App\Models\OfficialMessageAdmin;
 use Illuminate\Support\Facades\Auth;
-use Utd\ShippingAgency\Selectables\ShippingAgencies;
+use Utd\Agency\Selectables\ShippingAgencies;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use App\Admin\Controllers\OfficialMessageController;
