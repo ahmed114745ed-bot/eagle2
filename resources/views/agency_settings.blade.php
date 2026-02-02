@@ -16,7 +16,7 @@
     /* القائمة الجانبية */
     .settings-sidebar {
         width: 250px;
-        background: #222;
+        background: white;
         min-height: 400px;
         align-self: flex-start;
         padding: 20px;
