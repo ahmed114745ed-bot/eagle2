@@ -23,11 +23,8 @@ class AgencyServiceProvider extends ServiceProvider
         $this->registerCommands();
         $this->mergeConfigFrom(__DIR__ . '/../Config/agency.php', 'agency-package');
 
-        // Register Model Aliases
-        $this->app->alias(
-            \Utd\Agency\Entities\UsersJoinedAgency::class,
-            'App\Models\UsersJoinedAgency'
-        );
+        // Register class aliases for backward compatibility early
+        $this->registerModelAliases();
 
         // Register Services - Safe binding (returns null if not exists)
         $this->app->bind(
@@ -59,14 +56,6 @@ class AgencyServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
-        // Register class alias for backward compatibility
-        if (!class_exists('App\Models\UsersJoinedAgency')) {
-            class_alias(
-                \Utd\Agency\Entities\UsersJoinedAgency::class,
-                'App\Models\UsersJoinedAgency'
-            );
-        }
-
         $this->registerRoutes();
         $this->registerShippingRoutes();
         $this->registerViews();
@@ -240,5 +229,31 @@ class AgencyServiceProvider extends ServiceProvider
             InstallAgencyCommand::class,
             UninstallAgencyCommand::class,
         ]);
+    }
+
+    /**
+     * Register model aliases for backward compatibility.
+     *
+     * @return void
+     */
+    protected function registerModelAliases(): void
+    {
+        $aliases = [
+            'UsersJoinedAgency' => \Utd\Agency\Entities\UsersJoinedAgency::class,
+            'Agency' => \Utd\Agency\Entities\Agency::class,
+            'ShippingAgency' => \Utd\Agency\Entities\ShippingAgency::class,
+            'AgencyJoinRequest' => \Utd\Agency\Entities\AgencyJoinRequest::class,
+            'AgencySallary' => \Utd\Agency\Entities\AgencySalary::class,
+            'AgencyUserJob' => \Utd\Agency\Entities\AgencyUserJob::class,
+            'AdditionalInfo' => \Utd\Agency\Entities\AdditionalInfo::class,
+            'LeaveAgencyRequest' => \Utd\Agency\Entities\LeaveAgencyRequest::class,
+            'HostAgencyInvite' => \Utd\Agency\Entities\HostAgencyInvite::class,
+        ];
+
+        foreach ($aliases as $alias => $class) {
+            if (!class_exists('App\\Models\\' . $alias)) {
+                class_alias($class, 'App\\Models\\' . $alias);
+            }
+        }
     }
 }

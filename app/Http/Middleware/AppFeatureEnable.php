@@ -20,13 +20,14 @@ class AppFeatureEnable
     public function handle(Request $request, Closure $next, ...$slug): Response
     {
         // Check if agencies feature and package is not installed
-        if (isset($slug[0]) && $slug[0] === 'agencies' && !AgencyPackageHelper::isAgencyInstalled()) {
+    
+        /*   if (isset($slug[0]) && $slug[0] === 'agencies' && !AgencyPackageHelper::isAgencyInstalled()) {
             if ($request->is('api/*')) {
                 return Common::apiResponse(0, __('api_responses.feature_not_avilable'), []);
             } else {
                 abort(403, __('This feature has not been activated for you'));
             }
-        }
+        }*/
 
       /*  $appFeature = AppFeature::where("slug",$slug[0])->first();
         if ($appFeature != null && $appFeature->status == 0) {
