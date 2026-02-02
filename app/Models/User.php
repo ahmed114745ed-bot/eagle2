@@ -47,7 +47,7 @@ use Modules\Vip\Entities\Vip;
  */
 class User extends Authenticatable
 {
-    use DynamicAchievementTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel;
+    use DynamicAchievementTrait, ChatUserTrait, FollowTrait, HasApiTokens, HasFactory, MomentRelationshipTrait, Notifiable, PaymentGetWayTrait, RealRelationshipTrait, SoftDeletes, SpecialId, TimestampsWithTimezone, UserTransferTrait, UserLevel, \App\Traits\SafeRelationLoading;
 
     /*
      * To enable and disable observer saving and updating methods
@@ -617,17 +617,17 @@ class User extends Authenticatable
 
     public function agency()
     {
-        // Safe check - return empty relation if agency model not available
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->belongsTo(\App\Models\NullAgency::class, 'agency_id')->whereRaw('1 = 0');
+        // Safe check - return empty relation if agency model not available or table doesn't exist
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->nullRelation();
         }
         return $this->belongsTo(Agency::class, 'agency_id');
     }
 
     public function agencies()
     {
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasMany(\App\Models\NullAgency::class, 'agency_manger_id')->whereRaw('1 = 0');
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->hasMany(self::class, 'agency_manger_id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Agency::class, 'agency_manger_id');
     }
@@ -1283,8 +1283,8 @@ class User extends Authenticatable
 
     public function managedAgencies()
     {
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasMany(\App\Models\NullAgency::class, 'agency_dash_manger_id')->whereRaw('1 = 0');
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->hasMany(self::class, 'agency_dash_manger_id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Agency::class, 'agency_dash_manger_id');
     }
@@ -1831,8 +1831,14 @@ class User extends Authenticatable
     public function shippingAgency()
     {
         if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
-            return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
+            return $this->nullRelation();
         }
+        
+        // Check if table exists before loading relation
+        if (!$this->tableExists('agencies')) {
+            return $this->nullRelation();
+        }
+        
         return $this->hasOne(\Utd\Agency\Entities\ShippingAgency::class, 'app_owner_id');
     }
 
@@ -1841,15 +1847,20 @@ class User extends Authenticatable
         if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             return false;
         }
-        return $this->shippingAgency()->exists();
+        
+        try {
+            return $this->shippingAgency()->exists();
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
 
 
     public function hostAgency()
     {
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->nullRelation();
         }
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
@@ -1857,16 +1868,16 @@ class User extends Authenticatable
 
     public function hasHostAgency()
     {
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->nullRelation();
         }
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
 
     public function hasShippingAgencyV2()
     {
-        if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
+        if (!class_exists(\App\Models\Agency::class) || !$this->tableExists('agencies')) {
+            return $this->nullRelation();
         }
         return $this->hasOne(Agency::class, 'app_owner_id');
     }
@@ -1921,7 +1932,7 @@ class User extends Authenticatable
                     $userTypes[] = 3;
                 }
             } else {
-                $this->loadMissing('shippingAgency');
+                $this->safeLoadMissing('shippingAgency');
                 if ($this->shippingAgency) {
                     $userTypes[] = 3;
                 }
