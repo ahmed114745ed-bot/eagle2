@@ -25,6 +25,8 @@ class CreateTargetsTable extends Migration
             $table->decimal('usd')->nullable();
             $table->decimal('coin')->nullable();
             $table->decimal('gold')->nullable();
+            $table->boolean('under_edit')->default(false);
+            $table->unsignedBigInteger('edit_id')->nullable();
             $table->timestamps();
         });
     }
