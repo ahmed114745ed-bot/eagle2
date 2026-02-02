@@ -90,54 +90,11 @@
         $permission = reset($permission);
     }
 
-    /* Determine child visibility recursively so we can hide parent titles when no child is visible */
-    $canChildBeVisible = function ($child) use (&$canChildBeVisible) {
-        $childUri = Arr::get($child, 'uri', '');
-        $childShouldHideBd = Str::startsWith($childUri, 'bd/') && !Admin::user()->inRoles(['bd']);
-
-        $childRoles = Arr::get($child, 'roles', []);
-        if (!is_array($childRoles)) {
-            $childRoles = [];
-        }
-
-        $childPermission = Arr::get($child, 'permission');
-        if (is_array($childPermission)) {
-            $childPermission = reset($childPermission);
-        }
-
-        $visible = !$childShouldHideBd && Admin::user()->visible($childRoles) && ($childPermission === null || $childPermission === true || Admin::user()->can($childPermission));
-        if ($visible) {
-            return true;
-        }
-
-        if (isset($child['children']) && is_array($child['children'])) {
-            foreach ($child['children'] as $grand) {
-                if ($canChildBeVisible($grand)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    };
-
-    $hasVisibleChild = false;
-    if (isset($item['children']) && is_array($item['children'])) {
-        foreach ($item['children'] as $child) {
-            if ($canChildBeVisible($child)) {
-                $hasVisibleChild = true;
-                break;
-            }
-        }
-    }
-
     $isVisible =
         !$shouldHideBd &&
         Admin::user()->visible($roles) &&
-        ($permission === null || $permission === true || Admin::user()->can($permission)) &&
+        Admin::user()->can($permission) &&
         (!is_null($itemId) && !in_array($itemId, $renderedMenu));
-
-    $shouldRender = $isVisible && (empty($item['children']) || $hasVisibleChild);
 
     $badgeCount = 0;
 
@@ -177,14 +134,14 @@
 
 @endphp
 
-@if($shouldRender)
+@if($isVisible)
     @php
         $renderedMenu[] = $itemId;
         $href = url()->isValidUrl($uri) ? $uri : admin_url($uri);
     @endphp
 
     @if(!isset($item['children']))
-     <li class="crs-item" data-crs-id="{{ $itemId }}">
+        <li class="crs-item" data-crs-id="{{ $itemId }}">
             <a href="{{ $href }}" class="crs-link crs-leaf">
                 @if(str_contains($item['icon'] ?? '', 'fa-'))
                     <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
@@ -203,7 +160,6 @@
                 @endif
             </a>
         </li>
-       
     @else
         <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
             <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false"
