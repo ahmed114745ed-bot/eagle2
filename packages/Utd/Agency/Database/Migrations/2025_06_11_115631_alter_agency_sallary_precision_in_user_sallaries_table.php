@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->decimal('agency_sallary', 20, 4)->change();
-            $table->decimal('sallary', 20, 4)->change();
-            $table->decimal('cut_amount', 20, 4)->change();
-            $table->decimal('db', 20, 4)->change();
-            $table->decimal('app_profit', 20, 4)->change();
-        });
+        $columns = ['agency_sallary', 'sallary', 'cut_amount', 'db', 'app_profit'];
+        
+        foreach ($columns as $column) {
+            if (Schema::hasColumn('user_sallaries', $column)) {
+                Schema::table('user_sallaries', function (Blueprint $table) use ($column) {
+                    $table->decimal($column, 20, 4)->change();
+                });
+            }
+        }
     }
 
     public function down()

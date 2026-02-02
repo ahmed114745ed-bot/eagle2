@@ -13,9 +13,11 @@ class UpdateDefaultValuesForAgenciesColumns extends Migration
      */
     public function up()
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->unsignedBigInteger('owner_id')->default(0)->change();
-        });
+        if (Schema::hasColumn('agencies', 'owner_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedBigInteger('owner_id')->default(0)->change();
+            });
+        }
         
         if (!Schema::hasColumn('agencies', 'Shipping_agency')) {
             Schema::table('agencies', function (Blueprint $table) {

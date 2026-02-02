@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('agency_sallaries', function (Blueprint $table) {
-            $table->decimal('sallary', 20, 4)->change();
-            $table->decimal('cut_amount', 20, 4)->change();
-        });
+        if (Schema::hasColumn('agency_sallaries', 'sallary')) {
+            Schema::table('agency_sallaries', function (Blueprint $table) {
+                $table->decimal('sallary', 20, 4)->change();
+            });
+        }
+        
+        if (Schema::hasColumn('agency_sallaries', 'cut_amount')) {
+            Schema::table('agency_sallaries', function (Blueprint $table) {
+                $table->decimal('cut_amount', 20, 4)->change();
+            });
+        }
     }
 
     public function down()
