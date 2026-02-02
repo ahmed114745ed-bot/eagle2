@@ -105,9 +105,14 @@ class AllStatisticController extends MainController
     public function peakHours(Request $request)
     {
         $period = $request->get('period', 'day');
-
+        $countryID = $this->countryId();
         $query = DB::table('live_times')
-            ->join('users', 'live_times.uid', '=', 'users.id');
+            ->join('users', 'live_times.uid', '=', 'users.id')
+            ->when(
+                $countryID,
+                fn($q) =>
+                $q->whereIn('users.country_id', (array) $countryID)
+            );
 
         if ($period === 'day') {
             $query->selectRaw("FROM_UNIXTIME(live_times.start_time, '%H') as label, COUNT(*) as total")
@@ -135,8 +140,17 @@ class AllStatisticController extends MainController
 
     public function onlineStats()
     {
-        $online = User::where('online', 1)->count();
-        $offline = User::where('online', 0)->count();
+        $countryID = $this->countryId();
+        $online = User::where('online', 1)->when(
+            $countryID,
+            fn($q) =>
+            $q->whereIn('users.country_id', (array) $countryID)
+        )->count();
+        $offline = User::where('online', 0)->when(
+            $countryID,
+            fn($q) =>
+            $q->whereIn('users.country_id', (array) $countryID)
+        )->count();
 
 
         return response()->json(data: [
@@ -265,7 +279,9 @@ class AllStatisticController extends MainController
 
     public function topUsersVisits(Request $request)
     {
+        $countryID = $this->countryId();
         $topUsers = User::select('id', 'name')
+            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->withCount(['liveTimes as total_hours' => function ($q) {
                 $q->select(DB::raw("SUM(hours)"))
                     ->where('start_time', '>=', now()->subMonth());
