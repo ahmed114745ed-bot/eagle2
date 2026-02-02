@@ -184,13 +184,12 @@ class RankingRepositoryV2
     public function getUserRanking(string $role, string $rankingType, int $perPage = 10)
     {
         return GiftRanking::query()
+            ->where('role', $role)
+            ->where('ranker_type', User::class)
             ->whereHas('ranker')
             ->with([
                 'ranker' => fn($q) => $q->with($this->rankerRelations($role))
             ])
-
-            ->where('role', $role)
-            ->where('ranker_type', User::class)
             ->where('type', $rankingType)
             ->orderByDesc('total_gifts')
             ->take($perPage)

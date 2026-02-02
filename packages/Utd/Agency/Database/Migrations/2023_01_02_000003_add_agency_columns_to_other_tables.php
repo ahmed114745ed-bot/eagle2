@@ -56,37 +56,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('users')) {
-            Schema::table('users', function (Blueprint $table) {
-                if (Schema::hasColumn('users', 'agency_id')) {
-                    $table->dropColumn('agency_id');
-                }
-                if (Schema::hasColumn('users', 'type_user')) {
-                    $table->dropColumn('type_user');
-                }
-                if (Schema::hasColumn('users', 'is_manger')) {
-                    $table->dropColumn('is_manger');
-                }
-                if (Schema::hasColumn('users', 'is_host')) {
-                    $table->dropColumn('is_host');
-                }
-            });
-        }
-
-        if (Schema::hasTable('gift_logs')) {
-            Schema::table('gift_logs', function (Blueprint $table) {
-                if (Schema::hasColumn('gift_logs', 'agency_id')) {
-                    $table->dropColumn('agency_id');
-                }
-            });
-        }
-
-        if (Schema::hasTable('charges')) {
-            Schema::table('charges', function (Blueprint $table) {
-                if (Schema::hasColumn('charges', 'agency_id')) {
-                    $table->dropColumn('agency_id');
-                }
-            });
-        }
     }
 };

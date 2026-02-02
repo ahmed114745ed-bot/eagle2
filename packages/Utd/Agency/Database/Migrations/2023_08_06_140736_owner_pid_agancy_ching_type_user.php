@@ -27,7 +27,7 @@ class OwnerPidAgancyChingTypeUser extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('type_user')->default(0)->change();
+        //   $table->integer('type_user')->default(0)->change();
     });
     }
 }

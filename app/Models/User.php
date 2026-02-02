@@ -619,7 +619,7 @@ class User extends Authenticatable
     {
         // Safe check - return empty relation if agency model not available
         if (!class_exists(\App\Models\Agency::class)) {
-            return $this->belongsTo(self::class, 'id', 'id')->whereRaw('1 = 0');
+            return $this->belongsTo(\App\Models\NullAgency::class, 'agency_id')->whereRaw('1 = 0');
         }
         return $this->belongsTo(Agency::class, 'agency_id');
     }
@@ -627,7 +627,7 @@ class User extends Authenticatable
     public function agencies()
     {
         if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+            return $this->hasMany(\App\Models\NullAgency::class, 'agency_manger_id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Agency::class, 'agency_manger_id');
     }
@@ -855,7 +855,7 @@ class User extends Authenticatable
     public function ownAgency()
     {
         if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasOne(self::class, 'id', 'id')->whereRaw('1 = 0');
+            return $this->hasOne(\App\Models\NullAgency::class, 'app_owner_id', 'id')->whereRaw('1 = 0');
         }
         return $this->hasOne(Agency::class, 'app_owner_id', 'id');
     }
@@ -1284,7 +1284,7 @@ class User extends Authenticatable
     public function managedAgencies()
     {
         if (!class_exists(\App\Models\Agency::class)) {
-            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+            return $this->hasMany(\App\Models\NullAgency::class, 'agency_dash_manger_id')->whereRaw('1 = 0');
         }
         return $this->hasMany(Agency::class, 'agency_dash_manger_id');
     }
