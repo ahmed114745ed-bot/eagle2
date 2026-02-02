@@ -549,15 +549,18 @@ class UserController extends Controller
 
         $cacheKey = "user_response_{$id}";
 
-        $response =
-            \Cache::remember(
-                $cacheKey,
-                now()->addMinutes(30),
-                function () use ($id) {
-                    $user = $this->userService->showUser($id);
-                    return (new UserResource($user))->toArray(request());
-                }
-            );
+        // $response =
+        //     \Cache::remember(
+        //         $cacheKey,
+        //         now()->addMinutes(30),
+        //         function () use ($id) {
+        //             $user = $this->userService->showUser($id);
+        //             return (new UserResource($user))->toArray(request());
+        //         }
+        //     );
+
+        $user = $this->userService->showUser($id);
+        $response = (new UserResource($user))->toArray($request);
 
         $authUserId = auth()->id();
         $user = User::with([

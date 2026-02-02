@@ -33,6 +33,14 @@
 "registration forms": "نماذج التسجيل",
 "addons": "الإضافات",
     "filter_month": "شهر",
+ "difference": "حاصل الفرق",
+  "total_win": "مجموع win",
+  "total_lose": "مجموع lose",
+  "total_cost": "مجموع cost",
+ "Packages": "الباقات",
+"Gifts Rewards": "مكافآت الهدايا",
+ 
+
     "this agency does not have owner": "هذه الوكالة ليس لديها مالك",
     "Play coin sound inside the room when the win amount is greater than or equal to the added value.":"تشغيل صوت الكوينات داخل الغرفه عندما تكون قيمه المكسب اكبر من او تساوى القيمه المضافه",
     "filter_year": "سنة",
@@ -102,6 +110,7 @@
     "Charge To Area Manager": "تحصيل من مدير المنطقة",
     "Browse charge to area manager": "تصفح عمليات التحصيل من مديري المناطق",
     "SuperAdmin": "مدير دوله",
+    "Superadmin":"مدير دوله",
     "Browse superadmin": "عرض  مدير دوله",
     "Create superadmin": "إنشاء  مدير دوله",
     "Edit superadmin": "تعديل  مدير دوله",
@@ -5165,5 +5174,12 @@
     "moment_viewer.refresh": "تحديث",
     "moment_viewer.loadMore": "تحميل المزيد",
     "Settings updated successfully!": "تم تحديث الإعدادات بنجاح!",
-    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا"
+    "share_room_message": "مرحبا تعال وانضم الي هذه الغرفه معي انها ممتعه حقا",
+   "Super Package Reward": "الباقة",
+"Browse super package reward": "عرض الباقات",
+"Dedicate switch super package reward": "تخصيص الباقة",
+"Create super package reward": "إنشاء باقة",
+"Delete super package reward": "حذف باقة",
+"Edit super package reward": "تعديل الباقة",
+"close room": "إغلاق الغرفة"
 }

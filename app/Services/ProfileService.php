@@ -63,14 +63,14 @@ class ProfileService
             $user->profile_count += 1;
             $user->save();
 
-             $newImagePath = WebPHelper::uploadWebp(
-                    $img,
-                    'profile',
-                    'profile_image'
-                );
-            // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
-            //  $imagePath = Common::upload('profile', $img);
-            $this->profileRepo->updateAvatar($profile, $newImagePath);
+            //  $newImagePath = WebPHelper::uploadWebp(
+            //         $img,
+            //         'profile',
+            //         'profile_image'
+            //     );
+           // $newImagePass = Common::uploadProfileUser('profile', $img, $user->profile->id, $user->profile_count);
+             $imagePath = Common::upload('profile', $img);
+            $this->profileRepo->updateAvatar($profile, $imagePath);
         }
 
         if ($request->has('old_multi_image')) {
