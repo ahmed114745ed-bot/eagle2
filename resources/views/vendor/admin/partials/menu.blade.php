@@ -144,7 +144,7 @@
        
     @else
         <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
-            <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false"
+            /* <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false"
                aria-controls="crs-sub-{{ $itemId }}">
                 @if(str_contains($item['icon'] ?? '', 'fa-'))
                     <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
@@ -162,7 +162,7 @@
                     <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
                 @endif
                 <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow" aria-hidden="true"></i>
-            </a>
+            </a> */
 
             <ul id="crs-sub-{{ $itemId }}" class="crs-submenu" data-crs-parent="{{ $itemId }}">
                 @foreach($item['children'] as $child)
