@@ -2,7 +2,7 @@
 
 namespace App\Tik\Services;
 
-use App\Tik\Repositories\BackgroundRepository;
+use Utd\Room\Repositories\BackgroundRepository;
 
 class BackgroundService
 {

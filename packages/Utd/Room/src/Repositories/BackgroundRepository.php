@@ -11,6 +11,11 @@ class BackgroundRepository extends AbstractRepository
         parent::__construct(new Background());
     }
 
+    public function index()
+    {
+        return $this->model->where(['enable' => 1])->selectRaw('id,img')->orderBy('use_count', 'desc')->get();
+    }
+
     public function getEnabled()
     {
         return $this->model->where('enable', 1)->get();
