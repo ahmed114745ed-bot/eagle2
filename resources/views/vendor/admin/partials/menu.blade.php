@@ -193,3 +193,81 @@
         </li>
     @endif
 @endif
+
+
+
+
+
+
+
+@if($isVisible)
+    @php
+        $renderedMenu[] = $itemId;
+        $href = url()->isValidUrl($uri) ? $uri : admin_url($uri);
+        $isRtl = app()->getLocale() === 'ar';
+    @endphp
+
+    {{-- LEAF MENU --}}
+    @if(!isset($item['children']))
+        <li class="crs-item" data-crs-id="{{ $itemId }}">
+            <a href="{{ $href }}" class="crs-link crs-leaf">
+
+                {{-- ICON --}}
+                @if(str_contains($item['icon'] ?? '', 'fa-'))
+                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
+                @else
+                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+                @endif
+
+                {{-- TITLE --}}
+                <span class="crs-title">
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        : $normalizedTitle
+                    }}
+                </span>
+
+                @if($badgeCount > 0)
+                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
+                @endif
+            </a>
+        </li>
+
+    {{-- PARENT MENU --}}
+    @else
+        <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
+            <a href="#" class="crs-link crs-toggle" role="button" aria-expanded="false">
+
+                {{-- ICON --}}
+                @if(str_contains($item['icon'] ?? '', 'fa-'))
+                    <i class="fa {{ $item['icon'] }} crs-icon" aria-hidden="true"></i>
+                @else
+                    <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+                @endif
+
+                {{-- TITLE --}}
+                <span class="crs-title">
+                    {{ Lang::has('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        ? __('admin.menu_titles.' . trim(str_replace(' ', '_', strtolower($normalizedTitle))))
+                        : $normalizedTitle
+                    }}
+                </span>
+
+                @if($badgeCount > 0)
+                    <span class="crs-badge">{{ $badgeCount > 99 ? '99+' : $badgeCount }}</span>
+                @endif
+
+                <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow"></i>
+            </a>
+
+            <ul class="crs-submenu">
+                @foreach($item['children'] as $child)
+                    @include('vendor.admin.partials.menu', [
+                        'item' => $child,
+                        'renderedMenu' => $renderedMenu
+                    ])
+                @endforeach
+            </ul>
+        </li>
+    @endif
+@endif
