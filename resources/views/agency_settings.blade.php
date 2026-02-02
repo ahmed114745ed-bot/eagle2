@@ -12,6 +12,12 @@
         --radius: 12px;
         --container-gap: 20px;
     }
+    form {
+    background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));
+
+    padding: 20px;
+    border-radius: 5px;
+}
     body {
         font-family: Arial, sans-serif;
         margin: 0;
