@@ -66,7 +66,7 @@ class EnterRoomCollection extends JsonResource
             //////////////////////////////////////////////////////////
             ///
             ///
-            'lucky_gift_coins' => Common::getSettingsValue('lucky_gift_coins') ?? 2000, 
+            'lucky_gift_coins' => Common::getSettingsValue('lucky_gift_coins') ?? 2000,
             "room_id_num"         => $this->numid,
             "room_status"         => (string)$this->room_status,
 
@@ -186,7 +186,7 @@ class EnterRoomCollection extends JsonResource
         if ($this->mode == '3') {
             return 'custom_image/back-black.png';
         }
-        
+
         $customBackground = null;
         if (PackageHelper::isInstalled('room')) {
             $customBackground = RequestBackgroundImage::where('status', 1)
@@ -194,9 +194,9 @@ class EnterRoomCollection extends JsonResource
                 ->orderByDesc('id')
                 ->first()?->img;
         }
-        
-        return $customBackground 
-            ?? $this->room_background 
+
+        return $customBackground
+            ?? $this->room_background
             ?? @DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
     }
 
