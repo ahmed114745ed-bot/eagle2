@@ -1,4 +1,17 @@
 <style>
+
+    :root{
+        /* Softer dark theme (less harsh than previous) */
+        --bg: #1f2937; /* slate-800 — softer background */
+        --card: #0f1724; /* card slightly lighter than black */
+        --muted: #9aa9bd; /* subtle muted text */
+        --accent: #7c3aed; /* soft violet accent */
+        --accent-contrast: #071124;
+        --input: #111827; /* input surfaces slightly lighter */
+        --glass: rgba(255,255,255,0.025);
+        --radius: 12px;
+        --container-gap: 20px;
+    }
     body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -12,21 +25,33 @@
     html, body {
         overflow: auto;
     }
+ .settings-sidebar{
+        width: 280px;
+        background: linear-gradient(180deg, rgba(255,138,0,0.12), rgba(255,138,0,0.06));
+        color: #071124;
+        border-radius: var(--radius);
+        padding:18px;
+        box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+        backdrop-filter: blur(6px);
+        flex-shrink:0;
+        align-self: flex-start;
+    }
 
+    .settings-sidebar h2{font-size:18px;margin:0 0 12px;cursor:pointer;color:var(--accent-contrast);display:flex;align-items:center;justify-content:space-between}
     /* القائمة الجانبية */
-    .settings-sidebar {
+    /* .settings-sidebar {
         width: 250px;
         background: white;
         min-height: 400px;
         align-self: flex-start;
         padding: 20px;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    }
+    } */
 
-    .settings-sidebar h2 {
+    /* .settings-sidebar h2 {
         text-align: center;
         color: var(--primary-color);
-    }
+    } */
 
     .settings-menu button {
         display: block;
@@ -399,16 +424,16 @@
         display: flex;
     }
 
-    .settings-sidebar {
+    /* .settings-sidebar {
         /*width: 100%;*/
-        padding: 10px;
+        /* padding: 10px;
         box-shadow: none;
         position: relative;
-    }
+    } */ */
 
-    .settings-sidebar h2 {
+    /* .settings-sidebar h2 {
         margin-bottom: 10px;
-    }
+    } */
 
     /*.settings-menu {*/
     /*    display: flex;*/
@@ -439,6 +464,7 @@
 }
 
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
