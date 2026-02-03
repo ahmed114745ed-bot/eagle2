@@ -2,15 +2,18 @@
 
 namespace Utd\Room\Repositories;
 
+use Illuminate\Database\Eloquent\Model;
+
 interface RoomRepoInterface
 {
     public function all($req);
-    public function find($id);
+    public function find(int $id): ?Model;
+    public function findByUid($id);
     public function findByType($id, $type);
     public function create($data);
     public function update($req, $id);
     public function save($model);
-    public function delete($id);
+    public function delete(int $id): bool;
     public function getAllOpening();
     public function getAllOpeningIds();
     
