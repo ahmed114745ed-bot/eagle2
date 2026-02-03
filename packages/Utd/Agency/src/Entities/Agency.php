@@ -168,7 +168,8 @@ class Agency extends Model
             $year = date('Y');
         }
 
-        return $this->hasMany(AgencySallary::class)->where('month', $month)->where('year', $year)->first();
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $this->hasMany($agencySalaryClass)->where('month', $month)->where('year', $year)->first();
     }
 
     public function getTargetAttribute($month = null, $year = null)
@@ -180,7 +181,8 @@ class Agency extends Model
             $year = date('Y');
         }
 
-        return $this->hasMany(AgencySallary::class)
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $this->hasMany($agencySalaryClass)
             ->where('month', $month)
             ->where('year', $year)
             ->first();
@@ -214,7 +216,8 @@ class Agency extends Model
 
     public function setSalaryAttribute()
     {
-        $salary = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $salary = $agencySalaryClass::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
         $this->attributes['salary'] = $salary;
 
         return $salary;
@@ -222,7 +225,8 @@ class Agency extends Model
 
     public function getSalaryAttributeAgencyManger()
     {
-        $salaryAgency = AgencySallary::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $salaryAgency = $agencySalaryClass::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
         $attributes['salaryAgency'] = $salaryAgency;
 
         return $attributes;
@@ -242,7 +246,8 @@ class Agency extends Model
 
     public function agencySalary()
     {
-        return $this->hasOne(AgencySallary::class, 'agency_id')
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $this->hasOne($agencySalaryClass, 'agency_id')
             ->orderByDesc('id')
             ->where('month', now()->month)
             ->where('year', now()->year);
@@ -250,7 +255,8 @@ class Agency extends Model
 
     public function getLastMonthSalaryAttribute()
     {
-        return $this->hasOne(AgencySallary::class, 'agency_id')
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $this->hasOne($agencySalaryClass, 'agency_id')
             ->orderByDesc('id')
             ->where('month', now()->subMonth()->month)
             ->where('year', now()->subMonth()->year)
@@ -272,7 +278,8 @@ class Agency extends Model
 
     public function agencySalaries()
     {
-        return $this->hasMany(AgencySallary::class, 'agency_id')->orderByDesc('id');
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $this->hasMany($agencySalaryClass, 'agency_id')->orderByDesc('id');
     }
 
     public function getTotalSallaryAgency($month = null, $year = null)
@@ -280,7 +287,8 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
@@ -308,7 +316,8 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
@@ -322,7 +331,8 @@ class Agency extends Model
     {
         $month ??= now()->month;
         $year ??= now()->year;
-        $result = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $result = $agencySalaryClass::query()
             ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
@@ -341,7 +351,8 @@ class Agency extends Model
         $currentYear = date('Y');
         $currentMonth = date('m');
 
-        return AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        return $agencySalaryClass::query()
             ->where('month', '<=', $month)
             ->where('year', '<=', $year)
             ->where('agency_id', $this->id)
@@ -355,7 +366,8 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
@@ -370,7 +382,8 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
@@ -385,7 +398,8 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->where('year', $year)
             ->where('month', $month)
             ->where('agency_id', $this->id)
@@ -396,7 +410,8 @@ class Agency extends Model
 
     public function sumNetSalary($month = null, $year = null)
     {
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
                     $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
@@ -410,7 +425,8 @@ class Agency extends Model
 
     public function sumCutAmount($month = null, $year = null)
     {
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
                     $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
@@ -423,7 +439,8 @@ class Agency extends Model
     }
     public function sumSalary($month = null, $year = null)
     {
-        $agencySalary = AgencySallary::query()
+        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
                     $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
