@@ -106,7 +106,7 @@ class PercentageGameController extends MainController
 
         $form->text('title', __('title'));
         $form->number('percentage_game', __('percentage game'))->default(2);
-        $form->belongsToMany('users', Users::class)
+        $form->belongsToMany('users', Users::class, trans('users'))
             ->rules('required|array');
 
         return $form;

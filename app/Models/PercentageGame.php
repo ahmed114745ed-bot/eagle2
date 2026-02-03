@@ -12,6 +12,11 @@ class PercentageGame extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'percentage_game_users', 'percentage_game_id', 'user_id');
+        return $this->belongsToMany(
+            User::class,               // Related model
+            'percentage_game_users',   // Pivot table
+            'percentage_game_id',      // Foreign key on pivot table for this model
+            'user_id'                  // Foreign key on pivot table for related model
+        );
     }
 }
