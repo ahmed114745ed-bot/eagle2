@@ -193,16 +193,23 @@ class AgencyController extends MainController
                 break;
 
             case 'requests':
-                $agencyJoinRequests =
-                    //  Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
-                    //     return
-                    AgencyJoinRequest::query()
+                $agencyJoinRequests = AgencyJoinRequest::query()
                     ->where(['agency_id' => $id, 'status' => 0])
                     ->with('user')
                     ->whereHas('user')
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'join_page');
-                // });
+                
+                // Debug: Check data
+                dump([
+                    'agency_id' => $id,
+                    'total_requests' => AgencyJoinRequest::where('agency_id', $id)->count(),
+                    'pending_requests' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->count(),
+                    'with_user' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->whereHas('user')->count(),
+                    'requests_data' => $agencyJoinRequests->toArray(),
+                    'user_model' => config('agency-package.models.user'),
+                ]);
+                
                 break;
 
             case 'targets':
