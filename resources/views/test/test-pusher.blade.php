@@ -14,7 +14,7 @@
 
     const pusher = new Pusher("{{ config('broadcasting.connections.pusher.key') }}", {
         cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
-        authEndpoint: "/broadcasting/auth",
+        authEndpoint: "/api/broadcasting/auth",
         forceTLS: true,
         // This is the key part → send token in the Authorization header
         auth: {
