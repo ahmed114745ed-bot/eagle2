@@ -596,7 +596,7 @@ class UserController extends MainController
                 break;
 
             case 'user-coins':
-                $usersCoins = UserCoinLog::where('user_id', $id)
+                $usersCoins = UserCoinLog::where('user_id', $id)->with('authUser')
                     ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
                     ->when(request('to_date'), fn($q) => $q->whereDate('to_date', '<=', request('to_date')))
                     ->when(request('sub_type'), fn($q) => $q->where('sub_type', request('sub_type')))

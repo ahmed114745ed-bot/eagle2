@@ -89,7 +89,8 @@ class WalletService
                 $toUserId,
                 $amount,
                 $amountBefore,
-                UserCoinLogType::APP_CHARGE,
+                UserCoinLogType::TRANSFER,
+                authId: $fromUserId,
             );
 
             $this->walletRepo->createLog([

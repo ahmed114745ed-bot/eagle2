@@ -8,6 +8,7 @@ enum UserCoinLogType: string
     case AREA_MANAGER_CHARGES = 'area_manager_charge';
     case BD_CHARGES = 'bd_charge';
     case APP_CHARGE = 'app_charge';
+    case TRANSFER = 'transfer';
     case ROOM_COMMENT = 'comment';
     case HUAWEI_PAY = 'huawei_pay';
     case GOOGLE_PAY = 'google_pay';
@@ -59,6 +60,11 @@ enum UserCoinLogType: string
             self::APP_CHARGE => [
                 'sub_type' => 'charges',
                 'item_name' => 'app_charges',
+                'queue_job' => null,
+            ],
+            self::TRANSFER => [
+                'sub_type' => 'charges',
+                'item_name' => 'transfer',
                 'queue_job' => null,
             ],
 

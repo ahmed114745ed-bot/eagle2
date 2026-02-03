@@ -72,7 +72,7 @@ class UsersWalletController extends Controller
             return Common::apiResponse(0, __('api_responses.user_not_found'), 404);
         }
 
-        if ($from->transfer_salary == 1)  return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+       if ($from->transfer_salary == 1)  return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
 
 
         Common::checkUserAgencyFrozen($from);

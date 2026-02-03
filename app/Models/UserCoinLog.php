@@ -24,6 +24,7 @@ class UserCoinLog extends Model
         'amount_before',
         'helper_amount',
         'user_type',
+        'auth_id',
     ];
 
     public $timestamps = true;
@@ -31,5 +32,10 @@ class UserCoinLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function authUser()
+    {
+        return $this->belongsTo(User::class, 'auth_id');
     }
 }
