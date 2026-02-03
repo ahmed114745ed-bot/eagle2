@@ -696,7 +696,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     /**
      * Find room by owner user ID
      */
-    public function find($id)
+    public function findByUid($id)
     {
         return $this->model->where('uid', $id)->first();
     }

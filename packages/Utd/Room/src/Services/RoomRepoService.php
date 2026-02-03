@@ -562,7 +562,7 @@ class RoomRepoService
 
     public function update($request, $id)
     {
-        $room = $this->repo->find($id);
+        $room = $this->repo->findByUid($id);
         if (!$room) {
             return Common::apiResponse(false, 'Room not found', null, 404);
         }
