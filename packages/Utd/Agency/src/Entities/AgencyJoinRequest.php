@@ -41,7 +41,8 @@ class AgencyJoinRequest extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo($this->getModelClass('user'), 'user_id');
+        $userClass = config('agency-package.models.user', \App\Models\User::class);
+        return $this->belongsTo($userClass, 'user_id');
     }
 
     /**
@@ -49,8 +50,8 @@ class AgencyJoinRequest extends Model
      */
     public function admin(): BelongsTo
     {
-        $adminModel = config('agency-package.models.admin', \App\Models\Agent::class);
-        return $this->belongsTo($adminModel, 'change_status_admin_id');
+        $agentClass = config('agency-package.models.agent', \App\Models\Agent::class);
+        return $this->belongsTo($agentClass, 'change_status_admin_id');
     }
 
     /**
@@ -58,7 +59,8 @@ class AgencyJoinRequest extends Model
      */
     public function userOperator(): BelongsTo
     {
-        return $this->belongsTo($this->getModelClass('user'), 'change_status_admin_id');
+        $userClass = config('agency-package.models.user', \App\Models\User::class);
+        return $this->belongsTo($userClass, 'change_status_admin_id');
     }
 
     /**
@@ -109,5 +111,44 @@ class AgencyJoinRequest extends Model
     {
         $this->status = self::STATUS_REJECTED;
         return $this->save();
+    }
+
+    /**
+     * Alias for user relationship
+     */
+    public function requsers()
+    {
+        $userClass = config('agency-package.models.user', \App\Models\User::class);
+        return $this->belongsTo($userClass, 'user_id', 'id');
+    }
+
+    /**
+     * Override update to handle type_user
+     */
+    public function update(array $attributes = [], array $options = [])
+    {
+        if ($this->agency_id === 0) {
+            $attributes['type_user'] = 0;
+        }
+
+        return parent::update($attributes, $options);
+    }
+
+    /**
+     * Boot model events
+     */
+    protected static function booted()
+    {
+        self::saved(function ($model) {
+            if ($model->agency_id && function_exists('clearAgencyCache')) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+
+        self::deleted(function ($model) {
+            if ($model->agency_id && function_exists('clearAgencyCache')) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
     }
 }

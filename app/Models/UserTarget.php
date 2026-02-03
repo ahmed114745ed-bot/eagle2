@@ -28,7 +28,11 @@ class UserTarget extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'agency_id')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'agency_id');
     }
 
     public function user()

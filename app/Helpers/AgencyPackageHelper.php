@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Schema;
+use Utd\Agency\Helpers\AgencyModelsHelper;
 
 /**
  * AgencyPackageHelper
@@ -20,8 +21,13 @@ class AgencyPackageHelper
      */
     public static function isAgencyInstalled(): bool
     {
+        // Check using package helper
+        if (!AgencyModelsHelper::isPackageAvailable()) {
+            return false;
+        }
+        
         // Check class exists
-        $classExists = class_exists(\Utd\Agency\Entities\Agency::class) 
+        $classExists = AgencyModelsHelper::getAgencyClass() !== null
             || class_exists(\App\Models\Agency::class);
         
         if (!$classExists) {
@@ -95,15 +101,31 @@ class AgencyPackageHelper
      */
     public static function getAgencyClass(): ?string
     {
-        if (class_exists(\Utd\Agency\Entities\Agency::class)) {
-            return \Utd\Agency\Entities\Agency::class;
-        }
+        return AgencyModelsHelper::getAgencyClass() ?? (class_exists(\App\Models\Agency::class) ? \App\Models\Agency::class : null);
+    }
 
-        if (class_exists(\App\Models\Agency::class)) {
-            return \App\Models\Agency::class;
-        }
+    /**
+     * Get AgencyJoinRequest model class
+     */
+    public static function getAgencyJoinRequestClass(): ?string
+    {
+        return AgencyModelsHelper::getAgencyJoinRequestClass() ?? (class_exists(\App\Models\AgencyJoinRequest::class) ? \App\Models\AgencyJoinRequest::class : null);
+    }
 
-        return null;
+    /**
+     * Get AgencySalary model class
+     */
+    public static function getAgencySalaryClass(): ?string
+    {
+        return AgencyModelsHelper::getAgencySalaryClass() ?? (class_exists(\App\Models\AgencySallary::class) ? \App\Models\AgencySallary::class : null);
+    }
+
+    /**
+     * Get AgencyUserJob model class
+     */
+    public static function getAgencyUserJobClass(): ?string
+    {
+        return AgencyModelsHelper::getAgencyUserJobClass() ?? (class_exists(\App\Models\AgencyUserJob::class) ? \App\Models\AgencyUserJob::class : null);
     }
 
     /**

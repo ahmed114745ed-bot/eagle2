@@ -84,6 +84,7 @@ return [
         'user' => \App\Models\User::class,
         'admin' => \App\Models\Admin::class,
         'admin_user' => \App\Models\AdminUser::class,
+        'agent' => \App\Models\Agent::class,
         'country' => \App\Models\Country::class,
         'charge' => \App\Models\Charge::class,
         'coin_log' => \App\Models\CoinLog::class,
@@ -94,6 +95,12 @@ return [
         'payment_gateway' => \App\Models\PaymentGateway::class,
         'config' => \App\Models\Config::class,
         'language' => \App\Models\Language::class,
+        
+        // Agency Package Models
+        'agency' => \Utd\Agency\Entities\Agency::class,
+        'agency_salary' => \Utd\Agency\Entities\AgencySalary::class,
+        'agency_join_request' => \Utd\Agency\Entities\AgencyJoinRequest::class,
+        'agency_user_job' => \Utd\Agency\Entities\AgencyUserJob::class,
     ],
 
     'helpers' => [

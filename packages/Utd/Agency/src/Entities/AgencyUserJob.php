@@ -42,7 +42,7 @@ class AgencyUserJob extends Model
      */
     public function user(): BelongsTo
     {
-        $userClass = $this->getModelClass('user', \App\Models\User::class);
+        $userClass = config('agency-package.models.user', \App\Models\User::class);
         return $this->belongsTo($userClass, 'user_id');
     }
 

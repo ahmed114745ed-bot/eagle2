@@ -11,7 +11,11 @@ class PreviewAdmin extends Administrator
 
     public function agency()
     {
-        return $this->hasOne(Agency::class, 'owner_id');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->hasOne(self::class, 'owner_id')->whereRaw('1 = 0');
+        }
+        return $this->hasOne($agencyClass, 'owner_id');
     }
 
     public function getAgencyIdAttribute()
@@ -26,12 +30,20 @@ class PreviewAdmin extends Administrator
 
     public function agencies()
     {
-        return $this->hasMany(Agency::class, 'agency_manger_id');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->hasMany(self::class, 'agency_manger_id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany($agencyClass, 'agency_manger_id');
     }
 
     public function per()
     {
-        return $this->hasMany(Agency::class, 'agency_manger_id');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->hasMany(self::class, 'agency_manger_id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany($agencyClass, 'agency_manger_id');
     }
 
     protected static function boot()
@@ -44,8 +56,12 @@ class PreviewAdmin extends Administrator
 
         // Listen for the 'deleting' event of the admin model
         self::deleting(function ($admin) {
+            $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+            if (!class_exists($agencyClass)) {
+                return;
+            }
             $appId = $admin->app_id;
-            $agencies = Agency::where('agency_manger_id', $appId)->get();
+            $agencies = $agencyClass::where('agency_manger_id', $appId)->get();
             $config = Config::where('name', 'system_default_manger')->first();
 
             $user = User::where('uuid', $config->value)->first();

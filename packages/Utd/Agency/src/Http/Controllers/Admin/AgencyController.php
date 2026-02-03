@@ -116,13 +116,7 @@ class AgencyController extends MainController
         }
         
         // Debug: Print owner information
-        dump([
-            'agency_id' => $agency->id,
-            'app_owner_id' => $agency->app_owner_id,
-            'owner_loaded' => $agency->relationLoaded('owner'),
-            'owner_exists' => $agency->owner ? true : false,
-            'owner_data' => $agency->owner,
-        ]);
+      
         
         // Debug: Fetch owner manually without relationship
         if ($agency->app_owner_id) {
@@ -130,17 +124,7 @@ class AgencyController extends MainController
                 ->where('is_host', 1)
                 ->whereNull('deleted_at')
                 ->first();
-            dump([
-                'manual_owner_query' => 'User::where(id, ' . $agency->app_owner_id . ')->where(is_host, 1)->first()',
-                'manual_owner_exists' => $manualOwner ? true : false,
-                'manual_owner_data' => $manualOwner ? [
-                    'id' => $manualOwner->id,
-                    'name' => $manualOwner->name,
-                    'uuid' => $manualOwner->uuid,
-                    'is_host' => $manualOwner->is_host,
-                    'deleted_at' => $manualOwner->deleted_at,
-                ] : null,
-            ]);
+           
         }
         
         $adminUser = DB::table('admin_users')->where('id', $agency->created_by)->first() ?? $agency->owner;
