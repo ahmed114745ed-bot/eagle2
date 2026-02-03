@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pusher Token Test</title>
 </head>
 <body>
@@ -21,6 +22,7 @@
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
         }
     });
