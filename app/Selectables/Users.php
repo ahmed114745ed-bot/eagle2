@@ -16,7 +16,18 @@ class Users extends Selectable
     public function make()
     {
 
-        if (!request('id')) {
+        // When creating: show users that don't have any percentage assignment.
+        // When editing (request has id): show users that either don't have a percentage
+        // or already belong to the PercentageGame being edited so they remain selectable.
+        if (request('id')) {
+            $percentageId = request('id');
+            $this->grid->model()->with('profile')->where(function ($q) use ($percentageId) {
+                $q->doesntHave('gamePercentage')
+                    ->orWhereHas('gamePercentage', function ($q2) use ($percentageId) {
+                        $q2->where('percentage_game_id', $percentageId);
+                    });
+            });
+        } else {
             $this->grid->model()->with('profile')->doesntHave('gamePercentage');
         }
 
