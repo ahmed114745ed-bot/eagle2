@@ -241,9 +241,7 @@ class AgencyAppController extends Controller
 
     public function agency_data(Request $request)
     {
-        // $user = Auth::user();
         $user = $this->get_user(request());
-        // return $user;
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
@@ -332,7 +330,6 @@ class AgencyAppController extends Controller
             'phone' => 'required',
             'notice' => 'nullable',
         ]);
-        // $user = Auth::user();
         $user = $this->get_user(request());
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);

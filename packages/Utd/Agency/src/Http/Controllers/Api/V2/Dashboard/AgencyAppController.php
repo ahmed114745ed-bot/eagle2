@@ -77,7 +77,6 @@ class AgencyAppController extends Controller
             'phone' => 'required',
             'notice' => 'nullable',
         ]);
-        // $user = Auth::user();
         try {
             $agency = $this->agencyService->editAgency($request);
         } catch (Exception $e) {

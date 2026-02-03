@@ -1,56 +1,35 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Agency Package Configuration
-    |--------------------------------------------------------------------------
-    */
 
     'name' => 'Agency Package',
 
-    /*
-    |--------------------------------------------------------------------------
-    | Routes Enable/Disable
-    |--------------------------------------------------------------------------
-    | Control which route groups are loaded by the package
-    */
     'routes' => [
-        // Enable/disable Host Agency API routes
+
         'api_enabled' => true,
 
-        // Enable/disable UTD API routes
+
         'utd_enabled' => true,
 
-        // Enable/disable Web/Admin routes (requires Laravel Admin)
+
         'web_enabled' => true,
 
-        // Enable/disable Shipping Agency API routes
+
         'shipping_api_enabled' => true,
 
-        // Enable/disable Shipping Agency UTD routes
+
         'shipping_utd_enabled' => true,
 
-        // Enable/disable Shipping Agency Web routes
+
         'shipping_web_enabled' => true,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Route Configuration
-    |--------------------------------------------------------------------------
-    */
     'route' => [
         'prefix' => 'agency',
         'middleware' => ['web', 'admin'],
         'namespace' => 'Utd\\Agency\\Http\\Controllers',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Database Table Names
-    |--------------------------------------------------------------------------
-    */
     'tables' => [
         'agencies' => 'agencies',
         'agency_join_requests' => 'agency_join_requests',
@@ -60,21 +39,11 @@ return [
         'agency_packages' => 'agency_packages',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Agency Types
-    |--------------------------------------------------------------------------
-    */
     'types' => [
         'host' => 1,
         'shipping' => 2,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Agency Status
-    |--------------------------------------------------------------------------
-    */
     'status' => [
         'pending' => 0,
         'active' => 1,
@@ -82,11 +51,6 @@ return [
         'frozen' => 3,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Agency User Job Types
-    |--------------------------------------------------------------------------
-    */
     'job_types' => [
         'owner' => 'owner',
         'admin' => 'admin',
@@ -94,61 +58,28 @@ return [
         'operator' => 'operator',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cache Settings
-    |--------------------------------------------------------------------------
-    */
     'cache' => [
         'enabled' => true,
         'ttl' => 3600, // 1 hour
         'prefix' => 'agency_',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Pagination Settings
-    |--------------------------------------------------------------------------
-    */
     'pagination' => [
         'per_page' => 20,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Upload Settings
-    |--------------------------------------------------------------------------
-    */
     'uploads' => [
         'path' => 'agency',
         'national_id_path' => 'nationalId',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Notifications
-    |--------------------------------------------------------------------------
-    */
     'notifications' => [
         'enabled' => true,
         'channels' => ['database', 'fcm'],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Agency Feature Flag
-    |--------------------------------------------------------------------------
-    */
     'feature_key' => 'agencies',
 
-    /*
-    |--------------------------------------------------------------------------
-    | External Models Configuration
-    |--------------------------------------------------------------------------
-    | Configure external model classes used by this package.
-    | This allows the package to be independent of the main application.
-    | Override these in your published config to use custom models.
-    */
     'models' => [
         'user' => \App\Models\User::class,
         'admin' => \App\Models\Admin::class,
@@ -165,43 +96,20 @@ return [
         'language' => \App\Models\Language::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | External Helpers Configuration
-    |--------------------------------------------------------------------------
-    */
     'helpers' => [
         'common' => \App\Helpers\Common::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | External Controllers Configuration
-    |--------------------------------------------------------------------------
-    */
     'controllers' => [
         'main_controller' => \App\Admin\Controllers\MainController::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | External Traits Configuration
-    |--------------------------------------------------------------------------
-    | Note: Traits cannot be configured at runtime, but this documents
-    | which traits are required from the main application.
-    */
     'required_traits' => [
         \App\Traits\CreatedByTrait::class,
         \App\Traits\PaymentGetWayTrait::class,
         \App\Traits\TimestampsWithTimezone::class,
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | External Modules Configuration
-    |--------------------------------------------------------------------------
-    | Optional modules that enhance functionality when available.
-    */
     'modules' => [
         'salary_transaction' => [
             'enabled' => true,

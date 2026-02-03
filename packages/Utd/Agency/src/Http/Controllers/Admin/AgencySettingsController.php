@@ -31,12 +31,6 @@ class AgencySettingsController extends MainController
 
         $tab = request('firsttab');
 
-        // $hours =  settings()->get('hours');
-        // $days =  settings()->get('days');
-        // $Moments =  settings()->get('Moments');
-        // $reels = settings()->get('reels');
-        // $diamonds = settings()->get('diamonds');
-
         $hours =  AgencyHelper::getSettingValue('hours') ?? 0;
         $days =  AgencyHelper::getSettingValue('days') ?? 0;
         $moments =  AgencyHelper::getSettingValue('Moments') ?? 0;
@@ -127,7 +121,6 @@ class AgencySettingsController extends MainController
         $suffixes = ['badge', 'intro', 'frame'];
         $configNames = [];
 
-        // Collect all config names needed (localized and English fallback)
         foreach ($types as $type => $id) {
             foreach ($suffixes as $suffix) {
                 $localizedName = $suffix === 'badge' ? "{$lang}_{$type}" : "{$lang}_{$type}_{$suffix}";
@@ -138,10 +131,8 @@ class AgencySettingsController extends MainController
             }
         }
 
-        // Fetch all needed configs in a single query
         $configs = Config::whereIn('name', $configNames)->pluck('value', 'name');
 
-        // Build the final response data
         $data = [];
         foreach ($types as $type => $id) {
             $images = [];

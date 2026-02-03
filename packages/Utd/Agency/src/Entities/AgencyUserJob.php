@@ -109,11 +109,7 @@ class AgencyUserJob extends Model
     {
         return $this->type === self::TYPE_OPERATOR;
     }
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo($this->getModelClass('user'), 'user_id');
-    }
+ 
 
     /**
      * Scope by type
@@ -123,35 +119,4 @@ class AgencyUserJob extends Model
         return $query->where('type', $type);
     }
 
-    /**
-     * Scope for admins
-     */
-    public function scopeAdmins($query)
-    {
-        return $query->where('type', self::TYPE_REQUEST_MANAGER);
-    }
-
-    /**
-     * Scope for operators
-     */
-    public function scopeOperators($query)
-    {
-        return $query->where('type', self::TYPE_OPERATOR);
-    }
-
-    /**
-     * Check if is admin
-     */
-    public function isAdmin(): bool
-    {
-        return $this->type == self::TYPE_REQUEST_MANAGER;
-    }
-
-    /**
-     * Check if is operator
-     */
-    public function isOperator(): bool
-    {
-        return $this->type == self::TYPE_OPERATOR;
-    }
 }

@@ -11,11 +11,6 @@ use Utd\Agency\Http\Controllers\Api\V2\Dashboard\AgencyHostInviteController;
 use Utd\Agency\Http\Controllers\Shipping\Admin\PaymentGetWayController;
 use Utd\Agency\Http\Controllers\Api\AgencyAppController;
 use Utd\Agency\Http\Controllers\Api\V2\AgencyAppController as ApiAgencyAppController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-*/
 
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeatureEnable:agencies', 'update.last.seen'])
     ->prefix('agencies')
@@ -47,10 +42,8 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
         Route::post('history-data-agency', [ApiAgencyAppController::class, 'historyDataAgency']);
         Route::post('kick-of-agency', [ApiAgencyAppController::class, 'kick_of_agency']);
         Route::post('/filter', [ApiAgencyAppController::class, 'agency_filter']);
-        Route::post('host-reports', [ApiAgencyAppController::class, 'dailyReport']);//host center
-    
+        Route::post('host-reports', [ApiAgencyAppController::class, 'dailyReport']);
 
-        //dashboard
         Route::get('agency-data', [ApiAgencyAppController::class, 'agency_data']);
         Route::get('host-report/{id}', [ApiAgencyAppController::class, 'host_report']);
         Route::post('host-daily-report', [ApiAgencyAppController::class, 'host_daily_report']);
