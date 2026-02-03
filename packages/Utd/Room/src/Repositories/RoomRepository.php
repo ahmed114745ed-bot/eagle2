@@ -722,7 +722,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     /**
      * Delete room by ID
      */
-    public function delete($id)
+    public function delete(int $id): bool
     {
         return $this->model->where('id', $id)->delete();
     }
