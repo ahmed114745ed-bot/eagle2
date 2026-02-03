@@ -19,8 +19,18 @@ class Users extends Selectable
         // When creating: show users that don't have any percentage assignment.
         // When editing (request has id): show users that either don't have a percentage
         // or already belong to the PercentageGame being edited so they remain selectable.
-        if (request('id')) {
-            $percentageId = request('id');
+        // Try several places for the PercentageGame id: request input, route params, or URL.
+        $percentageId = request('id') ?? request()->route('percentage_game') ?? request()->route('percentage-game');
+        if (!$percentageId) {
+            $segments = request()->segments();
+            $idx = array_search('percentage-games', $segments, true);
+            if ($idx !== false && isset($segments[$idx + 1])) {
+                $percentageId = $segments[$idx + 1];
+            }
+        }
+
+        if ($percentageId) {
+            $percentageId = intval($percentageId);
             $this->grid->model()->with('profile')->where(function ($q) use ($percentageId) {
                 $q->doesntHave('gamePercentage')
                     ->orWhereHas('gamePercentage', function ($q2) use ($percentageId) {
