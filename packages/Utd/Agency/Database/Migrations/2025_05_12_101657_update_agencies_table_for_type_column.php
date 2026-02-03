@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('agencies') || Schema::hasColumn('agencies', 'type')) return;
-        Schema::table('agencies', function (Blueprint $table) {
-            // $table->dropColumn('Host_agency');
-            // $table->dropColumn('Shipping_agency');
-            $table->integer('type')->comment('1 = Host Agency, 2 = Shipping');
-        });
+        if (!Schema::hasTable('agencies')) return;
+        if (!Schema::hasColumn('agencies', 'type')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->integer('type')->comment('1 = Host Agency, 2 = Shipping');
+            });
+        }
     }
 
     public function down()

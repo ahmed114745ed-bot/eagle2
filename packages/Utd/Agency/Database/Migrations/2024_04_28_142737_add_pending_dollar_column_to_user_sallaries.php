@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->integer('achieved_diamond')->default(0)->after('diamond');
-            $table->integer('achieved_days')->default(0)->after('achieved_diamond');
-            $table->integer('achieved_hours')->default(0)->after('achieved_days');
-        });
+        if (!Schema::hasColumn('user_sallaries', 'pending_dollar')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->double('pending_dollar')->default(0);
+            });
+        }
     }
 
     /**
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->dropColumn(['achieved_diamond', 'achieved_days', 'achieved_hours']);
+            $table->dropColumn('pending_dollar');
         });
     }
 };

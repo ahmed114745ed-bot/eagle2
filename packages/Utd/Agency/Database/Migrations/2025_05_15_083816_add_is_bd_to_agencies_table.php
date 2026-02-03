@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('agencies') || Schema::hasColumn('agencies', 'bd_id')) return;
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->bigInteger('bd_id')->default(0);     
-        });
+        if (!Schema::hasTable('agencies')) return;
+        if (!Schema::hasColumn('agencies', 'bd_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->bigInteger('bd_id')->default(0);
+            });
+        }
     }
     
     public function down()

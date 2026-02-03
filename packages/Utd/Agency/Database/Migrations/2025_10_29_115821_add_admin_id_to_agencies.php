@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-           $table->double('target_diamonds')->default(0);
-        });
+        if (!Schema::hasColumn('agencies', 'admin_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedBigInteger('admin_id')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->dropColumn('target_diamonds');
+        Schema::table('agencies', function (Blueprint $table) {
+            $table->dropColumn('admin_id');
         });
     }
 };

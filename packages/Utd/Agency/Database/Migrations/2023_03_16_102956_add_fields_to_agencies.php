@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDimondInUserSallaries extends Migration
+class AddFieldsToAgencies extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddDimondInUserSallaries extends Migration
      */
     public function up()
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->string('diamond')->nullable()->default("0 / 0");
-        });
+        if (!Schema::hasColumn('agencies', 'app_owner_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedBigInteger('app_owner_id')->nullable();
+            });
+        }
     }
 
     /**
@@ -25,7 +27,7 @@ class AddDimondInUserSallaries extends Migration
      */
     public function down()
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
+        Schema::table('agencies', function (Blueprint $table) {
             //
         });
     }

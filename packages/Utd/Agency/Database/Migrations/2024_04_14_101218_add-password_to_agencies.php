@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agency_sallaries', function (Blueprint $table) {
-            $table->double('sallary', 15, 2)->default(0)->change();
-        });
+        if (!Schema::hasColumn('agencies', 'password')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->string('password')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('agency_sallaries', function (Blueprint $table) {
-            //
+        Schema::table('agencies', function (Blueprint $table) {
+            $table->dropColumn('password');
         });
     }
 };

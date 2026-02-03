@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-           $table->double('remaining_diamond')->default(0);
-           $table->unsignedBigInteger('target_id')->nullable();
-        });
+        if (!Schema::hasColumn('user_sallaries', 'remaining_diamond')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->double('remaining_diamond')->default(0);
+            });
+        }
+        
+        if (!Schema::hasColumn('user_sallaries', 'target_id')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->unsignedBigInteger('target_id')->nullable();
+            });
+        }
     }
 
     /**

@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('additional_infos') || Schema::hasColumn('additional_infos', 'owner_id')) return;
-        Schema::table('additional_infos', function (Blueprint $table) {
-            $table->foreignId('owner_id')->nullable()->constrained('users')->onDelete('cascade');
-        });
+        if (!Schema::hasTable('additional_infos')) return;
+        if (!Schema::hasColumn('additional_infos', 'owner_id')) {
+            Schema::table('additional_infos', function (Blueprint $table) {
+                $table->foreignId('owner_id')->nullable()->constrained('users')->onDelete('cascade');
+            });
+        }
     }
 
     /**

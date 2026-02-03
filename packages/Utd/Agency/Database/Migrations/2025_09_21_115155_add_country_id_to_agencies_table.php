@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->unsignedBigInteger('admin_id')->nullable();
-        });
+        if (!Schema::hasColumn('agencies', 'country_id')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->unsignedInteger('country_id')->nullable();
+                $table->foreign('country_id')->references('id')->on('countries')->cascadeOnDelete()->cascadeOnUpdate();
+            });
+        }
     }
 
     /**
@@ -22,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn('admin_id');
+            //
         });
     }
 };

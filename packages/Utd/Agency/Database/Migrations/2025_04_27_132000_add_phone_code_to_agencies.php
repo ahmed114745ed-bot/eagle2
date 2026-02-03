@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->unsignedBigInteger('coins')->change();
-        });
+        if (!Schema::hasColumn('agencies', 'phone_code')) {
+            Schema::table('agencies', function (Blueprint $table) {
+                $table->string('phone_code')->nullable();
+            });
+        }
     }
 
     /**
@@ -22,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            //
+            $table->dropColumn('phone_code');
         });
     }
 };

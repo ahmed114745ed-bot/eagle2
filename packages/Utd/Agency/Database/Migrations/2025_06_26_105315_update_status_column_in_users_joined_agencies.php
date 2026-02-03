@@ -13,10 +13,12 @@ return new class extends Migration
     {
         if (!Schema::hasTable('users_joined_agencies')) return;
         
-        Schema::table('users_joined_agencies', function (Blueprint $table) {
-            // Check if column exists and change it to text if it's not already
-            $table->text('status')->nullable()->change();
-        });
+        if (Schema::hasColumn('users_joined_agencies', 'status')) {
+            Schema::table('users_joined_agencies', function (Blueprint $table) {
+                // Check if column exists and change it to text if it's not already
+                $table->text('status')->nullable()->change();
+            });
+        }
     }
 
     /**

@@ -11,29 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('user_sallaries')) return;
-        
-        if (!Schema::hasColumn('user_sallaries', 'dB')) {
+        if (Schema::hasColumn('user_sallaries', 'achieved_diamond')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
-                $table->double('dB')->nullable();
+                $table->unsignedBigInteger('achieved_diamond')->default(0)->change();
             });
         }
         
-        if (!Schema::hasColumn('user_sallaries', 'app_profit')) {
+        if (Schema::hasColumn('user_sallaries', 'remaining_diamond')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
-                $table->double('app_profit')->nullable();
+                $table->unsignedBigInteger('remaining_diamond')->default(0)->change();
             });
         }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('user_sallaries', function (Blueprint $table) {
-           $table->dropColumn('app_profit');
-           $table->dropColumn('dB');
+            $table->integer('achieved_diamond')->change();
+            $table->integer('remaining_diamond')->change();
         });
     }
 };

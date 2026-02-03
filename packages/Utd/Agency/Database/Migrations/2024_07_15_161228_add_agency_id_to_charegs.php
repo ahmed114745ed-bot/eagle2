@@ -12,12 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('charges')) return;
-        Schema::table('charges', function (Blueprint $table) {
-            $table->unsignedInteger('user_id')->nullable()->change();
-            if (!Schema::hasColumn('charges', 'agency_id')) {
+        
+        if (Schema::hasColumn('charges', 'user_id')) {
+            Schema::table('charges', function (Blueprint $table) {
+                $table->unsignedInteger('user_id')->nullable()->change();
+            });
+        }
+        
+        if (!Schema::hasColumn('charges', 'agency_id')) {
+            Schema::table('charges', function (Blueprint $table) {
                 $table->integer('agency_id')->nullable();
-            }
-        });
+            });
+        }
     }
 
     /**

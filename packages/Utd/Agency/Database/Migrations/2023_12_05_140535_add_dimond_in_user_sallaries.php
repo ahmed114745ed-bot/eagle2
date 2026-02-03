@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddWhatsappToAgencyRequests extends Migration
+class AddDimondInUserSallaries extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddWhatsappToAgencyRequests extends Migration
      */
     public function up()
     {
-        Schema::table('agency_join_requests', function (Blueprint $table) {
-            $table->string ('whatsapp')->nullable ();
-        });
+        if (!Schema::hasColumn('user_sallaries', 'diamond')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
+                $table->string('diamond')->nullable()->default("0 / 0");
+            });
+        }
     }
 
     /**
@@ -25,7 +27,7 @@ class AddWhatsappToAgencyRequests extends Migration
      */
     public function down()
     {
-        Schema::table('agency_join_requests', function (Blueprint $table) {
+        Schema::table('user_sallaries', function (Blueprint $table) {
             //
         });
     }

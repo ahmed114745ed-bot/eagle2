@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddUsdToAgencies extends Migration
+class AddWhatsappToAgencyRequests extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class AddUsdToAgencies extends Migration
      */
     public function up()
     {
-        Schema::table('agencies', function (Blueprint $table) {
-            $table->double ('old_usd')->nullable ();
-            $table->double ('target_usd')->nullable ();
-            $table->double ('target_token_usd')->nullable ();
-        });
+        if (!Schema::hasColumn('agency_join_requests', 'whatsapp')) {
+            Schema::table('agency_join_requests', function (Blueprint $table) {
+                $table->string('whatsapp')->nullable();
+            });
+        }
     }
 
     /**
@@ -27,7 +27,7 @@ class AddUsdToAgencies extends Migration
      */
     public function down()
     {
-        Schema::table('agencies', function (Blueprint $table) {
+        Schema::table('agency_join_requests', function (Blueprint $table) {
             //
         });
     }

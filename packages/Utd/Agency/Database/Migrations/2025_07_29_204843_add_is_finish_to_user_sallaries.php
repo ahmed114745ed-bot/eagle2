@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('user_sallaries', function (Blueprint $table) {
-            if (!Schema::hasColumn('user_sallaries', 'is_finished')) {
+        if (!Schema::hasColumn('user_sallaries', 'is_finished')) {
+            Schema::table('user_sallaries', function (Blueprint $table) {
                 $table->boolean('is_finished')->default(0);
-            }
-        });
+            });
+        }
     }
 
     /**
