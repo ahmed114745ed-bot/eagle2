@@ -54,12 +54,12 @@ Broadcast::channel('presence.user.{id}', function ($user, $id) {
         : false;
 });
 
-Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
-    return [
-        'id'   => $user->id,
-       // 'name' => $user->name,
-    ];
-});
+//Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
+//    return [
+//        'id'   => $user->id,
+//       // 'name' => $user->name,
+//    ];
+//});
 
 Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
     $chatRoomService = app(ChatRoomService::class);
