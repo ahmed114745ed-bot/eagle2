@@ -1623,7 +1623,7 @@
     "transfer_title": "Transfer",
     "transfer_description": "Transferred :amount coins",
     "withdrawal_pending": "Withdrawal request under review :amount",
-    "withdraw_to_shipping_agency": "Withdraw to Shipping Agency",
+    "withdraw_to_shipping_agency": "Transfer to Shipping Agency",
     "subtract_title": "Withdraw",
     "subtract_description": "Withdrawn :amount coins from your wallet",
 
@@ -1715,7 +1715,8 @@
     "moment_viewer.refresh": "Refresh",
     "moment_viewer.loadMore": "Load More",
     "share_room_message": "Hello, come and join me in this room, it's really fun",
-    "withdrawal_request_created": "Withdrawal request created successfully. Status: pending."
+    "withdrawal_request_created": "Withdrawal request created successfully. Status: pending.",
+    "withdrawn": "The withdrawal request has been approved via"
 }
 
 

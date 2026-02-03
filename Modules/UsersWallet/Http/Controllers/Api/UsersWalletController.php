@@ -2,14 +2,15 @@
 
 namespace Modules\UsersWallet\Http\Controllers\Api;
 
-use App\Helpers\ShippingAgencyHelper;
-use App\Models\ShippingAgency;
 use App\Models\User;
+use App\Models\Charge;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
+use App\Models\ShippingAgency;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Helpers\ShippingAgencyHelper;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Support\Renderable;
 use Modules\UsersWallet\Helpers\WalletHelper;
@@ -67,11 +68,11 @@ class UsersWalletController extends Controller
 
         $from = $request->user();
         $to = User::find($request->user_id);
-        
+
         if (!$to) {
             return Common::apiResponse(0, __('api_responses.user_not_found'), 404);
         }
-        
+
         if ($from->transfer_salary == 1)  return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
 
 
@@ -84,13 +85,13 @@ class UsersWalletController extends Controller
         if (!$rate) return Common::apiResponse(0, __('please set usd_value_in_coins in configs'), 422);
         $usd = $request->amount;
         $coins = $usd * $rate;
-        return $this->handleRequest(function () use ($request, $coins,$usd) {
+        return $this->handleRequest(function () use ($request, $coins, $usd) {
             $from = $request->user();
             $result = $this->walletService->transfer(
                 Auth::id(),
                 $request->user_id,
                 $coins,
-                $usd 
+                $usd
             );
 
 
@@ -130,7 +131,7 @@ class UsersWalletController extends Controller
 
 
 
-     public function agencyRequestWithdrawal(Request $request)
+    public function agencyRequestWithdrawal(Request $request)
     {
         $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
         if ($stop_all_charge == 1) {
@@ -170,11 +171,11 @@ class UsersWalletController extends Controller
         if (!$rate) {
             return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
         }
-        
+
         $coins = $usd * $rate;
-        
+
         $available = wallet_available_by_user($from->id);
-        
+
         if ($available < $usd) {
             return Common::apiResponse(0, 'balance not enough', 407);
         }
@@ -209,7 +210,7 @@ class UsersWalletController extends Controller
 
         $wallet->cut_amount += $usd;
         $wallet->save();
-     
+
         $toAgency->increment('coins', $coins);
 
         \Modules\UsersWallet\Entities\WalletLog::create([
@@ -224,5 +225,17 @@ class UsersWalletController extends Controller
         ]);
 
 
+        $data = [
+            'charger_id' => $fromUser->id,
+            'charger_type' => $chargeType,
+            'user_id' => $toAgency->id,
+            'agency_id' => null,
+            'user_type' => 'agency',
+            'amount' => $coins,
+            'amount_type' => 2,
+            'usd' => $usd ?? 0,
+            'is_used_transferred' => false,
+        ];
+        Charge::create($data);
     }
 }

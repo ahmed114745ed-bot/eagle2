@@ -365,7 +365,7 @@ protected function detail($id)
             'type' => 'user',
             'before_amount' => $available ,
             'after_amount' => $after_amount,
-           'related_id' => $withdrawal->id
+           'related_id' => Auth::id()
 
         ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
@@ -400,12 +400,12 @@ protected function detail($id)
             $walletLog->update([
                 'wallet_id' => $wallet->id,
                 'user_id' => $withdrawal->user->id,
-                'amount' => $withdrawal->amount,
+                'amount' => -$withdrawal->amount,
                 'operation' => 'rejected',
                 'type' => 'user',
                 'before_amount' => $available,
                 'after_amount' => $after_amount,
-                'related_id' => $withdrawal->id
+                'related_id' => Auth::id()
             ]);
         } catch (\Exception $e) {
             \Log::error('Failed to update WalletLog', [

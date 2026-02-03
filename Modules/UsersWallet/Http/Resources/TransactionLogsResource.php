@@ -34,7 +34,7 @@ class TransactionLogsResource extends JsonResource
                 if ($this->amount > 0) {
                     $title = __('transfer_to', ['target' => $this->related ? $this->related->name : '']);
                 } else {
-                    $title = __('transfer_from', ['target' => $this->related ? $this->related->name : '']);
+                    $title = __('transfer_to', ['target' => $this->related ? $this->related->name : '']);
                 }
                 break;
 
