@@ -1446,3 +1446,6 @@ Route::get('/fix-room-morph', function () {
         'rows_updated' => $updated,
     ]);
 });
+
+// Include cache clearing routes
+require __DIR__ . '/cache-clear.php';

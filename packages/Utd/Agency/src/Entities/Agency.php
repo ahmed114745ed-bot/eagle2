@@ -11,15 +11,39 @@ use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Utd\Agency\Traits\AgencyAdditionalInfoTrait;
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
+if (trait_exists('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait')) {
+    class_alias('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait', 'AgencyAdditionalInfoTraitAlias');
+}
+
 class Agency extends Model
 {
-    use AgencyAdditionalInfoTrait, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    use DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    
+    // Conditionally use AgencyAdditionalInfoTrait if it exists
+    public function __construct(array $attributes = [])
+    {
+        if (trait_exists('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait')) {
+            $this->initializeTraits();
+        }
+        parent::__construct($attributes);
+    }
+    
+    /**
+     * Additional Info relationship (from AgencyAdditionalInfoTrait)
+     */
+    public function additionalInfo()
+    {
+        if (class_exists('Utd\\Agency\\Entities\\AdditionalInfo')) {
+            $additionalInfoClass = \Utd\Agency\Entities\AdditionalInfo::class;
+            return $this->hasOne($additionalInfoClass, 'agency_id');
+        }
+        return $this->hasOne(self::class, 'agency_id')->whereRaw('1 = 0');
+    }
 
     protected $guarded = [];
 
