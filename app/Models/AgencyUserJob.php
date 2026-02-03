@@ -2,22 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Model;
+use Utd\Agency\Helpers\AgencyModelsHelper;
 
-class AgencyUserJob extends Model
-{
-    use TimestampsWithTimezone;
-
-    protected $guarded = [];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function agency()
-    {
-        return $this->belongsTo(Agency::class);
-    }
+if ($agencyUserJobClass = AgencyModelsHelper::getAgencyUserJobClass()) {
+    class_alias($agencyUserJobClass, __NAMESPACE__ . '\AgencyUserJob');
 }

@@ -20,6 +20,10 @@ class SalaryTrx extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'oid');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'oid')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'oid');
     }
 }

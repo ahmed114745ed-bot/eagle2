@@ -2,13 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Utd\Agency\Helpers\AgencyModelsHelper;
 
-class AgencyMangerDeleted extends Model
-{
-    use HasFactory, TimestampsWithTimezone;
-
-    protected $guarded = [];
+if ($agencymangerdeletedClass = AgencyModelsHelper::getAgencyMangerDeletedClass()) {
+    class_alias($agencymangerdeletedClass, __NAMESPACE__ . '\AgencyMangerDeleted');
 }
