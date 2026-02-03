@@ -15,10 +15,23 @@ class MyDataForAgencyNewResource extends JsonResource
         $this->type = $type;
     }
 
-    public static function collection($resources, $type = 'default')
+    /**
+     * Create a new resource collection with type.
+     * This overrides the default collection method to support the type parameter
+     */
+    public static function collection($resource, $type = 'default')
     {
-        return $resources->map(function ($resource) use ($type) {
-            return new static($resource, $type);
+        // If it's a Laravel paginator, transform its items
+        if (method_exists($resource, 'items')) {
+            $items = collect($resource->items())->map(function ($item) use ($type) {
+                return new static($item, $type);
+            });
+            return $items;
+        }
+        
+        // Otherwise treat as regular collection
+        return collect($resource)->map(function ($item) use ($type) {
+            return new static($item, $type);
         });
     }
 

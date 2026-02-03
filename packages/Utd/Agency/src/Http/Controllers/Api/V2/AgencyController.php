@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\AgencyUserJob;
 use PHPUnit\Framework\Exception;
 use App\Models\AgencyJoinRequest;
-use App\Tik\Services\AgencyService;
+use Utd\Agency\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
 use Utd\Agency\Http\Resources\AdminsAgencyResource;
@@ -170,7 +170,7 @@ class AgencyController extends Controller
             return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
 
-        return AgencyHelper::apiResponse(1, '', MyDataForAgancyResource::collection($members), 200, AgencyHelper::getPaginates($members));
+        return AgencyHelper::apiResponse(1, '', MyDataForAgencyNewResource::collection($members), 200, AgencyHelper::getPaginates($members));
     }
 
     public function show_request(Request $request)
@@ -181,9 +181,9 @@ class AgencyController extends Controller
             $requestList = $this->agencyService->showRequests($userId);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '', MyDataForAgancyResource::collection($requestList));
+        return AgencyHelper::apiResponse(1, '', MyDataForAgencyNewResource::collection($requestList));
     }
 
     public function Accept_request(Request $request)
@@ -191,19 +191,19 @@ class AgencyController extends Controller
         $accept    = $request->accept;
         $owner     = $request->user();
         if (!$request->user_id || !isset($request->accept)) {
-            return Common::apiResponse(0, 'missing params');
+            return AgencyHelper::apiResponse(0, 'missing params');
         }
         try {
             $this->agencyService->requestAction($owner, $request);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
         if ($accept === 0 || $accept === false) {
 
-            return Common::apiResponse(1, 'joinfalse');
+            return AgencyHelper::apiResponse(1, 'joinfalse');
         } elseif ($accept === 1 || $accept === true) {
-            return Common::apiResponse(1, 'joinSacsesAg');
+            return AgencyHelper::apiResponse(1, 'joinSacsesAg');
         }
     }
 
@@ -211,14 +211,14 @@ class AgencyController extends Controller
     {
         $agencyId      = $request->user()->agency_id;
         $monthsToInclude = $this->agencyService->listOption($agencyId);
-        return Common::apiResponse(1, '', $monthsToInclude);
+        return AgencyHelper::apiResponse(1, '', $monthsToInclude);
     }
 
     public function historyAgencySearch(Request $request)
     {
         $agencyId         = $request->user()->agency_id;
         $responseData = $this->agencyService->historySearch($agencyId, $request);
-        return Common::apiResponse(1, '', $responseData);
+        return AgencyHelper::apiResponse(1, '', $responseData);
     }
 
     public function update(Request $request, $id)
@@ -234,10 +234,10 @@ class AgencyController extends Controller
             $agency = $this->agencyService->update($userId, $id, $request);
         } catch (\Exception $e) {
 
-            return Common::apiResponse(0, $e->getMessage(), null, 500);
+            return AgencyHelper::apiResponse(0, $e->getMessage(), null, 500);
         }
 
-        return Common::apiResponse(1, __('api_responses.agency_updated'), new AllDataAgencyResource($agency));
+        return AgencyHelper::apiResponse(1, __('api_responses.agency_updated'), new AllDataAgencyResource($agency));
     }
 
     public function make_user_handling_requests(Request $request)
@@ -245,11 +245,11 @@ class AgencyController extends Controller
         $user = $request->user();
         $type = $request->type ?? null;
         $agency = $user->ownAgency;
-        if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
+        if (!$user->ownAgency)   return AgencyHelper::apiResponse(0, 'لا يوجد وكاله!', []);
 
         $mass =  $this->agencyService->userHandlingRequest($request->user_id, $agency->id, $type);
 
-        return Common::apiResponse(1, $mass, []);
+        return AgencyHelper::apiResponse(1, $mass, []);
     }
 
     public function showAgencyRequest(Request $request)
@@ -265,23 +265,31 @@ class AgencyController extends Controller
         }
 
         if (!$agency) {
-            return Common::apiResponse(0, __('api_responses.notAdmin'));
+            return AgencyHelper::apiResponse(0, __('api_responses.notAdmin'));
         }
+        
         $agency_id = $agency->id;
-        $list_req = AgencyJoinRequest::where('agency_id', $agency_id);
 
-        if ($type == "application") {
-            $list_req1 = $list_req->where('status', 0)->with('user')->paginate(10);
-            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
-        } elseif ($type == "record") {
-            $list_req1 = $list_req->where('status', '!=', 0)->with('user', 'admin')->paginate(10);
-            $list_req = MyDataForAgencyNewResource::collection($list_req1, 'record');
+        try {
+            if ($type == "application") {
+                // Get pending requests (status = 0)
+                $list_req = $this->agencyService->getAgencyJoinRequests($agency_id, 0, true, 10);
+                $formatted = MyDataForAgencyNewResource::collection($list_req, 'application');
+            } elseif ($type == "record") {
+                // Get accepted and rejected requests (status != 0)
+                $allRequests = $this->agencyService->getAgencyJoinRequests($agency_id, null, false);
+                $filteredRequests = $allRequests->filter(function($item) {
+                    return $item->status != 0;
+                });
+                $formatted = MyDataForAgencyNewResource::collection($filteredRequests, 'record');
+            } else {
+                return AgencyHelper::apiResponse(0, 'Invalid type parameter', []);
+            }
+            
+            return AgencyHelper::apiResponse(1, '', $formatted, 200);
+        } catch (\Exception $exception) {
+            return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
-
-        if ($list_req) {
-            return Common::apiResponse(1, '', $list_req, 200);
-        }
-        return Common::apiResponse(0, 'لا يوجد بيانات', []);
     }
 
     public function agenciesCharge(Request $request)
@@ -290,9 +298,9 @@ class AgencyController extends Controller
             $agencies = $this->agencyService->allAgencyCharged($request->agency_id);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '',  AllDataAgencyResource::collection($agencies));
+        return AgencyHelper::apiResponse(1, '',  AllDataAgencyResource::collection($agencies));
     }
 
     public function gitOldAgencies(Request $request)
@@ -302,8 +310,8 @@ class AgencyController extends Controller
             $agency = $this->agencyService->gitOldAgencies($userId);
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return AgencyHelper::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return Common::apiResponse(1, '', JoinedAgencyResource::collection($agency));
+        return AgencyHelper::apiResponse(1, '', JoinedAgencyResource::collection($agency));
     }
 }
