@@ -3119,7 +3119,7 @@
 "Edit wallet fields": "Edit bidang dompet",
 "Show wallet fields": "Tampilkan bidang dompet",
 "withdrawn": "Permintaan penarikan telah disetujui",
-"withdraw_to_shipping_agency": "Transfer ke Agen Pengiriman",
+"withdraw_to_shipping_agency": "Transfer ke agen pengiriman :name",
 "accounts number": "Jumlah akun"
 
 

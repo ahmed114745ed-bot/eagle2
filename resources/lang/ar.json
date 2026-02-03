@@ -4934,7 +4934,7 @@
     "User Withdrawal": "سحب المستخدم",
     "withdrawal pending": "طلب السحب قيد المراجعة",
     "withdrawal rejected": "تم رفض طلب السحب",
-    "withdraw_to_shipping_agency": "تحويل إلى وكالة شحن",
+    "withdraw_to_shipping_agency": "تحويل إلى شركة الشحن :name",
     "role_user": "المستخدم",
     "role_bd": "مدير BD",
     "role_agency_manager": "مدير الوكالة",

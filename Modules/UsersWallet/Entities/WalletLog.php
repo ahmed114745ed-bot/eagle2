@@ -2,9 +2,10 @@
 
 namespace Modules\UsersWallet\Entities;
 
+use App\Models\User;
 use App\Models\Admin;
 use App\Models\Target;
-use App\Models\User;
+use App\Models\ShippingAgency;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -42,5 +43,10 @@ class WalletLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function shippingAgency()
+    {
+        return $this->belongsTo(ShippingAgency::class, 'related_id');
     }
 }
