@@ -87,7 +87,11 @@ class Charge extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'agency_id')
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'agency_id')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'agency_id')
             ->withoutGlobalScope(HostAgencyScope::class);
     }
 
@@ -98,7 +102,11 @@ class Charge extends Model
 
     public function receiverage()
     {
-        return $this->belongsTo(Agency::class, 'agency_id')
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'agency_id')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'agency_id')
             ->withoutGlobalScope(HostAgencyScope::class);
     }
 
@@ -113,7 +121,11 @@ class Charge extends Model
 
     public function receiveragency()
     {
-        return $this->belongsTo(Agency::class, 'user_id')
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'user_id')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'user_id')
             ->withoutGlobalScope(HostAgencyScope::class);
     }
 
@@ -147,7 +159,11 @@ class Charge extends Model
 
     public function senderAgency()
     {
-        return $this->belongsTo(Agency::class, 'charger_id');
+        $agencyClass = config('agency-package.models.agency', \App\Models\Agency::class);
+        if (!class_exists($agencyClass)) {
+            return $this->belongsTo(self::class, 'charger_id')->whereRaw('1 = 0');
+        }
+        return $this->belongsTo($agencyClass, 'charger_id');
     }
 
     public function senderShippingAgency()
