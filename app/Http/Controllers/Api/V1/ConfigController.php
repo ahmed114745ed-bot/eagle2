@@ -185,11 +185,11 @@ class ConfigController extends Controller
         Cache::forget('all_configs');
         Cache::flush();
 
-
-//        if (method_exists(Cache::store('octane'), 'flush')) {
-//            Cache::store('octane')->flush();
-//        }
-
+        if (array_key_exists('octane', config('cache.stores'))) {
+            if (method_exists(Cache::store('octane'), 'flush')) {
+                Cache::store('octane')->flush();
+            }
+        }
 
         if ($hasPusherUpdate) {
             $pusherMapping = [
