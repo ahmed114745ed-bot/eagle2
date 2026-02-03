@@ -27,5 +27,13 @@ return[
 'trans_to_'            => 'An amount has been transferred to the target: :target.',
 'charge_to_user'       => 'Balance has been charged to user :name.',
 'request_agencies' => 'Request Agencies',
+    'approve_title' => 'Are you sure you want to approve this withdrawal?',
+    'approve_confirm' => 'Yes',
+    'reject_title' => 'Do you want to reject this withdrawal?',
+    'reject_confirm' => 'Reject',
+    'cancel' => 'Cancel',
+    'success' => 'Action completed successfully!',
+    'error' => 'An error occurred!',
+
 
 ];

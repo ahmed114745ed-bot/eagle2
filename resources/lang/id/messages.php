@@ -22,5 +22,12 @@ return[
 'returnCharge' => 'Apakah Anda yakin ingin mengembalikan koin ke agensi?',
 'request_agencies' => 'Permintaan agensi',
 'cancelCp' => 'Apakah Anda ingin membatalkan hubungan ini?',
+'approve_title'   => 'Apakah Anda yakin ingin menyetujui penarikan ini?',
+    'approve_confirm' => 'Ya',
+    'reject_title'    => 'Apakah Anda ingin menolak permintaan penarikan ini?',
+    'reject_confirm'  => 'Tolak',
+    'cancel'          => 'Batal',
+    'success'         => 'Proses berhasil!',
+    'error'           => 'Terjadi kesalahan saat proses!',
 
 ];
