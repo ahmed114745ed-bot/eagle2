@@ -25,4 +25,12 @@ class BackgroundRepository extends AbstractRepository
     {
         return $this->model->where('enable', 1)->orderBy('id', 'asc')->first();
     }
+
+    /**
+     * Get default background image
+     */
+    public function getDefaultImage()
+    {
+        return \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img ?? null;
+    }
 }

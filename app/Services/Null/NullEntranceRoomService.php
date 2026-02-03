@@ -5,7 +5,7 @@ namespace App\Services\Null;
 use App\Contracts\EnteranceRoomContract;
 use Illuminate\Http\Request;
 
-class NullEnteranceRoomService implements EnteranceRoomContract
+class NullEntranceRoomService implements EnteranceRoomContract
 {
     public function updateRoomCountFromPusher(Request $request)
     {

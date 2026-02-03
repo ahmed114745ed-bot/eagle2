@@ -41,7 +41,6 @@ use App\Observers\FamilyObserver;
 use App\Observers\SettingObserver;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\CustomNotification;
-use Utd\Room\Repositories\RoomRepo;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\URL;
 use App\Observers\FamilyUserObserver;

@@ -21,13 +21,15 @@ use App\Http\Requests\EditRoomRequest;
 use Utd\Room\Entities\RequestBackgroundImage;
 
 use Utd\Room\Repositories\RoomRepoInterface;
+use Utd\Room\Repositories\BackgroundRepository;
+
 use App\Http\Resources\Api\V1\BoxUseResource;
 use App\Http\Services\ProfileRelationsService;
 use App\Http\Resources\Api\V1\MiniUserResource;
 use Utd\Room\Http\Resources\RoomUserResource;
 use Utd\Room\Http\Resources\EnterRoomCollection;
 use App\Http\Services\EnterRoomService;
-use Utd\Room\Services\EnteranceRoomService;
+use Utd\Room\Services\EntranceRoomService;
 use Illuminate\Support\Facades\Validator;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\CP\Entities\CpRoomHistory;
@@ -37,11 +39,13 @@ class EnteranceController extends Controller
 
     protected $repo;
     protected $enteranceRoomService;
+    protected $backgroundRepo;
 
-    public function __construct(RoomRepoInterface $repo, EnteranceRoomService $enteranceRoomService)
+    public function __construct(RoomRepoInterface $repo, EntranceRoomService $enteranceRoomService, BackgroundRepository $backgroundRepo)
     {
         $this->repo = $repo;
         $this->enteranceRoomService = $enteranceRoomService;
+        $this->backgroundRepo = $backgroundRepo;
     }
 
     public function updateRoomCountFromPusher(Request $request)
@@ -334,10 +338,7 @@ class EnteranceController extends Controller
 
     private function setDefaultBackground(): void
     {
-        request()->default_background = \DB::table('backgrounds')
-            ->where('enable', 1)
-            ->orderBy('id')
-            ->value('img');
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
     }
 
     private function handleRoomType(?string $type, $user, Request $request, $roomPass, Room $room): JsonResponse
@@ -469,8 +470,9 @@ class EnteranceController extends Controller
         $duration = $request->minutes ?: 5;
         if (!$uid || !$black_id) return Common::apiResponse(0, 'invalid data', null, 422);
         if (!Common::can_kick($black_id)) return Common::apiResponse(0, 'cant kick this user', null, 403);
-        $black_list = @DB::table('rooms')->where('uid', $uid)->first()->room_black;
-        $room_id = @DB::table('rooms')->where('uid', $uid)->first()->id;
+        $roomInfo = $this->repo->getRoomUserInfoByUid($uid);
+        $black_list = $roomInfo->room_black ?? null;
+        $room_id = $roomInfo->id ?? null;
         if ($black_list == null) {
             $black_list = $black_id . '#' . time() . '#' . ($duration * 60);
         } else {
@@ -489,7 +491,7 @@ class EnteranceController extends Controller
 
             $black_list = implode(',', $list);
         }
-        $result = DB::table('rooms')->where('uid', $uid)->update(['room_black' => $black_list]);
+        $result = $this->repo->updateByUid($uid, ['room_black' => $black_list]);
 
         if ($result) {
             //exit the room

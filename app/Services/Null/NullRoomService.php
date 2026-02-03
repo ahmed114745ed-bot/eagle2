@@ -82,7 +82,7 @@ class NullRoomService implements RoomServiceContract
         return null;
     }
 
-    public function getRoomBackground($room): string
+    public function getRoomBackground($room = null): string
     {
         return '';
     }

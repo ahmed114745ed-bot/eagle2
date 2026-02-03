@@ -31,4 +31,12 @@ class RoomCategoryRepository extends AbstractRepository
             ->select('id', 'name', 'img', 'name_en')
             ->get();
     }
+
+    /**
+     * Get enabled parent categories
+     */
+    public function getEnabledParentCategories()
+    {
+        return \DB::table('room_categories')->where(['pid' => 0, 'enable' => 1])->selectRaw("id,name")->get();
+    }
 }

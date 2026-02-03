@@ -13,7 +13,7 @@ use App\Contracts\AchievementContract;
 use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
 use App\Contracts\RealsContract;
-use App\Services\Null\NullEnteranceRoomService;
+use App\Services\Null\NullEntranceRoomService;
 use App\Services\Null\NullRoomGameService;
 use App\Services\Null\NullRoomService;
 use App\Services\Null\NullRoomRepository;
@@ -74,7 +74,7 @@ class FeatureServiceProvider extends ServiceProvider
         if (!$this->app->bound(EnteranceRoomContract::class)) {
             $this->app->singleton(
                 EnteranceRoomContract::class,
-                NullEnteranceRoomService::class
+                NullEntranceRoomService::class
             );
         }
 

@@ -11,11 +11,12 @@ use Utd\Room\Entities\RoomPrivateMessages;
 use App\Http\Resources\Api\V1\NowRoomResource;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Contracts\RoomRepositoryContract;
+use App\Helpers\CacheHelper;
 
 /**
  * @property Room $model
  */
-class RoomRepository extends AbstractRepository implements RoomRepositoryContract
+class RoomRepository extends AbstractRepository implements RoomRepositoryContract, RoomRepoInterface
 {
     public function __construct()
     {
@@ -686,5 +687,136 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         return RoomResource::collection(
             $query->where('type', 'live')->where('is_afk', 1)->paginate()
         );
+    }
+
+    // ========================================
+    // Methods from RoomRepoInterface
+    // ========================================
+
+    /**
+     * Find room by owner user ID
+     */
+    public function find($id)
+    {
+        return $this->model->where('uid', $id)->first();
+    }
+
+    /**
+     * Find room by owner ID and type
+     */
+    public function findByType($id, $type)
+    {
+        return $this->model->where('uid', $id)->where('type', $type)->first();
+    }
+
+    /**
+     * Save model and clear cache
+     */
+    public function save($model)
+    {
+        CacheHelper::forget('rooms');
+        $model->save();
+        return $model;
+    }
+
+    /**
+     * Delete room by ID
+     */
+    public function delete($id)
+    {
+        return $this->model->where('id', $id)->delete();
+    }
+
+    /**
+     * Get all opening rooms
+     */
+    public function getAllOpening()
+    {
+        return $this->model
+            ->orderBy('top_room', 'DESC')
+            ->where('room_status', 1)
+            ->get();
+    }
+
+    /**
+     * Get all opening room IDs
+     */
+    public function getAllOpeningIds()
+    {
+        return $this->model
+            ->where('room_status', 1)
+            ->pluck('id')
+            ->toArray();
+    }
+
+    // ========================================
+    // DB Query Helper Methods (Issue #10)
+    // ========================================
+
+    /**
+     * Get single column value by uid
+     */
+    public function getValueByUid($uid, $column)
+    {
+        return \DB::table('rooms')->where('uid', $uid)->value($column);
+    }
+
+    /**
+     * Get room data with specific columns by uid
+     */
+    public function getColumnsByUid($uid, $columns)
+    {
+        return \DB::table('rooms')->where('uid', $uid)->select($columns)->first();
+    }
+
+    /**
+     * Update room by uid
+     */
+    public function updateByUid($uid, $data)
+    {
+        return \DB::table('rooms')->where('uid', $uid)->update($data);
+    }
+
+    /**
+     * Get microphone status data
+     */
+    public function getMicrophoneStatusByUid($uid)
+    {
+        return (array)\DB::table('rooms')
+            ->selectRaw("uid,microphone,is_prohibit_sound,room_sound,play_num")
+            ->where('uid', $uid)
+            ->first();
+    }
+
+    /**
+     * Get room mic info
+     */
+    public function getMicInfoByUid($uid)
+    {
+        return (array)\DB::table('rooms')
+            ->where(['uid' => $uid])
+            ->selectRaw('id,room_visitor,room_admin,microphone,free_mic,mode')
+            ->first();
+    }
+
+    /**
+     * Get room user info (admin, speak, judge, sound)
+     */
+    public function getRoomUserInfoByUid($uid)
+    {
+        return \DB::table('rooms')->where('uid', $uid)->select([
+            'room_admin',
+            'room_speak',
+            'room_judge',
+            'room_sound'
+        ])->get()->toArray();
+    }
+
+    /**
+     * Get room black and id by uid
+     */
+    public function getRoomBlackByUid($uid)
+    {
+        return \DB::table('rooms')->where('uid', $uid)->first();
     }
 }

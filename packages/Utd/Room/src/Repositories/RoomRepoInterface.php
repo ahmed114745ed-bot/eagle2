@@ -13,4 +13,13 @@ interface RoomRepoInterface
     public function delete($id);
     public function getAllOpening();
     public function getAllOpeningIds();
+    
+    // DB Query Helper Methods (Issue #10)
+    public function getValueByUid($uid, $column);
+    public function getColumnsByUid($uid, $columns);
+    public function updateByUid($uid, $data);
+    public function getMicrophoneStatusByUid($uid);
+    public function getMicInfoByUid($uid);
+    public function getRoomUserInfoByUid($uid);
+    public function getRoomBlackByUid($uid);
 }

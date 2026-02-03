@@ -47,6 +47,13 @@ class RoomRepoService
         return $this->repository->all($request);
     }
 
+    public function roomDetails($userId)
+    {
+        $room = $this->repository->findRoomUser($userId);
+        if (!$room) throw new \Exception('This user don\'t have room');
+        return $room;
+    }
+
     public function getAllMine($request, $user_id)
     {
         return $this->repository->mine($request, $user_id);

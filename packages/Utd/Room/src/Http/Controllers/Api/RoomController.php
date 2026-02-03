@@ -15,7 +15,6 @@ use App\Models\KickRecord;
 use Utd\Room\Entities\EnteredRoom;
 use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
-use Utd\Room\Services\RoomMainService;
 use Illuminate\Http\JsonResponse;
 use Utd\Room\Classes\RoomComments;
 use App\Jobs\EnterRoomZigoRequest;
@@ -35,6 +34,8 @@ use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\Api\V1\UserResource;
 use Utd\Room\Http\Resources\RoomDetailsResource;
 use Utd\Room\Repositories\RoomRepoInterface;
+use Utd\Room\Repositories\BackgroundRepository;
+use Utd\Room\Repositories\RoomCategoryRepository;
 use App\Http\Resources\Api\V1\BoxUseResource;
 use Utd\Room\Http\Resources\RoomCountriesResource;
 use App\Http\Services\ProfileRelationsService;
@@ -54,16 +55,19 @@ class RoomController extends Controller
 
     protected $repo;
     protected $roomService;
-    protected $roomServiceMain;
+    protected $backgroundRepo;
+    protected $categoryRepo;
 
     public function __construct(
         RoomRepoInterface $repo,
         RoomRepoService $roomService,
-        RoomMainService $roomServiceMain,
+        BackgroundRepository $backgroundRepo,
+        RoomCategoryRepository $categoryRepo,
     ) {
         $this->repo = $repo;
         $this->roomService = $roomService;
-        $this->roomServiceMain = $roomServiceMain;
+        $this->backgroundRepo = $backgroundRepo;
+        $this->categoryRepo = $categoryRepo;
     }
 
     public function sendPrivateComment(Request $request, int $ownerId)
@@ -96,7 +100,7 @@ class RoomController extends Controller
 
     public function index(Request $request)
     {
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
         $rooms = $this->roomService->getAllRooms($request);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
@@ -106,7 +110,7 @@ class RoomController extends Controller
     public function mine(Request $request)
     {
         $user_id = request('user_id') ?? Auth::user()->id;
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
         $rooms = $this->roomService->getAllMine($request, $user_id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
@@ -114,7 +118,7 @@ class RoomController extends Controller
     public function userRoom($id, Request $request)
     {
 
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
         $rooms = $this->roomService->getUserRooms($request, $id);
         return Common::apiResponse(true, '', $rooms, 200);
     }
@@ -124,7 +128,7 @@ class RoomController extends Controller
 
     public function getAllLiveRooms(Request $request)
     {
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
         $rooms = $this->roomService->getAllLiveRooms($request);
         return Common::apiResponse(true, '', $rooms, 200);
     }
@@ -476,7 +480,7 @@ class RoomController extends Controller
             $admin[$k]['is_admin'] = 1;
         }
 
-        $roomVisitor = DB::table('rooms')->where(['uid' => $uid])->value('room_visitor');
+        $roomVisitor = $this->repo->getValueByUid($uid, 'room_visitor');
         $roomVisitor = explode(',', $roomVisitor);
 
         $roomVisitor = array_values(array_diff($roomVisitor, $roomAdmin));
@@ -506,8 +510,7 @@ class RoomController extends Controller
     {
         $uid = $request->owner_id;
         if (!$uid) return Common::apiResponse(0, __('missing owner_id'), null, 422);
-        $room =
-            (array)DB::table('rooms')->selectRaw("uid,microphone,is_prohibit_sound,room_sound,play_num")->where('uid', $uid)->first();
+        $room = $this->repo->getMicrophoneStatusByUid($uid);
         if (!$room) return Common::apiResponse(0, __('room not found'), null, 404);
         $microphone        = explode(',', $room['microphone']);
         $is_prohibit_sound = explode(',', $room['is_prohibit_sound']);
@@ -550,24 +553,23 @@ class RoomController extends Controller
                 //numerical play
                 $ar['is_play'] = $room['play_num'];
                 if ($room['play_num']) {
-                    $ar['price'] =
-                        DB::table('play_num_logs')->where(['uid' => $uid, 'user_id' => $v])->value('price') ?: 0;
+                    $ar['price'] = DB::table('play_num_logs')->where(['uid' => $uid, 'user_id' => $v])->value('price') ?: 0;
                 } else {
                     $ar['price'] = 0;
                 }
                 $ar['is_master'] = $uid == $v ? 1 : 0;
 
                 //countdown time
-                $info = (array)Db::table('time_logs')->selectRaw('created_at,time')->where([
-                    'uid'  => $uid,
-                    'muid' => $v
+                $info = (array)DB::table('time_logs')->selectRaw('created_at,time')->where([
+                    'uid' => $uid,
+                    'user_id' => $v
                 ])->orderByRaw('id desc')->limit(1)->first();
                 if (!empty($info) && $info['time'] && $info['created_at']) {
                     $endTime          = ($info['time'] + $info['created_at']);
                     $remainTime       = ($endTime - time());
                     $ar['remainTime'] = $remainTime <= 0 ? 0 : (string)$remainTime;
                     if ($ar['remainTime'] <= 0) {
-                        Db::table('time_log')->where(['uid' => $uid, 'muid' => $v])->delete();
+                        DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $v])->delete();
                     }
                     //if ($v == '1100001'){
                     //}
@@ -581,10 +583,10 @@ class RoomController extends Controller
             $mic[]          = $ar;
         }
         $wait_user_id      = DB::table('mics')->where([
-            'roomowner_id' => $uid,
-            'type' => 1
-        ])->orderBy('id', 'asc')->limit(1)->value('user_id');
-        $arr['user_id']    = !$wait_user_id ? '' : $wait_user_id;
+            'uid' => $uid,
+            'room_id' => $uid
+        ])->pluck('user_id')->toArray();
+        $arr['user_id']    = !$wait_user_id ? '' : ($wait_user_id[0] ?? '');
         $arr['microphone'] = $mic;
         return Common::apiResponse(1, '', $arr);
     }
@@ -595,8 +597,7 @@ class RoomController extends Controller
         $user_id = $request->user_id;
         $phase   = $request->phase;
         if (!$data['owner_id'] || !$user_id) return Common::apiResponse(0, __('Missing data'), null, 422);
-        $room =
-            (array)DB::table('rooms')->where(['uid' => $data['owner_id']])->selectRaw('id,room_visitor,room_admin,microphone,free_mic,mode')->first();
+        $room = $this->repo->getMicInfoByUid($data['owner_id']);
         if (!$room) return Common::apiResponse(0, __('room does not exist'));
         $vis_arr = !$room['room_visitor'] ? [] : explode(",", $room['room_visitor']);
         if (!in_array($user_id, $vis_arr) && $data['owner_id'] != $user_id) return Common::apiResponse(0, __('The user is not in this room'), null, 403);
@@ -664,7 +665,7 @@ class RoomController extends Controller
             $mic_arr[$position] = $user_id;
         }
         $mic  = implode(',', $mic_arr);
-        $res  = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $mic]);
+        $res  = $this->repo->updateByUid($data['owner_id'], ['microphone' => $mic]);
         $room = Room::query()->where('uid', $data['owner_id'])->first();
         $pk   = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
         if ($pk) {
@@ -672,7 +673,7 @@ class RoomController extends Controller
             $pk->save();
         }
 
-        $user               = (array)DB::table('users')->selectRaw('id,nickname')->find($user_id);
+        $user               = (array)DB::table('users')->select(['id', 'nickname'])->find($user_id);
         $u                  = User::query()->find($user_id);
         $user['avatar']     = @$u->profile->avatar;
         $user_level         = Common::getLevel($user_id, 3);
@@ -846,13 +847,13 @@ class RoomController extends Controller
             return Common::apiResponse(0, __('you dont have permission'), null, 408);
         }
 
-        $microphone = DB::table('rooms')->where('uid', $data['owner_id'])->value('microphone');
+        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
         $microphone = explode(',', $microphone);
         if (@$microphone[$position]) {
             $microphone[$position] = -2;
         }
         $microphone = implode(',', $microphone);
-        $res        = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $microphone]);
+        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
         if (true) {
             $ms   = [
                 'messageContent' => [
@@ -885,13 +886,13 @@ class RoomController extends Controller
         if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
             return Common::apiResponse(0, __('you dont have permission'), null, 408);
         }
-        $microphone = DB::table('rooms')->where('uid', $data['owner_id'])->value('microphone');
+        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
         $microphone = explode(',', $microphone);
         if (@$microphone[$position]) {
             $microphone[$position] = 0;
         }
         $microphone = implode(',', $microphone);
-        $res        = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $microphone]);
+        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
         if (true) {
             $room = Room::query()->where('uid', $data['owner_id'])->first();
             $ms   = [
@@ -926,13 +927,13 @@ class RoomController extends Controller
             return Common::apiResponse(0, __('you dont have permission'), null, 408);
         }
 
-        $microphone = DB::table('rooms')->where('uid', $data['owner_id'])->value('microphone');
+        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
         $microphone = explode(',', $microphone);
         if (@$microphone[$position] == false) {
             $microphone[$position] = -1;
         }
         $microphone = implode(',', $microphone);
-        $res        = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $microphone]);
+        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
         if ($res) {
             $ms   = [
                 'messageContent' => [
@@ -966,13 +967,13 @@ class RoomController extends Controller
         if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
             return Common::apiResponse(0, __('you dont have permission'), null, 408);
         }
-        $microphone = DB::table('rooms')->where('uid', $data['owner_id'])->value('microphone');
+        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
         $microphone = explode(',', $microphone);
         if (@$microphone[$position]) {
             $microphone[$position] = 0;
         }
         $microphone = implode(',', $microphone);
-        $res        = DB::table('rooms')->where('uid', $data['owner_id'])->update(['microphone' => $microphone]);
+        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
         if (true) {
             $room = Room::query()->where('uid', $data['owner_id'])->first();
             $ms   = [
@@ -1002,13 +1003,13 @@ class RoomController extends Controller
         if ($request->user()->id != $uid && !in_array($request->user()->id, $admins)) {
             return Common::apiResponse(0, __('you dont have permission'), null, 408);
         }
-        $sound     = DB::table('rooms')->where('uid', $uid)->value('room_sound');
+        $sound     = $this->repo->getValueByUid($uid, 'room_sound');
         $sound_arr = explode(',', $sound);
         if (in_array($user_id, $sound_arr)) return Common::apiResponse(0, __('The user is already muted, please do not repeat the settings'), null, 444);
 
         array_push($sound_arr, $user_id);
         $str = implode(',', $sound_arr);
-        $res = DB::table('rooms')->where('uid', $uid)->update(['room_sound' => $str]);
+        $res = $this->repo->updateByUid($uid, ['room_sound' => $str]);
         if ($res) {
             $room = Room::query()->where('uid', $uid)->first();
             $ms   = [
@@ -1036,13 +1037,13 @@ class RoomController extends Controller
         if ($request->user()->id != $uid && !in_array($request->user()->id, $admins)) {
             return Common::apiResponse(0, __('you dont have permission'));
         }
-        $sound     = DB::table('rooms')->where('uid', $uid)->value('room_sound');
+        $sound     = $this->repo->getValueByUid($uid, 'room_sound');
         $sound_arr = explode(',', $sound);
         if (!in_array($user_id, $sound_arr)) return Common::apiResponse(0, __('The user is no longer in the ban list, please do not repeat the settings'), null, 444);
         $key = array_search($user_id, $sound_arr);
         unset($sound_arr[$key]);
         $sound = implode(',', $sound_arr);
-        $res   = DB::table('rooms')->where('uid', $uid)->update(['room_sound' => $sound]);
+        $res   = $this->repo->updateByUid($uid, ['room_sound' => $sound]);
         if ($res) {
             $room = Room::query()->where('uid', $uid)->first();
             $ms   = [
@@ -1096,7 +1097,7 @@ class RoomController extends Controller
 
             $black_list = implode(',', $list);
         }
-        $result = DB::table('rooms')->where('uid', $uid)->update(['room_black' => $black_list]);
+        $result = $this->repo->updateByUid($uid, ['room_black' => $black_list]);
 
         if ($result) {
             //exit the room
@@ -1185,7 +1186,7 @@ class RoomController extends Controller
     {
         $uid = $request->owner_id ?: 0;
         if (!$uid) return Common::apiResponse(0, 'invalid data');
-        $result = DB::table('rooms')->where('uid', $uid)->value('room_pass');
+        $result = $this->repo->getValueByUid($uid, 'room_pass');
         if ($result) {
             return Common::apiResponse(1, 'The room has a password, please enter the password', ['is_password' => true]);
         } else {
@@ -1201,12 +1202,7 @@ class RoomController extends Controller
         $user_id = $data['user_id'];
         $my_id   = $request->user()->id;
 
-        $room_info                 = DB::table('rooms')->where('uid', $uid)->select([
-            'room_admin',
-            'room_speak',
-            'room_judge',
-            'room_sound'
-        ])->get()->toArray();
+        $room_info                 = $this->repo->getRoomUserInfoByUid($uid);
         $room_info[0]              = (array)$room_info[0];
         $room_info[0]['user_type'] = 5;
         $roomAdmin                 = explode(',', $room_info[0]['room_admin']);
@@ -1269,8 +1265,8 @@ class RoomController extends Controller
         $result[0]['vip_img']  = $vip_img;
 
         $result[0]['is_time'] = 0;
-        $info                 = Db::table('time_logs')->selectRaw('created_at,time')->where([
-            'uid'     => $uid,
+        $info                 = (array)DB::table('time_logs')->selectRaw('created_at,time')->where([
+            'uid' => $uid,
             'user_id' => $result[0]['id']
         ])->orderByRaw('id desc')->limit(1)->first();
 
@@ -1280,7 +1276,7 @@ class RoomController extends Controller
             $result[0]['is_time'] = $remainTime < 0 ? 0 : 1;
             //delete timer
             if ($remainTime < 0) {
-                Db::table('time_logs')->where(['uid' => $uid, 'user_id' => $result[0]['id']])->delete();
+                DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $result[0]['id']])->delete();
             }
         }
 
@@ -1329,7 +1325,7 @@ class RoomController extends Controller
 
     public function room_type()
     {
-        $data = DB::table('room_categories')->where(['pid' => 0, 'enable' => 1])->selectRaw("id,name")->get();
+        $data = $this->categoryRepo->getEnabledParentCategories();
         return Common::apiResponse(1, '', $data);
     }
 
@@ -1451,13 +1447,13 @@ class RoomController extends Controller
         //        if ($request->user ()->id != $uid){
         //            return Common::apiResponse(0,'not allowed');
         //        }
-        $roomVisitor = DB::table('rooms')->where('uid', $uid)->value('room_visitor');
+        $roomVisitor = $this->repo->getValueByUid($uid, 'room_visitor');
         $room        = Room::query()->where('uid', $uid)->first();
         $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
         if (!in_array($user_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
 
-        $roomSpeak = DB::table('rooms')->where('uid', $uid)->value('room_speak');
+        $roomSpeak = $this->repo->getValueByUid($uid, 'room_speak');
         $spe_arr   = !$roomSpeak ? [] : explode(",", $roomSpeak);
         foreach ($spe_arr as $k => &$v) {
             $arr = explode("#", $v);
@@ -1467,7 +1463,7 @@ class RoomController extends Controller
         $jinyan  = $user_id . "#" . $shic;
         $spe_arr = array_merge($spe_arr, [$jinyan]);
         $str     = implode(",", $spe_arr);
-        $res     = DB::table('rooms')->where(['uid' => $uid])->update(['room_speak' => $str]);
+        $res     = $this->repo->updateByUid($uid, ['room_speak' => $str]);
         if ($res) {
             $ms = [
                 'messageContent' => [
@@ -1492,7 +1488,7 @@ class RoomController extends Controller
 
         $room = Room::query()->where('uid', $uid)->first();
 
-        $roomSpeak = DB::table('rooms')->where('uid', $uid)->value('room_speak');
+        $roomSpeak = $this->repo->getValueByUid($uid, 'room_speak');
         $spe_arr   = !$roomSpeak ? [] : explode(",", $roomSpeak);
         foreach ($spe_arr as $k => &$v) {
             $arr = explode("#", $v);
@@ -1501,7 +1497,7 @@ class RoomController extends Controller
             }
         }
         $str = implode(",", $spe_arr);
-        $res = DB::table('rooms')->where(['uid' => $uid])->update(['room_speak' => $str]);
+        $res = $this->repo->updateByUid($uid, ['room_speak' => $str]);
         if ($res) {
             $ms = [
                 'messageContent' => [
@@ -1799,7 +1795,7 @@ class RoomController extends Controller
 
     public function gameRoom()
     {
-        request()->default_background = \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img;
+        request()->default_background = $this->backgroundRepo->getDefaultImage();
         $game_id = request("game_id");
         $rooms = $this->roomService->getRoomsForGame($game_id);
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
@@ -1936,7 +1932,7 @@ class RoomController extends Controller
     public function roomUserDetails($id)
     {
         try {
-            $room = $this->roomServiceMain->roomDetails($id);
+            $room = $this->roomService->roomDetails($id);
             return   Common::apiResponse(true, 'done', new RoomDetailsResource($room));
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);

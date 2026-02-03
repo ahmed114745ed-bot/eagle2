@@ -559,7 +559,7 @@ class UserRepository extends AbstractRepository
         return $this->model->whereNotNull('game_id')->with(['profile:id,user_id,avatar'])->where('online', 1)->with('nowGame')->paginate(10);
     }
 
-    public function friends($tasks): LengthAwarePaginator
+    public function friends($tasks = null): LengthAwarePaginator
     {
         $user = $this->model->where('id', auth()->id())->firstOrFail();
 

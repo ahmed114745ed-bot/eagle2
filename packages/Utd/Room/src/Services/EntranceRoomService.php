@@ -32,7 +32,7 @@ use Modules\RoomCup\Helpers\RoomCupHelper;
 use Modules\TaskStream\Services\TaskStreamService;
 use App\Contracts\EnteranceRoomContract;
 
-class EnteranceRoomService implements EnteranceRoomContract
+class EntranceRoomService implements EnteranceRoomContract
 {
     protected $roomRepository;
     protected $userRepository;

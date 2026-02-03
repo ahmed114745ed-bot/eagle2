@@ -785,10 +785,8 @@ class RoomController extends \App\Admin\Controllers\MainController
         if (empty($roomIds)) return response()->json([]);
 
         // fetch microphone rows for all requested rooms in one query
-        $micRows = \DB::table('room_microphones')
-            ->whereIn('room_id', $roomIds)
-            ->orderBy('position')
-            ->get(['room_id', 'user_id', 'position']);
+        $micRepo = app(\Utd\Room\Repositories\RoomMicrophoneRepository::class);
+        $micRows = $micRepo->getByRoomIds($roomIds);
 
         $userIds = collect($micRows)->pluck('user_id')->filter()->unique()->values()->all();
 

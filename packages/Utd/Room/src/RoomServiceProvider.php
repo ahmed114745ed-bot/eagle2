@@ -13,9 +13,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Utd\Room\Services\RoomService;
-use Utd\Room\Services\EnteranceRoomService;
+use Utd\Room\Services\EntranceRoomService;
 use Utd\Room\Services\RoomGameServices;
-use Utd\Room\Repositories\RoomRepo;
 use Utd\Room\Repositories\RoomRepoInterface;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Room\Repositories\RoomSalaryRepository;
@@ -35,11 +34,11 @@ class RoomServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../Config/room.php', 'room');
 
-        // Bind the repository interface to the implementation
-        $this->app->bind(RoomRepoInterface::class, RoomRepo::class);
+        // Bind the repository interface to the implementation (RoomRepository now implements both)
+        $this->app->bind(RoomRepoInterface::class, RoomRepository::class);
 
         // Bind EnteranceRoomContract so external code can use it
-        $this->app->singleton(EnteranceRoomContract::class, EnteranceRoomService::class);
+        $this->app->singleton(EnteranceRoomContract::class, EntranceRoomService::class);
 
         // Bind RoomGameContract so external code can use it
         $this->app->singleton(RoomGameContract::class, RoomGameServices::class);

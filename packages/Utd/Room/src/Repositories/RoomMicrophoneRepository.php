@@ -51,4 +51,12 @@ class RoomMicrophoneRepository extends AbstractRepository
             ->where('position', $position)
             ->update(['status' => $status]);
     }
+
+    public function getByRoomIds(array $roomIds, array $columns = ['room_id', 'user_id', 'position'])
+    {
+        return \DB::table('room_microphones')
+            ->whereIn('room_id', $roomIds)
+            ->orderBy('position')
+            ->get($columns);
+    }
 }

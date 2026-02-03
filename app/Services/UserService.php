@@ -308,24 +308,25 @@ class UserService
         return $this->userRepository->getUserWithMedals($user->id);
     }
 
-    public function updateCountryAgencyAndBD($userId, $countryId)
-    {
-        $agency = $this->agencyRepository->findByOwner($userId);
-        if ($agency) {
-            $agency->country_id = $countryId;
-            $agency->save();
-        }
-        $shippingAgency = $this->shippingAgencyRepository->findAgencyByOwnerId($userId);
-        if ($shippingAgency) {
-            $shippingAgency->country_id = $countryId;
-            $shippingAgency->save();
-        }
-        $bd = $this->bdRepository->findByAppUser($userId);
-        if ($bd) {
-            $bd->country_id = $countryId;
-            $bd->save();
-        }
-    }
+//    public function updateCountryAgencyAndBD($userId, $countryId)
+//    {
+//        $agency = $this->agencyRepository->findByOwner($userId);
+//        if ($agency) {
+//            $agency->country_id = $countryId;
+//            $agency->save();
+//        }
+//        $shippingAgency = $this->shippingAgencyRepository->findAgencyByOwnerId($userId);
+//        if ($shippingAgency) {
+//            $shippingAgency->country_id = $countryId;
+//            $shippingAgency->save();
+//        }
+//        $bd = $this->bdRepository->findByAppUser($userId);
+//        if ($bd) {
+//            $bd->country_id = $countryId;
+//            $bd->save();
+//        }
+//    }
+
     public function update_user_multi_images($user, $id, $src)
     {
 
