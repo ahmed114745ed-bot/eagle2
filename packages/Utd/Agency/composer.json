@@ -24,7 +24,11 @@
         "laravel": {
             "providers": [
                 "Utd\\Agency\\AgencyServiceProvider"
-            ]
+            ],
+            "aliases": {
+                "AgencyHelper": "Utd\\Agency\\Facades\\AgencyHelper"
+          
+            }
         }
     },
     "minimum-stability": "stable",
