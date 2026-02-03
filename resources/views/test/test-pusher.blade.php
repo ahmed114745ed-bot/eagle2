@@ -27,8 +27,8 @@
         }
     });
 
-    // Test with a simple private channel first
-    const channel = pusher.subscribe('private-test-channel');
+    // Test with a simple private channel
+    const channel = pusher.subscribe('private-test-private');
 
     channel.bind('pusher:subscription_succeeded', function() {
         console.log("✅ Subscribed successfully with token");
