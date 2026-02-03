@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Utd\Agency\Http\Controllers\Admin\AgencyController;
 use Utd\Agency\Http\Controllers\Admin\PackageController;
 use Utd\Agency\Http\Controllers\Admin\JoinRequestController;
+use Utd\Agency\Http\Controllers\Admin\RecommendationAgencyController;
+use Utd\Agency\Http\Controllers\Admin\RequestAgencyController;
+use Utd\Agency\Http\Controllers\Admin\RequestAgencyFilterationController;
 use Utd\Agency\Http\Controllers\Admin\SalaryController;
 use Utd\Agency\Http\Controllers\Admin\AgencyMangerAgencyesController;
 use Utd\Agency\Http\Controllers\Admin\AgencyMangerUsers;
@@ -95,6 +98,10 @@ Route::group([
             Route::get('/charges', [ChargeController::class, 'index'])->name('charges');
             Route::resource('/ag-req', AgencyJoinRequestController::class);
         });
+
+            Route::resource('request-agencies', RequestAgencyController::class);
+            Route::resource('request-agencies-filteration', RequestAgencyFilterationController::class);
+            Route::resource('recommendation-agencies', RecommendationAgencyController::class);
     }); // End of web-agency-feature group
 });
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Agency\Http\Controllers\Admin;
 
 use Carbon\Carbon;
 use App\Models\User;
