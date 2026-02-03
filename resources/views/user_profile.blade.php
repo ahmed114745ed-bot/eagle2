@@ -2175,14 +2175,33 @@
                                 <th>{{ __('balance yet') }}</th>
                                 <th>{{ __('from date') }}</th>
                                 <th>{{ __('to date') }}</th>
+                                 @if($giftType == 'receiver')
+                               <th>{{ __('created by') }}</th>
+                            @endif
                                 <!-- <th>{{ __('action') }}</th> -->
                             </tr>
                             </thead>
                             @if($usersCoins && $usersCoins->count())
                                 <tbody style="color: rgb(208, 115, 43);">
                                 @foreach($usersCoins as $index => $coin)
+                                @php
+                                $userImageDefault = asset('images/businessman-icon.jpg');
+                               ;
+
+                                $userCharges =  $coin->authUser;
+                                $name = @$userCharges->name ?? '';
+                                $uid = @$userCharges->uuid ?? '';
+                                $id = @$userCharges->id ?? 0;
+
+                                $avatar = @$userCharges->profile->avatar;
+                                $image = getImagePath($avatar) ?? $userImageDefault;
+                                if (!isImageExists($image)) {
+                                    $image = $userImageDefault;
+                                }
+                                 @endphp
                                     <tr>
                                         <td>{{ ($usersCoins->currentPage() - 1) * $usersCoins->perPage() + $index + 1 }}</td>
+                                        
                                         <td>{{ $coin->type }}</td>
                                         <td>{{ @$coin->sub_type ?? 0 }}</td>
                                         <td>{{ @$coin->item_name ?? '' }}</td>
@@ -2208,6 +2227,19 @@
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($coin->from_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
                                         <td>{{ \Carbon\Carbon::parse($coin->to_date)->format('Y-m-d H:i:s') ?? '0' }}</td>
+                                         @if($coin->type === 'transfer')
+                                                <td>
+                                                    <a href="{{ url('admin/users/' . $id) }}" target="_blank"
+                                                    class="d-flex align-items-center text-decoration-none">
+                                                        <img src="{{ $image }}" width="40" height="40"
+                                                            style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
+                                                        <div>
+                                                            <strong style="font-size: 14px;">{{ $name }}</strong><br>
+                                                            <small class="text-muted">UUID: {{ $uid }}</small>
+                                                        </div>
+                                                    </a>
+                                                </td>
+                                            @endif
                                         <td>
                                             <div class="d-flex">
                                                 <!-- <button class="btn btn-danger delete-coins-log-btn" data-id="{{ @$coin->id }}">
