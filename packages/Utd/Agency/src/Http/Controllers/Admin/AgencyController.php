@@ -97,7 +97,7 @@ class AgencyController extends MainController
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
-                ->with(['admins', 'bd', 'owner:id,name,uuid,country_id,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
+                ->with(['admins', 'bd', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'created_by', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
@@ -105,7 +105,7 @@ class AgencyController extends MainController
         if (!$agency) {
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::query()
-                    ->with(['admins', 'owner:id,name,uuid,country_id,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
+                    ->with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
                     ->select('id', 'name', 'app_owner_id', 'created_by', 'phone', 'coins', 'img')
                     ->find($id);
             });
@@ -113,6 +113,34 @@ class AgencyController extends MainController
         
         if (!$agency) {
             abort(404, 'Agency not found.');
+        }
+        
+        // Debug: Print owner information
+        dump([
+            'agency_id' => $agency->id,
+            'app_owner_id' => $agency->app_owner_id,
+            'owner_loaded' => $agency->relationLoaded('owner'),
+            'owner_exists' => $agency->owner ? true : false,
+            'owner_data' => $agency->owner,
+        ]);
+        
+        // Debug: Fetch owner manually without relationship
+        if ($agency->app_owner_id) {
+            $manualOwner = \App\Models\User::where('id', $agency->app_owner_id)
+                ->where('is_host', 1)
+                ->whereNull('deleted_at')
+                ->first();
+            dump([
+                'manual_owner_query' => 'User::where(id, ' . $agency->app_owner_id . ')->where(is_host, 1)->first()',
+                'manual_owner_exists' => $manualOwner ? true : false,
+                'manual_owner_data' => $manualOwner ? [
+                    'id' => $manualOwner->id,
+                    'name' => $manualOwner->name,
+                    'uuid' => $manualOwner->uuid,
+                    'is_host' => $manualOwner->is_host,
+                    'deleted_at' => $manualOwner->deleted_at,
+                ] : null,
+            ]);
         }
         
         $adminUser = DB::table('admin_users')->where('id', $agency->created_by)->first() ?? $agency->owner;
@@ -404,7 +432,7 @@ class AgencyController extends MainController
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
-            ->with(['owner:id,name,uuid,country_id,phone,monthly_diamond_received', 'owner.country', 'owner.packs', 'owner.profile', 'creator', 'country'])
+            ->with(['owner:id,name,uuid,country_id,phone', 'owner.country', 'owner.packs', 'owner.profile', 'creator', 'country'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')

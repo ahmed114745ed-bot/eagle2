@@ -112,7 +112,7 @@ class AppearChargerAgencyController extends MainController
 
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
@@ -506,7 +506,7 @@ class AppearChargerAgencyController extends MainController
         $tab = $request->input('tab', 'charges');
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->findOrFail($id);
         });
