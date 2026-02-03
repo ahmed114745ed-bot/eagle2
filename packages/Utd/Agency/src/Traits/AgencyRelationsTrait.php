@@ -58,6 +58,14 @@ trait AgencyRelationsTrait
     }
 
     /**
+     * Alias for owner relationship
+     */
+    public function appOwner(): BelongsTo
+    {
+        return $this->owner();
+    }
+
+    /**
      * Relationship with agency manager
      */
     public function agencyManger(): BelongsTo
