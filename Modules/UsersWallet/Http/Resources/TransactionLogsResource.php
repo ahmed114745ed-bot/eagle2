@@ -50,7 +50,7 @@ class TransactionLogsResource extends JsonResource
                 break;
 
             case 'withdraw_to_shipping_agency':
-                $title = __('withdraw_to_shipping_agency');
+                $title = __('withdraw_to_shipping_agency',['name' => $this->shippingAgency ? $this->shippingAgency->name : '']);
                 break;
 
             default:
