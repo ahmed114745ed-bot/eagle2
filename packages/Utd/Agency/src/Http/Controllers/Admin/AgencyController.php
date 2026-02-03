@@ -25,8 +25,6 @@ use App\Models\GiftLog;
 use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\Target;
-use Utd\Agency\Entities\UserTarget;
 use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Services\ExternalModelService;
 use Utd\Agency\Entities\UsersJoinedAgency;
@@ -199,17 +197,6 @@ class AgencyController extends MainController
                     ->whereHas('user')
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'join_page');
-                
-                // Debug: Check data
-                dump([
-                    'agency_id' => $id,
-                    'total_requests' => AgencyJoinRequest::where('agency_id', $id)->count(),
-                    'pending_requests' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->count(),
-                    'with_user' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->whereHas('user')->count(),
-                    'requests_data' => $agencyJoinRequests->toArray(),
-                    'user_model' => config('agency-package.models.user'),
-                ]);
-                
                 break;
 
             case 'targets':
@@ -360,8 +347,16 @@ class AgencyController extends MainController
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->sum('agency_sallary') ?? 0;
-        $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
-        $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
+        
+        try {
+            $targetClass = config('agency-package.models.target', \App\Models\Target::class);
+            $minValue = $targetClass::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
+            $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
+        } catch (\Exception $e) {
+            // Column might not exist or table might be missing
+            $rate = 0;
+        }
+        
         return [$agencyTarget, $rate];
     }
 
@@ -1030,7 +1025,8 @@ class AgencyController extends MainController
 
     public function targetGrid($id)
     {
-        $grid = new Grid(new UserTarget);
+        $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
+        $grid = new Grid(new $userTargetClass);
         $grid->model()->where('agency_obtain', '>', 0);
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();

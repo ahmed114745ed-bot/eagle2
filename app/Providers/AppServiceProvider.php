@@ -345,8 +345,23 @@ class AppServiceProvider extends ServiceProvider
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);
         Pk::observe(PKObserver::class);
-        Agency::observe(AgencyObserver::class);
-        AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
+        
+        // Agency observers - only if package is loaded
+        if (class_exists(Agency::class) && class_exists(AgencyObserver::class)) {
+            try {
+                Agency::observe(AgencyObserver::class);
+            } catch (\Exception $e) {
+                // Package not fully loaded yet
+            }
+        }
+        if (class_exists(AgencyJoinRequest::class) && class_exists(AgencyJoinRequestObserver::class)) {
+            try {
+                AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
+            } catch (\Exception $e) {
+                // Package not fully loaded yet
+            }
+        }
+        
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
         Setting::observe(SettingObserver::class);
