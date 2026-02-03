@@ -88,7 +88,7 @@ class RequestAgencyController extends MainController
 
         $grid->model()->where('status', 0)
             ->when($countryID, fn($q) => $q->where('country_id', $countryID))
-            ->with(['owner:id,name,uuid,img,country_id', 'owner.profile', 'additionalInfo'])
+            ->with(['owner:id,name,uuid,country_id', 'owner.profile', 'additionalInfo'])
             ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         });
