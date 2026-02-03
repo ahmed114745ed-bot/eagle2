@@ -15,16 +15,16 @@ use App\Models\AgencyJoinRequest;
 use App\Tik\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
-use App\Http\Resources\Api\V1\AdminsAgencyResource;
-use App\Http\Resources\Api\V1\AgencyDetailsResource;
-use App\Http\Resources\Api\V1\AgencyJoinReqResource;
-use App\Http\Resources\Api\V1\AllDataAgencyResource;
-use App\Http\Resources\Api\V1\HistoryAgencyResource;
-use App\Http\Resources\Api\V1\SenderGiftLogResource;
-use App\Http\Resources\Api\V1\MyDataForAgancyResource;
-use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
-use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use App\Http\Resources\JoinedAgencyResource;
+use Utd\Agency\Http\Resources\AdminsAgencyResource;
+use Utd\Agency\Http\Resources\AgencyDetailsResource;
+use Utd\Agency\Http\Resources\AgencyJoinReqResource;
+use Utd\Agency\Http\Resources\AllDataAgencyResource;
+use Utd\Agency\Http\Resources\HistoryAgencyResource;
+use Utd\Agency\Http\Resources\SenderGiftLogResource;
+use Utd\Agency\Http\Resources\MyDataForAgencyResource;
+use Utd\Agency\Http\Resources\ReceiverGiftLogResource;
+use Utd\Agency\Http\Resources\MyDataForAgencyNewResource;
+use Utd\Agency\Http\Resources\JoinedAgencyResource;
 
 class AgencyController extends Controller
 {

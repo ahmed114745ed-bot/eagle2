@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Services\ExternalModelService;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;
@@ -196,9 +196,10 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('withdrawal', __('withdrawal'))->display(function () {
-            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
+            $externalModel = app('agency.external-model');
+            $userSalary = $externalModel->query('user_salary')
+                ?->where('user_id', $this->user_id)
                 ->where('month', $this->add_month)
-
                 ->where('year', $this->add_year)
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
@@ -216,10 +217,11 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('net_salary', __('net salary'))->display(function () {
-            $image = asset('images/dollar.jpg'); // Adjust path as needed
-            $userSalary = UserSallary::query()->where('user_id', $this->user_id)
+            $image = asset('images/dollar.jpg');
+            $externalModel = app('agency.external-model');
+            $userSalary = $externalModel->query('user_salary')
+                ?->where('user_id', $this->user_id)
                 ->where('month', $this->add_month)
-
                 ->where('year', $this->add_year)
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)

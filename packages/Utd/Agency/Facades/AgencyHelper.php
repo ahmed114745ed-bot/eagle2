@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed checkUserAgencyFrozen($user)
  * @method static mixed getCoinsValue($key)
  * @method static mixed getPaginates($data)
+ * @method static bool hasInPack($userId, $packId, $checkActive = false)
+ * @method static mixed wareUserVip($userId, $packId, $attribute)
+ * @method static int level_center_min($userId)
+ * @method static int ovip_center($userId)
+ * @method static array getChargerInfo($charge)
+ * @method static array getReceiverInfo($charge)
  */
 class AgencyHelper extends Facade
 {
