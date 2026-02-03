@@ -41,13 +41,14 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
         Route::get('agency-total-reports', [ApiAgencyAppController::class, 'agency_total_reports']);
         Route::post('cancel-request-createAgency', [AgencyAppController::class, 'cancel_request_createAgency']);
         Route::get('agency-request-info', [AgencyAppController::class, 'agency_request_info']);
-        Route::prefix('agencies')->group(function () {
-            Route::post('request-leave-agency', [ApiAgencyAppController::class, 'leave_agency']);
-            Route::post('history-data-agency', [ApiAgencyAppController::class, 'historyDataAgency']);
-            Route::post('kick-of-agency', [ApiAgencyAppController::class, 'kick_of_agency']);
-            Route::post('/filter', [ApiAgencyAppController::class, 'agency_filter']);
-            Route::post('host-reports', [ApiAgencyAppController::class, 'dailyReport']);//host center
-        });
+          
+        
+        Route::post('request-leave-agency', [ApiAgencyAppController::class, 'leave_agency']);
+        Route::post('history-data-agency', [ApiAgencyAppController::class, 'historyDataAgency']);
+        Route::post('kick-of-agency', [ApiAgencyAppController::class, 'kick_of_agency']);
+        Route::post('/filter', [ApiAgencyAppController::class, 'agency_filter']);
+        Route::post('host-reports', [ApiAgencyAppController::class, 'dailyReport']);//host center
+    
 
         //dashboard
         Route::get('agency-data', [ApiAgencyAppController::class, 'agency_data']);
@@ -59,7 +60,6 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
         Route::post('/action-invite-agency', [AgencyHostInviteController::class, 'actionInvitation']);
         Route::post('/host-agency-edit', [ApiAgencyAppController::class, 'host_agency_edit']);
    
-               Route::prefix('agencies')->middleware(['appFeatureEnable:agencies'])->group(function () {
                 Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
                 Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
                 Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
@@ -85,7 +85,6 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'appFeature
                 Route::get('charges', [V2AgencyController::class, 'agenciesCharge']);
                 Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
                 Route::get('old-agencies', [V2AgencyController::class, 'gitOldAgencies']);
-            });
 
             Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
     
