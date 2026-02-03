@@ -11,7 +11,6 @@ interface RoomRepoInterface
     public function findByUid($id);
     public function findByType($id, $type);
     public function create(array $data): mixed;
-    public function update($req, $id);
     public function save($model);
     public function delete(int $id): bool;
     public function getAllOpening();
