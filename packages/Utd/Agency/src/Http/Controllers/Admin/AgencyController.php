@@ -116,13 +116,7 @@ class AgencyController extends MainController
         }
         
         // Debug: Print owner information
-        dump([
-            'agency_id' => $agency->id,
-            'app_owner_id' => $agency->app_owner_id,
-            'owner_loaded' => $agency->relationLoaded('owner'),
-            'owner_exists' => $agency->owner ? true : false,
-            'owner_data' => $agency->owner,
-        ]);
+      
         
         // Debug: Fetch owner manually without relationship
         if ($agency->app_owner_id) {
