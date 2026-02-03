@@ -27,7 +27,8 @@
         }
     });
 
-    const channel = pusher.subscribe('presence-chat.room.1793');
+    // Test with a simple private channel first
+    const channel = pusher.subscribe('private-test-channel');
 
     channel.bind('pusher:subscription_succeeded', function() {
         console.log("✅ Subscribed successfully with token");
