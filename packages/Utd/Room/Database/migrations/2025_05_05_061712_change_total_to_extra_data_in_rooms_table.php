@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            $table->integer('max_admin')->default(0)->change();
+        Schema::table('extra_data_in_rooms', function (Blueprint $table) {
+            $table->decimal('total', 65, 2)->change();
+
         });
     }
 
@@ -21,8 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            $table->dropColumn('max_admin');
-        });
+        // Note: Reverting decimal precision changes requires doctrine/dbal
+        // Original column definition would need to be known
     }
 };

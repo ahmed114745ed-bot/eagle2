@@ -4,29 +4,25 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddVcountToRooms extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->integer ('visitor_count')->nullable ()->default (0);
+            $table->boolean('is_comment_closed')->default(0);
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('is_comment_closed');
         });
     }
-}
+};

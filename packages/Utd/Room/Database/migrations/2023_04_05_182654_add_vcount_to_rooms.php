@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddMaxAdminToRooms extends Migration
+class AddVcountToRooms extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddMaxAdminToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->integer ('max_admin')->nullable ()->default (100);
+            $table->integer ('visitor_count')->nullable ()->default (0);
         });
     }
 
@@ -26,7 +26,7 @@ class AddMaxAdminToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('visitor_count');
         });
     }
 }

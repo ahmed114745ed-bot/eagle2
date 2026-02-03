@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddModeToRooms extends Migration
+class AddHourHotToRooms extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddModeToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('mode')->nullable ()->default (0);
+            $table->unsignedBigInteger ('hour_hot')->nullable ()->default (0);
         });
     }
 
@@ -26,7 +26,7 @@ class AddModeToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('hour_hot');
         });
     }
 }

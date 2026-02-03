@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('extra_data_in_rooms', function (Blueprint $table) {
-            $table->decimal('total', 65, 2)->change();
-
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->integer('max_admin')->default(0)->change();
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('extra_data_in_rooms', function (Blueprint $table) {
-            //
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->integer('max_admin')->default(100)->change();
         });
     }
 };

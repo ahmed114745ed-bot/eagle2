@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            $table->unsignedInteger('room_id')->nullable()->change();
+        Schema::table('room_categories', function (Blueprint $table) {
+              $table->integer('sort')->default(0);
+              $table->string('name_ar')->nullable();
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('gift_logs', function (Blueprint $table) {
-            //
+        Schema::table('room_categories', function (Blueprint $table) {
+            $table->dropColumn(['sort', 'name_ar']);
         });
     }
 };
