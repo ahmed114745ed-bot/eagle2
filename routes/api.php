@@ -180,7 +180,13 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
                 } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+//                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                    return response()->json([
+                        'success' => false,
+                        'type' => get_class($e),
+                        'message' => $e->getMessage(),
+                        'code' => $e->getCode(),
+                    ], 500);
                 }
             });
 
