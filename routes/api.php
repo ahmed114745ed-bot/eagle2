@@ -191,7 +191,18 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
                 } catch (\Exception $e) {
-                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+                    \Log::error('Broadcasting auth error', [
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'channel' => $request->input('channel_name'),
+                        'user' => auth()->id(),
+                    ]);
+                    return response()->json([
+                        'success' => false, 
+                        'message' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                    ], 500);
                 }
             });
 
