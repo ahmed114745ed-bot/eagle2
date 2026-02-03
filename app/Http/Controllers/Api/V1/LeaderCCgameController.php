@@ -68,7 +68,7 @@ class LeaderCCgameController extends Controller
                 'avatar'   => getImagePath($user->profile->avatar),
                 'coin'     => $user->di,
                 'vipLevel' => $user->UserVip->level ?? 0,
-                'percentage' => @$user->gamePercentage->percentageGame->percentage_game ?? 2,
+                'percentage' => (@$user->gamePercentage->percentageGame->percentage_game ?? 2) / 100,
             ]);
         });
     }
