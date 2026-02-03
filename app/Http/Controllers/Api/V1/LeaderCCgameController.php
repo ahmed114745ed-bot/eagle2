@@ -37,7 +37,7 @@ class LeaderCCgameController extends Controller
                 'line' => $e->getLine()
             ]);
 
-            return $this->json(500, 'Server error'.$e->getMessage());
+            return $this->json(500, 'Server error' . $e->getMessage());
         }
     }
 
@@ -54,9 +54,9 @@ class LeaderCCgameController extends Controller
                 return $err;
             }
 
-            $user = User::with(['profile:id,user_id,avatar', 'UserVip:id,user_id,level'])
-                        ->select('id', 'name', 'di')
-                        ->find($request->uid);
+            $user = User::with(['profile:id,user_id,avatar', 'gamePercentage', 'UserVip:id,user_id,level'])
+                ->select('id', 'name', 'di')
+                ->find($request->uid);
 
             if (!$user) {
                 return $this->json(4005, 'user not found');
@@ -67,7 +67,8 @@ class LeaderCCgameController extends Controller
                 'nickname' => $user->name,
                 'avatar'   => getImagePath($user->profile->avatar),
                 'coin'     => $user->di,
-                'vipLevel' => $user->UserVip->level ?? 0
+                'vipLevel' => $user->UserVip->level ?? 0,
+                'percentage' => @$user->gamePercentage->percentageGame->percentage_game ?? 2,
             ]);
         });
     }
@@ -77,7 +78,7 @@ class LeaderCCgameController extends Controller
     {
         return $this->safe(function () use ($request) {
 
-            $required = ['orderId','gameId','roundId','uid','coin','type','rewardType','token','sign'];
+            $required = ['orderId', 'gameId', 'roundId', 'uid', 'coin', 'type', 'rewardType', 'token', 'sign'];
             $missing = array_filter($required, fn($r) => !$request->filled($r) && $request->input($r) !== "0");
             if ($missing) return $this->json(4005, 'Invalid params');
 
@@ -94,10 +95,10 @@ class LeaderCCgameController extends Controller
             return DB::transaction(function () use ($request, $type) {
 
                 $user = User::lockForUpdate()->with([
-                                                    'profile:id,user_id,avatar',
-                                                    'nowGame:id,image',
-                                                     'nowRoom:id,uid'
-                                                    ])->find($request->uid);
+                    'profile:id,user_id,avatar',
+                    'nowGame:id,image',
+                    'nowRoom:id,uid'
+                ])->find($request->uid);
 
                 if (!$user) return $this->json(4005, 'User not found');
 
@@ -138,7 +139,7 @@ class LeaderCCgameController extends Controller
                             'uName'   => $user->name ?? '',
                             'uId'     => $user->id ?? 0,
                             'coins'   => numToStringNew($coin),
-//                            'coins'   => numToStringNew((int) $request->currency_diff),
+                            //                            'coins'   => numToStringNew((int) $request->currency_diff),
                             "gImage"  => @$user->nowGame?->image
                         ]
                     ];
