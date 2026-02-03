@@ -29,8 +29,7 @@ class ChangeSomeOtherColumnsInRooms extends Migration
      */
     public function down()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            //
-        });
+        // Note: This migration modifies column types, rollback would require doctrine/dbal
+        // and knowledge of original column definitions
     }
 }

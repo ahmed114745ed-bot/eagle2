@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\RoleCategory;
 use App\Enums\PermissionType;
+use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Utd\Achievements\Entities\Achievement;
@@ -719,45 +720,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Room',
-                'sort' => 25,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 25],
-                    PermissionType::SUPER_ADMIN->value => ['sort' => 6],
-                    PermissionType::AREA_MANAGER->value => ['sort' => 7],
-                ],
-                'permissions' => [
-                    ['key' => 'rooms', 'except' => ['create'], 'additional' => ['actions-switch', 'pin-switch', 'close-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'show', 'edit', 'delete', 'actions-switch', 'pin-switch', 'close-switch'],
-                        PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'show'],
-                    ],],
-                    ['key' => 'live-rooms', 'except' => ['create'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'show', 'edit', 'delete',],
-                        PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
-                        PermissionType::AREA_MANAGER->value => ['browse', 'show'],
-                    ],],
-                    ['key' => 'categories', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'room-vip', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'room-background', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
-                    ],],
-                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'edit'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Gift',
                 'sort' => 26,
                 'types' => [
@@ -1190,9 +1152,24 @@ class PermissionTypeSeeder extends Seeder
                     //                    ],],
                 ],
             ],
+            [
+                'name' => 'emojis',
+                'sort' => 43,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 43],
+                ],
+                'permissions' => [
+                    ['key' => 'emoji', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'emoji-categories', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ],
         ];
 
-        if (class_exists(Moment::class)) {
+        if (PackageHelper::isInstalled('moment')) {
             $categories[] = [
                 'name' => 'Moment',
                 'sort' => 34,
@@ -1210,7 +1187,7 @@ class PermissionTypeSeeder extends Seeder
             ];
         }
 
-        if (class_exists(Achievement::class)) {
+        if (PackageHelper::isInstalled('achievement')) {
             $categories[] = [
                 'name' => 'Achievements',
                 'sort' => 28,
@@ -1231,8 +1208,8 @@ class PermissionTypeSeeder extends Seeder
             ];
         }
 
-        if (class_exists(Real::class)) {
-            $categories[] =             [
+        if (PackageHelper::isInstalled('real')) {
+            $categories[] = [
                 'name' => 'Reels',
                 'sort' => 33,
                 'types' => [
@@ -1244,6 +1221,42 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'report-real', 'except' => ['create', 'edit', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'delete'],
+                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('room')) {
+            $categories[] = [
+                'name' => 'Room',
+                'sort' => 25,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 25],
+                    PermissionType::SUPER_ADMIN->value => ['sort' => 6],
+                    PermissionType::AREA_MANAGER->value => ['sort' => 7],
+                ],
+                'permissions' => [
+                    ['key' => 'rooms', 'except' => ['create'], 'additional' => ['actions-switch', 'pin-switch', 'close-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'show', 'edit', 'delete', 'actions-switch', 'pin-switch', 'close-switch'],
+                        PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'show'],
+                    ],],
+                    ['key' => 'live-rooms', 'except' => ['create'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'show', 'edit', 'delete',],
+                        PermissionType::SUPER_ADMIN->value => ['browse', 'show'],
+                        PermissionType::AREA_MANAGER->value => ['browse', 'show'],
+                    ],],
+                    ['key' => 'categories', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'room-vip', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'room-background', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'edit'],
                     ],],
                 ],
             ];

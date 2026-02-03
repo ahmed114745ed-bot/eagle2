@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTopRoomToRooms extends Migration
+class AddNowRoomToUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddTopRoomToRooms extends Migration
      */
     public function up()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('top_room')->nullable ()->default (0);
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedInteger ('now_room_uid')->nullable ()->default (0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddTopRoomToRooms extends Migration
      */
     public function down()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('now_room_uid');
         });
     }
 }

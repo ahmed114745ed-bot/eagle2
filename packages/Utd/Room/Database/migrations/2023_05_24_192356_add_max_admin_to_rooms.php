@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddCountUserSocketToRooms extends Migration
+class AddMaxAdminToRooms extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddCountUserSocketToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->integer('count_room_socket')->nullable()->default (0);
+            $table->integer ('max_admin')->nullable ()->default (100);
         });
     }
 
@@ -26,7 +26,7 @@ class AddCountUserSocketToRooms extends Migration
     public function down()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            //
+            $table->dropColumn('max_admin');
         });
     }
 }

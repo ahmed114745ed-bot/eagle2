@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddNowRoomToUsers extends Migration
+class AddCountUserSocketToRooms extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddNowRoomToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger ('now_room_uid')->nullable ()->default (0);
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->integer('count_room_socket')->nullable()->default (0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddNowRoomToUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->dropColumn('count_room_socket');
         });
     }
 }

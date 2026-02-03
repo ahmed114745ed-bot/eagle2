@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddHourHotToRooms extends Migration
+class AddCountryIdToRoomsAndUsers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddHourHotToRooms extends Migration
      */
     public function up()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedBigInteger ('hour_hot')->nullable ()->default (0);
+        Schema::table('users', function (Blueprint $table) {
+            $table->unsignedInteger ('country_id')->nullable ()->default (0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddHourHotToRooms extends Migration
      */
     public function down()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('country_id');
         });
     }
 }

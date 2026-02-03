@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddCountryIdToRoomsAndUsers extends Migration
+class AddTopRoomToRooms extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddCountryIdToRoomsAndUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger ('country_id')->nullable ()->default (0);
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->unsignedTinyInteger ('top_room')->nullable ()->default (0);
         });
     }
 
@@ -25,8 +25,8 @@ class AddCountryIdToRoomsAndUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->dropColumn('top_room');
         });
     }
 }
