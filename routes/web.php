@@ -1434,3 +1434,6 @@ Route::get('/debug/test-user-online', function () {
     }
 });
 
+
+// Include cache clearing routes
+require __DIR__ . '/cache-clear.php';
