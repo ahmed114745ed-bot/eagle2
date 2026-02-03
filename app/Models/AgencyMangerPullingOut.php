@@ -2,15 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Utd\Agency\Helpers\AgencyModelsHelper;
 
-class AgencyMangerPullingOut extends Model
-{
-    use HasFactory, TimestampsWithTimezone;
-
-    protected $table = 'agency_manger_pulling_out';
-
-    protected $guarded = [];
+if ($agencymangerpullingoutClass = AgencyModelsHelper::getAgencyMangerPullingOutClass()) {
+    class_alias($agencymangerpullingoutClass, __NAMESPACE__ . '\AgencyMangerPullingOut');
 }

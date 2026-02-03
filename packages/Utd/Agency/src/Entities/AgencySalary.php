@@ -69,4 +69,46 @@ class AgencySalary extends Model
         $this->is_paid = true;
         return $this->save();
     }
+
+    /**
+     * Get total salary attribute (backward compatibility)
+     */
+    public function getTotalSalaryAttribute()
+    {
+        return floor($this->sallary - $this->cut_amount);
+    }
+
+    /**
+     * Total target diamonds relationship
+     */
+    public function totalTargetDiamonds($month = null, $year = null)
+    {
+        $month = $month ?? now()->month;
+        $year = $year ?? now()->year;
+
+        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+        return $this->hasMany($userSalaryClass, 'user_agency_id', 'agency_id')
+            ->where('month', $month)
+            ->where('year', $year)
+            ->selectRaw('user_agency_id, SUM(target_diamonds) as total_target_diamonds')
+            ->groupBy('user_agency_id');
+    }
+
+    /**
+     * Boot model events
+     */
+    protected static function booted()
+    {
+        self::saved(function ($model) {
+            if ($model->agency_id && function_exists('clearAgencyCache')) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+
+        self::deleted(function ($model) {
+            if ($model->agency_id && function_exists('clearAgencyCache')) {
+                clearAgencyCache($model->agency_id);
+            }
+        });
+    }
 }

@@ -54,7 +54,8 @@ trait AgencyRelationsTrait
      */
     public function owner(): BelongsTo
     {
-        return $this->belongsTo($this->getModelClass('user', \App\Models\User::class), 'app_owner_id', 'id');
+        return $this->belongsTo($this->getModelClass('user', \App\Models\User::class), 'app_owner_id', 'id')
+            ->withoutGlobalScopes();
     }
 
     /**

@@ -2,15 +2,8 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Utd\Agency\Helpers\AgencyModelsHelper;
 
-class AgencymAngerLink extends Model
-{
-    use HasFactory, TimestampsWithTimezone;
-
-    protected $table = 'agency_manger_app_dash';
-
-    protected $guarded = [];
+if ($agencymangerlinkClass = AgencyModelsHelper::getAgencymAngerLinkClass()) {
+    class_alias($agencymangerlinkClass, __NAMESPACE__ . '\AgencymAngerLink');
 }

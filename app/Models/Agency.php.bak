@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Agency\Entities;
+namespace App\Models;
 
 use App\Models\Scopes\HostAgencyScope;
 use App\Traits\CreatedByTrait;
@@ -12,14 +12,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Utd\Agency\Traits\AgencyAdditionalInfoTrait;
-use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
 class Agency extends Model
 {
-    use AgencyAdditionalInfoTrait, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    use AgencyAdditionalInfoTrait, DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait;
 
     protected $guarded = [];
 
@@ -35,26 +34,22 @@ class Agency extends Model
 
     public function charges()
     {
-        $chargeClass = config('agency-package.models.charge', \App\Models\Charge::class);
-        return $this->hasMany($chargeClass, 'user_id', 'id')->where('charger_type', 'host_agency');
+        return $this->hasMany(Charge::class, 'user_id', 'id')->where('charger_type', 'host_agency');
     }
     public function senderCharges()
     {
-        $chargeClass = config('agency-package.models.charge', \App\Models\Charge::class);
-        return $this->hasMany($chargeClass, 'charger_id', 'id')->where('charger_type', 'host_agency');
+        return $this->hasMany(Charge::class, 'charger_id', 'id')->where('charger_type', 'host_agency');
     }
 
 
     public function Countries()
     {
-        $countryClass = config('agency-package.models.country', \App\Models\Country::class);
-        return $this->belongsToMany($countryClass, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
+        return $this->belongsToMany(Country::class, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
     }
 
     public function country(): BelongsTo
     {
-        $countryClass = config('agency-package.models.country', \App\Models\Country::class);
-        return $this->belongsTo($countryClass);
+        return $this->belongsTo(Country::class);
     }
 
     public function salaryRequests()
@@ -64,21 +59,18 @@ class Agency extends Model
 
     public function mempers()
     {
-        $userClass = config('agency-package.models.user', \App\Models\User::class);
-        return $this->hasMany($userClass, 'agency_id');
+        return $this->hasMany(User::class, 'agency_id');
     }
 
     public function members()
     {
-        $userClass = config('agency-package.models.user', \App\Models\User::class);
-        return $this->hasMany($userClass, 'agency_id');
+        return $this->hasMany(User::class, 'agency_id');
     }
 
 
     public function users()
     {
-        $userClass = config('agency-package.models.user', \App\Models\User::class);
-        return $this->hasMany($userClass, 'agency_id');
+        return $this->hasMany(User::class, 'agency_id');
     }
 
     public function admins()
@@ -93,15 +85,13 @@ class Agency extends Model
 
     public function owner()
     {
-        $userClass = config('agency-package.models.user', \App\Models\User::class);
-        return $this->belongsTo($userClass, 'app_owner_id', 'id')
+        return $this->belongsTo(User::class, 'app_owner_id', 'id')
             ->withoutGlobalScopes();
     }
 
     public function agencyManger()
     {
-        $userClass = config('agency-package.models.user', \App\Models\User::class);
-        return $this->belongsTo($userClass, 'agency_manger_id', 'id');
+        return $this->belongsTo(User::class, 'agency_manger_id', 'id');
     }
 
     public function setPasswordAttribute($value)
@@ -113,8 +103,7 @@ class Agency extends Model
 
     public function dashOwner()
     {
-        $adminClass = config('agency-package.models.admin', \App\Models\Admin::class);
-        return $this->belongsTo($adminClass, 'owner_id', 'id');
+        return $this->belongsTo(Admin::class, 'owner_id', 'id');
     }
 
     public function getUrlAttribute($val)
@@ -171,8 +160,7 @@ class Agency extends Model
             $year = date('Y');
         }
 
-        $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
-        return $this->hasMany($userTargetClass)
+        return $this->hasMany(UserTarget::class)
             ->where('add_month', $month)
             ->where('add_year', $year)
             ->first();
@@ -206,14 +194,12 @@ class Agency extends Model
 
     public function AgencyUsersTargets()
     {
-        $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
-        return $this->hasMany($userTargetClass, 'agency_id');
+        return $this->hasMany(UserTarget::class, 'agency_id');
     }
 
     public function UserTarget()
     {
-        $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
-        return $this->hasMany($userTargetClass, 'agency_id');
+        return $this->hasMany(UserTarget::class, 'agency_id');
     }
 
     public function agencySalary()
@@ -236,14 +222,12 @@ class Agency extends Model
 
     public function salaries()
     {
-        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
-        return $this->hasMany($userSalaryClass, 'sallary');
+        return $this->hasMany(UserSallary::class, 'sallary');
     }
 
     public function userSalaries()
     {
-        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
-        return $this->hasMany($userSalaryClass, 'user_agency_id');
+        return $this->hasMany(UserSallary::class, 'user_agency_id');
     }
 
     public function agencySalaries()
@@ -453,8 +437,7 @@ class Agency extends Model
             }
 
             if (request()->has('appear_charger_agency')) {
-                $userClass = config('agency-package.models.user', \App\Models\User::class);
-                $user = $userClass::find($model->app_owner_id);
+                $user = User::find($model->app_owner_id);
 
                 if ($user) {
                     if (request('appear_charger_agency') === 1) {
@@ -478,12 +461,11 @@ class Agency extends Model
         self::deleting(function ($agency) {
 
             if ($agency->app_owner_id) {
-                $userClass = config('agency-package.models.user', \App\Models\User::class);
-                $user = $userClass::find($agency->app_owner_id);
+                $user = User::find($agency->app_owner_id);
                 if ($user) {
                     $user->type_user = 0;
                     $user->save();
-                    $users = $userClass::where('agency_id', $agency->id)->update([
+                    $users = User::where('agency_id', $agency->id)->update([
                         'type_user' => 0,
                     ]);
                 }
@@ -495,13 +477,11 @@ class Agency extends Model
 
     public function bd()
     {
-        $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
-        return $this->belongsTo($bdClass, 'bd_id');
+        return $this->belongsTo(Bd::class, 'bd_id');
     }
     public function creator()
     {
-        $adminUserClass = config('agency-package.models.admin_user', \App\Models\AdminUser::class);
-        return $this->belongsTo($adminUserClass, 'created_by');
+        return $this->belongsTo(AdminUser::class, 'created_by');
     }
 
 

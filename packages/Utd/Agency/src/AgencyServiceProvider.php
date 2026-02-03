@@ -97,6 +97,11 @@ class AgencyServiceProvider extends ServiceProvider
             return new \Utd\Agency\Services\AgencyHelperService();
         });
         
+        // Register Models Helper
+        $this->app->singleton('agency.models', function ($app) {
+            return new \Utd\Agency\Helpers\AgencyModelsHelper();
+        });
+        
         // Register External Model Service
         $this->app->singleton('agency.external-model', function ($app) {
             return new \Utd\Agency\Services\ExternalModelService();
