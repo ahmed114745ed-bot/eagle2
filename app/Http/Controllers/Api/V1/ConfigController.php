@@ -76,21 +76,20 @@ class ConfigController extends Controller
             });
         }
         if ($request['enable-special'] == 1) {
-            $wapel                 = Pack::query()
+            $wapel = Pack::query()
                 ->where('type', 12)
                 ->where('expire', '>=', time())
                 ->where('user_id', \Auth::id())
                 ->where('use_num', '>', 0)
                 ->select(['id', 'use_num'])
                 ->first();
-            $configs['wapel_num']  =  @(int)$wapel->use_num ?? 0;
-            $user                  = $request->user();
-            $configs['user_coins'] =  @(int)$user->di ?? 0;
-            $configs['user_coins_string'] =  @$user->coins_string ?? '0';
+            $configs['wapel_num'] = @(int)$wapel->use_num ?? 0;
+            $user = $request->user();
+            $configs['user_coins'] = @(int)$user->di ?? 0;
+            $configs['user_coins_string'] = @$user->coins_string ?? '0';
         }
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
-
 
 
     public function index()
@@ -187,11 +186,11 @@ class ConfigController extends Controller
         Cache::flush();
 
 
-        if (method_exists(Cache::store('octane'), 'flush')) {
-            try {
+        try {
+            if (method_exists(Cache::store('octane'), 'flush')) {
                 Cache::store('octane')->flush();
-            } catch (Throwable $e) {
             }
+        } catch (Throwable $e) {
         }
 
         if ($hasPusherUpdate) {
@@ -216,7 +215,6 @@ class ConfigController extends Controller
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
 
         }
-
 
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
