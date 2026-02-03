@@ -22,6 +22,7 @@ class AgencyServiceProvider extends ServiceProvider
     {
         $this->registerCommands();
         $this->mergeConfigFrom(__DIR__ . '/../Config/agency.php', 'agency-package');
+        $this->mergeConfigFrom(__DIR__ . '/../Config/agency-dependencies.php', 'agency-dependencies');
 
         // Register class aliases for backward compatibility early
         $this->registerModelAliases();
@@ -30,10 +31,53 @@ class AgencyServiceProvider extends ServiceProvider
         $this->app->bind(
             \Utd\Agency\Contracts\AgencyServiceInterface::class,
             function ($app) {
-                if (class_exists(\Utd\Agency\Services\AgencyService::class)) {
-                    return $app->make(\Utd\Agency\Services\AgencyService::class);
+                $serviceClass = config('agency-dependencies.dependencies.services.agency_service');
+                if ($serviceClass && class_exists($serviceClass)) {
+                    return $app->make($serviceClass);
                 }
                 return null;
+            }
+        );
+        
+        // Register Charge Service Contract
+        $this->app->bind(
+            \Utd\Agency\Contracts\ChargeServiceInterface::class,
+            function ($app) {
+                $serviceClass = config('agency-dependencies.dependencies.services.charge_service');
+                if ($serviceClass && class_exists($serviceClass)) {
+                    return $app->make($serviceClass);
+                }
+                return null;
+            }
+        );
+        
+        // Register Notification Service Contract
+        $this->app->bind(
+            \Utd\Agency\Contracts\NotificationServiceInterface::class,
+            function ($app) {
+                $notificationClass = config('agency-dependencies.dependencies.helpers.custom_notification');
+                if ($notificationClass && class_exists($notificationClass)) {
+                    return new class($notificationClass) implements \Utd\Agency\Contracts\NotificationServiceInterface {
+                        protected $notificationClass;
+                        
+                        public function __construct($notificationClass) {
+                            $this->notificationClass = $notificationClass;
+                        }
+                        
+                        public function acceptRequestAgency($user) {
+                            return $this->notificationClass::acceptRequestAgency($user);
+                        }
+                        
+                        public function refuseRequestAgency($user) {
+                            return $this->notificationClass::refuseRequestAgency($user);
+                        }
+                        
+                        public function charges($user, $title, $body, $data = []) {
+                            return $this->notificationClass::charges($user, $title, $body, $data);
+                        }
+                    };
+                }
+                return new \Utd\Agency\Services\NullNotificationService();
             }
         );
 
@@ -47,6 +91,21 @@ class AgencyServiceProvider extends ServiceProvider
                 return null;
             }
         );
+        
+        // Register Helper Service
+        $this->app->singleton('agency.helper', function ($app) {
+            return new \Utd\Agency\Services\AgencyHelperService();
+        });
+        
+        // Register External Model Service
+        $this->app->singleton('agency.external-model', function ($app) {
+            return new \Utd\Agency\Services\ExternalModelService();
+        });
+        
+        // Register External Module Service
+        $this->app->singleton(\Utd\Agency\Services\ExternalModuleService::class, function ($app) {
+            return new \Utd\Agency\Services\ExternalModuleService();
+        });
     }
 
     /**

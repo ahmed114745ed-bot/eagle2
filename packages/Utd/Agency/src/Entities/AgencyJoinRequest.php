@@ -45,6 +45,23 @@ class AgencyJoinRequest extends Model
     }
 
     /**
+     * Relationship with Admin (who changed status)
+     */
+    public function admin(): BelongsTo
+    {
+        $adminModel = config('agency-package.models.admin', \App\Models\Agent::class);
+        return $this->belongsTo($adminModel, 'change_status_admin_id');
+    }
+
+    /**
+     * Relationship with User Operator (who changed status from app)
+     */
+    public function userOperator(): BelongsTo
+    {
+        return $this->belongsTo($this->getModelClass('user'), 'change_status_admin_id');
+    }
+
+    /**
      * Scope for pending requests
      */
     public function scopePending($query)

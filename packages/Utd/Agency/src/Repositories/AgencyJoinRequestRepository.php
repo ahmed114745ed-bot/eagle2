@@ -114,9 +114,41 @@ class AgencyJoinRequestRepository
         return $this->model
             ->where('agency_id', $agencyId)
             ->where('status', 0)
-            ->with('user')
+            ->with(['user', 'user.profile'])
             ->orderByDesc('id')
             ->get();
+    }
+
+    /**
+     * Get all requests by agency with filters
+     */
+    public function getByAgencyWithStatus($agencyId, $status = null)
+    {
+        $query = $this->model
+            ->where('agency_id', $agencyId)
+            ->with(['user', 'user.profile', 'admin', 'userOperator']);
+
+        if ($status !== null) {
+            $query->where('status', $status);
+        }
+
+        return $query->orderByDesc('id')->get();
+    }
+
+    /**
+     * Get paginated requests by agency with status
+     */
+    public function getPaginatedByAgencyWithStatus($agencyId, $status = null, $perPage = 10)
+    {
+        $query = $this->model
+            ->where('agency_id', $agencyId)
+            ->with(['user', 'user.profile', 'admin', 'userOperator']);
+
+        if ($status !== null) {
+            $query->where('status', $status);
+        }
+
+        return $query->orderByDesc('id')->paginate($perPage);
     }
 
     /**

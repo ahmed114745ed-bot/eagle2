@@ -112,7 +112,7 @@ class AppearChargerAgencyController extends MainController
 
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid,img,country_id', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
@@ -225,7 +225,7 @@ class AppearChargerAgencyController extends MainController
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
-        $grid->model()->with(['owner.profile', 'creator', 'country'])
+        $grid->model()->with(['owner:id,name,uuid,img,country_id', 'owner.profile', 'owner.country', 'creator', 'country'])
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
@@ -506,7 +506,7 @@ class AppearChargerAgencyController extends MainController
         $tab = $request->input('tab', 'charges');
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid'])
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid,img,country_id', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
                 ->findOrFail($id);
         });

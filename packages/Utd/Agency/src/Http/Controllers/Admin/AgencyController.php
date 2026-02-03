@@ -25,10 +25,10 @@ use App\Models\GiftLog;
 use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Entities\AgencySallary;
 use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\UserSallary;
 use Utd\Agency\Entities\Target;
 use Utd\Agency\Entities\UserTarget;
 use Utd\Agency\Entities\AgencyUserJob;
+use Utd\Agency\Services\ExternalModelService;
 use Utd\Agency\Entities\UsersJoinedAgency;
 use App\Admin\Controllers\MainController;
 use App\Admin\Extensions\Permission;
@@ -97,7 +97,7 @@ class AgencyController extends MainController
 
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return Agency::query()
-                ->with(['admins', 'bd', 'owner:id,name,uuid', 'owner.profile'])
+                ->with(['admins', 'bd', 'owner:id,name,uuid,country_id,img,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone','created_at', 'created_by', 'coins', 'bd_id', 'img')
                 ->find($id);
         });
@@ -105,7 +105,7 @@ class AgencyController extends MainController
         if (!$agency) {
             $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
                 return ShippingAgency::query()
-                    ->with(['admins', 'owner:id,name,uuid', 'owner.profile'])
+                    ->with(['admins', 'owner:id,name,uuid,country_id,img,phone,monthly_diamond_received', 'owner.profile', 'owner.country'])
                     ->select('id', 'name', 'app_owner_id', 'created_by', 'phone', 'coins', 'img')
                     ->find($id);
             });
@@ -289,7 +289,8 @@ class AgencyController extends MainController
                     ->orWhereHas('receiver', fn($q) => $q->where('uuid', $uuid));
             });
         })->selectRaw('SUM(giftPrice) AS total')->value('total');
-        $diamondsHosts = UserSallary::where('user_agency_id', $id)->sum('achieved_diamond');
+        $externalModel = app('agency.external-model');
+        $diamondsHosts = $externalModel->sum('user_salary', 'achieved_diamond', ['user_agency_id' => $id]);
         $prefix = dashboardName();
         return $content
             ->title(__('agency profile'))
@@ -334,7 +335,12 @@ class AgencyController extends MainController
 
     public function rateAgency($agencyId, $month, $year)
     {
-        $agencyTarget = UserSallary::where('user_agency_id', $agencyId)->whereYear('created_at', $year)->whereMonth('created_at', $month)->sum('agency_sallary');
+        $externalModel = app('agency.external-model');
+        $agencyTarget = $externalModel->query('user_salary')
+            ?->where('user_agency_id', $agencyId)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->sum('agency_sallary') ?? 0;
         $minValue = Target::where('usd', '<', $agencyTarget)->orderBy('usd', 'desc')->first();
         $rate = (@$minValue->agency_share / 100) * @$agencyTarget;
         return [$agencyTarget, $rate];
@@ -398,7 +404,7 @@ class AgencyController extends MainController
         $grid->model()
             ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
             ->select(['agencies.id', 'agencies.name', 'agencies.app_owner_id', 'agencies.phone_code', 'agencies.phone', 'agencies.coins', 'agencies.country_id', 'agencies.img', 'agencies.is_frozen', 'agencies.created_by'])
-            ->with(['owner:id,name,uuid,country_id', 'owner.country', 'owner.packs', 'owner.profile', 'creator', 'country'])
+            ->with(['owner:id,name,uuid,country_id,img,phone,monthly_diamond_received', 'owner.country', 'owner.packs', 'owner.profile', 'creator', 'country'])
             ->where(function ($query) {
                 $query
                     ->whereDoesntHave('additionalInfo')
@@ -469,9 +475,12 @@ class AgencyController extends MainController
 
         // --- Owner column ---
         $grid->column('owner.name', trans('owner'))->display(function ($name) {
+            if (!$this->owner) {
+                return '<span style="color: #999;">-</span>';
+            }
 
-            $uid = @$this->owner->uuid;
-            $path = @$this->owner->profile?->avatar;
+            $uid = $this->owner->uuid ?? '';
+            $path = $this->owner->profile?->avatar ?? null;
             $defaultImage = asset("images/businessman-icon.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 

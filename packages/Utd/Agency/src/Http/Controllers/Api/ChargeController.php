@@ -1,0 +1,414 @@
+<?php
+
+namespace Utd\Agency\Http\Controllers\Api;
+
+use Utd\Agency\Helpers\ShippingAgencyHelper;
+use Exception;
+use App\Models\User;
+use App\Helpers\Common;
+use App\Helpers\UserCommon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Facades\CustomNotification;
+use App\Http\Controllers\Controller;
+use App\Tik\Services\ChargeRepoService;
+use Utd\Agency\Http\Resources\TrxResource;
+use Utd\Agency\Http\Resources\ChargeResource;
+use Utd\Agency\Http\Resources\DollarChargeLogResource;
+use Utd\Agency\Http\Resources\DollarChargeAgencyResource;
+use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Utd\Agency\Http\Resources\ChargeReceivedInfoResource;
+use Utd\Agency\Http\Resources\ChargeResourceForAgencyCharge;
+use Illuminate\Support\Facades\Log;
+use App\Contracts\UserAchievementContract;
+
+
+class ChargeController extends Controller
+{
+
+    protected $chargeService;
+
+    public function __construct(ChargeRepoService $chargeService)
+    {
+        $this->chargeService = $chargeService;
+    }
+
+    public function sendMoneyFoeHost(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
+        Common::checkUserAgencyFrozen($user);
+
+        $count = $request->amount;
+        $userUuid = $request->user_id;
+
+        if ($count < 0 || !is_numeric($count)) {
+            return Common::apiResponse(0, 'this value not allow', 422);
+        }
+
+        if ($user->di < $count) {
+            return Common::apiResponse(0, 'balance not enough');
+        }
+
+        try {
+            $userReceiver = $this->chargeService->sendMoney($user, $userUuid, $count);
+            if ($userReceiver instanceof User) {
+                app(UserAchievementContract::class)->insertCharging($userReceiver, $count);
+            }
+            UserCommon::UserEarnedInvitation($userReceiver->id, $count);
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
+            return Common::apiResponse(1, 'your recharge was successful', $data, 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+    }
+
+    public function chargeCoForUsersHistory(Request $request)
+    {
+        $userId = $request->user()->id;
+        if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'agency');
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
+    }
+
+    public function ChargeDollarForOwner(Request $request)
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+        $stop_all_charge = settings()->get("stop_charge") ?? 0;
+        if ($stop_all_charge == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
+        }
+        $types = [
+            'user' => [$this, 'ChargeDollarForOwner_to_users'],
+            'agency' => [$this, 'ChargeDollarForOwner_to_agency']
+        ];
+
+        $type = $request->input('type');
+        $instance = $types[$type] ?? $types['user'];
+        if (!$instance) {
+            return Common::apiResponse(0, 'Type Not Found', 400);
+        }
+
+        $data = call_user_func($instance, $request);
+        return $data;
+    }
+
+    public function ChargeDollarForOwner_to_users(Request $request)
+    {
+        $user = $request->user();
+        if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
+        Common::checkUserAgencyFrozen($user);
+
+        $count = $request->amount;
+        $userUuid = $request->id;
+
+        if ($count < 0 || !is_numeric($count)) {
+            return Common::apiResponse(0, 'this value not allow', 422);
+        }
+        if (!$userUuid || !$count) {
+            return Common::apiResponse(0, __('api_responses.missing_params'), 404);
+        }
+
+        try {
+            [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner($user, $userUuid, $count);
+
+            if ($user instanceof User) {
+                app(UserAchievementContract::class)->insertCharging($receiver, $amount);
+            }
+            UserCommon::UserEarnedInvitation($receiver->id, $amount);
+            UserCommon::addChargeLevel($receiver->id, $amount);
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
+
+            $notificationToken[] = DB::table('users')->where('id', $receiver->id)->value('notification_id');
+
+            $title = 'Balance Recharged';
+            $body = 'Your balance has been recharged with :usd coins by :name.';
+
+            CustomNotification::charges(
+                $receiver,
+                $title,
+                $body,
+                ['usd' => $amount, 'name' => $user->name,]
+            );
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
+            return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
+        } catch (Exception $e) {
+
+            return Common::apiResponse(0, $e->getMessage(), 400);
+        }
+    }
+
+    public function ChargeDollarForOwner_to_agency(Request $request)
+    {
+        $user = $request->user();
+        if ($user->transfer_salary == 1) return Common::apiResponse(false, __('Transfer salary has been disabled!'), null, 407);
+        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+
+        Common::checkUserAgencyFrozen($user);
+
+        $count = $request->amount;
+        $userUuid = $request->id;
+
+        if ($count < 0 || !is_numeric($count)) {
+            return Common::apiResponse(0, 'this value not allow', 422);
+        }
+        if (!$userUuid || !$count) {
+            return Common::apiResponse(0, __('api_responses.missing_params'), 404);
+        }
+        $receiver = Common::searchAgency($userUuid);
+        if ($receiver == false) return Common::apiResponse(0, 'this  not found', 422);
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($receiver)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
+        if ($receiver->is_frozen == 1) {
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+
+        try {
+            [$receiver, $amount, $salary] = $this->chargeService->chargeDollarForOwner_to_agency($user, $userUuid, $count);
+
+            $data = ['coins' => (string)$user->di, 'usd' => (string)$salary,];
+            return Common::apiResponse(1, 'Your recharge was successful', $data, 200);
+        } catch (Exception $e) {
+
+            return Common::apiResponse(0, $e->getMessage(), 400);
+        }
+    }
+
+    public function chargeDollarHistory(Request $request)
+    {
+        $userId = $request->user()->id;
+        if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
+        $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'host_agency');
+        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
+    }
+
+    public function chargeTo(Request $request)
+    {
+        $app_feature = \Cache::get('host_agency');
+        if (!$app_feature) {
+            throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
+        }
+
+        $types = [
+            'user' => [$this, 'chargeToUser'],
+            'agency' => [$this, 'chargeToAgency']
+        ];
+
+        $type = $request->input('type');
+        $instance = $types[$type] ?? $types['agency'];
+
+        if (!$instance) {
+            return Common::apiResponse(0, 'Type Not Found', 400);
+        }
+        try {
+            $data = call_user_func($instance, $request);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage(), 400);
+        }
+        return $data;
+    }
+
+    public function chargeToUser(Request $request)
+    {
+        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
+        if ($stop_all_charge == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_charge_settings'), 404);
+        }
+        $toId = $request->to_id;
+        $from = $request->user();
+        $isRoomTarget = false;
+        $to = User::find($toId);
+
+        if (!$to) return Common::apiResponse(0, 'User Not Found', 400);
+
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
+
+        Common::checkUserAgencyFrozen($from);
+
+        if ($to->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_receiver'), 404);
+        }
+
+        if (!$to) Common::apiResponse(0, __('user not found'), 404);
+
+        $usd = floatval($request->usd);
+
+        if ($usd <= 0) {
+            return Common::apiResponse(0, 'This value is not allowed', 422);
+        }
+
+        if (!$usd || !$to) {
+            return Common::apiResponse(0, 'not found', 404);
+        }
+        $rate = Common::getCoinsValue('user_coins');
+
+        if (!$rate) {
+            return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
+        }
+        $coins = $usd * $rate;
+
+        $totalSalary = $from->salary;
+        $roomSalary = $from->ownerRoom?->salary;
+        if ($totalSalary < $usd) {
+            return Common::apiResponse(0, 'balance not enough', 407);
+        } else if ($roomSalary >= $usd) {
+            $isRoomTarget = (bool)$from->ownerRoom;
+        }
+        DB::beginTransaction();
+        try {
+
+            $this->chargeService->chargeTo($from, $to, $coins, $isRoomTarget, $usd);
+            $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
+
+            DB::commit();
+
+            $notificationToken[] = DB::table('users')->where('id', $to->id)->value('notification_id');
+
+            $title = 'Coins Received';
+            $body = 'You have received :coins coins (equivalent to :usd USD) from :sender.';
+
+            CustomNotification::charges(
+                $to,
+                $title,
+                $body,
+                ['coins' => $coins, 'usd' => $usd, 'sender' => $from->name],
+            );
+
+            Common::send_firebase_notification($notificationToken, $title, $body);
+
+            return Common::apiResponse(1, 'success', $data, 201);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return Common::apiResponse(0, $exception->getMessage(), 400);
+        }
+    }
+
+    public function chargeToAgency(Request $request)
+    {
+        $stop_all_charge = settings()->get("stop_charge") ? settings()->get("stop_charge") : 0;
+        if ($stop_all_charge == 1) {
+            return Common::apiResponse(0, __('api_responses.freez_charge'), 404);
+        }
+
+        $toId = $request->to_id;
+        $from = $request->user();
+        $isRoomTarget = false;
+
+        if ($from->transfer_salary == 1) {
+            return Common::apiResponse(0, __('api_responses.freeze_transfer_charger'), 404);
+        }
+
+        Common::checkUserAgencyFrozen($from);
+
+        $to = Common::searchAgency($toId);
+        if (!$to) return Common::apiResponse(0, 'Not allowed To this agency or this not an agency', 422);
+
+        if (!ShippingAgencyHelper::isVerifiedChargeForAgency($to)) {
+            return Common::apiResponse(0, __('not_verified_agency'), 403);
+        }
+
+        if ($to->is_frozen == 1) {
+            return Common::apiResponse(0, __('api_responses.frozen_agency'), 404);
+        }
+
+        $usd = floatval($request->usd);
+
+        if ($usd <= 0) {
+            return Common::apiResponse(0, 'This value is not allowed', 422);
+        }
+
+        if (!$usd || !$to) {
+            return Common::apiResponse(0, 'not found', 404);
+        }
+        $rate = Common::getCoinsValue('shipping_coins');
+
+        if (!$rate) {
+            return Common::apiResponse(0, 'please set usd_value_in_coins in configs', 422);
+        }
+        $coins = $usd * $rate;
+        $totalSalary = $from->salary;
+        $roomSalary = $from->ownerRoom?->salary;
+        if ($totalSalary < $usd) {
+            return Common::apiResponse(0, 'balance not enough', 407);
+        } else if ($roomSalary >= $usd) {
+            $isRoomTarget = (bool)$from->ownerRoom;
+        }
+        DB::beginTransaction();
+        try {
+            $this->chargeService->chargeToAgency($from, $to, $coins, $isRoomTarget, $usd);
+
+            $data = ['coins' => (string)$from->di, 'usd' => (string)$from->salary,];
+
+            DB::commit();
+            return Common::apiResponse(1, 'success', $data, 201);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            return Common::apiResponse(0, $exception->getMessage(), 400);
+        }
+    }
+
+    public function getUserAgency(Request $request)
+    {
+        $data = $this->chargeService->userAgencySearch($request);
+        return Common::apiResponse(1, '', $data, 200);
+    }
+
+    public function chargeFromAgencyToAnother(Request $request)
+    {
+        $from = $request->user();
+        if (!$request->id || !$request->amount) return Common::apiResponse(false, 'missing_params');
+        if ($request->amount < 0) return Common::apiResponse(false, 'value not allow');
+
+        try {
+            $this->chargeService->chargeAgencyToAnother($from, $request);
+
+            return Common::apiResponse(1, 'your recharge was successful', 200);
+        } catch (Exception $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+    }
+
+    public function chargeToHistory(Request $request)
+    {
+        $types = [
+            'user' => [$this, 'chargeToUserHistory'],
+            'agency' => [$this, 'chargeToAgencyHistory']
+        ];
+
+        $type = $request->input('type');
+        $instance = $types[$type] ?? $types['user'];
+
+        if (!$instance) {
+            return Common::apiResponse(0, 'Type Not Found', 400);
+        }
+        $data = call_user_func($instance, $request);
+        return $data;
+    }
+
+    public function chargeToUserHistory($request)
+    {
+        $userId = auth()->user()->id;
+        $charge = $this->chargeService->getChargeToUserHistory();
+        return Common::apiResponse(1, '', DollarChargeLogResource::collection($charge), 200);
+    }
+
+    public function chargeToAgencyHistory($request)
+    {
+        $charge = $this->chargeService->getChargeAgencyHistory();
+        return Common::apiResponse(1, '', DollarChargeAgencyResource::collection($charge), 200);
+    }
+}

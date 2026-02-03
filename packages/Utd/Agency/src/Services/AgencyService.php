@@ -183,20 +183,6 @@ class AgencyService implements AgencyServiceInterface
     }
 
     /**
-     * Get agency members
-     */
-    public function agencyMembers($agencyId)
-    {
-        $agency = $this->agencyRepository->findById($agencyId);
-        
-        if (!$agency) {
-            throw new Exception(__('api_responses.agency'));
-        }
-        
-        return $this->agencyRepository->members($agency);
-    }
-
-    /**
      * Accept join request
      */
     public function acceptRequest($agencyId, $userId)
@@ -478,4 +464,113 @@ class AgencyService implements AgencyServiceInterface
     {
         return $this->leaveAgencyRequestRepository->reject($requestId);
     }
+
+    /**
+     * Get agency join requests
+     */
+    public function getAgencyJoinRequests($agencyId, $status = null, $paginate = true, $perPage = 10)
+    {
+        if ($paginate) {
+            return $this->agencyJoinRequestRepository->getPaginatedByAgencyWithStatus($agencyId, $status, $perPage);
+        }
+        
+        return $this->agencyJoinRequestRepository->getByAgencyWithStatus($agencyId, $status);
+    }
+
+    /**
+     * Get pending join requests for agency
+     */
+    public function getPendingJoinRequests($agencyId)
+    {
+        return $this->agencyJoinRequestRepository->getPendingByAgency($agencyId);
+    }
+
+    /**
+     * Show requests (for backward compatibility with old code)
+     */
+    public function showRequests($userId)
+    {
+        // This returns the user's own requests
+        return $this->agencyJoinRequestRepository->getByUser($userId);
+    }
+
+    /**
+     * Agency members
+     */
+    public function agencyMembers($agencyId)
+    {
+        if (!$agencyId) {
+            throw new Exception(__('api_responses.not_in_agency'));
+        }
+
+        $userModel = $this->getUserModel();
+        
+        return $userModel::where('agency_id', $agencyId)
+            ->with('profile')
+            ->paginate(10);
+    }
+
+    /**
+     * Request action (accept/reject)
+     */
+    public function requestAction($owner, $request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * List options for history
+     */
+    public function listOption($agencyId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Search agency history
+     */
+    public function historySearch($agencyId, $request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Update agency
+     */
+    public function update($userId, $agencyId, $request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * User handling request
+     */
+    public function userHandlingRequest($userId, $agencyId, $type)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get all charged agencies
+     */
+    public function allAgencyCharged($agencyId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get old agencies for user
+     */
+    public function gitOldAgencies($userId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
 }
+

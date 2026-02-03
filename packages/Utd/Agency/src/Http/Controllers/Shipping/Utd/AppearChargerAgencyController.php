@@ -29,7 +29,7 @@ class AppearChargerAgencyController extends Controller
             ->whereIn('type_user', [3, 4])
             ->paginate($perPage);
 
-        return Common::apiResponse(true, 'Success', AppearChargerAgencyResource::collection($users));
+        return AgencyHelper::apiResponse(true, 'Success', AppearChargerAgencyResource::collection($users));
     }
 
     public function update(Request $request, $id)
@@ -40,6 +40,6 @@ class AppearChargerAgencyController extends Controller
             'appear_charger_agency' => $request->appear_charger_agency
         ]);
 
-        return Common::apiResponse(true, 'Success');
+        return AgencyHelper::apiResponse(true, 'Success');
     }
 }

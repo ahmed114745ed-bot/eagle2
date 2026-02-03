@@ -171,7 +171,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     // all route with auth
     Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen', 'localization'])->group(
         function () {
-            Route::get('/agency-badges', [AgencySettingsController::class, 'badges']);
             // Route::post('/broadcasting/auth', function (Request $request) {
             //     return Broadcast::auth($request);
             // });
@@ -338,7 +337,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
                 Route::post('change-request', [CountryController::class, 'changeRequest']);
             });
             // user controller
-            Route::get('user-agency-information', [UserController::class, 'user_agency_information']);
 
 
             Route::prefix('backgrounds')->group(function () {
@@ -485,39 +483,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             Route::post('send-mail-to-customer-service', [QuestionController::class, 'send_mail_to_customer_service']);
             // end questions
 
-            Route::prefix('agencies')->middleware(['appFeatureEnable:agencies'])->group(function () {
-                Route::post('charge_co_for_users', [ChargeController::class, 'sendMoneyFoeHost']);
-                Route::get('charge_co_for_usersHistory', [ChargeController::class, 'chargeCoForUsersHistory']);
-                Route::post('charge_dollar_for_owner', [ChargeController::class, 'ChargeDollarForOwner']);
-                Route::get('charge_dollar_for_OwnerHistory', [ChargeController::class, 'chargeDollarHistory']);
-                Route::post('join_request', [AgencyController::class, 'joinRequest']);
-                Route::get('show', [AgencyController::class, 'view']);
-                Route::get('details/{id}', [AgencyController::class, 'agencyDetails']);
-                Route::get('admins/{id}', [AgencyController::class, 'admin']);
-                Route::get('target-details/{id}', [AgencyController::class, 'agencyTargetDetails']); //target
-                Route::get('stars/{id}', [AgencyController::class, 'star']);
-                Route::get('heroes/{id}', [AgencyController::class, 'heroes']);
-                Route::post('showAllusers', [AgencyController::class, 'agencyMembers']);
-                Route::get('show-agency-request', [AgencyController::class, 'showAgencyRequest']);
-                Route::get('show_request', [AgencyController::class, 'show_request']);
-                Route::post('actions_request', [AgencyController::class, 'Accept_request']);
-                Route::get('list_options_his', [AgencyController::class, 'list_options_his']);
-                Route::post('historyAgancy', [AgencyController::class, 'historyAgencySearch']);
-                Route::post('make-user-as-operator', [AgencyController::class, 'make_user_handling_requests']);
-                Route::post('charge_to', [ChargeController::class, 'chargeTo']);
-                Route::post('charges-history', [ChargeController::class, 'chargeToHistory']);
-                Route::get('history/{id}', [AgencyController::class, 'history']);
-                Route::post('{id}', [AgencyController::class, 'update'])->where('id', '[0-9]+');
-                Route::get('charges', [AgencyController::class, 'agenciesCharge']);
-                Route::post('charge-agency', [ChargeController::class, 'chargeFromAgencyToAnother']);
-                Route::get('old-agencies', [AgencyController::class, 'gitOldAgencies']);
-            });
 
-            Route::post('search-user-agency', [ChargeController::class, 'getUserAgency']);
-            Route::prefix('payment-gateway')->group(function () {
-                Route::get('/', [PaymentGetWayController::class, 'index']);
-                Route::post('/select-payment-get-way', [PaymentGetWayController::class, 'selectPaymentGateway']);
-            });
             Route::get('/charge-level', [ChargeLevelController::class, 'chargeLevel']);
 
             // coins reports

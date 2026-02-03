@@ -130,7 +130,7 @@ class AgencyMangerAgencyesController extends MainController
                         'total_hours' => $member->liveTime->sum("hours") ?? 0,
                         'monthly_diamond_received' => $member->monthly_diamond_received ?? 0,
                         'image' => $imageHtml,
-                        'salary' => $member->userSallary->sallary ?? '',
+                        'salary' => optional($member->userSallary)->sallary ?? 0,
                     ];
                 });
 
