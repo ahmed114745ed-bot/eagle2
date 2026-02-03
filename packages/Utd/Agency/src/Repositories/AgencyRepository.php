@@ -25,7 +25,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function findById($id)
     {
         return $this->model
-            ->with(['additionalInfo', 'mempers', 'admins', 'userSalaries'])
+            ->with(['additionalInfo', 'mempers', 'admins', 'userSalaries', 'owner.profile'])
             ->withCount('mempers')
             ->where('id', $id)
             ->first();
@@ -216,6 +216,7 @@ class AgencyRepository implements AgencyRepositoryInterface
             ->when(isset($id), function ($query) use ($id) {
                 $query->where('id', $id);
             })
+            ->with(['owner', 'owner.profile'])
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -235,6 +236,7 @@ class AgencyRepository implements AgencyRepositoryInterface
                         $query->where('status', 1);
                     });
             })
+            ->with(['owner', 'owner.profile'])
             ->orderByDesc('id')
             ->get();
     }
@@ -251,6 +253,7 @@ class AgencyRepository implements AgencyRepositoryInterface
                         $query->where('status', 1);
                     });
             })
+            ->with(['owner', 'owner.profile'])
             ->findOrFail($id);
     }
 
@@ -281,7 +284,7 @@ class AgencyRepository implements AgencyRepositoryInterface
                     $query->where('uuid', $uuid);
                 });
             })
-            ->with('additionalInfo', 'owner')
+            ->with(['additionalInfo', 'owner', 'owner.profile'])
             ->when(isset($id), function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -300,7 +303,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function getAgencyByFilter($keyword)
     {
         return $this->model
-            ->with('owner')
+            ->with(['owner', 'owner.profile'])
             ->where(function ($q) use ($keyword) {
                 $q->where('id', 'like', '%' . $keyword . '%');
             })
@@ -322,7 +325,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     {
         return $this->model
             ->where('agency_manger_id', $agencyMangerId)
-            ->with('owner')
+            ->with(['owner', 'owner.profile'])
             ->get();
     }
 
@@ -391,7 +394,7 @@ class AgencyRepository implements AgencyRepositoryInterface
                         ->orWhere('uuid', 'like', "%$search%");
                 });
             })
-            ->with('owner')
+            ->with(['owner', 'owner.profile'])
             ->paginate($perPage, ['*'], 'page', $page);
     }
 
@@ -435,6 +438,7 @@ class AgencyRepository implements AgencyRepositoryInterface
             ->when(isset($id), function ($query) use ($id) {
                 $query->where('id', $id);
             })
+            ->with(['owner', 'owner.profile'])
             ->get();
     }
 }

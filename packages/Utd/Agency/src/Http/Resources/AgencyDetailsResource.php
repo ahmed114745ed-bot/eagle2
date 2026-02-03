@@ -48,7 +48,7 @@ class AgencyDetailsResource extends JsonResource
             'name' => $this->name ?: '',
             'img' => $this->img ?: '',
             'bio'               => $this->contents,
-            'owner' => new MyDataForAgencyResource($this->owner) ?: [
+            'owner' => $this->owner ? new MyDataForAgencyResource($this->owner) : [
                 "id" => 0,
                 "uuid" => '',
                 "target_usd" => 0,

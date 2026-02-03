@@ -9,6 +9,26 @@ class MyDataForAgencyResource extends JsonResource
 {
     public function toArray($request)
     {
+        // التأكد من وجود بيانات
+        if (!$this->resource) {
+            return [
+                'id' => 0,
+                'uuid' => '',
+                'diamonds' => 0,
+                'name' => '',
+                'phone' => '',
+                'country' => null,
+                'vip' => null,
+                'level' => 0,
+                'profile' => [
+                    'image' => ''
+                ],
+                'has_color_name' => false,
+                'gender' => null,
+                'colored_name' => '',
+            ];
+        }
+
         $hasColor = AgencyHelper::hasInPack(@$this->id, 18, true);
 
         $data = [
