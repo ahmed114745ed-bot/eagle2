@@ -23,7 +23,7 @@ use App\Models\Bd;
 use App\Models\User;
 use App\Models\GiftLog;
 use Utd\Agency\Entities\ShippingAgency;
-use Utd\Agency\Entities\AgencySallary;
+use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Entities\Target;
 use Utd\Agency\Entities\UserTarget;
@@ -184,7 +184,7 @@ class AgencyController extends MainController
                 $salaries =
                     // Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
                     //     return
-                    AgencySallary::query()
+                    AgencySalary::query()
                     ->where('agency_id', $id)
                     ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                     ->orderByDesc('id')
@@ -193,16 +193,23 @@ class AgencyController extends MainController
                 break;
 
             case 'requests':
-                $agencyJoinRequests =
-                    //  Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
-                    //     return
-                    AgencyJoinRequest::query()
+                $agencyJoinRequests = AgencyJoinRequest::query()
                     ->where(['agency_id' => $id, 'status' => 0])
                     ->with('user')
                     ->whereHas('user')
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'join_page');
-                // });
+                
+                // Debug: Check data
+                dump([
+                    'agency_id' => $id,
+                    'total_requests' => AgencyJoinRequest::where('agency_id', $id)->count(),
+                    'pending_requests' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->count(),
+                    'with_user' => AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])->whereHas('user')->count(),
+                    'requests_data' => $agencyJoinRequests->toArray(),
+                    'user_model' => config('agency-package.models.user'),
+                ]);
+                
                 break;
 
             case 'targets':
@@ -552,7 +559,7 @@ class AgencyController extends MainController
         $grid->column('salary', __('Agency wallet'))->display(function () {
             $salary = 0;
             if (\Schema::hasTable('agency_salaries')) {
-                $salary = \Utd\Agency\Entities\AgencySallary::where('agency_id', $this->id)
+                $salary = \Utd\Agency\Entities\AgencySalary::where('agency_id', $this->id)
                     ->sum(\DB::raw('sallary - cut_amount'));
             }
             $coin = truncateAndTrim($salary);
