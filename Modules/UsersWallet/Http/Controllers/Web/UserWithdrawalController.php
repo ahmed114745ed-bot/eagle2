@@ -400,7 +400,7 @@ protected function detail($id)
             $walletLog->update([
                 'wallet_id' => $wallet->id,
                 'user_id' => $withdrawal->user->id,
-                'amount' => -$withdrawal->amount,
+                'amount' => $withdrawal->amount,
                 'operation' => 'rejected',
                 'type' => 'user',
                 'before_amount' => $available,
