@@ -86,6 +86,60 @@ class AgencyHelperService
         return '';
     }
     
+    public function hasInPack($userId, $packId, $checkActive = false)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'hasInPack')) {
+            return $this->commonHelper::hasInPack($userId, $packId, $checkActive);
+        }
+        
+        return false;
+    }
+    
+    public function wareUserVip($userId, $packId, $attribute)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'wareUserVip')) {
+            return $this->commonHelper::wareUserVip($userId, $packId, $attribute);
+        }
+        
+        return null;
+    }
+    
+    public function level_center_min($userId)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'level_center_min')) {
+            return $this->commonHelper::level_center_min($userId);
+        }
+        
+        return 0;
+    }
+    
+    public function ovip_center($userId)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'ovip_center')) {
+            return $this->commonHelper::ovip_center($userId);
+        }
+        
+        return 0;
+    }
+    
+    public function getChargerInfo($charge)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'getChargerInfo')) {
+            return $this->commonHelper::getChargerInfo($charge);
+        }
+        
+        return [];
+    }
+    
+    public function getReceiverInfo($charge)
+    {
+        if ($this->commonHelper && method_exists($this->commonHelper, 'getReceiverInfo')) {
+            return $this->commonHelper::getReceiverInfo($charge);
+        }
+        
+        return [];
+    }
+    
     public function __call($method, $parameters)
     {
         if ($this->commonHelper && method_exists($this->commonHelper, $method)) {
