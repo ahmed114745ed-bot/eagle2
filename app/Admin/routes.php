@@ -765,6 +765,7 @@ Route::group(
         // Pusher test route - outside local middleware for testing
         Route::get('/pusher-test/{id}', function ($id) {
             $user = \App\Models\User::findOrFail($id);
+            dd($user);
             $token = $user->createToken('broadcast')->plainTextToken;
 
             return view('test.test-pusher', compact('token'));
