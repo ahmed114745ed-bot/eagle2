@@ -90,7 +90,7 @@ class ConfigController extends Controller
         return Common::apiResponse(true, 'config returned success', $configs, 200);
     }
 
-   
+
 
     public function index()
     {
@@ -147,12 +147,12 @@ class ConfigController extends Controller
                 Cache::forever($key, $value);
             }
         }
-        
+
         // Clear all cache including rememberForever keys
         Cache::forget('all_configs');
         Cache::flush();
         Artisan::call('config:cache');
-        
+
         admin_success('Saved Successfully');
         return Redirect::back();
     }
@@ -161,21 +161,21 @@ class ConfigController extends Controller
     {
         $excludeKeys = ['_token', 'redirect_to', 'current_tab', 'inner_tab_type'];
         $keys = array_diff(array_keys($request->all()), $excludeKeys);
-        
+
         $updatedKeys = [];
         $hasPusherUpdate = false;
-        
+
         foreach ($keys as $key) {
             $value = $request->input($key);
-            
+
             Config::updateOrCreate(
                 ['name' => $key],
                 ['value' => $value]
             );
-            
+
             $updatedKeys[] = $key;
             Cache::forget($key);
-            
+
             if (in_array($key, ['pusher_app_id', 'pusher_app_key', 'pusher_app_secret', 'pusher_app_cluster'])) {
                 $hasPusherUpdate = true;
             }
@@ -184,12 +184,12 @@ class ConfigController extends Controller
         Cache::forget('pusher_config');
         Cache::forget('all_configs');
         Cache::flush();
-        
-        
-        if (method_exists(Cache::store('octane'), 'flush')) {
-            Cache::store('octane')->flush();
-        }
-        
+
+
+//        if (method_exists(Cache::store('octane'), 'flush')) {
+//            Cache::store('octane')->flush();
+//        }
+
         if ($hasPusherUpdate) {
             $pusherMapping = [
                 'pusher_app_key' => 'broadcasting.connections.pusher.key',
@@ -197,7 +197,7 @@ class ConfigController extends Controller
                 'pusher_app_id' => 'broadcasting.connections.pusher.app_id',
                 'pusher_app_cluster' => 'broadcasting.connections.pusher.options.cluster',
             ];
-            
+
             foreach ($pusherMapping as $key => $configKey) {
                 $value = $request->input($key);
                 if ($value !== null) {
@@ -208,15 +208,15 @@ class ConfigController extends Controller
                     }
                 }
             }
-            
+
             \App\Services\OctaneBroadcasterService::rebuildBroadcaster();
-            
+
         }
 
 
 
         $redirectUrl = url(config('admin.route.prefix') . '/settings');
-        
+
         if ($request->has('current_tab')) {
             $redirectUrl .= '?tab=' . $request->current_tab;
             if ($request->has('inner_tab_type')) {
