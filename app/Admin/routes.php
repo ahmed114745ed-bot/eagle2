@@ -760,14 +760,13 @@ Route::group(
 
             Route::get('/app-settings-test', [GiftLogTestController::class, 'showAppSettings']);
             Route::post('/app-settings-test', [GiftLogTestController::class, 'app_setting']);
-        });
 
-        // Pusher test route - outside local middleware for testing
-        Route::get('/pusher-test/{id}', function ($id) {
-            $user = \App\Models\User::findOrFail($id);
-            $token = $user->createToken('broadcast')->plainTextToken;
+            Route::get('/pusher-test/{id}', function ($id) {
+                $user = \App\Models\User::findOrFail($id);
+                $token = $user->createToken('broadcast')->plainTextToken;
 
-            return view('test.test-pusher', compact('token'));
+                return view('test.test-pusher', compact('token'));
+            });
         });
 
         Route::prefix('notifications')->group(function () {

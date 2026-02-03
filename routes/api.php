@@ -188,50 +188,10 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // });
             Route::post('/broadcasting/auth', function (Request $request) {
                 try {
-                    $user = auth()->user();
-                    $channelName = $request->input('channel_name');
-                    
-                    \Log::info('Broadcasting auth attempt', [
-                        'channel' => $channelName,
-                        'user_id' => $user ? $user->id : null,
-                        'socket_id' => $request->input('socket_id'),
-                    ]);
-                    
-                    if (!$user) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'User not authenticated',
-                        ], 401);
-                    }
-                    
                     $authResponse = Broadcast::auth($request);
                     return $authResponse;
-                } catch (\Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException $e) {
-                    \Log::error('Broadcasting auth denied', [
-                        'channel' => $request->input('channel_name'),
-                        'user' => auth()->id(),
-                        'exception' => get_class($e),
-                    ]);
-                    return response()->json([
-                        'success' => false, 
-                        'message' => 'Channel authorization failed - channel not found or access denied',
-                        'channel' => $request->input('channel_name'),
-                        'user_id' => auth()->id(),
-                    ], 403);
                 } catch (\Exception $e) {
-                    \Log::error('Broadcasting auth error', [
-                        'message' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                        'channel' => $request->input('channel_name'),
-                        'user' => auth()->id(),
-                    ]);
-                    return response()->json([
-                        'success' => false, 
-                        'message' => $e->getMessage() ?: 'Unknown error',
-                        'exception' => get_class($e),
-                        'file' => $e->getFile(),
-                        'line' => $e->getLine(),
-                    ], 500);
+                    return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
                 }
             });
 

@@ -47,11 +47,6 @@ Broadcast::channel('test-channel', function () {
     return true; // No authentication required
 });
 
-// Simple test channel for debugging
-Broadcast::channel('test-private', function ($user) {
-    return $user ? true : false;
-});
-
 
 Broadcast::channel('presence.user.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id
