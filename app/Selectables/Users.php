@@ -15,7 +15,11 @@ class Users extends Selectable
 
     public function make()
     {
-        $this->grid->model()->with('profile')->doesntHave('gamePercentage');
+        $percentageGameId = request('viaResourceId');
+        if (!$percentageGameId) {
+            $this->grid->model()->with('profile')->doesntHave('gamePercentage');
+        }
+
         $this->column('id');
         $this->column('uuid');
         $this->column('name');
