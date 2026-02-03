@@ -16,9 +16,17 @@ return new class extends Migration
         if (!Schema::hasTable('real_categories')) {
             Schema::create('real_categories', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('real_id')->constrained('reals')->onDelete('cascade');
-                $table->foreignId('category_id')->constrained('interests')->onDelete('cascade');
+                $table->unsignedBigInteger('real_id');
+                $table->unsignedBigInteger('category_id');
                 $table->timestamps();
+                
+                // Only add foreign keys if referenced tables exist
+                if (Schema::hasTable('reals')) {
+                    $table->foreign('real_id')->references('id')->on('reals')->onDelete('cascade');
+                }
+                if (Schema::hasTable('interests')) {
+                    $table->foreign('category_id')->references('id')->on('interests')->onDelete('cascade');
+                }
             });
         }
     }

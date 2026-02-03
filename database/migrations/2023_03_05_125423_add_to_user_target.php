@@ -14,8 +14,12 @@ class AddToUserTarget extends Migration
     public function up()
     {
         Schema::table('user_target', function (Blueprint $table) {
-            $table->double ('agency_obtain')->nullable ()->default (0);
-            $table->double ('user_obtain')->nullable ()->default (0);
+            if (!Schema::hasColumn('user_target', 'agency_obtain')) {
+                $table->double('agency_obtain')->nullable()->default(0);
+            }
+            if (!Schema::hasColumn('user_target', 'user_obtain')) {
+                $table->double('user_obtain')->nullable()->default(0);
+            }
         });
     }
 

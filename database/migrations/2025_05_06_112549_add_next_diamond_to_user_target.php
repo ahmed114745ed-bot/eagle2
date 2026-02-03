@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_target', function (Blueprint $table) {
-            $table->double('next_diamond')->nullable();
+            if (!Schema::hasColumn('user_target', 'next_diamond')) {
+                $table->double('next_diamond')->nullable();
+            }
         });
     }
 

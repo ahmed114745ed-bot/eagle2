@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-
         Schema::table('agencies', function (Blueprint $table) {
-            $table->unsignedBigInteger('created_by')->nullable()->after('id'); 
+            if (!Schema::hasColumn('agencies', 'created_by')) {
+                $table->unsignedBigInteger('created_by')->nullable()->after('id');
+            }
         });
     }
 

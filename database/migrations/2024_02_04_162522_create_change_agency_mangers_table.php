@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('change_agency_mangers')) {
+            return;
+        }
+        
         Schema::create('change_agency_mangers', function (Blueprint $table) {
             $table->id();
             $table->text('agencies_ids')->nullable();
-            $table->unsignedBigInteger ('old_agency_manger_id')->nullable ();
-            $table->unsignedBigInteger ('new_agency_manger_id')->nullable ();
+            $table->unsignedBigInteger('old_agency_manger_id')->nullable();
+            $table->unsignedBigInteger('new_agency_manger_id')->nullable();
             $table->timestamps();
         });
     }

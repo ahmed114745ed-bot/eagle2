@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('agency_manger_app_dash')) {
+            return;
+        }
+        
         Schema::create('agency_manger_app_dash', function (Blueprint $table) {
             $table->id();
             $table->integer('dash_id')->default(0);

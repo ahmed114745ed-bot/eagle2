@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('charge_agencies')) {
+            return;
+        }
+        
         Schema::create('charge_agencies', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger ('agency_id')->nullable ()->default (0);
+            $table->unsignedInteger('agency_id')->nullable()->default(0);
             $table->timestamps();
         });
     }

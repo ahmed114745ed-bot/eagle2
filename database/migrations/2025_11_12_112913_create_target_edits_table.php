@@ -11,18 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('target_edits', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('target_id');
-            $table->unsignedBigInteger('edited_by')->nullable(); 
-            $table->json('data'); 
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending'); 
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('target_edits')) {
+            Schema::create('target_edits', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('target_id');
+                $table->unsignedBigInteger('edited_by')->nullable(); 
+                $table->json('data'); 
+                $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending'); 
+                $table->timestamps();
+            });
+        }
 
         Schema::table('targets', function (Blueprint $table) {
-            $table->boolean('under_edit')->default(false);
-            $table->unsignedBigInteger('edit_id')->nullable();
+            if (!Schema::hasColumn('targets', 'under_edit')) {
+                $table->boolean('under_edit')->default(false);
+            }
+            if (!Schema::hasColumn('targets', 'edit_id')) {
+                $table->unsignedBigInteger('edit_id')->nullable();
+            }
         });
 
     }
