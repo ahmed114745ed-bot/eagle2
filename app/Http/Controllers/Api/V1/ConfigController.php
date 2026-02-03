@@ -190,6 +190,7 @@ class ConfigController extends Controller
 //            Cache::store('octane')->flush();
 //        }
 
+
         if ($hasPusherUpdate) {
             $pusherMapping = [
                 'pusher_app_key' => 'broadcasting.connections.pusher.key',
