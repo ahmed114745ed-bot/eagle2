@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Auth\Permission;
+use Throwable;
 
 class ConfigController extends Controller
 {
@@ -185,9 +186,11 @@ class ConfigController extends Controller
         Cache::forget('all_configs');
         Cache::flush();
 
-        if (array_key_exists('octane', config('cache.stores'))) {
-            if (method_exists(Cache::store('octane'), 'flush')) {
+
+        if (method_exists(Cache::store('octane'), 'flush')) {
+            try {
                 Cache::store('octane')->flush();
+            } catch (Throwable $e) {
             }
         }
 
