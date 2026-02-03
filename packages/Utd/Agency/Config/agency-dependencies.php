@@ -2,16 +2,10 @@
 
 return [
     
-    /*
-    |--------------------------------------------------------------------------
-    | Agency Services Dependencies Configuration
-    |--------------------------------------------------------------------------
-    | Configure which models and services to use for agency functionality
-    */
     
     'dependencies' => [
         
-        // Models mapping
+
         'models' => [
             'user' => \App\Models\User::class,
             'agency' => \App\Models\Agency::class,
@@ -21,14 +15,14 @@ return [
             'agency_salary' => \App\Models\AgencySallary::class,
         ],
         
-        // Services mapping
+
         'services' => [
             'agency_service' => \App\Tik\Services\AgencyService::class,
             'charge_service' => \App\Tik\Services\ChargeRepoService::class,
             'agency_host_invite_service' => \App\Tik\Services\AgencyHostInviteService::class,
         ],
         
-        // Helpers mapping
+
         'helpers' => [
             'common' => \App\Helpers\Common::class,
             'user_common' => \App\Helpers\UserCommon::class,
@@ -37,12 +31,6 @@ return [
         ],
     ],
     
-    /*
-    |--------------------------------------------------------------------------
-    | External Modules Configuration
-    |--------------------------------------------------------------------------
-    | Configure which external modules are available and their classes
-    */
     
     'modules' => [
         'reals' => [
@@ -63,11 +51,6 @@ return [
         ],
     ],
     
-    /*
-    |--------------------------------------------------------------------------
-    | Features Configuration
-    |--------------------------------------------------------------------------
-    */
     
     'features' => [
         'host_agency' => env('AGENCY_HOST_ENABLED', true),

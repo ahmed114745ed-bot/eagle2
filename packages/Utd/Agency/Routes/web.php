@@ -21,12 +21,6 @@ use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyTargetController;
 use Utd\Agency\Http\Controllers\Admin\AgencyControllers\ChargeController;
 use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyJoinRequestController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes (Admin Panel)
-|--------------------------------------------------------------------------
-*/
-
 Route::group([
     'prefix' => config('admin.route.prefix'),
     'middleware' => [
@@ -38,7 +32,6 @@ Route::group([
     'as' => config('admin.route.prefix') . '.',
 ], function () {
 
-    // Package Management (No agency feature check required)
     Route::group([
         'prefix' => 'agency',
         'as' => 'agency.',
@@ -48,10 +41,8 @@ Route::group([
         Route::get('debug', [PackageController::class, 'debug'])->name('debug');
     });
 
-    // Agency Features (Requires installation and activation)
     Route::group(['middleware' => ['web-agency-feature']], function () {
 
-        // Main Agency CRUD
         Route::resource('agencies', AgencyController::class);
         Route::get('agencies/profile/{id}', [AgencyController::class, 'profile'])->name('agency.profile');
         Route::post('agencies/accept_join/{id}', [AgencyController::class, 'acceptJoin']);
@@ -59,35 +50,28 @@ Route::group([
         Route::post('agencies/admin/{id}', [AgencyController::class, 'adminAgency']);
         Route::post('agencies/kick/{id}', [AgencyController::class, 'kickFromAgency']);
 
-        // Agency Manager Routes
         Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);
         Route::resource('agency-manger-users', AgencyMangerUsers::class);
         Route::resource('agency-manger-target', AgencyMangerTaregetController::class);
 
-        // Change agency manager
         Route::resource('change_agencies_manger', ChangeAgencyMangerController::class);
 
-        // Users joined agencies
         Route::resource('users-joined-agencies', UsersJoinedAgencyController::class);
 
-        // Host agencies alias
         Route::resource('host-agencies', AgencyController::class);
         Route::get('host-agencies/profile/{id}', [AgencyController::class, 'profile'])->name('host-agencies.profile');
         Route::post('host-agencies/{id}/accept-join', [AgencyController::class, 'acceptJoin'])->name('host-agencies.accept-join');
         Route::post('host-agencies/{id}/reject-join', [AgencyController::class, 'rejectJoin'])->name('host-agencies.reject-join');
         Route::post('host-agencies/{id}/kick', [AgencyController::class, 'kick'])->name('host-agencies.kick');
 
-        // Join requests
         Route::resource('agency-join-requests', JoinRequestController::class)->only(['index']);
         Route::post('agency-join-requests/{id}/accept', [JoinRequestController::class, 'accept'])->name('agency-join-requests.accept');
         Route::post('agency-join-requests/{id}/reject', [JoinRequestController::class, 'reject'])->name('agency-join-requests.reject');
 
-        // Salaries
         Route::get('agency-salaries', [SalaryController::class, 'index'])->name('agency-salaries.index');
         Route::post('agency-salaries/{id}/mark-paid', [SalaryController::class, 'markAsPaid'])->name('agency-salaries.mark-paid');
         Route::get('agency-salaries/report', [SalaryController::class, 'report'])->name('agency-salaries.report');
 
-        // Agency Controllers Group (ag prefix)
         Route::prefix('ag')->name('agency.')->group(function () {
             Route::get('/', [HomeController::class, 'infoBox'])->name('home');
             Route::resource('/users', UserController::class);
