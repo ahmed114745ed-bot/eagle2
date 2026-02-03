@@ -724,7 +724,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
      */
     public function delete(int $id): bool
     {
-        return $this->model->where('id', $id)->delete();
+        return (bool)$this->model->where('id', $id)->delete();
     }
 
     /**
@@ -800,16 +800,11 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     }
 
     /**
-     * Get room user info (admin, speak, judge, sound)
+     * Get room user info (admin, speak, judge, sound, room_black, id)
      */
     public function getRoomUserInfoByUid($uid)
     {
-        return \DB::table('rooms')->where('uid', $uid)->select([
-            'room_admin',
-            'room_speak',
-            'room_judge',
-            'room_sound'
-        ])->get()->toArray();
+        return \DB::table('rooms')->where('uid', $uid)->first();
     }
 
     /**

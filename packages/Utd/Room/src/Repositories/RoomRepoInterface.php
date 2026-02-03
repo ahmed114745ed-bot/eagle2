@@ -10,7 +10,7 @@ interface RoomRepoInterface
     public function find(int $id): ?Model;
     public function findByUid($id);
     public function findByType($id, $type);
-    public function create($data);
+    public function create(array $data): mixed;
     public function update($req, $id);
     public function save($model);
     public function delete(int $id): bool;
