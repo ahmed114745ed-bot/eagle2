@@ -1066,6 +1066,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-boom-rewards', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'super-boom-rules', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                     [
                         'key' => 'room-boom-winners',
                         'except' => ['create', 'edit', 'delete', 'show'],
