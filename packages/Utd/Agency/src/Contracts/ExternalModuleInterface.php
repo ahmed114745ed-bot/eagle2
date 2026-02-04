@@ -10,7 +10,9 @@ interface ExternalModuleInterface
     public function isAvailable(): bool;
     
     /**
-     * Get module service or helper
+     * Get module service, helper, or model class
+     * @param string|null $identifier Optional identifier for getting specific models or services
+     * @return mixed
      */
-    public function get();
+    public function get($identifier = null);
 }

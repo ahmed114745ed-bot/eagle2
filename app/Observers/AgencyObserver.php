@@ -46,7 +46,8 @@ class AgencyObserver
      */
     public function deleted(Agency $agency)
     {
-        if ($agency->Host_agency) {
+        // type = 1 means host agency, type = 2 means shipping agency
+        if ($agency->type == 1) {
             AgencyJoinRequest::query()->where('agency_id', $agency->id)->delete();
             UserHandling::kickOfAllUsersFromAgency($agency);
             User::query()->where('agency_id', $agency->id)->update(['agency_id' => 0, 'type_user' => 0]);

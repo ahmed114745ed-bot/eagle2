@@ -183,7 +183,7 @@ class AgencyController extends MainController
                     // Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
                     //     return
                     AgencySalary::query()
-                    ->where('agency_id', $id)
+                    ->where('agency_id', $agencyId)
                     ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'salary_page');
@@ -192,7 +192,7 @@ class AgencyController extends MainController
 
             case 'requests':
                 $agencyJoinRequests = AgencyJoinRequest::query()
-                    ->where(['agency_id' => $id, 'status' => 0])
+                    ->where(['agency_id' => $agencyId, 'status' => 0])
                     ->with('user')
                     ->whereHas('user')
                     ->orderByDesc('id')
