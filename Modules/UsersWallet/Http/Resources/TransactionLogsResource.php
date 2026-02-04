@@ -39,7 +39,7 @@ class TransactionLogsResource extends JsonResource
                 break;
 
             case 'subtract':
-                $title = __('withdrawCoins', ['admin' => $this->admin ? $this->admin->name : '']);
+                $title = __('withdrawCoins', ['admin' => $this->authAdmin ? $this->authAdmin->name : '']);
                 break;
             case 'withdrawal_pending':
                 $title = __('withdrawal pending');

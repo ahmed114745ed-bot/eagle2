@@ -19,7 +19,8 @@ class WalletLog extends Model
         'type',
         'before_amount',
         'after_amount',
-        'related_id'
+        'related_id',
+        'auth_id'
     ];
 
     public function wallet()
@@ -35,6 +36,13 @@ class WalletLog extends Model
     {
         return $this->belongsTo(Admin::class, 'related_id');
     }
+
+    public function authAdmin()
+    {
+        return $this->belongsTo(Admin::class, 'auth_id');
+    }
+
+
 
     public function related()
     {
