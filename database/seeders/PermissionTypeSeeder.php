@@ -714,6 +714,25 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'room-cup-target',
+                'sort' => 26,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 26],
+                ],
+                'permissions' => [
+
+                    ['key' => 'room-cup-target', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'room-cup-settings', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                    ['key' => 'room-cup-report', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ],
+            [
                 'name' => 'Gift',
                 'sort' => 26,
                 'types' => [
