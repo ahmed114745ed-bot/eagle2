@@ -21,27 +21,31 @@ class AdminReelController extends MainController
             ->withCount(['likes', 'comments', 'Views'])
             ->orderByRaw("RAND(?)", [$seed])
             ->limit(15) 
-            ->get()
-            ->map(function ($reel) {
-                $videoUrl = $this->buildMediaUrl($reel->url);
-                $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+            ->get();
+        
+        // Get gifts counts if available
+        $giftsCounts = $this->getGiftsCountsForReels($reels->pluck('id')->toArray());
+        
+        $reels = $reels->map(function ($reel) use ($giftsCounts) {
+            $videoUrl = $this->buildMediaUrl($reel->url);
+            $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
 
-                return [
-                    'id' => $reel->id,
-                    'user_id' => $reel->user_id,
-                    'user' => $reel->user,
-                    'title' => $reel->description ?: 'بدون عنوان',
-                    'description' => $reel->description,
-                    'video_url' => $videoUrl,
-                    'thumbnail_url' => $thumbnailUrl ?: null,
-                    'thumbnail_needs_capture' => empty($thumbnailUrl),
-                    'likes_count' => $reel->likes_count ?? 0,
-                    'comments_count' => $reel->comments_count ?? 0,
-                    'views_count' => $reel->views_count ?? 0,
-                    'gifts_count' => 0,
-                    'created_at' => $reel->created_at,
-                ];
-            });
+            return [
+                'id' => $reel->id,
+                'user_id' => $reel->user_id,
+                'user' => $reel->user,
+                'title' => $reel->description ?: 'بدون عنوان',
+                'description' => $reel->description,
+                'video_url' => $videoUrl,
+                'thumbnail_url' => $thumbnailUrl ?: null,
+                'thumbnail_needs_capture' => empty($thumbnailUrl),
+                'likes_count' => $reel->likes_count ?? 0,
+                'comments_count' => $reel->comments_count ?? 0,
+                'views_count' => $reel->views_count ?? 0,
+                'gifts_count' => $giftsCounts[$reel->id] ?? 0,
+                'created_at' => $reel->created_at,
+            ];
+        });
 
         return $content
             ->body(view('reals::admin.reels.index', compact('reels', 'seed')));
@@ -67,27 +71,31 @@ class AdminReelController extends MainController
         
         $reels = $query->orderByRaw("RAND(?)", [$seed])
             ->take($limit)
-            ->get()
-            ->map(function ($reel) {
-                $videoUrl = $this->buildMediaUrl($reel->url);
-                $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+            ->get();
+        
+        // Get gifts counts if available
+        $giftsCounts = $this->getGiftsCountsForReels($reels->pluck('id')->toArray());
+        
+        $reels = $reels->map(function ($reel) use ($giftsCounts) {
+            $videoUrl = $this->buildMediaUrl($reel->url);
+            $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
 
-                return [
-                    'id' => $reel->id,
-                    'user_id' => $reel->user_id,
-                    'user' => $reel->user,
-                    'title' => $reel->description ?: 'بدون عنوان',
-                    'description' => $reel->description,
-                    'video_url' => $videoUrl,
-                    'thumbnail_url' => $thumbnailUrl ?: null,
-                    'thumbnail_needs_capture' => empty($thumbnailUrl),
-                    'likes_count' => $reel->likes_count ?? 0,
-                    'comments_count' => $reel->comments_count ?? 0,
-                    'views_count' => $reel->views_count ?? 0,
-                    'gifts_count' => 0,
-                    'created_at' => $reel->created_at,
-                ];
-            });
+            return [
+                'id' => $reel->id,
+                'user_id' => $reel->user_id,
+                'user' => $reel->user,
+                'title' => $reel->description ?: 'بدون عنوان',
+                'description' => $reel->description,
+                'video_url' => $videoUrl,
+                'thumbnail_url' => $thumbnailUrl ?: null,
+                'thumbnail_needs_capture' => empty($thumbnailUrl),
+                'likes_count' => $reel->likes_count ?? 0,
+                'comments_count' => $reel->comments_count ?? 0,
+                'views_count' => $reel->views_count ?? 0,
+                'gifts_count' => $giftsCounts[$reel->id] ?? 0,
+                'created_at' => $reel->created_at,
+            ];
+        });
         
         return response()->json([
             'reels' => $reels,
@@ -104,6 +112,9 @@ class AdminReelController extends MainController
 
         $videoUrl = $this->buildMediaUrl($reel->url);
         $thumbnailUrl = $this->buildMediaUrl($reel->intro_image);
+        
+        // Get gifts count for this reel
+        $giftsCounts = $this->getGiftsCountsForReels([$id]);
 
         return response()->json([
             'reel' => [
@@ -118,7 +129,7 @@ class AdminReelController extends MainController
                 'likes_count' => $reel->likes_count ?? 0,
                 'comments_count' => $reel->comments_count ?? 0,
                 'views_count' => $reel->views_count ?? 0,
-                'gifts_count' => 0,
+                'gifts_count' => $giftsCounts[$id] ?? 0,
                 'created_at' => $reel->created_at,
             ],
             'likes' => $reel->likes,
@@ -145,7 +156,46 @@ class AdminReelController extends MainController
     
     public function getGifts($id)
     {
-        return response()->json(['gifts' => []]);
+        try {
+            // Check if GiftLog class exists (from Gifts package)
+            if (!class_exists('Utd\Gifts\Entities\GiftLog')) {
+                return response()->json(['gifts' => []]);
+            }
+            
+            $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+            
+            // Get gifts for this reel from gift_logs where type='reel'
+            $gifts = $GiftLogClass::where('real_id', $id)
+                ->with(['sender.profile', 'sender.country', 'gift'])
+                ->orderBy('created_at', 'desc')
+                ->limit(50)
+                ->get()
+                ->map(function ($giftLog) {
+                    return [
+                        'id' => $giftLog->id,
+                        'user' => $giftLog->sender ? [
+                            'id' => $giftLog->sender->id,
+                            'name' => $giftLog->sender->name,
+                            'profile' => $giftLog->sender->profile,
+                            'country' => $giftLog->sender->country,
+                        ] : null,
+                        'gift' => $giftLog->gift ? [
+                            'id' => $giftLog->gift->id,
+                            'name' => $giftLog->gift->name,
+                            'icon' => $giftLog->gift->icon,
+                            'diamond' => $giftLog->gift->diamond,
+                        ] : null,
+                        'count' => $giftLog->count ?? 1,
+                        'created_at' => $giftLog->created_at,
+                    ];
+                });
+            
+            return response()->json(['gifts' => $gifts]);
+        } catch (\Exception $e) {
+            // If any error occurs, return empty array
+            \Log::error('Error loading gifts for reel: ' . $e->getMessage());
+            return response()->json(['gifts' => []]);
+        }
     }
     
     public function batchCounts(Request $request)
@@ -159,16 +209,34 @@ class AdminReelController extends MainController
             
             $reelIds = array_slice($reelIds, 0, 10);
             
+            // Get gifts counts if GiftLog exists
+            $giftsCounts = [];
+            if (class_exists('Utd\Gifts\Entities\GiftLog')) {
+                try {
+                    $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+                    $giftsCountsQuery = $GiftLogClass::selectRaw('real_id, COUNT(*) as count')
+                        ->whereIn('real_id', $reelIds)
+                        ->groupBy('real_id')
+                        ->get();
+                    
+                    foreach ($giftsCountsQuery as $item) {
+                        $giftsCounts[$item->real_id] = $item->count;
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Could not load gift counts: ' . $e->getMessage());
+                }
+            }
+            
             $reels = Real::whereIn('id', $reelIds)
                 ->withCount(['likes', 'comments', 'Views'])
                 ->get(['id'])
-                ->map(function($reel) {
+                ->map(function($reel) use ($giftsCounts) {
                     return [
                         'id' => $reel->id,
                         'likes_count' => $reel->likes_count ?? 0,
                         'comments_count' => $reel->comments_count ?? 0,
                         'views_count' => $reel->views_count ?? 0,
-                        'gifts_count' => 0,
+                        'gifts_count' => $giftsCounts[$reel->id] ?? 0,
                     ];
                 });
             
@@ -280,5 +348,40 @@ class AdminReelController extends MainController
         }
 
         return asset('storage/' . ltrim($path, '/'));
+    }
+    
+    /**
+     * Helper method to get gifts counts for multiple reels safely
+     * Returns empty array if GiftLog class doesn't exist
+     */
+    private function getGiftsCountsForReels(array $reelIds): array
+    {
+        if (empty($reelIds)) {
+            return [];
+        }
+        
+        // Check if GiftLog class exists (from Gifts package)
+        if (!class_exists('Utd\Gifts\Entities\GiftLog')) {
+            return [];
+        }
+        
+        try {
+            $GiftLogClass = 'Utd\Gifts\Entities\GiftLog';
+            $giftsCountsQuery = $GiftLogClass::selectRaw('real_id, COUNT(*) as count')
+                ->whereIn('real_id', $reelIds)
+                ->whereNotNull('real_id')
+                ->groupBy('real_id')
+                ->get();
+            
+            $giftsCounts = [];
+            foreach ($giftsCountsQuery as $item) {
+                $giftsCounts[$item->real_id] = $item->count;
+            }
+            
+            return $giftsCounts;
+        } catch (\Exception $e) {
+            \Log::warning('Could not load gift counts for reels: ' . $e->getMessage());
+            return [];
+        }
     }
 }

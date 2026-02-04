@@ -133,5 +133,6 @@ class Kernel extends HttpKernel
         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 
         'verify.pusher' => \App\Http\Middleware\VerifyPusherSignature::class,
+        'gifts.installed' => \App\Http\Middleware\CheckGiftsPackageInstalled::class,
     ];
 }

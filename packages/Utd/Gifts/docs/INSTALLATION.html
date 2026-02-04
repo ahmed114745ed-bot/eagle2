@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تثبيت باكيج الهدايا</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-right: 5px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .step {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .command {
+            color: #50fa7b;
+        }
+
+        .string {
+            color: #f1fa8c;
+        }
+
+        .success {
+            background: #d4edda;
+            border-right: 5px solid #28a745;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .icon {
+            font-size: 1.2em;
+            margin-left: 10px;
+        }
+
+        .footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        ul {
+            margin-right: 20px;
+            margin-top: 10px;
+        }
+
+        ul li {
+            margin: 10px 0;
+            padding-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎁 تثبيت باكيج الهدايا</h1>
+            <div class="subtitle">5 خطوات فقط</div>
+            <div style="margin-top: 20px; font-size: 0.9em;">
+                UTD Gifts Package | Laravel 10+
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- المتطلبات -->
+            <div class="section">
+                <h2>📋 المتطلبات</h2>
+                <ul>
+                    <li><strong>Laravel:</strong> 10+ أو 11+</li>
+                    <li><strong>PHP:</strong> 8.1+</li>
+                    <li><strong>Composer</strong></li>
+                </ul>
+            </div>
+
+            <!-- خطوات التثبيت -->
+            <div class="section">
+                <h2>🚀 خطوات التثبيت</h2>
+
+                <!-- الخطوة 1 -->
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <strong>إضافة الباكيج إلى composer.json</strong>
+                    <p>افتح ملف <code>composer.json</code> في جذر المشروع</p>
+                    
+                    <p style="margin: 15px 0; padding: 10px; background: #fff3cd; border-radius: 5px;">
+                        <strong>⚠️ ملاحظة:</strong> أضف هذه الأسطر داخل الملف الموجود، لا تحذف المحتوى القديم
+                    </p>
+                    
+                    <h4 style="margin: 20px 0 10px 0;">أولاً: أضف في قسم "repositories":</h4>
+                    <div class="code-block">
+<code><span class="string">"repositories"</span>: [
+    {
+        <span class="string">"type"</span>: <span class="string">"path"</span>,
+        <span class="string">"url"</span>: <span class="string">"./packages/Utd/Gifts"</span>
+    }
+]</code>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px 0;">ثانياً: أضف في قسم "require":</h4>
+                    <div class="code-block">
+<code><span class="string">"require"</span>: {
+    <span class="string">"utd/gifts"</span>: <span class="string">"*"</span>
+}</code>
+                    </div>
+                    
+                    <h4 style="margin: 20px 0 10px 0;">مثال: الشكل النهائي الكامل</h4>
+                    <div class="code-block">
+<code>{
+    <span class="string">"name"</span>: <span class="string">"your-project"</span>,
+    <span class="string">"repositories"</span>: [
+        {
+            <span class="string">"type"</span>: <span class="string">"path"</span>,
+            <span class="string">"url"</span>: <span class="string">"./packages/Utd/Gifts"</span>
+        }
+    ],
+    <span class="string">"require"</span>: {
+        <span class="string">"php"</span>: <span class="string">"^8.1"</span>,
+        <span class="string">"laravel/framework"</span>: <span class="string">"^10.0"</span>,
+        <span class="string">"utd/gifts"</span>: <span class="string">"*"</span>
+    }
+}</code>
+                    </div>
+                </div>
+
+                <!-- الخطوة 2 -->
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <strong>تثبيت الباكيج</strong>
+                    <div class="code-block">
+<code><span class="command">composer update utd/gifts</span></code>
+                    </div>
+                </div>
+
+                <!-- الخطوة 3 -->
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <strong>نشر ملف Config</strong>
+                    <div class="code-block">
+<code><span class="command">php artisan vendor:publish --tag=gifts-config</span></code>
+                    </div>
+                </div>
+
+                <!-- الخطوة 4 -->
+                <div class="step">
+                    <span class="step-number">4</span>
+                    <strong>تشغيل الـ Migrations</strong>
+                    <div class="code-block">
+<code><span class="command">php artisan migrate</span></code>
+                    </div>
+                    <div class="success">
+                        <span class="icon">✅</span>
+                        سيتم إنشاء الجداول تلقائياً!
+                    </div>
+                </div>
+
+                <!-- الخطوة 5 -->
+                <div class="step">
+                    <span class="step-number">5</span>
+                    <strong>تنظيف الـ Cache وإعادة التشغيل</strong>
+                    <div class="code-block">
+<code><span class="command">php artisan config:clear</span>
+<span class="command">php artisan cache:clear</span></code>
+                    </div>
+                </div>
+            </div>
+
+            <!-- اختبار -->
+            <div class="section">
+                <h2>✅ اختبار التثبيت</h2>
+                <div class="step">
+                    <p>افتح المتصفح:</p>
+                    <div class="code-block">
+<code><span class="string">http://your-domain.com/admin/gifts</span></code>
+                    </div>
+                    <div class="success">
+                        <span class="icon">🎉</span>
+                        <strong>إذا ظهرت صفحة الهدايا، التثبيت تم بنجاح!</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>✨ تم! جاهز للاستخدام ✨</h3>
+            <p style="margin-top: 15px; opacity: 0.8;">
+                Made with ❤️ by UTD Team | 2026
+            </p>
+        </div>
+    </div>
+</body>
+</html>

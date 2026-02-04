@@ -42,9 +42,13 @@ class MoveGiftCategory extends RowAction
 
                 $categories = [];
                 foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
-                    $title = $category->title[$locale]
-                        ?? $category->title['en']
-                        ?? reset($category->title);
+                    $titleValue = $category->title;
+                    
+                    if (is_array($titleValue)) {
+                        $title = $titleValue[$locale] ?? $titleValue['en'] ?? reset($titleValue);
+                    } else {
+                        $title = $titleValue;
+                    }
 
                     $categories[$category->id] = $title;
                 }
