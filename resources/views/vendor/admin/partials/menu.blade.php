@@ -123,6 +123,10 @@ $isVisible =
     );
 @endphp
 
+@php
+dump($item);
+@endphp
+
 @if($isVisible)
 @php
     $renderedMenu[] = $itemId;
