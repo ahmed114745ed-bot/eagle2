@@ -365,7 +365,7 @@ class UserWithdrawalController extends MainController
         $walletLog->type = 'user';
         $walletLog->before_amount = $available;
         $walletLog->after_amount = $after_amount;
-        $walletLog->related_id = Auth::id();
+        $walletLog->auth_id = Auth::id();
         $walletLog->save();
 
          $updatedWalletLog = WalletLog::find($walletLog->id);
@@ -420,7 +420,7 @@ class UserWithdrawalController extends MainController
                 'type' => 'user',
                 'before_amount' => $available,
                 'after_amount' => $after_amount,
-                'related_id' => Auth::id()
+                'auth_id' => Auth::id()
             ]);
             \Log::info('WalletLog after update', $walletLog->toArray());
         } catch (\Exception $e) {
