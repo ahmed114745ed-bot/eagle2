@@ -139,11 +139,8 @@ class Agency extends Model
 
     public function getContentsAttribute($val)
     {
-        if (! $val) {
-            return '';
-        }
-
-        return $val;
+        // Map 'contents' attribute to 'notice' column for backward compatibility
+        return $this->attributes['notice'] ?? '';
     }
 
     public function target($month = null, $year = null)

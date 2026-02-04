@@ -551,8 +551,9 @@ class AgencyService implements AgencyServiceInterface
             $agency->name = $request->name;
         }
 
+        // Update notice field (bio/contents)
         if ($request->contents != null) {
-            $agency->contents = $request->contents;
+            $agency->notice = $request->contents;
         }
 
         if ($request->get('content') != null) {
