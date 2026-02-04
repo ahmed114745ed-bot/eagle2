@@ -81,24 +81,24 @@ class UserChargeReportController extends MainController
             $filter->expand();
 
             $filter->disableIdFilter();
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $date = UserCommon::arabicToEnglishNumbers($this->input);
                     $query->whereDate('created_at', '>=', $date);
                 }, __('from_date'), 'from_date')->date();
             });
 
-            $filter->column(1/2, function ($filter) {
+            $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $date = UserCommon::arabicToEnglishNumbers($this->input);
 
-                    $query->whereDate('created_at', '<=',$date);
-
+                    $query->whereDate('created_at', '<=', $date);
                 }, __('to_date'), 'to_date')->date();
             });
         });
 
-        Admin::script(<<<JS
+        Admin::script(
+            <<<JS
             $(document).ready(function() {
                 $('.form-control[id$="_date"]').datetimepicker({
                     format: 'YYYY-MM-DD'
@@ -133,7 +133,7 @@ class UserChargeReportController extends MainController
     ');
 
         $grid->model()
-            ->where('user_id', '=', request('id'))
+            ->where('user_id', '=', request('id'))->where('user_type', 'user')
             ->orderByDesc('created_at')->with(['sender', 'receiver']);
 
         if ($charger_type == "dash") {
@@ -228,10 +228,11 @@ class UserChargeReportController extends MainController
             $reason = ChargeInvoice::where('charge_id', $this->id)->first();
 
             if (!$reason) {
-                return "<table class='table'><tr><td>".__('No reasons available')."</td><td>-</td></tr></table>";
+                return "<table class='table'><tr><td>" . __('No reasons available') . "</td><td>-</td></tr></table>";
             }
 
-            Admin::style(<<<CSS
+            Admin::style(
+                <<<CSS
                 .modal-reason-table td {
                     max-width: 300px;
                     word-wrap: break-word;
@@ -245,12 +246,12 @@ class UserChargeReportController extends MainController
             $imgHtml = "<img src='" . $img . "' style='width:50px;height:50px' class='img img-thumbnail' />";
 
             $html = "<table class='table modal-reason-table'>";
-            $html .= "<tr><td>".__('Reason')."</td><td>" . htmlspecialchars(
-                    app()->getLocale() === 'en'
-                        ? ($reason->reason_en ?? $reason->reason_ar)
-                        : ($reason->reason_ar ?? $reason->reason_en)
-                ) . "</td></tr>";
-            $html .= "<tr><td>".__('Invoice')."</td><td>" . $imgHtml . "</td></tr>";
+            $html .= "<tr><td>" . __('Reason') . "</td><td>" . htmlspecialchars(
+                app()->getLocale() === 'en'
+                    ? ($reason->reason_en ?? $reason->reason_ar)
+                    : ($reason->reason_ar ?? $reason->reason_en)
+            ) . "</td></tr>";
+            $html .= "<tr><td>" . __('Invoice') . "</td><td>" . $imgHtml . "</td></tr>";
             $html .= "</table>";
 
             return $html;
