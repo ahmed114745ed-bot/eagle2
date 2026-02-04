@@ -428,7 +428,7 @@
         <span class="step-number">4</span>
         <span class="step-title">Run Setup Commands</span>
         <p>Run migrations, seeders, and clear cache (all in one command):</p>
-        <pre><code>php artisan migrate; php artisan db:seed --class=Utd\RoomBoom\Database\Seeders\RoomBoomDatabaseSeeder; php artisan optimize:clear</code></pre>
+        <pre><code>php artisan migrate; php artisan db:seed --class=Utd\RoomBoom\Database\Seeders\RoomBoomDatabaseSeeder; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
     </div>
 
     <div class="page-break"></div>
