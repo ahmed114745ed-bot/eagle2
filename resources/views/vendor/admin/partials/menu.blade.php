@@ -50,13 +50,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /* =========================================================
- | Helpers (recursive-safe)
+ | Helper: can user see THIS item itself?
  |=========================================================*/
-
-/**
- * Can user see this menu item itself?
- */
-$canSeeItem = function ($item) {
+$canSeeSelf = function ($item) {
     $roles = Arr::get($item, 'roles', []);
     $permission = Arr::get($item, 'permission');
 
@@ -64,27 +60,30 @@ $canSeeItem = function ($item) {
         return false;
     }
 
-    // permission = null → container (allowed)
+    // MUST have permission and be allowed
     if (empty($permission)) {
-        return true;
+        return false;
     }
 
     return Admin::user()->can($permission);
 };
 
-/**
- * Recursively filter children
- */
-$filterChildren = function ($children) use (&$filterChildren, $canSeeItem) {
+/* =========================================================
+ | Helper: recursively filter children
+ |=========================================================*/
+$filterChildren = function ($children) use (&$filterChildren, $canSeeSelf) {
     $visible = [];
 
     foreach ($children as $child) {
         $childChildren = Arr::get($child, 'children', []);
 
+        // recurse first
         $visibleGrandChildren = $filterChildren($childChildren);
 
-        // show if child itself OR any grandchild is visible
-        if ($canSeeItem($child) || count($visibleGrandChildren) > 0) {
+        // show child ONLY if:
+        // - user can see this child
+        // - OR it has any visible descendant
+        if ($canSeeSelf($child) || count($visibleGrandChildren) > 0) {
             $child['children'] = $visibleGrandChildren;
             $visible[] = $child;
         }
@@ -116,19 +115,19 @@ if (is_array($title)) {
 $title = (string) $title;
 
 /* =========================================================
- | Filter children (RECURSIVE)
+ | Filter children (RECURSIVE & STRICT)
  |=========================================================*/
 $children = Arr::get($item, 'children', []);
 $visibleChildren = $filterChildren($children);
 
 /* =========================================================
- | Final visibility
+ | FINAL visibility decision
  |=========================================================*/
 $isVisible =
     !$shouldHideBd
     && !in_array($itemId, $renderedMenu)
     && (
-        $canSeeItem($item)
+        $canSeeSelf($item)
         || count($visibleChildren) > 0
     );
 @endphp
@@ -145,11 +144,7 @@ $isVisible =
 @if(count($visibleChildren) === 0)
 <li class="crs-item" data-crs-id="{{ $itemId }}">
     <a href="{{ $href }}" class="crs-link crs-leaf">
-        @if(str_contains($item['icon'] ?? '', 'fa-'))
-            <i class="fa {{ $item['icon'] }} crs-icon"></i>
-        @else
-            <span class="crs-icon emoji-icon">{{ $item['icon'] ?? '•' }}</span>
-        @endif
+        <span class="crs-icon">{{ $item['icon'] ?? '•' }}</span>
         <span class="crs-title">{{ $title }}</span>
     </a>
 </li>
@@ -158,13 +153,9 @@ $isVisible =
 @else
 <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
     <a href="#" class="crs-link crs-toggle">
-        @if(str_contains($item['icon'] ?? '', 'fa-'))
-            <i class="fa {{ $item['icon'] }} crs-icon"></i>
-        @else
-            <span class="crs-icon emoji-icon">{{ $item['icon'] ?? '•' }}</span>
-        @endif
+        <span class="crs-icon">{{ $item['icon'] ?? '•' }}</span>
         <span class="crs-title">{{ $title }}</span>
-        <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow"></i>
+        <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }}"></i>
     </a>
 
     <ul class="crs-submenu">
