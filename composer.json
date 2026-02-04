@@ -149,11 +149,7 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/Room",
-            "options": {
-                "symlink": true
-            }
+            "url": "packages/Utd/Room"
         }
-
     ]
 }

@@ -345,8 +345,7 @@ class AppServiceProvider extends ServiceProvider
         UserSallary::observe(UserSallaryObserver::class);
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);
-        Pk::observe(PKObserver::class);
-        
+
         if (class_exists(Agency::class) && class_exists(AgencyObserver::class)) {
             try {
                 Agency::observe(AgencyObserver::class);
@@ -359,7 +358,7 @@ class AppServiceProvider extends ServiceProvider
             } catch (\Exception $e) {
             }
         }
-        
+
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
         Setting::observe(SettingObserver::class);
