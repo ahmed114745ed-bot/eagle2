@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Pusher Token Test</title>
 </head>
 <body>
@@ -14,18 +15,20 @@
 
     const pusher = new Pusher("{{ config('broadcasting.connections.pusher.key') }}", {
         cluster: "{{ config('broadcasting.connections.pusher.options.cluster') }}",
-        authEndpoint: "/broadcasting/auth",
+        authEndpoint: "/api/broadcasting/auth",
         forceTLS: true,
         // This is the key part → send token in the Authorization header
         auth: {
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             }
         }
     });
 
-    const channel = pusher.subscribe('presence-chat.room.1793');
+    // Test with a simple private channel
+    const channel = pusher.subscribe('private-test-private');
 
     channel.bind('pusher:subscription_succeeded', function() {
         console.log("✅ Subscribed successfully with token");

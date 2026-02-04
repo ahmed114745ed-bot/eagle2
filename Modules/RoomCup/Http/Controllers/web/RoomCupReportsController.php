@@ -2,26 +2,28 @@
 
 namespace Modules\RoomCup\Http\Controllers\web;
 
-use App\Models\User;
 use App\Models\Room;
-use Encore\Admin\Controllers\AdminController;
+use App\Models\User;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\RoomCup\Entities\RoomCupReward;
-use Modules\RoomCup\Entities\TotalRoomGift;
 use Encore\Admin\Layout\Content;
 use App\Admin\Services\UserService;
+use App\Admin\Controllers\MainController;
+use Modules\RoomCup\Entities\RoomCupReward;
+use Modules\RoomCup\Entities\TotalRoomGift;
+use Encore\Admin\Controllers\AdminController;
 
-class RoomCupReportsController extends AdminController
+class RoomCupReportsController extends MainController
 {
     protected $title = '';
+    public $permission_name = 'room-cup-report';
 
     public function index(Content $content)
     {
-        return $content
+        return parent::index($content
             ->header(__('Room Cup Daily Rewards'))
             ->description(__('Room Cup Daily Rewards'))
-            ->body($this->grid());
+            ->body($this->grid()));
     }
     protected function grid()
     {
@@ -36,8 +38,8 @@ class RoomCupReportsController extends AdminController
                 'user.profile:id,user_id,avatar',
                 'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner:id,id,name,uuid,special_id',
-               'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
-               'gift.room.owner.packs.ware:id',
+                'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
+                'gift.room.owner.packs.ware:id',
                 'gift.room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner.profile:id,user_id,avatar',
             ])
