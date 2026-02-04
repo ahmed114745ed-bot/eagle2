@@ -70,7 +70,7 @@ class ChatMessagesController extends Controller
 
         $maxMessage = \Cache::rememberForever('max_message', function () {
             $setting =   Config::where('name', 'max_message')->first();
-            return $setting?->value ?? 0;
+            return $setting?->value ?? 3;
         });
 
         if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
