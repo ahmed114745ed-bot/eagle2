@@ -50,9 +50,9 @@ class ChatMessagesController extends Controller
 
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
             return response()->json([
-                'status' => 404,
+                'status' => 403,
                 'message' => "Unauthorized Block Condition"
-            ], 404);
+            ], 403);
         }
 
         $chatRoom = $this->chatService->findChatRoomBetweenUsers($user->id, $request->user_id);
@@ -75,9 +75,9 @@ class ChatMessagesController extends Controller
 
         if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
-                'status' => 404,
+                'status' => 429,
                 'message' => 'You have reached the limit for sending messages',
-            ], 404);
+            ], 429);
         }
 
         if ($chatRoom->user_id != $user->id) {
