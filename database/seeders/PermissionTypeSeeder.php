@@ -714,6 +714,25 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'room-cup-target',
+                'sort' => 26,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 26],
+                ],
+                'permissions' => [
+
+                    ['key' => 'room-cup-target', 'except' => [], 'additional' => ['move-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['move-switch', 'browse', 'create', 'delete', 'show', 'edit'],
+                    ],],
+                    ['key' => 'room-cup-settings', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                    ['key' => 'room-cup-report', 'except' => ['create', 'delete', 'show', 'edit'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ],
+            [
                 'name' => 'Gift',
                 'sort' => 26,
                 'types' => [
@@ -1047,6 +1066,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-boom-rewards', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
+                    ['key' => 'super-boom-rules', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
                     [
                         'key' => 'room-boom-winners',
                         'except' => ['create', 'edit', 'delete', 'show'],
@@ -1190,9 +1212,19 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    //                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
-                    //                        PermissionType::ADMIN->value => $defaultMethods,
-                    //                    ],],
+                ],
+            ],
+
+             [
+                'name' => 'addons',
+                'sort' => 43,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 43],
+                ],
+                'permissions' => [
+                    ['key' => 'app-feature', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                 ],
             ],
         ];
