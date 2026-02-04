@@ -23,8 +23,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('room_categories', function (Blueprint $table) {
-            $table->string('type')->nullable(false); 
-        });
+        // Cannot revert - column type change not reversible
     }
 };

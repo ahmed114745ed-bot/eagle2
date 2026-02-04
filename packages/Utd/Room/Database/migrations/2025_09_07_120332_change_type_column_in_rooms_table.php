@@ -20,10 +20,11 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('rooms', function (Blueprint $table) {
-            $table->enum('type', ['audio', 'single_live', 'multi_live'])
-                  ->collation('utf8mb4_unicode_ci')
-                  ->change();
-        });
+        // Cannot revert to enum type due to Doctrine limitations
+        // Schema::table('rooms', function (Blueprint $table) {
+        //     $table->enum('type', ['audio', 'single_live', 'multi_live'])
+        //           ->collation('utf8mb4_unicode_ci')
+        //           ->change();
+        // });
     }
 };

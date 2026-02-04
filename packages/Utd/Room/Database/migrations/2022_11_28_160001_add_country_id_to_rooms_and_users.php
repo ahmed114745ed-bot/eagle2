@@ -14,7 +14,9 @@ class AddCountryIdToRoomsAndUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger ('country_id')->nullable ()->default (0);
+            if (!Schema::hasColumn('users', 'country_id')) {
+                $table->unsignedInteger ('country_id')->nullable ()->default (0);
+            }
         });
     }
 
@@ -25,8 +27,9 @@ class AddCountryIdToRoomsAndUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('country_id');
-        });
+        // Do not drop country_id - it's used by other foreign keys
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->dropColumn('country_id');
+        // });
     }
 }

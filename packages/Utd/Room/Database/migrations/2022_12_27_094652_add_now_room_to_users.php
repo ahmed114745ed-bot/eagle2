@@ -14,7 +14,9 @@ class AddNowRoomToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger ('now_room_uid')->nullable ()->default (0);
+            if (!Schema::hasColumn('users', 'now_room_uid')) {
+                $table->unsignedInteger ('now_room_uid')->nullable ()->default (0);
+            }
         });
     }
 
