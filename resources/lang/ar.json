@@ -4931,6 +4931,8 @@
     "add_title": "إضافة للمحفظة",
     "add_description": "تمت إضافة :amount كوين إلى محفظتك",
     "transfer_title": "تحويل",
+    "percentage game":"النسبة المئوية للعبة",
+    "game settings":"إعدادات اللعبة",
     "transfer_description": "تم تحويل :amount كوين",
     "withdrawal_pending": "طلب السحب قيد المراجعة :amount",
     "subtract_title": "سحب من المحفظة",
