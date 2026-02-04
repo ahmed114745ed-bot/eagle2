@@ -1558,6 +1558,7 @@
 "transfer_from": "Transferred from :target",
 "withdrawCoins": "The withdrawal request has been approved by: :admin",
 "wallet.add": "Target Achievement",
+"transfer_from_user": "Transferred from :target",
 "wallet.subtract": "Withdraw",
 "wallet.transfer": "Transfer",
 "update_start":"Data processing has started, and the modification will be applied once completed",

@@ -2145,6 +2145,7 @@
 "Withdraw": "Tarik",
 "prof_reports": "Laporan keuntungan",
 "padding": "Padding",
+"transfer_from_user": "Ditransfer dari :target",
 "The withdrawal has been approved successfully": "Penarikan telah disetujui dengan sukses",
 "The request has been rejected and the amount has been removed from pending": "Permintaan telah ditolak dan jumlahnya telah dihapus dari status tertunda",
 "user can upload Gif image": "Pengguna dapat mengunggah gambar GIF",
