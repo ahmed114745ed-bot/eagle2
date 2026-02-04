@@ -877,8 +877,9 @@ if (!function_exists('showSvgaImage2')) {
     }
 
     // Global initializer for SVGA `.svga-player` elements
-    Admin::script(
-        <<<JS
+    if (class_exists(\Encore\Admin\Admin::class)) {
+        Admin::script(
+            <<<JS
 if (typeof initSvgaPlayers === 'undefined') {
     function initSvgaPlayers(context = document) {
         context.querySelectorAll('.svga-player').forEach(el => {
@@ -936,7 +937,8 @@ if (typeof MutationObserver !== 'undefined') {
     observer.observe(document.body, { childList: true, subtree: true });
 }
 JS
-    );
+        );
+    }
 }
 if (! function_exists('checkAgencyFeature')) {
     function checkAgencyFeature()

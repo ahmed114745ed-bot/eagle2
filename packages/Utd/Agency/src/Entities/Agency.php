@@ -16,22 +16,9 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
 
-if (trait_exists('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait')) {
-    class_alias('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait', 'AgencyAdditionalInfoTraitAlias');
-}
-
 class Agency extends Model
 {
     use DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
-    
-    // Conditionally use AgencyAdditionalInfoTrait if it exists
-    public function __construct(array $attributes = [])
-    {
-        if (trait_exists('Utd\\Agency\\Traits\\AgencyAdditionalInfoTrait')) {
-            $this->initializeTraits();
-        }
-        parent::__construct($attributes);
-    }
     
     /**
      * Additional Info relationship (from AgencyAdditionalInfoTrait)
