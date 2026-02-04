@@ -28,6 +28,8 @@ class CreateTotalRoomGiftsTable extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('total_room_gifts');
+        Schema::enableForeignKeyConstraints();
     }
 }
