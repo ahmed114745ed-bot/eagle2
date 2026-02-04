@@ -76,4 +76,28 @@ class AllDataAgencyResource extends JsonResource
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
         ];
     }
+
+    public function getTopGiftLogsByUserType(int $year, int $month, string $userType, int $limit = null)
+    {
+        $externalModule = app(ExternalModuleInterface::class);
+        $giftLogModel = $externalModule->get('models.gift_log');
+        
+        $userRelation = $userType; // 'receiver' or 'sender'
+        $userColumn   = $userType . '_id'; // receiver_id or sender_id
+
+        $query = $giftLogModel::where('agency_id', $this->id)
+            ->selectRaw("SUM(giftPrice) as exp, {$userColumn}")
+            ->with($userRelation)
+            ->groupBy($userColumn)
+            ->whereHas($userRelation)
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderByDesc('exp');
+
+        if ($limit) {
+            $query->take($limit);
+        }
+
+        return $query->get();
+    }
 }
