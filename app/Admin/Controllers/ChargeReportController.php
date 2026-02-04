@@ -178,14 +178,14 @@ class ChargeReportController extends MainController
         $grid->column('charger_id', __("sender"))->display(function () use ($charger_type) {
 
             $sender = Common::getChargerInfoII($this);
-            if (empty($sender['name']) && empty($sender['uuid'])) {
+                        if (empty($sender['name']) && empty($sender['uuid'])) {
+                $label = $this->charger_type === 'agency' ? 'Deleted Shipping Agency' : ($this->charger_type === 'user' ? 'Deleted user' : 'Deleted admin');
+
                 return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-
-                            <span style=' cursor: pointer;'>Unknown </span>
-
-                </div>
-            ";
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <span style='cursor: pointer;'>{$label}</span>
+                    </div>
+                ";
             }
 
             $name = $sender['name'];
@@ -218,18 +218,18 @@ class ChargeReportController extends MainController
                 </div>
             ";
         });
-        $grid->column('user_id', __('recipient'))->display(function ($recever) {
+        $grid->column('user_id', __('receiver'))->display(function ($recever) {
 
 
             $sender = Common::getReceiverInfoII($this);
             if (empty($sender['name']) && empty($sender['uuid'])) {
+                $label = $this->user_type === 'agency' ? 'Deleted Shipping Agency' : ($this->user_type === 'user' ? 'Deleted user' : 'Deleted admin');
+
                 return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-
-                            <span style=' cursor: pointer;'>Unknown </span>
-
-                </div>
-            ";
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <span style='cursor: pointer;'>{$label}</span>
+                    </div>
+                ";
             }
             $name = $sender['name'];
             $uid = $sender['uuid'];
@@ -260,6 +260,8 @@ class ChargeReportController extends MainController
             </div>
         ";
         });
+
+    $grid->column('user_type', __('receiver type'));
 
         if (request("name") == "dash") {
             $grid->column('agency_id', __('Agency'))->display(function () {
@@ -683,7 +685,7 @@ class ChargeReportController extends MainController
         $grid->column('user_id', __('charger'))->display(function () {
             $user = $this->user;
             if (!$user) {
-                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Unknown</span></div>";
+                return "<div style='display: flex; align-items: center; gap: 10px;'><span style='cursor: pointer;'>Deleted user</span></div>";
             }
 
             $name = $user->name ?? '';
@@ -909,7 +911,7 @@ class ChargeReportController extends MainController
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Unknown </span>
+                            <span style=' cursor: pointer;'>Deleted user </span>
 
                 </div>
             ";
@@ -1056,7 +1058,7 @@ class ChargeReportController extends MainController
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
-                            <span style=' cursor: pointer;'>Unknown </span>
+                            <span style=' cursor: pointer;'>Deleted user </span>
 
                 </div>
             ";
