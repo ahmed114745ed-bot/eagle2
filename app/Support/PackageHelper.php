@@ -9,6 +9,7 @@ use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
 use Utd\Room\Entities\Pk;
 use Utd\Room\Entities\Room;
+use Utd\RoomBoom\Entities\RoomBoom;
 
 class PackageHelper
 {
@@ -19,6 +20,7 @@ class PackageHelper
         'room' => Room::class,
         'pk' => Pk::class,
         'taskStream' => TaskStream::class,
+        'roomBoom' => RoomBoom::class,
     ];
 
     /**

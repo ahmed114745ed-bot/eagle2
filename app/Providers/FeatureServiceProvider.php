@@ -2,6 +2,7 @@
 namespace App\Providers;
 
 use App\Contracts\EnteranceRoomContract;
+use App\Contracts\NewRoomBoomGiftServiceContract;
 use App\Contracts\RoomGameContract;
 use App\Contracts\RoomServiceContract;
 use App\Contracts\RoomRepositoryContract;
@@ -14,6 +15,7 @@ use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
 use App\Contracts\RealsContract;
 use App\Services\Null\NullEntranceRoomService;
+use App\Services\Null\NullNewRoomBoomGiftService;
 use App\Services\Null\NullRoomGameService;
 use App\Services\Null\NullRoomService;
 use App\Services\Null\NullRoomRepository;
@@ -123,6 +125,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 RoomVisitorRepositoryContract::class,
                 NullRoomVisitorRepository::class
+            );
+        }
+
+        // Room Boom Feature
+        if (!$this->app->bound(NewRoomBoomGiftServiceContract::class)) {
+            $this->app->singleton(
+                NewRoomBoomGiftServiceContract::class,
+                NullNewRoomBoomGiftService::class
             );
         }
     }

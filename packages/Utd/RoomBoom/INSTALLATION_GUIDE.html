@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Boom Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #dc2626;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #b91c1c;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #dc2626;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #dc2626;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #ef4444;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #fef2f2;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #fca5a5;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #b91c1c;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #b91c1c;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #b91c1c;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #fecaca;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #fef2f2;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        
+        tr:nth-child(even) {
+            background: #fff5f5;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>💥 Room Boom Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Room Boom package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: February 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#requirements">2. Requirements</a></li>
+            <li><a href="#installation">3. Installation Steps</a></li>
+            <li><a href="#configuration">4. Configuration</a></li>
+            <li><a href="#database">5. Database Tables</a></li>
+            <li><a href="#routes">6. Routes & API</a></li>
+            <li><a href="#verification">7. Verification</a></li>
+            <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <h1 id="overview">1. Overview</h1>
+    
+    <h2>1.1 What is Room Boom?</h2>
+    <p>Room Boom is a gamification feature that rewards users for sending gifts in rooms. When a room reaches certain gift thresholds (levels), it triggers a "boom" event with rewards for top contributors.</p>
+    
+    <h2>1.2 Key Features</h2>
+    <ul>
+        <li><strong>Boom Levels</strong> - Configurable gift thresholds that trigger boom events</li>
+        <li><strong>Top Contributors</strong> - Tracks and rewards users who contribute the most gifts</li>
+        <li><strong>Winners</strong> - Records boom winners for each level</li>
+        <li><strong>Super Boom Rules</strong> - Special rules for enhanced boom events</li>
+        <li><strong>Real-time Tracking</strong> - Live tracking of room gift totals</li>
+    </ul>
+
+    <h2>1.3 How It Works</h2>
+    <ol>
+        <li>Users send gifts in a room</li>
+        <li>System tracks total gift value for the day</li>
+        <li>When total reaches a boom level's <code>min_target</code>, boom starts</li>
+        <li>When total reaches the level's <code>target</code>, boom ends</li>
+        <li>Top contributors receive rewards</li>
+        <li>Next boom level can start automatically</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Requirements -->
+    <h1 id="requirements">2. Requirements</h1>
+    
+    <h2>2.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel-Admin Package</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>2.2 Required Dependencies</h2>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Purpose</th>
+            <th>Required</th>
+        </tr>
+        <tr>
+            <td>Utd/Room</td>
+            <td>Room system (provides TotalRoomGift)</td>
+            <td><strong>Yes</strong></td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <div class="warning-title">⚠️ Important</div>
+        <p>The <code>Utd/Room</code> package must be installed and migrated before installing Room Boom, as it depends on the <code>total_room_gifts</code> table.</p>
+    </div>
+
+    <h2>2.3 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    
+    <h3>Core Tables</h3>
+    <ul>
+        <li><code>room_boom_levels</code> - Boom level definitions (targets, rewards)</li>
+        <li><code>room_booms</code> - Active and completed boom records</li>
+        <li><code>room_boom_gifts</code> - Gift contributions tracking</li>
+        <li><code>room_boom_rewards</code> - Reward configurations per level</li>
+    </ul>
+
+    <h3>Additional Tables</h3>
+    <ul>
+        <li><code>room_boom_top_contributors</code> - Top contributor records</li>
+        <li><code>room_boom_winners</code> - Boom winners history</li>
+        <li><code>super_boom_rules</code> - Special boom rules</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Installation -->
+    <h1 id="installation">3. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>RoomBoom</code> folder to your project:</p>
+        <pre><code>packages/Utd/RoomBoom</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/RoomBoom"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/room-boom</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Setup Commands</span>
+        <p>Run migrations, seeders, and clear cache (all in one command):</p>
+        <pre><code>php artisan migrate; php artisan db:seed --class=Utd\RoomBoom\Database\Seeders\RoomBoomDatabaseSeeder; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Configuration -->
+    <h1 id="configuration">4. Configuration</h1>
+
+    <h2>4.1 Environment Variables</h2>
+    <p>Add these to your <code>.env</code> file:</p>
+
+    <pre><code># Room Boom Package Configuration
+ROOM_BOOM_ENABLED=true</code></pre>
+
+    <h2>4.2 Publish Configuration</h2>
+    <p>Publish the configuration file (if available):</p>
+    <pre><code>php artisan vendor:publish --tag=roomboom-config</code></pre>
+
+    <h2>4.3 Contract Binding</h2>
+    <p>The package automatically binds the following contract:</p>
+    <pre><code>App\Contracts\NewRoomBoomGiftServiceContract
+→ Utd\RoomBoom\Services\NewRoomBoomGiftService</code></pre>
+    
+    <p>If the package is not installed, a null implementation is used:</p>
+    <pre><code>App\Contracts\NewRoomBoomGiftServiceContract
+→ App\Services\Null\NullNewRoomBoomGiftService</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Database -->
+    <h1 id="database">5. Database Tables Reference</h1>
+
+    <h2>5.1 room_boom_levels</h2>
+    <p>Defines the boom levels and their thresholds.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>level</td>
+            <td>integer</td>
+            <td>Level number (1, 2, 3...)</td>
+        </tr>
+        <tr>
+            <td>min_target</td>
+            <td>integer</td>
+            <td>Minimum gift total to start boom</td>
+        </tr>
+        <tr>
+            <td>target</td>
+            <td>integer</td>
+            <td>Gift total to complete boom</td>
+        </tr>
+        <tr>
+            <td>video</td>
+            <td>string</td>
+            <td>Video URL for boom animation</td>
+        </tr>
+    </table>
+
+    <h2>5.2 room_booms</h2>
+    <p>Tracks active and completed boom events.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>total_room_gift_id</td>
+            <td>bigint</td>
+            <td>Reference to total_room_gifts</td>
+        </tr>
+        <tr>
+            <td>room_boom_level_id</td>
+            <td>bigint</td>
+            <td>Reference to boom level</td>
+        </tr>
+        <tr>
+            <td>started_at</td>
+            <td>timestamp</td>
+            <td>When boom started</td>
+        </tr>
+        <tr>
+            <td>ended_at</td>
+            <td>timestamp</td>
+            <td>When boom ended (null if active)</td>
+        </tr>
+        <tr>
+            <td>total_gifts_value</td>
+            <td>integer</td>
+            <td>Total gift value at boom end</td>
+        </tr>
+    </table>
+
+    <h2>5.3 room_boom_gifts</h2>
+    <p>Tracks individual gift contributions during a boom.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>total_room_gift_id</td>
+            <td>bigint</td>
+            <td>Reference to total_room_gifts</td>
+        </tr>
+        <tr>
+            <td>user_id</td>
+            <td>bigint</td>
+            <td>User who sent the gift</td>
+        </tr>
+        <tr>
+            <td>price</td>
+            <td>integer</td>
+            <td>Gift value</td>
+        </tr>
+        <tr>
+            <td>room_boom_level</td>
+            <td>integer</td>
+            <td>Boom level when gift was sent</td>
+        </tr>
+        <tr>
+            <td>start_boom_ranking</td>
+            <td>tinyint</td>
+            <td>Whether gift counts for ranking</td>
+        </tr>
+    </table>
+
+    <h2>5.4 room_boom_rewards</h2>
+    <p>Reward configurations for each boom level.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>room_boom_level_id</td>
+            <td>bigint</td>
+            <td>Reference to boom level</td>
+        </tr>
+        <tr>
+            <td>rank</td>
+            <td>integer</td>
+            <td>Reward rank (1st, 2nd, 3rd...)</td>
+        </tr>
+        <tr>
+            <td>reward_type</td>
+            <td>string</td>
+            <td>Type of reward (coins, diamonds, etc.)</td>
+        </tr>
+        <tr>
+            <td>reward_value</td>
+            <td>integer</td>
+            <td>Reward amount</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Routes -->
+    <h1 id="routes">6. Routes & API</h1>
+
+    <h2>6.1 API Routes (Mobile App)</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/room-boom/levels</td>
+            <td>Get all boom levels</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/super-boom/rules</td>
+            <td>Get super boom rules</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Admin Panel Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/room-boom-levels</td>
+            <td>Manage boom levels</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/room-boom-rewards</td>
+            <td>Manage boom rewards</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/room-boom-winners</td>
+            <td>View boom winners</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/admin/super-boom-rules</td>
+            <td>Manage super boom rules</td>
+        </tr>
+    </table>
+
+    <h2>6.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr boom</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Verification -->
+    <h1 id="verification">7. Verification</h1>
+
+    <h2>7.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/room-boom</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All room_boom migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>Boom routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Admin Pages Working</td>
+            <td>Visit /admin/room-boom-levels</td>
+            <td>Page loads without errors</td>
+        </tr>
+        <tr>
+            <td>5. API Working</td>
+            <td>Test /api/room-boom/levels</td>
+            <td>Returns JSON response</td>
+        </tr>
+    </table>
+
+    <h2>7.2 Test Admin Panel</h2>
+    <p>Open your browser and navigate to:</p>
+    <pre><code>https://your-domain.com/admin/room-boom-levels</code></pre>
+
+    <h2>7.3 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test List Boom Levels
+curl -X GET "https://your-domain.com/api/room-boom/levels" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Super Boom Rules
+curl -X GET "https://your-domain.com/api/super-boom/rules" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If you can access the admin panel and the API returns data, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Troubleshooting -->
+    <h1 id="troubleshooting">8. Troubleshooting</h1>
+
+    <h2>8.1 Common Issues</h2>
+
+    <h3>Issue: Page Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan optimize:clear</code></pre>
+    </div>
+
+    <h3>Issue: Migration Errors (Foreign Key)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure Utd/Room package is installed and migrated first:</p>
+        <pre><code># Install Room package first
+composer require utd/room
+php artisan migrate
+
+# Then install Room Boom
+composer require utd/room-boom
+php artisan migrate</code></pre>
+    </div>
+
+    <h3>Issue: Class Not Found Errors</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan cache:clear</code></pre>
+    </div>
+
+    <h3>Issue: Admin Menu Not Showing</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Run the database seeder:</p>
+        <pre><code>php artisan db:seed --class=Utd\RoomBoom\Database\Seeders\RoomBoomDatabaseSeeder</code></pre>
+    </div>
+
+    <h3>Issue: Contract Binding Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure the contract exists in <code>app/Contracts</code>:</p>
+        <pre><code>App\Contracts\NewRoomBoomGiftServiceContract</code></pre>
+        <p>And the null service exists:</p>
+        <pre><code>App\Services\Null\NullNewRoomBoomGiftService</code></pre>
+    </div>
+
+    <h2>8.2 Rollback Migrations</h2>
+    <p>To rollback room boom migrations:</p>
+    <pre><code># Rollback all room boom migrations
+php artisan migrate:rollback --path=packages/Utd/RoomBoom/Database/migrations
+
+# Or rollback specific batch
+php artisan migrate:rollback --step=1</code></pre>
+
+    <h2>8.3 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your Room Boom package is now ready to use.</p>
+        
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #dc2626;">Quick Links:</h3>
+            <ul>
+                <li>Boom Levels: <code>/admin/room-boom-levels</code></li>
+                <li>Boom Rewards: <code>/admin/room-boom-rewards</code></li>
+                <li>Boom Winners: <code>/admin/room-boom-winners</code></li>
+                <li>API Base: <code>/api/room-boom/levels</code></li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: February 2026
+        </p>
+    </div>
+
+</body>
+</html>

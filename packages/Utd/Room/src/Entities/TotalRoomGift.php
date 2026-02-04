@@ -2,9 +2,12 @@
 
 namespace Utd\Room\Entities;
 
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\RoomCup\Entities\RoomCupReward;
+use Utd\RoomBoom\Entities\RoomBoom;
 
 class TotalRoomGift extends Model
 {
@@ -17,11 +20,12 @@ class TotalRoomGift extends Model
 
     public function roomBooms(): HasMany
     {
-        return $this->hasMany(\Modules\RoomBoom\Entities\RoomBoom::class, 'total_room_gift_id');
+        return PackageHelper::checkRelation($this, 'roomBoom', 'hasMany') ??
+            $this->hasMany(RoomBoom::class, 'total_room_gift_id');
     }
 
     public function ownerRewards(): HasMany
     {
-        return $this->hasMany(\Modules\RoomCup\Entities\RoomCupReward::class, 'total_room_gift_id');
+        return $this->hasMany(RoomCupReward::class, 'total_room_gift_id');
     }
 }

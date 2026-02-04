@@ -50,10 +50,11 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "*",
-        "utd/agency": "dev-master",
+        "utd/agency": "*",
         "utd/moments": "*",
         "utd/reals": "*",
         "utd/room": "*",
+        "utd/room-boom": "dev-room-boom-package",
         "utd/gifts": "*"
     },
     "require-dev": {
@@ -151,6 +152,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Room"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/RoomBoom"
         },{
             "type": "path", "url": "./packages/Utd/Gifts"
         }

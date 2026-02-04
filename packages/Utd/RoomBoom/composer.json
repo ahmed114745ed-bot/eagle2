@@ -1,0 +1,31 @@
+{
+    "name": "utd/room-boom",
+    "description": "RoomBoom Laravel Package - Room boom levels, rewards, and gift tracking functionality",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\RoomBoom\\": "src/",
+            "Utd\\RoomBoom\\Database\\": "Database/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\RoomBoom\\RoomBoomServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
