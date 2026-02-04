@@ -44,7 +44,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-             [
+            [
                 'name' => 'Fast orders',
                 'sort' => 2,
                 'types' => [
@@ -117,7 +117,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-           
+
             [
                 'name' => 'regions system',
                 'sort' => 3,
@@ -203,7 +203,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-              [
+            [
                 'name' => 'Gifts Rewards',
                 'sort' => 5,
                 'types' => [
@@ -246,10 +246,10 @@ class PermissionTypeSeeder extends Seeder
                     ],
                     [
                         'key' => 'game-settings',
-                        'except' => ['create', 'delete', 'show'],
+                        'except' => [],
                         'additional' => [],
                         'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'edit'],
+                            PermissionType::ADMIN->value => $defaultMethods,
                         ],
                     ],
                 ],
@@ -270,7 +270,7 @@ class PermissionTypeSeeder extends Seeder
 
                 ],
             ],
-             [
+            [
                 'name' => 'host level',
                 'sort' => 8,
                 'types' => [
@@ -306,7 +306,7 @@ class PermissionTypeSeeder extends Seeder
                     ],
                 ],
             ],
-           
+
             [
                 'name' => 'Wallet',
                 'sort' => 9,
@@ -510,7 +510,7 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
-          
+
             [
                 'name' => 'Agency System',
                 'sort' => 18,
