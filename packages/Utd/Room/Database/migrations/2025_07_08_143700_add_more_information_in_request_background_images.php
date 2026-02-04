@@ -44,14 +44,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop index safely
-        try {
-            Schema::table('request_background_images', function (Blueprint $table) {
-                $table->dropIndex('request_bg_created_by_index');
-            });
-        } catch (\Exception $e) {}
-
         Schema::table('request_background_images', function (Blueprint $table) {
+            // Drop index safely
+            $table->dropIndex('request_bg_created_by_index');
+
             // Drop created_by and created_by_type columns if they exist
             if (Schema::hasColumn('request_background_images', 'created_by')) {
                 $table->dropColumn('created_by');
@@ -60,18 +56,11 @@ return new class extends Migration
             if (Schema::hasColumn('request_background_images', 'created_by_type')) {
                 $table->dropColumn('created_by_type');
             }
-        });
 
-        if (Schema::hasColumn('request_background_images', 'room_id')) {
-            try {
-                Schema::table('request_background_images', function (Blueprint $table) {
-                    $table->dropForeign(['room_id']);
-                });
-            } catch (\Exception $e) {}
-            
-            Schema::table('request_background_images', function (Blueprint $table) {
+            if (Schema::hasColumn('request_background_images', 'room_id')) {
+                $table->dropForeign(['room_id']);
                 $table->dropColumn('room_id');
-            });
-        }
+            }
+        });
     }
 };

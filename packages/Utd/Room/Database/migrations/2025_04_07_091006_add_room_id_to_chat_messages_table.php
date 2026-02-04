@@ -12,9 +12,8 @@ return new class extends Migration
         public function up(): void
         {
             Schema::table('chat_messages', function (Blueprint $table) {
-                if (!Schema::hasColumn('chat_messages', 'room_id')) {
-                    $table->bigInteger('room_id')->nullable();
-                }
+                $table->bigInteger('room_id')->nullable();
+          
             });
         }
     

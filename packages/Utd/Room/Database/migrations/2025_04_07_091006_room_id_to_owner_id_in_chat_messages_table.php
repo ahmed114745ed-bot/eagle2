@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            if (Schema::hasColumn('chat_messages', 'room_id') && !Schema::hasColumn('chat_messages', 'room_owner_id')) {
-                $table->renameColumn('room_id', 'room_owner_id');
-            }
+            $table->renameColumn('room_id', 'room_owner_id');
         });
     }
 

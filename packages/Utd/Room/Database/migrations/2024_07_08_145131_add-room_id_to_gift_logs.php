@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            if (!Schema::hasColumn('gift_logs', 'room_id')) {
-                $table->unsignedInteger('room_id');
-            }
+            $table->unsignedInteger('room_id');
         });
     }
 
