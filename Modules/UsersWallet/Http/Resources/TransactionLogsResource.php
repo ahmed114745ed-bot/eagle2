@@ -32,8 +32,8 @@ class TransactionLogsResource extends JsonResource
                 break;
 
             case 'transfer':
-                if ($this->amount > 0 || $this->related_id == Auth::id()) {
-                    $title = __('transfer_from', ['target' => $this->related ? $this->related->name : '']);
+                if ($this->amount > 0) {
+                    $title = __('transfer_from_user', ['target' => $this->related ? $this->related->name : '']);
                 } else {
                     $title = __('transfer_to', ['target' => $this->related ? $this->related->name : '']);
                 }

@@ -4932,7 +4932,7 @@
     "add_agency_profit": "أرباح وكالة :target",
     "add_bd_profit": "أرباح مدير وكالة :admin",
     "transfer_to": "تم التحويل إلى :target",
-    "transfer_from": "تم التحويل من :target",
+    "transfer_from_user": "تم التحويل من :target",
     "source:": "مصدر:",
     "gift:": "هدية:",
     "withdraw": "تم السحب بواسطة :admin",
