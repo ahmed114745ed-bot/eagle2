@@ -4075,5 +4075,8 @@
     "withdrawn": "निकासी अनुरोध को माध्यम से स्वीकृत किया गया है",
     "share_room_message": "नमस्ते, आओ और मेरे साथ इस कमरे में शामिल हो जाओ, यह वाकई बहुत मज़ेदार है",
     "withdraw_to_shipping_agency": "शिपिंग एजेंसी को स्थानांतरण",
+    "The withdrawal has been approved successfully": "निकासी को सफलतापूर्वक मंजूरी दी गई है",
+    "The request has been rejected and the amount has been removed from pending": "अनुरोध को अस्वीकार कर दिया गया है और राशि लंबित से हटा दी गई है",
+
     "withdrawCoins": "निकासी अनुरोध को :admin द्वारा स्वीकृत किया गया है"
   }

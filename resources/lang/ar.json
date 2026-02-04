@@ -4915,6 +4915,8 @@
     "withdrawal_pending": "طلب السحب قيد المراجعة :amount",
     "subtract_title": "سحب من المحفظة",
     "subtract_description": "تم سحب :amount كوين من محفظتك",
+"The withdrawal has been approved successfully":" تم الموافقة على السحب بنجاح",
+"The request has been rejected and the amount has been removed from pending":"تم رفض الطلب وتمت إزالة المبلغ من المعلق",
     "User Withdrawals": "مسحوبات المستخدمين",
     "User Withdrawal": "سحب المستخدم",
     "withdrawal pending": "طلب السحب قيد المراجعة",
