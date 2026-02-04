@@ -385,7 +385,7 @@ class UserWithdrawalController extends MainController
     ]);
         CustomNotification::withdrawalApproved($withdrawal->user, $withdrawal->amount);
 
-        return response()->json(['success' => true, 'message' => 'تمت الموافقة على السحب بنجاح']);
+        return response()->json(['success' => true, 'message' => __('The withdrawal has been approved successfully')]);
     }
 
     public function reject($id)
@@ -433,6 +433,6 @@ class UserWithdrawalController extends MainController
 
         CustomNotification::withdrawalRejected($withdrawal->user, $withdrawal->amount);
 
-        return response()->json(['success' => true, 'message' => 'تم رفض الطلب وإزالة المبلغ من المعلّق']);
+        return response()->json(['success' => true, 'message' => __('The request has been rejected and the amount has been removed from pending')]);
     }
 }

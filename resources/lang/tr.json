@@ -4199,6 +4199,8 @@
     "add_bd_profit": "BD için kazanç :admin",
     "transfer_to": ":target'a transfer edildi",
     "transfer_from": ":target'den transfer edildi",
+    "The withdrawal has been approved successfully": "Para çekme işlemi başarıyla onaylandı",
+"The request has been rejected and the amount has been removed from pending": "Talep reddedildi ve tutar bekleyenlerden kaldırıldı",
     "withdrawCoins": "Para çekme talebi :admin tarafından onaylandı",
     "User Withdrawal": "Kullanıcı Çekimi",
     "source:": "Kaynak:",
