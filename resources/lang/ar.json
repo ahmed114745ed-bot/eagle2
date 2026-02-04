@@ -4801,7 +4801,7 @@
     "transfer_from": "تم التحويل من :target",
     "source:": "مصدر:",
     "gift:": "هدية:",
-    "withdraw": "تم السحب بواسطة :admin",
+    "withdrawCoins": "تم قبول طلب السحب  بواسطة :admin",
     "wallet.add": "تحقيق تارجت",
     "wallet.subtract": "سحب",
     "wallet.transfer": "تحويل",

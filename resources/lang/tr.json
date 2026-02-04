@@ -4181,7 +4181,7 @@
     "add_bd_profit": "BD için kazanç :admin",
     "transfer_to": ":target'a transfer edildi",
     "transfer_from": ":target'den transfer edildi",
-    "withdraw": ":admin tarafından çekildi",
+    "withdrawCoins": "Para çekme talebi :admin tarafından onaylandı",
     "User Withdrawal": "Kullanıcı Çekimi",
     "source:": "Kaynak:",
     "wallet.add": "Hedef Başarısı",

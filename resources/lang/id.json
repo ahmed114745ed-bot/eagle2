@@ -2151,6 +2151,7 @@
 "Total recharge to recharge agencies": "Total pengisian ke agen pengisian",
 "Sender UUID or shipping Agency ID": "UUID pengirim atau ID Agen Pengiriman",
 "receiver UUID or shipping Agency ID": "UUID penerima atau ID Agen Pengiriman",
+"withdrawCoins": "Permintaan penarikan telah disetujui oleh :admin",
 "Balance": "Saldo",
 "Received Balance": "Saldo diterima",
 "Sent Balance": "Saldo dikirim",
