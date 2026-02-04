@@ -37,6 +37,14 @@ class MenuRoomBoomSeeder extends Seeder
             'browse-room-boom-winners',
             '🏆'
         );
+
+        $this->createChildMenu(
+            $roomBoomParent->id,
+            'Rules',
+            'super-boom-rules',
+            'browse-super-boom-rules',
+            '📋'
+        );
     }
 
     protected function createChildMenu(

@@ -53,8 +53,7 @@
         "utd/agency": "*",
         "utd/moments": "*",
         "utd/reals": "*",
-        "utd/room": "*",
-        "utd/room-boom": "dev-room-boom-package"
+        "utd/room": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
