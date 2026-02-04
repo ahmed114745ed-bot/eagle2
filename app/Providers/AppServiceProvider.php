@@ -20,7 +20,6 @@ use App\Admin\Fields\Image;
 use App\Helpers\RoomHelper;
 use App\Models\UserSallary;
 use App\Helpers\CacheHelper;
-use Illuminate\Http\Request;
 use App\Classes\UserHandling;
 use Utd\Room\Observers\PKObserver;
 use Modules\Vip\Entities\Vip;
@@ -47,14 +46,11 @@ use App\Observers\FamilyUserObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Observers\UserSallaryObserver;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use App\Observers\RoomBoomLevelObserver;
 use App\Services\Gifts\LuckyGiftService;
 use App\Observers\AgencyJoinRequestObserver;
 use App\Repositories\User\UserRepoInterface;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
 use Illuminate\Support\Str;
@@ -360,7 +356,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Vip::observe(VipObserver::class);
-        RoomBoomLevel::observe(RoomBoomLevelObserver::class);
         Setting::observe(SettingObserver::class);
         \App\Models\Config::observe(ConfigObserver::class);
     }

@@ -45,9 +45,9 @@ use Utd\Room\Http\Resources\EnterRoomCollection;
 use Utd\Room\Http\Resources\RoomVisitorsResource;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use App\Contracts\UserAchievementContract;
-use Modules\RoomBoom\Entities\RoomBoom;
-use Modules\RoomBoom\Transformers\RoomBoomLevelResource;
-use Modules\RoomBoom\Transformers\RoomBoomResource;
+use App\Support\PackageHelper;
+use Utd\RoomBoom\Entities\RoomBoom;
+use Utd\RoomBoom\Transformers\RoomBoomResource;
 
 class RoomController extends Controller
 {
@@ -184,13 +184,16 @@ class RoomController extends Controller
         $tz = getTimezone();
         $today = Carbon::today($tz);
 
-        $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
-            $q->where('room_id', $room->id);
-        })
-            ->whereNull('ended_at')
-            ->whereNotNull('started_at')
-            ->whereDate('started_at', $today)
-            ->first();
+        $openBoom = null;
+        if (PackageHelper::isInstalled('roomBoom')) {
+            $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
+                $q->where('room_id', $room->id);
+            })
+                ->whereNull('ended_at')
+                ->whereNotNull('started_at')
+                ->whereDate('started_at', $today)
+                ->first();
+        }
 
         $collections = [
             'charisma'          => $this->roomCharisma($owner_id),
@@ -213,13 +216,16 @@ class RoomController extends Controller
         $tz = getTimezone();
         $today = Carbon::today($tz);
 
-        $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
-            $q->where('room_id', $room->id);
-        })
-            ->whereNull('ended_at')
-            ->whereNotNull('started_at')
-            ->whereDate('started_at', $today)
-            ->first();
+        $openBoom = null;
+        if (PackageHelper::isInstalled('roomBoom')) {
+            $openBoom = RoomBoom::whereHas('totalRoomGift', function ($q) use ($room) {
+                $q->where('room_id', $room->id);
+            })
+                ->whereNull('ended_at')
+                ->whereNotNull('started_at')
+                ->whereDate('started_at', $today)
+                ->first();
+        }
 
         $collections = [
             'charisma'          => $this->roomCharisma($room->id ),

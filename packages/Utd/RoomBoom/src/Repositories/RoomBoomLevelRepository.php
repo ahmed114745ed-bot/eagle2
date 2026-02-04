@@ -1,0 +1,33 @@
+<?php
+
+namespace Utd\RoomBoom\Repositories;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Utd\RoomBoom\Entities\RoomBoomLevel;
+
+class RoomBoomLevelRepository
+{
+    public function getLatestWithRewards(int $roomId): Collection|array
+    {
+        $tz = getTimezone();
+        $today = Carbon::today($tz);
+
+        return RoomBoomLevel::with([
+            'roomBoomRewards' => function ($query) {
+            $query->orderBy('priority');
+        },
+            'roomBooms' => function ($query) use ($roomId, $today) {
+                $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
+                    $q->where('room_id', $roomId);
+                })
+                ->whereDate('started_at', $today);
+        },
+        ])->orderBy('level')->get();
+    }
+
+    public function getVideos(): \Illuminate\Support\Collection
+    {
+        return RoomBoomLevel::select(['id', 'level', 'video'])->with(['roomBoomRewards','roomBooms'])->orderBy('level')->get();
+    }
+}

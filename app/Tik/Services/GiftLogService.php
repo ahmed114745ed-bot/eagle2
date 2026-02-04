@@ -11,6 +11,7 @@ use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
+use App\Support\PackageHelper;
 use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
@@ -29,7 +30,7 @@ use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use GuzzleHttp\Exception\BadResponseException;
 use App\Contracts\RoomTopUsersRepositoryContract;
-use Modules\RoomBoom\Services\NewRoomBoomGiftService;
+use App\Contracts\NewRoomBoomGiftServiceContract;
 
 
 class GiftLogService
@@ -148,7 +149,7 @@ class GiftLogService
             $cpId =  Cp::where(function ($query) use ($user) {
                 $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
             })->whereIn('status', [1, 4])->first();
-           
+
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
@@ -190,16 +191,18 @@ class GiftLogService
                 $settings = $settings->pluck('value', 'key')->toArray();
             }
 
-            $roomBoomSettings = $settings['room_boom'] ?? 1;
-            if ($roomBoomSettings){
-                (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
-            } else {
-                $tz = getTimezone();
-                $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+            if (PackageHelper::isInstalled('roomBoom')) {
+                $roomBoomSettings = $settings['room_boom'] ?? 1;
+                if ($roomBoomSettings){
+                    app(NewRoomBoomGiftServiceContract::class)->sendGift($room, $totalPrice, $userId);
+                } else {
+                    $tz = getTimezone();
+                    $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-                $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+                    $totalRoomGift = app(NewRoomBoomGiftServiceContract::class)->getOrCreateTotalRoomGift($room->id, $todayStart);
 
-                $totalRoomGift->increment('current_total', $totalPrice);
+                    $totalRoomGift->increment('current_total', $totalPrice);
+                }
             }
 
             foreach ($receivedUsers as $receivedUser) {
@@ -382,7 +385,10 @@ class GiftLogService
             $roomBoomUuid = $sendGiftServices->sendGift3($number, $room, $gift, $user, $receivedUsers, totalPrice: $price, isPk: @$room->lastPk ? 1 : 0, cpIds: $cpIds, sourceType: $sourceType);
 
 //            (new RoomBoomGiftService())->sendGift($room, $totalPrice, $roomBoomUuid);
-            (new NewRoomBoomGiftService())->sendGift($room, $totalPrice, $userId);
+
+            if (PackageHelper::isInstalled('roomBoom')) {
+                app(NewRoomBoomGiftServiceContract::class)->sendGift($room, $totalPrice, $userId);
+            }
 
             foreach ($receivedUsers as $receivedUser) {
                 $updateUserWhenSendGift->update($price, $receivedUser);

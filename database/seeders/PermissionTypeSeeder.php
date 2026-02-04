@@ -992,29 +992,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Room Boom',
-                'sort' => 42,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 42],
-                ],
-                'permissions' => [
-                    ['key' => 'room-boom-levels', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'room-boom-rewards', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    [
-                        'key' => 'room-boom-winners',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => [],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse'],
-                        ],
-                    ],
-                ],
-            ],
-            [
                 'name' => 'reward',
                 'sort' => 43,
                 'types' => [
@@ -1258,6 +1235,35 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'room-settings', 'except' => ['create', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit'],
                     ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('roomBoom')) {
+            $categories[] =             [
+                'name' => 'Room Boom',
+                'sort' => 42,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 42],
+                ],
+                'permissions' => [
+                    ['key' => 'room-boom-levels', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'room-boom-rewards', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'super-boom-rules', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    [
+                        'key' => 'room-boom-winners',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+                        ],
+                    ],
                 ],
             ];
         }
