@@ -47,8 +47,8 @@ use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\GameSettingsController;
-use App\Admin\Controllers\GiftCategoryController;
-use App\Admin\Controllers\GiftController;
+// use App\Admin\Controllers\GiftCategoryController; // Moved to package
+// use App\Admin\Controllers\GiftController; // Moved to package
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\GiftLogTestController;
 use App\Admin\Controllers\GroupChatController;
@@ -302,15 +302,10 @@ Route::group(
             Route::get('/', [BlackListUsersController::class, 'index']);
         });
         Route::resource('codes', 'CodeController');
-        Route::resource('gifts', 'GiftController', [
-            'names' => [
-                'index' => 'gifts'
-            ]
-        ]);
-        Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
+        
+        // Gifts Routes moved to packages/Utd/Gifts/routes/admin.php
+        
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
-
-        Route::resource('gift-categories', GiftCategoryController::class);
         Route::resource('charge-vips', ChargeVipController::class);
         Route::resource('delete-accounts', DeleteAccountController::class);
         Route::resource('wares', 'WareController', ['names' => ['index' => 'wares']]);

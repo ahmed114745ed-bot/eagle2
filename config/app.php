@@ -238,6 +238,7 @@ return [
 
       
         App\Providers\RealsPackageServiceProvider::class,
+        App\Providers\GiftsMenuServiceProvider::class,
 
     ],
 

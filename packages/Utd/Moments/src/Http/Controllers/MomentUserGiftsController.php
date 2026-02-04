@@ -5,15 +5,13 @@ namespace Utd\Moments\Http\Controllers;
 use App\Enums\UserDiamondLogType;
 use App\Helpers\UserDiamondLogHelper;
 use DB;
-use App\Models\Gift;
+use App\Contracts\GiftsContract;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\GiftLog;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Facades\CustomNotification;
 use Utd\Moments\Entities\Moment;
-
 use App\Exceptions\NotInfMoneyException;
 use Utd\Moments\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
@@ -23,6 +21,12 @@ use Utd\Moments\Transformers\MomentGiftUserResource;
 
 class MomentUserGiftsController extends Controller
 {
+    protected $giftsService;
+
+    public function __construct(GiftsContract $giftsService)
+    {
+        $this->giftsService = $giftsService;
+    }
     /**
      * Display a listing of the resource.
      * @return Renderable
@@ -66,22 +70,12 @@ class MomentUserGiftsController extends Controller
         //validation if pass num < 1
         if ($data['num'] < 1) return Common::apiResponse(0, 'The number of gifts cannot be less than 1', null, 422);
 
-
-
-        //get the gift data from id in the parameter
-        $gift = Gift::query()->select([
-            'id',
-            'name',
-            'type',
-            'price',
-            'vip_level',
-            'is_play',
-            'img',
-            'show_img',
-            'show_img2'
-        ])->where('id', $giftId)->where('enable', 1)->first();
-        // Validation if gift return null
-        if (!$gift) return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
+        $gift = $this->giftsService->getGift($giftId);
+        
+        if (!$gift || !$gift->enable) {
+            return Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
+        }
+        
         // attached Moments and gifts
         $moment->gifts()->attach($gift, ['user_id' => $user->id, 'num' => $number]);
         // receivers ids
@@ -167,44 +161,50 @@ class MomentUserGiftsController extends Controller
     }
 
 
-    public function sendGift($number, $momentId, Gift $gift, User $senderUser, $receivedUser,  $isPlay = 0, $totalPrice = null)
+    public function sendGift($number, $momentId, $gift, User $senderUser, $receivedUser,  $isPlay = 0, $totalPrice = null)
     {
         if ($totalPrice == null) $totalPrice = $gift->price * $number;
 
-        $info['giftId']       = $gift->id;
-        $info['roomowner_id'] = 0;
-        $info['giftNum']      = $number;
-        $info['giftName']     = $gift->name ?: '_';
-        $info['giftPrice']    = $totalPrice;
-        $info['app_profit_coins']    = $totalPrice;
-        $info['sender_id']    = $senderUser->id;
-        $info['receiver_id']  = $receivedUser->id;
-        $info['is_play']      = $isPlay ? 2 : 1;
-        $info['type']         = 2;
-        $info['moent_id']         = $momentId;
-        $info['created_at']   = $info['updated_at'] = date('Y-m-d H:i:s', time());
+        $info = [
+            'giftId'       => $gift->id,
+            'roomowner_id' => 0,
+            'giftNum'      => $number,
+            'giftName'     => $gift->name ?: '_',
+            'giftPrice'    => $totalPrice,
+            'app_profit_coins' => $totalPrice,
+            'sender_id'    => $senderUser->id,
+            'receiver_id'  => $receivedUser->id,
+            'is_play'      => $isPlay ? 2 : 1,
+            'type'         => 2,
+            'moent_id'     => $momentId,
+            'created_at'   => date('Y-m-d H:i:s', time()),
+            'updated_at'   => date('Y-m-d H:i:s', time()),
+        ];
 
-        // $income = $this->calculate($room->uid,$senderUser->id,$info['giftPrice']);
-        // $info['platform_obtain']=$income['platform'];   //platform
-        // $info['receiver_obtain']=$income['toUid'];     //recipient
-        // $info['roomowner_obtain']=$income['uid']+$income['uid_yj'];//homeowner
-
-        // $info['agency_id']=$income['uid']+$income['uid_yj'];//homeowner
-
-
-        GiftLog::query()->create($info);
+        $this->giftsService->createGiftLog($info);
+        
         CustomNotification::sendMomentGift($senderUser, $gift, $receivedUser, $momentId);
     }
 
     public function getGifts($id)
     {
-
         $moment = Moment::with('gifts')->find($id);
         if (!$moment) {
             return Common::apiResponse(0, 'Moment does not exist or has been removed', null, 404);
         }
-        $data = $moment->gifts()->select('gifts.img', DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
-            ->groupBy('gifts.id', 'gifts.img', 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id')->orderByDesc('num_gift')
+        
+        $giftModel = config('moments.models.gift', 'Utd\Gifts\Entities\Gift');
+        $giftsTable = 'gifts'; // Default table name
+        
+  
+        if (class_exists($giftModel)) {
+            $giftsTable = (new $giftModel)->getTable();
+        }
+        
+        $data = $moment->gifts()
+            ->select("{$giftsTable}.img", DB::raw('CAST(sum(moment_user_gifts.num) AS INT) as num_gift'))
+            ->groupBy("{$giftsTable}.id", "{$giftsTable}.img", 'moment_user_gifts.moment_id', 'moment_user_gifts.gift_id')
+            ->orderByDesc('num_gift')
             ->get();
 
         return Common::apiResponse(1, 'successful', $data, 200);

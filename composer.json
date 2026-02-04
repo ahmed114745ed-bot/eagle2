@@ -50,10 +50,11 @@
         "spatie/laravel-translatable": "^6.11",
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "*",
-        "utd/agency": "dev-achievmentPackage",
+        "utd/agency": "dev-master",
         "utd/moments": "*",
         "utd/reals": "*",
-        "utd/room": "*"
+        "utd/room": "*",
+        "utd/gifts": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -153,6 +154,8 @@
             "options": {
                 "symlink": true
             }
+        },{
+            "type": "path", "url": "./packages/Utd/Gifts"
         }
 
     ]

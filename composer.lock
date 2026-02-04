@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ee9d15da0340ef297ea42c25cb4a4e81",
+    "content-hash": "ae85217cac10fcdf8d240eae6b4777b1",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14376,11 +14376,11 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-achievmentPackage",
+            "version": "dev-giftsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
-                "reference": "73e243a67837210559d41cbb0e72f4fd92d4cb5b"
+                "reference": "da7c70f33699cf57d0d8c957f6f51750035dd4b0"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14418,11 +14418,11 @@
         },
         {
             "name": "utd/agency",
-            "version": "dev-achievmentPackage",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Agency",
-                "reference": "141050ca5f41809305c3af195a6af13bf497509a"
+                "reference": "1c72434679c2d6831ae6b62de9fdf5d30a0ece62"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14465,12 +14465,58 @@
             }
         },
         {
+            "name": "utd/gifts",
+            "version": "dev-giftsPackage",
+            "dist": {
+                "type": "path",
+                "url": "./packages/Utd/Gifts",
+                "reference": "00ef9f9788b2950c92e34863f39a0a32ab78a0b6"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Gifts\\GiftsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Gifts\\": "src/",
+                    "Utd\\Gifts\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Complete Gifts Laravel Package - Gifts Management System",
+            "keywords": [
+                "gifts",
+                "laravel",
+                "management",
+                "presents"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "utd/moments",
-            "version": "dev-achievmentPackage",
+            "version": "dev-giftsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
-                "reference": "ed1a9236e70257dbf92528425e1a2cee0c8a37b4"
+                "reference": "361a5546167e3ccbafab4148dd58078e72d096e7"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14507,11 +14553,11 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-achievmentPackage",
+            "version": "dev-giftsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
-                "reference": "62bf966f616bc3ac25632b5bcba722b717cf4751"
+                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
             },
             "require": {
                 "illuminate/database": "^10.0|^11.0",
@@ -14559,11 +14605,11 @@
         },
         {
             "name": "utd/room",
-            "version": "dev-achievmentPackage",
+            "version": "dev-giftsPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Room",
-                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+                "reference": "b2f088ad65c29ed4d2342c81c97b17f6b1e6193b"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",

@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class UserGift extends Model
-{
-    use HasFactory;
-    protected $table = 'user_gifts';
-    protected $fillable = ['gift_id', 'user_id', 'quantity', 'expire'];
-}
+/**
+ * Class Alias for backward compatibility
+ * This model now extends from the Gifts package
+ * 
+ * @deprecated Use Utd\Gifts\Entities\UserGift instead
+ */
+class_alias(\Utd\Gifts\Entities\UserGift::class, UserGift::class);

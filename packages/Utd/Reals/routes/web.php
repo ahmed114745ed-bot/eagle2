@@ -44,6 +44,9 @@ Route::prefix('admin')
             // Get comments for a reel
             Route::get('reels/{id}/comments', [AdminReelController::class, 'getComments'])->name('comments');
 
+            // Get gifts for a reel
+            Route::get('reels/{id}/gifts', [AdminReelController::class, 'getGifts'])->name('gifts');
+
             // Batch counts (for multiple reels)
             Route::post('reels/batch-counts', [AdminReelController::class, 'batchCounts'])->name('batchCounts');
 

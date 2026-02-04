@@ -2,73 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Model;
-use Modules\Vip\Entities\OVip;
-use App\Traits\AchievementGift;
-use Utd\Moments\Entities\Moment;
-
-class Gift extends Model
-{
-    use AchievementGift, TimestampsWithTimezone;
-
-
-    public $sortable = [
-        'order_column_name' => 'sort', // Set this to your column name
-        'sort_when_creating' => true,
-    ];
-    // protected $fillable=['use_count'];
-    protected $guarded = [];
-
-    public function luckyGift()
-    {
-        return $this->hasOne(LuckyGift::class);
-    }
-
-    public function moments()
-    {
-        if (! class_exists(Moment::class)){
-            return $this->belongsToMany(self::class, 'id', 'id')->whereRaw('1 = 0');
-        }
-        return $this->belongsToMany(Moment::class, 'moment_user_gifts')->withPivot('num', 'created_at', 'updated_at')->withTimestamps();
-    }
-
-    public function lucky_gift()
-    {
-        return $this->hasOne(LuckyGift::class, 'gift_id');
-    }
-    public function vip()
-    {
-        return $this->hasOne(OVip::class, 'id', 'vip_level');
-    }
-
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'user_gifts')
-            ->withPivot('quantity');
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(GiftCategory::class, 'gift_category_id');
-    }
-
-    public function canPassToCp($cpEnableAllGifts)
-    {
-        if ($cpEnableAllGifts) {
-            return true;
-        }
-        return $this->category && $this->category->type === 'cp';
-    }
-
-        public function scopeCpAllowed($query, $cpEnableAllGifts)
-    {
-        if ($cpEnableAllGifts) {
-            return $query;
-        }
-
-        return $query->whereHas('category', function ($q) {
-            $q->where('type', 'cp');
-        });
-    }
-}
+/**
+ * Class Alias for backward compatibility
+ * This model now extends from the Gifts package
+ * 
+ * @deprecated Use Utd\Gifts\Entities\Gift instead
+ */
+class_alias(\Utd\Gifts\Entities\Gift::class, Gift::class);

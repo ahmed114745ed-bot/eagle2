@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلغاء تثبيت حزمة الهدايا - Gifts Package</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #764ba2;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #f093fb;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-right: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .warning-box h3 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+        
+        .danger-box {
+            background: #ffe5e5;
+            border-right: 5px solid #dc3545;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .danger-box h3 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+        }
+        
+        .step h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            direction: ltr;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+        
+        .code-block code {
+            display: block;
+            white-space: pre;
+        }
+        
+        .checklist {
+            background: #e8f5e9;
+            border-right: 5px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .checklist h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+        
+        .checklist ul {
+            list-style: none;
+            padding-right: 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            padding-right: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            right: 0;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-right: 5px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        ul {
+            padding-right: 20px;
+        }
+        
+        ul li {
+            margin: 10px 0;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 0 5px;
+        }
+        
+        .badge.danger {
+            background: #dc3545;
+        }
+        
+        .badge.warning {
+            background: #ff9800;
+        }
+        
+        .badge.success {
+            background: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ إلغاء تثبيت حزمة الهدايا</h1>
+            <p>Uninstall Gifts Package</p>
+        </div>
+        
+        <div class="content">
+            <!-- Warning Section -->
+            <div class="danger-box">
+                <h3>⚠️ تحذير هام جداً</h3>
+                <p><strong>إلغاء التثبيت سيؤدي إلى:</strong></p>
+                <ul>
+                    <li>❌ حذف جميع بيانات الهدايا من قاعدة البيانات</li>
+                    <li>❌ فقدان سجلات إرسال واستقبال الهدايا</li>
+                    <li>❌ حذف تصنيفات الهدايا</li>
+                    <li>❌ فقدان بيانات Lucky Gifts</li>
+                    <li>❌ توقف جميع الوظائف المتعلقة بالهدايا</li>
+                </ul>
+                <p style="margin-top: 15px;"><strong>⚠️ تأكد من عمل نسخة احتياطية قبل الإلغاء!</strong></p>
+            </div>
+
+            <!-- Backup Section -->
+            <div class="section">
+                <h2>📦 الخطوة 0: النسخ الاحتياطي (ضروري)</h2>
+                
+                <div class="step">
+                    <h3>1. نسخ احتياطي لقاعدة البيانات</h3>
+                    <div class="code-block"><code># نسخ الجداول الخاصة بالهدايا
+mysqldump -u username -p database_name \
+  gifts \
+  gift_categories \
+  gift_logs \
+  user_gifts \
+  lucky_gifts \
+  > gifts_backup_$(date +%Y%m%d).sql</code></div>
+                </div>
+
+                <div class="step">
+                    <h3>2. نسخ ملفات الصور</h3>
+                    <div class="code-block"><code># نسخ صور الهدايا
+cp -r public/storage/gifts ~/backup/gifts_images_$(date +%Y%m%d)</code></div>
+                </div>
+            </div>
+
+            <!-- Uninstall Steps -->
+            <div class="section">
+                <h2>🗑️ خطوات إلغاء التثبيت</h2>
+
+                <!-- Step 1 -->
+                <div class="step">
+                    <h3>الخطوة 1: حذف من composer.json</h3>
+                    <p>افتح ملف <code>composer.json</code> واحذف السطور التالية:</p>
+                    
+                    <p><strong>من قسم repositories:</strong></p>
+                    <div class="code-block"><code>{
+    "type": "path",
+    "url": "./packages/Utd/Gifts"
+}</code></div>
+
+                    <p><strong>من قسم require:</strong></p>
+                    <div class="code-block"><code>"utd/gifts": "*"</code></div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step">
+                    <h3>الخطوة 2: تحديث Composer</h3>
+                    <div class="code-block"><code>composer update utd/gifts --with-all-dependencies</code></div>
+                    <div class="info-box">
+                        <h3>💡 ملاحظة</h3>
+                        <p>سيقوم Composer بإزالة الحزمة وكل dependencies الخاصة بها</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step">
+                    <h3>الخطوة 3: حذف جداول قاعدة البيانات</h3>
+                    
+                    <div class="warning-box">
+                        <h3>⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه</h3>
+                        <p>تأكد من النسخ الاحتياطي قبل التنفيذ!</p>
+                    </div>
+
+                    <p><strong>أ) الطريقة الآمنة (عبر Laravel):</strong></p>
+                    <div class="code-block"><code>php artisan migrate:rollback --path=vendor/utd/gifts/database/migrations</code></div>
+
+                    <p><strong>ب) الطريقة المباشرة (SQL):</strong></p>
+                    <div class="code-block"><code>DROP TABLE IF EXISTS `gift_logs`;
+DROP TABLE IF EXISTS `user_gifts`;
+DROP TABLE IF EXISTS `lucky_gifts`;
+DROP TABLE IF EXISTS `gifts`;
+DROP TABLE IF EXISTS `gift_categories`;</code></div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step">
+                    <h3>الخطوة 4: حذف ملف الإعدادات</h3>
+                    <div class="code-block"><code>rm config/gifts.php</code></div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="step">
+                    <h3>الخطوة 5: حذف الـ Class Aliases</h3>
+                    <p>احذف الملفات التالية:</p>
+                    <div class="code-block"><code>rm app/Models/Gift.php
+rm app/Models/GiftLog.php
+rm app/Models/GiftCategory.php
+rm app/Models/UserGift.php
+rm app/Models/LuckyGift.php
+rm app/Observers/GiftCategoryObserver.php</code></div>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="step">
+                    <h3>الخطوة 6: حذف مجلد الباكيج</h3>
+                    <div class="code-block"><code>rm -rf packages/Utd/Gifts</code></div>
+                </div>
+
+                <!-- Step 7 -->
+                <div class="step">
+                    <h3>الخطوة 7: تنظيف الملفات المؤقتة</h3>
+                    <div class="code-block"><code>composer dump-autoload
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear</code></div>
+                </div>
+
+                <!-- Step 8 -->
+                <div class="step">
+                    <h3>الخطوة 8: حذف صور الهدايا (اختياري)</h3>
+                    <div class="warning-box">
+                        <h3>⚠️ تحذير</h3>
+                        <p>تأكد من نسخ الصور قبل الحذف إذا كنت تحتاجها</p>
+                    </div>
+                    <div class="code-block"><code>rm -rf public/storage/gifts
+rm -rf storage/app/public/gifts</code></div>
+                </div>
+            </div>
+
+            <!-- Cleanup Dependencies -->
+            <div class="section">
+                <h2>🧹 تنظيف الاعتماديات</h2>
+                
+                <div class="step">
+                    <h3>1. حذف الاستدعاءات من الباكيجات الأخرى</h3>
+                    <p>إذا كانت باكيجات أخرى تعتمد على Gifts، يجب تنظيفها:</p>
+                    
+                    <p><strong>مثال: Moments Package</strong></p>
+                    <div class="code-block"><code># في Moments/config/moments.php
+# احذف:
+'models' => [
+    'gift' => \Utd\Gifts\Entities\Gift::class,
+],
+
+# في MomentUserGiftsController
+# استبدل GiftsContract بـ null handling</code></div>
+                </div>
+
+                <div class="step">
+                    <h3>2. البحث عن الاستدعاءات المتبقية</h3>
+                    <div class="code-block"><code># ابحث عن أي استخدام متبقي
+grep -r "use Utd\\\\Gifts" app/
+grep -r "use App\\\\Models\\\\Gift" app/
+grep -r "GiftsContract" app/</code></div>
+                </div>
+            </div>
+
+            <!-- Verification -->
+            <div class="section">
+                <h2>✅ التحقق من الإلغاء</h2>
+                
+                <div class="checklist">
+                    <h3>قائمة التحقق النهائية</h3>
+                    <ul>
+                        <li>تم عمل نسخة احتياطية لقاعدة البيانات</li>
+                        <li>تم حذف الحزمة من composer.json</li>
+                        <li>تم تشغيل composer update بنجاح</li>
+                        <li>تم حذف جميع الجداول من قاعدة البيانات</li>
+                        <li>تم حذف ملف config/gifts.php</li>
+                        <li>تم حذف Class Aliases من app/Models</li>
+                        <li>تم حذف مجلد packages/Utd/Gifts</li>
+                        <li>تم مسح جميع أنواع الكاش</li>
+                        <li>لا توجد أخطاء عند تشغيل التطبيق</li>
+                        <li>اختفت قوائم الهدايا من الداشبورد</li>
+                    </ul>
+                </div>
+
+                <div class="step">
+                    <h3>اختبار نهائي</h3>
+                    <div class="code-block"><code># تأكد من عدم وجود أخطاء
+php artisan route:list | grep gift
+php artisan config:cache
+php artisan optimize:clear
+
+# اختبار التطبيق
+php artisan serve</code></div>
+                </div>
+            </div>
+
+            <!-- Recovery -->
+            <div class="section">
+                <h2>🔄 استعادة البيانات (إذا لزم الأمر)</h2>
+                
+                <div class="step">
+                    <h3>استرجاع من النسخة الاحتياطية</h3>
+                    <div class="code-block"><code># استرجاع قاعدة البيانات
+mysql -u username -p database_name < gifts_backup_20260204.sql
+
+# استرجاع الصور
+cp -r ~/backup/gifts_images_20260204/* public/storage/gifts/
+
+# إعادة التثبيت
+composer require utd/gifts
+php artisan migrate
+php artisan config:cache</code></div>
+                </div>
+            </div>
+
+            <!-- Common Issues -->
+            <div class="section">
+                <h2>❗ المشاكل الشائعة</h2>
+                
+                <div class="warning-box">
+                    <h3>مشكلة: Class not found بعد الإلغاء</h3>
+                    <p><strong>الحل:</strong></p>
+                    <div class="code-block"><code>composer dump-autoload
+php artisan config:clear
+php artisan cache:clear</code></div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>مشكلة: لا يزال الجدول موجود</h3>
+                    <p><strong>الحل:</strong></p>
+                    <div class="code-block"><code># احذف يدوياً
+DROP TABLE IF EXISTS gift_logs;
+DROP TABLE IF EXISTS gifts;</code></div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>مشكلة: قوائم الهدايا لا تزال ظاهرة</h3>
+                    <p><strong>الحل:</strong></p>
+                    <div class="code-block"><code>php artisan cache:clear
+php artisan view:clear
+php artisan config:clear</code></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>📚 التوثيق الكامل:</strong></p>
+            <p>
+                <span class="badge">README.md</span>
+                <span class="badge">INSTALLATION.html</span>
+                <span class="badge">COMPATIBILITY_SUMMARY.md</span>
+            </p>
+            <p style="margin-top: 20px;">
+                <strong>Gifts Package v1.0</strong><br>
+                © 2026 UTD Packages
+            </p>
+        </div>
+    </div>
+</body>
+</html>
