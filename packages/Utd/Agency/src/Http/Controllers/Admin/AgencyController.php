@@ -194,7 +194,7 @@ class AgencyController extends MainController
                 $agencyJoinRequests = AgencyJoinRequest::query()
                     ->where(['agency_id' => $agencyId, 'status' => 0])
                     ->with('user')
-                    ->whereHas('user')
+                    // ->whereHas('user')
                     ->orderByDesc('id')
                     ->paginate(10, ['*'], 'join_page');
                 break;

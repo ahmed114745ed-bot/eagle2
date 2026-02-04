@@ -542,8 +542,37 @@ class AgencyService implements AgencyServiceInterface
      */
     public function update($userId, $agencyId, $request)
     {
-        // TODO: Implement this method based on the business logic from Tik module
-        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+        $agency = $this->agencyRepository->findById($agencyId);
+        if (!$agency) throw new Exception(__('api_responses.agency'));
+
+        if ($agency->app_owner_id != $userId)  throw new Exception(__('api_responses.agency_app_owner'));
+
+        if ($request->name != null) {
+            $agency->name = $request->name;
+        }
+
+        if ($request->contents != null) {
+            $agency->contents = $request->contents;
+        }
+
+        if ($request->get('content') != null) {
+            $agency->notice = $request->get('content');
+        }
+
+        if ($request->hasFile('img')) {
+            if ($agency->img && \Storage::exists($agency->img)) {
+                \Storage::delete($agency->img);
+            }
+
+            $img = $request->file('img');
+            $helperClass = $this->getHelperClass('common');
+            $image = $helperClass::upload('agency', $img);
+            $agency->img = $image;
+        }
+
+        $agency->save();
+
+        return $agency;
     }
 
     /**
