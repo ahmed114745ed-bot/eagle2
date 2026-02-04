@@ -49,90 +49,81 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
-/* =========================================================
- | Helper: can user see THIS item itself?
- |=========================================================*/
-$canSeeSelf = function ($item) {
-    $roles = Arr::get($item, 'roles', []);
-    $permission = Arr::get($item, 'permission');
-
-    if (!Admin::user()->visible($roles)) {
-        return false;
-    }
-
-    // MUST have permission and be allowed
-    if (empty($permission)) {
-        return false;
-    }
-
-    return Admin::user()->can($permission);
-};
-
-/* =========================================================
- | Helper: recursively filter children
- |=========================================================*/
-$filterChildren = function ($children) use (&$filterChildren, $canSeeSelf) {
-    $visible = [];
-
-    foreach ($children as $child) {
-        $childChildren = Arr::get($child, 'children', []);
-
-        // recurse first
-        $visibleGrandChildren = $filterChildren($childChildren);
-
-        // show child ONLY if:
-        // - user can see this child
-        // - OR it has any visible descendant
-        if ($canSeeSelf($child) || count($visibleGrandChildren) > 0) {
-            $child['children'] = $visibleGrandChildren;
-            $visible[] = $child;
-        }
-    }
-
-    return $visible;
-};
-
-/* =========================================================
- | URI / BD visibility
- |=========================================================*/
+/* -------------------------------
+ | URI / BD Visibility
+ |-------------------------------*/
 $uri = Arr::get($item, 'uri', '');
 $shouldHideBd = Str::startsWith($uri, 'bd/')
     && !Admin::user()->inRoles(['bd']);
 
-/* =========================================================
+/* -------------------------------
  | Prevent duplicate rendering
- |=========================================================*/
+ |-------------------------------*/
 $renderedMenu = $renderedMenu ?? [];
-$itemId = Arr::get($item, 'id');
+$itemId = $item['id'] ?? null;
 
-/* =========================================================
+/* -------------------------------
  | Normalize title
- |=========================================================*/
+ |-------------------------------*/
 $title = Arr::get($item, 'title', '');
 if (is_array($title)) {
     $title = $title[app()->getLocale()] ?? reset($title);
 }
 $title = (string) $title;
 
-/* =========================================================
- | Filter children (RECURSIVE & STRICT)
- |=========================================================*/
-$children = Arr::get($item, 'children', []);
-$visibleChildren = $filterChildren($children);
+/* -------------------------------
+ | Normalize roles & permission
+ |-------------------------------*/
+$roles = Arr::get($item, 'roles', []);
+$roles = is_array($roles) ? $roles : [];
 
-/* =========================================================
+$permission = Arr::get($item, 'permission');
+if (is_array($permission)) {
+    $permission = reset($permission);
+}
+
+/* -------------------------------
+ | Can see THIS item? (STRICT)
+ |-------------------------------*/
+$canSelf =
+    Admin::user()->visible($roles)
+    && $permission
+    && Admin::user()->can($permission);
+
+/* -------------------------------
+ | FILTER allowed children (STRICT)
+ |-------------------------------*/
+$visibleChildren = [];
+
+if (!empty($item['children']) && is_array($item['children'])) {
+    foreach ($item['children'] as $child) {
+
+        $childRoles = $child['roles'] ?? [];
+        $childPermission = $child['permission'] ?? null;
+
+        if (
+            $childPermission
+            && Admin::user()->visible($childRoles)
+            && Admin::user()->can($childPermission)
+        ) {
+            $visibleChildren[] = $child;
+        }
+    }
+}
+
+/* -------------------------------
  | FINAL visibility decision
- |=========================================================*/
+ |-------------------------------*/
 $isVisible =
     !$shouldHideBd
     && !in_array($itemId, $renderedMenu)
     && (
-        $canSeeSelf($item)
+        $canSelf
         || count($visibleChildren) > 0
     );
 @endphp
 
-{{-- ===================== RENDER ===================== --}}
+        
 @if($isVisible)
 @php
     $renderedMenu[] = $itemId;
@@ -140,22 +131,30 @@ $isVisible =
     $isRtl = app()->getLocale() === 'ar';
 @endphp
 
-{{-- ===================== LEAF ===================== --}}
+{{-- ================= LEAF ================= --}}
 @if(count($visibleChildren) === 0)
 <li class="crs-item" data-crs-id="{{ $itemId }}">
     <a href="{{ $href }}" class="crs-link crs-leaf">
-        <span class="crs-icon">{{ $item['icon'] ?? '•' }}</span>
+        @if(str_contains($item['icon'] ?? '', 'fa-'))
+            <i class="fa {{ $item['icon'] }} crs-icon"></i>
+        @else
+            <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+        @endif
         <span class="crs-title">{{ $title }}</span>
     </a>
 </li>
 
-{{-- ===================== PARENT ===================== --}}
+{{-- ================= PARENT ================= --}}
 @else
 <li class="crs-tree crs-item" data-crs-id="{{ $itemId }}">
     <a href="#" class="crs-link crs-toggle">
-        <span class="crs-icon">{{ $item['icon'] ?? '•' }}</span>
+        @if(str_contains($item['icon'] ?? '', 'fa-'))
+            <i class="fa {{ $item['icon'] }} crs-icon"></i>
+        @else
+            <span class="crs-icon emoji-icon">{{ $item['icon'] }}</span>
+        @endif
         <span class="crs-title">{{ $title }}</span>
-        <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }}"></i>
+        <i class="fa {{ $isRtl ? 'fa-angle-left' : 'fa-angle-right' }} crs-arrow"></i>
     </a>
 
     <ul class="crs-submenu">
