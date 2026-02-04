@@ -1212,9 +1212,19 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'ranking-types', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    //                    ['key' => 'ranking-rewards', 'except' => [], 'additional' => [], 'types' => [
-                    //                        PermissionType::ADMIN->value => $defaultMethods,
-                    //                    ],],
+                ],
+            ],
+
+             [
+                'name' => 'addons',
+                'sort' => 43,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 43],
+                ],
+                'permissions' => [
+                    ['key' => 'app-feature', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
                 ],
             ],
         ];
