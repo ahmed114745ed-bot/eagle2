@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('o_vips', function (Blueprint $table) {
-            if (!Schema::hasColumn('o_vips', 'background_img')) {
-                $table->string('background_img')->nullable()->after('img');
-            }
+           $table->string('background_img')->nullable()->after('img');
         });
     }
 
@@ -24,9 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('o_vips', function (Blueprint $table) {
-            if (Schema::hasColumn('o_vips', 'background_img')) {
-                $table->dropColumn('background_img');
-            }
+            $table->dropColumn('background_img');
         });
     }
 };

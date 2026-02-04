@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            if (!Schema::hasColumn('agencies', 'coins')) {
-                $table->integer('coins')->default(0);
-            }
+            $table->integer('coins')->default(0);
         });
     }
 

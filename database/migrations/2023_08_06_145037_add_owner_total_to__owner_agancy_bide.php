@@ -13,13 +13,10 @@ class AddOwnerTotalToOwnerAgancyBide extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('OwnerAgancyBide')) {
-            Schema::table('OwnerAgancyBide', function (Blueprint $table) {
-                if (!Schema::hasColumn('OwnerAgancyBide', 'total')) {
-                    $table->unsignedBigInteger('total')->default(0);
-                }
-            });
-        }
+        Schema::table('OwnerAgancyBide', function (Blueprint $table) {
+            $table->unsignedBigInteger('total')->default(0);
+
+        });
     }
 
     /**
@@ -29,12 +26,9 @@ class AddOwnerTotalToOwnerAgancyBide extends Migration
      */
     public function down()
     {
-        if (Schema::hasTable('OwnerAgancyBide')) {
-            Schema::table('OwnerAgancyBide', function (Blueprint $table) {
-                if (Schema::hasColumn('OwnerAgancyBide', 'total')) {
-                    $table->dropColumn('total');
-                }
-            });
-        }
+        Schema::table('OwnerAgancyBide', function (Blueprint $table) {
+            $table->dropColumn('total');
+
+        });
     }
 }

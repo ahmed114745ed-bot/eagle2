@@ -14,12 +14,8 @@ class AddFieldsToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'family_id')) {
-                $table->unsignedInteger('family_id')->nullable()->default(0);
-            }
-            if (!Schema::hasColumn('users', 'is_host')) {
-                $table->unsignedTinyInteger('is_host')->nullable()->default(0);
-            }
+            $table->unsignedInteger ('family_id')->nullable ()->default (0);
+            $table->unsignedTinyInteger ('is_host')->nullable ()->default (0);
         });
     }
 

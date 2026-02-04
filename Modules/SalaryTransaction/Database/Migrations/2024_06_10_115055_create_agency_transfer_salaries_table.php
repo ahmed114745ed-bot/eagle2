@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('agency_transfer_salaries')) {
-            return;
-        }
-        
         Schema::create('agency_transfer_salaries', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('agency_id')->default(0);
-            $table->float('salary')->default(0);
-            $table->float('cut_amount')->default(0);
-            $table->integer('month')->default(0);
-            $table->integer('year')->default(0);
-            $table->integer('pending_usd')->default(0);
+            $table->unsignedBigInteger('agency_id')->default (0);
+            $table->float('salary')->default (0);
+            $table->float('cut_amount')->default (0);
+            $table->integer('month')->default (0);
+            $table->integer('year')->default (0);
+            $table->integer('pending_usd')->default (0);
             $table->timestamps();
         });
     }

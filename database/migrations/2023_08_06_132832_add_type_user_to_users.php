@@ -14,9 +14,7 @@ class AddTypeUserToUsers extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'type_user')) {
-                $table->enum('type_user', [0, 1, 2, 3, 4, 5])->default(0);
-            }
+                $table->enum('type_user', [0, 1, 2,3,4,5])->default(0);
         });
     }
 

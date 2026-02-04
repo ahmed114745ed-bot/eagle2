@@ -14,15 +14,12 @@ return new class extends Migration
      public function up()
      {
          Schema::table('user_target', function (Blueprint $table) {
-             if (Schema::hasColumn('user_target', 'extras')) {
-                 $table->json('extras')->nullable()->change();
-             }
+             $table->json('extras')->nullable()->change();
+
          });
 
          Schema::table('user_sallaries', function (Blueprint $table) {
-             if (Schema::hasColumn('user_sallaries', 'extras')) {
-                 $table->json('extras')->nullable()->change();
-             }
+             $table->json('extras')->nullable()->change();
          });
      }
 

@@ -14,12 +14,8 @@ class AddOtherFieldsToGiftLogs extends Migration
     public function up()
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            if (!Schema::hasColumn('gift_logs', 'agency_id')) {
-                $table->unsignedInteger('agency_id')->nullable();
-            }
-            if (!Schema::hasColumn('gift_logs', 'agency_obtain')) {
-                $table->decimal('agency_obtain', 14, 2, true)->nullable()->default(0);
-            }
+            $table->unsignedInteger ('agency_id')->nullable ();
+            $table->decimal ('agency_obtain',14,2,true)->nullable ()->default (0);
         });
     }
 

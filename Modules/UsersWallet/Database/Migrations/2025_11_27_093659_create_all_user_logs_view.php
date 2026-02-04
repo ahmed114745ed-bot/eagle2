@@ -12,9 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Drop view if exists first
-        DB::statement("DROP VIEW IF EXISTS all_user_logs");
-        
+
         DB::statement("
             CREATE VIEW all_user_logs AS
             SELECT

@@ -11,14 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('agency_countries')) {
-            return;
-        }
-        
         Schema::create('agency_countries', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('agency_id');
-            $table->unsignedInteger('country_id')->nullable()->default(0);
+            $table->unsignedInteger('agency_id')->constrained('agencies')->onDelete ('cascade');
+            $table->unsignedInteger ('country_id')->nullable ()->default (0);
             $table->timestamps();
         });
     }
