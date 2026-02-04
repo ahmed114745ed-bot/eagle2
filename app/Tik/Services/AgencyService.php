@@ -511,8 +511,8 @@ class AgencyService
         $additionalInfo->status = $request->status;
         $additionalInfo->save();
 
-        $Host_agency = $agency->Host_agency;
-        if ($Host_agency == 1) {
+        // type = 1 means host agency, type = 2 means shipping agency
+        if ($agency->type == 1) {
             $user->type_user = 2;
             $user->agency_id = $agency->id;
             $user->is_host = 1;

@@ -467,8 +467,8 @@ class AgencyAppController extends Controller
         $additionalInfo->status = $request->status;
         $additionalInfo->save();
         $appOwnerId = $agency->app_owner_id;
-        $Host_agency = $agency->Host_agency;
-        if ($Host_agency == 1) {
+        // type = 1 means host agency, type = 2 means shipping agency
+        if ($agency->type == 1) {
             $user = User::find($appOwnerId);
             $user->type_user = 2;
             $user->agency_id = $agency->id;
