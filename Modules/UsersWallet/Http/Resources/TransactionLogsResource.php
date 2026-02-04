@@ -2,6 +2,7 @@
 
 namespace Modules\UsersWallet\Http\Resources;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 
@@ -31,7 +32,7 @@ class TransactionLogsResource extends JsonResource
                 break;
 
             case 'transfer':
-                if ($this->amount > 0) {
+                if ($this->amount > 0 || $this->related_id == Auth::id()) {
                     $title = __('transfer_from', ['target' => $this->related ? $this->related->name : '']);
                 } else {
                     $title = __('transfer_to', ['target' => $this->related ? $this->related->name : '']);
