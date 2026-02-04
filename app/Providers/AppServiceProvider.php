@@ -345,8 +345,21 @@ class AppServiceProvider extends ServiceProvider
         UserSallary::observe(UserSallaryObserver::class);
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);
-        Agency::observe(AgencyObserver::class);
-        AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
+        Pk::observe(PKObserver::class);
+        
+        if (class_exists(Agency::class) && class_exists(AgencyObserver::class)) {
+            try {
+                Agency::observe(AgencyObserver::class);
+            } catch (\Exception $e) {
+            }
+        }
+        if (class_exists(AgencyJoinRequest::class) && class_exists(AgencyJoinRequestObserver::class)) {
+            try {
+                AgencyJoinRequest::observe(AgencyJoinRequestObserver::class);
+            } catch (\Exception $e) {
+            }
+        }
+        
         Vip::observe(VipObserver::class);
         RoomBoomLevel::observe(RoomBoomLevelObserver::class);
         Setting::observe(SettingObserver::class);

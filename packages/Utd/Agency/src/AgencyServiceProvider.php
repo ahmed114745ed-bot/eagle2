@@ -111,6 +111,31 @@ class AgencyServiceProvider extends ServiceProvider
         $this->app->singleton(\Utd\Agency\Services\ExternalModuleService::class, function ($app) {
             return new \Utd\Agency\Services\ExternalModuleService();
         });
+        
+        // Register ExternalModuleInterface binding to ExternalModelService for backward compatibility
+        $this->app->bind(\Utd\Agency\Contracts\ExternalModuleInterface::class, function ($app) {
+            // Return a wrapper that delegates to ExternalModelService
+            return new class implements \Utd\Agency\Contracts\ExternalModuleInterface {
+                protected $modelService;
+                
+                public function __construct() {
+                    $this->modelService = app('agency.external-model');
+                }
+                
+                public function isAvailable(): bool {
+                    return true;
+                }
+                
+                public function get($modelName = null) {
+                    if ($modelName) {
+                        // Handle both 'models.gift_log' and 'gift_log' formats
+                        $modelKey = str_replace('models.', '', $modelName);
+                        return $this->modelService->getModelClass($modelKey);
+                    }
+                    return $this->modelService;
+                }
+            };
+        });
     }
 
     /**
