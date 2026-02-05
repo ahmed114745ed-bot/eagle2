@@ -193,6 +193,7 @@ class GiftLogService
 
             $roomBoomSettings = $settings['room_boom'] ?? 1;
             if (PackageHelper::isInstalled('roomBoom')) {
+                info('roomBoom installed');
                 if ($roomBoomSettings){
                     app(NewRoomBoomGiftServiceContract::class)->sendGift($room, $totalPrice, $userId);
                 } else {
