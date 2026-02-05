@@ -3,7 +3,7 @@
 namespace Utd\Room\Http\Controllers\Api;
 
 use Exception;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Room\Entities\Room;
 use App\Models\User;

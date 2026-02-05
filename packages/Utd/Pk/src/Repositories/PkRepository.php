@@ -1,8 +1,8 @@
 <?php
 
-namespace Utd\Room\Repositories;
+namespace Utd\Pk\Repositories;
 
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 
 class PkRepository extends AbstractRepository
 {

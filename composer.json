@@ -54,7 +54,8 @@
         "utd/moments": "*",
         "utd/reals": "*",
         "utd/gifts": "*",
-        "utd/room": "*"
+        "utd/room": "*",
+        "utd/pk": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -155,8 +156,15 @@
             "options": {
                 "symlink": true
             }
-        }
-        ,{
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Pk",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
             "type": "path", "url": "./packages/Utd/Gifts"
         }
     ]

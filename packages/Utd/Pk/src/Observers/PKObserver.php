@@ -1,8 +1,8 @@
 <?php
 
-namespace Utd\Room\Observers;
+namespace Utd\Pk\Observers;
 
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 
 class PKObserver
 {

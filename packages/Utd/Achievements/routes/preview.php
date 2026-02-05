@@ -27,7 +27,6 @@ Route::group(
             'adminIp',
             'multiLanguage',
             'prevent-delete',
-            'appFeatureEnable:achievement',
         ],
         'as' => 'preview.' . config('admin.route.prefix') . '.',
     ],

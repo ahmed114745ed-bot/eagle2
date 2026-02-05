@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;;
+use Utd\Pk\Entities\Pk;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Helpers\LogHelper;

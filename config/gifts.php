@@ -144,7 +144,7 @@ return [
         
         'cp' => env('GIFTS_CP_MODEL', 'App\Models\Cp'),
         
-        'pk' => env('GIFTS_PK_MODEL', 'Utd\Room\Entities\Pk'),
+        'pk' => env('GIFTS_PK_MODEL', 'Utd\Pk\Entities\Pk'),
         
         'app_feature' => env('GIFTS_APP_FEATURE_MODEL', 'App\Models\AppFeature'),
         
@@ -236,7 +236,7 @@ return [
         'clean_gift_logs' => env('GIFTS_CLEAN_LOGS_JOB', 'App\Jobs\CleanGiftLogsJob'),
         'all_opening_rooms_zego_request' => env('GIFTS_ZEGO_REQUEST_JOB', 'App\Jobs\AllOpeningRoomsZegoRequest'),
         'update_user_data_when_send_gift' => env('GIFTS_UPDATE_USER_DATA_JOB', 'App\Jobs\UpdateUserDataWhenSendGift'),
-        'update_pk_and_send_to_zigo' => env('GIFTS_UPDATE_PK_JOB', 'Utd\Room\Jobs\UpdatePkAndSendToZigoJob'),
+        'update_pk_and_send_to_zigo' => env('GIFTS_UPDATE_PK_JOB', 'Utd\Pk\Jobs\UpdatePkAndSendToZigoJob'),
     ],
 
     /*

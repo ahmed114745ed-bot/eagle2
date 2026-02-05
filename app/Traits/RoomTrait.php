@@ -305,7 +305,7 @@ trait RoomTrait
         }
 
         $roomClass = \Utd\Room\Entities\Room::class;
-        $pkClass = \Utd\Room\Entities\Pk::class;
+        $pkClass = \Utd\Pk\Entities\Pk::class;
 
         $room = $roomClass::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
         $microphone = $room->microphone;
@@ -347,7 +347,7 @@ trait RoomTrait
         }
 
         $roomClass = \Utd\Room\Entities\Room::class;
-        $pkClass = \Utd\Room\Entities\Pk::class;
+        $pkClass = \Utd\Pk\Entities\Pk::class;
 
         $room = $roomClass::withoutAppends()->where('type', 'audio')->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
 

@@ -6,7 +6,7 @@ use App\Helpers\Common;
 
 use App\Models\configesModel;
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\RequestBackgroundImage;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;

@@ -7,7 +7,7 @@ use Modules\TaskStream\Entities\TaskStream;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Utd\RoomBoom\Entities\RoomBoom;
 

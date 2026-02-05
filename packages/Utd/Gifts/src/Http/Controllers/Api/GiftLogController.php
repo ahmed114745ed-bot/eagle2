@@ -2,7 +2,7 @@
 
 namespace Utd\Gifts\Http\Controllers\Api;
 
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;

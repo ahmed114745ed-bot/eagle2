@@ -5,7 +5,7 @@ namespace App\Classes\Gifts;
 use App\Helpers\Common;
 use App\Interfaces\RoomJobInterface;
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Carbon\Carbon;
 use Modules\Charizma\Http\Services\UserCharismaService;

@@ -3,7 +3,7 @@
 namespace Modules\SuperAdmin\Http\Controllers\SuperAdmin;
 
 
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Form;

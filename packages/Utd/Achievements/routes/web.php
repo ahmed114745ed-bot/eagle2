@@ -30,7 +30,6 @@ Route::group(
             'adminIp',
             //            'adminGeneralBan',
             'multiLanguage',
-            'appFeatureEnable:achievement',
         ],
         'as' => config('admin.route.prefix') . '.',
     ],

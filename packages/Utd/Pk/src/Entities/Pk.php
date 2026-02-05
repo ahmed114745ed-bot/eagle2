@@ -1,8 +1,9 @@
 <?php
 
-namespace Utd\Room\Entities;
+namespace Utd\Pk\Entities;
 
 use App\Models\User;
+use Utd\Room\Entities\Room;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

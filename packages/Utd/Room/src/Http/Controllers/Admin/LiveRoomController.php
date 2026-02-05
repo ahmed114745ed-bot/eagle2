@@ -4,7 +4,7 @@ namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Services\UserService;
 use App\Models\KickRecord;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Form;

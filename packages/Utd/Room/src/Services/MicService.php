@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Facades\RoomHelper;
 use App\Models\Cp;
-use Utd\Room\Repositories\PkRepository;
+use Utd\Pk\Repositories\PkRepository;
 use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\TimeLogRepository;

@@ -7,7 +7,7 @@ use App\Http\Resources\RankingGameCollectionResource;
 use App\Http\Resources\RankingUserV2Resource;
 use App\Http\Resources\TopUserResource;
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;;
+use Utd\Pk\Entities\Pk;
 
 use App\Models\User;
 use App\Helpers\Common;

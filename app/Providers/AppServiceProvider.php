@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
@@ -21,7 +21,7 @@ use App\Helpers\RoomHelper;
 use App\Models\UserSallary;
 use App\Helpers\CacheHelper;
 use App\Classes\UserHandling;
-use Utd\Room\Observers\PKObserver;
+use Utd\Pk\Observers\PKObserver;
 use Modules\Vip\Entities\Vip;
 use App\Helpers\ManagerHelper;
 use App\Observers\VipObserver;

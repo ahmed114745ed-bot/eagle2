@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Room\Jobs;
+namespace Utd\Pk\Jobs;
 
 use App\Classes\Gifts\SendGiftService;
 use Utd\Pk\Entities\Pk;

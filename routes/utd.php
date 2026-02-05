@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\V1\OfferController;
 use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionController;
-use Utd\Room\Http\Controllers\Api\PkController;
+use Utd\Pk\Http\Controllers\Api\PkController;
 use App\Http\Controllers\Api\V1\RoleController;
 use Utd\Room\Http\Controllers\Api\RoomController as RoomControllerVi;
 use App\Http\Controllers\Api\V1\TargetController;

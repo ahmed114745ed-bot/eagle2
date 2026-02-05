@@ -1,17 +1,17 @@
 <?php
 
-namespace Utd\Room\Services;
+namespace Utd\Pk\Services;
 
 use Exception;
 use Carbon\Carbon;
-use Utd\Room\Repositories\PkRepository;
-use Utd\Room\Repositories\RoomRepository;
+use Utd\Pk\Repositories\PkRepository;
+use App\Contracts\RoomRepositoryContract;
 
 class PkService
 {
     public function __construct(
         private readonly PkRepository $pkRepository,
-        private readonly RoomRepository $roomRepository,
+        private readonly RoomRepositoryContract $roomRepository,
     ) {}
 
     public function create($request, $userId)

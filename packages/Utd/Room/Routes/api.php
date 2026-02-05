@@ -5,7 +5,6 @@ use Utd\Room\Http\Controllers\Api\RoomController;
 use Utd\Room\Http\Controllers\Api\EnteranceController;
 use Utd\Room\Http\Controllers\Api\MicrophoneController;
 use Utd\Room\Http\Controllers\Api\RoomCategoryController;
-use Utd\Room\Http\Controllers\Api\PkController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
@@ -65,20 +64,7 @@ Route::prefix('api')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBa
         Route::post('/yellow-banner', [RoomController::class, 'sendComment']);
         Route::post('/check-admin-owner', [RoomController::class, 'adminOwner']);
 
-        // PK routes
-        Route::middleware(['appFeatureEnable:pk'])->group(function () {
-            Route::post('create-pk', [PkController::class, 'createPK']);
-            Route::post('close-pk', [PkController::class, 'closePK']);
-            Route::post('show-pk', [PkController::class, 'showPK']);
-            Route::post('hide-pk', [PkController::class, 'hidePk']);
-        });
-
-        Route::middleware(['appFeatureEnable:pk'])->prefix('pk')->group(function () {
-            Route::post('create', [PkController::class, 'createPKWithoutZego']);
-            Route::post('close', [PkController::class, 'closePKWithoutZego']);
-            Route::post('show', [PkController::class, 'showPKWithoutZego']);
-            Route::post('hide', [PkController::class, 'hidePkWithoutZego']);
-        });
+        // PK routes moved to packages/Utd/Pk/Routes/api.php
 
         // Microphone routes
         Route::post('liveTime', [MicrophoneController::class, 'lifeTime']);

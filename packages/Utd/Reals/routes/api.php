@@ -15,7 +15,7 @@ use Utd\Reals\Http\Controllers\ReportController;
 Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])
     ->group(function () {
 
-        Route::prefix('reals')->middleware('appFeatureEnable:reel')->group(function () {
+        Route::prefix('reals')->group(function () {
 
             // قراءة ريلز المستخدم
             Route::get('user/{user_id?}', [RealsController::class, 'getUserReals'])
@@ -57,6 +57,5 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
         });
 
         // التقارير
-        Route::apiResource('report', ReportController::class)
-            ->middleware('appFeatureEnable:reel');
+        Route::apiResource('report', ReportController::class);
     });

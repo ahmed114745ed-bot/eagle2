@@ -4,7 +4,7 @@ namespace Modules\AreaManager\Http\Controllers;
 
 use App\Models\Country;
 use Log;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use Encore\Admin\Form;

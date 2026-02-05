@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
+use Utd\Pk\Jobs\UpdatePkAndSendToZigoJob;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;

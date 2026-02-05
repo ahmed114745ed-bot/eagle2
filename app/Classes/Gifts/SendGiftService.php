@@ -4,7 +4,7 @@ namespace App\Classes\Gifts;
 
 use App\Enums\UserDiamondLogType;
 use App\Helpers\UserDiamondLogHelper;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;

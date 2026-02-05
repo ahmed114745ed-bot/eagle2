@@ -1,0 +1,29 @@
+{
+    "name": "utd/pk",
+    "description": "PK (Player vs Player) package for Eagle application",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTD",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Pk\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Pk\\PkServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

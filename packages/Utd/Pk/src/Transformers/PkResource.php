@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Room\Transformers;
+namespace Utd\Pk\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 

@@ -3,7 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Room\Entities\Room;
 use App\Models\Police;

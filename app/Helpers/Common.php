@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use App\Support\PackageHelper;
-use Utd\Room\Entities\Pk;
+use Utd\Pk\Entities\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;

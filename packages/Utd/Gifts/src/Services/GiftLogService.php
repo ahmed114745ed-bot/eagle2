@@ -15,7 +15,7 @@ use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
 use App\Events\GiftBannerEvent;
-use Utd\Room\Jobs\UpdatePkAndSendToZigoJob;
+use Utd\Pk\Jobs\UpdatePkAndSendToZigoJob;
 use App\Classes\Gifts\SendGiftService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
