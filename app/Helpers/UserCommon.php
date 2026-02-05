@@ -103,37 +103,48 @@ class UserCommon
             $startDate = Carbon::now($timezone)->startOfMonth()->timezone('UTC');
             $endDate = Carbon::now($timezone)->endOfMonth()->timezone('UTC');
         }
-        $user = User::withCount(["reals" => function ($reals) use ($type, $startDate, $endDate) {
+        
+        // Check if packages are available
+        $hasRealsPackage = class_exists(\Utd\Reals\Entities\Real::class);
+        $hasMomentsPackage = class_exists(\Modules\Moment\Entities\Moment::class);
+        
+        $user = User::withCount(["reals" => function ($reals) use ($type, $startDate, $endDate, $hasRealsPackage) {
+            if (!$hasRealsPackage) return;
             if ($type == 0) {
                 $reals->whereBetween("reals.created_at", getToday());
             } elseif ($type == 1) {
                 $reals->whereBetween('reals.created_at', [$startDate, $endDate]);
             }
-        }, 'real_comments' => function ($real_comments) use ($type, $startDate, $endDate) {
+        }, 'real_comments' => function ($real_comments) use ($type, $startDate, $endDate, $hasRealsPackage) {
+            if (!$hasRealsPackage) return;
             if ($type == 0) {
                 $real_comments->whereBetween("real_user_comments.created_at", getToday());
             } elseif ($type == 1) {
                 $real_comments->whereBetween("real_user_comments.created_at", [$startDate, $endDate]);
             }
-        }, 'real_likes' => function ($real_likes) use ($startDate, $endDate, $type) {
+        }, 'real_likes' => function ($real_likes) use ($startDate, $endDate, $type, $hasRealsPackage) {
+            if (!$hasRealsPackage) return;
             if ($type == 0) {
                 $real_likes->whereBetween("real_user_likes.created_at", getToday());
             } elseif ($type == 1) {
                 $real_likes->whereBetween("real_user_likes.created_at", [$startDate, $endDate]);
             }
-        }, 'Moments' => function ($moments) use ($startDate, $endDate, $type) {
+        }, 'Moments' => function ($moments) use ($startDate, $endDate, $type, $hasMomentsPackage) {
+            if (!$hasMomentsPackage) return;
             if ($type == 0) {
                 $moments->whereBetween("moment.created_at", getToday());
             } elseif ($type == 1) {
                 $moments->whereBetween("moment.created_at", [$startDate, $endDate]);
             }
-        }, 'moment_comments' => function ($moment_comments) use ($startDate, $endDate, $type) {
+        }, 'moment_comments' => function ($moment_comments) use ($startDate, $endDate, $type, $hasMomentsPackage) {
+            if (!$hasMomentsPackage) return;
             if ($type == 0) {
                 $moment_comments->whereBetween("moment_user_comments.created_at", getToday());
             } elseif ($type == 1) {
                 $moment_comments->whereBetween("moment_user_comments.created_at", [$startDate, $endDate]);
             }
-        }, 'moment_likes' => function ($moment_likes) use ($startDate, $endDate, $type) {
+        }, 'moment_likes' => function ($moment_likes) use ($startDate, $endDate, $type, $hasMomentsPackage) {
+            if (!$hasMomentsPackage) return;
             if ($type == 0) {
                 $moment_likes->whereBetween("moment_user_likes.created_at", getToday());
             } elseif ($type == 1) {
