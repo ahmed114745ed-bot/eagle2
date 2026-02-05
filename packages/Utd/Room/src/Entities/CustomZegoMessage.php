@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Room\Entities;
 
-use App\Support\PackageHelper;
-use App\Traits\TimestampsWithTimezone;
+use App\Models\Gift;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Utd\Room\Entities\Room;
 
 class CustomZegoMessage extends Model
 {
-    use HasFactory, TimestampsWithTimezone;
+    use HasFactory;
 
     protected $guarded = [];
 
@@ -21,8 +20,7 @@ class CustomZegoMessage extends Model
 
     public function room()
     {
-        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
-            $this->belongsTo(Room::class, 'room_id');
+        return $this->belongsTo(Room::class, 'room_id');
     }
 
     public function gift()

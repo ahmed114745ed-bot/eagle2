@@ -1,32 +1,31 @@
 <?php
 
-namespace App\Admin\Actions;
+namespace Utd\Room\Admin\Actions;
 
-use App\Models\CustomZegoMessage;
 use App\Models\Gift;
 use App\Models\User;
 use App\Traits\Gifts\WinLuckyGift;
 use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Utd\Room\Entities\CustomZegoMessage;
 
 class ResendZegoMessageAction extends RowAction
 {
     use WinLuckyGift;
     public $name;
+    
     public function __construct($id = 0)
     {
         $this->name = __("dashboard.retryZego");
         parent::__construct();
     }
+    
     public function handle(Model $model, Request $request)
     {
         try {
-
-
-           $data=CustomZegoMessage::query()->find($model->id);
-           $percentage = ($request->percentage != null ? $request->percentage : $data->percentage);
+            $data = CustomZegoMessage::query()->find($model->id);
+            $percentage = ($request->percentage != null ? $request->percentage : $data->percentage);
             $newDate = CustomZegoMessage::create([
                 'user_id'   =>  $data->user_id,
                 'room_id'   =>  $data->room_id,
@@ -34,9 +33,9 @@ class ResendZegoMessageAction extends RowAction
                 'percentage'=>  $percentage,
             ]);
 
-            $user=User::query()->find($newDate->user_id);
-            $gift=Gift::query()->find($newDate->gift_id);
-            $room=$user->ownerRoom;
+            $user = User::query()->find($newDate->user_id);
+            $gift = Gift::query()->find($newDate->gift_id);
+            $room = $user->ownerRoom;
 
             $zigoData = [
                 'user_id'      => $user->id,
@@ -50,12 +49,11 @@ class ResendZegoMessageAction extends RowAction
                 'gift_price'   => @$gift->price,
                 'room_name'    => $room->room_name ?: '',
                 'room_cover'   => $room->room_cover ?? '',
-                'room_background'   => $room->final_room_image ?? '', 
+                'room_background'   => $room->final_room_image ?? '',
                 'room_mode'   =>  $room->mode,
                 'room_uuid'   => $room->owner?->uuid ?: 0,
                 'room_owner_id'   => $room->uid ?: 0,
                 'is_password'   =>  (bool)(@$room->room_pass),
-
             ];
             $this->sendToZegoLuckyGift($zigoData);
             return $this->response()->success(__('dashboard.successful'))->refresh();

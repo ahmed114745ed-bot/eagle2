@@ -19,7 +19,7 @@ class MomentsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
+//        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
 
         $this->app->singleton(MomentContract::class, MomentService::class);
     }

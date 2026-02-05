@@ -911,12 +911,14 @@
                     <i class="fas fa-users"></i> {{ __('Users') }}
                 </button>
             </li>
+            @if(\App\Support\PackageHelper::isInstalled('room'))
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="rooms-tab" data-bs-toggle="tab" data-bs-target="#rooms" type="button"
                         role="tab" aria-controls="rooms" aria-selected="false">
                     <i class="fas fa-home"></i> {{ __('Rooms') }}
                 </button>
             </li>
+            @endif
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="agencies-tab" data-bs-toggle="tab" data-bs-target="#agencies" type="button"
                         role="tab" aria-controls="agencies" aria-selected="false">
@@ -955,6 +957,7 @@
                 </div>
             </div>
 
+            @if(\App\Support\PackageHelper::isInstalled('room'))
             <div class="tab-pane fade" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
                 <div class="col-md-12 mb-4">@include('admin.dashboard.widgets.room_tab')</div>
                 <div class="row">
@@ -964,6 +967,7 @@
                     <div class="col-lg-6 col-12 mb-3"><div class="widget-card">@include('admin.dashboard.widgets.avg_session_duration_chart')</div></div>
                 </div>
             </div>
+            @endif
 
             <div class="tab-pane fade" id="agencies" role="tabpanel" aria-labelledby="agencies-tab">
                 <div class="col-md-12 mb-4">@include('admin.dashboard.widgets.agency_tab')</div>

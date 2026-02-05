@@ -38,7 +38,6 @@ use App\Admin\Controllers\CountryCategoryController;
 use App\Admin\Controllers\CountryRequestActionController;
 use App\Admin\Controllers\CountryRequestHistoryController;
 use App\Admin\Controllers\CustomController;
-use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\EmojiController;
@@ -594,7 +593,7 @@ Route::group(
         Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
         Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
         Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
-        // rooms/{id}/image moved to packages/Utd/Room/Routes/web.php
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
@@ -629,7 +628,7 @@ Route::group(
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
-        Route::resource('custom-zego-messages', CustomZegoMessageController::class);
+        // custom-zego-messages moved to packages/Utd/Room/Routes/web.php
 
         // Agency settings - only if package installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {

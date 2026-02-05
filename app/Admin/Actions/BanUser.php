@@ -4,7 +4,7 @@ namespace App\Admin\Actions;
 
 use Exception;
 use App\Models\Ban;
-use Utd\Room\Entities\Room;
+use App\Support\PackageHelper;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -22,6 +22,7 @@ use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Facades\Admin as AuthAdmin;
+use Utd\Room\Entities\Room;
 
 class BanUser extends Action
 {
@@ -32,7 +33,7 @@ class BanUser extends Action
 
     public function handle(Request $request)
     {
-      
+
         $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
 
 
@@ -52,7 +53,10 @@ class BanUser extends Action
         if (!$user) {
             return $this->response()->error(__('user not found'))->refresh();
         }
-        $room = Room::query()->where('uid',  $user->now_room_uid)->first();
+        $room = null;
+        if (PackageHelper::isInstalled('room')) {
+            $room = Room::query()->where('uid', $user->now_room_uid)->first();
+        }
         // $ban = Ban::query()->where('uid', $userUuid)->where('ty')->first();
         if (in_array('ip', $request->type)) {
 
@@ -151,7 +155,7 @@ class BanUser extends Action
             );
 
             $route = $ban->banType?->route;
-                           
+
 
             if ($route == 'rooms/enter_room' && $user->nowRoom) {
                 $ms = [

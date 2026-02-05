@@ -16,6 +16,7 @@ use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use App\Support\PackageHelper;
 
 class GroupChatController extends MainController
 {
@@ -518,6 +519,15 @@ class GroupChatController extends MainController
     public function getRoomImage($id): JsonResponse
     {
         try {
+            if (!PackageHelper::isInstalled('room')) {
+                return response()->json([
+                    'success' => true,
+                    'image' => '',
+                    'room_id' => $id,
+                    'room_name' => ''
+                ]);
+            }
+
             $room = \Utd\Room\Entities\Room::find($id);
 
             if (!$room) {

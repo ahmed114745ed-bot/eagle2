@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Models\Ban;
-use Utd\Room\Entities\Room;
+use App\Support\PackageHelper;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Agency;
@@ -17,6 +17,7 @@ use Encore\Admin\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Auth;
+use Utd\Room\Entities\Room;
 
 class BanUserId extends Action
 {
@@ -29,7 +30,10 @@ class BanUserId extends Action
 
         $user = User::query ()->where ('id',$request->uid)->first ();
 
-        $room = Room::query ()->where('uid',@$user->now_room_uid??0)->first();
+        $room = null;
+        if (PackageHelper::isInstalled('room')) {
+            $room = Room::query()->where('uid', @$user->now_room_uid ?? 0)->first();
+        }
         if (!$user){
             return $this->response()->error(__('user not found'))->refresh();
         }
