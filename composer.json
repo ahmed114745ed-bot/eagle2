@@ -53,6 +53,7 @@
         "utd/agency": "dev-master",
         "utd/moments": "*",
         "utd/reals": "*",
+        "utd/gifts": "*",
         "utd/room": "*"
     },
     "require-dev": {
@@ -154,6 +155,9 @@
             "options": {
                 "symlink": true
             }
+        }
+        ,{
+            "type": "path", "url": "./packages/Utd/Gifts"
         }
 
     ]
