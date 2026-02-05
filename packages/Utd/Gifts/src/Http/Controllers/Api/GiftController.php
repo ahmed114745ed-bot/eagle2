@@ -27,7 +27,7 @@ class GiftController extends Controller
     {
         $type = $request->type;
         $gifts = $this->giftService->index($type);
-        return $this->$this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
+        return $this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
     }
     public function getByCategory(Request $request)
     {
@@ -35,21 +35,21 @@ class GiftController extends Controller
         $categoryId = $request->input('type');
         $type       = $request->input('type'); 
         $gifts = $this->giftService->getByCategory($categoryId, $type);
-        return $this->$this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
+        return $this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
     }
     
     public function get_images(Request $request)
     {
 
         $gifts = $this->giftService->get_images();
-        return $this->$this->Common::apiResponse(true, '', $gifts, 200);
+        return $this->Common::apiResponse(true, '', $gifts, 200);
     }
 
 
     public function allGifts(Request $request)
     {
         $gifts = $this->giftService->allGift($request->page, $request->per_page);
-        return $this->$this->Common::apiResponse(1, '',  $gifts);
+        return $this->Common::apiResponse(1, '',  $gifts);
     }
 
     public function store(Request $request)
