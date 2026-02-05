@@ -93,6 +93,7 @@ class MilestoneHelper
     protected static function applyRewardEffect(User $user, MilestoneReward $mr): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
+        
 
         switch ($mr->type) {
             case 'coins':
@@ -117,7 +118,7 @@ class MilestoneHelper
             case 'ware':
                 $ware = Ware::find($mr->rewardable_id);
                 if (!$ware) { break;}
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType);
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature:$mr);
                 break;
 
             case 'badge':
