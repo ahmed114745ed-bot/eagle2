@@ -92,18 +92,18 @@ class WalletService
                 UserCoinLogType::TRANSFER,
                 authId: $fromUserId,
             );
-            if ($toUserId != $fromUserId) {
-                $this->walletRepo->createLog([
-                    'wallet_id' => $toWallet->id,
-                    'user_id' => $toUserId,
-                    'amount' => $usd,
-                    'operation' => 'transfer',
-                    'type' => 'transfer',
-                    'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
-                    'after_amount' =>  wallet_available_by_user($toUserId),
-                    'related_id'  =>  $fromUserId
-                ]);
-            }
+            // if ($toUserId != $fromUserId) {
+            //     $this->walletRepo->createLog([
+            //         'wallet_id' => $toWallet->id,
+            //         'user_id' => $toUserId,
+            //         'amount' => $usd,
+            //         'operation' => 'transfer',
+            //         'type' => 'transfer',
+            //         'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
+            //         'after_amount' =>  wallet_available_by_user($toUserId),
+            //         'related_id'  =>  $fromUserId
+            //     ]);
+            // }
 
 
             if ($receiver instanceof User) {
