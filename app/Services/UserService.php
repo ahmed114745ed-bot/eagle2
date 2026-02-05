@@ -49,6 +49,7 @@ use App\Tik\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\InvitationEarningResource;
 use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Contracts\ShippingAgencyRepositoryInterface;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use Modules\FixedTarget\Services\FixedTargetService;
 use Modules\Public\Http\Services\UserCounterServices;
@@ -72,7 +73,7 @@ class UserService
         private readonly UserTargetRepository $userTargetRepository,
         private readonly FamilyUserRepository $familyUserRepository,
         private readonly AgencyRepository $agencyRepository,
-        private readonly ShippingAgencyRepository $shippingAgencyRepository,
+        private readonly ShippingAgencyRepositoryInterface $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepository $roomVisitorRepository,
         private readonly BdRepository $bdRepository,
