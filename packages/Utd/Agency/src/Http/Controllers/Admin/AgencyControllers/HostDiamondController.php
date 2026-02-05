@@ -5,16 +5,16 @@ namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 use App\Admin\Controllers\MainController;
 use App\Admin\Services\AgencyService;
 use App\Admin\Services\UserService;
-use App\Helpers\UserCommon;
-use App\Models\GiftLog;
 use Carbon\Carbon;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class HostDiamondController extends MainController
 {
     use HasResourceActions;
+    use ResolvesExternalDependencies;
 
     public $permission_name = 'host-diamond';
 

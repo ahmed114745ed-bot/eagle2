@@ -2,39 +2,11 @@
 
 namespace App\Traits;
 
-use App\Models\Bd;
-
+/**
+ * Alias for backward compatibility
+ * @deprecated Use Utd\Agency\Traits\DefaultBdAssignmentTrait instead
+ */
 trait DefaultBdAssignmentTrait
 {
-    public static function bootDefaultBdAssignmentTrait()
-    {
-
-        static::creating(function ($model) {
-            if (empty($model->bd_id)) {
-                $defaultBd = Bd::where('type', 'bd')
-                                ->where('default', true)
-                                ->where('country_id', $model->country_id)
-                                ->first();
-
-                if ($defaultBd) {
-                    $model->bd_id = $defaultBd->id;
-                }
-            }
-
-        });
-
-
-        static::updating(function ($model) {
-            if (empty($model->bd_id)) {
-                $defaultBd = Bd::where('type', 'bd')
-                                ->where('default', true)
-                                ->where('country_id', $model->country_id)
-                                ->first();
-
-                if ($defaultBd) {
-                    $model->bd_id = $defaultBd->id;
-                }
-            }
-        });
-    }
+    use \Utd\Agency\Traits\DefaultBdAssignmentTrait;
 }

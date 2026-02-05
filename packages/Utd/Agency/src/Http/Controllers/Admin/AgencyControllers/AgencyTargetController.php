@@ -2,21 +2,21 @@
 
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\UserTarget;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyTargetController extends MainController
 {
     use HasResourceActions;
+    use ResolvesExternalDependencies;
+    
     public $permission_name = 'user-agent-target';
 
 

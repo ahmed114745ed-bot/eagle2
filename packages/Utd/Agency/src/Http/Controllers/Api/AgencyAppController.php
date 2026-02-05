@@ -3,29 +3,18 @@
 namespace Utd\Agency\Http\Controllers\Api;
 
 use Admin;
-use App\Models\User;
-use App\Models\Agency;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Facades\CustomNotification;
 use Utd\Agency\Facades\AgencyHelper;
-use App\Models\Admin as ModelsAdmin;
-use App\Models\AgencyJoinRequest;
-use App\Models\Agent;
-use App\Models\Follow;
-use App\Models\GiftLog;
-use App\Models\LiveTime;
-use App\Models\ProfileVisitor;
-use App\Models\UserSallary;
-use App\Notifications\AcceptAgency;
-use App\Notifications\RefuseAgency;
+use Utd\Agency\Notifications\AcceptAgency;
+use Utd\Agency\Notifications\RefuseAgency;
 use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Facades\Notification;
 use Utd\Agency\Emails\SendAgencyEmail;
-use Modules\Reals\Http\Services\RealsService;
 use Utd\Agency\Entities\AdditionalInfo;
 use Utd\Agency\Notifications\AgencyMail;
 use Utd\Agency\Http\Requests\CreateAgencyRequest;
@@ -37,16 +26,21 @@ use Utd\Agency\Transformers\AgencyHostResource;
 use Utd\Agency\Transformers\AgencyInvitationResource;
 use Utd\Agency\Transformers\AgencyMonthlyHostResource;
 use Utd\Agency\Transformers\HostDailyReportResource;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyAppController extends Controller
 {
+    use ResolvesExternalDependencies;
 
     public function get_user(Request $request) {
         if($request->user_id){
-            $admin = ModelsAdmin::find($request->user()->id);
-            $user = User::find($request->user_id);
+            $adminClass = config('agency-package.models.admin');
+            $userClass = config('agency-package.models.user');
+            
+            $admin = $adminClass::find($request->user()->id);
+            $user = $userClass::find($request->user_id);
             if(isset($admin)&& $admin->isRole("admin")){
-                $user = User::find($request->user_id);
+                $user = $userClass::find($request->user_id);
             }else{
                 $user = null ;
             }

@@ -2,23 +2,36 @@
 
 namespace Utd\Agency\Entities;
 
-use App\Models\Scopes\HostAgencyScope;
-use App\Traits\CreatedByTrait;
-use App\Traits\DefaultBdAssignmentTrait;
-use App\Traits\PaymentGetWayTrait;
-use App\Traits\TimestampsWithTimezone;
-use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Utd\Agency\Scopes\HostAgencyScope;
 use Utd\Agency\Traits\ConfigurableModelsTrait;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
-use Modules\SalaryTransaction\Entities\SalaryRequest;
-use Modules\SalaryTransaction\Traits\SalaryTransferTrait;
+use Utd\Agency\Traits\PaymentGetWayTrait;
+use Utd\Agency\Traits\TimestampsWithTimezone;
+use Utd\Agency\Traits\CreatedByTrait;
+use Utd\Agency\Traits\DefaultBdAssignmentTrait;
 
 class Agency extends Model
 {
-    use DefaultBdAssignmentTrait, PaymentGetWayTrait, SalaryTransferTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    use DefaultBdAssignmentTrait, PaymentGetWayTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    
+    // Dynamically use SalaryTransferTrait if available
+    public function __construct(array $attributes = [])
+    {
+        if (trait_exists('Modules\\SalaryTransaction\\Traits\\SalaryTransferTrait')) {
+            $this->initializeSalaryTransferTrait();
+        }
+        parent::__construct($attributes);
+    }
+    
+    protected function initializeSalaryTransferTrait()
+    {
+        if (method_exists($this, 'bootSalaryTransferTrait')) {
+            $this->bootSalaryTransferTrait();
+        }
+    }
     
     /**
      * Additional Info relationship (from AgencyAdditionalInfoTrait)
@@ -41,7 +54,20 @@ class Agency extends Model
 
     public function chargeAgency()
     {
-        return $this->hasMany(ChargeAgency::class, 'agency_id');
+        if (!class_exists('Modules\\SalaryTransaction\\Entities\\ChargeAgency')) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        $chargeAgencyClass = 'Modules\\SalaryTransaction\\Entities\\ChargeAgency';
+        return $this->hasMany($chargeAgencyClass, 'agency_id');
+    }
+    
+    public function salaryRequests()
+    {
+        if (!class_exists('Modules\\SalaryTransaction\\Entities\\SalaryRequest')) {
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        $salaryRequestClass = 'Modules\\SalaryTransaction\\Entities\\SalaryRequest';
+        return $this->hasMany($salaryRequestClass, 'agency_id');
     }
 
     public function charges()
@@ -66,11 +92,6 @@ class Agency extends Model
     {
         $countryClass = config('agency-package.models.country', \App\Models\Country::class);
         return $this->belongsTo($countryClass);
-    }
-
-    public function salaryRequests()
-    {
-        return $this->hasMany(SalaryRequest::class, 'agency_id');
     }
 
     public function mempers()

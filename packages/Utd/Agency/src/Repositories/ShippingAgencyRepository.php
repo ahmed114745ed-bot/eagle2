@@ -2,9 +2,9 @@
 
 namespace Utd\Agency\Repositories;
 
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Models\AgencyUserJob;
+use Utd\Agency\Entities\Agency;
+use Utd\Agency\Entities\AgencyJoinRequest;
+use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Entities\ShippingAgency;
 
 class ShippingAgencyRepository

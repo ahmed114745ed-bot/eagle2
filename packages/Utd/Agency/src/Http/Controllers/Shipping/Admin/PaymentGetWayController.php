@@ -4,14 +4,15 @@ namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
 
 use App\Admin\Controllers\MainController;
-use App\Models\PaymentGateway;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class PaymentGetWayController extends MainController
 {
+    use ResolvesExternalDependencies;
     /**
      * Title for current resource.
      *

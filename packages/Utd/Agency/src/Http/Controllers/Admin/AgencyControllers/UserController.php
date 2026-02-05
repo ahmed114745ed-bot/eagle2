@@ -3,15 +3,9 @@
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
 use Session;
-use App\Models\User;
-use App\Models\Agency;
-use App\Helpers\AgencyPackageHelper;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Country;
-use App\Facades\UserHandling;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Illuminate\Validation\Rule;
@@ -29,11 +23,12 @@ use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
-use Modules\SwitchAccount\Entities\UserAccount;
-use App\Contracts\UserAchievementContract;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class UserController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     /**
      * Title for current resource.
      *

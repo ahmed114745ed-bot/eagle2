@@ -2,21 +2,21 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
 // use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
-use App\Helpers\AgencyPackageHelper;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 
 class AgencyMangerUsers extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     /**
      * Title for current resource.
      *
@@ -43,9 +43,12 @@ class AgencyMangerUsers extends MainController
      */
     protected function grid()
     {
-        $grid = new Grid(new User());
-
-        $grid = new Grid(new User());
+        $userClass = $this->getUserModel();
+        if (!$userClass) {
+            abort(500, 'User model not available');
+        }
+        
+        $grid = new Grid(new $userClass());
         $grid->model ()->ofAgency();
         $grid->quickSearch ();
         $grid->filter (function (Grid\Filter $filter){

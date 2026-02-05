@@ -18,10 +18,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
-use App\Helpers\Common;
-use App\Models\Bd;
-use App\Models\User;
-use App\Models\GiftLog;
 use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Entities\AgencyJoinRequest;
@@ -32,13 +28,14 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Extensions\Permission;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use App\Helpers\CustomNotification;
-use App\Helpers\UserHandling;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
+use App\Helpers\Common;
 
 
 class AgencyController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     protected $title = 'Agencies';
     public $permission_name = 'agencies';
     public $hiddenColumns = [];

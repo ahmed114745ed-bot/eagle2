@@ -3,29 +3,26 @@
 namespace Utd\Agency\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
-use App\Models\UsersJoinedAgency;
+use Utd\Agency\Entities\AgencyJoinRequest;
+use Utd\Agency\Entities\UsersJoinedAgency;
 use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use App\Services\AppFeatureService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyJoinRequestController extends MainController
 {
     use HasResourceActions;
+    use ResolvesExternalDependencies;
+    
     public $permission_name = 'agencies-join-requests';
 
     public function update($id)

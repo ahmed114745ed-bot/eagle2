@@ -2,27 +2,30 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\Agency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Services\AppFeatureService;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Widgets\Table as WidgetsTable;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class RequestAgencyController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     public $permission_name = 'request-agencies';
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("agencies");
+        $appFeatureService = $this->getAppFeatureService();
+        if ($appFeatureService) {
+            $appFeatureService->validateStatusEnable("agencies");
+        }
     }
 
 

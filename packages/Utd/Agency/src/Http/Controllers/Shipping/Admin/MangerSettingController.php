@@ -3,18 +3,17 @@
 namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
 use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
-use App\Models\Config;
-use App\Models\Language;
-use App\Models\PaymentGateway;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class MangerSettingController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     public $permission_name = 'updates_group_chat';
     public $permission_setting = 'agency-manger-setting';
 

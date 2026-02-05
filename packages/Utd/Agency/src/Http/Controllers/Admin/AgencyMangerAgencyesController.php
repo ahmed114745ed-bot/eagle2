@@ -2,21 +2,20 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\AgencySallary;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesModels;
 
 class AgencyMangerAgencyesController extends MainController
 {
+    use ResolvesModels;
 
     public $permission_name = 'agency-manager';
 
@@ -300,7 +299,8 @@ class AgencyMangerAgencyesController extends MainController
             // }
             // if ($appOwnerId) {
             // $newType = intval($host);
-            $user =   User::where('id', $appOwnerId)->first();
+            $userClass = $this->getUserModel();
+            $user = $userClass::where('id', $appOwnerId)->first();
             $user->type_user = 2;
             $user->save();
         });

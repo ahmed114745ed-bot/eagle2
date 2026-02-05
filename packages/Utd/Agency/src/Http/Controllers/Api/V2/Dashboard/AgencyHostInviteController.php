@@ -3,15 +3,16 @@
 namespace Utd\Agency\Http\Controllers\Api\V2\Dashboard;
 
 use Exception;
-use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use App\Tik\Services\AgencyHostInviteService;
 use Utd\Agency\Transformers\AgencyInvitationResource;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 
 class AgencyHostInviteController extends Controller
 {
+    use ResolvesExternalDependencies;
     protected $agencyHostInviteService;
 
     public function __construct(AgencyHostInviteService $agencyHostInviteService)

@@ -10,11 +10,12 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Cache;
-use Modules\SalaryTransaction\Entities\ChargeAgency as EntitiesChargeAgency;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class ChargeAgencyController extends MainController
 {
     use HasResourceActions;
+    use ResolvesExternalDependencies;
     public $permission_name = 'charge-agency';
 
     public function index(Content $content)
