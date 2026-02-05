@@ -25,7 +25,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use App\Admin\Services\UserService;
 use App\Models\Admin as AdminModel;
-use App\Admin\Actions\RoomPinAction;
 use Illuminate\Support\Facades\Cache;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Admin\Controllers\MainController;
@@ -506,7 +505,7 @@ class RoomController extends MainController
     {
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-            
+
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {

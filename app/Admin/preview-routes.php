@@ -19,7 +19,7 @@ use App\Admin\Controllers\chargUsersSleemController;
 use App\Admin\Controllers\ColorController;
 use App\Admin\Controllers\CoreWalletsController;
 use App\Admin\Controllers\CustomController;
-use App\Admin\Controllers\CustomZegoMessageController;
+use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\GroupChatController;

@@ -38,7 +38,6 @@ use App\Admin\Controllers\CountryCategoryController;
 use App\Admin\Controllers\CountryRequestActionController;
 use App\Admin\Controllers\CountryRequestHistoryController;
 use App\Admin\Controllers\CustomController;
-use App\Admin\Controllers\CustomZegoMessageController;
 use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\EmojiController;
@@ -634,7 +633,7 @@ Route::group(
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
 
-        Route::resource('custom-zego-messages', CustomZegoMessageController::class);
+        // custom-zego-messages moved to packages/Utd/Room/Routes/web.php
 
         // Agency settings - only if package installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {

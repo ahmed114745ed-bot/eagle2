@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers;
 
+use App\Support\PackageHelper;
 use Modules\Vip\Entities\Vip;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -308,11 +309,12 @@ class VipController extends MainController
             $tabs = [
                 'Appsender' => __('AppSender'),
                 'Appreceived' => __('AppReceived'),
-                'Appcp' => __('AppCP'),
-                'Approom' => __('AppRoom'),
-                'Appcharge' => __('AppCharge'),
+                'Appcp' => __('AppCP'), 'Appcharge' => __('AppCharge'),
             ];
 
+            if (PackageHelper::isInstalled('room')){
+                $tabs['Approom'] = __('AppRoom');
+            }
             // Render the Blade view with tabs data
             return view('admin.tabs', compact('tabs'));
         });
@@ -444,7 +446,7 @@ class VipController extends MainController
         $form->file('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->removable()->rules('required');
-        
+
 
         $form->footer(function ($footer) {
             $footer->disableReset();        // Disables the "Reset" button

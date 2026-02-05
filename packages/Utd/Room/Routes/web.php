@@ -12,6 +12,7 @@ use Utd\Room\Http\Controllers\Admin\BackgroundController;
 use Utd\Room\Http\Controllers\Admin\RequestBackgroundImageController;
 use Utd\Room\Http\Controllers\Admin\RoomCategoryController;
 use Utd\Room\Http\Controllers\Admin\LiveRoomController;
+use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
 use App\Admin\Controllers\GroupChatController;
 use Utd\Room\Entities\Room;
 
@@ -79,6 +80,9 @@ Route::group(
 
         // Room Bans
         Route::get('/bans-rooms', [BanRoomsController::class, 'index']);
+
+        // Custom Zego Messages
+        Route::resource('custom-zego-messages', CustomZegoMessageController::class);
 
         // Filter
         Route::get('filter-rooms', [RoomController::class, 'filterRooms'])->name('filter-rooms');
