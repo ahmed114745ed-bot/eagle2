@@ -15,7 +15,7 @@ class UninstallAgencyCommand extends Command
      */
     protected $signature = 'agency:uninstall 
                             {--force : Force uninstall without confirmation}
-                            {--keep-data : Keep database data (only remove code references)}
+                            {--remove-data : Remove all database data (tables, columns, triggers)}
                             {--keep-menu : Keep admin menu items}';
 
     /**
@@ -38,8 +38,13 @@ class UninstallAgencyCommand extends Command
 
         // Confirm uninstallation
         if (!$this->option('force')) {
-            $this->warn('⚠️  WARNING: This will remove all Agency package data!');
-            $this->warn('   This action cannot be undone.');
+            if ($this->option('remove-data')) {
+                $this->warn('⚠️  WARNING: --remove-data option will delete all Agency data!');
+                $this->warn('   This action cannot be undone.');
+            } else {
+                $this->info('ℹ️  Note: Data will be kept safely. Only code references will be removed.');
+                $this->info('   Use --remove-data option to delete database data.');
+            }
             $this->info('');
 
             if (!$this->confirm('Are you sure you want to uninstall the Agency package?')) {
@@ -48,7 +53,7 @@ class UninstallAgencyCommand extends Command
             }
         }
 
-        if (!$this->option('keep-data')) {
+        if ($this->option('remove-data')) {
             // Step 1: Remove triggers
             $this->info('🗑️  Step 1/4: Removing database triggers...');
             $this->removeTriggers();
@@ -69,7 +74,7 @@ class UninstallAgencyCommand extends Command
             $this->removeMigrationHistory();
             $this->info('   ✅ Migration entries removed.');
         } else {
-            $this->info('⏭️  Skipping data removal (--keep-data option)');
+            $this->info('✅  Data kept safely (use --remove-data to delete database data)');
         }
 
         // Step 4: Clear caches
