@@ -56,7 +56,7 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) return Common::apiResponse(0, 'api_responses.giftNotFound');
+        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         $giftPrice       = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
@@ -86,7 +86,7 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
+        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
         $roomId   = $room->id;
 
@@ -307,7 +307,7 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) return Common::apiResponse(0, 'api_responses.giftNotFound');
+        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         $giftPrice       = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
@@ -338,7 +338,7 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
+        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
         $roomId   = $room->id;
 
@@ -560,7 +560,7 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) return Common::apiResponse(0, 'api_responses.giftNotFound');
+        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         $giftPrice       = $gift->price;
         $receiversIds = explode(',', $data['toUid']);
@@ -590,7 +590,7 @@ class LuckyGiftService
             $ownerId = $room?->uid;
         }
 
-        if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
+        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
         $roomId   = $room->id;
 
@@ -825,7 +825,7 @@ class LuckyGiftService
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
-        if (!$gift) return Common::apiResponse(0, 'api_responses.giftNotFound');
+        if (!$gift) throw new InvalidArgumentException(__('api_responses.giftNotFound'));
 
         // update gift count
         (new LuckyStrategyService())->getUpdateGiftCountForCategory($gift);
@@ -846,7 +846,7 @@ class LuckyGiftService
             ->where('uid', $ownerId)
             ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
             ->first();
-        if (!$room) return Common::apiResponse(0, __('api_responses.roomNotFound'));
+        if (!$room) throw new InvalidArgumentException(__('api_responses.roomNotFound'));
 
         $roomId   = $room->id;
 
