@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Utd\Pk\Entities\Pk;
+use Utd\Room\Entities\Room;
 
 trait RoomTrait
 {
@@ -80,7 +82,7 @@ trait RoomTrait
             return __('room does not exist');
         }
 
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
         $room = $roomClass::query()->where('uid', $owner_id)->select('id', 'uid', 'room_visitor')->with(['microphones.user.profile'])->first();
 
         if (!$room) return __('room does not exist');
@@ -188,7 +190,7 @@ trait RoomTrait
         if (!PackageHelper::isInstalled('room')) {
             return 0;
         }
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
         $is_afk = $roomClass::query()->where('uid', $user_id)->value('is_afk');
         if ($is_afk) {
             return $user_id;
@@ -201,7 +203,7 @@ trait RoomTrait
     {
         $room_id = self::userNowRooms($user_id);
         if ($room_id && PackageHelper::isInstalled('room')) {
-            $roomClass = \Utd\Room\Entities\Room::class;
+            $roomClass = Room::class;
             $roomInfo = $roomClass::query()->select(['uid', 'room_name', 'hot', 'room_cover'])->where('uid', $room_id)->first();
             $roomInfo['hot'] = self::room_hot($roomInfo['hot']);
             $roomInfo['room_name'] = urldecode($roomInfo['room_name']);
@@ -244,9 +246,9 @@ trait RoomTrait
 
         $Visitor = DB::table('rooms')->where(['uid' => $uid])->value('room_visitor');
         $room_visitor = explode(',', $Visitor);
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
         $room = $roomClass::query()->where('uid', $uid)->first();
-        
+
         if ($uid == $user_id) {
             if ($room) {
                 $room->update(['is_afk' => 0]);
@@ -275,9 +277,9 @@ trait RoomTrait
 
         $Visitor = DB::table('rooms')->where(['uid' => $uid])->value('room_visitor');
         $room_visitor = explode(',', $Visitor);
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
         $room = $roomClass::query()->where('uid', $uid)->first();
-        
+
         if ($uid == $user_id) {
             if ($room) {
                 $room->update(['is_afk' => 0]);
@@ -304,8 +306,7 @@ trait RoomTrait
             return 0;
         }
 
-        $roomClass = \Utd\Room\Entities\Room::class;
-        $pkClass = \Utd\Pk\Entities\Pk::class;
+        $roomClass = Room::class;
 
         $room = $roomClass::withoutAppends()->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
         $microphone = $room->microphone;
@@ -331,10 +332,13 @@ trait RoomTrait
 
         $result = DB::table('rooms')->where('uid', $uid)->update(['microphone' => implode(',', $baseMic)]);
         $room = $roomClass::query()->where('uid', $uid)->first();
-        $pk = $pkClass::query()->where('room_id', $room->id)->where('status', 1)->first();
-        if ($pk) {
-            $pk->mics = $microphone;
-            $pk->save();
+        if (PackageHelper::isInstalled('pk')) {
+            $pkClass = Pk::class;
+            $pk = $pkClass::query()->where('room_id', $room->id)->where('status', 1)->first();
+            if ($pk) {
+                $pk->mics = $microphone;
+                $pk->save();
+            }
         }
         DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $user_id])->delete();
         return $result;
@@ -346,8 +350,7 @@ trait RoomTrait
             return 0;
         }
 
-        $roomClass = \Utd\Room\Entities\Room::class;
-        $pkClass = \Utd\Pk\Entities\Pk::class;
+        $roomClass = Room::class;
 
         $room = $roomClass::withoutAppends()->where('type', 'audio')->where('uid', $uid)->select(['id', 'uid', 'microphone'])->first();
 
@@ -375,10 +378,13 @@ trait RoomTrait
             })
             ->implode(',');
 
-        $pk = $pkClass::query()->where('room_id', $room->id)->where('status', 1)->first();
-        if ($pk) {
-            $pk->mics = $micString;
-            $pk->save();
+        if (PackageHelper::isInstalled('pk')) {
+            $pkClass = Pk::class;
+            $pk = $pkClass::query()->where('room_id', $room->id)->where('status', 1)->first();
+            if ($pk) {
+                $pk->mics = $micString;
+                $pk->save();
+            }
         }
 
         DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $user_id])->delete();
@@ -613,7 +619,7 @@ trait RoomTrait
         if (!PackageHelper::isInstalled('room')) {
             return;
         }
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
         $roomClass::query()->where('uid', $owner_id)->increment('session', $num);
     }
 }

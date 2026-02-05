@@ -4,6 +4,7 @@ namespace App\Classes\Gifts;
 
 use App\Enums\UserDiamondLogType;
 use App\Helpers\UserDiamondLogHelper;
+use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use App\Models\Gift;
@@ -232,51 +233,10 @@ class SendGiftService
         return $repeatedData;
     }
 
-    public function updatePkScoresAndSendToZego($pk, $userId, $roomId, $receivedIds, $giftPrice, $microphone)
-    {
-        if (!($pk instanceof Pk)) return;
-
-        $m      = explode(',', $microphone);
-        $mic_1  = isset($m[1]) ? $m[1] : 0;
-        $mic_2  = isset($m[2]) ? $m[2] : 0;
-        $mic_3  = isset($m[3]) ? $m[3] : 0;
-        $mic_4  = isset($m[4]) ? $m[4] : 0;
-        $mic_5  = isset($m[5]) ? $m[5] : 0;
-        $mic_6  = isset($m[6]) ? $m[6] : 0;
-        $mic_7  = isset($m[7]) ? $m[7] : 0;
-        $mic_8  = isset($m[8]) ? $m[8] : 0;
-        $team_1 = [$mic_1, $mic_2, $mic_5, $mic_6];
-        $team_2 = [$mic_3, $mic_4, $mic_7, $mic_8];
-        $t1     = implode(',', $team_1);
-        $t2     = implode(',', $team_2);
-
-        foreach ($receivedIds as $toUid) {
-            if (in_array($toUid, $team_1)) {
-                $pk->t1_score += $giftPrice;
-            } elseif (in_array($toUid, $team_2)) {
-                $pk->t2_score += $giftPrice;
-            }
-        }
-        $pk->team_1 = $t1;
-        $pk->team_2 = $t2;
-        $pk->save();
-
-        $ms = [
-            'messageContent' => [
-                "message"            => "updatePk",
-                "PkTime"             => Carbon::parse($pk->end_at)->diffInMinutes(now()),
-                "scoreTeam1"         => $pk->t1_score,
-                "scoreTeam2"         => $pk->t2_score,
-                "percentagepk_team1" => $pk->t1_per,
-                "percentagepk_team2" => $pk->t2_per
-            ]
-        ];
-
-        return json_encode($ms);
-    }
-
     public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $room)
     {
+        if (! PackageHelper::isInstalled('pk')) return;
+
         if (!($pk instanceof Pk)) return;
 
 //        $m      = explode(',', $microphone);
@@ -398,6 +358,8 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room) :  array
     {
+        if (! PackageHelper::isInstalled('pk')) return;
+
         if(!($pk instanceof Pk)) return [];
 
 //        $m = explode (',',$microphone);

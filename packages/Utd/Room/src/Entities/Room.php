@@ -19,6 +19,7 @@ use Modules\TaskStream\Entities\TaskStream;
 use Modules\TaskStream\Entities\TaskStreamRoom;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\LuckyBox\Entities\BoxUse;
+use Utd\Pk\Entities\Pk;
 
 /**
  * @method static withoutAppends()
@@ -183,7 +184,8 @@ class Room extends Model
 
     public function pks()
     {
-        return $this->hasMany(Pk::class, 'room_id', 'id');
+        return PackageHelper::checkRelation($this, 'pk', 'hasMany') ??
+            $this->hasMany(Pk::class, 'room_id', 'id');
     }
 
 
@@ -213,7 +215,9 @@ class Room extends Model
 
     public function lastPk()
     {
-        return $this->hasOne(Pk::class, 'room_id', 'id')->where('status', 1)->where('end_at', '>=', now())->orderByDesc('id');
+        return PackageHelper::checkRelation($this, 'pk', 'hasOne') ??
+            $this->hasOne(Pk::class, 'room_id', 'id')->where('status', 1)
+                ->where('end_at', '>=', now())->orderByDesc('id');
     }
 
     public function getSessionStringAttribute()

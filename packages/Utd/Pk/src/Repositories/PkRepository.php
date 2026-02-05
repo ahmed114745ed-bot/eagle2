@@ -2,9 +2,10 @@
 
 namespace Utd\Pk\Repositories;
 
+use App\Contracts\PkRepositoryContract;
 use Utd\Pk\Entities\Pk;
 
-class PkRepository extends AbstractRepository
+class PkRepository extends AbstractRepository implements PkRepositoryContract
 {
     public function __construct()
     {

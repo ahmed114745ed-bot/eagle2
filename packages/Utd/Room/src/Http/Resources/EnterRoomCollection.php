@@ -7,6 +7,7 @@ use App\Helpers\Common;
 use App\Models\configesModel;
 use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
+use Utd\Pk\Http\Resources\PkCollection;
 use Utd\Room\Entities\RequestBackgroundImage;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -25,7 +26,6 @@ class EnterRoomCollection extends JsonResource
      */
     public function toArray($request)
     {
-
         $pks     = $this->getRoomTwoLastPk($this->id);
 
         request()->type = 1;
@@ -148,7 +148,7 @@ class EnterRoomCollection extends JsonResource
 
     private function getRoomTwoLastPk(int $roomId)
     {
-        if (!PackageHelper::isInstalled('room')) {
+        if (!PackageHelper::isInstalled('pk')) {
             return collect();
         }
         return Pk::query()

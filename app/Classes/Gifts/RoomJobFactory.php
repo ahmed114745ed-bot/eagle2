@@ -5,6 +5,8 @@ namespace App\Classes\Gifts;
 use App\Interfaces\RoomJobInterface;
 use App\Jobs\TestTestCharizma;
 use App\Soalfna\DTO\RoomJob;
+use App\Support\PackageHelper;
+use Utd\Pk\Classes\PKWork;
 
 class RoomJobFactory
 {
@@ -17,8 +19,10 @@ class RoomJobFactory
             $this->type = 'charisma';
             $this->roomJob = new CharismaWork();
         }elseif ($type == 'pk'){
-            $this->type = 'pk';
-            $this->roomJob = new PKWork();
+            if (PackageHelper::isInstalled('pk')){
+                $this->type = 'pk';
+                $this->roomJob = new PKWork();
+            }
         }
         return $this;
     }

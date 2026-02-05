@@ -2,63 +2,59 @@
 
 namespace App\Providers;
 
-use Utd\Pk\Entities\Pk;
-use Carbon\Carbon;
-use App\Models\Gift;
-use Utd\Room\Entities\Room;
-use App\Models\User;
-use App\Models\Ware;
-use App\Models\Emoji;
-use App\Models\Agency;
-use App\Models\Family;
-use Encore\Admin\Form;
-use App\Helpers\Common;
-use App\Models\Setting;
-use App\Models\Language;
-use App\Models\FamilyUser;
 use App\Admin\Fields\Image;
-use App\Helpers\RoomHelper;
-use App\Models\UserSallary;
-use App\Helpers\CacheHelper;
-use App\Classes\UserHandling;
-use Utd\Pk\Observers\PKObserver;
-use Modules\Vip\Entities\Vip;
-use App\Helpers\ManagerHelper;
-use App\Observers\VipObserver;
-use App\Services\RedisService;
 use App\Admin\Fields\ImagePath;
-use App\Observers\GiftObserver;
-use App\Observers\RoomObserver;
-use App\Observers\UserObserver;
-use App\Observers\WareObserver;
-use Encore\Admin\Facades\Admin;
-use App\Observers\EmojiObserver;
+use App\Classes\UserHandling;
+use App\Contracts\ShippingAgencyRepositoryInterface;
+use App\Helpers\CacheHelper;
+use App\Helpers\Common;
+use App\Helpers\CustomNotification;
+use App\Helpers\ManagerHelper;
+use App\Helpers\RoomHelper;
+use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
+use App\Models\Emoji;
+use App\Models\Family;
+use App\Models\FamilyUser;
+use App\Models\Gift;
+use App\Models\Language;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserSallary;
+use App\Models\Ware;
+use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;
 use App\Observers\ConfigObserver;
+use App\Observers\EmojiObserver;
 use App\Observers\FamilyObserver;
-use App\Observers\SettingObserver;
-use Illuminate\Support\Facades\DB;
-use App\Helpers\CustomNotification;
-use App\Repositories\User\UserRepo;
-use Illuminate\Support\Facades\URL;
 use App\Observers\FamilyUserObserver;
-use Illuminate\Support\Facades\Cache;
+use App\Observers\GiftObserver;
+use App\Observers\SettingObserver;
+use App\Observers\UserObserver;
 use App\Observers\UserSallaryObserver;
-use Illuminate\Support\Facades\Config;
-use App\Contracts\ShippingAgencyRepositoryInterface;
-use App\Repositories\NullShippingAgencyRepository;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\ServiceProvider;
-use App\Services\Gifts\LuckyGiftService;
-use App\Observers\AgencyJoinRequestObserver;
-use App\Repositories\User\UserRepoInterface;
-use Illuminate\Database\Eloquent\Collection;
+use App\Observers\VipObserver;
+use App\Observers\WareObserver;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
-use Illuminate\Support\Str;
-use Illuminate\Broadcasting\BroadcastManager;
+use App\Repositories\NullShippingAgencyRepository;
+use App\Repositories\User\UserRepo;
+use App\Repositories\User\UserRepoInterface;
+use App\Services\Gifts\LuckyGiftService;
+use App\Services\RedisService;
 use App\Support\PackageHelper;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Illuminate\Broadcasting\BroadcastManager;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Modules\Vip\Entities\Vip;
+use Utd\Pk\Entities\Pk;
+use Utd\Pk\Observers\PKObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -84,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('RoomHelper', fn($app) => new RoomHelper());
         $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
-        
+
         if (class_exists('Utd\\Agency\\Repositories\\ShippingAgencyRepository')) {
             $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);
         } else {
@@ -343,10 +339,6 @@ class AppServiceProvider extends ServiceProvider
         Gift::observe(GiftObserver::class);
         Emoji::observe(EmojiObserver::class);
         Ware::observe(WareObserver::class);
-        if (PackageHelper::isInstalled('room')) {
-            Room::observe(RoomObserver::class);
-            Pk::observe(PKObserver::class);
-        }
         UserSallary::observe(UserSallaryObserver::class);
         Family::observe(FamilyObserver::class);
         FamilyUser::observe(FamilyUserObserver::class);

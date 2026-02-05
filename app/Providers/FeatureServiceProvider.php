@@ -18,6 +18,7 @@ use App\Services\Null\NullEntranceRoomService;
 use App\Services\Null\NullNewRoomBoomGiftService;
 use App\Contracts\GiftLogRepositoryContract;
 use App\Contracts\GiftRepositoryContract;
+use App\Contracts\PkRepositoryContract;
 use App\Services\Null\NullEnteranceRoomService;
 use App\Services\Null\NullRoomGameService;
 use App\Services\Null\NullRoomService;
@@ -32,6 +33,7 @@ use App\Services\Null\NullUserAchievementService;
 use App\Services\Null\NullRealsService;
 use App\Services\Null\NullGiftLogRepository;
 use App\Services\Null\NullGiftRepository;
+use App\Services\Null\NullPkRepository;
 use Illuminate\Support\ServiceProvider;
 
 class FeatureServiceProvider extends ServiceProvider
@@ -153,6 +155,14 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 GiftRepositoryContract::class,
                 NullGiftRepository::class
+            );
+        }
+
+        // Pk Repository Feature
+        if (!$this->app->bound(PkRepositoryContract::class)) {
+            $this->app->singleton(
+                PkRepositoryContract::class,
+                NullPkRepository::class
             );
         }
     }

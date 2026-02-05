@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Observers;
+namespace Utd\Room\Observers;
 
 use Utd\Room\Entities\Room;
-use Illuminate\Support\Facades\Log;
 
 class RoomObserver
 {
@@ -20,7 +19,7 @@ class RoomObserver
         if (!$room->enableSaving) return;
 
         if($room->type  == 'audio'){
-        
+
             $this->changeMode($room);
         }
         $this->resetRoomSession($room);
@@ -29,7 +28,7 @@ class RoomObserver
     public function saving(Room $room)
     {
         if (!$room->enableSaving) return;
-        
+
         if($room->type  == 'audio'){
             $this->changeMode($room);
         }
@@ -43,8 +42,8 @@ class RoomObserver
         if ($room->isDirty('mode')) {
             $mics = explode(',', $room->all_microphone);
             $count = count($mics);
-    
-           
+
+
             if ($room->mode == '0') {
                 if ($count <= 10) {
                     $m = array_merge($mics, array_fill(0, 10 - $count, '0'));

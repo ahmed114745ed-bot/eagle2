@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Cache;
 use Modules\LuckyBox\Entities\BoxUse;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
-use App\Support\PackageHelper;
 
 class RoomController extends MainController
 {
@@ -143,7 +142,7 @@ class RoomController extends MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = PackageHelper::isInstalled('room')
+        $pks = PackageHelper::isInstalled('pk')
             ? Pk::where('room_id', $room->id)
                 ->with(['team1Boss.profile', 'team2Boss.profile'])
                 ->orderByDesc('created_at')

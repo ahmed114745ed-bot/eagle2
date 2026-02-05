@@ -460,7 +460,7 @@ class RankingService
     }
     private function getRoomTwoLastPk(int $roomId)
     {
-        if (!PackageHelper::isInstalled('room')) {
+        if (!PackageHelper::isInstalled('pk')) {
             return collect();
         }
         return Pk::query()

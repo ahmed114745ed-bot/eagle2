@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Facades\RoomHelper;
 use App\Models\Cp;
-use Utd\Pk\Repositories\PkRepository;
+use App\Contracts\PkRepositoryContract;
 use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\TimeLogRepository;
@@ -24,7 +24,7 @@ class MicService
         private readonly RoomRepository $roomRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
         private readonly UserRepository $userRepository,
-        private readonly PkRepository $pkRepository,
+        private readonly PkRepositoryContract $pkRepository,
         private readonly TimeLogRepository $timeLogRepository,
 
     ) {}

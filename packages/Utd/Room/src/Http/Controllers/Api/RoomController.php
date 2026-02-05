@@ -4,29 +4,23 @@ namespace Utd\Room\Http\Controllers\Api;
 
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use Exception;
-use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\AllGame;
 use App\Models\LiveTime;
 use App\Models\KickRecord;
 use Utd\Room\Entities\EnteredRoom;
-use Utd\Room\Entities\RoomCategory;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Utd\Room\Classes\RoomComments;
 use App\Jobs\EnterRoomZigoRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
 use Utd\Room\Services\RoomRepoService;
 use Modules\LuckyBox\Entities\BoxUse;
-use App\Http\Requests\EditRoomRequest;
-use Utd\Room\Entities\RequestBackgroundImage;
 use Modules\CP\Entities\CpRoomHistory;
 use Utd\Room\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
@@ -59,11 +53,12 @@ class RoomController extends Controller
     protected $categoryRepo;
 
     public function __construct(
-        RoomRepoInterface $repo,
-        RoomRepoService $roomService,
-        BackgroundRepository $backgroundRepo,
+        RoomRepoInterface      $repo,
+        RoomRepoService        $roomService,
+        BackgroundRepository   $backgroundRepo,
         RoomCategoryRepository $categoryRepo,
-    ) {
+    )
+    {
         $this->repo = $repo;
         $this->roomService = $roomService;
         $this->backgroundRepo = $backgroundRepo;
@@ -82,11 +77,11 @@ class RoomController extends Controller
 
         //user id how send and recieved this message
         $fromUser = Auth::user();
-        $fromUserId      = $fromUser->id;
-        $toUserId        = $request->to_user_id;
+        $fromUserId = $fromUser->id;
+        $toUserId = $request->to_user_id;
         $message = $request->message;
         try {
-            [$toUser, $price] =   $this->roomService->privateComment($toUserId, $message, $ownerId, $fromUser);
+            [$toUser, $price] = $this->roomService->privateComment($toUserId, $message, $ownerId, $fromUser);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
@@ -105,8 +100,6 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', RoomResource::collection($rooms), 200);
     }
 
-
-
     public function mine(Request $request)
     {
         $user_id = request('user_id') ?? Auth::user()->id;
@@ -123,9 +116,6 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', $rooms, 200);
     }
 
-
-
-
     public function getAllLiveRooms(Request $request)
     {
         request()->default_background = $this->backgroundRepo->getDefaultImage();
@@ -138,6 +128,7 @@ class RoomController extends Controller
         $data = $this->roomService->index2();
         return RoomCountriesResource::collection($data);
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -147,7 +138,7 @@ class RoomController extends Controller
     public function store(Request $request)
     {
 
-        $request['show']  = true;
+        $request['show'] = true;
         $request['numid'] = rand(111111, 999999);
         $user = $request->user();
 
@@ -170,11 +161,6 @@ class RoomController extends Controller
             return Common::apiResponse(false, $exception->getMessage(), null, 400);
         }
     }
-    private function getTimezone(): string
-    {
-        $tz = request()->header('tz', Common::timeZone());
-        return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
-    }
 
     public function extraRoomData($owner_id): JsonResponse
     {
@@ -196,17 +182,16 @@ class RoomController extends Controller
         }
 
         $collections = [
-            'charisma'          => $this->roomCharisma($owner_id),
-            'achievements'      => $this->achievementLevels($owner_id),
-            'boxes'             => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
-            'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
+            'charisma' => $this->roomCharisma($owner_id),
+            'achievements' => $this->achievementLevels($owner_id),
+            'boxes' => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
+            'open_boom' => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
     }
 
     public function extraDataRoom(Request $request)
     {
-
         $roomId = $request->room_id;
         $room = $roomId
             ? Room::find($roomId)
@@ -228,10 +213,10 @@ class RoomController extends Controller
         }
 
         $collections = [
-            'charisma'          => $this->roomCharisma($room->id ),
-            'achievements'      => $this->achievementLevels($owner_id),
-            'boxes'             => BoxUseResource::collection($this->getBoxes($room ->id, Auth::id())),
-            'open_boom'       => $openBoom ? new RoomBoomResource($openBoom) : null,
+            'charisma' => $this->roomCharisma($room->id),
+            'achievements' => $this->achievementLevels($owner_id),
+            'boxes' => BoxUseResource::collection($this->getBoxes($room->id, Auth::id())),
+            'open_boom' => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
     }
@@ -251,7 +236,6 @@ class RoomController extends Controller
             ->get();
     }
 
-
     private function achievementLevels(int $owner_id)
     {
         return app(UserAchievementContract::class)->roomAchievement($owner_id);
@@ -261,7 +245,6 @@ class RoomController extends Controller
     {
         return (new UserCharismaService())->roomCharisma($room_id);
     }
-
 
     /**
      * Display the specified resource.
@@ -283,7 +266,6 @@ class RoomController extends Controller
 
     public function getAdmins(Request $request)
     {
-
         //if (!$request->owner_id && !$request->room_id) return Common::apiResponse(0, 'missing params', null, 422);
         try {
             $admins = $this->roomService->roomAdmins($request->id);
@@ -293,65 +275,6 @@ class RoomController extends Controller
 
         $data = RoomAdminsResource::collection($admins);
         return Common::apiResponse(1, '', $data, 200);
-    }
-
-
-    //------------------------------------------------------------------ops----------------------------------------------------------------
-
-    public function get_room_by_owner_id(Request $request)
-    {
-        $request['show'] = true;
-        $room            = Room::where('uid', $request->owner_id)->first();
-        if (!$room) {
-            return Common::apiResponse(0, 'not found', null, 404);
-        }
-        return Common::apiResponse(true, '', new RoomResource($room), 200);
-    }
-
-
-    //get_room_by_owner_id
-
-    public function amIHaveRoom(Request $request)
-    {
-        $room = Room::query()->where('uid', $request->user()->id)->exists();
-        if ($room) {
-            return Common::apiResponse(1, 'have a room', null, 200);
-        }
-        return Common::apiResponse(0, 'does not have a room', null, 200);
-    }
-
-    public function quit_room(Request $request)
-    {
-        if (!$request->owner_id && !$request->room_id) {
-
-            return Common::apiResponse(false, __('missing parameter'), null, 422);
-        }
-        try {
-            $user            = $request->user();
-            [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $roomId] = $this->roomService->quiteRoom($request->owner_id, $user, $request->room_id);
-            if ($isToZegoCharisma && isset($userDataWithCharisma)) {
-                $ms = [
-                    'messageContent' => [
-                        "message" => "updateCharisma",
-                        'data' => $userDataWithCharisma
-                    ]
-                ];
-                $json = json_encode($ms);
-
-                Common::sendToZego('SendCustomCommand', $roomId, $request->owner_id, $json);
-            }
-            $this->handleLeaveCp($user, $roomId);
-            $room = Room::find($roomId);
-            if ($user->id === $room->uid) {
-                $room->is_afk = 0;
-                $room->save();
-            }
-            $this->updateMicrophone($room->uid, $user->id);
-            return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
-        } catch (Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
     }
 
     public function quit_room_2(Request $request)
@@ -394,6 +317,7 @@ class RoomController extends Controller
         $this->removeUserCpInRoom($userId);
         return $this->sendCpLovelyMessage($roomId, $user);
     }
+
     public function removeUserCpInRoom(mixed $userId): void
     {
         CpRoomHistory::where("user_one_id", $userId)
@@ -411,6 +335,7 @@ class RoomController extends Controller
 
         Common::sendToZego('SendCustomCommand', $roomId, $user->id, $json);
     }
+
     public function cpMapJson($indices): string|false
     {
         $ms = [
@@ -422,17 +347,17 @@ class RoomController extends Controller
         $json = json_encode($ms);
         return $json;
     }
+
     public function calcTime($uid)
     {
-
         // case 1 : up_mic and go_mic in the same day
-        $user  = User::find($uid);
+        $user = User::find($uid);
         $timer =
             LiveTime::query()->where('uid', $uid)->whereDate('created_at', today())->where('end_time', null)->orderByDesc('id')->first();
         if ($timer) {
-            $hours           = round((time() - $timer->start_time) / (60 * 60), 2);
+            $hours = round((time() - $timer->start_time) / (60 * 60), 2);
             $timer->end_time = time();
-            $timer->hours    = $hours;
+            $timer->hours = $hours;
             $timer->save();
             //$user_day = UserDay::where('user_id', $uid)->whereDate('created_at', today())->first();
             $user_hours =
@@ -453,7 +378,7 @@ class RoomController extends Controller
 
     public function getRoomUsers(Request $request, ProfileRelationsService $profileRelationsService)
     {
-        $uid  = $request->owner_id;
+        $uid = $request->owner_id;
         try {
             [$allData, $roomAdminActive] = $this->roomService->roomUsers($request);
         } catch (Exception $e) {
@@ -467,288 +392,11 @@ class RoomController extends Controller
         return Common::apiResponse(1, '', $data);
     }
 
-    public function getRoomUsersDeprecated(Request $request)
-    {
-        $uid       = $request->owner_id;
-        $roomAdmin = Room::query()->where(['uid' => $uid])->value('room_admin');
-
-        $roomAdmin = explode(',', $roomAdmin);
-        $admins    = User::whereIn('id', $roomAdmin)->get();
-        $admins    = $admins->filter(function ($q) {
-            return !Common::hasInPack($q->id, 17, true);
-        });
-        $admin     = [];
-        foreach ($admins as $k => $v) {
-            $admin[$k]['id']       = @$v->id;
-            $admin[$k]['nickname'] = @$v->nickname;
-            $admin[$k]['avatar']   = @$v->profile->avatar;
-            $admin[$k]['country']  = @$v->profile->country;
-            $admin[$k]['is_admin'] = 1;
-        }
-
-        $roomVisitor = $this->repo->getValueByUid($uid, 'room_visitor');
-        $roomVisitor = explode(',', $roomVisitor);
-
-        $roomVisitor = array_values(array_diff($roomVisitor, $roomAdmin));
-        $visitors    = User::query()->whereIn('id', $roomVisitor)->get();
-        $visitors    = $visitors->filter(function ($q) {
-            return !Common::hasInPack($q->id, 17, true);
-        });
-        $visitor     = [];
-        foreach ($visitors as $k => $v) {
-            $visitor[$k]['id']       = @$v->id;
-            $visitor[$k]['nickname'] = @$v->nickname;
-            $visitor[$k]['avatar']   = @$v->profile->avatar;
-            $visitor[$k]['country']  = @$v->profile->country;
-            $visitor[$k]['is_admin'] = 0;
-        }
-        $res['room_id']  = $uid;
-        $res['owner']    = new UserResource(User::find($uid));
-        $res['admin']    = UserResource::collection($admins);  //$admin;
-        $res['visitors'] = UserResource::collection($visitors); //$visitor;
-        return Common::apiResponse(1, '', $res);
-    }
-
-
-    //exit the room
-
-    public function microphone_status(Request $request)
-    {
-        $uid = $request->owner_id;
-        if (!$uid) return Common::apiResponse(0, __('missing owner_id'), null, 422);
-        $room = $this->repo->getMicrophoneStatusByUid($uid);
-        if (!$room) return Common::apiResponse(0, __('room not found'), null, 404);
-        $microphone        = explode(',', $room['microphone']);
-        $is_prohibit_sound = explode(',', $room['is_prohibit_sound']);
-        $roomSound_arr     = explode(",", $room['room_sound']);
-        $mic               = [];
-
-        foreach ($microphone as $k => &$v) {
-            $ar = [];
-            //            $ar['remainTime'] = 0;
-            foreach ($is_prohibit_sound as $ke => &$va) {
-                if ($k == $ke) {
-                    $ar['can_lock'] = $va ? 2 : 1;
-                }
-            }
-
-            if ($v == 0) {
-                $ar['status'] = 1;
-            } elseif ($v == -1) {
-                $ar['status'] = 3;
-            } else {
-                $ar['status']   = 2;
-                $user           = (array)DB::table('users')->selectRaw("id,nickname,dress_1,dress_4")->find($v);
-                $ar['user_id']  = $v;
-                $ar['avatar']   = @User::query()->find($v)->profile->avatar;
-                $ar['nickname'] = $user['nickname'];
-                $ar['gender']   = @User::query()->find($v)->profile->gender;
-                if ($user['dress_1']) {
-                    $txk       = DB::table('wares')->where(['id' => $user['dress_4']])->value('img1');
-                    $ar['txk'] = $txk;
-                } else {
-                    $ar['txk'] = '';
-                }
-                if ($user['dress_4']) {
-                    $ar['mic_color'] =
-                        DB::table('wares')->where(['id' => $user['dress_4']])->value('color') ?: '#ffffff';
-                } else {
-                    $ar['mic_color'] = '#ffffff';
-                }
-
-                //numerical play
-                $ar['is_play'] = $room['play_num'];
-                if ($room['play_num']) {
-                    $ar['price'] = DB::table('play_num_logs')->where(['uid' => $uid, 'user_id' => $v])->value('price') ?: 0;
-                } else {
-                    $ar['price'] = 0;
-                }
-                $ar['is_master'] = $uid == $v ? 1 : 0;
-
-                //countdown time
-                $info = (array)DB::table('time_logs')->selectRaw('created_at,time')->where([
-                    'uid' => $uid,
-                    'user_id' => $v
-                ])->orderByRaw('id desc')->limit(1)->first();
-                if (!empty($info) && $info['time'] && $info['created_at']) {
-                    $endTime          = ($info['time'] + $info['created_at']);
-                    $remainTime       = ($endTime - time());
-                    $ar['remainTime'] = $remainTime <= 0 ? 0 : (string)$remainTime;
-                    if ($ar['remainTime'] <= 0) {
-                        DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $v])->delete();
-                    }
-                    //if ($v == '1100001'){
-                    //}
-                    //删除计时时间
-                    // if ($ar['remainTime'] == 0){
-                    //    //Db::name('time_log')->where(array('uid'=>$uid,'muid'=>$uid))->delete();
-                    // }
-                }
-            }
-            $ar['is_muted'] = in_array($v, $roomSound_arr) ? 2 : 1;
-            $mic[]          = $ar;
-        }
-        $wait_user_id      = DB::table('mics')->where([
-            'uid' => $uid,
-            'room_id' => $uid
-        ])->pluck('user_id')->toArray();
-        $arr['user_id']    = !$wait_user_id ? '' : ($wait_user_id[0] ?? '');
-        $arr['microphone'] = $mic;
-        return Common::apiResponse(1, '', $arr);
-    }
-
-    public function up_microphone(Request $request)
-    {
-        $data    = $request;
-        $user_id = $request->user_id;
-        $phase   = $request->phase;
-        if (!$data['owner_id'] || !$user_id) return Common::apiResponse(0, __('Missing data'), null, 422);
-        $room = $this->repo->getMicInfoByUid($data['owner_id']);
-        if (!$room) return Common::apiResponse(0, __('room does not exist'));
-        $vis_arr = !$room['room_visitor'] ? [] : explode(",", $room['room_visitor']);
-        if (!in_array($user_id, $vis_arr) && $data['owner_id'] != $user_id) return Common::apiResponse(0, __('The user is not in this room'), null, 403);
-
-        $position = $data['position']; //mic sequence 0-8
-        if ($room['mode'] != '1') {
-            if ($position < 0 || $position > 9) return Common::apiResponse(0, __('position error'), null, 422);
-        } else {
-            if ($position < 0 || $position > 17) return Common::apiResponse(0, __('position error'), null, 422);
-        }
-        $mic_arr = explode(',', $room['microphone']);
-        if (@$mic_arr[$position] == -1) return Common::apiResponse(0, __('This slot has been locked'), null, 408);
-        if (@$mic_arr[$position] != 0) return Common::apiResponse(0, __('There is a user on the mic'), null, 405);
-
-
-        //How to play free mic
-        $adm_id = $request->user()->id;
-        if ($room['free_mic'] == 1 && $adm_id != $data['owner_id']) {
-            $adm_arr = $room['room_admin'] ? explode(",", $room['room_admin']) : [$data['owner_id']];
-            if (!in_array($adm_id, $vis_arr)) return Common::apiResponse(0, __('Please enter this room first'), null, 403);
-            if (!in_array($adm_id, $adm_arr)) return Common::apiResponse(0, __('You do not have this permission yet'), null, 408);
-        }
-
-
-        //If it is on the mic, skip to the top mic, and the original mic is empty
-        if (in_array($user_id, $mic_arr)) {
-            $key           = array_search($user_id, $mic_arr);
-            $mic_arr[$key] = 0;
-        }
-
-        $arr = $mic_arr;
-
-
-        if ($phase < 4) $arr[] = $data['owner_id'];
-        // $cp_arr = [];
-        // foreach ($arr as $k => &$v) {
-        //     if ($v == -1 || $v == 0) continue;
-        //     $cp_id = Common::check_first_cp($user_id, $v, 1);
-        //     if ($cp_id) {
-        //         $level            = Common::getLevel($v, 3);
-        //         $ar['cp_level']   = Common::getCpLevel($cp_id);
-        //         $ar['nick_color'] = Common::getNickColorByVip($level);
-        //         $ar['id']         = $v;
-        //         $ar['nickname']   = DB::table('users')->where(['id' => $v])->value('nickname');
-        //         $ar['exp']        = DB::table('cp')->where(['id' => $cp_id])->value('exp');
-        //         $img              = @User::query()->find($v)->profile->avatar;
-        //         $ar['img']        = $img;
-        //         $cp_arr[]         = $ar;
-        //     }
-        // }
-        // if ($cp_arr) {
-        //     array_multisort(array_column($cp_arr, 'exp'), SORT_DESC, $cp_arr);
-        // }
-        // $cp_xssm = Common::getConf('cp_xssm');
-        // $i       = 0;
-        // foreach ($cp_arr as $k => &$va) {
-        //     if (!$i) {
-        //         $va['cp_xssm'] = $va['cp_level'] >= 7 ? $cp_xssm : '';
-        //     } else {
-        //         $va['cp_xssm'] = '';
-        //     }
-        //     $i++;
-        // }
-        if (@$mic_arr[$position]) {
-            $mic_arr[$position] = $user_id;
-        }
-        $mic  = implode(',', $mic_arr);
-        $res  = $this->repo->updateByUid($data['owner_id'], ['microphone' => $mic]);
-        $room = Room::query()->where('uid', $data['owner_id'])->first();
-        $pk   = Pk::query()->where('room_id', $room->id)->where('status', 1)->first();
-        if ($pk) {
-            $pk->mics = $mic;
-            $pk->save();
-        }
-
-        $user               = (array)DB::table('users')->select(['id', 'nickname'])->find($user_id);
-        $u                  = User::query()->find($user_id);
-        $user['avatar']     = @$u->profile->avatar;
-        $user_level         = Common::getLevel($user_id, 3);
-        $user['nick_color'] = Common::getNickColorByVip($user_level);
-        // $res_arr['cp']      = $cp_arr;
-        $res_arr['user']    = $user;
-
-        if ($res) {
-
-            //Remove mic sequence
-            Common::delMicHand($user_id);
-            LiveTime::query()->where('uid', $user_id)->where('end_time', null)->whereDate('created_at', '!=', today())->delete();
-            $t =
-                LiveTime::query()->where('uid', $user_id)->where('end_time', null)->whereDate('created_at', today())->orderByDesc('id')->first();
-            if ($t) {
-                LiveTime::query()->where('uid', $user_id)->where('end_time', null)->where('id', '!=', $t->id)->delete();
-            }
-
-            if (!$t) {
-                LiveTime::query()->create([
-                    'uid' => $user_id,
-                    'start_time' => time()
-                ]);
-            }
-
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'upMic',
-                    'userId' => $user_id,
-                    'position' => $position,
-                    'userName' => @$u->name
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $user_id, $json);
-            return Common::apiResponse(1, __('Success on the mic'), $res_arr);
-        } else {
-            return Common::apiResponse(0, __('Failed to mic'), null, 400);
-        }
-    }
-
-
-    //getRoomUsers
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update0(EditRoomRequest $request, $id)
-    {
-
-        try {
-            $this->roomService->update($request, $id);
-            return $this->enter_room($request);
-        } catch (Exception $exception) {
-            return Common::apiResponse(false, 'failed', $exception, 400);
-        }
-    }
-
-
     // mic sequence list
-
     public function enter_room(Request $request)
     {
         $room_pass = $request['room_pass'];
-        $owner_id  = $request['owner_id'];
+        $owner_id = $request['owner_id'];
 
         if ($request->type == 'random') {
             $owner_id = Room::query()->where('room_status', 1)->where('uid', '!=', null)->where(function ($q) {
@@ -756,7 +404,7 @@ class RoomController extends Controller
             })->pluck('uid')->random();
         }
 
-        $user    = $request->user();
+        $user = $request->user();
         $user_id = $user->id;
 
         // if owner id not path throw error
@@ -797,9 +445,7 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', $room_info);
     }
 
-
     // on the mic
-
     private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
     {
         EnteredRoom::query()->updateOrCreate([
@@ -811,265 +457,10 @@ class RoomController extends Controller
         ]);
     }
 
-    //leave mic
-
-    public function go_microphone(Request $request)
-    {
-        $data   = $request;
-        $result = Common::go_microphone_hand($data['owner_id'], $data['user_id']);
-        $room   = Room::query()->where('uid', $data['owner_id'])->first();
-        if (!$room) return Common::apiResponse(0, 'room not found', null, 404);
-        if ($result) {
-            $this->calcTime($data['user_id']);
-            //            $ms = [
-            //                "messageContent"=>[
-            //                    "message"=>"leaveMic",
-            //                    "userId"=>$data['user_id']
-            //                ]
-            //            ];
-            //            $json = json_encode ($ms);
-            //            Common::sendToZego ('SendCustomCommand',$room->id,$data['user_id'],$json);
-            return Common::apiResponse(1, __('Success'));
-        } else {
-            return Common::apiResponse(0, __('Failed'), null, 400);
-        }
-    }
-
-
-    //mute mic place
-    public function mute_microphone(Request $request)
-    {
-        $data     = $request;
-        $position = $data['position'];
-        $room     = Room::query()->where('uid', $data['owner_id'])->first();
-        if (@$room->mode != '1') {
-            if ($position < 0 || $position > 9) return Common::apiResponse(0, __('position error'), null, 422);
-        } else {
-            if ($position < 0 || $position > 17) return Common::apiResponse(0, __('position error'), null, 422);
-        }
-        $admins = Room::query()->where('uid', $data['owner_id'])->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'), null, 408);
-        }
-
-        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
-        $microphone = explode(',', $microphone);
-        if (@$microphone[$position]) {
-            $microphone[$position] = -2;
-        }
-        $microphone = implode(',', $microphone);
-        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
-        if (true) {
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'muteMic',
-                    'userId' => $request->user()->id,
-                    'position' => $data['position']
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-            return Common::apiResponse(1, __('Successfully locked the microphone position'));
-        } else {
-            return Common::apiResponse(0, __('Failed to lock microphone'), null, 400);
-        }
-    }
-
-    //unmute mic place
-    public function unmute_microphone(Request $request)
-    {
-        $data     = $request;
-        $position = $data['position'];
-        $room     = Room::query()->where('uid', $data['owner_id'])->first();
-        if (@$room->mode != '1') {
-            if ($position < 0 || $position > 9) return Common::apiResponse(0, __('position error'), null, 422);
-        } else {
-            if ($position < 0 || $position > 17) return Common::apiResponse(0, __('position error'), null, 422);
-        }
-        $admins = Room::query()->where('uid', $data['owner_id'])->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'), null, 408);
-        }
-        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
-        $microphone = explode(',', $microphone);
-        if (@$microphone[$position]) {
-            $microphone[$position] = 0;
-        }
-        $microphone = implode(',', $microphone);
-        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
-        if (true) {
-            $room = Room::query()->where('uid', $data['owner_id'])->first();
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'unmuteMic',
-                    'userId' => $request->user()->id,
-                    'position' => $data['position']
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-            return Common::apiResponse(1, __('Successfully unlocked the microphone'));
-        } else {
-            return Common::apiResponse(0, __('Failed to unlock microphone'), null, 400);
-        }
-    }
-
-    //lock mic place
-    public function shut_microphone(Request $request)
-    {
-        $data     = $request;
-        $position = $data['position'];
-        $room     = Room::query()->where('uid', $data['owner_id'])->first();
-        if (@$room->mode != '1') {
-            if ($position < 0 || $position > 9) return Common::apiResponse(0, __('position error'), null, 422);
-        } else {
-            if ($position < 0 || $position > 17) return Common::apiResponse(0, __('position error'), null, 422);
-        }
-        $admins = Room::query()->where('uid', $data['owner_id'])->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'), null, 408);
-        }
-
-        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
-        $microphone = explode(',', $microphone);
-        if (@$microphone[$position] == false) {
-            $microphone[$position] = -1;
-        }
-        $microphone = implode(',', $microphone);
-        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
-        if ($res) {
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'lockMic',
-                    'userId' => $request->user()->id,
-                    'position' => $data['position']
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-            return Common::apiResponse(1, __('Successfully locked the microphone position'));
-        } else {
-            return Common::apiResponse(0, __('Failed to lock microphone'), null, 400);
-        }
-    }
-
-
-    //open mic place
-    public function open_microphone(Request $request)
-    {
-        $data     = $request;
-        $position = $data['position'];
-        $room     = Room::query()->where('uid', $data['owner_id'])->first();
-        if (@$room->mode != '1') {
-            if ($position < 0 || $position > 9) return Common::apiResponse(0, __('position error'), null, 422);
-        } else {
-            if ($position < 0 || $position > 17) return Common::apiResponse(0, __('position error'), null, 422);
-        }
-        $admins = Room::query()->where('uid', $data['owner_id'])->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $data['owner_id'] && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'), null, 408);
-        }
-        $microphone = $this->repo->getValueByUid($data['owner_id'], 'microphone');
-        $microphone = explode(',', $microphone);
-        if (@$microphone[$position]) {
-            $microphone[$position] = 0;
-        }
-        $microphone = implode(',', $microphone);
-        $res        = $this->repo->updateByUid($data['owner_id'], ['microphone' => $microphone]);
-        if (true) {
-            $room = Room::query()->where('uid', $data['owner_id'])->first();
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'unLockMic',
-                    'userId' => $request->user()->id,
-                    'position' => $data['position']
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-            return Common::apiResponse(1, __('Successfully unlocked the microphone'));
-        } else {
-            return Common::apiResponse(0, __('Failed to unlock microphone'), null, 400);
-        }
-    }
-
-
-    //Turn off user microphone
-    public function is_sound(Request $request)
-    {
-        $user_id = $request->user_id ?: 0;
-        $uid     = $request->owner_id ?: 0;
-        if (!$uid || !$user_id) return Common::apiResponse(0, __('require user_id and owner_id'), null, 422);
-        $admins = Room::query()->where('uid', $uid)->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $uid && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'), null, 408);
-        }
-        $sound     = $this->repo->getValueByUid($uid, 'room_sound');
-        $sound_arr = explode(',', $sound);
-        if (in_array($user_id, $sound_arr)) return Common::apiResponse(0, __('The user is already muted, please do not repeat the settings'), null, 444);
-
-        array_push($sound_arr, $user_id);
-        $str = implode(',', $sound_arr);
-        $res = $this->repo->updateByUid($uid, ['room_sound' => $str]);
-        if ($res) {
-            $room = Room::query()->where('uid', $uid)->first();
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'muteMic',
-                    'userId' => $user_id,
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $user_id, $json);
-            return Common::apiResponse(1, __('Successfully muted'));
-        } else {
-            return Common::apiResponse(0, __('Failed to mute'), null, 400);
-        }
-    }
-
-    //Open user voice microphone
-    public function remove_sound(Request $request)
-    {
-        $user_id = $request->user_id ?: 0;
-        $uid     = $request->owner_id ?: 0;
-        if (!$uid || !$user_id) return Common::apiResponse(0, __('require user_id and owner_id'), null, 422);
-        $admins = Room::query()->where('uid', $uid)->value('room_admin');
-        $admins = explode(',', $admins);
-        if ($request->user()->id != $uid && !in_array($request->user()->id, $admins)) {
-            return Common::apiResponse(0, __('you dont have permission'));
-        }
-        $sound     = $this->repo->getValueByUid($uid, 'room_sound');
-        $sound_arr = explode(',', $sound);
-        if (!in_array($user_id, $sound_arr)) return Common::apiResponse(0, __('The user is no longer in the ban list, please do not repeat the settings'), null, 444);
-        $key = array_search($user_id, $sound_arr);
-        unset($sound_arr[$key]);
-        $sound = implode(',', $sound_arr);
-        $res   = $this->repo->updateByUid($uid, ['room_sound' => $sound]);
-        if ($res) {
-            $room = Room::query()->where('uid', $uid)->first();
-            $ms   = [
-                'messageContent' => [
-                    'message' => 'UnMuteMic',
-                    'userId' => $user_id,
-                ]
-            ];
-            $json = json_encode($ms);
-            Common::sendToZego('SendCustomCommand', $room->id, $user_id, $json);
-            return Common::apiResponse(1, __('Successfully unmuted'));
-        } else {
-            return Common::apiResponse(0, __('Unmute failed'), null, 400);
-        }
-    }
-
     //kick out of the room
     public function out_room(Request $request)
     {
-        $uid      = $request->owner_id ?: 0;
+        $uid = $request->owner_id ?: 0;
         $roomId = $request->room_id;
         $black_id = $request->user_id ?: 0;
         $duration = $request->minutes ?: 5;
@@ -1084,16 +475,16 @@ class RoomController extends Controller
         if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
         $uid = $room->uid;
         $black_list = @$room->room_black;
-        $room_id    = @$room->id;
+        $room_id = @$room->id;
         if ($black_list == null) {
             $black_list = $black_id . '#' . time() . '#' . ($duration * 60);
         } else {
-            $list   = explode(',', $black_list);
+            $list = explode(',', $black_list);
             $exists = false;
             foreach ($list as &$item) {
                 $black = explode('#', $item);
                 if ($black[0] == $black_id) {
-                    $item   = $black_id . '#' . time() . '#' . ($duration * 60);
+                    $item = $black_id . '#' . time() . '#' . ($duration * 60);
                     $exists = true;
                 }
             }
@@ -1113,15 +504,15 @@ class RoomController extends Controller
                 $user->now_room_uid = 0;
                 $user->save();
             }
-            $mc   = [
+            $mc = [
                 'messageContent' => [
                     'message' => 'kickout',
                     'duration' => $duration
                 ]
             ];
             $json = json_encode($mc);
-            $b    = User::find($black_id);
-            $n    = 'nan';
+            $b = User::find($black_id);
+            $n = 'nan';
             if ($b) {
                 $n = $b->name ?: 'nan';
             }
@@ -1136,7 +527,7 @@ class RoomController extends Controller
 
             Common::sendToZego_4('SendCustomCommand', $room_id, $uid, $black_id, $json);
             $this->calcTime($black_id);
-            $message             = __('api.blockRoom', ['name' => $b->name, 'actionName' => $request->user()->name, 'duration' => $duration], 'ar');
+            $message = __('api.blockRoom', ['name' => $b->name, 'actionName' => $request->user()->name, 'duration' => $duration], 'ar');
 
             Common::sendToZego_2('SendBroadcastMessage', $room_id, $uid, 'room', $message);
             return Common::apiResponse(1, 'success');
@@ -1145,201 +536,16 @@ class RoomController extends Controller
         }
     }
 
-    //make favorite room
-    public function room_mykeep(Request $request)
-    {
-        $data        = $request;
-        $uid         = $data['owner_id'];
-        $user_id     = $request->user()->id;
-        $mykeep_list = DB::table('users')->where('id', $user_id)->value('mykeep');
-        $mykeep_arr  = explode(",", $mykeep_list);
-        if (in_array($uid, $mykeep_arr)) return Common::apiResponse(0, 'Do not repeat favorites', null, 444);
-
-        array_unshift($mykeep_arr, $uid);
-        $str = trim(implode(",", $mykeep_arr), ",");
-        $res = DB::table('users')->where('id', $user_id)->update(['mykeep' => $str]);
-        if ($res) {
-            return Common::apiResponse(1, 'success');
-        } else {
-            return Common::apiResponse(0, 'failed', null, 400);
-        }
-    }
-
-
-    //cancel favorite room
-    public function remove_mykeep(Request $request)
-    {
-        $data        = $request;
-        $uid         = $data['owner_id'];
-        $user_id     = $request->user()->id;
-        $mykeep_list = DB::table('users')->where('id', $user_id)->value('mykeep');
-        $mykeep_arr  = explode(",", $mykeep_list);
-        if (!in_array($uid, $mykeep_arr)) return Common::apiResponse(0, 'This room has not been favorited', null, 404);
-        $key = array_search($uid, $mykeep_arr);
-        unset($mykeep_arr[$key]);
-        $str = trim(implode(",", $mykeep_arr), ",");
-        $res = DB::table('users')->where('id', $user_id)->update(['mykeep' => $str]);
-        if ($res) {
-            return Common::apiResponse(1, 'success');
-        } else {
-            return Common::apiResponse(0, 'failed', null, 400);
-        }
-    }
-
-
-    //Whether to set a password
-    public function is_pass(Request $request)
-    {
-        $uid = $request->owner_id ?: 0;
-        if (!$uid) return Common::apiResponse(0, 'invalid data');
-        $result = $this->repo->getValueByUid($uid, 'room_pass');
-        if ($result) {
-            return Common::apiResponse(1, 'The room has a password, please enter the password', ['is_password' => true]);
-        } else {
-            return Common::apiResponse(1, 'room without password', ['is_password' => false]);
-        }
-    }
-
-    //Get other users in the room
-    public function get_other_user(Request $request)
-    {
-        $data    = $request;
-        $uid     = $data['owner_id'];
-        $user_id = $data['user_id'];
-        $my_id   = $request->user()->id;
-
-        $room_info                 = $this->repo->getRoomUserInfoByUid($uid);
-        $room_info[0]              = (array)$room_info[0];
-        $room_info[0]['user_type'] = 5;
-        $roomAdmin                 = explode(',', $room_info[0]['room_admin']);
-        for ($i = 0; $i < count($roomAdmin); $i++) {
-            if ($roomAdmin[$i] == $user_id) {
-                $room_info[0]['user_type'] = 2;
-            }
-        }
-        $roomJudge = explode(',', $room_info[0]['room_judge']);
-        for ($i = 0; $i < count($roomJudge); $i++) {
-            if ($roomJudge[$i] == $user_id) {
-                $room_info[0]['user_type'] = 4;
-            }
-        }
-        $room_info[0]['is_speak'] = 1;
-        $is_speak                 = explode(',', $room_info[0]['room_speak']);
-        for ($i = 0; $i < count($is_speak); $i++) {
-            if ($is_speak[$i] == $user_id) {
-                $room_info[0]['is_speak'] = 2;
-            }
-        }
-        // $room_info[0]['is_sound'] = 1;
-        // $is_sound = explode(',', $room_info[0]['roomSound']);
-        // for ($i=0; $i < count($is_sound); $i++) {
-        //     if($is_sound[$i] == $user_id){
-        //         $room_info[0]['is_sound'] = 2;
-        //     }
-        // }
-
-        $is_sound_arr             = $room_info[0]['room_sound'] ? explode(',', $room_info[0]['room_sound']) : [];
-        $room_info[0]['is_sound'] = in_array($user_id, $is_sound_arr) ? 2 : 1;
-
-
-        $result = DB::table('users')->where('id', $user_id)->select(['id', 'nickname'])->get()->toArray();
-
-        $result[0] = (array)$result[0];
-
-        $is_follows = Common::IsFollow($my_id, $user_id);
-
-        $result[0]['is_follows'] = $is_follows ? 1 : 2;
-
-        $user = User::find($result[0]['id']);
-
-        $result[0]['image'] = @$user->profile->avatar;
-        $result[0]['age']   = Common::getBrithdayMsg(@$user->profile->birthday, 0) ?: 0;
-
-        $result[0]['user_type'] = $room_info[0]['user_type'];
-        $result[0]['is_speak']  = $room_info[0]['is_speak'];
-        $result[0]['is_sound']  = $room_info[0]['is_sound'];
-
-
-        $star_level            = Common::getLevel($user_id, 1);
-        $gold_level            = Common::getLevel($user_id, 2);
-        $vip_level             = Common::getLevel($user_id, 3);
-        $star_img              = DB::table('vips')->where('level', $star_level)->where('type', 1)->value('img');
-        $gold_img              = DB::table('vips')->where('level', $gold_level)->where('type', 2)->value('img');
-        $vip_img               = DB::table('vips')->where('level', $vip_level)->where('type', 3)->value('img');
-        $result[0]['star_img'] = $star_img;
-        $result[0]['gold_img'] = $gold_img;
-        $result[0]['vip_img']  = $vip_img;
-
-        $result[0]['is_time'] = 0;
-        $info                 = (array)DB::table('time_logs')->selectRaw('created_at,time')->where([
-            'uid' => $uid,
-            'user_id' => $result[0]['id']
-        ])->orderByRaw('id desc')->limit(1)->first();
-
-        if (!empty($info) && $info['time'] && $info['created_at']) {
-            $endTime              = ($info['time'] + $info['created_at']);
-            $remainTime           = ($endTime - time());
-            $result[0]['is_time'] = $remainTime < 0 ? 0 : 1;
-            //delete timer
-            if ($remainTime < 0) {
-                DB::table('time_logs')->where(['uid' => $uid, 'user_id' => $result[0]['id']])->delete();
-            }
-        }
-
-
-        if ($result) {
-            return Common::apiResponse(1, 'success', $result);
-        } else {
-            return Common::apiResponse(0, 'failed', null, 400);
-        }
-    }
-
-
-    // //can you speak
-    // public function not_speak_status()
-    // {
-    //     $uid     = input('uid/d', 0);
-    //     $user_id = $this->user_id;
-    //     if (!$uid) $this->ApiReturn(0, '缺少参数');
-    //     $roomSpeak = DB::name('rooms')->where('uid', $uid)->value('roomSpeak');
-    //     $spe_arr   = !$roomSpeak ? [] : explode(',', $roomSpeak);
-
-    //     $is_speak = 1;
-    //     foreach ($spe_arr as $k => &$v) {
-    //         $arr      = explode("#", $v);
-    //         $new_time = $arr[1] + 180;
-    //         if (time() - $new_time < 0) {
-    //             if ($arr[0] == $user_id) {
-    //                 $is_speak = 0;
-    //             }
-    //         } else {
-    //             unset($spe_arr[$k]);
-    //         }
-    //     }
-    //     $str = trim(implode(",", $spe_arr), ",");
-    //     DB::name('rooms')->where(['uid' => $uid])->update(['roomSpeak' => $str]);
-
-    //     if ($is_speak) {
-    //         $this->ApiReturn(1, '可以发言');
-    //     } else {
-    //         $this->ApiReturn(0, '不能发言');
-    //     }
-    // }
-
-
-
-
     public function room_type()
     {
         $data = $this->categoryRepo->getEnabledParentCategories();
         return Common::apiResponse(1, '', $data);
     }
 
-
     //set as admin
     public function is_admin(Request $request)
     {
-        $uid      = $request->owner_id;
+        $uid = $request->owner_id;
         $admin_id = $request->user_id;
         $roomId = $request->room_id;
         if ((!$uid || !$roomId) && !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
@@ -1349,17 +555,17 @@ class RoomController extends Controller
             : Room::where('uid', $uid)->where('type', 'audio')->first();
 
         if (!$room) return Common::apiResponse(0, 'Room not exist', null, 422);
-        $uid  = $room->uid;
+        $uid = $room->uid;
         if ($room->uid == $admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
         $roomVisitor = $room->room_visitor;
-        $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
+        $vis_arr = !$roomVisitor ? [] : explode(",", $roomVisitor);
         if (!in_array($admin_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
         $roomAdmin = $room->room_admin;
-        $roomMax   = $room->total_admins;
-        $adm_arr   = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+        $roomMax = $room->total_admins;
+        $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
         if (count($adm_arr) > 0 && $adm_arr[0] == '') unset($adm_arr[0]);
-        $adm_arr   = array_unique($adm_arr);
+        $adm_arr = array_unique($adm_arr);
 
         if (in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is already an administrator, please do not repeat the settings', null, 444);
         $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
@@ -1368,17 +574,17 @@ class RoomController extends Controller
 
 
         $adm_arr = array_merge($adm_arr, [$admin_id]);
-        $str     = implode(",", $adm_arr);
+        $str = implode(",", $adm_arr);
 
-        $res  =  $room->update(['room_admin' => $str]);
+        $res = $room->update(['room_admin' => $str]);
         $adm_arr = explode(",", $room->room_admin) ?? [];
-        $a    = User::find($admin_id);
-        $n    = 'nan';
+        $a = User::find($admin_id);
+        $n = 'nan';
         if ($a) {
             $n = $a->name ?: 'nan';
         }
         //  Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', " اصبح ادمن $n");
-        $ms   = [
+        $ms = [
             'messageContent' => [
                 'message' => 'updateAdmins',
                 'admins' => array_values($adm_arr)
@@ -1398,7 +604,7 @@ class RoomController extends Controller
     public function remove_admin(Request $request)
     {
         $user = $request->user();
-        $uid      = $request->owner_id;
+        $uid = $request->owner_id;
         $admin_id = $request->user_id;
         $roomId = $request->room_id;
         if ((!$uid && !$roomId) || !$admin_id) return Common::apiResponse(0, 'invalid data', null, 422);
@@ -1406,26 +612,26 @@ class RoomController extends Controller
             ? Room::find($roomId)
             : Room::where('uid', $uid)->where('type', 'audio')->first();
         if (!$room) return Common::apiResponse(0, 'room not found', null, 422);
-        $uid      = $room->uid;
+        $uid = $room->uid;
         if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
 
         $roomAdmin = $room->room_admin;
-        $adm_arr   = !$roomAdmin ? [] : explode(",", $roomAdmin);
+        $adm_arr = !$roomAdmin ? [] : explode(",", $roomAdmin);
         if (!in_array($admin_id, $adm_arr)) return Common::apiResponse(0, 'This user is not an administrator of this room', null, 404);
         $key = array_search($admin_id, $adm_arr);
         unset($adm_arr[$key]);
-        $str  = implode(",", $adm_arr);
-        $res  = $room->update(['room_admin' => $str]);
+        $str = implode(",", $adm_arr);
+        $res = $room->update(['room_admin' => $str]);
         $adm_arr = explode(",", $room->room_admin) ?? [];
 
 
-        $a    = User::find($admin_id);
-        $n    = 'nan';
+        $a = User::find($admin_id);
+        $n = 'nan';
         if ($a) {
             $n = $a->name ?: 'nan';
         }
         // Common::sendToZego_2('SendBroadcastMessage', $room->id, $uid, 'room', "  لم يعد هذا المستخدم ادمن فى هذة الغرفه  $n");
-        $ms   = [
+        $ms = [
             'messageContent' => [
                 'message' => 'updateAdmins',
                 'admins' => array_values($adm_arr)
@@ -1439,85 +645,6 @@ class RoomController extends Controller
         }
     }
 
-    //add ban
-    public function is_black(Request $request)
-    {
-        $uid     = $request->owner_id;
-        $user_id = $request->user_id;
-
-        if (Common::hasInPack($user_id, 15)) {
-            return Common::apiResponse(0, 'user cannot banned', null, 403);
-        }
-        if (!$uid || !$user_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        if ($uid == $user_id) return Common::apiResponse(0, 'Illegal operation', null, 403);
-        //        if ($request->user ()->id != $uid){
-        //            return Common::apiResponse(0,'not allowed');
-        //        }
-        $roomVisitor = $this->repo->getValueByUid($uid, 'room_visitor');
-        $room        = Room::query()->where('uid', $uid)->first();
-        $vis_arr     = !$roomVisitor ? [] : explode(",", $roomVisitor);
-        if (!in_array($user_id, $vis_arr)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
-
-
-        $roomSpeak = $this->repo->getValueByUid($uid, 'room_speak');
-        $spe_arr   = !$roomSpeak ? [] : explode(",", $roomSpeak);
-        foreach ($spe_arr as $k => &$v) {
-            $arr = explode("#", $v);
-            if ($arr[0] == $user_id) return Common::apiResponse(0, 'This user is already on the ban list', null, 405);
-        }
-        $shic    = time() + 18000;
-        $jinyan  = $user_id . "#" . $shic;
-        $spe_arr = array_merge($spe_arr, [$jinyan]);
-        $str     = implode(",", $spe_arr);
-        $res     = $this->repo->updateByUid($uid, ['room_speak' => $str]);
-        if ($res) {
-            $ms = [
-                'messageContent' => [
-                    'message' => 'banFromWriting',
-                    'userId' => $user_id
-                ]
-            ];
-            Common::sendToZego('SendCustomCommand', $room->id, $user_id, json_encode($ms));
-            return Common::apiResponse(1, 'Succeeded adding writing ban for');
-        } else {
-            return Common::apiResponse(0, 'Failed to add writing ban', null, 400);
-        }
-    }
-
-    public function removeBan(Request $request)
-    {
-        $uid     = $request->owner_id;
-        $user_id = $request->user_id;
-
-        if (!$uid || !$user_id) return Common::apiResponse(0, 'invalid data', null, 422);
-        if ($uid == $user_id) return Common::apiResponse(0, 'Illegal operation', null, 403);
-
-        $room = Room::query()->where('uid', $uid)->first();
-
-        $roomSpeak = $this->repo->getValueByUid($uid, 'room_speak');
-        $spe_arr   = !$roomSpeak ? [] : explode(",", $roomSpeak);
-        foreach ($spe_arr as $k => &$v) {
-            $arr = explode("#", $v);
-            if ($arr[0] == $user_id) {
-                unset($spe_arr[$k]);
-            }
-        }
-        $str = implode(",", $spe_arr);
-        $res = $this->repo->updateByUid($uid, ['room_speak' => $str]);
-        if ($res) {
-            $ms = [
-                'messageContent' => [
-                    'message' => 'removeBanFromWriting',
-                    'userId' => $user_id
-                ]
-            ];
-            Common::sendToZego('SendCustomCommand', $room->id, $user_id, json_encode($ms));
-            return Common::apiResponse(1, 'Succeeded remove writing ban for');
-        } else {
-            return Common::apiResponse(0, 'Failed to remove writing ban', null, 400);
-        }
-    }
-
     public function removeRoomPass(Request $request)
     {
         $room = $this->roomService->changePasswordRoom($request->owner_id, $request->room_id);
@@ -1525,11 +652,11 @@ class RoomController extends Controller
         $data = [
             "messageContent" => [
                 "message" => "changeBackground",
-                "imgbackground" => $room->final_room_image ??  '',
+                "imgbackground" => $room->final_room_image ?? '',
                 "roomIntro" => $room->room_intro ?? "",
                 "roomImg" => $room->room_cover ?? "",
                 // "room_type" => @$room->myType->name ?? "",
-                "room_type" => app()->getLocale() === 'ar' ? @$room->roomCategory?->name  ?? @$room->roomCategory?->name_en : @$room->roomCategory?->name_en ?? @$room->roomCategory?->name,
+                "room_type" => app()->getLocale() === 'ar' ? @$room->roomCategory?->name ?? @$room->roomCategory?->name_en : @$room->roomCategory?->name_en ?? @$room->roomCategory?->name,
                 "room_name" => @$room->room_name ?? "",
                 "is_locked" => false
 
@@ -1540,123 +667,12 @@ class RoomController extends Controller
         return Common::apiResponse(1, 'success');
     }
 
-
-    public function createPK(Request $request)
-    {
-        $userId = Auth::id();
-        if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-        $room = Room::query()->where('uid', $request->owner_id)->where('room_status', 1)->first();
-        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-        if ($userId != $room->uid && $room->room_visitor = '') return Common::apiResponse(0, 'room closed', null, 403);
-        $ex = Pk::query()->where('room_id', $room->id)->where('status', 1)->exists();
-        if ($ex) Pk::query()->where('status', 1)->update(['status' => 0]);
-        Pk::query()->create([
-            'room_id'  => $room->id,
-            'status' => 1,
-            'mics' => $room->microphone,
-            //                'prize_value'=>$request->prize_value,
-            'start_at' => Carbon::now(),
-            'end_at' => Carbon::now()->addMinutes($request->minutes),
-        ]);
-        $mc   = [
-            'messageContent' => [
-                'message' => 'startPK',
-                'PkTime' => $request->minutes
-            ]
-        ];
-        $json = json_encode($mc);
-        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-        return Common::apiResponse(1, __('api_responses.created'), null, 201);
-    }
-
-    public function closePK(Request $request)
-    {
-
-        if (!@$request->owner_id) Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-        $room = Room::withoutAppends()->where('uid', $request->owner_id)->select('id')->first();
-
-        $pk = Pk::query()->where('room_id', $room->id)->where('status', 1)->orderByDesc('id')->first();
-        if (!$pk) {
-            return Common::apiResponse(1, __('api_responses.closed'), null, 201);
-        }
-        if ($pk->t1_score > $pk->t2_score) {
-            $winner = 1;
-        } elseif ($pk->t2_score > $pk->t1_score) {
-            $winner = 2;
-        } else {
-            $winner = 0;
-        }
-        $pk->winner = $winner;
-        $pk->status = 0;
-        $pk->save();
-
-        $mc   = [
-            'messageContent' => [
-                'message'            => 'closePk',
-                'scoreTeam1' => $pk->t1_score,
-                'scoreTeam2' => $pk->t2_score,
-                'percentagepk_team1' => $pk->t1_per,
-                'percentagepk_team2' => $pk->t2_per,
-                'winner_Team' => $winner,
-            ]
-        ];
-        $json = json_encode($mc);
-        Common::sendToZego('SendCustomCommand', $pk->room_id, $request->user()->id, $json);
-        /*foreach($pks as $pk){
-//            Pk::query ()->where ('id',$pk->id)->where ('status',1)->update (['status'=>0]);
-
-        }*/
-        return Common::apiResponse(1, __('api_responses.closed'), null, 201);
-    }
-
-
-    public function showPK(Request $request)
-    {
-        if (!$request->owner_id) return Common::apiResponse(0, __('api_responses.missing_params'), null, 422);
-        $room = Room::withoutAppends()->where('uid', $request->owner_id)->select('id', 'is_show_pk')->first();
-        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-
-        $room->enableSaving = false;
-        $room->update(['is_show_pk' => 1]);
-        $mc   = [
-            'messageContent' => [
-                'message' => 'showPK'
-            ]
-        ];
-        $json = json_encode($mc);
-        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-        return Common::apiResponse(1, 'done', null, 201);
-    }
-
-
     public function firstOfRoom(Request $request)
     {
         $OwnerId = $request->owner_id;
         if (!$OwnerId) return Common::apiResponse(0, 'missing param', null, 422);
         $firstRoomOwner = $this->roomService->getFirstRoomOwner($OwnerId);
         return Common::apiResponse(1, '', ['user' => new UserResource($firstRoomOwner->sender), 'total' => (int)$firstRoomOwner->total], 200);
-    }
-
-    public function roomMode(Request $request)
-    {
-        $room = Room::query()->where('uid', $request->owner_id)->first();
-        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-        if ($room->mood == 1) {
-            $mode = 'party';
-        } else if ($room->mood == 3) {
-            $mode = 'cinema';
-        } else {
-            $mode = 'topCenter';
-        }
-        $ms   = [
-            'messageContent' => [
-                'message' => 'roomMode',
-                'mode' => $mode
-            ]
-        ];
-        $json = json_encode($ms);
-        Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
-        return Common::apiResponse(1, 'done', null, 201);
     }
 
     public function changeMode(Request $request)
@@ -1672,7 +688,6 @@ class RoomController extends Controller
         if ($currentMode == null || !$request->owner_id) return Common::apiResponse(0, 'missing param', null, 422);
         return $this->roomService->changeModeMic($request, $currentMode);
     }
-
 
     /**
      * @return JsonResponse
@@ -1697,43 +712,17 @@ class RoomController extends Controller
     {
         $data = [
             "messageContent" => [
-                "message"       => "changeBackground",
+                "message" => "changeBackground",
                 "imgbackground" => $image ?: "",
-                "roomIntro"     => $room->room_intro ?: "",
-                "roomImg"       => $room->room_cover ?: "",
-                "room_type"     => @$room->myType->name ?: "",
-                "room_name"     => @$room->room_name ?: ""
+                "roomIntro" => $room->room_intro ?: "",
+                "roomImg" => $room->room_cover ?: "",
+                "room_type" => @$room->myType->name ?: "",
+                "room_name" => @$room->room_name ?: ""
             ]
         ];
         $json = json_encode($data);
         //        Common::sendToZego('SendCustomCommand', $room->id, $owner_id, $json);
         return $json;
-    }
-
-    public function change_game_room(Request $request)
-    {
-
-        $currentGame = $request->game_id;
-        if ($currentGame == null || !$request->owner_id) return Common::apiResponse(0, 'missing param', null, 422);
-        $game = AllGame::find($currentGame);
-        if (!$game) return Common::apiResponse(false, 'this game does not exists');
-
-        $room = Room::query()->where('uid', $request->owner_id)->first();
-        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
-        $room->game_id =  $currentGame;
-        $room->mode = 4;
-        $room->save();
-
-        $data = [
-            "messageContent" => [
-                "message"       => "changeRoomGame",
-                "game_url"     => $game->mini_url ?: "",
-            ]
-        ];
-        $json = json_encode($data);
-        Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
-
-        return Common::apiResponse(1, 'success', 200);
     }
 
     public function disable_writing(Request $request, $room_id)
@@ -1764,7 +753,6 @@ class RoomController extends Controller
             200
         );
     }
-
 
     public function changeRoomImage(Request $request)
     {
@@ -1820,7 +808,7 @@ class RoomController extends Controller
     protected function blackList(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id'        => 'required|integer|exists:rooms,id',
+            'room_id' => 'required|integer|exists:rooms,id',
 
         ]);
         if ($validator->fails()) {
@@ -1829,10 +817,10 @@ class RoomController extends Controller
         try {
             $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
-            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
+            if ($room->uid != $userId) return Common::apiResponse(0, 'you do not have permission', 400);
             $ids = explode(',', $room->room_black);
             $data = UserResource::collection(User::query()->whereIn('id', $ids)->get());
-            return   Common::apiResponse(true, '', $data, 200);
+            return Common::apiResponse(true, '', $data, 200);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
@@ -1854,6 +842,7 @@ class RoomController extends Controller
 
         return Common::apiResponse(true, "messages.$message", [], 200);
     }
+
     protected function addBlock(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -1870,7 +859,7 @@ class RoomController extends Controller
             $room = Room::findOrFail($request->room_id);
             $userToBlock = $request->user_id;
             $roomVisitors = $room->roomVisitors->pluck('user_id')->toArray();
-            if (!in_array($userToBlock, $roomVisitors))   return Common::apiResponse(0, 'This user is not in this room', null, 404);
+            if (!in_array($userToBlock, $roomVisitors)) return Common::apiResponse(0, 'This user is not in this room', null, 404);
 
 
             // Check if the current user is the owner of the room
@@ -1902,11 +891,12 @@ class RoomController extends Controller
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
     }
+
     protected function removeBlock(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id'        => 'required|integer|exists:rooms,id',
-            'user_id'        => 'required|integer|exists:users,id',
+            'room_id' => 'required|integer|exists:rooms,id',
+            'user_id' => 'required|integer|exists:users,id',
 
         ]);
         if ($validator->fails()) {
@@ -1915,7 +905,7 @@ class RoomController extends Controller
         try {
             $userId = $request->user()->id;
             $room = Room::findOrFail($request->room_id);
-            if ($room->uid != $userId) return   Common::apiResponse(0, 'you do not have permission', 400);
+            if ($room->uid != $userId) return Common::apiResponse(0, 'you do not have permission', 400);
             $ids = explode(',', $room->room_black);
             $updatedIds = [];
             $userToRemove = $request->user_id;
@@ -1924,12 +914,12 @@ class RoomController extends Controller
                 $parts = explode('#', $entry);
                 $id = $parts[0] ?? null;
 
-                if ($id != $userToRemove)   return   Common::apiResponse(0, 'this user not in black list', 400);
+                if ($id != $userToRemove) return Common::apiResponse(0, 'this user not in black list', 400);
             }
 
             $room->room_black = implode(',', $updatedIds);
             $room->save();
-            return   Common::apiResponse(true, 'block removed', 200);
+            return Common::apiResponse(true, 'block removed', 200);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
@@ -1939,7 +929,7 @@ class RoomController extends Controller
     {
         try {
             $room = $this->roomService->roomDetails($id);
-            return   Common::apiResponse(true, 'done', new RoomDetailsResource($room));
+            return Common::apiResponse(true, 'done', new RoomDetailsResource($room));
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
@@ -1953,7 +943,6 @@ class RoomController extends Controller
         $result = Room::where('uid', $id)->first()?->gifts()->paginate($perPage);
         return Common::apiResponse(true, 'done', GiftRoomResource::collection($result));
     }
-
 
     public function check_room(Request $request)
     {
@@ -1973,27 +962,11 @@ class RoomController extends Controller
         return Common::apiResponse(true, '', $data, 200);
     }
 
-
-    private function updateMicrophone($room_uid, $user_id)
-    {
-        $user = User::query()->find($user_id);
-        if (!$user) return;
-        $result  = Common::go_microphone_hand($room_uid, $user_id);
-
-        $room = Room::query()->where('uid', $room_uid)->first();
-
-        if (!$room) return;
-        if ($result) {
-
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
-        }
-    }
-
     private function updateMicrophone2($room_uid, $user_id)
     {
         $user = User::query()->find($user_id);
         if (!$user) return;
-        $result  = Common::go_microphone_hand_2($room_uid, $user_id);
+        $result = Common::go_microphone_hand_2($room_uid, $user_id);
 
         $room = Room::query()->where('uid', $room_uid)->first();
 

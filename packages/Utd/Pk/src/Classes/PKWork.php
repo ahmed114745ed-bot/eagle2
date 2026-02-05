@@ -1,27 +1,25 @@
 <?php
 
-namespace App\Classes\Gifts;
+namespace Utd\Pk\Classes;
 
-use App\Helpers\Common;
+use App\Classes\Gifts\SendGiftService;
 use App\Interfaces\RoomJobInterface;
 use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Carbon\Carbon;
-use Modules\Charizma\Http\Services\UserCharismaService;
 
 class PKWork implements RoomJobInterface
 {
 
     public function work($roomJob) : array
     {
-        $room = Room::query()->find($roomJob->room_id);
+        $room = PackageHelper::isInstalled('room') ? Room::query()->find($roomJob->room_id) : null;
         if(!$room) throw new \Exception('Room not found');
         $userIds = unserialize($roomJob->data);
         $earnedCoinsPerUser = $roomJob->coins;
-        $lastPk = PackageHelper::isInstalled('room')
-            ? Pk::query()->where('room_id', $room->id)->where('status', 1)->whereDate('end_at', "<=", now())->orderByDesc('id')->first()
-            : null;
+        $lastPk = Pk::query()->where('room_id', $room->id)->where('status', 1)
+            ->whereDate('end_at', "<=", now())->orderByDesc('id')->first();
         $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk,$userIds, $earnedCoinsPerUser, $room);
         return ['room_id'=> $room->id, ...$data];
     }

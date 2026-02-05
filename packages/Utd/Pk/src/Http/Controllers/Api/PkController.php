@@ -261,7 +261,7 @@ class PkController extends Controller
     {
         try {
             $data = $this->pkService->roomPk($id, $request->per_page, $request->page);
-            return   Common::apiResponse(true, 'done', PkResource::collection($data));
+            return Common::apiResponse(true, 'done', PkResource::collection($data));
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }

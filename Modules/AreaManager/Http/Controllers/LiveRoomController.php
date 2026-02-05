@@ -141,7 +141,7 @@ class LiveRoomController extends MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = PackageHelper::isInstalled('room')
+        $pks = PackageHelper::isInstalled('pk')
             ? Pk::where('room_id', $room->id)
                 ->with(['team1Boss.profile', 'team2Boss.profile'])
                 ->orderByDesc('created_at')
@@ -322,7 +322,7 @@ class LiveRoomController extends MainController
 
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        
+
         $countries = Common::areaCountries();
 
         $grid->model()

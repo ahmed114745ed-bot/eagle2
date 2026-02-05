@@ -4,22 +4,24 @@ namespace Utd\Room;
 
 use App\Contracts\EnteranceRoomContract;
 use App\Contracts\RoomGameContract;
-use App\Contracts\RoomServiceContract;
 use App\Contracts\RoomRepositoryContract;
 use App\Contracts\RoomSalaryRepositoryContract;
+use App\Contracts\RoomServiceContract;
 use App\Contracts\RoomTopUsersRepositoryContract;
 use App\Contracts\RoomVisitorRepositoryContract;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Utd\Room\Services\RoomService;
-use Utd\Room\Services\EntranceRoomService;
-use Utd\Room\Services\RoomGameServices;
+use Utd\Room\Entities\Room;
+use Utd\Room\Observers\RoomObserver;
 use Utd\Room\Repositories\RoomRepoInterface;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Room\Repositories\RoomSalaryRepository;
 use Utd\Room\Repositories\RoomTopUsersRepository;
 use Utd\Room\Repositories\RoomVisitorRepository;
+use Utd\Room\Services\EntranceRoomService;
+use Utd\Room\Services\RoomGameServices;
+use Utd\Room\Services\RoomService;
 
 class RoomServiceProvider extends ServiceProvider
 {
@@ -72,6 +74,7 @@ class RoomServiceProvider extends ServiceProvider
         $this->registerMigrations();
         $this->registerPublishing();
         $this->registerCommands();
+        $this->registerObservers();
     }
 
     /**
@@ -170,5 +173,10 @@ class RoomServiceProvider extends ServiceProvider
 //                __DIR__ . '/../Database/migrations' => database_path('migrations'),
 //            ], 'room-migrations');
         }
+    }
+
+    protected function registerObservers(): void
+    {
+        Room::observe(RoomObserver::class);
     }
 }

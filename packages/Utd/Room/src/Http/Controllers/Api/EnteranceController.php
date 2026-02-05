@@ -215,7 +215,6 @@ class EnteranceController extends Controller
         $user_id = $request->events[0]['user_id'];
 
         if ($name !== 'member_added') {
-            // RemoveUserFromRoomJob::dispatch( $user_id);
             $user = User::find($user_id);
             if ($user) {
                 $room = Room::where('uid', $user->now_room_uid)->first();

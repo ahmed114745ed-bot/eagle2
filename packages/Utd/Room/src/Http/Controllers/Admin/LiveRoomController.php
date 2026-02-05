@@ -4,6 +4,7 @@ namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Services\UserService;
 use App\Models\KickRecord;
+use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use App\Models\User;
@@ -134,10 +135,10 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             });
 
         // 4. PKs (Room PKs)
-        $pks = Pk::where('room_id', $room->id)
+        $pks = PackageHelper::isInstalled('pk') ? Pk::where('room_id', $room->id)
             ->with(['team1Boss.profile', 'team2Boss.profile'])
             ->orderByDesc('created_at')
-            ->paginate(15);
+            ->paginate(15) : null;
 
         $currentPage = request()->get('page', 1);
         $perPage = 15;

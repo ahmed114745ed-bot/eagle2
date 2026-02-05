@@ -2,8 +2,10 @@
 
 namespace Utd\Pk;
 
+use App\Contracts\PkRepositoryContract;
 use Utd\Pk\Entities\Pk;
 use Utd\Pk\Observers\PKObserver;
+use Utd\Pk\Repositories\PkRepository;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -20,6 +22,8 @@ class PkServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../Config/pk.php', 'pk');
+
+        $this->app->singleton(PkRepositoryContract::class, PkRepository::class);
     }
 
     /**
