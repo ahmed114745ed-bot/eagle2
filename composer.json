@@ -153,9 +153,6 @@
             "url": "packages/Utd/Room"
         },
         {
-            "type": "path",
-            "url": "packages/Utd/RoomBoom"
-        },{
             "type": "path", "url": "./packages/Utd/Gifts"
         }
     ]
