@@ -502,11 +502,11 @@
         <section>
             <h2><span class="icon">🗑️</span> إزالة الحزمة</h2>
             
-            <div class="note note-danger">
-                <strong>⚠️ تحذير:</strong> إزالة الحزمة سيؤدي إلى حذف جميع بيانات الوكالات!
+            <div class="note note-info">
+                <strong>ℹ️ ملاحظة:</strong> إزالة الحزمة بشكل افتراضي لا تحذف البيانات من قاعدة البيانات، فقط تزيل الكود والإعدادات.
             </div>
             
-            <h3>خطوات الإزالة</h3>
+            <h3>خطوات الإزالة الآمنة (بدون حذف البيانات)</h3>
             
             <div class="step">
                 <div class="step-number">1</div>
@@ -514,6 +514,11 @@
                     <div class="step-title">تشغيل أمر الإزالة</div>
                     <pre><code>php artisan agency:uninstall</code><button class="copy-btn" onclick="copyCode(this)">نسخ</button></pre>
                 </div>
+            </div>
+
+            <div class="note note-danger">
+                <strong>⚠️ تحذير:</strong> إذا أردت حذف جميع بيانات الوكالات من قاعدة البيانات، استخدم:
+                <pre style="margin-top: 10px;"><code>php artisan agency:uninstall --remove-data</code></pre>
             </div>
 
             <div class="step">
