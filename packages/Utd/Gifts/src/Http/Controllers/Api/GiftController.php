@@ -15,6 +15,8 @@ class GiftController extends Controller
     protected $giftService;
     protected $Common;
     protected $GiftResource;
+    protected $commonClass;
+    protected $resourceClass;
     
     public function __construct() 
     {
@@ -22,12 +24,14 @@ class GiftController extends Controller
         $this->giftService = app($giftServiceClass);
         $this->Common = ClassResolver::helper('common');
         $this->GiftResource = ClassResolver::resource('gift');
+        $this->commonClass = $this->Common;
+        $this->resourceClass = $this->GiftResource;
     }
     public function index(Request $request)
     {
         $type = $request->type;
         $gifts = $this->giftService->index($type);
-        return $this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
+        return $this->commonClass::apiResponse(true, '', $this->resourceClass::collection($gifts), 200);
     }
     public function getByCategory(Request $request)
     {
@@ -35,21 +39,21 @@ class GiftController extends Controller
         $categoryId = $request->input('type');
         $type       = $request->input('type'); 
         $gifts = $this->giftService->getByCategory($categoryId, $type);
-        return $this->Common::apiResponse(true, '', $this->GiftResource::collection($gifts), 200);
+        return $this->commonClass::apiResponse(true, '', $this->resourceClass::collection($gifts), 200);
     }
     
     public function get_images(Request $request)
     {
 
         $gifts = $this->giftService->get_images();
-        return $this->Common::apiResponse(true, '', $gifts, 200);
+        return $this->commonClass::apiResponse(true, '', $gifts, 200);
     }
 
 
     public function allGifts(Request $request)
     {
         $gifts = $this->giftService->allGift($request->page, $request->per_page);
-        return $this->Common::apiResponse(1, '',  $gifts);
+        return $this->commonClass::apiResponse(1, '',  $gifts);
     }
 
     public function store(Request $request)
@@ -74,14 +78,14 @@ class GiftController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->commonClass::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         if ((($request->min_percentage + $request->mid_percentage + $request->max_percentage) != 100) && ($request->type == 6)) {
-            return $this->Common::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
+            return $this->commonClass::apiResponse(0, __('The sum of percentages must be equal to 100.'), 400);
         }
         $this->giftService->create($request);
 
-        return $this->Common::apiResponse(1, 'created successfully');
+        return $this->commonClass::apiResponse(1, 'created successfully');
     }
 
     public function storeList(Request $request)
