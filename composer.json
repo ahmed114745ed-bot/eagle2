@@ -54,7 +54,6 @@
         "utd/moments": "*",
         "utd/reals": "*",
         "utd/room": "*",
-        "utd/room-boom": "dev-room-boom-package",
         "utd/gifts": "*"
     },
     "require-dev": {
