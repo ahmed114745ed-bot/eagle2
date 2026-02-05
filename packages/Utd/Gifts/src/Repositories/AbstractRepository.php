@@ -27,11 +27,11 @@ abstract class AbstractRepository
     }
 
     /**
-     * @param array $data
      * @param $id
+     * @param array $data
      * @return mixed
      */
-    public function update(array $data, $id): mixed
+    public function update($id, array $data): mixed
     {
         if ($id instanceof Model){
             return $id->update($data);
