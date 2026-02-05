@@ -9,7 +9,6 @@ return new class extends Migration
     /**
      * Run the migrations.
      * 
-     * تحويل أعمدة add_month و add_year إلى month و year
      * Converting add_month and add_year columns to month and year
      */
     public function up(): void
@@ -17,6 +16,19 @@ return new class extends Migration
         if (!Schema::hasTable('bd_agency_host_sallaries')) {
             return;
         }
+
+        // Ensure only basic required columns exist
+        Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
+            if (!Schema::hasColumn('bd_agency_host_sallaries', 'amount')) {
+                $table->decimal('amount', 20, 4)->default(0)->after('agency_id');
+            }
+            if (!Schema::hasColumn('bd_agency_host_sallaries', 'salary')) {
+                $table->decimal('salary', 20, 4)->default(0)->after('year');
+            }
+            if (!Schema::hasColumn('bd_agency_host_sallaries', 'bd_user_id')) {
+                $table->unsignedBigInteger('bd_user_id')->nullable()->after('user_id');
+            }
+        });
 
         if (Schema::hasColumn('bd_agency_host_sallaries', 'add_month') 
             && !Schema::hasColumn('bd_agency_host_sallaries', 'month')) {
