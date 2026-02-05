@@ -249,198 +249,426 @@ cp -r public/storage/gifts ~/backup/gifts_images_$(date +%Y%m%d)</code></div>
             <!-- Uninstall Steps -->
             <div class="section">
                 <h2>🗑️ خطوات إلغاء التثبيت</h2>
+                <p style="font-size: 16px; margin-bottom: 20px;">
+                    <strong>⚡ إلغاء التثبيت سهل وآمن:</strong> أمر واحد فقط لحذف الحزمة!
+                </p>
+
+                <div class="info-box" style="background: #fff3cd; border-right: 4px solid #ffc107; margin-bottom: 25px;">
+                    <h3>⚡ الطريقة السريعة (موصى بها)</h3>
+                    <p><strong>أمر واحد يكفي لإزالة كل شيء:</strong></p>
+                    <div class="code-block"><code>composer remove utd/gifts --ignore-platform-req=ext-redis</code></div>
+                    <p style="margin-top: 10px;">✅ هذا الأمر سيحذف الحزمة من composer.json و composer.lock تلقائياً</p>
+                </div>
+
+                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                    أو اتبع الخطوات اليدوية التالية إذا أردت:
+                </p>
 
                 <!-- Step 1 -->
                 <div class="step">
-                    <h3>الخطوة 1: حذف من composer.json</h3>
+                    <h3>الخطوة 1: حذف الحزمة من composer.json (يدوياً)</h3>
                     <p>افتح ملف <code>composer.json</code> واحذف السطور التالية:</p>
                     
+                    <p><strong>من قسم require:</strong></p>
+                    <div class="code-block"><code>"utd/gifts": "*"</code></div>
+
                     <p><strong>من قسم repositories:</strong></p>
                     <div class="code-block"><code>{
     "type": "path",
-    "url": "./packages/Utd/Gifts"
+    "url": "./packages/Utd/Gifts",
+    "options": {
+        "symlink": true
+    }
 }</code></div>
-
-                    <p><strong>من قسم require:</strong></p>
-                    <div class="code-block"><code>"utd/gifts": "*"</code></div>
                 </div>
 
                 <!-- Step 2 -->
                 <div class="step">
-                    <h3>الخطوة 2: تحديث Composer</h3>
-                    <div class="code-block"><code>composer update utd/gifts --with-all-dependencies</code></div>
+                    <h3>الخطوة 2: إزالة الحزمة عبر Composer (الطريقة الأسهل)</h3>
+                    <div class="code-block"><code>composer remove utd/gifts --ignore-platform-req=ext-redis</code></div>
                     <div class="info-box">
-                        <h3>💡 ملاحظة</h3>
-                        <p>سيقوم Composer بإزالة الحزمة وكل dependencies الخاصة بها</p>
-                        <p><strong>البيانات في قاعدة البيانات لن تُحذف</strong></p>
+                        <h3>💡 ملاحظات مهمة</h3>
+                        <ul>
+                            <li>✅ سيقوم Composer بإزالة الحزمة تلقائياً من composer.json و composer.lock</li>
+                            <li>✅ <code>--ignore-platform-req=ext-redis</code> لتجاهل مشاكل إصدار Redis extension</li>
+                            <li>✅ <strong>البيانات في قاعدة البيانات لن تُحذف</strong></li>
+                            <li>✅ <strong>قوائم الهدايا ستختفي من Admin Panel تلقائياً</strong></li>
+                            <li>✅ <strong>التطبيق سيعمل بشكل طبيعي بدون أخطاء</strong></li>
+                            <li>✅ لا حاجة لتعديل أي كود في التطبيق</li>
+                        </ul>
                     </div>
+                    
+                    <p style="margin-top: 15px;"><strong>بديل:</strong> إذا كنت قد حذفت من composer.json يدوياً:</p>
+                    <div class="code-block"><code>composer update utd/gifts --with-all-dependencies --ignore-platform-req=ext-redis</code></div>
                 </div>
 
                 <!-- Step 3 -->
                 <div class="step">
-                    <h3>الخطوة 3: حذف ملف الإعدادات</h3>
-                    <div class="code-block"><code>rm config/gifts.php</code></div>
-                </div>
-
-                <!-- Step 4 -->
-                <div class="step">
-                    <h3>الخطوة 4: حذف الـ Class Aliases (إذا كانت موجودة)</h3>
-                    <p>احذف الملفات التالية إذا كانت موجودة:</p>
-                    <div class="code-block"><code>rm app/Models/Gift.php
-rm app/Models/GiftLog.php
-rm app/Models/GiftCategory.php
-rm app/Models/UserGift.php
-rm app/Models/LuckyGift.php
-rm app/Observers/GiftCategoryObserver.php</code></div>
-                </div>
-
-                <!-- Step 6 -->
-                <div class="step">
-                    <h3>الخطوة 6: حذف مجلد الباكيج</h3>
-                    <div class="code-block"><code>rm -rf packages/Utd/Gifts</code></div>
-                </div>
-
-                <!-- Step 7 -->
-                <div class="step">
-                    <h3>الخطوة 7: تنظيف الملفات المؤقتة</h3>
+                    <h3>الخطوة 3: تنظيف الكاش</h3>
                     <div class="code-block"><code>composer dump-autoload
 php artisan config:clear
 php artisan cache:clear
 php artisan route:clear
-php artisan view:clear</code></div>
+php artisan view:clear
+php artisan optimize:clear</code></div>
                 </div>
 
-                <!-- Step 5 -->
+                <!-- Step 4 (Optional) -->
                 <div class="step">
-                    <h3>الخطوة 5: حذف مجلد الحزمة</h3>
+                    <h3>الخطوة 4: حذف ملف الإعدادات (اختياري)</h3>
+                    <p>إذا أردت حذف ملف إعدادات الحزمة:</p>
+                    <div class="code-block"><code>rm config/gifts.php</code></div>
+                    <div class="info-box">
+                        <p>💡 يمكنك الاحتفاظ بالملف إذا كنت تخطط لإعادة التثبيت لاحقاً</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 (Optional) -->
+                <div class="step">
+                    <h3>الخطوة 5: حذف مجلد الحزمة (اختياري)</h3>
+                    <p>إذا أردت حذف مجلد الحزمة من المشروع:</p>
                     <div class="code-block"><code>rm -rf packages/Utd/Gifts</code></div>
+                    <div class="warning-box">
+                        <p>⚠️ <strong>تحذير:</strong> احفظ نسخة احتياطية قبل الحذف إذا كنت تخطط للعودة لاحقاً</p>
+                    </div>
+                </div>
+
+                <!-- Step 6 (Optional) -->
+                <div class="step">
+                    <h3>الخطوة 6: حذف Class Aliases (نادراً)</h3>
+                    <p>إذا كنت قد أنشأت Aliases يدوياً في <code>app/Models</code>:</p>
+                    <div class="code-block"><code># فقط إذا كانت موجودة وتريد حذفها
+rm -f app/Models/Gift.php
+rm -f app/Models/GiftLog.php
+rm -f app/Models/GiftCategory.php
+rm -f app/Models/UserGift.php
+rm -f app/Models/LuckyGift.php</code></div>
+                    <div class="info-box">
+                        <p>💡 <strong>ملاحظة:</strong> معظم المشاريع لا تحتاج هذه الخطوة لأن Models موجودة في الحزمة نفسها</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Optional Database Cleanup -->
             <div class="section">
-                <h2>🗄️ حذف قاعدة البيانات (اختياري)</h2>
+                <h2>🗄️ حذف البيانات من قاعدة البيانات (اختياري وخطير)</h2>
                 
                 <div class="danger-box">
-                    <h3>⚠️ تحذير: هذا الخطوة اختيارية وخطيرة!</h3>
-                    <p>لا تنفذ هذه الخطوة إلا إذا كنت متأكداً أنك لا تحتاج البيانات!</p>
-                    <p>سيتم حذف جميع سجلات الهدايا بشكل نهائي ولا يمكن استرجاعها!</p>
+                    <h3>⛔ تحذير شديد: هذه الخطوة اختيارية وخطيرة جداً!</h3>
+                    <ul style="margin: 10px 0; line-height: 2;">
+                        <li><strong>❌ لا تنفذ هذه الخطوة إلا إذا كنت متأكداً 100%</strong></li>
+                        <li><strong>❌ سيتم حذف جميع سجلات الهدايا بشكل نهائي</strong></li>
+                        <li><strong>❌ لا يمكن استرجاع البيانات بعد الحذف</strong></li>
+                        <li><strong>✅ إلغاء التثبيت لا يتطلب حذف البيانات</strong></li>
+                        <li><strong>✅ يمكنك إعادة التثبيت لاحقاً والاستفادة من البيانات الموجودة</strong></li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 16px; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 6px;">
+                        💡 <strong>نصيحة:</strong> احتفظ بالبيانات إلا إذا كنت متأكداً أنك لن تحتاجها أبداً
+                    </p>
                 </div>
 
                 <div class="step">
-                    <h3>إذا أردت حذف جداول قاعدة البيانات:</h3>
+                    <h3>إذا قررت حذف البيانات (بعد التأكد):</h3>
                     
-                    <p><strong>أ) الطريقة الآمنة (عبر Laravel):</strong></p>
-                    <div class="code-block"><code>php artisan migrate:rollback --path=packages/Utd/Gifts/database/migrations</code></div>
+                    <p><strong>الطريقة 1: استخدام Rollback (الأكثر أماناً):</strong></p>
+                    <div class="code-block"><code># سيحذف الجداول بترتيب آمن مع مراعاة Foreign Keys
+php artisan migrate:rollback --path=packages/Utd/Gifts/Database/Migrations</code></div>
+                    <div class="info-box">
+                        <p>✅ هذه الطريقة تحترم Foreign Keys وتحذف الجداول بالترتيب الصحيح</p>
+                    </div>
 
-                    <p><strong>ب) الطريقة المباشرة (SQL):</strong></p>
-                    <div class="code-block"><code>DROP TABLE IF EXISTS `gift_logs`;
+                    <p><strong>الطريقة 2: حذف مباشر عبر SQL:</strong></p>
+                    <div class="code-block"><code># احذف الجداول بالترتيب (Foreign Keys أولاً)
+DROP TABLE IF EXISTS `gift_logs`;
 DROP TABLE IF EXISTS `user_gifts`;
 DROP TABLE IF EXISTS `lucky_gifts`;
 DROP TABLE IF EXISTS `gifts`;
 DROP TABLE IF EXISTS `gift_categories`;</code></div>
+                    <div class="warning-box">
+                        <p>⚠️ <strong>انتبه:</strong> تأكد من حذف الجداول بهذا الترتيب لتجنب أخطاء Foreign Keys</p>
+                    </div>
                 </div>
 
-                <!-- Step 8 -->
                 <div class="step">
-                    <h3>حذف صور الهدايا (اختياري)</h3>
+                    <h3>حذف صور الهدايا (اختياري):</h3>
                     <div class="warning-box">
                         <h3>⚠️ تحذير</h3>
-                        <p>تأكد من نسخ الصور قبل الحذف إذا كنت تحتاجها</p>
+                        <p>تأكد من نسخ الصور احتياطياً قبل الحذف إذا كنت قد تحتاجها لاحقاً</p>
                     </div>
-                    <div class="code-block"><code>rm -rf public/storage/gifts
-rm -rf storage/app/public/gifts</code></div>
+                    <div class="code-block"><code># حذف صور الهدايا
+rm -rf public/storage/gifts
+rm -rf storage/app/public/gifts
+rm -rf storage/app/gifts</code></div>
+                </div>
+
+                <div class="info-box">
+                    <h3>💾 الحجم التقريبي للبيانات</h3>
+                    <p>قبل الحذف، تحقق من حجم البيانات:</p>
+                    <div class="code-block"><code># حجم صور الهدايا
+du -sh public/storage/gifts
+du -sh storage/app/public/gifts
+
+# عدد السجلات في كل جدول
+mysql -u username -p database_name -e "
+SELECT 'gifts' AS table_name, COUNT(*) AS count FROM gifts
+UNION SELECT 'gift_logs', COUNT(*) FROM gift_logs
+UNION SELECT 'user_gifts', COUNT(*) FROM user_gifts;"</code></div>
                 </div>
             </div>
 
             <!-- No Code Changes Required -->
-            <div class="info-box">
-                <h3>✨ لا حاجة لتعديل الكود!</h3>
-                <p><strong>النظام مصمم ليكون fail-safe:</strong></p>
-                <ul>
-                    <li>✅ الباكيجات الأخرى تستخدم <code>Contracts</code> وليس الحزمة مباشرة</li>
-                    <li>✅ <code>FeatureServiceProvider</code> يوفر Null implementations تلقائياً</li>
-                    <li>✅ لو تم حذف الحزمة، التطبيق يشتغل عادي مع Null implementations</li>
-                    <li>✅ لا توجد أخطاء أو crashes - فقط الميزات تتوقف</li>
+            <div class="info-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin: 30px 0;">
+                <h3 style="color: white; margin-top: 0;">✨ ماذا يحدث بعد إلغاء التثبيت؟</h3>
+                <p><strong>🎯 النظام مصمم ليكون fail-safe ومتوافق تماماً:</strong></p>
+                <ul style="line-height: 2;">
+                    <li>✅ <strong>البيانات محمية:</strong> لن يتم حذف أي بيانات من قاعدة البيانات تلقائياً</li>
+                    <li>✅ <strong>القوائم تختفي:</strong> قوائم الهدايا في Admin Panel ستختفي تلقائياً</li>
+                    <li>✅ <strong>استخدام Contracts:</strong> الباكيجات الأخرى تستخدم <code style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; color: #fff;">GiftServiceInterface</code> وليس الحزمة مباشرة</li>
+                    <li>✅ <strong>Null Object Pattern:</strong> <code style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; color: #fff;">FeatureServiceProvider</code> يوفر <code style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; color: #fff;">NullGiftService</code> تلقائياً</li>
+                    <li>✅ <strong>لا أخطاء:</strong> التطبيق يعمل بشكل طبيعي، فقط ميزات الهدايا تتوقف</li>
+                    <li>✅ <strong>سهولة الإرجاع:</strong> يمكنك إعادة التثبيت بسهولة مع الاحتفاظ بكل البيانات</li>
                 </ul>
-                <p style="margin-top: 15px;"><strong>💡 يمكنك حذف الحزمة مباشرة بدون تعديل أي كود!</strong></p>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.15); border-radius: 8px; border-right: 4px solid #ffd700;">
+                    <p style="margin: 0; font-size: 16px;"><strong>💡 باختصار:</strong></p>
+                    <p style="margin: 10px 0 0 0; font-size: 15px;">
+                        يمكنك حذف الحزمة مباشرة بدون أي تعديلات على الكود!<br>
+                        النظام سيستمر في العمل بشكل طبيعي، وستبقى البيانات محفوظة،<br>
+                        وقوائم الهدايا ستختفي من Admin Panel تلقائياً.
+                    </p>
+                </div>
             </div>
 
             <!-- Verification -->
             <div class="section">
-                <h2>✅ التحقق من الإلغاء</h2>
+                <h2>✅ التحقق من نجاح إلغاء التثبيت</h2>
                 
                 <div class="checklist">
-                    <h3>قائمة التحقق النهائية</h3>
-                    <ul>
-                        <li>تم حذف الحزمة من composer.json</li>
-                        <li>تم تشغيل composer update بنجاح</li>
-                        <li>تم حذف ملف config/gifts.php</li>
-                        <li>تم حذف Class Aliases من app/Models (إذا كانت موجودة)</li>
-                        <li>تم حذف مجلد packages/Utd/Gifts</li>
-                        <li>تم مسح جميع أنواع الكاش</li>
-                        <li>لا توجد أخطاء عند تشغيل التطبيق</li>
-                        <li>البيانات في قاعدة البيانات لا تزال موجودة (ما لم تحذفها يدوياً)</li>
+                    <h3>📋 قائمة التحقق النهائية</h3>
+                    <ul style="line-height: 2.2;">
+                        <li>✔️ تم حذف <code>"utd/gifts": "*"</code> من قسم require في composer.json</li>
+                        <li>✔️ تم حذف repository الخاص بالحزمة من قسم repositories في composer.json</li>
+                        <li>✔️ تم تشغيل <code>composer update</code> بنجاح بدون أخطاء</li>
+                        <li>✔️ تم تنظيف جميع أنواع الكاش (config, cache, route, view, optimize)</li>
+                        <li>✔️ التطبيق يعمل بدون أخطاء عند التشغيل</li>
+                        <li>✔️ لا توجد رسائل خطأ عند زيارة الصفحات المختلفة</li>
+                        <li>✔️ البيانات في قاعدة البيانات لا تزال محفوظة (إلا إذا حذفتها يدوياً)</li>
+                        <li>✔️ تم حذف config/gifts.php (اختياري)</li>
+                        <li>✔️ تم حذف مجلد packages/Utd/Gifts (اختياري)</li>
                     </ul>
                 </div>
 
                 <div class="step">
-                    <h3>اختبار نهائي</h3>
-                    <div class="code-block"><code># تأكد من عدم وجود أخطاء
+                    <h3>🧪 اختبار شامل للتطبيق</h3>
+                    <p>قم بتشغيل هذه الأوامر للتأكد من عمل كل شيء بشكل صحيح:</p>
+                    <div class="code-block"><code># 1. التأكد من عدم وجود أخطاء في الإعدادات
 php artisan config:cache
-php artisan optimize:clear
 
-# اختبار التطبيق
-php artisan serve</code></div>
+# 2. التأكد من عدم وجود مشاكل في Autoloading
+composer dump-autoload
+
+# 3. اختبار تشغيل التطبيق
+php artisan serve
+
+# 4. فحص الـ Routes (يجب أن يعمل بدون أخطاء)
+php artisan route:list
+
+# 5. فحص الـ Migrations (للتأكد من عدم وجود migrations معلقة)
+php artisan migrate:status</code></div>
+
+                    <div class="info-box">
+                        <h3>💡 ما المتوقع؟</h3>
+                        <ul>
+                            <li>✅ لا يجب أن تظهر أي أخطاء من نوع <code>Class not found</code></li>
+                            <li>✅ التطبيق يعمل بشكل طبيعي كامل</li>
+                            <li>✅ Routes الخاصة بالهدايا لن تكون موجودة (وهذا طبيعي)</li>
+                            <li>✅ الباقات الأخرى (Room, Moments, Reals) تعمل بشكل طبيعي</li>
+                            <li>✅ أي استدعاء لـ <code>GiftServiceInterface</code> سيستخدم <code>NullGiftService</code> تلقائياً</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>🔍 التحقق من composer.lock</h3>
+                    <p>تأكد من أن الحزمة تم حذفها بالكامل:</p>
+                    <div class="code-block"><code># البحث عن الحزمة في composer.lock
+grep -i "utd/gifts" composer.lock
+
+# يجب أن لا يظهر أي نتائج، أو يجب أن تظهر رسالة:
+# (no matches found)</code></div>
                 </div>
             </div>
 
             <!-- Recovery -->
             <div class="section">
-                <h2>🔄 استعادة البيانات (إذا لزم الأمر)</h2>
+                <h2>🔄 إعادة تثبيت الحزمة (استرجاع)</h2>
                 
+                <div class="info-box">
+                    <h3>💡 هل تريد إعادة تثبيت الحزمة؟</h3>
+                    <p>إذا قمت بإلغاء التثبيت ثم غيرت رأيك، يمكنك إعادة التثبيت بسهولة:</p>
+                </div>
+
                 <div class="step">
-                    <h3>استرجاع من النسخة الاحتياطية</h3>
-                    <div class="code-block"><code># استرجاع قاعدة البيانات
-mysql -u username -p database_name < gifts_backup_20260204.sql
+                    <h3>الخطوة 2: إعادة إضافة الحزمة لـ composer (الطريقة السريعة)</h3>
+                    <div class="code-block"><code># إعادة تثبيت الحزمة بأمر واحد
+composer require utd/gifts --ignore-platform-req=ext-redis
 
-# استرجاع الصور
-cp -r ~/backup/gifts_images_20260204/* public/storage/gifts/
+# نشر ملف الإعدادات
+php artisan vendor:publish --tag=gifts-config --force
 
-# إعادة التثبيت
-composer require utd/gifts
+# تشغيل Migrations (إذا لم تكن موجودة)
+php artisan migrate
+
+# تنظيف الكاش
+php artisan config:cache
+php artisan optimize:clear</code></div>
+
+                    <div class="info-box">
+                        <p>✅ <strong>بعد إعادة التثبيت:</strong> قوائم الهدايا ستظهر في Admin Panel تلقائياً!</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>الطريقة اليدوية: إضافة لـ composer.json</h3>
+                    <p>أو أضف السطور التالية يدوياً ثم نفذ composer install:</p>
+                    
+                    <p><strong>في قسم require:</strong></p>
+                    <div class="code-block"><code>"utd/gifts": "*"</code></div>
+
+                    <p><strong>في قسم repositories:</strong></p>
+                    <div class="code-block"><code>{
+    "type": "path",
+    "url": "./packages/Utd/Gifts",
+    "options": {
+        "symlink": true
+    }
+}</code></div>
+
+                    <p style="margin-top: 15px;"><strong>ثم نفذ:</strong></p>
+                    <div class="code-block"><code>composer install --ignore-platform-req=ext-redis
+php artisan vendor:publish --tag=gifts-config --force
 php artisan migrate
 php artisan config:cache</code></div>
+                </div>
+
+                <div class="step">
+                    <h3>استرجاع النسخة الاحتياطية (إذا كنت قد حذفت البيانات)</h3>
+                    <div class="warning-box">
+                        <p>⚠️ فقط إذا كنت قد حذفت جداول قاعدة البيانات</p>
+                    </div>
+                    <div class="code-block"><code># استرجاع قاعدة البيانات من النسخة الاحتياطية
+mysql -u username -p database_name < gifts_backup_20260204.sql
+
+# استرجاع صور الهدايا
+cp -r ~/backup/gifts_images_20260204/* public/storage/gifts/
+cp -r ~/backup/gifts_images_20260204/* storage/app/public/gifts/</code></div>
+                </div>
+
+                <div class="info-box" style="background: #d4edda; border-right: 4px solid #28a745;">
+                    <h3>✅ ميزة حفظ البيانات</h3>
+                    <p><strong>إذا لم تحذف جداول قاعدة البيانات:</strong></p>
+                    <ul>
+                        <li>✅ جميع الهدايا السابقة ستكون متاحة فوراً</li>
+                        <li>✅ سجلات الهدايا المُرسلة محفوظة</li>
+                        <li>✅ صور الهدايا لا تزال موجودة</li>
+                        <li>✅ لا حاجة لإعادة إدخال أي بيانات!</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>💡 هذا هو السبب في عدم حذف البيانات افتراضياً!</strong></p>
                 </div>
             </div>
 
             <!-- Common Issues -->
             <div class="section">
-                <h2>❗ المشاكل الشائعة</h2>
+                <h2>❗ المشاكل الشائعة والحلول</h2>
                 
                 <div class="warning-box">
-                    <h3>مشكلة: Class not found بعد الإلغاء</h3>
+                    <h3>مشكلة 1: Class 'Utd\Gifts\...' not found</h3>
+                    <p><strong>السبب:</strong> الكاش لم يتم تنظيفه بعد إلغاء التثبيت</p>
                     <p><strong>الحل:</strong></p>
                     <div class="code-block"><code>composer dump-autoload
 php artisan config:clear
-php artisan cache:clear</code></div>
+php artisan cache:clear
+php artisan optimize:clear
+php artisan route:clear
+php artisan view:clear</code></div>
                 </div>
 
                 <div class="warning-box">
-                    <h3>مشكلة: أريد حذف بيانات قاعدة البيانات</h3>
+                    <h3>مشكلة 2: Routes الخاصة بالهدايا لا تزال موجودة</h3>
+                    <p><strong>السبب:</strong> Route cache لم يتم مسحه</p>
                     <p><strong>الحل:</strong></p>
-                    <p>راجع القسم "🗄️ حذف قاعدة البيانات (اختياري)" في الأعلى</p>
-                    <div class="code-block"><code># إذا أردت حذفها يدوياً
-DROP TABLE IF EXISTS gift_logs;
-DROP TABLE IF EXISTS gifts;</code></div>
+                    <div class="code-block"><code>php artisan route:clear
+php artisan route:cache</code></div>
                 </div>
 
                 <div class="warning-box">
-                    <h3>مشكلة: قوائم الهدايا لا تزال ظاهرة</h3>
+                    <h3>مشكلة 3: composer update لا يحذف الحزمة</h3>
+                    <p><strong>السبب:</strong> الحزمة لا تزال في composer.json أو مطلوبة من حزمة أخرى</p>
                     <p><strong>الحل:</strong></p>
-                    <div class="code-block"><code>php artisan cache:clear
-php artisan view:clear
+                    <div class="code-block"><code># 1. تأكد من حذفها من composer.json (require & repositories)
+# 2. جرّب إزالتها بالقوة
+composer remove utd/gifts --with-all-dependencies
+
+# 3. إذا استمرت المشكلة، احذف composer.lock وأعد التثبيت
+rm composer.lock
+composer install</code></div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>مشكلة 4: أريد حذف البيانات ولكن توجد Foreign Keys</h3>
+                    <p><strong>السبب:</strong> جداول أخرى تعتمد على جداول الهدايا</p>
+                    <p><strong>الحل:</strong></p>
+                    <div class="code-block"><code># احذف الجداول بالترتيب الصحيح (من الأكثر اعتمادية للأقل)
+SET FOREIGN_KEY_CHECKS=0;
+
+DROP TABLE IF EXISTS `gift_logs`;
+DROP TABLE IF EXISTS `user_gifts`;
+DROP TABLE IF EXISTS `lucky_gifts`;
+DROP TABLE IF EXISTS `gifts`;
+DROP TABLE IF EXISTS `gift_categories`;
+
+SET FOREIGN_KEY_CHECKS=1;</code></div>
+                    <div class="danger-box" style="margin-top: 10px;">
+                        <p>⚠️ <strong>انتبه:</strong> هذا الأمر يُعطّل فحص Foreign Keys مؤقتاً - استخدمه بحذر!</p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>مشكلة 5: Config file لم يُحذف تلقائياً</h3>
+                    <p><strong>السبب:</strong> Laravel لا يحذف ملفات الإعدادات المنشورة تلقائياً</p>
+                    <p><strong>الحل:</strong></p>
+                    <div class="code-block"><code># احذف الملف يدوياً
+rm config/gifts.php
+
+# نظف الكاش
 php artisan config:clear</code></div>
+                </div>
+
+                <div class="warning-box">
+                    <h3>مشكلة 6: ظهور أخطاء في Logs بعد إلغاء التثبيت</h3>
+                    <p><strong>السبب:</strong> بعض الباقات تحاول استدعاء Gift Service</p>
+                    <p><strong>الحل:</strong></p>
+                    <div class="info-box" style="margin-top: 10px;">
+                        <p>✅ <strong>لا حاجة للقلق!</strong> هذا طبيعي في الفترة الانتقالية:</p>
+                        <ul>
+                            <li>النظام يستخدم <code>NullGiftService</code> تلقائياً</li>
+                            <li>الأخطاء ستختفي بعد تنظيف الكاش</li>
+                            <li>قم بتنظيف الـ Logs القديمة:</li>
+                        </ul>
+                        <div class="code-block"><code>php artisan log:clear
+# أو يدوياً
+rm storage/logs/laravel-*.log</code></div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>💡 نصائح لتجنب المشاكل</h3>
+                    <ul style="line-height: 2;">
+                        <li>✅ دائماً نظّف الكاش بعد إلغاء التثبيت</li>
+                        <li>✅ استخدم <code>composer dump-autoload</code> بعد أي تغيير</li>
+                        <li>✅ راجع <code>storage/logs</code> للتأكد من عدم وجود أخطاء</li>
+                        <li>✅ اختبر التطبيق جيداً قبل نشره للإنتاج</li>
+                        <li>✅ احتفظ بنسخة احتياطية قبل حذف البيانات</li>
+                    </ul>
                 </div>
             </div>
         </div>

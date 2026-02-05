@@ -2,10 +2,28 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
- * Class Alias for backward compatibility
- * This model now extends from the Gifts package
+ * Safe Class Alias for backward compatibility
+ * Uses Null Object Pattern when Gifts package is not installed
  * 
  * @deprecated Use Utd\Gifts\Entities\UserGift instead
  */
-class_alias(\Utd\Gifts\Entities\UserGift::class, UserGift::class);
+if (class_exists('\Utd\Gifts\Entities\UserGift')) {
+    class_alias(\Utd\Gifts\Entities\UserGift::class, 'App\Models\UserGift');
+} else {
+    /**
+     * Null implementation when Gifts package is not installed
+     */
+    class UserGift extends Model
+    {
+        protected $table = 'user_gifts';
+        protected $guarded = [];
+        
+        public function save(array $options = [])
+        {
+            return false;
+        }
+    }
+}
