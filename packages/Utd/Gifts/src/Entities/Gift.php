@@ -6,9 +6,7 @@ use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Gifts\Support\ModelResolver;
 
-/**
- * Gift Model
- */
+
 class Gift extends Model
 {
     use TimestampsWithTimezone;

@@ -53,8 +53,8 @@
         "utd/agency": "*",
         "utd/moments": "*",
         "utd/reals": "*",
-        "utd/room": "*",
-        "utd/gifts": "*"
+        "utd/gifts": "*",
+        "utd/room": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -141,6 +141,7 @@
                 "symlink": true
             }
         },
+       
         {
             "type": "path",
             "url": "packages/Utd/Reals",
@@ -150,9 +151,12 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/Room"
-        },
-        {
+            "url": "packages/Utd/Room",
+            "options": {
+                "symlink": true
+            }
+        }
+        ,{
             "type": "path", "url": "./packages/Utd/Gifts"
         }
     ]
