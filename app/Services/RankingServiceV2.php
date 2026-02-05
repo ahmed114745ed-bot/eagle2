@@ -19,8 +19,6 @@ use App\Helpers\UserLevelHelper;
 use Illuminate\Pagination\Paginator;
 use App\Repositories\RankingRepositoryV2;
 use App\Http\Resources\GameRankingResource;
-use App\Tik\Repositories\GiftLogRepository;
-use Modules\CP\Transformers\RankingResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\CP\Transformers\TopRankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
@@ -30,6 +28,9 @@ use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
+use App\Contracts\GiftLogRepositoryContract;
+
+// Use the package repository if available, fallback to old one
 
 class rankingServiceV2
 {
@@ -37,7 +38,7 @@ class rankingServiceV2
 
     public function __construct(
         RankingRepositoryV2 $rankingRepo,
-        private readonly GiftLogRepository $GiftLogRepository,
+        private readonly ?GiftLogRepositoryContract $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementContract $achievementService,
         RepositoriesCpRepository $cpRepository

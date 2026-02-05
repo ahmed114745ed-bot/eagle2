@@ -14,12 +14,10 @@ use Utd\Gifts\Support\ModelResolver;
 /**
  * GiftsService
  * 
- * Implementation حقيقي لنظام الهدايا مع دعم ديناميكي للـ Models الخارجية
  */
 class GiftsService implements GiftsContract
 {
     /**
-     * الحصول على هدايا المستخدم
      * 
      * @param int $userId
      * @return Collection
@@ -45,7 +43,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * إرسال هدية
      * 
      * @param int $senderId
      * @param int $receiverId
@@ -56,8 +53,7 @@ class GiftsService implements GiftsContract
      */
     public function sendGift($senderId, $receiverId, $giftId, $quantity = 1, array $options = [])
     {
-        // هذه الدالة تحتاج implementation كامل
-        // سيتم نقله من GiftLogController
+      
         
         $gift = Gift::find($giftId);
         
@@ -65,12 +61,10 @@ class GiftsService implements GiftsContract
             return ['success' => false, 'message' => 'Gift not found'];
         }
 
-        // التحقق من القدرة على الإرسال
         if (!$this->canSendGift($senderId, $giftId, $quantity)) {
             return ['success' => false, 'message' => 'Cannot send gift'];
         }
 
-        // إنشاء log للهدية
         $giftLog = GiftLog::create(array_merge([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
@@ -84,7 +78,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على الهدايا حسب الفئة
      * 
      * @param int|null $categoryId
      * @return Collection
@@ -103,7 +96,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على سجلات الهدايا
      * 
      * @param array $filters
      * @return mixed
@@ -137,7 +129,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على هدية بالـ ID
      * 
      * @param int $giftId
      * @return mixed
@@ -148,7 +139,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على جميع الهدايا
      * 
      * @return Collection
      */
@@ -177,7 +167,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * التحقق من إمكانية إرسال الهدية
      * 
      * @param int $userId
      * @param int $giftId
@@ -199,29 +188,24 @@ class GiftsService implements GiftsContract
             return false;
         }
 
-        // التحقق من الرصيد
         $totalPrice = $gift->price * $quantity;
         if ($user->coins < $totalPrice) {
             return false;
         }
 
-        // التحقق من الحد الأقصى للكمية
         $maxQuantity = config('gifts.max_gift_quantity', 9999);
         if ($quantity > $maxQuantity) {
             return false;
         }
 
-        // التحقق من VIP Level
         if ($gift->vip_level > 0) {
             $vipTrait = ModelResolver::getTrait('vip_level');
             
-            // إذا المستخدم عنده VIP Trait
             if ($vipTrait && in_array($vipTrait, class_uses($user))) {
                 if ($user->vip_level < $gift->vip_level) {
                     return false;
                 }
             } else {
-                // إذا ما فيش VIP System أصلاً
                 return false;
             }
         }

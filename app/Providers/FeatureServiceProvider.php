@@ -16,6 +16,9 @@ use App\Contracts\UserAchievementContract;
 use App\Contracts\RealsContract;
 use App\Services\Null\NullEntranceRoomService;
 use App\Services\Null\NullNewRoomBoomGiftService;
+use App\Contracts\GiftLogRepositoryContract;
+use App\Contracts\GiftRepositoryContract;
+use App\Services\Null\NullEnteranceRoomService;
 use App\Services\Null\NullRoomGameService;
 use App\Services\Null\NullRoomService;
 use App\Services\Null\NullRoomRepository;
@@ -27,6 +30,8 @@ use App\Services\Null\NullAchievementService;
 use App\Services\Null\NullAchievementLevelService;
 use App\Services\Null\NullUserAchievementService;
 use App\Services\Null\NullRealsService;
+use App\Services\Null\NullGiftLogRepository;
+use App\Services\Null\NullGiftRepository;
 use Illuminate\Support\ServiceProvider;
 
 class FeatureServiceProvider extends ServiceProvider
@@ -133,6 +138,21 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 NewRoomBoomGiftServiceContract::class,
                 NullNewRoomBoomGiftService::class
+                   );
+        } 
+        // Gift Log Repository Feature
+        if (!$this->app->bound(GiftLogRepositoryContract::class)) {
+            $this->app->singleton(
+                GiftLogRepositoryContract::class,
+                NullGiftLogRepository::class
+            );
+        }
+
+        // Gift Repository Feature
+        if (!$this->app->bound(GiftRepositoryContract::class)) {
+            $this->app->singleton(
+                GiftRepositoryContract::class,
+                NullGiftRepository::class
             );
         }
     }

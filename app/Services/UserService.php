@@ -37,7 +37,6 @@ use Modules\CP\Repositories\CpRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
-use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\ProfileRepository;
 use Modules\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\FamilyUserRepository;
@@ -57,15 +56,15 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
+use App\Contracts\GiftLogRepositoryContract;
 
 class UserService
 {
-
     public function __construct(
         private readonly VipRepository $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly UserSalaryRepository $userSalaryRepository,
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,

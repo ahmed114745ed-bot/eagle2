@@ -15,14 +15,19 @@ use Illuminate\Database\Eloquent\Collection;
 use App\Helpers\Common;
 use App\Tik\Repositories\WareRepository;
 use App\Http\Resources\MomentGiftResource;
-use App\Tik\Repositories\GiftLogRepository;
 use Modules\Moment\Entities\MomentUserGift;
 use App\Http\Resources\AudioGiftsListResource;
+use App\Contracts\GiftLogRepositoryContract;
+
 class WalletService
 {
     protected $walletRepo;
 
-    public function __construct(WalletRepositoryInterface $walletRepo ,private readonly GiftLogRepository $GiftLogRepository,private readonly UserLogRepository $userCoinLogRepository)
+    public function __construct(
+        WalletRepositoryInterface $walletRepo,
+        private readonly ?GiftLogRepositoryContract $GiftLogRepository,
+        private readonly UserLogRepository $userCoinLogRepository
+    )
     {
         $this->walletRepo = $walletRepo;
     }

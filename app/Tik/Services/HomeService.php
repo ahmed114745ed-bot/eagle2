@@ -15,11 +15,11 @@ use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
-use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Log;
 use Modules\Vip\Repositories\OvipRepository;
 use Modules\Vip\Repositories\UserVipRepository;
+use App\Contracts\GiftLogRepositoryContract;
 
 
 class HomeService
@@ -27,7 +27,7 @@ class HomeService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly ImageRepository $imageRepository,
         private readonly OvipRepository $ovipRepository,
         private readonly WareRepository $wareRepository,

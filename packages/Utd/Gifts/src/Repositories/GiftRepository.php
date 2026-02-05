@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Tik\Repositories;
+namespace Utd\Gifts\Repositories;
 
 use App\Models\Gift;
 use Illuminate\Support\Facades\Auth;
+use App\Contracts\GiftRepositoryContract;
 
 
 
-class GiftRepository extends AbstractRepository
+class GiftRepository extends AbstractRepository implements GiftRepositoryContract
 {
     public function __construct()
     {

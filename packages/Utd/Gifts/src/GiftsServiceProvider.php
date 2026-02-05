@@ -4,7 +4,15 @@ namespace Utd\Gifts;
 
 use App\Contracts\GiftsContract;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Utd\Gifts\Services\GiftsService;
+use Utd\Gifts\Contracts\GiftSenderInterface;
+use Utd\Gifts\Services\GiftSenderService;
+use Utd\Gifts\Events\GiftSent;
+use Utd\Gifts\Listeners\IncrementReceiverDiamond;
+use Utd\Gifts\Listeners\SendGiftNotification;
+use Utd\Gifts\Listeners\UpdateAgencySalary;
+use Utd\Gifts\Listeners\UpdateUserLevels;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 
@@ -20,10 +28,36 @@ class GiftsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Bind the GiftsContract to the real implementation
+        // Bind Repository Contracts
+        $this->app->singleton(\App\Contracts\GiftLogRepositoryContract::class, \Utd\Gifts\Repositories\GiftLogRepository::class);
+        $this->app->singleton(\App\Contracts\GiftRepositoryContract::class, \Utd\Gifts\Repositories\GiftRepository::class);
+
+        // Bind GiftSenderInterface (NEW - Main service)
+        $this->app->singleton(GiftSenderInterface::class, GiftSenderService::class);
+
+        // Bind old GiftsContract for backward compatibility
         $this->app->bind(GiftsContract::class, function($app) {
             return new GiftsService();
         });
+
+        // Bind old services for backward compatibility
+        $this->app->bind(\Utd\Gifts\Services\GiftService::class, function($app) {
+            return new \Utd\Gifts\Services\GiftService(
+                $app->make(\Utd\Gifts\Repositories\GiftRepository::class)
+            );
+        });
+
+        $this->app->bind(\Utd\Gifts\Services\GiftLogService::class, function($app) {
+            return $app->make(\Utd\Gifts\Services\GiftLogService::class);
+        });
+
+        if (!class_exists('App\Tik\Services\GiftService', false)) {
+            $this->app->bind('App\Tik\Services\GiftService', \Utd\Gifts\Services\GiftService::class);
+        }
+        
+        if (!class_exists('App\Tik\Services\GiftLogService', false)) {
+            $this->app->bind('App\Tik\Services\GiftLogService', \Utd\Gifts\Services\GiftLogService::class);
+        }
 
         // Merge config
         $this->mergeConfigFrom(
@@ -67,6 +101,22 @@ class GiftsServiceProvider extends ServiceProvider
 
         // Register observers
         $this->registerObservers();
+
+        // Register event listeners (NEW)
+        $this->registerEventListeners();
+    }
+
+    /**
+     * Register event listeners
+     */
+    protected function registerEventListeners(): void
+    {
+        Event::listen(GiftSent::class, [
+            IncrementReceiverDiamond::class,
+            SendGiftNotification::class,
+            UpdateAgencySalary::class,
+            UpdateUserLevels::class,
+        ]);
     }
 
     /**

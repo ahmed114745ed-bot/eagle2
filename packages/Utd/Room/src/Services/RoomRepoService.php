@@ -20,27 +20,30 @@ use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Repositories\RoomRepository;
 use App\Tik\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
-use App\Tik\Repositories\GiftLogRepository;
 use Utd\Room\Repositories\RoomRepoInterface;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\TaskStream\Services\TaskStreamService;
+use App\Contracts\GiftLogRepositoryContract;
 
 class RoomRepoService
 {
     use MultiQueryPagination;
     protected $repo;
+    
     /**
      * @param Model $model
      */
     public function __construct(
         private readonly RoomRepository $repository,
         private readonly UserRepository $userRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly RequestBackgroundImageRepository $requestBackgroundImageRepository,
         private readonly CountryRepository $countryRepository,
         RoomRepoInterface $repo,
-    ) {}
+    ) {
+        $this->repo = $repo;
+    }
 
     public function getAllRooms($request)
     {
