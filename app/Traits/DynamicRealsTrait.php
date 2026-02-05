@@ -49,6 +49,22 @@ trait DynamicRealsTrait
             ->whereRaw('1 = 0');
     }
 
+    /**
+     * Snake case alias for realComments
+     */
+    public function real_comments(): HasMany
+    {
+        return $this->realComments();
+    }
+
+    /**
+     * Snake case alias for realLikes
+     */
+    public function real_likes(): HasMany
+    {
+        return $this->realLikes();
+    }
+
     public function reelSetting(): HasOne
     {
         if ($this->hasRealsFeature()) {
