@@ -3,9 +3,7 @@
 namespace App\Tik\Services;
 
 /**
- * GiftLogService - Wrapper for package service
  * 
- * Uses package service if available, otherwise throws meaningful error
  */
 class GiftLogService
 {
@@ -13,7 +11,6 @@ class GiftLogService
 
     public function __construct()
     {
-        // Try to use package service if available
         if (class_exists(\Utd\Gifts\Services\GiftLogService::class)) {
             try {
                 $this->packageService = app(\Utd\Gifts\Services\GiftLogService::class);
