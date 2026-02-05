@@ -46,6 +46,9 @@ use App\Observers\FamilyUserObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Observers\UserSallaryObserver;
 use Illuminate\Support\Facades\Config;
+use App\Contracts\ShippingAgencyRepositoryInterface;
+use App\Repositories\NullShippingAgencyRepository;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Gifts\LuckyGiftService;
 use App\Observers\AgencyJoinRequestObserver;
@@ -81,6 +84,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('RoomHelper', fn($app) => new RoomHelper());
         $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
+        
+        if (class_exists('Utd\\Agency\\Repositories\\ShippingAgencyRepository')) {
+            $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);
+        } else {
+            $this->app->bind(ShippingAgencyRepositoryInterface::class, NullShippingAgencyRepository::class);
+        }
 
         // Register custom event dispatcher for Octane broadcaster refresh
         if (\App\Services\OctaneBroadcasterService::isOctane()) {
