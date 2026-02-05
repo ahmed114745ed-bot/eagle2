@@ -33,7 +33,7 @@ class WalletService
         $this->walletRepo = $walletRepo;
     }
 
-    public function transfer(int $fromUserId, int $toUserId, float $amount , float $usd )
+    public function transfer(int $fromUserId, int $toUserId, float $amount, float $usd)
     {
 
         $app_feature = \Cache::get('host_agency');
@@ -47,7 +47,7 @@ class WalletService
                 ?? $this->walletRepo->createWallet(['user_id' => $fromUserId, 'balance' => 0]);
 
             $available = wallet_available_by_wallet($fromWallet);
-            
+
             \Log::info('Transfer - Wallet Info', [
                 'from_user_id' => $fromUserId,
                 'to_user_id' => $toUserId,
@@ -58,7 +58,7 @@ class WalletService
                 'wallet_pending_amount' => $fromWallet->pending_amount,
                 'available' => $available,
             ]);
-            
+
             if ($available < $usd) {
                 throw new \Exception('Insufficient balance.');
             }
@@ -92,17 +92,19 @@ class WalletService
                 UserCoinLogType::TRANSFER,
                 authId: $fromUserId,
             );
+            if ($toUserId != $fromUserId) {
+                $this->walletRepo->createLog([
+                    'wallet_id' => $toWallet->id,
+                    'user_id' => $toUserId,
+                    'amount' => $usd,
+                    'operation' => 'transfer',
+                    'type' => 'transfer',
+                    'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
+                    'after_amount' =>  wallet_available_by_user($toUserId),
+                    'related_id'  =>  $fromUserId
+                ]);
+            }
 
-            $this->walletRepo->createLog([
-                'wallet_id' => $toWallet->id,
-                'user_id' => $toUserId,
-                'amount' => $usd,
-                'operation' => 'transfer',
-                'type' => 'transfer',
-                'before_amount' => $toWallet->balance -  $toWallet->cut_amount - $toWallet->pending_amount,
-                'after_amount' =>  wallet_available_by_user($toUserId),
-                'related_id'  =>  $fromUserId
-            ]);
 
             if ($receiver instanceof User) {
                 (new UserAchievementService())->insertCharging($receiver, $amount);
