@@ -118,7 +118,7 @@ class MilestoneHelper
             case 'ware':
                 $ware = Ware::find($mr->rewardable_id);
                 if (!$ware) { break;}
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature:$mr);
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType);
                 break;
 
             case 'badge':
