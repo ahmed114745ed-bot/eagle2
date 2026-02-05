@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Schema;
 /**
  * AgencyPackageHelper
  * 
- * مساعد للتحقق من وجود حزمة الوكالات والتعامل معها بأمان
  * Helper to check agency package existence and handle it safely
  */
 class AgencyPackageHelper
