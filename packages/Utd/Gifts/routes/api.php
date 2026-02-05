@@ -31,7 +31,12 @@ Route::prefix('api/v1')->middleware(['api', 'auth:sanctum'])->group(function () 
     });
 });
 
-Route::prefix('gifts')->group(function () {
+
+
+Route::prefix('api/')->middleware(['api', 'auth:sanctum'])->group(function () {
+    
+    // Gift Routes
+    Route::prefix('gifts')->group(function () {
         Route::get('/', 'Utd\Gifts\Http\Controllers\Api\GiftController@index');
         Route::get('/v2', 'Utd\Gifts\Http\Controllers\Api\GiftController@getByCategory');
         Route::get('/images', 'Utd\Gifts\Http\Controllers\Api\GiftController@get_images');
@@ -53,3 +58,4 @@ Route::prefix('gifts')->group(function () {
         Route::get('/', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@index');
         Route::get('/report', 'Utd\Gifts\Http\Controllers\Api\GiftLogController@report');
     });
+});
