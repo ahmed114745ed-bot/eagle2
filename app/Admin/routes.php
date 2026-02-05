@@ -196,7 +196,7 @@ Route::group(
 
         // Route::get('agency/install', [PackageController::class, 'install'])->name('agency.install');
         // Route::get('agency/uninstall', [PackageController::class, 'uninstall'])->name('agency.uninstall');
-    
+
         Route::post('targe-percentage', [AddTargetToJsonController::class, 'targetPercentage'])->name('target-percentage');
 
         Route::resource('reset-salary', ResetUserSalaryController::class);
@@ -217,7 +217,7 @@ Route::group(
         Route::post('create-preview-user', [App\Admin\Controllers\AuthController::class, "createPreviewUser"]);
 
         Route::resource('rooms-preview', TestController::class); //
-    
+
         // Agency routes - only load if package is installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
             Route::get('agency-user-job/{agency_id}', 'AgencyUserJobController@index');
@@ -278,7 +278,7 @@ Route::group(
         Route::post('/pack/free', [UsersAppController::class, 'free'])->name('pack.free');
 
         //        Route::get('users/profile/{id}', [UsersAppController::class, 'profile'])->name('user.profile');
-    
+
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
@@ -558,7 +558,7 @@ Route::group(
         // room-vips and room-target moved to packages/Utd/Room/Routes/web.php
 
         // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
-    
+
         // Agency controllers group - only if package installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
             Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
@@ -598,7 +598,7 @@ Route::group(
         Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
         Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
         Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
-        // rooms/{id}/image moved to packages/Utd/Room/Routes/web.php
+        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
@@ -607,7 +607,7 @@ Route::group(
         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
 
         // Agency manager routes - only if package installed
-    
+
 
         Route::resource('core-wallets', CoreWalletsController::class);
         Route::resource('core-wallet-transactions', CoreWalletTransactionController::class);
@@ -626,9 +626,9 @@ Route::group(
         //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
         //             ->icon('fa-file');
         //     }));
-    
+
         // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-    
+
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);

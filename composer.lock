@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df05374b494232f1e1d33dd346082291",
+    "content-hash": "6fc551a3b4d14499c806220fcdcfeb48",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14510,47 +14510,6 @@
             }
         },
         {
-            "name": "utd/room",
-            "version": "dev-room-package",
-            "dist": {
-                "type": "path",
-                "url": "packages/Utd/Room",
-                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
-            },
-            "require": {
-                "illuminate/support": "^10.0|^11.0",
-                "php": "^8.1"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Utd\\Room\\RoomServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Utd\\Room\\": "src/",
-                    "Utd\\Room\\Database\\": "Database/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "UTD Team",
-                    "email": "dev@utd.com"
-                }
-            ],
-            "description": "Room Laravel Package - Core room functionality including microphones, visitors, categories, and more",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15322,8 +15281,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20,
-        "utd/room": 20
+        "fruitcake/laravel-cors": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

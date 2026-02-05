@@ -60,7 +60,6 @@ Route::group(
             $room->update(['pin' => !$room->pin]);
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
-        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
 
         // Room Category Routes
         Route::resource('categories', RoomCategoryController::class);
