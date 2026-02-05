@@ -29,7 +29,7 @@ use App\Admin\Extensions\Permission;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
-use App\Helpers\Common;
+use Utd\Agency\Helpers\AdminHelper;
 
 
 class AgencyController extends MainController
@@ -565,7 +565,7 @@ class AgencyController extends MainController
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
             ->display(fn() => $this->is_frozen ? 1 : 0)
-            ->switch(Common::getSwitchStates())->sortable();
+            ->switch(AdminHelper::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
            $creator = $this->creator;
