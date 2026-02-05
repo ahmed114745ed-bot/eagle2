@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Tik\Repositories;
+namespace Utd\Gifts\Repositories;
 
 use Carbon\Carbon;
 use App\Models\GiftLog;
 use Illuminate\Support\Facades\DB;
+use App\Contracts\GiftLogRepositoryContract;
 
 
-class GiftLogRepository extends AbstractRepository
+class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract
 {
     public function __construct()
     {

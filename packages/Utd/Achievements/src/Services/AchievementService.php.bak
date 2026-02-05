@@ -1,26 +1,3 @@
-<?php
-
-namespace Utd\Achievements\Services;
-
-use App\Contracts\AchievementContract;
-use App\Models\User;
-use App\Helpers\Common;
-use Utd\Achievements\Enums\TargetType;
-use Utd\Achievements\Entities\Achievement;
-use Utd\Achievements\Repositories\AchievementRepository;
-use Utd\Achievements\Repositories\GiftAchievementRepository;
-use Utd\Achievements\Repositories\AchievementLevelRepository;
-use Utd\Achievements\Repositories\UserAchievementLevelRepository;
-use App\Contracts\GiftRepositoryContract;
-
-class AchievementService implements AchievementContract
-{
-    public function __construct(
-        private readonly AchievementRepository          $achievementRepository,
-        private readonly AchievementLevelRepository     $achievementLevelRepository,
-        private readonly GiftAchievementRepository      $giftAchievementRepository,
-        private readonly ?GiftRepositoryContract        $giftRepository,
-        private readonly UserAchievementLevelRepository $userAchievementLevelRepository,
     )
     {
     }

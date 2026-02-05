@@ -3,17 +3,16 @@
 namespace App\Tik\Services;
 
 use App\Http\Resources\AudioGiftsListResource;
-use App\Tik\Repositories\GiftLogRepository;
 use Modules\UsersWallet\Repositories\Eloquent\UserLogRepository;
 use Utd\Moments\Entities\MomentUserGift;
 use Utd\Moments\Transformers\MomentGiftResource;
+use App\Contracts\GiftLogRepositoryContract;
 
 
 class WalletStatisticService
 {
-
     public function __construct(
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly UserLogRepository $userCoinLogRepository
     ) {}
 

@@ -19,7 +19,6 @@ use App\Repositories\RankingRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\GameRankingResource;
 
-use App\Tik\Repositories\GiftLogRepository;
 use Modules\CP\Transformers\RankingResource;
 use App\Http\Resources\RankingUserV2Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -33,6 +32,7 @@ use App\Http\Resources\RankingGameCollectionResource;
 use App\Contracts\UserAchievementContract;
 use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
+use App\Contracts\GiftLogRepositoryContract;
 
 class RankingService
 {
@@ -41,7 +41,7 @@ class RankingService
 
     public function __construct(
         RankingRepository $rankingRepo,
-        private readonly GiftLogRepository $GiftLogRepository,
+        private readonly ?GiftLogRepositoryContract $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementContract $achievementService,
         RepositoriesCpRepository $cpRepository

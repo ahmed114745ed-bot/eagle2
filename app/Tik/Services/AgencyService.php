@@ -23,7 +23,6 @@ use App\Tik\Repositories\AdminRepository;
 use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\FollowRepository;
 use App\Tik\Repositories\TargetRepository;
-use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\HistoryRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Notification;
@@ -44,6 +43,7 @@ use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Utd\Agency\Transformers\AgencyMonthlyHostResource;
+use App\Contracts\GiftLogRepositoryContract;
 
 
 
@@ -61,7 +61,7 @@ class AgencyService
         private readonly HistoryRepository $historyRepository,
         private readonly AdditionalInfoRepository $additionalInfoRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
-        private readonly GiftLogRepository $giftLogRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
         private readonly ProfileVisitorRepository $profileVisitorRepository,
         private readonly FollowRepository $followRepository,
         private readonly LeaveAgencyRequestRepository $leaveAgencyRequestRepository,

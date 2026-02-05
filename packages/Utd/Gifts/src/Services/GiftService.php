@@ -1,107 +1,59 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Utd\Gifts\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Storage;
+use Utd\Gifts\Repositories\GiftRepository;
 
-/**
- * GiftService - Wrapper for package service
- * 
- * Uses package service if available, otherwise provides fallback functionality
- */
 class GiftService
 {
-    private $giftRepository;
-    private $packageService;
 
-    public function __construct()
-    {
-        // Try to use package service if available
-        if (class_exists(\Utd\Gifts\Services\GiftService::class)) {
-            try {
-                $this->packageService = app(\Utd\Gifts\Services\GiftService::class);
-            } catch (\Exception $e) {
-                // Package not available, will use local implementation
-            }
-        }
-
-        // Fallback to local repository if package not available
-        if (!$this->packageService) {
-            if (class_exists(\Utd\Gifts\Repositories\GiftRepository::class)) {
-                $this->giftRepository = app(\Utd\Gifts\Repositories\GiftRepository::class);
-            } elseif (class_exists(\App\Tik\Repositories\GiftRepository::class)) {
-                $this->giftRepository = app(\App\Tik\Repositories\GiftRepository::class);
-            }
-        }
-    }
+    public function __construct(
+        private readonly GiftRepository $giftRepository,
+    ) {}
 
     public function index($type)
     {
-        if ($this->packageService) {
-            return $this->packageService->index($type);
-        }
-        
-        return $this->giftRepository?->all($type) ?? collect();
+        return $this->giftRepository->all($type);
     }
 
-    public function getByCategory($categoryId, $typ)
+    public function getByCategory($categoryId ,$typ)
     {
-        if ($this->packageService) {
-            return $this->packageService->getByCategory($categoryId, $typ);
-        }
-        
-        return $this->giftRepository?->getByCategory($categoryId, $typ) ?? collect();
+        return $this->giftRepository->getByCategory($categoryId ,$typ);
     }
     
     public function get_images()
     {
-        if ($this->packageService) {
-            return $this->packageService->get_images();
-        }
-        
-        return $this->giftRepository?->get_images() ?? collect();
+        return $this->giftRepository->get_images();
     }
     
     public function allGift($page, $perPage)
     {
-        if ($this->packageService) {
-            return $this->packageService->allGift($page, $perPage);
-        }
-        
-        return $this->giftRepository?->allGifts($page, $perPage) ?? collect();
+        return $this->giftRepository->allGifts($page, $perPage);
     }
+
+
 
     public function show($giftId)
     {
-        if ($this->packageService) {
-            return $this->packageService->show($giftId);
-        }
-        
-        return $this->giftRepository?->findByGiftId($giftId);
+        return $this->giftRepository->findByGiftId($giftId);
     }
 
-    public function create($request)
+   
+    public function create( $request)
     {
-        if ($this->packageService) {
-            return $this->packageService->create($request);
-        }
-
-        if (!$this->giftRepository) {
-            throw new \Exception('Gift repository not available');
-        }
-        
         if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->file('img'));
         } elseif($request->has('img')) {
-            $image = httpImage($request->img);
+            $image =    httpImage($request->img);
         }
        
         if ($request->hasFile('show_img')) {
             $showImg = Common::upload('images', $request->file('show_img'));
         } elseif($request->has('show_img')) {
-            $showImg = httpImage($request->show_img);
+            $showImg =   httpImage($request->show_img);
         }
 
         $data = [
@@ -133,14 +85,6 @@ class GiftService
 
     public function update($request)
     {
-        if ($this->packageService) {
-            return $this->packageService->update($request);
-        }
-
-        if (!$this->giftRepository) {
-            throw new \Exception('Gift repository not available');
-        }
-
         $data = [
             'name' => $request->name,
             'e_name' => $request->e_name,
@@ -165,6 +109,7 @@ class GiftService
             $data['show_img2'] = Common::upload('images', $request->file('show_img2'));
         }
 
+
         $gift = $this->giftRepository->update($data, $request->gift_id);
         if ($request->type == 6) {
             $arrayPercentage = [$request->min_percentage, $request->mid_percentage, $request->max_percentage];
@@ -179,14 +124,6 @@ class GiftService
 
     public function updateSwitch($requestSwitch, $giftId, $type)
     {
-        if ($this->packageService) {
-            return $this->packageService->updateSwitch($requestSwitch, $giftId, $type);
-        }
-
-        if (!$this->giftRepository) {
-            throw new \Exception('Gift repository not available');
-        }
-
         $gift = $this->giftRepository->giftUpdate($giftId, $type, $requestSwitch);
         return true;
     }
