@@ -15,7 +15,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
         parent::__construct(new Gift());
     }
 
-    public function all($type)
+    public function all($type = null)
     {
         $user = Auth::user();
 
@@ -42,7 +42,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
             ->get();
     }
 
-    public function getByCategory(?int $categoryId = null, ?int $type = null, int $perPage = 10)
+    public function getByCategory($categoryId, ?int $type = null, int $perPage = 10)
     {
         $user = Auth::user();
 
