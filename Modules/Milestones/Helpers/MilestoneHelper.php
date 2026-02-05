@@ -94,7 +94,7 @@ class MilestoneHelper
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
         
-
+      Log::info(" reward effect: User ID {$user->id}, Reward Type: {$mr->type}, Rewardable ID: {$mr->rewardable_id}");
         switch ($mr->type) {
             case 'coins':
                 $amountBefore = $user->di;
