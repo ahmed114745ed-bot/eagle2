@@ -1323,6 +1323,22 @@ class User extends Authenticatable
         return $this->hasMany(Moment::class, 'user_id');
     }
 
+    public function moment_comments()
+    {
+        if (! class_exists(\Modules\Moment\Entities\MomentCommint::class)){
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany(\Modules\Moment\Entities\MomentCommint::class, 'user_id');
+    }
+
+    public function moment_likes()
+    {
+        if (! class_exists(\Modules\Moment\Entities\MomentLikes::class)){
+            return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
+        }
+        return $this->hasMany(\Modules\Moment\Entities\MomentLikes::class, 'user_id');
+    }
+
     public function admenUsersAPP()
     {
         return $this->hanMany(AdminUser::class);
