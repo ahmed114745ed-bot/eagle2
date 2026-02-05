@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PK Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #dc2626;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #b91c1c;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #dc2626;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #dc2626;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #ef4444;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #cbd5e1;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #b91c1c;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #be185d;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #b91c1c;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #dc2626;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #b91c1c;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f1f5f9;
+            font-weight: bold;
+            color: #b91c1c;
+        }
+        
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>⚔️ PK Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the PK (Player vs Player) battle system for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: February 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#requirements">1. Requirements</a></li>
+            <li><a href="#installation">2. Installation Steps</a></li>
+            <li><a href="#configuration">3. Configuration</a></li>
+            <li><a href="#database">4. Database Tables</a></li>
+            <li><a href="#routes">5. Routes & Middleware</a></li>
+            <li><a href="#contracts">6. Contracts & Dependencies</a></li>
+            <li><a href="#verification">7. Verification</a></li>
+            <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+            <li><a href="#api-reference">9. API Reference</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Requirements -->
+    <h1 id="requirements">1. Requirements</h1>
+    
+    <h2>1.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>1.2 Required Packages</h2>
+    <div class="warning">
+        <div class="warning-title">⚠️ Important</div>
+        <p>The PK package depends on the Room package. Install Room first!</p>
+    </div>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Purpose</th>
+            <th>Required</th>
+        </tr>
+        <tr>
+            <td>Utd/Room</td>
+            <td>Room system (PK battles happen in rooms)</td>
+            <td><strong>Yes</strong></td>
+        </tr>
+        <tr>
+            <td>Utd/Gifts</td>
+            <td>Gift system for PK scoring</td>
+            <td>Optional</td>
+        </tr>
+    </table>
+
+    <h2>1.3 Package Structure</h2>
+    <div class="file-structure">
+packages/Utd/Pk/
+├── composer.json
+├── Config/
+│   └── pk.php
+├── Database/
+│   └── migrations/
+│       └── 2023_01_29_214648_create_pks_table.php
+├── Routes/
+│   └── api.php
+└── src/
+    ├── PkServiceProvider.php
+    ├── Classes/
+    │   └── PKWork.php
+    ├── Contracts/
+    │   └── PkRepositoryContract.php
+    ├── Entities/
+    │   └── Pk.php
+    ├── Http/
+    │   ├── Controllers/
+    │   │   └── Api/
+    │   │       └── PkController.php
+    │   └── Resources/
+    │       └── PkCollection.php
+    ├── Jobs/
+    │   └── UpdatePkAndSendToZigoJob.php
+    ├── Observers/
+    │   └── PKObserver.php
+    ├── Repositories/
+    │   ├── AbstractRepository.php
+    │   └── PkRepository.php
+    ├── Services/
+    │   └── PkService.php
+    └── Transformers/
+        └── PkResource.php
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Installation -->
+    <h1 id="installation">2. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Ensure Room Package is Installed</span>
+        <p>Verify that the Room package is already installed:</p>
+        <pre><code>composer show utd/room</code></pre>
+        <p>If not installed, install Room first before proceeding.</p>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>Pk</code> folder to your project:</p>
+        <pre><code>packages/Utd/Pk</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Pk"
+        }
+    ],
+    "require": {
+        "utd/pk": "*"
+    }
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/pk</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <span class="step-title">Run Setup Commands</span>
+        <p>Run migrations, seeders, and clear cache (all in one command):</p>
+        <pre><code>php artisan migrate; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Configuration -->
+    <h1 id="configuration">3. Configuration</h1>
+
+    <h2>3.1 Environment Variables</h2>
+    <p>Add these to your <code>.env</code> file:</p>
+
+    <pre><code># PK Package Configuration
+PK_ENABLED=true
+
+# PK Battle Settings
+PK_DEFAULT_DURATION=300
+PK_MIN_PARTICIPANTS=2
+PK_MAX_ROUNDS=5
+
+# Scoring Settings
+PK_GIFT_MULTIPLIER=1.0
+PK_WIN_BONUS=100
+
+# Cache Settings
+PK_CACHE_TTL=60</code></pre>
+
+    <h2>3.2 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=pk-config</code></pre>
+
+    <h2>3.3 Configuration Options</h2>
+    <p>The published config file <code>config/pk.php</code> contains:</p>
+    <pre><code>return [
+    'enabled' => env('PK_ENABLED', true),
+    'default_duration' => env('PK_DEFAULT_DURATION', 300),
+    'min_participants' => env('PK_MIN_PARTICIPANTS', 2),
+    'max_rounds' => env('PK_MAX_ROUNDS', 5),
+    'gift_multiplier' => env('PK_GIFT_MULTIPLIER', 1.0),
+    'win_bonus' => env('PK_WIN_BONUS', 100),
+    'cache_ttl' => env('PK_CACHE_TTL', 60),
+];</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Database -->
+    <h1 id="database">4. Database Tables</h1>
+
+    <h2>4.1 PKs Table Structure</h2>
+    
+    <h3>pks</h3>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>room_id</td>
+            <td>bigint</td>
+            <td>Room reference (FK to rooms)</td>
+        </tr>
+        <tr>
+            <td>status</td>
+            <td>tinyint</td>
+            <td>PK status (0=ended, 1=active)</td>
+        </tr>
+        <tr>
+            <td>t1_score</td>
+            <td>decimal</td>
+            <td>Team 1 score</td>
+        </tr>
+        <tr>
+            <td>t2_score</td>
+            <td>decimal</td>
+            <td>Team 2 score</td>
+        </tr>
+        <tr>
+            <td>mics</td>
+            <td>json</td>
+            <td>Microphone positions for teams</td>
+        </tr>
+        <tr>
+            <td>start_at</td>
+            <td>timestamp</td>
+            <td>PK start time</td>
+        </tr>
+        <tr>
+            <td>end_at</td>
+            <td>timestamp</td>
+            <td>PK end time</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+            <td>timestamp</td>
+            <td>Record creation time</td>
+        </tr>
+        <tr>
+            <td>updated_at</td>
+            <td>timestamp</td>
+            <td>Record update time</td>
+        </tr>
+    </table>
+
+    <h2>4.2 Relationships</h2>
+    <ul>
+        <li><code>Pk</code> belongs to <code>Room</code></li>
+        <li><code>Room</code> has many <code>Pk</code> (history)</li>
+        <li><code>Room</code> has one active <code>Pk</code> (lastPk)</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Routes -->
+    <h1 id="routes">5. Routes & Middleware</h1>
+
+    <h2>5.1 Available API Routes</h2>
+    <p>The package registers the following routes:</p>
+
+    <h3>PK Management Routes (Authenticated)</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/create-pk</td>
+            <td>Create a new PK battle</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/close-pk</td>
+            <td>Close/end a PK battle</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/show-pk</td>
+            <td>Show PK details</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/hide-pk</td>
+            <td>Hide PK from display</td>
+        </tr>
+    </table>
+
+    <h3>PK Without Zego Routes</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/without-zego/create</td>
+            <td>Create PK without Zego integration</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/without-zego/close</td>
+            <td>Close PK without Zego</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/without-zego/show</td>
+            <td>Show PK without Zego</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/Utd/pk/without-zego/hide</td>
+            <td>Hide PK without Zego</td>
+        </tr>
+    </table>
+
+    <h3>Public Routes</h3>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td>/api/Utd/pk/room/{id}/pks</td>
+            <td>Get all PKs for a room</td>
+        </tr>
+    </table>
+
+    <h2>5.2 Middleware</h2>
+    <p>Routes are protected by:</p>
+    <ul>
+        <li><code>api</code> - API middleware group</li>
+        <li><code>auth:sanctum</code> - Authentication required</li>
+        <li><code>appFeatureEnable:pk</code> - PK feature must be enabled</li>
+    </ul>
+
+    <h2>5.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr pk</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Contracts -->
+    <h1 id="contracts">6. Contracts & Dependencies</h1>
+
+    <h2>6.1 Contract Pattern</h2>
+    <p>The PK package uses the contract pattern for loose coupling:</p>
+
+    <h3>PkRepositoryContract</h3>
+    <p>Location: <code>App\Contracts\PkRepositoryContract</code></p>
+    <pre><code>interface PkRepositoryContract
+{
+    public function getActiveByRoom($roomId);
+    public function getByRoom($roomId);
+    public function endPk($pkId);
+    public function getPk($roomId);
+    public function findById($id);
+    public function roomPks($userId, $perPage, $page);
+    public function create(array $data);
+    public function update(array $data, $id);
+}</code></pre>
+
+    <h2>6.2 Service Provider Bindings</h2>
+    <p>The <code>PkServiceProvider</code> binds the contract:</p>
+    <pre><code>// In PkServiceProvider::register()
+$this->app->singleton(
+    PkRepositoryContract::class, 
+    PkRepository::class
+);</code></pre>
+
+    <h2>6.3 Null Implementation</h2>
+    <p>If the PK package is not installed, <code>FeatureServiceProvider</code> provides a null implementation:</p>
+    <pre><code>// In FeatureServiceProvider::register()
+if (!$this->app->bound(PkRepositoryContract::class)) {
+    $this->app->singleton(
+        PkRepositoryContract::class,
+        NullPkRepository::class
+    );
+}</code></pre>
+
+    <h2>6.4 Using the Contract</h2>
+    <p>Inject the contract in your services:</p>
+    <pre><code>use App\Contracts\PkRepositoryContract;
+
+class YourService
+{
+    public function __construct(
+        private readonly PkRepositoryContract $pkRepository
+    ) {}
+    
+    public function getActivePk($roomId)
+    {
+        return $this->pkRepository->getActiveByRoom($roomId);
+    }
+}</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Verification -->
+    <h1 id="verification">7. Verification</h1>
+
+    <h2>7.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/pk</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>PK migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list | findstr pk</code></td>
+            <td>PK routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Contract Bound</td>
+            <td>Check service container</td>
+            <td>PkRepositoryContract resolves</td>
+        </tr>
+    </table>
+
+    <h2>7.2 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Get Room PKs
+curl -X GET "https://your-domain.com/api/Utd/pk/room/1/pks" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Test Create PK
+curl -X POST "https://your-domain.com/api/Utd/pk/create-pk" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"room_id": 1, "duration": 300}'
+
+# Test Close PK
+curl -X POST "https://your-domain.com/api/Utd/pk/close-pk" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"pk_id": 1}'</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If the API returns data, your PK package installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Troubleshooting -->
+    <h1 id="troubleshooting">8. Troubleshooting</h1>
+
+    <h2>8.1 Common Issues</h2>
+
+    <h3>Issue: Class Not Found Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan cache:clear</code></pre>
+    </div>
+
+    <h3>Issue: Room Package Not Found</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Install the Room package first:</p>
+        <pre><code>composer require utd/room
+php artisan migrate</code></pre>
+    </div>
+
+    <h3>Issue: Migration Errors (Foreign Key)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure rooms table exists before running PK migrations:</p>
+        <pre><code>php artisan migrate:status
+# If rooms table missing, run Room migrations first</code></pre>
+    </div>
+
+    <h3>Issue: Contract Not Resolving</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Check that PkServiceProvider is registered:</p>
+        <pre><code>php artisan config:clear
+php artisan package:discover</code></pre>
+    </div>
+
+    <h3>Issue: Routes Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan route:clear
+php artisan optimize:clear</code></pre>
+    </div>
+
+    <h2>8.2 Rollback Migrations</h2>
+    <p>To rollback PK migrations:</p>
+    <pre><code># Rollback PK migrations
+php artisan migrate:rollback --path=packages/Utd/Pk/Database/migrations</code></pre>
+
+    <h2>8.3 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 9: API Reference -->
+    <h1 id="api-reference">9. API Reference</h1>
+
+    <h2>9.1 Create PK</h2>
+    <pre><code>POST /api/Utd/pk/create-pk
+
+Request Body:
+{
+    "room_id": 1,
+    "duration": 300,
+    "mics": [1, 2, 3, 4, 5, 6, 7, 8]
+}
+
+Response:
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "room_id": 1,
+        "status": 1,
+        "t1_score": 0,
+        "t2_score": 0,
+        "start_at": "2026-02-05T10:00:00Z",
+        "end_at": "2026-02-05T10:05:00Z"
+    },
+    "message": "PK created successfully"
+}</code></pre>
+
+    <h2>9.2 Close PK</h2>
+    <pre><code>POST /api/Utd/pk/close-pk
+
+Request Body:
+{
+    "pk_id": 1
+}
+
+Response:
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "status": 0,
+        "t1_score": 1500,
+        "t2_score": 1200,
+        "winner": "team1"
+    },
+    "message": "PK closed successfully"
+}</code></pre>
+
+    <h2>9.3 Get Room PKs</h2>
+    <pre><code>GET /api/Utd/pk/room/{id}/pks
+
+Parameters:
+- page (int): Page number
+- per_page (int): Items per page (default: 15)
+
+Response:
+{
+    "data": [
+        {
+            "id": 1,
+            "room_id": 1,
+            "status": 0,
+            "t1_score": 1500,
+            "t2_score": 1200,
+            "created_at": "2026-02-05T10:00:00Z"
+        }
+    ],
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 15,
+    "total": 1
+}</code></pre>
+
+    <h2>9.4 PK Score Update (Internal)</h2>
+    <p>Scores are updated automatically via the <code>UpdatePkAndSendToZigoJob</code> when gifts are sent during an active PK.</p>
+    <pre><code>// Score calculation
+Team assignment based on microphone position:
+- Positions 1-4: Team 1
+- Positions 5-8: Team 2
+
+Score = Gift Price × Quantity × Multiplier</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your PK package is now ready to use.</p>
+        
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #dc2626;">Quick Links:</h3>
+            <ul>
+                <li>API Base: <code>/api/Utd/pk</code></li>
+                <li>Create PK: <code>POST /create-pk</code></li>
+                <li>Room PKs: <code>GET /room/{id}/pks</code></li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #dc2626;">Dependencies:</h3>
+            <ul>
+                <li>Room Package: <code>utd/room</code> (Required)</li>
+                <li>Gifts Package: <code>utd/gifts</code> (Optional)</li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: February 2026
+        </p>
+    </div>
+
+</body>
+</html>
