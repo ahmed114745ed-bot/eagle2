@@ -303,7 +303,7 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-            ->where('type', 6)
+           // ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
