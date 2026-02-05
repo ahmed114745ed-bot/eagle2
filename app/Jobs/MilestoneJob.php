@@ -43,6 +43,7 @@ class MilestoneJob implements ShouldQueue
             'charge-agency-owner' => User::whereHas('hasShippingAgencyV2'),
             'family-owner' => User::whereHas('hasFamily'),
             'host' => User::where('type_user', 1),
+            'area-manager' => User::where('is_area_manager', 1),
             default => User::query(),
         };
 
