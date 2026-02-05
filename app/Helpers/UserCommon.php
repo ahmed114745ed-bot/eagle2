@@ -481,10 +481,15 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null)
     {
         $title = __('congratulations');
-        $body = $user->name . ':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
+        if ($feature) {
+            $title = __('wareGiftNotification', ['wareName' => $ware->name, 'type' => $feature->name]);
+        } else {
+            $body = $user->name . ':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
+        }
+
 
         DB::beginTransaction();
         try {

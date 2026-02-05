@@ -17,6 +17,7 @@
     "Emoji Categories": "इमोजी श्रेणियाँ",
     "Theme": "थीम",
   "background": "पृष्ठभूमि",
+  "wareGiftNotification": "बधाई हो! आपको उपहार :wareName मिला है क्योंकि आप :type बन गए हैं।",
   "online": "ऑनलाइन",
     "withdrawal_pending": "निकासी अनुरोध समीक्षा के अंतर्गत है :राशि",
     "Enable host level Feature": "होस्ट स्तर की सुविधा सक्षम करें",
