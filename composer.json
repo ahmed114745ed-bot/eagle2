@@ -160,7 +160,7 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/pk",
+            "url": "packages/Utd/Pk",
             "options": {
                 "symlink": true
             }
