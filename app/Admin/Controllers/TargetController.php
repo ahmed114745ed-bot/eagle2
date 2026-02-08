@@ -420,7 +420,13 @@ class TargetController extends MainController
                     cancelButtonText: '" . __('cancel_button') . "',
                     reverseButtons: true
                 }).then((result) => {
-                    
+                    if (result.value) {
+
+                        $('#loadingOverlay').show();
+                        $('.confirm-btn').prop('disabled', true);
+
+                        window.location.href = url;
+                    }
                 });
             });
         });
