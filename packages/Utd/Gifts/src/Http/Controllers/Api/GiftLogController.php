@@ -295,7 +295,7 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                $AllOpeningRoomsZegoRequestClass = $this->AllOpeningRoomsZegoRequest;
+                $AllOpeningRoomsZegoRequestClass = ClassResolver::job('all_opening_rooms_zego_request');
                 dispatchJobToQueue(new $AllOpeningRoomsZegoRequestClass($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
             }
         }
@@ -303,7 +303,8 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        // Get the class name from ClassResolver and instantiate it
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $close_open_gifts = settings()->get('close_open_gifts');
@@ -407,7 +408,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
@@ -441,7 +442,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V2(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
@@ -475,7 +476,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
