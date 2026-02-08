@@ -519,7 +519,7 @@ class TargetController extends MainController
 
 
 
-         $form->display(__('ID'));
+        $form->display(__('ID'));
 
         $form->hidden('level', __('target no'))->default(function () {
             return Target::max('level') + 1;
@@ -639,52 +639,52 @@ class TargetController extends MainController
         </script>');
         $form->html('<h1>' . __('days and hours') . '</h1>');
 
-        // $form->number('hours', __('hours'))->default(function ($form) {
-        //     $hours = $form->model()->hours;
-        //     return $hours == null || $hours == '' ? 0 : $hours;
-        // });
-        // $form->number('days', __('days'))->default(function ($form) {
-        //     $days = $form->model()->days;
-        //     return $days == null || $days == '' ? 0 : $days;
-        // });
+        $form->number('hours', __('hours'))->default(function ($form) {
+            $hours = $form->model()->hours;
+            return $hours == null || $hours == '' ? 0 : $hours;
+        });
+        $form->number('days', __('days'))->default(function ($form) {
+            $days = $form->model()->days;
+            return $days == null || $days == '' ? 0 : $days;
+        });
 
 
-        // $form->html('<h1>' . __('Reel') . '</h1>');
+        $form->html('<h1>' . __('Reel') . '</h1>');
 
-        // $form->hidden('reel', 'reel');
-        // $form->number('reel1', __('uploadReel'))->default(function ($form) {
-        //     $reel = $form->model()->reel;
-        //     $str    = @explode(',', $reel)[0];
-        //     return $str == null || $str == '' ? 0 : $str;
-        // });
-        // $form->number('reel2', __('LikeReel'))->default(function ($form) {
-        //     $reel = $form->model()->reel;
+        $form->hidden('reel', 'reel');
+        $form->number('reel1', __('uploadReel'))->default(function ($form) {
+            $reel = $form->model()->reel;
+            $str    = @explode(',', $reel)[0];
+            return $str == null || $str == '' ? 0 : $str;
+        });
+        $form->number('reel2', __('LikeReel'))->default(function ($form) {
+            $reel = $form->model()->reel;
 
-        //     return @explode(',', $reel)[1] ?? 0;
-        // });;
-        // $form->number('reel3', __('commentReel'))->default(function ($form) {
-        //     $reel = $form->model()->reel;
+            return @explode(',', $reel)[1] ?? 0;
+        });;
+        $form->number('reel3', __('commentReel'))->default(function ($form) {
+            $reel = $form->model()->reel;
 
-        //     return @explode(',', $reel)[2] ?? 0;
-        // });
-        // $form->html('<h1>' . __('Moment') . '</h1>');
-        // $form->hidden('moment', 'moment');
+            return @explode(',', $reel)[2] ?? 0;
+        });
+        $form->html('<h1>' . __('Moment') . '</h1>');
+        $form->hidden('moment', 'moment');
 
-        // $form->number('moment1', __('uploadMoment'))->default(function ($form) {
-        //     $moment = $form->model()->moment;
-        //     $str    = @explode(',', $moment)[0];
-        //     return $str == null || $str == '' ? 0 : $str;
-        // });
-        // $form->number('moment2', __('likeMoment'))->default(function ($form) {
-        //     $moment = $form->model()->moment;
+        $form->number('moment1', __('uploadMoment'))->default(function ($form) {
+            $moment = $form->model()->moment;
+            $str    = @explode(',', $moment)[0];
+            return $str == null || $str == '' ? 0 : $str;
+        });
+        $form->number('moment2', __('likeMoment'))->default(function ($form) {
+            $moment = $form->model()->moment;
 
-        //     return @explode(',', $moment)[1] ?? 0;
-        // });
-        // $form->number('moment3', __('commentMoment'))->default(function ($form) {
-        //     $moment = $form->model()->moment;
+            return @explode(',', $moment)[1] ?? 0;
+        });
+        $form->number('moment3', __('commentMoment'))->default(function ($form) {
+            $moment = $form->model()->moment;
 
-        //     return @explode(',', $moment)[2] ?? 0;
-        // });
+            return @explode(',', $moment)[2] ?? 0;
+        });
 
         // $form->editing(function (Form $form) {
 
