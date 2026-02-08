@@ -529,115 +529,115 @@ class TargetController extends MainController
 
 
 
-        $form->decimal('diamonds', __('diamonds'))
-            ->help('
-                <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>')
-            ->rules('min:0')
-            ->default(0)
-            ->required();
+        // $form->decimal('diamonds', __('diamonds'))
+        //     ->help('
+        //         <span id="total_usd_amount" style="font-weight:bold;color:green">' . __('Total USD: ') . '0.00 USD</span>')
+        //     ->rules('min:0')
+        //     ->default(0)
+        //     ->required();
 
-        $form->decimal('usd', __('Host Percentage') . '(%)')
-            ->help('<span id="usd_amount">' . __('Amount will be: ')  . ' USD</span>')
-            ->rules('min:0')
-            ->default(0)
-            ->required();
+        // $form->decimal('usd', __('Host Percentage') . '(%)')
+        //     ->help('<span id="usd_amount">' . __('Amount will be: ')  . ' USD</span>')
+        //     ->rules('min:0')
+        //     ->default(0)
+        //     ->required();
 
-        $form->decimal('agency_share',  __('agency share') . '(%)')
-            ->help('<span id="agency_amount">' . __('Amount will be: ')  . ' USD</span>')
-            ->rules('min:0')
-            ->default(0)
-            ->required();
+        // $form->decimal('agency_share',  __('agency share') . '(%)')
+        //     ->help('<span id="agency_amount">' . __('Amount will be: ')  . ' USD</span>')
+        //     ->rules('min:0')
+        //     ->default(0)
+        //     ->required();
 
-        $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
-            ->help('<span id="super_admin_amount">' . __('Amount will be: ')  . ' USD</span>')
-            ->rules('min:0')
-            ->default(0)
-            ->required();
+        // $form->decimal('db_percentage',  __('DB  Percentage') . '(%)')
+        //     ->help('<span id="super_admin_amount">' . __('Amount will be: ')  . ' USD</span>')
+        //     ->rules('min:0')
+        //     ->default(0)
+        //     ->required();
 
-        $form->decimal('app_profit_percentage', __('app profit Percentage') . '(%)')
-            ->help('<span id="zone_amount">' . __('Amount will be: ')  . ' USD</span>')
-            ->rules('min:0')
-            ->default(100)
-            ->disable();
-        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
-        $coins = Common::getSettingValue($convertDiamond) ?? 1;
-        $form->html('
-        <script>
-            $(document).ready(function () {
-                var debounceTimer;
-                var coins = ' . $coins . ';
+        // $form->decimal('app_profit_percentage', __('app profit Percentage') . '(%)')
+        //     ->help('<span id="zone_amount">' . __('Amount will be: ')  . ' USD</span>')
+        //     ->rules('min:0')
+        //     ->default(100)
+        //     ->disable();
+        // $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        // $coins = Common::getSettingValue($convertDiamond) ?? 1;
+        // $form->html('
+        // <script>
+        //     $(document).ready(function () {
+        //         var debounceTimer;
+        //         var coins = ' . $coins . ';
 
-                function floor2(num) {
-                    return Math.floor(num * 100) / 100;
-                }
+        //         function floor2(num) {
+        //             return Math.floor(num * 100) / 100;
+        //         }
 
-                function calculateUsdAmount() {
-                    var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
-                    var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
-                    var agency = parseFloat($("input[name=\'agency_share\']").val()) || 0;
-                    var db = parseFloat($("input[name=\'db_percentage\']").val()) || 0;
-                    var app = parseFloat($("input[name=\'app_profit_percentage\']").val()) || 0;
+        //         function calculateUsdAmount() {
+        //             var diamonds = parseFloat($("input[name=\'diamonds\']").val()) || 0;
+        //             var usd = parseFloat($("input[name=\'usd\']").val()) || 0;
+        //             var agency = parseFloat($("input[name=\'agency_share\']").val()) || 0;
+        //             var db = parseFloat($("input[name=\'db_percentage\']").val()) || 0;
+        //             var app = parseFloat($("input[name=\'app_profit_percentage\']").val()) || 0;
 
-                    var totalUsd = diamonds / coins;
-                    var userAmount = floor2(totalUsd * usd / 100);
-                    var agencyAmount = floor2(totalUsd * agency / 100);
-                    var zoneAmount = floor2(totalUsd * app / 100);
-                    var superAdminAmount = floor2(totalUsd * db / 100);
+        //             var totalUsd = diamonds / coins;
+        //             var userAmount = floor2(totalUsd * usd / 100);
+        //             var agencyAmount = floor2(totalUsd * agency / 100);
+        //             var zoneAmount = floor2(totalUsd * app / 100);
+        //             var superAdminAmount = floor2(totalUsd * db / 100);
 
-                    $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
-                    $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
-                    $("#zone_amount").text("' . __('Amount will be: ') . '" + zoneAmount + " USD");
-                    $("#super_admin_amount").text("' . __('Amount will be: ') . '" + superAdminAmount + " USD");
-                    $("#total_usd_amount").text("' . __('Total USD: ') . '" + floor2(totalUsd) + " USD");
-                }
+        //             $("#usd_amount").text("' . __('Amount will be: ') . '" + userAmount + " USD");
+        //             $("#agency_amount").text("' . __('Amount will be: ') . '" + agencyAmount + " USD");
+        //             $("#zone_amount").text("' . __('Amount will be: ') . '" + zoneAmount + " USD");
+        //             $("#super_admin_amount").text("' . __('Amount will be: ') . '" + superAdminAmount + " USD");
+        //             $("#total_usd_amount").text("' . __('Total USD: ') . '" + floor2(totalUsd) + " USD");
+        //         }
 
-                function enforceTotalPercentageLimit(changedField) {
-                    var fields = ["usd", "agency_share", "db_percentage"];
-                    var values = {};
-                    var total = 0;
+        //         function enforceTotalPercentageLimit(changedField) {
+        //             var fields = ["usd", "agency_share", "db_percentage"];
+        //             var values = {};
+        //             var total = 0;
 
-                    fields.forEach(function (field) {
-                        values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
-                        total += values[field];
-                    });
+        //             fields.forEach(function (field) {
+        //                 values[field] = parseFloat($("input[name=\'" + field + "\']").val()) || 0;
+        //                 total += values[field];
+        //             });
 
-                    var remaining = floor2(100 - total);
-                    if (remaining < 0) {
-                        // لو المجموع أكبر من 100، نقص القيمة المدخلة نفسها
-                        var currentValue = values[changedField];
-                        var newValue = Math.max(0, currentValue + remaining);
-                        $("input[name=\'" + changedField + "\']").val(floor2(newValue));
-                        remaining = 0;
-                    }
+        //             var remaining = floor2(100 - total);
+        //             if (remaining < 0) {
+        //                 // لو المجموع أكبر من 100، نقص القيمة المدخلة نفسها
+        //                 var currentValue = values[changedField];
+        //                 var newValue = Math.max(0, currentValue + remaining);
+        //                 $("input[name=\'" + changedField + "\']").val(floor2(newValue));
+        //                 remaining = 0;
+        //             }
 
-                    $("input[name=\'app_profit_percentage\']").val(remaining);
-                }
+        //             $("input[name=\'app_profit_percentage\']").val(remaining);
+        //         }
 
-                var allFields = ["diamonds", "usd", "agency_share", "app_profit_percentage", "db_percentage"];
-                allFields.forEach(function (field) {
-                    $(document).on("input", "input[name=\'" + field + "\']", function () {
-                        var val = parseFloat($(this).val());
+        //         var allFields = ["diamonds", "usd", "agency_share", "app_profit_percentage", "db_percentage"];
+        //         allFields.forEach(function (field) {
+        //             $(document).on("input", "input[name=\'" + field + "\']", function () {
+        //                 var val = parseFloat($(this).val());
 
-                        // منع القيم السالبة
-                        if (val < 0) {
-                            $(this).val(0);
-                            val = 0;
-                        }
+        //                 // منع القيم السالبة
+        //                 if (val < 0) {
+        //                     $(this).val(0);
+        //                     val = 0;
+        //                 }
 
-                        clearTimeout(debounceTimer);
-                        debounceTimer = setTimeout(function () {
-                            if (["usd", "agency_share", "db_percentage"].includes(field)) {
-                                enforceTotalPercentageLimit(field);
-                            }
-                            calculateUsdAmount();
-                        }, 500);
-                    });
-                });
+        //                 clearTimeout(debounceTimer);
+        //                 debounceTimer = setTimeout(function () {
+        //                     if (["usd", "agency_share", "db_percentage"].includes(field)) {
+        //                         enforceTotalPercentageLimit(field);
+        //                     }
+        //                     calculateUsdAmount();
+        //                 }, 500);
+        //             });
+        //         });
 
-                calculateUsdAmount();
-            });
+        //         calculateUsdAmount();
+        //     });
 
-        </script>');
+        // </script>');
         $form->html('<h1>' . __('days and hours') . '</h1>');
 
         $form->number('hours', __('hours'))->default(function ($form) {
