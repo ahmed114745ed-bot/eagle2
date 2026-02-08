@@ -304,7 +304,7 @@ class GiftLogController extends Controller
     public function gift_queue_cp(Request $request)
     {
         // Get the class name from ClassResolver and instantiate it
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $close_open_gifts = settings()->get('close_open_gifts');
@@ -408,7 +408,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
@@ -442,7 +442,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V2(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
@@ -476,7 +476,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift');
+        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
