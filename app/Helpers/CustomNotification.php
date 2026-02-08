@@ -34,6 +34,8 @@ class CustomNotification
         $body = __('You have received a new VIP level as a gift') . $user->name;
         if (!$user->is_logout) Common::send_firebase_notification($tokens_notfacion, $title, $body);
     }
+
+   
     public function senderLevel(int $userId)
     {
         $user = User::withoutAppends()->where('id', $userId)->first();
@@ -47,6 +49,29 @@ class CustomNotification
         $title = __('api.senderLevelUpgrade', [], $lang);
 
         $image = Vip::where('level', $user->total_sender_level)->where('type', 2)->first()?->img;
+        $data = getImagePath($image);
+        $icon = $data;
+        if (!$user->is_logout)  Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data);
+        Common::sendOfficialMessage($user->id, title: $body, content: $title, titleAr: $body, image: $data);
+        (new UserCounterServices)->eventUser($user, 'official-messages', 1);
+    }
+
+    public function RoomLevel(int $userId ,$level, $reward)
+    {
+
+        $user = User::withoutAppends()->where('id', $userId)->with('ownerAudioRoom.roomLevel')->first();
+        if (!$user) {
+            return 0;
+        }
+          //  \Log::info('room level Job", ', ['user_id' => $user->id, 'level' => $level, 'reward' => $reward]);
+
+        $lang = $user->lan ?? 'en';
+        $tokens_notfacion = DB::table('users')->where('id', $userId)->value('notification_id');
+        $body = __('api.room_level', [ 'level' => $level, 'reward' => $reward],  $lang);
+
+        $title = __('congratulation', [], $lang);
+
+        $image = $user->ownerAudioRoom->roomLevel?->img;
         $data = getImagePath($image);
         $icon = $data;
         if (!$user->is_logout)  Common::send_firebase_notification($tokens_notfacion, $this->appName($user->lan), $body, icon: $icon, data: $data);

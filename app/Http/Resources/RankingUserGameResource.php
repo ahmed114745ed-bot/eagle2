@@ -14,12 +14,15 @@ class RankingUserGameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        $finalAvatar = $this->profile?->avatar ?? $this->avatar;
+        
         return [
             'id' => $this->id,
             'user_id' => $this->id,
             'color_name' => $this->color_name,
             'name' => $this->name,
-            'avatar' => $this->avatar,
+            'avatar' => $finalAvatar,
             'frame' => $this->frame,
             'frame_id' => $this->frame_id,
             'type_user' => $this->type_user,

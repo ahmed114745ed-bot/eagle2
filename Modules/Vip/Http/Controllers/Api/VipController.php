@@ -148,6 +148,15 @@ class VipController extends Controller
         });
     }
 
+    public function roomBadges()
+    {
+        return $this->wrap(function () {
+            $this->vipService->badges(4);
+            $groups = $this->vipService->getRoomLevel();
+            return Common::apiResponse(true, 'success', $groups);
+        });
+    }
+
     public function buyVipPercentage(BuyVipPercentageRequest $request)
     {
         return $this->wrap(fn() => $this->vipService->buyVips($request));

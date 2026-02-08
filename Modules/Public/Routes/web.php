@@ -1,8 +1,9 @@
 <?php
 
-use Modules\Public\Http\Controllers\web\LevelIntervalController;
-use Modules\Public\Http\Controllers\web\RewardLevelIntervalController;
 use Illuminate\Support\Facades\Route;
+use Modules\Public\Http\Controllers\web\LevelIntervalController;
+use Modules\Public\Http\Controllers\web\RewardLevelHistoryController;
+use Modules\Public\Http\Controllers\web\RewardLevelIntervalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,8 @@ Route::group(
     ],
     function () {
         Route::resource('level-intervals', LevelIntervalController::class);
+        Route::resource('winner-level-intervals', RewardLevelHistoryController::class);
+        Route::get('winner-level-intervals-rewards/{user_id}/{level_interval_id}', [RewardLevelHistoryController::class, 'getRewards']);
 
         Route::prefix('reward_level_interval/{level_interval_id}')->group(function () {
             Route::get('/', [RewardLevelIntervalController::class, 'index']);

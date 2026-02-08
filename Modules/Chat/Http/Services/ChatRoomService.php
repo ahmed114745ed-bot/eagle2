@@ -162,7 +162,11 @@ class ChatRoomService
                                     });
                             });
                     });
-            })->havingRaw("((chat_rooms.type = 'friends') OR (chat_rooms.type = 'guest' AND distinct_users_count >= 2))")
+            })->havingRaw("(
+                (chat_rooms.type = 'friends') 
+                OR (chat_rooms.type = 'guest' AND distinct_users_count >= 2)
+                OR (chat_rooms.type = 'guest' AND chat_rooms.user_id = {$user->id})
+            )")
             ->when($uuid, function ($q) use ($uuid) {
                 $q->where(function ($q) use ($uuid) {
                     $q->whereHas('userOne', function ($qq) use ($uuid) {
@@ -241,13 +245,10 @@ class ChatRoomService
             ];
         }
 
-        // Get chat requests (guest)
+        // Get chat requests (guest) - only for the receiver (user_id2)
         $guestChats = ChatRoom::WhereHas('messages')
             ->select('chat_rooms.*')
-            ->where(function ($q) use ($user) {
-                $q->where('chat_rooms.user_id2', $user->id)
-                    ->orWhere('chat_rooms.user_id', $user->id);
-            })
+            ->where('chat_rooms.user_id2', $user->id)  // المستقبل بس يشوف طلبات المراسلة
             ->where('chat_rooms.type', 'guest')
             ->has('messages')
             ->withCount([

@@ -26,7 +26,7 @@ class MilestoneHelper
 
     public static function grantMilestoneToUser(User|int $user, string $slug): void
     {
-      
+
 
         if (! $user instanceof User) {
             $user = User::find($user);
@@ -46,15 +46,14 @@ class MilestoneHelper
         }
 
         foreach ($milestone->rewards as $mr) {
-           
 
-            self::giveRewardToUser($user, $mr);
+
+            self::giveRewardToUser($user, $mr, $milestone);
         }
-
     }
 
 
-    public static function giveRewardToUser(User $user, MilestoneReward $mr): void
+    public static function giveRewardToUser(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
@@ -64,15 +63,15 @@ class MilestoneHelper
             ->where('rewardable_type', $mr->rewardable_type)
             ->where('rewardable_id', $mr->rewardable_id)
             ->first();
-    
+
         if ($existing) {
             if (!$existing->trashed()) {
                 return;
             }
-    
+
             $existing->forceDelete();
         }
-    
+
         UserHistoryReward::create([
             'user_id'         => $user->id,
             'receive_type'    => $receiveType,
@@ -85,12 +84,12 @@ class MilestoneHelper
                 'expire' => $mr?->expire,
             ]),
         ]);
-    
-        self::applyRewardEffect($user, $mr);
+
+        self::applyRewardEffect($user, $mr, $milestone);
     }
 
 
-    protected static function applyRewardEffect(User $user, MilestoneReward $mr): void
+    protected static function applyRewardEffect(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
@@ -116,8 +115,10 @@ class MilestoneHelper
 
             case 'ware':
                 $ware = Ware::find($mr->rewardable_id);
-                if (!$ware) { break;}
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType);
+                if (!$ware) {
+                    break;
+                }
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $milestone);
                 break;
 
             case 'badge':
@@ -192,16 +193,16 @@ class MilestoneHelper
         $milestone = Milestone::where('slug', $slug)->with('rewards')->first();
         if ($milestone && $milestone->rewards && $milestone->rewards->count()) {
             foreach ($milestone->rewards as $reward) {
-          
-    
+
+
                 self::revokeRewardFromUser($user, $reward);
             }
-        } 
+        }
         // else {
         //     Log::warning('No rewards found for milestone', [
         //         'milestone_slug' => $slug,
         //         'user_id' => $user->id ?? null,
         //     ]);
         // }   
-     }
+    }
 }

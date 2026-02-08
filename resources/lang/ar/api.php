@@ -10,6 +10,7 @@ return [
         'send_ware'   => 'لقد قمت ببعت :wareName ل :toUserName',
         'got_gift'    => 'لقد وصلك :giftName كهدية',
     ],
+    "room_level" => "غرفتك وصلت إلى مستوى VIP جديد :level وحصلت على المكافأة :reward",
     "rankingRewardLevel" => "تهانينا! لقد حصلت على مكافأة المستوى :level",
     "banRoom" => "تم حظرك لمدة :duration ساعة، الساعات المتبقية: :remaining",
     'notCharge' => 'وكالتك غير مفعّلة، يرجى التواصل مع المسؤول.',

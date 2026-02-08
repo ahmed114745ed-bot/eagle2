@@ -19,6 +19,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use App\Services\UserService;
+use Modules\Vip\Entities\Vip;
 use App\Enums\UserCoinLogType;
 use App\helper\TryCatchHelper;
 use App\Helpers\UserPackHelper;
@@ -28,6 +29,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
 use App\Models\UserCodeInvitation;
 use App\Models\UserEarnInvitation;
+use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -547,15 +549,18 @@ class UserController extends Controller
 
         $cacheKey = "user_response_{$id}";
 
-        $response =
-            \Cache::remember(
-                $cacheKey,
-                now()->addMinutes(30),
-                function () use ($id) {
-                    $user = $this->userService->showUser($id);
-                    return (new UserResource($user))->toArray(request());
-                }
-            );
+        // $response =
+        //     \Cache::remember(
+        //         $cacheKey,
+        //         now()->addMinutes(30),
+        //         function () use ($id) {
+        //             $user = $this->userService->showUser($id);
+        //             return (new UserResource($user))->toArray(request());
+        //         }
+        //     );
+
+        $user = $this->userService->showUser($id);
+        $response = (new UserResource($user))->toArray($request);
 
         $authUserId = auth()->id();
         $user = User::with([
@@ -1507,6 +1512,72 @@ class UserController extends Controller
             return Common::apiResponse(true, 'done', new DataUserResource($data));
         });
     }
+
+    public function userLevelDetails(Request $request)
+    {
+        $user = $request->user()->fresh();  // Refresh to get latest data from DB
+
+        $currentLevel = $user->senderLevel;
+
+        $expLevel             = $user->total_sender_diamonds;
+
+
+        if ($currentLevel) {
+            $secondLevel = Vip::where('type', 2)
+                ->where('level', '>', $currentLevel->level)
+                ->orderBy('level')
+                ->first();
+        } else {
+            $secondLevel = Vip::where('type', 2)->orderBy('level')->first();
+        }
+
+
+        if ($secondLevel != null && $currentLevel != null) {
+            $remaining       = $secondLevel?->exp - $expLevel;
+            $exactlyValue    = @$secondLevel?->exp;
+            $progressCurrent = $expLevel - $currentLevel->exp;
+            $progressNext    = $secondLevel->exp - $currentLevel->exp;
+
+            $prog = $progressNext != 0 ? ($progressCurrent / $progressNext) : 0;
+
+            if ($prog >= 1) {
+                $bar = 1;
+            } else {
+                $bar = round($prog, 1);
+            }
+            $progress = $exactlyValue == 0 ? 1 : $bar;
+        } elseif ($currentLevel != null) {
+            $exactlyValue    = $secondLevel?->exp ?? 0;
+            $progressCurrent = $expLevel - $currentLevel?->exp ?? 0;
+            $progressNext    = @$secondLevel?->exp - $currentLevel?->exp ?? 0;
+
+            $progress  = 1;
+            $remaining = 0;
+        } else {
+            $progress  = 1;
+            $remaining = 0;
+        }
+        $vipsData = DB::table('vips')->get()->groupBy('type');
+        $gold_level = $user->total_sender_level ?? 0;
+        $diamondSend = $user->total_sender_diamonds ?? 0;
+        $current_gold_num = Common::getCurrentLevelFromCache(2, $gold_level, 'exp', $vipsData);
+        $sender_div = max(1, ($nextGoldData['next_exp'] ?? 1) - $current_gold_num);
+        $senderNum = floor($diamondSend * ($expPercentages['exp_sender_percentage'] ?? 1));
+        $per = min(1, max(0, ($senderNum - $current_gold_num) / $sender_div));
+
+        $data = [
+            'receiver_img' => $user->receiverLevel?->img ?? '',
+            'exp_receiver' => $user->receiverLevel?->exp ?? 0,
+            'sender_img'   => $user->senderLevel?->img ?? '',
+            'sender_level' => intval($user->senderLevel?->level),
+            'next_sender_level' => intval($user->next_sender_level_info['next_level'] ?? 0),
+            'remaining_to_next_level' => $remaining ?? 0,
+            'sender_per' => round(Common::userLevelPer($user), 6),  // 6 decimals for high levels
+        ];
+        return Common::apiResponse(true, 'success', $data);
+    }
+
+
 
     public function syncBD()
     {

@@ -135,6 +135,7 @@ class UserResource extends JsonResource
     private function formatOnlineTime()
     {
         if (!$this->online_time) return '';
+        if ($this->online) return __('online');
 
         $onlineTime = Carbon::createFromTimestamp($this->online_time);
 

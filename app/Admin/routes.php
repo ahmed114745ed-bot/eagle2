@@ -85,6 +85,7 @@ use App\Admin\Controllers\BlackListUsersController;
 use App\Admin\Controllers\ChargesSettingController;
 use App\Admin\Controllers\CoinLogReportsController;
 use App\Admin\Controllers\GiftLogSummaryController;
+use App\Admin\Controllers\PercentageGameController;
 use App\Admin\Controllers\RoomGiftTargetController;
 use App\Http\Controllers\AddTargetToJsonController;
 use App\Admin\Controllers\chargUsersSleemController;
@@ -363,6 +364,7 @@ Route::group(
         Route::prefix('emojis')->group(function () {
             Route::get('/{filter?}', [EmojiController::class, 'index']);
         });
+       
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');

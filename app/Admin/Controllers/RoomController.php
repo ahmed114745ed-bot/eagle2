@@ -63,7 +63,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
+        $room = Room::with(['owner.profile', 'roomLevel','roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 

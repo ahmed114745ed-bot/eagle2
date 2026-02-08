@@ -6,11 +6,12 @@ use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-use Illuminate\Support\Facades\DB;
-use Modules\Milestones\Entities\Milestone;
+use App\Jobs\MilestoneJob;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
+use App\Admin\Controllers\MainController;
+use Modules\Milestones\Entities\Milestone;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneController extends MainController
@@ -77,12 +78,12 @@ class MilestoneController extends MainController
         }
 
         $grid->column('sync', __('Rewards'))->display(function () {
-            $url = admin_url("milestones/{$this->id}/sync"); 
+            $url = admin_url("milestones/{$this->id}/sync");
             return "<a href='{$url}' class='btn btn-xs btn-success'>
-                        <i class='fa fa-sync'></i> " . __('Reapply Rewards') ."
+                        <i class='fa fa-sync'></i> " . __('Reapply Rewards') . "
                     </a>";
         });
-        
+
         $grid->filter(function ($filter) {
             $filter->like('name', __('Name'));
             $filter->equal('type', __('Type'));
@@ -143,26 +144,9 @@ class MilestoneController extends MainController
 
     public function syncMilestone($id)
     {
-        $milestone = Milestone::with('rewards')->findOrFail($id);
-        $usersQuery = match ($milestone->slug) {
-            'super-admin' => User::where('is_super_admin', 1),
-            'bd' => User::where('is_bd', 1),
-            'host-agency-owner' => User::whereHas('hasHostAgency'),
-            'charge-agency-owner' => User::whereHas('hasShippingAgencyV2'),
-            'family-owner' => User::whereHas('hasFamily'),
-            'host' => User::where('type_user', 1),
-            default => User::query(),
-        };
-    
-        DB::transaction(function () use ($usersQuery, $milestone) {
-            $usersQuery->chunk(100, function ($users) use ($milestone) {
-                foreach ($users as $user) {
-                    MilestoneHelper::removeReward($user, $milestone->slug);
-                    MilestoneHelper::grantMilestoneToUser($user, $milestone->slug);
-                }
-            });
-        });
-    
+
+        dispatch(new MilestoneJob($id))->onQueue('milestones-job');
+
         admin_success(__('milestone_rewards_synced'));
         return redirect()->back();
     }

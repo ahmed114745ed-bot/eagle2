@@ -85,8 +85,8 @@ class RoomResource extends JsonResource
             'stream_type' => $this->type ?? 'audio',
             'is_live' => (bool)$this->is_live,
             'is_lucky_box' => $this->is_lucky_box ?? false,
-            'country' => $this->country
-                ? new CountryResource($this->country)
+            'country' => $this->owner?->country
+                ? new CountryResource($this->owner->country)
                 : [
                     'id' => 0,
                     'name' => '',

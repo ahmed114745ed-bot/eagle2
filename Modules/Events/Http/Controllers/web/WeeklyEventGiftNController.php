@@ -129,7 +129,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -149,10 +149,10 @@ class WeeklyEventGiftNController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -352,7 +352,7 @@ class WeeklyEventGiftNController extends MainController
 
         $form->hidden('weekly_star_id')->value(request('weekly_event_id'));
         $form->hidden('level')->value(request('level'));
-
+        $form->html('<div class="full-column-width">');
         $form->select('type', trans('type'))->options(["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins'), "achievement" => __('achievement')])
             ->when("ware", function () use ($form) {
                 $this->addWareField($form);
@@ -380,6 +380,33 @@ class WeeklyEventGiftNController extends MainController
                 })->disk('gcs');
                 $form->number('expire', __('expire'))->default(1);
             })->rules('required');
+
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
+        //     $form->html('
+        //     <style>
+        //     .file-input .input-group.file-caption-main {
+        //         display: flex !important;
+        //     }
+        //          .file-input .input-group.file-caption-main .btn-file {
+        //     padding: 5px 15px !important;
+        //     border-radius: 6px !important;
+        //     font-size: 12px !important;
+        //     margin-left: -3333% !important;
+        // }
+        //     </style>
+        // ');
+
 
         $form->saved(function (Form $form) {
             $route = url('admin/weekly-events-gift/' . request('weekly_event_id'));

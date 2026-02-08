@@ -699,6 +699,7 @@ ease;
                                             id="{{ $inputId }}"
                                             name="{{ $field->field_name }}"
                                             accept="image/*"
+                                            capture="environment"
                                             class="file-input"
                                             @required($field->is_required)
                                             onchange="handleFileUpload(this, '{{ $labelId }}')"
