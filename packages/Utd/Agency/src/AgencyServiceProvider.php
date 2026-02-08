@@ -45,7 +45,14 @@ class AgencyServiceProvider extends ServiceProvider
             function ($app) {
                 $serviceClass = config('agency-dependencies.dependencies.services.agency_service');
                 if ($serviceClass && class_exists($serviceClass)) {
-                    return $app->make($serviceClass);
+                    try {
+                        return $app->make($serviceClass);
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Agency Package: Failed to resolve service \'agency_service\'', [
+                            'error' => $e->getMessage()
+                        ]);
+                        return new \Utd\Agency\Services\NullAgencyService();
+                    }
                 }
                 return new \Utd\Agency\Services\NullAgencyService();
             }
