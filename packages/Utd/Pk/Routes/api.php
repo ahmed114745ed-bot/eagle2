@@ -13,7 +13,7 @@ use Utd\Pk\Http\Controllers\Api\PkController;
 |
 */
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::group(['middleware' => 'auth:sanctum', 'prefix' => 'api/rooms'], function () {
     // PK routes with Zego
     Route::group([],function () {
         Route::post('create-pk', [PkController::class, 'createPK']);
