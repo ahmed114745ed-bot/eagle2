@@ -8,7 +8,7 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\PackRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;

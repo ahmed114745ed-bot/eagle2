@@ -11,7 +11,7 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;

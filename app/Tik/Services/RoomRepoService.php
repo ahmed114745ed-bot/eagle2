@@ -21,7 +21,7 @@ use App\Http\Services\RoomService;
 use App\Traits\MultiQueryPagination;
 use App\Models\RequestBackgroundImage;
 use App\Tik\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Repositories\Room\RoomRepoInterface;

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\AreaManager\Entities\AreaManager;
 use Modules\AreaManager\Entities\SubAreaManager;
 use App\Http\Resources\Api\V1\UserDataRoomResource;
-use App\Tik\Repositories\UserRepository as Repository;
+use Utd\Agency\Repositories\UserRepository as Repository;
 
 class UserRepository extends Repository
 {

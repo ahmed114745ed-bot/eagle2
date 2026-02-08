@@ -136,4 +136,15 @@ class LeaveAgencyRequestRepository
         
         return false;
     }
+
+    /**
+     * Get request by user and agency
+     */
+    public function getRequest($userId, $agencyId)
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('agency_id', $agencyId)
+            ->first();
+    }
 }

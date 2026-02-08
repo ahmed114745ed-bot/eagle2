@@ -10,7 +10,7 @@ use App\Helpers\Common;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use App\Tik\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\FamilyRepository;
 use App\Http\Resources\Api\V2\FamilyResource;
 use App\Tik\Repositories\FamilyRankRepository;

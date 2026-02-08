@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use App\Tik\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Jobs\SendNotificationToAllFollowers;
 use App\Tik\Repositories\EnteranceRoomRepository;
 use App\Http\Resources\Api\V1\EnterRoomCollection;

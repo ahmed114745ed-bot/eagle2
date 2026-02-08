@@ -6,7 +6,7 @@ use Exception;
 use App\Models\Agency;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use App\Tik\Services\AgencyService;
+use Utd\Agency\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RequestJoinAgency;
 use Illuminate\Support\Facades\Validator;

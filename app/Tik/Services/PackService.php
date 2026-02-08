@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
 use App\Tik\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Vip\Repositories\UserVipRepository;
