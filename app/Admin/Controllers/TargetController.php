@@ -97,7 +97,9 @@ class TargetController extends MainController
 
         $grid->model()->orderBy('diamonds', 'asc');
 
-        $coins = Common::getMaxCoins();
+        // $coins = Common::getMaxCoins();
+        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $coins = Common::getSettingValue($convertDiamond) ?? 1;
 
         $this->addLevelColumn($grid);
         $this->addDiamondsColumn($grid, $coins);
@@ -513,7 +515,7 @@ class TargetController extends MainController
         $form = new Form(new Target);
         $this->disableFormTools($form);
 
-        $coins = Common::getMaxCoins();
+        //  $coins = Common::getMaxCoins();
 
 
 
@@ -556,6 +558,8 @@ class TargetController extends MainController
             ->rules('min:0')
             ->default(100)
             ->disable();
+        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $coins = Common::getSettingValue($convertDiamond) ?? 1;
         $form->html('
         <script>
             $(document).ready(function () {
@@ -917,7 +921,7 @@ class TargetController extends MainController
                 $this->applyPendingEdit($target);
                 \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
             } catch (\Throwable $e) {
-              //  \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
+                //  \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
             }
         }
         admin_toastr(__('update_start'), 'info');
