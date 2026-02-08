@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
-use App\Tik\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
@@ -38,7 +38,7 @@ class GiftLogService
     public function __construct(
         private readonly GiftRepository $giftRepository,
         private readonly RoomTopUsersRepository $roomTopUsersRepository,
-        private readonly RoomRepository $repository,
+        private readonly RoomRepositoryContract $repository,
         private readonly UserRepository $UserRepository,
         private readonly GiftLogRepository $giftLogRepository,
     ) {}

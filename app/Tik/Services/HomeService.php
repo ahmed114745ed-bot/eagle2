@@ -10,7 +10,7 @@ use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
-use App\Tik\Repositories\RoomRepository;
+use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
@@ -31,7 +31,7 @@ class HomeService
         private readonly ImageRepository $imageRepository,
         private readonly OvipRepository $ovipRepository,
         private readonly WareRepository $wareRepository,
-        private readonly RoomRepository $roomRepository,
+        private readonly RoomRepositoryContract $roomRepository,
         private readonly PackRepository $packRepository,
         private readonly UserVipRepository $userVipRepository,
         private readonly TicketRepository $ticketRepository,

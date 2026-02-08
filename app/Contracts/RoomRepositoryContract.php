@@ -19,4 +19,10 @@ interface RoomRepositoryContract
     public function updateRoomStatus($userId, $isAvailable);
     
     public function updateMicRoom($room, $mic);
+    
+    public function findUserRoom($ownerId, $selectRow = "*");
+    
+    public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = "*");
+    
+    public function findUserRoomById($ownerId, $selectRow = "*");
 }

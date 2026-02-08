@@ -45,4 +45,19 @@ class NullRoomRepository implements RoomRepositoryContract
     {
         return false;
     }
+
+    public function findUserRoom($ownerId, $selectRow = "*")
+    {
+        return null;
+    }
+
+    public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = "*")
+    {
+        return null;
+    }
+
+    public function findUserRoomById($ownerId, $selectRow = "*")
+    {
+        return null;
+    }
 }
