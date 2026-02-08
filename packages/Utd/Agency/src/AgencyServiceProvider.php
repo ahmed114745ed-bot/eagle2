@@ -138,6 +138,12 @@ class AgencyServiceProvider extends ServiceProvider
                 return null;
             }
         );
+        
+        // Bind ShippingAgencyRepository to its interface for backward compatibility
+        $this->app->bind(
+            \App\Contracts\ShippingAgencyRepositoryInterface::class,
+            \Utd\Agency\Repositories\ShippingAgencyRepository::class
+        );
     }
 
     /**

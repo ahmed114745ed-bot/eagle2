@@ -2,12 +2,13 @@
 
 namespace Utd\Agency\Repositories;
 
+use App\Contracts\ShippingAgencyRepositoryInterface;
 use Utd\Agency\Entities\Agency;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Entities\ShippingAgency;
 
-class ShippingAgencyRepository
+class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
 {
     protected $model;
 
