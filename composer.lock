@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "47d4f0db0838563b0b943722cb957877",
+    "content-hash": "23edb4d02d16e4ad91b831e1b3450c85",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14687,6 +14687,45 @@
             }
         },
         {
+            "name": "utd/room-cup",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/RoomCup",
+                "reference": "2a8bac652e7b32e2509612d3c4c57e4cd3fa682a"
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\RoomCup\\RoomCupServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\RoomCup\\": "src/",
+                    "Utd\\RoomCup\\Database\\Seeders\\": "Database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Room Cup rewards and targets package for Eagle application",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v5.6.3",
             "source": {
@@ -15458,7 +15497,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "fruitcake/laravel-cors": 20
+        "fruitcake/laravel-cors": 20,
+        "utd/room-cup": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

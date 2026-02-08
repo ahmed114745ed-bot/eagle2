@@ -1268,7 +1268,7 @@ class PermissionTypeSeeder extends Seeder
             ];
         }
 
-        if (PackageHelper::isInstalled('room-cup')) {
+        if (PackageHelper::isInstalled('roomCup')) {
             $categories[] = [
                 'name' => 'Room Cup',
                 'sort' => 44,
