@@ -642,7 +642,7 @@ class UserService
 
     public function showUserCheck(int $userId, bool $isVisit)
     {
-        if (!$this->userRepository->exists($userId)) {
+        if (!$this->userRepository->existsById($userId)) {
             throw new Exception('User not founded');
         }
 

@@ -592,7 +592,7 @@ class UserRepository extends AbstractRepository
     }
 
 
-    public function exists(int $id): bool
+    public function existsById(int $id): bool
     {
         return \Cache::remember(
             "user_exists_{$id}",
@@ -600,6 +600,7 @@ class UserRepository extends AbstractRepository
             fn() => $this->model->where('id', $id)->exists()
         );
     }
+    
     public function emailExists(string $email): bool
     {
         return $this->model->where('email', $email)->exists();
