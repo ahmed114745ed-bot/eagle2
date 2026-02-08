@@ -698,22 +698,22 @@ class TargetController extends MainController
             }
         });
 
-        // $form->html(<<<HTML
-        //         <script>
-        //             Dcat.ready(function () {
-        //                 let hasWarning = $('div.alert-warning:contains("بعض المستخدمين")').length > 0;
+        $form->html(<<<HTML
+                <script>
+                    Dcat.ready(function () {
+                        let hasWarning = $('div.alert-warning:contains("بعض المستخدمين")').length > 0;
 
-        //                 if (hasWarning) {
-        //                     $('form').on('submit', function (e) {
-        //                         e.preventDefault();
-        //                         Dcat.confirm('تحذير', 'بعض المستخدمين وصلوا إلى هذا الهدف. هل تريد حفظ التعديلات؟', function () {
-        //                             $('form').off('submit').submit(); // إعادة الإرسال بعد التأكيد
-        //                         });
-        //                     });
-        //                 }
-        //             });
-        //         </script>
-        //         HTML);
+                        if (hasWarning) {
+                            $('form').on('submit', function (e) {
+                                e.preventDefault();
+                                Dcat.confirm('تحذير', 'بعض المستخدمين وصلوا إلى هذا الهدف. هل تريد حفظ التعديلات؟', function () {
+                                    $('form').off('submit').submit(); // إعادة الإرسال بعد التأكيد
+                                });
+                            });
+                        }
+                    });
+                </script>
+                HTML);
 
 
         $form->saving(function (Form $form) {
@@ -784,7 +784,7 @@ class TargetController extends MainController
                 return redirect()->to($url);
             }
         });
-        
+
         return $form;
     }
 
