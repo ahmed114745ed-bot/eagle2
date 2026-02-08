@@ -34,6 +34,15 @@ class ClassResolver
     }
 
     /**
+     * Get service instance from config
+     */
+    public static function getService(string $key)
+    {
+        $class = config("gifts.services.{$key}");
+        return $class && class_exists($class) ? app($class) : null;
+    }
+
+    /**
      * Get service class from config
      */
     public static function service(string $key): ?string

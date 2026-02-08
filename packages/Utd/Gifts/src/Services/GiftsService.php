@@ -2,7 +2,7 @@
 
 namespace Utd\Gifts\Services;
 
-use App\Contracts\GiftsContract;
+use Utd\Gifts\Contracts\GiftsContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Utd\Gifts\Entities\Gift;
@@ -153,7 +153,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على فئات الهدايا
      * 
      * @return Collection
      */
@@ -189,7 +188,8 @@ class GiftsService implements GiftsContract
         }
 
         $totalPrice = $gift->price * $quantity;
-        if ($user->coins < $totalPrice) {
+        // استخدام di بدلاً من coins
+        if (!isset($user->di) || $user->di < $totalPrice) {
             return false;
         }
 
@@ -214,7 +214,6 @@ class GiftsService implements GiftsContract
     }
 
     /**
-     * الحصول على ترتيب الهدايا
      * 
      * @param string $type
      * @param array $filters

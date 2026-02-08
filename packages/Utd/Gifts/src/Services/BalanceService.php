@@ -2,23 +2,26 @@
 
 namespace Utd\Gifts\Services;
 
-use App\Models\User;
+use Utd\Gifts\Support\ModelResolver;
 
 class BalanceService
 {
     /**
-     * خصم الرصيد من المرسل
      */
-    public function deductFromSender(User $sender, int $amount): void
+    public function deductFromSender($sender, int $amount): void
     {
-        $sender->decrement('di', $amount);
+        if (method_exists($sender, 'decrement')) {
+            $sender->decrement('di', $amount);
+        } elseif (property_exists($sender, 'di')) {
+            $sender->di -= $amount;
+            $sender->save();
+        }
     }
 
     /**
-     * التحقق من كفاية الرصيد
      */
-    public function hasSufficientBalance(User $sender, int $amount): bool
+    public function hasSufficientBalance($sender, int $amount): bool
     {
-        return $sender->di >= $amount;
+        return ($sender->di ?? 0) >= $amount;
     }
 }

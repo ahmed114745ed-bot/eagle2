@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Repositories;
 
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Illuminate\Support\Facades\Auth;
-use App\Contracts\GiftRepositoryContract;
+use Utd\Gifts\Contracts\GiftRepositoryContract;
 
 
 

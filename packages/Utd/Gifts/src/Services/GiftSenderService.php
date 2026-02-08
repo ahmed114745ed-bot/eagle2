@@ -154,18 +154,34 @@ class GiftSenderService implements GiftSenderInterface
         }
 
         $user = $this->getSender($userId);
+        if (!$user) {
+            return false;
+        }
+        
         $userVipLevel = $this->getUserVipLevel($user);
 
         return $userVipLevel >= $gift->vip_level;
     }
 
-    private function getSender(int $userId): User
+    private function getSender(int $userId)
     {
-        return User::findOrFail($userId);
+        $userModel = ModelResolver::getUserModel();
+        if (!$userModel) {
+            return null;
+        }
+        
+        return $userModel::find($userId);
     }
 
-    private function getUserVipLevel(User $user): int
+    private function getUserVipLevel($user): int
     {
-        return \App\Helpers\Common::ovip_center($user)?->level ?? 0;
+        // Check if Common helper exists
+        if (class_exists('\App\Helpers\Common')) {
+            $vipData = \App\Helpers\Common::ovip_center($user);
+            return $vipData?->level ?? 0;
+        }
+        
+        // Fallback to user property if exists
+        return $user->vip_level ?? 0;
     }
 }
