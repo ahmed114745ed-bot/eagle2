@@ -519,11 +519,11 @@ class TargetController extends MainController
 
 
 
-        // $form->display(__('ID'));
+         $form->display(__('ID'));
 
-        // $form->hidden('level', __('target no'))->default(function () {
-        //     return Target::max('level') + 1;
-        // });
+        $form->hidden('level', __('target no'))->default(function () {
+            return Target::max('level') + 1;
+        });
 
 
 
