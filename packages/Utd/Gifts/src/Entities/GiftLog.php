@@ -3,6 +3,7 @@
 namespace Utd\Gifts\Entities;
 
 use App\Traits\TimestampsWithTimezone;
+use App\Traits\HostLevelTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Utd\Gifts\Support\ModelResolver;
@@ -12,7 +13,7 @@ use Utd\Gifts\Support\ModelResolver;
  */
 class GiftLog extends Model
 {
-    use TimestampsWithTimezone;
+    use TimestampsWithTimezone, HostLevelTrait;
 
     protected $table = 'gift_logs';
 
