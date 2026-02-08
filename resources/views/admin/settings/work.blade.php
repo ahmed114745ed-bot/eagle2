@@ -44,7 +44,7 @@
                         <div class="exp-card-body">
                             <div class="form-group">
                                 <label>{{ __('EXP Rate') }}</label>
-                                <input type="text" name="exp_sender_percentage"
+                                <input type="text" id="wealth_exp" name="exp_sender_percentage"
                                        value="{{ $oldExpData['exp_sender_percentage'] ?? '' }}"
                                        placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 coin = X EXP</small>
@@ -56,7 +56,7 @@
                                     <input type="text" id="wealth_gift_price" name="test_calco"
                                            value="{{ $settings['wealth_gift_price'] ?? '' }}"
                                            placeholder="{{ __('Enter price') }}" class="form-control">
-                                    <span id="exp_result" class="result-badge"></span>
+                                    <span id="wealth_exp_result" class="result-badge"></span>
                                 </div>
                             </div>
 
@@ -90,7 +90,7 @@
                         <div class="exp-card-body">
                             <div class="form-group">
                                 <label>{{ __('EXP Rate') }}</label>
-                                <input type="text" name="exp_received_percentage"
+                                <input type="text" id="attraction_exp" name="exp_received_percentage"
                                        value="{{ $oldExpData['exp_received_percentage'] ?? '' }}"
                                        placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 Diamond = X EXP</small>
@@ -136,7 +136,7 @@
                         <div class="exp-card-body">
                             <div class="form-group">
                                 <label>{{ __('EXP Rate') }}</label>
-                                <input type="text" name="exp_charge_percentage"
+                                <input type="text" id="charge_exp" name="exp_charge_percentage"
                                        value="{{ $oldExpData['exp_charge_percentage'] ?? '' }}"
                                        placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 charge = X EXP</small>
@@ -182,7 +182,7 @@
                         <div class="exp-card-body">
                             <div class="form-group">
                                 <label>{{ __('EXP Rate') }}</label>
-                                <input type="text" name="exp_room_percentage"
+                                <input type="text" id="rooms_exp" name="exp_room_percentage"
                                        value="{{ $oldExpData['exp_room_percentage'] ?? '' }}"
                                        placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 room action = X EXP</small>
@@ -228,7 +228,7 @@
                         <div class="exp-card-body">
                             <div class="form-group">
                                 <label>{{ __('EXP Rate') }}</label>
-                                <input type="text" name="exp_cp_percentage"
+                                <input type="text" id="cp_exp" name="exp_cp_percentage"
                                        value="{{ $oldExpData['exp_cp_percentage'] ?? '' }}"
                                        placeholder="{{ __('Enter Exp') }}" class="form-control" required>
                                 <small class="text-muted">1 CP action = X EXP</small>
