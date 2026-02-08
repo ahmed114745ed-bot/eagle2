@@ -4,10 +4,10 @@ namespace App\Tik\Services;
 
 use App\Models\Pack;
 use Modules\Vip\Entities\UserVip;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use Modules\Events\Entities\WinnerReward;
 use App\Http\Resources\UserReportResource;
-use App\Tik\Repositories\AgencyRepository;
+use Utd\Agency\Repositories\AgencyRepository;
 use App\Http\Resources\ReportEventResource;
 use Modules\Events\Entities\RewardWinnerPk;
 use App\Http\Resources\AgencyReportResource;

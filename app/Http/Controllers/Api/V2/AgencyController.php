@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\AgencyUserJob;
 use PHPUnit\Framework\Exception;
 use App\Models\AgencyJoinRequest;
-use App\Tik\Services\AgencyService;
+use Utd\Agency\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
 use App\Http\Resources\Api\V1\AdminsAgencyResource;

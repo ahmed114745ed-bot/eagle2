@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 //use App\Tik\Repositories\VipRepository;
 //use App\Tik\Repositories\OvipRepository;
 use App\Tik\Repositories\PackRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 //use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
