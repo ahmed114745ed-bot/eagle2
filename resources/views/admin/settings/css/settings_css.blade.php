@@ -798,7 +798,7 @@
         flex-direction: row-reverse;
     }
 
-    [dir="rtl"] .input-with-result .result-badge {
+    .rtl .input-with-result .result-badge {
         right: auto;
         left: 10px;
     }
