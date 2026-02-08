@@ -22,22 +22,22 @@ class GiftLogService
         private readonly GiftRepository $giftRepository,
         private readonly GiftLogRepository $giftLogRepository,
     ) {}
-    
+
     private function getRoomTopUsersRepository()
     {
         $class = 'App\\Contracts\\RoomTopUsersRepositoryContract';
         return class_exists($class) ? app($class) : null;
     }
-    
+
     private function getRoomRepository()
     {
         $class = 'App\\Contracts\\RoomRepositoryContract';
         return class_exists($class) ? app($class) : null;
     }
-    
+
     private function getUserRepository()
     {
-        $class = 'App\\Tik\\Repositories\\UserRepository';
+        $class = 'Utd\\Agency\\Repositories\\UserRepository';
         return class_exists($class) ? app($class) : null;
     }
 
@@ -84,7 +84,7 @@ class GiftLogService
             if (!$repository) {
                 throw new \Exception('Room repository not available');
             }
-            
+
             if (isset($ownerId)){
                 $room =  $repository->findTypeUserRoom($ownerId, selectRow: 'id,uid,room_visitor,	room_name,room_cover,play_num,hot,room_pass,session,microphone,charizma_status,type');
 
@@ -167,7 +167,7 @@ class GiftLogService
                     $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
                 })->whereIn('status', [1, 4])->first();
             }
-           
+
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
@@ -772,7 +772,7 @@ class GiftLogService
     {
         return $this->giftLogRepository->userGiftInfo($id, $type, $startDate, $endDate, $perPage, $page);
     }
-    
+
     /**
      * Helper methods لإدارة Classes الخارجية بشكل آمن
      */
@@ -781,61 +781,61 @@ class GiftLogService
         $class = 'App\\Enums\\GiftSourceType';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getUserCoinLogTypeClass()
     {
         $class = 'App\\Enums\\UserCoinLogType';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getCacheHelperClass()
     {
         $class = 'App\\Helpers\\CacheHelper';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getUserCoinLogHelperClass()
     {
         $class = 'App\\Helpers\\UserCoinLogHelper';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getCommonHelperClass()
     {
         $class = 'App\\Helpers\\Common';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getUpdatePkJobClass()
     {
         $class = 'Utd\\Room\\Jobs\\UpdatePkAndSendToZigoJob';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getSendGiftServiceInstance()
     {
         $class = 'App\\Classes\\Gifts\\SendGiftService';
         return class_exists($class) ? new $class() : null;
     }
-    
+
     private function getUpdateUserWhenSendGiftInstance()
     {
         $class = 'App\\Classes\\Gifts\\UpdateUserWhenSendGift';
         return class_exists($class) ? new $class() : null;
     }
-    
+
     private function getCpModelClass()
     {
         $class = 'App\\Models\\Cp';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function getReceiverGiftDTOClass()
     {
         $class = 'App\\Tik\\DTO\\ReceiverGiftDTO';
         return class_exists($class) ? $class : null;
     }
-    
+
     private function fireGiftBannerEvent($data)
     {
         $class = 'App\\Events\\GiftBannerEvent';
@@ -843,7 +843,7 @@ class GiftLogService
             event(new $class($data));
         }
     }
-    
+
     /**
      * Helper methods لإدارة Modules الخارجية بشكل آمن
      */
@@ -851,7 +851,7 @@ class GiftLogService
     {
         return class_exists('\\Modules\\CP\\Http\\Services\\CpService');
     }
-    
+
     private function getCpService()
     {
         if ($this->hasCpService()) {
@@ -859,12 +859,12 @@ class GiftLogService
         }
         return null;
     }
-    
+
     private function hasCharizmaJob(): bool
     {
         return class_exists('\\Modules\\Charizma\\Jobs\\UpdateSendCharismaToZigo');
     }
-    
+
     private function getCharizmaJob($roomId, $userIds, $amount, $senderId)
     {
         if ($this->hasCharizmaJob()) {
@@ -872,12 +872,12 @@ class GiftLogService
         }
         return null;
     }
-    
+
     private function hasRoomBoomService(): bool
     {
         return class_exists('\\Modules\\RoomBoom\\Services\\NewRoomBoomGiftService');
     }
-    
+
     private function getRoomBoomService()
     {
         if ($this->hasRoomBoomService()) {
