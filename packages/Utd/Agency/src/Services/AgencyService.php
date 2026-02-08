@@ -602,5 +602,103 @@ class AgencyService implements AgencyServiceInterface
         // TODO: Implement this method based on the business logic from Tik module
         throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
     }
-}
 
+    /**
+     * Create new agency
+     */
+    public function create($userId, $request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Action on agency request (accept/reject)
+     */
+    public function actionRequestAgency($request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get agency report
+     */
+    public function agencyReport($agencyId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Handle user request
+     */
+    public function handlingRequest($agencyId, $userId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Kick user from agency
+     */
+    public function kickAgency($user, $userId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Filter agencies
+     */
+    public function filter($keyword)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get daily report
+     */
+    public function dailyReport($user, $month, $year, $agencyId)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get agency data
+     */
+    public function dataAgency()
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get host report
+     */
+    public function hostReport($id)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Get host daily report
+     */
+    public function hostDailyReport($request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+
+    /**
+     * Edit agency
+     */
+    public function editAgency($request)
+    {
+        // TODO: Implement this method based on the business logic from Tik module
+        throw new Exception('Method not yet implemented. Please implement from App\\Tik\\Services\\AgencyService');
+    }
+}
