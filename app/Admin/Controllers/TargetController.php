@@ -686,17 +686,17 @@ class TargetController extends MainController
             return @explode(',', $moment)[2] ?? 0;
         });
 
-        // $form->editing(function (Form $form) {
+        $form->editing(function (Form $form) {
 
-        //     $target = Target::find($form->model()->id);
+            $target = Target::find($form->model()->id);
 
-        //     if ($target) {
-        //         $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month', now()->month)->where('year', now()->year)->count();
-        //         if ($users > 0) {
-        //             admin_warning('تحذير', __('target_change_warning'));
-        //         }
-        //     }
-        // });
+            if ($target) {
+                $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month', now()->month)->where('year', now()->year)->count();
+                if ($users > 0) {
+                    admin_warning('تحذير', __('target_change_warning'));
+                }
+            }
+        });
 
         // $form->html(<<<HTML
         //         <script>
@@ -784,6 +784,12 @@ class TargetController extends MainController
                 return redirect()->to($url);
             }
         });
+
+
+        // $form->saved(function (Form $form) {
+        //     $url = url('admin/agency-settings?firsttab=targets_table');
+        //     return redirect()->to($url);
+        // });
 
         return $form;
     }
