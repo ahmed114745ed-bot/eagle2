@@ -35,7 +35,7 @@
     $firstCategory = $categories->first()->slug ?? null;
 @endphp
 
-<style>
+{{-- <style>
     .label-small-font {
     font-size: 12px;
 }
@@ -114,7 +114,164 @@
     .rtl .fields-group .form-group {
     display: block !important;
 }
+</style> --}}
+
+<style>
+/* ===============================
+   GLOBAL TUNING
+================================ */
+:root {
+    --soft-bg: #f6f7fb;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --text-muted: #6b7280;
+    --radius: 12px;
+    --shadow-soft: 0 6px 18px rgba(0,0,0,.05);
+}
+
+/* ===============================
+   TABS
+================================ */
+.nav-tabs {
+    background: #f9f9f9;
+    padding: 6px;
+    border-radius: var(--radius);
+    border: none;
+}
+
+.nav-tabs .nav-item {
+    margin: 0 4px;
+}
+
+.nav-tabs .nav-link {
+    border-radius: 10px;
+    padding: 8px 18px;
+    color: #555;
+    font-weight: 500;
+    transition: all .25s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: rgba(0,0,0,.05);
+}
+
+.nav-tabs .nav-link.active {
+    background: var(--primary-color);
+    color: #fff;
+    box-shadow: var(--shadow-soft);
+}
+
+/* ===============================
+   CATEGORY SELECT ALL
+================================ */
+.category-select-all-container {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 12px 20px;
+    box-shadow: var(--shadow-soft);
+}
+
+/* ===============================
+   PERMISSIONS GRID
+================================ */
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px;
+}
+
+/* ===============================
+   PERMISSION GROUP CARD
+================================ */
+.permission-group {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px 16px 14px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    transition: all .25s ease;
+}
+
+.permission-group:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0,0,0,.08);
+}
+
+/* ===============================
+   GROUP TITLE
+================================ */
+.permission-group-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ===============================
+   CHECKBOXES
+================================ */
+.form-check {
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background .2s ease;
+}
+
+.form-check:hover {
+    background: #f3f4f6;
+}
+
+.form-check-input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.form-check-label {
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+}
+
+/* ===============================
+   ACTIVE STATES
+================================ */
+.permission-checkbox:checked + .form-check-label {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* ===============================
+   RTL SUPPORT
+================================ */
+[dir="rtl"] .permission-group-title {
+    justify-content: flex-end;
+}
+
+[dir="rtl"] .form-check {
+    flex-direction: row-reverse;
+    text-align: right;
+}
+
+/* ===============================
+   SMALL SCREENS
+================================ */
+@media (max-width: 768px) {
+    .permissions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
 </style>
+
 
 <input type="hidden" name="permissions_all" id="permissions_all">
 <ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">
