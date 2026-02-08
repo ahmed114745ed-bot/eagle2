@@ -55,10 +55,11 @@ use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
 use Utd\Agency\Transformers\AgencyMonthlyHostResource;
+use Utd\Agency\Contracts\AgencyServiceInterface;
 
 
 
-class AgencyService
+class AgencyService implements AgencyServiceInterface
 {
     public function __construct(
         private readonly AgencyRepository $agencyRepository,
