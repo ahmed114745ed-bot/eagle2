@@ -709,8 +709,11 @@ class AgencyService implements AgencyServiceInterface
         \Log::info('[AgencyService::dailyReport] Joined agency found, continuing...');
         
         
+        $joinRecord = $member;
+
         $timezone = getTimezone();
         //        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $nowInTimezone = Carbon::now($timezone);
 
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
