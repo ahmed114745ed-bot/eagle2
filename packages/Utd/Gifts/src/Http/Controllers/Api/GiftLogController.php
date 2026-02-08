@@ -92,7 +92,7 @@ class GiftLogController extends Controller
                 'GiftBannerEvent' => ClassResolver::event('gift_banner'),
                 'NotInfMoneyException' => ClassResolver::exception('not_inf_money'),
                 'roomTopUsersRepository' => app(ClassResolver::contract('room_top_users_repository')),
-                'giftLogService' => app(ClassResolver::service('gift_log')) ?: app(\Utd\Gifts\Services\GiftLogService::class),
+                'giftLogService' => ClassResolver::getService('gift_log') ?: app(\Utd\Gifts\Services\GiftLogService::class),
                 default => null,
             };
         }
