@@ -696,9 +696,8 @@ class TargetController extends MainController
                     admin_warning('تحذير', __('target_change_warning'));
                 }
             }
-        });
 
-        $form->html(<<<HTML
+            $form->html(<<<HTML
                 <script>
                     Dcat.ready(function () {
                         let hasWarning = $('div.alert-warning:contains("بعض المستخدمين")').length > 0;
@@ -714,6 +713,9 @@ class TargetController extends MainController
                     });
                 </script>
                 HTML);
+        });
+
+
 
 
         $form->saving(function (Form $form) {
