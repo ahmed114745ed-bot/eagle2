@@ -45,6 +45,23 @@
         border-radius: 12px;
         border: none;
     }
+
+.nav-tabs .nav-item {
+    margin: 0 4px;
+}
+
+.nav-tabs .nav-link {
+    border-radius: 10px;
+    padding: 8px 18px;
+    color: #555;
+    font-weight: 500;
+    transition: all .25s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: rgba(0,0,0,.05);
+}
+    
     .nav-link.active {
         background-color: var(--primary-color);
         color: white;
