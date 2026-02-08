@@ -299,15 +299,16 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                $AllOpeningRoomsZegoRequest = app($this->AllOpeningRoomsZegoRequest);
-                dispatchJobToQueue(new $AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+                $AllOpeningRoomsZegoRequestClass = $this->AllOpeningRoomsZegoRequest;
+                dispatchJobToQueue(new $AllOpeningRoomsZegoRequestClass($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
             }
         }
         return @$jsons ?? [];
     }
     public function gift_queue_cp(Request $request)
     {
-        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $close_open_gifts = settings()->get('close_open_gifts');
 
@@ -410,7 +411,8 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request)
     {
-        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -443,7 +445,8 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V2(Request $request)
     {
-        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -476,7 +479,8 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request)
     {
-        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
+        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
