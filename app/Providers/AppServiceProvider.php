@@ -90,6 +90,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('ManagerHelper', fn($app) => new ManagerHelper());
         $this->app->bind(SearchRepositoryInterface::class, SearchRepository::class);
         
+        // Bind Tik repositories for AgencyService dependencies
+        $this->app->bind(\App\Tik\Repositories\GiftLogRepository::class, \App\Tik\Repositories\GiftLogRepository::class);
+        $this->app->bind(\App\Tik\Repositories\AgencyRepository::class, \App\Tik\Repositories\AgencyRepository::class);
+        $this->app->bind(\App\Tik\Repositories\UserRepository::class, \App\Tik\Repositories\UserRepository::class);
+        
         if (class_exists('Utd\\Agency\\Repositories\\ShippingAgencyRepository')) {
             $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);
         } else {
