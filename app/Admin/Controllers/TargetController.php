@@ -520,10 +520,11 @@ class TargetController extends MainController
 
 
         $form->display(__('ID'));
+        // $form->hidden('level', __('target no'))->default(function () {
+        //     return Target::max('level') + 1;
+        // });
 
-        $form->hidden('level', __('target no'))->default(function () {
-            return Target::max('level') + 1;
-        });
+        $form->hidden('level', __('target no'));
 
 
 
@@ -718,6 +719,9 @@ class TargetController extends MainController
 
         $form->saving(function (Form $form) {
 
+            if (! $form->isEditing()) {
+                $form->level = Target::max('level') + 1;
+            }
 
             $fields = [
                 'usd' => request()->usd,
