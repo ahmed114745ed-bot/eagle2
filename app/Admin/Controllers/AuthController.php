@@ -156,14 +156,50 @@ class AuthController extends BaseAuthController
             return redirect()->route('bd.home');
         }
 
-        return redirect()->intended($request->url ?? $this->redirectPath());
+        $url = $this->getFirstUrl($user);
+      //  dd($url, $request->url);
+        $redirectUrl = $request->url != "/admin" ? $request->url : $url;
+        return redirect()->intended(
+            $redirectUrl
+            /**$this->redirectPath()*/
+        );
     }
+
+
 
     public function getFirstUrl($user)
     {
-        $firstPermission = $user->permissions()->orderBy('id', 'asc')->first();
+        $permissionSlugs = $user->roles
+            ->flatMap->permissions
+            ->unique('id')
+            ->pluck('slug');
 
+        if ($permissionSlugs->isEmpty()) {
+            return admin_url(); // fallback
+        }
+
+        $firstPermission = DB::table('admin_permissions')
+            ->join('role_categories', 'admin_permissions.category', '=', 'role_categories.slug')
+            ->whereIn('admin_permissions.slug', $permissionSlugs)
+            ->where('admin_permissions.slug', 'like', 'browse-%')
+            ->orderBy('role_categories.sort', 'asc')
+            ->orderBy('admin_permissions.id', 'asc')
+            ->select('admin_permissions.slug')
+            ->first();
+
+
+        // Fallback if no permission found
+        $permissionSlug = $firstPermission->slug ?? 'browse-dashboard';
+
+        $menuUrl = DB::table('admin_menu')
+            ->where('permission', $permissionSlug)
+            ->whereNotNull('uri')
+            ->where('uri', '!=', '')
+            ->value('uri');
+
+        return $menuUrl ? admin_url($menuUrl) : admin_url();
     }
+
     public function getSetting(Content $content)
     {
         $form = $this->settingForm();
@@ -232,7 +268,7 @@ class AuthController extends BaseAuthController
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    
+
         return redirect('/areaManager/login');
     }
 
@@ -241,7 +277,7 @@ class AuthController extends BaseAuthController
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    
+
         return redirect('/bd/login');
     }
     public function customSuperadminLogout(Request $request)
@@ -249,10 +285,7 @@ class AuthController extends BaseAuthController
         Auth::guard('admin')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-    
+
         return redirect('/superadmin/login');
     }
-
-    
-    
 }
