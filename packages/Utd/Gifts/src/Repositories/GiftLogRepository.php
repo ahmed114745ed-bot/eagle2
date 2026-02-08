@@ -12,7 +12,7 @@ interface GiftLogRepositoryContract
     public function userGiftInfo($id, $type, $startDate, $endDate, $perPage, $page);
 }
 
-class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract
+class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract, \App\Contracts\GiftLogRepositoryContract
 {
     public function __construct()
     {
