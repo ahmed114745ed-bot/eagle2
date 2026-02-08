@@ -2,21 +2,10 @@
 
 namespace App\Tik\Repositories;
 
-use Modules\SalaryTransaction\Entities\ChargeAgency;
-
-class ChargeAgencyRepository extends AbstractRepository
+/**
+ * Backward compatibility alias
+ * This class extends the new package repository
+ */
+class ChargeAgencyRepository extends \Utd\Agency\Repositories\ChargeAgencyRepository
 {
-
-    /**
-     * @param Model $model
-     */
-    public function __construct()
-    {
-        parent::__construct(new ChargeAgency());
-    }
-
-    public function all()
-    {
-        return $this->model->Select('agency_id')->groupBy('agency_id')->get();
-    }
 }
