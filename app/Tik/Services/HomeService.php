@@ -5,21 +5,21 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Models\Pack;
-use Utd\Room\Entities\Room;
+use App\Models\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
-use App\Contracts\RoomRepositoryContract;
-use App\Tik\Repositories\UserRepository;
+use App\Tik\Repositories\RoomRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
+use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Log;
 use Modules\Vip\Repositories\OvipRepository;
 use Modules\Vip\Repositories\UserVipRepository;
-use App\Contracts\GiftLogRepositoryContract;
 
 
 class HomeService
@@ -27,11 +27,11 @@ class HomeService
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
-        private readonly ?GiftLogRepositoryContract $giftLogRepository,
+        private readonly GiftLogRepository $giftLogRepository,
         private readonly ImageRepository $imageRepository,
         private readonly OvipRepository $ovipRepository,
         private readonly WareRepository $wareRepository,
-        private readonly RoomRepositoryContract $roomRepository,
+        private readonly RoomRepository $roomRepository,
         private readonly PackRepository $packRepository,
         private readonly UserVipRepository $userVipRepository,
         private readonly TicketRepository $ticketRepository,

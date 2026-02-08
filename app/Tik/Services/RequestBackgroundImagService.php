@@ -5,7 +5,7 @@ namespace App\Tik\Services;
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
 
 class RequestBackgroundImagService

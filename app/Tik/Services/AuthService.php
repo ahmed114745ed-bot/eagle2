@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Http;
 use App\Exceptions\CValidationException;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use Modules\SwitchAccount\Traits\SwithAccountLogin;
 use Modules\SwitchAccount\Http\Services\SwitchAccountServices;

@@ -6,8 +6,8 @@ use Exception;
 use App\Helpers\Common;
 use App\Facades\ManagerHelper;
 use Illuminate\Support\Facades\Hash;
-use App\Tik\Repositories\UserRepository;
-use App\Tik\Repositories\AgencyRepository;
+use Utd\Agency\Repositories\UserRepository;
+use Utd\Agency\Repositories\AgencyRepository;
 use App\Tik\Repositories\AdminUsersRepository;
 
 
