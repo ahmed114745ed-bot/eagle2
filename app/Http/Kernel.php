@@ -128,7 +128,6 @@ class Kernel extends HttpKernel
         'remaining.diamond.action' => \App\Http\Middleware\RemainingDiamondsMiddleware::class,
 
         'optional.sanctum' => \Modules\Form\Http\Middleware\OptionalSanctum::class,
-        'check.allowed.app' => \Modules\RoomCup\Http\Middleware\CheckAllowedApp::class,
         'host.level' => \App\Http\Middleware\HostLevelMiddleware::class,
         'host.level.action' => \App\Http\Middleware\HostLevelActionMiddleWare::class,
 

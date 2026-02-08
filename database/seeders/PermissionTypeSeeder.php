@@ -1268,6 +1268,27 @@ class PermissionTypeSeeder extends Seeder
             ];
         }
 
+        if (PackageHelper::isInstalled('room-cup')) {
+            $categories[] = [
+                'name' => 'Room Cup',
+                'sort' => 44,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 44],
+                ],
+                'permissions' => [
+                    ['key' => 'room-cup-target', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'room-cup-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                    ['key' => 'room-cup-reports', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ];
+        }
+
         $allSlugs = [];
 
         foreach ($categories as $category) {

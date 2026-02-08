@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5b27d0036ff658b0b6bc1d593cde5393",
+    "content-hash": "47d4f0db0838563b0b943722cb957877",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1247,29 +1247,29 @@
         },
         {
             "name": "doctrine/deprecations",
-            "version": "1.1.5",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/deprecations.git",
-                "reference": "459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38"
+                "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/deprecations/zipball/459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38",
-                "reference": "459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38",
+                "url": "https://api.github.com/repos/doctrine/deprecations/zipball/d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca",
+                "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0"
             },
             "conflict": {
-                "phpunit/phpunit": "<=7.5 || >=13"
+                "phpunit/phpunit": "<=7.5 || >=14"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^9 || ^12 || ^13",
-                "phpstan/phpstan": "1.4.10 || 2.1.11",
+                "doctrine/coding-standard": "^9 || ^12 || ^14",
+                "phpstan/phpstan": "1.4.10 || 2.1.30",
                 "phpstan/phpstan-phpunit": "^1.0 || ^2",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6 || ^10.5 || ^11.5 || ^12",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6 || ^10.5 || ^11.5 || ^12.4 || ^13.0",
                 "psr/log": "^1 || ^2 || ^3"
             },
             "suggest": {
@@ -1289,9 +1289,9 @@
             "homepage": "https://www.doctrine-project.org/",
             "support": {
                 "issues": "https://github.com/doctrine/deprecations/issues",
-                "source": "https://github.com/doctrine/deprecations/tree/1.1.5"
+                "source": "https://github.com/doctrine/deprecations/tree/1.1.6"
             },
-            "time": "2025-04-07T20:06:18+00:00"
+            "time": "2026-02-07T07:09:04+00:00"
         },
         {
             "name": "doctrine/event-manager",
@@ -6372,16 +6372,16 @@
         },
         {
             "name": "nette/schema",
-            "version": "v1.3.3",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/schema.git",
-                "reference": "2befc2f42d7c715fd9d95efc31b1081e5d765004"
+                "reference": "086497a2f34b82fede9b5a41cc8e131d087cd8f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/schema/zipball/2befc2f42d7c715fd9d95efc31b1081e5d765004",
-                "reference": "2befc2f42d7c715fd9d95efc31b1081e5d765004",
+                "url": "https://api.github.com/repos/nette/schema/zipball/086497a2f34b82fede9b5a41cc8e131d087cd8f7",
+                "reference": "086497a2f34b82fede9b5a41cc8e131d087cd8f7",
                 "shasum": ""
             },
             "require": {
@@ -6389,8 +6389,8 @@
                 "php": "8.1 - 8.5"
             },
             "require-dev": {
-                "nette/tester": "^2.5.2",
-                "phpstan/phpstan-nette": "^2.0@stable",
+                "nette/tester": "^2.6",
+                "phpstan/phpstan": "^2.0@stable",
                 "tracy/tracy": "^2.8"
             },
             "type": "library",
@@ -6431,9 +6431,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nette/schema/issues",
-                "source": "https://github.com/nette/schema/tree/v1.3.3"
+                "source": "https://github.com/nette/schema/tree/v1.3.4"
             },
-            "time": "2025-10-30T22:57:59+00:00"
+            "time": "2026-02-08T02:54:00+00:00"
         },
         {
             "name": "nette/utils",
@@ -11010,16 +11010,16 @@
         },
         {
             "name": "symfony/cache",
-            "version": "v7.3.11",
+            "version": "v7.4.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache.git",
-                "reference": "e3e76b9ba0dff3dfe08ebda500723976dd9de407"
+                "reference": "8dde98d5a4123b53877aca493f9be57b333f14bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache/zipball/e3e76b9ba0dff3dfe08ebda500723976dd9de407",
-                "reference": "e3e76b9ba0dff3dfe08ebda500723976dd9de407",
+                "url": "https://api.github.com/repos/symfony/cache/zipball/8dde98d5a4123b53877aca493f9be57b333f14bd",
+                "reference": "8dde98d5a4123b53877aca493f9be57b333f14bd",
                 "shasum": ""
             },
             "require": {
@@ -11027,12 +11027,14 @@
                 "psr/cache": "^2.0|^3.0",
                 "psr/log": "^1.1|^2|^3",
                 "symfony/cache-contracts": "^3.6",
-                "symfony/deprecation-contracts": "^2.5|^3.0",
+                "symfony/deprecation-contracts": "^2.5|^3",
                 "symfony/service-contracts": "^2.5|^3",
-                "symfony/var-exporter": "^6.4|^7.0"
+                "symfony/var-exporter": "^6.4|^7.0|^8.0"
             },
             "conflict": {
                 "doctrine/dbal": "<3.6",
+                "ext-redis": "<6.1",
+                "ext-relay": "<0.12.1",
                 "symfony/dependency-injection": "<6.4",
                 "symfony/http-kernel": "<6.4",
                 "symfony/var-dumper": "<6.4"
@@ -11047,13 +11049,13 @@
                 "doctrine/dbal": "^3.6|^4",
                 "predis/predis": "^1.1|^2.0",
                 "psr/simple-cache": "^1.0|^2.0|^3.0",
-                "symfony/clock": "^6.4|^7.0",
-                "symfony/config": "^6.4|^7.0",
-                "symfony/dependency-injection": "^6.4|^7.0",
-                "symfony/filesystem": "^6.4|^7.0",
-                "symfony/http-kernel": "^6.4|^7.0",
-                "symfony/messenger": "^6.4|^7.0",
-                "symfony/var-dumper": "^6.4|^7.0"
+                "symfony/clock": "^6.4|^7.0|^8.0",
+                "symfony/config": "^6.4|^7.0|^8.0",
+                "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+                "symfony/filesystem": "^6.4|^7.0|^8.0",
+                "symfony/http-kernel": "^6.4|^7.0|^8.0",
+                "symfony/messenger": "^6.4|^7.0|^8.0",
+                "symfony/var-dumper": "^6.4|^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -11088,7 +11090,7 @@
                 "psr6"
             ],
             "support": {
-                "source": "https://github.com/symfony/cache/tree/v7.3.11"
+                "source": "https://github.com/symfony/cache/tree/v7.4.5"
             },
             "funding": [
                 {
@@ -11108,7 +11110,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-27T16:12:03+00:00"
+            "time": "2026-01-27T16:16:02+00:00"
         },
         {
             "name": "symfony/cache-contracts",
@@ -14374,11 +14376,11 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-agencyPackage",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
-                "url": "packages/Utd/achievements",
-                "reference": "0bac63d13b4a92191c62beccecd5046ce57c812e"
+                "url": "packages/Utd/Achievements",
+                "reference": "73e243a67837210559d41cbb0e72f4fd92d4cb5b"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14410,16 +14412,17 @@
             ],
             "description": "Achievement System Package with License Support",
             "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },
         {
             "name": "utd/agency",
-            "version": "dev-agencyPackage",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Agency",
-                "reference": "685ebed5ebeb14cc84e8180f6bf9d7049fe82222"
+                "reference": "5b0789f587941fa91927066d5c81621ab954364d"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14460,16 +14463,63 @@
                 "shipping-agency"
             ],
             "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/gifts",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "./packages/Utd/Gifts",
+                "reference": "c11d04b813e62ece46d59dd18674ce9a6cb7d76b"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Gifts\\GiftsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Gifts\\": "src/",
+                    "Utd\\Gifts\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Complete Gifts Laravel Package - Gifts Management System",
+            "keywords": [
+                "gifts",
+                "laravel",
+                "management",
+                "presents"
+            ],
+            "transport-options": {
                 "relative": true
             }
         },
         {
             "name": "utd/moments",
-            "version": "dev-agencyPackage",
+            "version": "dev-achievmentPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
-                "reference": "a20d44d7a5a6212c4544657b83ddeb8e02cee856"
+                "reference": "ed1a9236e70257dbf92528425e1a2cee0c8a37b4"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14500,6 +14550,139 @@
             ],
             "description": "Moments Laravel Package",
             "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/pk",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Pk",
+                "reference": "a139aa14176b143a616732776379cac551d8a89b"
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Pk\\PkServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Pk\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "PK (Player vs Player) package for Eagle application",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/reals",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Reals",
+                "reference": "62bf966f616bc3ac25632b5bcba722b717cf4751"
+            },
+            "require": {
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/http": "^10.0|^11.0",
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0",
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Reals\\RealsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Reals\\": "src/",
+                    "Utd\\Reals\\Database\\Seeders\\": "database/Seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Utd\\Reals\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Reels/Reals Feature Package with License Support",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "utd/room",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Room",
+                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Room\\RoomServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Room\\": "src/",
+                    "Utd\\Room\\Database\\": "Database/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Room Laravel Package - Core room functionality including microphones, visitors, categories, and more",
+            "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },

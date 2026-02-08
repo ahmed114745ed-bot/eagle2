@@ -10,6 +10,7 @@ use Utd\Reals\Entities\Real;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Utd\RoomBoom\Entities\RoomBoom;
+use Utd\RoomCup\Entities\RoomCupTarget;
 
 class PackageHelper
 {
@@ -21,6 +22,7 @@ class PackageHelper
         'pk' => Pk::class,
         'taskStream' => TaskStream::class,
         'roomBoom' => RoomBoom::class,
+        'roomCup' => RoomCupTarget::class,
     ];
 
     /**

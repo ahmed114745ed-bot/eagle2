@@ -142,7 +142,7 @@
                 "symlink": true
             }
         },
-       
+
         {
             "type": "path",
             "url": "packages/Utd/Reals",
@@ -160,6 +160,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Pk",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/RoomCup",
             "options": {
                 "symlink": true
             }

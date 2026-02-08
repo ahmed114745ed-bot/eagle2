@@ -6,7 +6,7 @@ use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Modules\RoomCup\Entities\RoomCupReward;
+use Utd\RoomCup\Entities\RoomCupReward;
 use Utd\RoomBoom\Entities\RoomBoom;
 
 class TotalRoomGift extends Model
@@ -26,6 +26,7 @@ class TotalRoomGift extends Model
 
     public function ownerRewards(): HasMany
     {
-        return $this->hasMany(RoomCupReward::class, 'total_room_gift_id');
+        return PackageHelper::checkRelation($this, 'roomCup', 'hasMany') ??
+            $this->hasMany(RoomCupReward::class, 'total_room_gift_id');
     }
 }

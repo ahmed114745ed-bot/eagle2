@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Modules\CP\Database\Seeders\CPDatabaseSeeder;
 use Modules\Form\Database\Seeders\AgencyAndBdFormsSeeder;
 use Modules\Form\Database\Seeders\CustomFieldWidgetSeeder;
+use Utd\RoomCup\Database\Seeders\RoomCupDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -40,7 +41,8 @@ class DatabaseSeeder extends Seeder
 //        AdminNewPermission::class,
 //        AdminRoleBDSeeder::class,
         CustomFieldWidgetSeeder::class,
-            AgencyAndBdFormsSeeder::class
+            AgencyAndBdFormsSeeder::class,
+            RoomCupDatabaseSeeder::class,
         ]);
     }
 }
