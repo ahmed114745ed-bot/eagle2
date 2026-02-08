@@ -641,12 +641,18 @@ class TargetController extends MainController
         $form->html('<h1>' . __('days and hours') . '</h1>');
 
         $form->number('hours', __('hours'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $hours = $form->model()->hours;
-            return $hours == null || $hours == '' ? 0 : $hours;
+            return $hours === null || $hours === '' ? 0 : $hours;
         });
         $form->number('days', __('days'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $days = $form->model()->days;
-            return $days == null || $days == '' ? 0 : $days;
+            return $days === null || $days === '' ? 0 : $days;
         });
 
 
@@ -654,16 +660,25 @@ class TargetController extends MainController
 
         $form->hidden('reel', 'reel');
         $form->number('reel1', __('uploadReel'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $reel = $form->model()->reel;
             $str    = @explode(',', $reel)[0];
-            return $str == null || $str == '' ? 0 : $str;
+            return $str === null || $str === '' ? 0 : $str;
         });
         $form->number('reel2', __('LikeReel'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $reel = $form->model()->reel;
 
             return @explode(',', $reel)[1] ?? 0;
         });;
         $form->number('reel3', __('commentReel'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $reel = $form->model()->reel;
 
             return @explode(',', $reel)[2] ?? 0;
@@ -672,28 +687,40 @@ class TargetController extends MainController
         $form->hidden('moment', 'moment');
 
         $form->number('moment1', __('uploadMoment'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $moment = $form->model()->moment;
             $str    = @explode(',', $moment)[0];
-            return $str == null || $str == '' ? 0 : $str;
+            return $str === null || $str === '' ? 0 : $str;
         });
         $form->number('moment2', __('likeMoment'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $moment = $form->model()->moment;
 
             return @explode(',', $moment)[1] ?? 0;
         });
         $form->number('moment3', __('commentMoment'))->default(function ($form) {
+            if (! $form->isEditing()) {
+                return 0;
+            }
             $moment = $form->model()->moment;
 
             return @explode(',', $moment)[2] ?? 0;
         });
 
         $form->editing(function (Form $form) {
-
-            $target = Target::find($form->model()->id);
+            $target = $form->model();
 
             if ($target) {
-                $users = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)->where('month', now()->month)->where('year', now()->year)->count();
-                if ($users > 0) {
+                $exists = MonthlyDiamondReceive::where('monthly_diamond_received', '>=', $target->diamonds)
+                    ->where('month', now()->month)
+                    ->where('year', now()->year)
+                    ->exists();
+
+                if ($exists) {
                     admin_warning('تحذير', __('target_change_warning'));
                 }
             }
