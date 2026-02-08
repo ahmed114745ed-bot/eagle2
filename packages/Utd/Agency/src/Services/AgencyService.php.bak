@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Agency\Services;
+namespace App\Tik\Services;
 
 use Exception;
 use Carbon\Carbon;
@@ -25,9 +25,9 @@ use App\Models\MonthlyDiamondReceive;
 use App\Notifications\AgencyOwnerRole;
 use Illuminate\Support\Facades\Storage;
 use App\Exceptions\CValidationException;
-use Utd\Agency\Repositories\UserRepository;
-use Utd\Agency\Repositories\AdminRepository;
-use Utd\Agency\Repositories\AgencyRepository;
+use App\Tik\Repositories\UserRepository;
+use App\Tik\Repositories\AdminRepository;
+use App\Tik\Repositories\AgencyRepository;
 use App\Tik\Repositories\FollowRepository;
 use App\Tik\Repositories\TargetRepository;
 use Modules\Milestones\Entities\Milestone;
@@ -39,17 +39,17 @@ use Modules\Reals\Http\Services\RealsService;
 use App\Tik\Repositories\UserSalaryRepository;
 use Illuminate\Validation\ValidationException;
 use Modules\Milestones\Helpers\MilestoneHelper;
-use Utd\Agency\Repositories\AgencySalaryRepository;
-use Utd\Agency\Repositories\ChargeAgencyRepository;
-use Utd\Agency\Repositories\AgencyUserJobRepository;
-use Utd\Agency\Repositories\AdditionalInfoRepository;
+use App\Tik\Repositories\AgencySalaryRepository;
+use App\Tik\Repositories\ChargeAgencyRepository;
+use App\Tik\Repositories\AgencyUserJobRepository;
+use App\Tik\Repositories\AdditionalInfoRepository;
 use App\Tik\Repositories\ProfileVisitorRepository;
 use Utd\Agency\Repositories\ShippingAgencyRepository;
 use App\Http\Resources\Api\V1\SenderGiftLogResource;
-use Utd\Agency\Repositories\AgencyJoinRequestRepository;
-use Utd\Agency\Repositories\UsersJoinedAgencyRepository;
+use App\Tik\Repositories\AgencyJoinRequestRepository;
+use App\Tik\Repositories\UsersJoinedAgencyRepository;
 use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
-use Utd\Agency\Repositories\LeaveAgencyRequestRepository;
+use App\Tik\Repositories\LeaveAgencyRequestRepository;
 use Utd\Agency\Transformers\AgencyHostResource;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
