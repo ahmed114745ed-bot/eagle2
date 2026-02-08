@@ -58,49 +58,45 @@ class GiftLogController extends Controller
     
     public function __construct()
     {
-        // Resolve all external classes from config
-        $this->Common = ClassResolver::helper('common');
-        $this->UserCommon = ClassResolver::helper('user_common');
-        $this->UserHandling = ClassResolver::facade('user_handling');
-        $this->CustomNotification = ClassResolver::facade('custom_notification');
-        $this->GiftLogResource = ClassResolver::resource('gift_log');
-        $this->GiftLogUtdResource = ClassResolver::resource('gift_log_utd');
-        
-        // Models
-        $this->User = ClassResolver::model('user');
-        $this->Agency = ClassResolver::model('agency');
-        $this->Cp = ClassResolver::model('cp');
-        $this->AppFeature = ClassResolver::model('app_feature');
-        $this->CoreWallet = ClassResolver::model('core_wallet');
-        $this->UserSallary = ClassResolver::model('user_salary');
-        $this->RemainingDiamond = ClassResolver::model('remaining_diamond');
-        $this->MonthlyDiamondReceive = ClassResolver::model('monthly_diamond_receive');
-        
-        // Services
-        $this->LuckyGiftService = app(ClassResolver::service('lucky_gift'));
-        $this->SendGiftService = ClassResolver::service('send_gift');
-        $this->GiftService = ClassResolver::service('gift_service');
-        $this->RoomLevelServices = app(ClassResolver::service('room_level'));
-        $this->UpdateUserWhenSendGift = ClassResolver::service('update_user_when_send_gift');
-        
-        // Jobs
-        $this->CleanGiftLogsJob = ClassResolver::job('clean_gift_logs');
-        $this->AllOpeningRoomsZegoRequest = ClassResolver::job('all_opening_rooms_zego_request');
-        $this->UpdateUserDataWhenSendGift = ClassResolver::job('update_user_data_when_send_gift');
-        $this->UpdatePkAndSendToZigoJob = ClassResolver::job('update_pk_and_send_to_zigo');
-        
-        // Events
-        $this->GiftBannerEvent = ClassResolver::event('gift_banner');
-        
-        // Exceptions
-        $this->NotInfMoneyException = ClassResolver::exception('not_inf_money');
-        
-        // Contracts & Repository
-        $roomTopUsersRepositoryClass = ClassResolver::contract('room_top_users_repository');
-        $this->roomTopUsersRepository = app($roomTopUsersRepositoryClass);
-        
-        $giftLogServiceClass = ClassResolver::service('gift_log');
-        $this->giftLogService = app($giftLogServiceClass);
+        // Load only essential services - others loaded on-demand via properties
+    }
+    
+    // Lazy loading via magic method - loads only when accessed
+    public function __get($name)
+    {
+        if (!isset($this->$name)) {
+            $this->$name = match($name) {
+                'Common' => ClassResolver::helper('common'),
+                'UserCommon' => ClassResolver::helper('user_common'),
+                'UserHandling' => ClassResolver::facade('user_handling'),
+                'CustomNotification' => ClassResolver::facade('custom_notification'),
+                'GiftLogResource' => ClassResolver::resource('gift_log'),
+                'GiftLogUtdResource' => ClassResolver::resource('gift_log_utd'),
+                'User' => ClassResolver::model('user'),
+                'Agency' => ClassResolver::model('agency'),
+                'Cp' => ClassResolver::model('cp'),
+                'AppFeature' => ClassResolver::model('app_feature'),
+                'CoreWallet' => ClassResolver::model('core_wallet'),
+                'UserSallary' => ClassResolver::model('user_salary'),
+                'RemainingDiamond' => ClassResolver::model('remaining_diamond'),
+                'MonthlyDiamondReceive' => ClassResolver::model('monthly_diamond_receive'),
+                'LuckyGiftService' => app(ClassResolver::service('lucky_gift')),
+                'SendGiftService' => ClassResolver::service('send_gift'),
+                'GiftService' => ClassResolver::service('gift_service'),
+                'RoomLevelServices' => app(ClassResolver::service('room_level')),
+                'UpdateUserWhenSendGift' => ClassResolver::service('update_user_when_send_gift'),
+                'CleanGiftLogsJob' => ClassResolver::job('clean_gift_logs'),
+                'AllOpeningRoomsZegoRequest' => ClassResolver::job('all_opening_rooms_zego_request'),
+                'UpdateUserDataWhenSendGift' => ClassResolver::job('update_user_data_when_send_gift'),
+                'UpdatePkAndSendToZigoJob' => ClassResolver::job('update_pk_and_send_to_zigo'),
+                'GiftBannerEvent' => ClassResolver::event('gift_banner'),
+                'NotInfMoneyException' => ClassResolver::exception('not_inf_money'),
+                'roomTopUsersRepository' => app(ClassResolver::contract('room_top_users_repository')),
+                'giftLogService' => app(ClassResolver::service('gift_log')),
+                default => null,
+            };
+        }
+        return $this->$name;
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
