@@ -1,0 +1,650 @@
+<?php
+
+namespace Utd\Room\Services;
+
+use App\Enums\UserCoinLogType;
+use App\Helpers\UserCoinLogHelper;
+use App\Helpers\WebPHelper;
+use App\Models\Config;
+use Illuminate\Support\Facades\Schema;
+use Utd\Room\Entities\Room;
+use App\Models\User;
+use App\Helpers\Common;
+use App\Models\AllGame;
+use Utd\Room\Entities\RoomCategory;
+use App\Facades\UserHandling;
+use GuzzleHttp\Promise\Utils;
+use Utd\Room\Services\RoomService;
+use App\Traits\MultiQueryPagination;
+use Utd\Room\Entities\RequestBackgroundImage;
+use Utd\Room\Repositories\RoomRepository;
+use Utd\Agency\Repositories\UserRepository;
+use App\Tik\Repositories\CountryRepository;
+use Utd\Room\Repositories\RoomRepoInterface;
+use App\Tik\Repositories\RequestBackgroundImageRepository;
+use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\TaskStream\Services\TaskStreamService;
+use App\Contracts\GiftLogRepositoryContract;
+
+class RoomRepoService
+{
+    use MultiQueryPagination;
+    protected $repo;
+    
+    /**
+     * @param Model $model
+     */
+    public function __construct(
+        private readonly RoomRepository $repository,
+        private readonly UserRepository $userRepository,
+        private readonly ?GiftLogRepositoryContract $giftLogRepository,
+        private readonly RequestBackgroundImageRepository $requestBackgroundImageRepository,
+        private readonly CountryRepository $countryRepository,
+        RoomRepoInterface $repo,
+    ) {
+        $this->repo = $repo;
+    }
+
+    public function getAllRooms($request)
+    {
+        return $this->repository->all($request);
+    }
+
+    public function roomDetails($userId)
+    {
+        $room = $this->repository->findRoomUser($userId);
+        if (!$room) throw new \Exception('This user don\'t have room');
+        return $room;
+    }
+
+    public function getAllMine($request, $user_id)
+    {
+        return $this->repository->mine($request, $user_id);
+    }
+
+    public function getUserRooms($request, $user_id)
+    {
+        return $this->repository->getUserRooms($request, $user_id);
+    }
+
+    public function getAllLiveRooms($request)
+    {
+        return $this->repository->liveRooms($request);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function create($request, $user)
+    {
+        $userId = $user->id;
+        $data = array_merge($request->all(), ['uid' => $userId]);
+        unset($data['show']);
+        $paidRoom = Config::where('name', 'paid_room')->first();
+
+        if ($paidRoom && $paidRoom->value && $request->type === 'audio') {
+            $paidRoomAmount = Config::where('name', 'paid_room_amount')->first();
+            if ($user->di < $paidRoomAmount->value) {
+                throw new \Exception(__('you do not have enough coins for creating a room'));
+            }
+
+            $amountBefore = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($paidRoomAmount->value),
+                $amountBefore,
+                UserCoinLogType::CREATE_ROOM,
+            );
+
+            $user->di = $user->di - $paidRoomAmount->value;
+            $user->save();
+        }
+
+        $room = $this->repository->create($data);
+
+        if ($request->type) {
+            $room->type = $request->type;
+            if ($request->type == 'live') {
+                $room->is_live = true;
+            }
+        }
+
+        if ($request->hasFile('room_cover')) {
+            $room->room_cover = WebPHelper::uploadWebp(
+                $request->file('room_cover'),
+                'rooms',
+                'room_cover'
+            );
+        } else {
+            $room->room_cover = $request->room_cover;
+        }
+
+        if (!is_null($request->mode)) {
+            $this->changeModeCreateRoom($request, $request->mode, $room);
+        }
+
+        $this->repository->updateRoomUser($room);
+        return $room;
+    }
+
+    public function findRoomUser($userId)
+    {
+        return $this->repository->findRoomUser($userId);
+    }
+
+    public function findAudioRoomUser($userId)
+    {
+        return $this->repository->findAudioRoomUser($userId);
+    }
+
+    public function findRoomUserByType($userId, $type)
+    {
+        return $this->repository->findRoomUserByType($userId, $type);
+    }
+
+    public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
+    {
+        return $this->repository->createPrivetMessage($fromUserId, $toUserId, $message, $price);
+    }
+
+    public function privateComment($toUserId, $message, $ownerId, $fromUser)
+    {
+        $toUser = $this->userRepository->findById($toUserId);
+
+        $price = Common::getConfig('private_comment_price') ?? 100;
+
+        $room = $this->findRoomUser($ownerId);
+        if (!$room) throw new \Exception(__('room not founded'));
+
+        //validate if user have coins enough or not
+        if ($fromUser->di < $price) throw new \Exception(__('not enough coins'));
+
+        $this->createPrivetMessage($fromUser->id, $toUserId, $message, $price);
+        $fromUser->di -= $price;
+        $fromUser->save();
+
+        return [$toUser, $price];
+    }
+
+    public function findRoom($id)
+    {
+        return $room = $this->repository->findRoom($id);
+    }
+
+    public function disableWriting($roomId)
+    {
+        $room = $this->findRoom($roomId);
+        if (!$room) {
+            throw new \Exception(__('api_responses.room_not_found'));
+        }
+
+        $room->writing_disabled = !$room->writing_disabled;
+        $this->repository->updateRoomUser($room);
+        return $room;
+    }
+
+    public function changeRoomImage($ownerId)
+    {
+        $room = $this->findRoomUser($ownerId);
+
+        if (!$room) throw new \Exception(__('room not found'));
+        $room->enableSaving = false;
+        $room->is_pk_custom = true;
+        $this->repository->updateRoomUser($room);
+        return $room;
+    }
+
+    public function adminOwner($request, $user)
+    {
+        $adminOnlyTypes = ['clear_chat', 'music'];
+        $room = $this->findRoom($request->room_id);
+
+        if (!$room) {
+            throw new \Exception(__('room not found'));
+        }
+
+        $isRoomOwner = $user->id === $room->uid;
+
+        if (in_array($request->type, $adminOnlyTypes)) {
+            $adminIds = array_filter(explode(',', (string) $room->room_admin));
+            $adminIds = array_unique(array_map('trim', $adminIds));
+
+            return in_array($user->id, $adminIds) || $isRoomOwner;
+        }
+
+        return $isRoomOwner;
+    }
+
+    public function getFirstRoomOwner($ownerId)
+    {
+        return $this->giftLogRepository->getFirstRoomByOwnerId($ownerId);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function roomAdmins($id)
+    {
+        $room = $this->repository->findRoomId($id, true);
+        if (!$room) throw new \Exception(__('room not found'));
+
+        if (empty($room->room_admin)) return collect();
+
+        $adminIds = explode(',', $room->room_admin);
+        return $this->userRepository->getAdmins($adminIds);
+    }
+
+    public function changePasswordRoom($ownerId = null, $roomId = null)
+    {
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
+        if ($room) {
+            $room->room_pass = '';
+            $this->repository->updateRoomUser($room);
+            return $room;
+        }
+        return $room;
+    }
+
+    public function quiteRoom($ownerId = null, User $user, $roomId = null)
+    {
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
+        if (!$room) throw new \Exception(__("Room not found for this owner."));
+        $isToZegoCharisma = false;
+        $userDataWithCharisma = [];
+
+        if (isset($room->charizma_status)) {
+            $userCharismaService = new UserCharismaService();
+            $userCharismaService->resetUserCharisma($user->id, $room->id);
+            $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, [$user->id]);
+            $isToZegoCharisma = true;
+        }
+
+        if (isset($room->microphone)) {
+            $microphones = explode(',', $room->microphone);
+            if (in_array($user->id, $microphones)) {
+                UserHandling::calcTime($user->id);
+            }
+        }
+
+        $res = Common::quit_hand($ownerId, $user->id);
+        $visitorIdsList = explode(',', $res);
+
+        $user->now_room_uid = 0;
+        $user->save();
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
+            $room->update(['is_live' => false]);
+        }
+
+        if ($room->is_afk == null && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+
+        if ($user->id == $ownerId && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+        $this->repository->updateRoomUser($room);
+
+        return [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $room->id];
+    }
+
+    public function quiteRoom2($ownerId = null, User $user, $roomId = null)
+    {
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($ownerId);
+        if (!$room) throw new \Exception(__("Room not found for this owner."));
+        $isToZegoCharisma = false;
+        $userDataWithCharisma = [];
+
+        if (isset($room->charizma_status)) {
+            $userCharismaService = new UserCharismaService();
+            $userCharismaService->resetUserCharisma($user->id, $room->id);
+            $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom2($room, [$user->id]);
+            $isToZegoCharisma = true;
+        }
+
+        $micUserIds = $room->microphones()->pluck('user_id')->filter()->all();
+        if (in_array($user->id, $micUserIds, true)) {
+            UserHandling::calcTime($user->id);
+        }
+
+        $res = Common::quit_hand_2($ownerId, $user->id);
+        $visitorIdsList = explode(',', $res);
+
+        $user->now_room_uid = 0;
+        $user->save();
+
+        $taskStreamRoom = $room->taskStreamRoom()->first();
+        if ($taskStreamRoom) {
+            app(TaskStreamService::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
+        }
+
+        if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {
+            $room->update(['is_live' => false]);
+        }
+
+        if ($room->is_afk == null && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+
+        if ($user->id == $ownerId && $room->room_admin == null) {
+            $room->is_afk = 0;
+        }
+        $this->repository->updateRoomUser($room);
+
+        return [$visitorIdsList, $isToZegoCharisma, $userDataWithCharisma, $room->id];
+    }
+
+    public function roomUsers($request)
+    {
+        $room = $this->findRoomUser($request->owner_id);
+        if (!$room) throw new \Exception('Room not found');
+        $currentPage = $request->page ?? 1;
+        $visitors = null;
+
+        if ($request->has('users') && $currentPage == 1) {
+            $room->enableSaving = false;
+            $visitors = $request->users ?? '';
+        }
+
+        $roomAdmin = $room->room_admin ?? '';
+        $roomVisitor = $visitors ?? $room->room_visitor;
+        $roomVisitor = explode(',', $roomVisitor);
+
+        $roomAdmin = explode(',', $roomAdmin);
+        $roomAdminActive = array_intersect($roomVisitor, $roomAdmin);
+
+        $roomVisitorArray = array_diff($roomVisitor, array_merge($roomAdminActive, [$room->uid . '']));
+        $users = $this->userRepository->usersRoom($roomAdminActive);
+
+        $usersCount = count($roomVisitor);
+        $countInterested = $users->count(['users.id']);
+        $perPage = 10;
+
+        $users = $users->paginate($perPage);
+
+        if ($currentPage == 1 && in_array($room->uid, $roomVisitor)) {
+            $allData[] = $room->owner;
+            $allData = array_merge($allData, $users->items());
+        } else {
+            $allData = $users->items();
+        }
+
+        $allData = collect($allData);
+        $diffCountWithPage = $this->getDiffCountWithPage($countInterested, $perPage, $currentPage);
+
+        if ($diffCountWithPage < 0) {
+            [$limit, $offset] = $this->getNewLimitAndOffset($countInterested, $perPage, $currentPage);
+
+            $anotherData = $this->userRepository->anotherUserRoom($roomVisitorArray, $limit, $offset);
+
+            $allData = $allData->merge($anotherData);
+        }
+        return [$allData, $roomAdminActive];
+    }
+
+    public function getRoomsForGame($gameId)
+    {
+        return $this->repository->getRoomsByGameId(gameId: $gameId, with: ['game', 'boxUse' => fn($q) => $q->where('not_used_num', '>=', 1), 'backgroundImage']);
+    }
+
+    public function changeModeCreateRoom($request, $currentMode, Room $room)
+    {
+        $lastMode = $room->mode;
+
+        $room->mode = $currentMode;
+        $jsons = [];
+        $map = [];
+        if ($currentMode == '1') {
+            $mode = 'party';
+        } elseif ($currentMode == '2') {
+            $mode = 'seats12';
+        } elseif ($currentMode == '5') {
+            $mode = 'cinema';
+        } elseif ($currentMode == '4') {
+            $mode = 'game';
+            if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+            $game = AllGame::find($request->game_id);
+            if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+            $room->game_id = $request->game_id;
+            $map['game_url'] = $game->mini_url;
+        } else {
+            $mode = 'topCenter';
+        }
+        $ms = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+        if ($lastMode == '3' && $currentMode != '3') {
+            $jsons[] = $this->changeBackground($room, $room->uid, $this->getRoomBackground($room));
+        }
+        Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+    }
+
+    public function changeMode($request, $currentMode)
+    {
+        $user = request()->user();
+        $roomId = $request->room_id;
+        $room = $roomId
+            ? $this->repository->findById($roomId)
+            : $this->repository->findRoomUserEnableAudio($request->owner_id);
+
+        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+        if ($user->id != $room->uid) return Common::apiResponse(0, __('you don not have permission'), null, 404);
+        $youtubeStatus = (bool)(getSettingCash('youtube_status') ?? true);
+        if ($currentMode == 5 && $youtubeStatus === false) return Common::apiResponse(0, __('this feature stopped'), null, 404);
+
+        $lastMode = $room->mode;
+        $room->mode = $currentMode;
+        $room->save();
+        $jsons = [];
+        $map = [];
+        $mode = '';
+        try {
+            if ($currentMode == '1') {
+                $mode = 'party';
+            } elseif ($currentMode == '2') {
+                $mode = 'seats12';
+            } elseif ($currentMode == '5') {
+                $mode = 'cinema';
+            } elseif ($currentMode == '4') {
+                $mode = 'game';
+                if (!$request->game_id) return Common::apiResponse(0, 'please send game_id', null, 404);
+                $game = AllGame::find($request->game_id);
+                if (!$game) return Common::apiResponse(false, 'this game does not exists');
+
+                $room->game_id = $request->game_id;
+                $room->save();
+                $map['game_url'] = $game->mini_url;
+            } elseif ($currentMode == '8') {
+                $mode = 'eight';
+            } else {
+                $mode = 'topCenter';
+            }
+        } catch (\Throwable $e) {
+            return Common::apiResponse(0, $e->getMessage());
+        }
+        $ms = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+
+        $jsons[] = $this->changeBackground($room, $room->uid, app(RoomService::class)->getRoomBackground($room));
+
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
+
+        return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function getRoomBackground(?Room $room)
+    {
+        if ($room == null) return '';
+        return $room->final_room_image ?? '';
+    }
+
+    public function changeModeMic($request, $currentMode)
+    {
+        $room = $this->findRoomUser($request->owner_id);
+        if (!$room) return Common::apiResponse(0, 'not found', null, 404);
+
+        $lastMode = $room->mode;
+        $room->mode = $currentMode;
+        $room->save();
+        $jsons = [];
+        $map = [];
+        $mode = $currentMode;
+        $ms = [
+            'messageContent' => array_merge($map, ['message' => 'roomMode', 'mode' => $mode])
+        ];
+        $json = json_encode($ms);
+        $jsons[] = $json;
+
+        $promises = Common::sendToZego3('SendCustomCommand', $room->id, $request->user()->id, $jsons);
+
+        try {
+            Utils::unwrap($promises);
+        } catch (\Throwable $e) {
+        }
+        return Common::apiResponse(1, 'done', null, 201);
+    }
+
+    public function changeBackground(Room $room, int $owner_id, string $image = ''): string|false
+    {
+        $data = [
+            "messageContent" => [
+                "message" => "changeBackground",
+                "imgbackground" => $image ?: "",
+                "roomIntro" => $room->room_intro ?: "",
+                "roomImg" => $room->room_cover ?: "",
+                "room_type" => @$room->myType->name ?: "",
+                "room_name" => @$room->room_name ?: ""
+            ]
+        ];
+        $json = json_encode($data);
+        return $json;
+    }
+
+    public function userRooms($userId)
+    {
+        return $this->repository->roomUsers($userId);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function commentStatus($roomId, $request): bool
+    {
+        $room = $this->repository->findRoom($roomId);
+
+        if (!$room) throw new \Exception(__('room not founded'));
+
+        if (auth()->id() != $room->uid && !in_array(auth()->id(), $room->admins)) {
+            throw new \Exception(__('you don not have permission'));
+        }
+
+        $room->update(['is_comment_closed' => $request['status']]);
+
+        return $room->is_comment_closed;
+    }
+
+    public function index2()
+    {
+        return $this->countryRepository->countryGet();
+    }
+
+    public function update($request, $id)
+    {
+        $room = $this->repo->findByUid($id);
+        if (!$room) {
+            return Common::apiResponse(false, 'Room not found', null, 404);
+        }
+        if ($room->uid != $request->user()->id && !in_array($request->user()->id, explode(',', $room->room_admin))) {
+            return Common::apiResponse(false, 'not allowed', null, 403);
+        }
+        if ($request->room_name) {
+            $room->room_name = $request->room_name;
+        }
+
+        if ($request->hasFile('room_cover')) {
+            $room->room_cover = WebPHelper::uploadWebp(
+                $request->file('room_cover'),
+                'rooms',
+                'room_cover'
+            );
+        }
+
+        if ($request->free_mic) {
+            $room->free_mic = $request->free_mic;
+        }
+
+        if ($request->room_intro) {
+            $room->room_intro = $request->room_intro;
+        }
+
+        if ($request->room_pass) {
+            $room->room_pass = $request->room_pass;
+        }
+
+        $RoomCategoryides = RoomCategory::where('enable', 1)->pluck('id');
+
+        if ($request->room_type !== null) {
+            if (!in_array($request->room_type, $RoomCategoryides)) {
+                return Common::apiResponse(0, 'Type not found', null, 404);
+            }
+            $room->room_type = $request->room_type;
+        }
+
+        if ($request->room_class !== null) {
+            if (!in_array($request->room_class, $RoomCategoryides)) {
+                return Common::apiResponse(0, 'Type not found', null, 404);
+            }
+            $room->room_type = $request->room_type;
+        }
+
+        $background_me = '';
+        if ($request->room_background) {
+            if ($request->change == 'app') {
+                Common::backgroundCount($room->room_background, $request->room_background);
+                $room->room_background = $request->room_background;
+                RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('status', 1)->update(['status' => 3]);
+            }
+            if ($request->change == 'me') {
+                RequestBackgroundImage::query()->where('owner_room_id', $room->uid)->where('id', '!=', $request->room_background)->where('status', 1)->update(['status' => 3]);
+                $background_update = RequestBackgroundImage::where('id', $request->room_background)->first();
+                $background_update->status = 1;
+                $background_update->save();
+                $background_me = $background_update->img;
+                Common::backgroundCount($room->room_background, 0);
+                $room->room_background = null;
+            }
+        }
+        $room->save();
+        $request['owner_id'] = $room->uid;
+
+        $data = [
+            "messageContent" => [
+                "message" => "changeBackground",
+                "imgbackground" => $room->room_background ?: $background_me,
+                "roomIntro" => $room->room_intro ?: "",
+                "roomImg" => $room->room_cover ?: "",
+                "room_type" => @$room->myType->name ?: "",
+                "room_name" => @$room->room_name ?: ""
+            ]
+        ];
+        $json = json_encode($data);
+        $res = Common::sendToZego('SendCustomCommand', $room->id, $request->user()->id, $json);
+        $request->is_update = true;
+        return true;
+    }
+}

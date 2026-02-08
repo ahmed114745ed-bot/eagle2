@@ -202,8 +202,19 @@ class AgencyAppController extends Controller
         $year = request()->year ?? now()->year;
         $agencyId = request()->agency_id ?? $user->agency_id;
 
+        \Log::info('[AgencyAppController::dailyReport] START', [
+            'user_id' => $user->id,
+            'month' => $month,
+            'year' => $year,
+            'agency_id' => $agencyId,
+            'user_agency_id' => $user->agency_id,
+        ]);
+
         $userModel = $this->getUserModel();
-        if (!$user instanceof $userModel) return;
+        if (!$user instanceof $userModel) {
+            \Log::warning('[AgencyAppController::dailyReport] User not instance of userModel');
+            return;
+        }
         $userId        = $user->id;
 
         $cacheKey = 'cache-data-my-store-' . $user->id;
@@ -216,6 +227,13 @@ class AgencyAppController extends Controller
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year, $agencyId);
+        
+        \Log::info('[AgencyAppController::dailyReport] Service returned', [
+            'data_empty' => empty($data),
+            'data_is_array' => is_array($data),
+            'data_count' => is_array($data) ? count($data) : 'not_array',
+        ]);
+        
         $data = empty($data) ? new \stdClass() : $data;
         return Common::apiResponse(true, 'success', $data);
     }

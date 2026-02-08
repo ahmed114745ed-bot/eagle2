@@ -673,20 +673,40 @@ class AgencyService implements AgencyServiceInterface
 
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
+        \Log::info('[AgencyService::dailyReport] START', [
+            'user_id' => $user->id,
+            'month' => $month,
+            'year' => $year,
+            'agencyId_param' => $agencyId,
+            'user_agency_id' => $user->agency_id,
+        ]);
+        
         $timezone = Common::timeZone();
         
         // Check if user is owner of an agency
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
+        \Log::info('[AgencyService::dailyReport] Owner check', [
+            'owner_found' => $owner ? true : false,
+            'owner_id' => $owner?->id,
+        ]);
         
         // Check if user is member (joined) of an agency
         $member = UsersJoinedAgency::where('user_id', $user->id)
             ->where('agency_id', $agencyId ?? $user->agency_id)
             ->first();
+        \Log::info('[AgencyService::dailyReport] Member check', [
+            'member_found' => $member ? true : false,
+            'member_agency_id' => $member?->agency_id,
+            'searched_agency_id' => $agencyId ?? $user->agency_id,
+        ]);
         
         $joinedAgency = $owner ?? $member;
         if (! $joinedAgency) {
+            \Log::warning('[AgencyService::dailyReport] No joined agency found - returning empty array');
             return [];
         }
+        
+        \Log::info('[AgencyService::dailyReport] Joined agency found, continuing...');
         
         
         $joinRecord = $member;
