@@ -326,6 +326,11 @@ class GiftLogController extends Controller
             return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
+        // Ensure giftLogService is initialized
+        if (!$this->giftLogService) {
+            $this->giftLogService = app(\Utd\Gifts\Services\GiftLogService::class);
+        }
+
         try {
             $message = $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
         } catch (\Exception $e) {
