@@ -123,6 +123,14 @@ class AgencyServiceProvider extends ServiceProvider
             return new \Utd\Agency\Services\ExternalModuleResolver();
         });
         
+        // Bind ExternalModuleInterface to ExternalModuleResolver
+        $this->app->bind(
+            \Utd\Agency\Contracts\ExternalModuleInterface::class,
+            function ($app) {
+                return $app->make('agency.external.module');
+            }
+        );
+        
         // Register External Helper Service
         $this->app->singleton('agency.external.helper', function ($app) {
             return new \Utd\Agency\Services\ExternalHelperResolver();
