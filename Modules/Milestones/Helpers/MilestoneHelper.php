@@ -48,12 +48,12 @@ class MilestoneHelper
         foreach ($milestone->rewards as $mr) {
 
 
-            self::giveRewardToUser($user, $mr);
+            self::giveRewardToUser($user, $mr, $milestone);
         }
     }
 
 
-    public static function giveRewardToUser(User $user, MilestoneReward $mr): void
+    public static function giveRewardToUser(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
@@ -85,11 +85,11 @@ class MilestoneHelper
             ]),
         ]);
 
-        self::applyRewardEffect($user, $mr);
+        self::applyRewardEffect($user, $mr, $milestone);
     }
 
 
-    protected static function applyRewardEffect(User $user, MilestoneReward $mr): void
+    protected static function applyRewardEffect(User $user, MilestoneReward $mr, $milestone = null): void
     {
         $receiveType = "Milestone:{$mr->milestone_id}";
 
@@ -119,7 +119,7 @@ class MilestoneHelper
                 if (!$ware) {
                     break;
                 }
-                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $mr);
+                UserCommon::addEvintsWareToUser($user, $ware, $mr->expire, 0, $receiveType, feature: $milestone);
                 break;
 
             case 'badge':
