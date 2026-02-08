@@ -10,42 +10,142 @@ use Utd\Agency\Contracts\AgencyServiceInterface;
  */
 class NullAgencyService implements AgencyServiceInterface
 {
+    public function find($id)
+    {
+        return null;
+    }
+
     public function joinAgency($user, $request)
     {
         return null;
     }
 
-    public function createAgency(array $data)
-    {
-        return null;
-    }
-
-    public function getAgency(int $id)
-    {
-        return null;
-    }
-
-    public function updateAgency(int $id, array $data)
-    {
-        return null;
-    }
-
-    public function deleteAgency(int $id): bool
-    {
-        return false;
-    }
-
-    public function getAgencyMembers(int $agencyId)
+    public function agencyMembers($agencyId)
     {
         return [];
     }
 
-    public function acceptJoinRequest(int $requestId)
+    public function agencyTarget($agencyId, $user, $request)
     {
         return null;
     }
 
-    public function rejectJoinRequest(int $requestId)
+    public function stars($agencyId, $request)
+    {
+        return [];
+    }
+
+    public function heroes($agencyId, $request)
+    {
+        return [];
+    }
+
+    public function showRequests($userId)
+    {
+        return [];
+    }
+
+    public function requestAction($owner, $request)
+    {
+        return null;
+    }
+
+    public function listOption($agencyId)
+    {
+        return [];
+    }
+
+    public function historySearch($agencyId, $request)
+    {
+        return [];
+    }
+
+    public function update($userId, $agencyId, $request)
+    {
+        return null;
+    }
+
+    public function userHandlingRequest($userId, $agencyId, $type)
+    {
+        return null;
+    }
+
+    public function allAgencyCharged($agencyId)
+    {
+        return [];
+    }
+
+    public function gitOldAgencies($userId)
+    {
+        return [];
+    }
+
+    public function create($userId, $request)
+    {
+        return null;
+    }
+
+    public function actionRequestAgency($request)
+    {
+        return null;
+    }
+
+    public function allRequest()
+    {
+        return [];
+    }
+
+    public function historyLastThirtyDays($userUuid)
+    {
+        return [];
+    }
+
+    public function agencyReport($agencyId)
+    {
+        return null;
+    }
+
+    public function leaveAgency($userId, $agency)
+    {
+        return null;
+    }
+
+    public function handlingRequest($agencyId, $userId)
+    {
+        return null;
+    }
+
+    public function kickAgency($user, $userId)
+    {
+        return null;
+    }
+
+    public function filter($keyword)
+    {
+        return [];
+    }
+
+    public function dailyReport($user, $month, $year, $agencyId)
+    {
+        return null;
+    }
+
+    public function dataAgency()
+    {
+        return null;
+    }
+
+    public function hostReport($id)
+    {
+        return null;
+    }
+
+    public function hostDailyReport($request)
+    {
+        return null;
+    }
+
+    public function editAgency($request)
     {
         return null;
     }
