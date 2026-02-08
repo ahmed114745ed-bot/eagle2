@@ -605,6 +605,9 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'hosts', 'except' => ['create'], 'additional' => ['charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch',], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show', 'charge-switch', 'chang-agency-switch', 'invite-switch', 'can-Play-host-switch', 'kick-agency-host-switch', 'kick-family-host-switch'],
                     ],],
+                    ['key' => 'target', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
 
                 ],
             ],
@@ -618,9 +621,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'agencies-join-requests', 'except' => ['create'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show'],
                     ],],
-                    ['key' => 'target', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+                    
                     ['key' => 'request-agencies', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['accept-agency', 'refuse-agency'], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'accept-agency', 'refuse-agency'],
                     ],],
