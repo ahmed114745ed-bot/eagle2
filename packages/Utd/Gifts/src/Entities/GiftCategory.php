@@ -2,8 +2,7 @@
 
 namespace Utd\Gifts\Entities;
 
-use App\Observers\GiftCategoryObserver;
-use App\Traits\TimestampsWithTimezone;
+use Utd\Gifts\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -29,11 +28,19 @@ class GiftCategory extends Model
         'sort_when_creating' => true,
     ];
 
- 
     protected static function booted()
     {
         parent::booted();
-        static::observe(GiftCategoryObserver::class);
+        
+        // Use package observer if exists, otherwise check for app observer
+        $packageObserver = 'Utd\\Gifts\\Observers\\GiftCategoryObserver';
+        $appObserver = 'App\\Observers\\GiftCategoryObserver';
+        
+        if (class_exists($packageObserver)) {
+            static::observe($packageObserver);
+        } elseif (class_exists($appObserver)) {
+            static::observe($appObserver);
+        }
     }
 
     /**

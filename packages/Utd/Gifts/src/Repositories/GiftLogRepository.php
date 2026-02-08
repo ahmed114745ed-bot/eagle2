@@ -3,10 +3,14 @@
 namespace Utd\Gifts\Repositories;
 
 use Carbon\Carbon;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use Illuminate\Support\Facades\DB;
-use App\Contracts\GiftLogRepositoryContract;
 
+interface GiftLogRepositoryContract
+{
+    public function getRoomRankingData($roomOwnerId, $type, $limit);
+    public function userGiftInfo($id, $type, $startDate, $endDate, $perPage, $page);
+}
 
 class GiftLogRepository extends AbstractRepository implements GiftLogRepositoryContract
 {
