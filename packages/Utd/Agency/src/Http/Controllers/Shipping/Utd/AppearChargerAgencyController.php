@@ -2,21 +2,24 @@
 
 namespace Utd\Agency\Http\Controllers\Shipping\Utd;
 
-use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Utd\Agency\Http\Resources\AppearChargerAgencyResource;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
+use Utd\Agency\Helpers\AgencyHelper;
 
 class AppearChargerAgencyController extends Controller
 {
+    use ResolvesExternalDependencies;
+
     public function index()
     {
         $id = request('id');
         $search = request('search');
         $perPage = request('per_page') ?? 10;
 
-        $users = User::when($id, function ($q) use ($id) {
+        $userClass = $this->getUserModel();
+        $users = $userClass::when($id, function ($q) use ($id) {
             $q->where('id', $id);
         })
             ->when($search, function ($q) use ($search) {
@@ -34,7 +37,8 @@ class AppearChargerAgencyController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $userClass = $this->getUserModel();
+        $user = $userClass::findOrFail($id);
 
         $user->update([
             'appear_charger_agency' => $request->appear_charger_agency

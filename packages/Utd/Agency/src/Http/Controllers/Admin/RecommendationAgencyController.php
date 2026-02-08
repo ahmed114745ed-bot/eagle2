@@ -2,24 +2,31 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Table;
-use App\Services\AppFeatureService;
-
 use Encore\Admin\Controllers\AdminController;
 use Utd\Agency\Entities\AdditionalInfo;
+use Utd\Agency\Traits\ResolvesModels;
+use Utd\Agency\Facades\ExternalHelper;
 
 
 class RecommendationAgencyController extends AdminController
 {
+    use ResolvesModels;
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("agencies");
+        // Safely check if AppFeatureService is available
+        $featureServiceClass = config('agency-dependencies.dependencies.services.app_feature_service');
+        if ($featureServiceClass && class_exists($featureServiceClass)) {
+            try {
+                app($featureServiceClass)->validateStatusEnable("agencies");
+            } catch (\Exception $e) {
+                \Log::warning("Agency Package: AppFeatureService validation failed", ['error' => $e->getMessage()]);
+            }
+        }
     }
     /**
      * Title for current resource.
@@ -35,7 +42,10 @@ class RecommendationAgencyController extends AdminController
      */
     protected function grid()
     {
-        $grid = new Grid(new User());
+        $userClass = $this->getUserModel();
+        $agencyClass = $this->getAgencyModel();
+        
+        $grid = new Grid(new $userClass());
         $grid->model()->whereHas('additionalInfo',function($q) 
         {
             $q->where('status', 1);
@@ -51,9 +61,9 @@ class RecommendationAgencyController extends AdminController
         });
         $grid->column('uuid', __('uuid'));
         $grid->column('name', __('name'));
-        $grid->column('additional', __('agencies'))->modal('الوكالات', function ($model) {
-            $agenciesIds =AdditionalInfo::where('user_id',$this->id)->pluck('agency_id');
-            $agencies = Agency::whereIn('id',$agenciesIds)->select("name", 'id',)->get();
+        $grid->column('additional', __('agencies'))->modal('الوكالات', function ($model) use ($agencyClass) {
+            $agenciesIds = AdditionalInfo::where('user_id',$this->id)->pluck('agency_id');
+            $agencies = $agencyClass::whereIn('id',$agenciesIds)->select("name", 'id',)->get();
             $filteredAgencies = $agencies->map(function ($agency) {
                 return $agency->only(["id", "name", ]);
             });

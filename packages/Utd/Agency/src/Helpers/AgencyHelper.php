@@ -120,4 +120,33 @@ class AgencyHelper
         
         return $months[$month] ?? '';
     }
+    
+    /**
+     * API Response helper
+     *
+     * @param mixed $status
+     * @param string $message
+     * @param mixed $data
+     * @param int $statusCode
+     * @param mixed $pagination
+     * @param string $dataKey
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public static function apiResponse($status, $message = '', $data = [], $statusCode = 200, $pagination = '', $dataKey = 'data')
+    {
+        $response = [
+            'status' => $status ? 1 : 0,
+            'message' => $message,
+        ];
+        
+        if (!empty($data)) {
+            $response[$dataKey] = $data;
+        }
+        
+        if (!empty($pagination)) {
+            $response['pagination'] = $pagination;
+        }
+        
+        return response()->json($response, $statusCode);
+    }
 }

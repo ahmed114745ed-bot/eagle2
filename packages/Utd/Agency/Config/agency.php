@@ -95,6 +95,13 @@ return [
         'payment_gateway' => \App\Models\PaymentGateway::class,
         'config' => \App\Models\Config::class,
         'language' => \App\Models\Language::class,
+        'setting' => \App\Models\Setting::class,
+        'country_rate' => \App\Models\CountryRate::class,
+        'gift' => \App\Models\Gift::class,
+        'room' => \App\Models\Room::class,
+        'chat' => \App\Models\Chat::class,
+        'notification' => \App\Models\Notification::class,
+        'user_gift' => \App\Models\UserGift::class,
         
         // Agency Package Models
         'agency' => \Utd\Agency\Entities\Agency::class,

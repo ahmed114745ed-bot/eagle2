@@ -2,17 +2,18 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 
 class ChangeAgencyMangerController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     /**
      * Title for current resource.
      *

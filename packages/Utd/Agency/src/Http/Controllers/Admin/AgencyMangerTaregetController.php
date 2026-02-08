@@ -1,31 +1,28 @@
 <?php
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Agency;
-use App\Models\Config;
 use Encore\Admin\Grid;
-use App\Helpers\Common;
-use App\Models\SalaryTrx;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
-use App\Services\AppFeatureService;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Admin\Extensions\UserExporter;
 use App\Admin\Controllers\MainController;
-
-
-use App\Models\AgencyMangerPullingOut;
 use Illuminate\Support\Facades\Request;
 use App\Admin\Extensions\AgencyExporter;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
+use Utd\Agency\Entities\AgencyMangerPullingOut;
 
 class AgencyMangerTaregetController extends MainController {
+    use ResolvesExternalDependencies;
 
     public $permission_name = "agencies-tareget-manger";
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("agencies");
+        $appFeatureService = $this->getAppFeatureService();
+        if ($appFeatureService) {
+            $appFeatureService->validateStatusEnable("agencies");
+        }
     }
     public function index ( Content $content )
     {

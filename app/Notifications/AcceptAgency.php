@@ -2,55 +2,12 @@
 
 namespace App\Notifications;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-
-class AcceptAgency extends Notification
+/**
+ * Alias for backward compatibility
+ * @deprecated Use Utd\Agency\Notifications\AcceptAgency instead
+ */
+class AcceptAgency extends \Utd\Agency\Notifications\AcceptAgency
 {
-    use Queueable;
-
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
-    public function via(object $notifiable): array
-    {
-        return ['mail'];
-    }
-
-    /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage 
-    {
-        return (new MailMessage)
-            ->subject('وكالة جديدة')
-            ->line('تم قبول الوكاله')
-            ->line('شكرا لاستخدامك تيك شات !')
-            ->line('أطيب التمنيات لكم')
-            ->salutation("TIK CHAT - تيك شات");
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
-    {
-        return [
-            //
-        ];
-    }
+    // This class is just an alias for backward compatibility
+    // All functionality is inherited from the package
 }

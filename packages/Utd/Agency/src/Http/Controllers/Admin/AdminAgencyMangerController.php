@@ -2,11 +2,6 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Helpers\Common;
-use App\Models\Admin;
-use App\Models\Agency;
-use App\Models\Country;
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -17,10 +12,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Encore\Admin\Facades\Admin as LaravelAdmin;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 use function Doctrine\Common\Cache\Psr6\get;
 
 class  AdminAgencyMangerController extends MainController
 {
+    use ResolvesExternalDependencies;
 
     public $permission_name = 'managers';
 
@@ -28,8 +25,10 @@ class  AdminAgencyMangerController extends MainController
 
     public function __construct()
     {
-        $userModel = Admin::class;
-        $this->model = new $userModel;
+        $adminClass = $this->getAdminModel();
+        if ($adminClass) {
+            $this->model = new $adminClass;
+        }
     }
 
 

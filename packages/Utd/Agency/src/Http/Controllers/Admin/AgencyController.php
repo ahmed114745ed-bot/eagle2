@@ -18,10 +18,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
-use App\Helpers\Common;
-use App\Models\Bd;
-use App\Models\User;
-use App\Models\GiftLog;
 use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Entities\AgencyJoinRequest;
@@ -32,13 +28,14 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Extensions\Permission;
 use App\Admin\Actions\DeleteAgencyAction;
 use App\Admin\Actions\ChangeUsersAgencyAction;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use App\Helpers\CustomNotification;
-use App\Helpers\UserHandling;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
+use Utd\Agency\Helpers\AdminHelper;
 
 
 class AgencyController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     protected $title = 'Agencies';
     public $permission_name = 'agencies';
     public $hiddenColumns = [];
@@ -568,7 +565,7 @@ class AgencyController extends MainController
         // --- Frozen column ---
         $grid->column('is_frozen', __("frozen"))
             ->display(fn() => $this->is_frozen ? 1 : 0)
-            ->switch(Common::getSwitchStates())->sortable();
+            ->switch(AdminHelper::getSwitchStates())->sortable();
 
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
            $creator = $this->creator;

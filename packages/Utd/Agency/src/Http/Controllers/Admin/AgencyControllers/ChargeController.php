@@ -3,11 +3,7 @@
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
 use App\Admin\Controllers\MainController;
-use App\Helpers\Common;
-use App\Models\Admin;
-use App\Models\Charge;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -16,10 +12,12 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\Auth;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class ChargeController extends MainController
 {
     use HasResourceActions;
+    use ResolvesExternalDependencies;
 
     protected $title = "Charges";
 

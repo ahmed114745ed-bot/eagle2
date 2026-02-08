@@ -3,20 +3,30 @@
 namespace Utd\Agency\Http\Controllers\Api\V2\Dashboard;
 
 use Exception;
-use App\Helpers\Common;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\Tik\Services\AgencyHostInviteService;
 use Utd\Agency\Transformers\AgencyInvitationResource;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
+use Utd\Agency\Contracts\AgencyHostInviteServiceInterface;
+
+// Import external classes
+use App\Helpers\Common;
 
 
 class AgencyHostInviteController extends Controller
 {
+    use ResolvesExternalDependencies;
     protected $agencyHostInviteService;
 
-    public function __construct(AgencyHostInviteService $agencyHostInviteService)
+    public function __construct(AgencyHostInviteServiceInterface $agencyHostInviteService = null)
     {
-        $this->agencyHostInviteService = $agencyHostInviteService;
+        // Use injected service if available, otherwise resolve from config
+        $this->agencyHostInviteService = $agencyHostInviteService ?? $this->getAgencyHostInviteService();
+        
+        // If still null, throw exception
+        if (!$this->agencyHostInviteService) {
+            throw new \RuntimeException('AgencyHostInviteService is not configured. Please configure it in agency-dependencies.php');
+        }
     }
 
     public function invite_user_to_hostAgency(Request $request)

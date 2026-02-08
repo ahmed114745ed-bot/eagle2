@@ -2,13 +2,11 @@
 
 namespace App\Traits;
 
-use Utd\Agency\Entities\AdditionalInfo;
-
-
+/**
+ * Alias for backward compatibility
+ * @deprecated Use Utd\Agency\Traits\AgencyAdditionalInfoTrait instead
+ */
 trait AgencyAdditionalInfoTrait
 {
-    public function additionalInfo()
-    {
-        return $this->hasOne(AdditionalInfo::class, 'agency_id');
-    }
+    use \Utd\Agency\Traits\AgencyAdditionalInfoTrait;
 }

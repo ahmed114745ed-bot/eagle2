@@ -4,12 +4,6 @@ namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
 use App\Admin\Customization\Dashboard\CustomDashboard;
 use App\Http\Controllers\Controller;
-use App\Models\Agency;
-use App\Models\Gift;
-use App\Models\Room;
-use App\Models\User;
-use App\Models\UserTarget;
-use App\Models\Ware;
 use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Layout\Column;
@@ -18,9 +12,11 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\Auth;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class HomeController extends Controller
 {
+    use ResolvesExternalDependencies;
 
     public $permission_name = 'agent-home';
 

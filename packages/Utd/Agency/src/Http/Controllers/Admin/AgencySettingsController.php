@@ -2,18 +2,17 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\Config;
-use App\Models\Setting;
-use App\Models\Language;
 use Encore\Admin\Facades\Admin;
 use Utd\Agency\Facades\AgencyHelper;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencySettingsController extends MainController
 {
+    use ResolvesExternalDependencies;
 
     public $permission_name = 'agency-settings';
     /**

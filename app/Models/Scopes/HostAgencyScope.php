@@ -2,17 +2,12 @@
 
 namespace App\Models\Scopes;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Scope;
-
-class HostAgencyScope implements Scope
+/**
+ * Alias for backward compatibility
+ * @deprecated Use Utd\Agency\Scopes\HostAgencyScope instead
+ */
+class HostAgencyScope extends \Utd\Agency\Scopes\HostAgencyScope
 {
-    /**
-     * Apply the scope to a given Eloquent query builder.
-     */
-    public function apply(Builder $builder, Model $model): void
-    {
-        $builder->where('agencies.type', '=', 1);
-    }
+    // This class is just an alias for backward compatibility
+    // All functionality is inherited from the package
 }

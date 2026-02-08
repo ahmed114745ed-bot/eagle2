@@ -3,74 +3,82 @@
 namespace Utd\Agency\Http\Controllers\Api;
 
 use Utd\Agency\Helpers\ShippingAgencyHelper;
+use Utd\Agency\Contracts\ChargeServiceInterface;
+use Utd\Agency\Contracts\UserAchievementServiceInterface;
 use Exception;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
 use App\Http\Controllers\Controller;
-use App\Tik\Services\ChargeRepoService;
 use Utd\Agency\Http\Resources\TrxResource;
 use Utd\Agency\Http\Resources\ChargeResource;
 use Utd\Agency\Http\Resources\DollarChargeLogResource;
 use Utd\Agency\Http\Resources\DollarChargeAgencyResource;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Utd\Agency\Http\Resources\ChargeReceivedInfoResource;
 use Utd\Agency\Http\Resources\ChargeResourceForAgencyCharge;
 use Illuminate\Support\Facades\Log;
-use App\Contracts\UserAchievementContract;
 
 
 class ChargeController extends Controller
 {
-
     protected $chargeService;
+    protected $achievementService;
+    protected $userClass;
+    protected $commonClass;
+    protected $userCommonClass;
 
-    public function __construct(ChargeRepoService $chargeService)
-    {
+    public function __construct(
+        ChargeServiceInterface $chargeService = null,
+        UserAchievementServiceInterface $achievementService = null
+    ) {
         $this->chargeService = $chargeService;
+        $this->achievementService = $achievementService;
+        $this->userClass = config('agency-package.models.user', \App\Models\User::class);
+        $this->commonClass = config('agency-dependencies.dependencies.helpers.common', \App\Helpers\Common::class);
+        $this->userCommonClass = config('agency-dependencies.dependencies.helpers.user_common', \App\Helpers\UserCommon::class);
     }
 
     public function sendMoneyFoeHost(Request $request)
     {
         $user = $request->user();
+        $commonClass = $this->commonClass;
+        $userCommonClass = $this->userCommonClass;
+        $userClass = $this->userClass;
 
-        if ($user->is_bd) return Common::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
+        if ($user->is_bd) return $commonClass::apiResponse(false, 'You are BD, You can\'t charge', null, 407);
 
-        Common::checkUserAgencyFrozen($user);
+        $commonClass::checkUserAgencyFrozen($user);
 
         $count = $request->amount;
         $userUuid = $request->user_id;
 
         if ($count < 0 || !is_numeric($count)) {
-            return Common::apiResponse(0, 'this value not allow', 422);
+            return $commonClass::apiResponse(0, 'this value not allow', 422);
         }
 
         if ($user->di < $count) {
-            return Common::apiResponse(0, 'balance not enough');
+            return $commonClass::apiResponse(0, 'balance not enough');
         }
 
         try {
             $userReceiver = $this->chargeService->sendMoney($user, $userUuid, $count);
-            if ($userReceiver instanceof User) {
-                app(UserAchievementContract::class)->insertCharging($userReceiver, $count);
+            if ($userReceiver instanceof $userClass && $this->achievementService) {
+                $this->achievementService->insertCharging($userReceiver, $count);
             }
-            UserCommon::UserEarnedInvitation($userReceiver->id, $count);
+            $userCommonClass::UserEarnedInvitation($userReceiver->id, $count);
             $data = ['coins' => (string)$user->di, 'usd' => (string)$user->salary,];
-            return Common::apiResponse(1, 'your recharge was successful', $data, 200);
+            return $commonClass::apiResponse(1, 'your recharge was successful', $data, 200);
         } catch (Exception $e) {
-            return Common::apiResponse(0, $e->getMessage());
+            return $commonClass::apiResponse(0, $e->getMessage());
         }
     }
 
     public function chargeCoForUsersHistory(Request $request)
     {
+        $commonClass = $this->commonClass;
         $userId = $request->user()->id;
-        if (!$request->type) return Common::apiResponse(0, 'missing params', null, 422);
+        if (!$request->type) return $commonClass::apiResponse(0, 'missing params', null, 422);
         $charge = $this->chargeService->getChargeUserHistory(userId: $userId, type: $request->type, chargeType: 'agency');
-        return Common::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
+        return $commonClass::apiResponse(1, '', ChargeResourceforAgencyCharge::collection($charge), 200);
     }
 
     public function ChargeDollarForOwner(Request $request)

@@ -2,20 +2,23 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use App\Models\Agency;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class RequestAgencyFilterationController extends MainController
 {
+    use ResolvesExternalDependencies;
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("agencies");
+        $appFeatureService = $this->getAppFeatureService();
+        if ($appFeatureService) {
+            $appFeatureService->validateStatusEnable("agencies");
+        }
     }
     public $permission_name = 'request-agency-history';
 

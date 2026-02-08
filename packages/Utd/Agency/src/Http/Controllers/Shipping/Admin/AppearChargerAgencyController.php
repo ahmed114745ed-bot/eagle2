@@ -2,20 +2,13 @@
 
 namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
-use App\Models\Charge;
-use App\Models\CoinLog;
 use Carbon\Carbon;
-use App\Models\User;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\AgencySallary;
 use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Models\AgencyJoinRequest;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Illuminate\Support\Facades\Cache;
@@ -23,11 +16,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Admin\Controllers\MainController;
 use Utd\Agency\Actions\DeleteShippingAgencyAction;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use Modules\SalaryTransaction\Entities\ChargeAgency;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AppearChargerAgencyController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     public $permission_name = 'appear-charger-agency';
 
     public function index(Content $content)

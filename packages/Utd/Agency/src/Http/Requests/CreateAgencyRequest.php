@@ -2,7 +2,7 @@
 
 namespace Utd\Agency\Http\Requests;
 
-use App\Traits\RequestTrait;
+use Utd\Agency\Traits\RequestTrait;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Http\FormRequest;
 

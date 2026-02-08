@@ -6,13 +6,15 @@ use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Content;
-use App\Models\UsersJoinedAgency;
+use Utd\Agency\Entities\UsersJoinedAgency;
 use App\Admin\Controllers\MainController;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class UsersJoinedAgencyController extends MainController
 {
+    use ResolvesExternalDependencies;
+    
     /**
      * Title for current resource.
      *

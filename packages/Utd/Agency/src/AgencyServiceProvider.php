@@ -26,8 +26,20 @@ class AgencyServiceProvider extends ServiceProvider
 
         // Register class aliases for backward compatibility early
         $this->registerModelAliases();
-
-        // Register Services - Safe binding (returns null if not exists)
+        
+        // Register Service Contracts
+        $this->registerServiceContracts();
+        
+        // Register Helper Services
+        $this->registerHelperServices();
+    }
+    
+    /**
+     * Register Service Contracts
+     */
+    protected function registerServiceContracts(): void
+    {
+        // Agency Service
         $this->app->bind(
             \Utd\Agency\Contracts\AgencyServiceInterface::class,
             function ($app) {
@@ -35,11 +47,11 @@ class AgencyServiceProvider extends ServiceProvider
                 if ($serviceClass && class_exists($serviceClass)) {
                     return $app->make($serviceClass);
                 }
-                return null;
+                return new \Utd\Agency\Services\NullAgencyService();
             }
         );
         
-        // Register Charge Service Contract
+        // Charge Service
         $this->app->bind(
             \Utd\Agency\Contracts\ChargeServiceInterface::class,
             function ($app) {
@@ -47,51 +59,50 @@ class AgencyServiceProvider extends ServiceProvider
                 if ($serviceClass && class_exists($serviceClass)) {
                     return $app->make($serviceClass);
                 }
-                return null;
+                return new \Utd\Agency\Services\NullChargeService();
             }
         );
         
-        // Register Notification Service Contract
+        // Agency Host Invite Service
         $this->app->bind(
-            \Utd\Agency\Contracts\NotificationServiceInterface::class,
+            \Utd\Agency\Contracts\AgencyHostInviteServiceInterface::class,
             function ($app) {
-                $notificationClass = config('agency-dependencies.dependencies.helpers.custom_notification');
-                if ($notificationClass && class_exists($notificationClass)) {
-                    return new class($notificationClass) implements \Utd\Agency\Contracts\NotificationServiceInterface {
-                        protected $notificationClass;
-                        
-                        public function __construct($notificationClass) {
-                            $this->notificationClass = $notificationClass;
-                        }
-                        
-                        public function acceptRequestAgency($user) {
-                            return $this->notificationClass::acceptRequestAgency($user);
-                        }
-                        
-                        public function refuseRequestAgency($user) {
-                            return $this->notificationClass::refuseRequestAgency($user);
-                        }
-                        
-                        public function charges($user, $title, $body, $data = []) {
-                            return $this->notificationClass::charges($user, $title, $body, $data);
-                        }
-                    };
-                }
-                return new \Utd\Agency\Services\NullNotificationService();
-            }
-        );
-
-        // Register Repositories - Safe binding (returns null if not exists)
-        $this->app->bind(
-            \Utd\Agency\Contracts\AgencyRepositoryInterface::class,
-            function ($app) {
-                if (class_exists(\Utd\Agency\Repositories\AgencyRepository::class)) {
-                    return $app->make(\Utd\Agency\Repositories\AgencyRepository::class);
+                $serviceClass = config('agency-dependencies.dependencies.services.agency_host_invite_service');
+                if ($serviceClass && class_exists($serviceClass)) {
+                    return $app->make($serviceClass);
                 }
                 return null;
             }
         );
         
+        // User Achievement Service
+        $this->app->bind(
+            \Utd\Agency\Contracts\UserAchievementServiceInterface::class,
+            function ($app) {
+                // Check if App\Contracts\UserAchievementContract exists
+                if (interface_exists(\App\Contracts\UserAchievementContract::class)) {
+                    return $app->make(\App\Contracts\UserAchievementContract::class);
+                }
+                return new \Utd\Agency\Services\NullUserAchievementService();
+            }
+        );
+        
+        // Backward compatibility - bind old contract name to new one
+        if (interface_exists(\App\Contracts\UserAchievementContract::class)) {
+            $this->app->bind(
+                \App\Contracts\UserAchievementContract::class,
+                function ($app) {
+                    return $app->make(\Utd\Agency\Contracts\UserAchievementServiceInterface::class);
+                }
+            );
+        }
+    }
+    
+    /**
+     * Register Helper Services
+     */
+    protected function registerHelperServices(): void
+    {
         // Register Helper Service
         $this->app->singleton('agency.helper', function ($app) {
             return new \Utd\Agency\Services\AgencyHelperService();
@@ -103,39 +114,30 @@ class AgencyServiceProvider extends ServiceProvider
         });
         
         // Register External Model Service
-        $this->app->singleton('agency.external-model', function ($app) {
-            return new \Utd\Agency\Services\ExternalModelService();
+        $this->app->singleton('agency.external.model', function ($app) {
+            return new \Utd\Agency\Services\ExternalModelResolver();
         });
         
         // Register External Module Service
-        $this->app->singleton(\Utd\Agency\Services\ExternalModuleService::class, function ($app) {
-            return new \Utd\Agency\Services\ExternalModuleService();
+        $this->app->singleton('agency.external.module', function ($app) {
+            return new \Utd\Agency\Services\ExternalModuleResolver();
         });
         
-        // Register ExternalModuleInterface binding to ExternalModelService for backward compatibility
-        $this->app->bind(\Utd\Agency\Contracts\ExternalModuleInterface::class, function ($app) {
-            // Return a wrapper that delegates to ExternalModelService
-            return new class implements \Utd\Agency\Contracts\ExternalModuleInterface {
-                protected $modelService;
-                
-                public function __construct() {
-                    $this->modelService = app('agency.external-model');
-                }
-                
-                public function isAvailable(): bool {
-                    return true;
-                }
-                
-                public function get($modelName = null) {
-                    if ($modelName) {
-                        // Handle both 'models.gift_log' and 'gift_log' formats
-                        $modelKey = str_replace('models.', '', $modelName);
-                        return $this->modelService->getModelClass($modelKey);
-                    }
-                    return $this->modelService;
-                }
-            };
+        // Register External Helper Service
+        $this->app->singleton('agency.external.helper', function ($app) {
+            return new \Utd\Agency\Services\ExternalHelperResolver();
         });
+        
+        // Register Repository Contracts
+        $this->app->bind(
+            \Utd\Agency\Contracts\AgencyRepositoryInterface::class,
+            function ($app) {
+                if (class_exists(\Utd\Agency\Repositories\AgencyRepository::class)) {
+                    return $app->make(\Utd\Agency\Repositories\AgencyRepository::class);
+                }
+                return null;
+            }
+        );
     }
 
     /**

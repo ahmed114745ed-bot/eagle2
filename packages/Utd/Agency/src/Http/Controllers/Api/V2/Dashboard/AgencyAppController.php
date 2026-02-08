@@ -6,19 +6,28 @@ use Exception;
 use Illuminate\Http\Request;
 use Utd\Agency\Facades\AgencyHelper;
 use Illuminate\Routing\Controller;
-use App\Tik\Services\AgencyService;
 use Maatwebsite\Excel\Facades\Excel;
 use Utd\Agency\Exports\HostDailyDataExport;
 use Utd\Agency\Transformers\HostDailyReportResource;
+use Utd\Agency\Contracts\AgencyServiceInterface;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 
 class AgencyAppController extends Controller
 {
+    use ResolvesExternalDependencies;
+    
     protected $agencyService;
 
-    public function __construct(AgencyService $agencyService)
+    public function __construct(AgencyServiceInterface $agencyService = null)
     {
-        $this->agencyService = $agencyService;
+        // Use injected service if available, otherwise resolve from config
+        $this->agencyService = $agencyService ?? $this->getAgencyService();
+        
+        // If still null, throw exception
+        if (!$this->agencyService) {
+            throw new \RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
+        }
     }
 
     public function agency_data(Request $request)

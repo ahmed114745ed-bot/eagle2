@@ -3,15 +3,10 @@
 namespace Utd\Agency\Http\Controllers\Api\V2;
 
 use Cache;
-use App\Models\User;
-use App\Models\Agency;
-use App\Models\Setting;
-use App\Helpers\UserCommon;
 use Utd\Agency\Facades\AgencyHelper;
+use Utd\Agency\Traits\ResolvesModels;
 use Illuminate\Http\Request;
-use App\Models\AgencyUserJob;
 use PHPUnit\Framework\Exception;
-use App\Models\AgencyJoinRequest;
 use Utd\Agency\Services\AgencyService;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
@@ -28,11 +23,15 @@ use Utd\Agency\Http\Resources\JoinedAgencyResource;
 
 class AgencyController extends Controller
 {
+    use ResolvesModels;
+    
     protected $agencyService;
+    protected $userCommonClass;
 
     public function __construct(AgencyService $agencyService)
     {
         $this->agencyService = $agencyService;
+        $this->userCommonClass = config('agency-dependencies.dependencies.helpers.user_common', \App\Helpers\UserCommon::class);
     }
 
     public function joinRequest(Request $request)

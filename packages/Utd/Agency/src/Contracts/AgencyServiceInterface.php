@@ -73,4 +73,74 @@ interface AgencyServiceInterface
      * Get old agencies for user
      */
     public function gitOldAgencies($userId);
+    
+    /**
+     * Create new agency
+     */
+    public function create($userId, $request);
+    
+    /**
+     * Action on agency request (accept/reject)
+     */
+    public function actionRequestAgency($request);
+    
+    /**
+     * Get all agency requests
+     */
+    public function allRequest();
+    
+    /**
+     * Get history for last 30 days
+     */
+    public function historyLastThirtyDays($userUuid);
+    
+    /**
+     * Get agency report
+     */
+    public function agencyReport($agencyId);
+    
+    /**
+     * Leave agency
+     */
+    public function leaveAgency($userId, $agency);
+    
+    /**
+     * Handle user request
+     */
+    public function handlingRequest($agencyId, $userId);
+    
+    /**
+     * Kick user from agency
+     */
+    public function kickAgency($user, $userId);
+    
+    /**
+     * Filter agencies
+     */
+    public function filter($keyword);
+    
+    /**
+     * Get daily report
+     */
+    public function dailyReport($user, $month, $year, $agencyId);
+    
+    /**
+     * Get agency data
+     */
+    public function dataAgency();
+    
+    /**
+     * Get host report
+     */
+    public function hostReport($id);
+    
+    /**
+     * Get host daily report
+     */
+    public function hostDailyReport($request);
+    
+    /**
+     * Edit agency
+     */
+    public function editAgency($request);
 }
