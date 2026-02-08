@@ -299,14 +299,17 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
+                $AllOpeningRoomsZegoRequest = app($this->AllOpeningRoomsZegoRequest);
+                dispatchJobToQueue(new $AllOpeningRoomsZegoRequest($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
             }
         }
         return @$jsons ?? [];
     }
-    public function gift_queue_cp(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function gift_queue_cp(Request $request)
     {
-       $close_open_gifts = settings()->get('close_open_gifts');
+        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        
+        $close_open_gifts = settings()->get('close_open_gifts');
 
         if ($close_open_gifts == 1) {
             return $this->Common::apiResponse(0, __('Send gift stopped by admin'));
@@ -405,8 +408,10 @@ class GiftLogController extends Controller
         return $randomValue <= $win_probability;
     }
 
-    public function sendLuckyGift2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2(Request $request)
     {
+        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return $this->Common::apiResponse(0, __('api_responses.try_again'));
@@ -436,8 +441,10 @@ class GiftLogController extends Controller
     }
 
 
-    public function sendLuckyGift2V2(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2V2(Request $request)
     {
+        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return $this->Common::apiResponse(0, __('api_responses.try_again'));
@@ -467,8 +474,10 @@ class GiftLogController extends Controller
     }
 
 
-    public function sendLuckyGift2V3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
+    public function sendLuckyGift2V3(Request $request)
     {
+        $updateUserWhenSendGift = app($this->UpdateUserWhenSendGift);
+        
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
             return $this->Common::apiResponse(0, __('api_responses.try_again'));
