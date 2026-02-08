@@ -422,7 +422,7 @@ class TargetController extends MainController
                 }).then((result) => {
                     if (result.value) {
 
-                        $('#loadingOverlay').show();
+                        // $('#loadingOverlay').show();
                         $('.confirm-btn').prop('disabled', true);
 
                         window.location.href = url;
