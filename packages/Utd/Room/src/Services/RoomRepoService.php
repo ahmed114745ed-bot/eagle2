@@ -18,7 +18,7 @@ use Utd\Room\Services\RoomService;
 use App\Traits\MultiQueryPagination;
 use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Repositories\RoomRepository;
-use App\Tik\Repositories\UserRepository;
+use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use Utd\Room\Repositories\RoomRepoInterface;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
