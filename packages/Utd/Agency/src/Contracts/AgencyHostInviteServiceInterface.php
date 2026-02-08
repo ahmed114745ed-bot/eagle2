@@ -37,4 +37,28 @@ interface AgencyHostInviteServiceInterface
      * @return mixed
      */
     public function getPendingInvitations(int $hostId);
+    
+    /**
+     * Invite user to agency
+     *
+     * @param mixed $request
+     * @return mixed
+     */
+    public function inviteAgency($request);
+    
+    /**
+     * Get host invitations
+     *
+     * @param mixed $request
+     * @return mixed
+     */
+    public function hostInvitation($request);
+    
+    /**
+     * Handle invite action
+     *
+     * @param mixed $request
+     * @return mixed
+     */
+    public function inviteAction($request);
 }

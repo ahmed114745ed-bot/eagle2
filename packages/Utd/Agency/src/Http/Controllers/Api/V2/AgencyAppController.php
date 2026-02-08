@@ -6,7 +6,6 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use App\Tik\Services\AgencyService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +13,10 @@ use Utd\Agency\Emails\SendAgencyEmail;
 use Utd\Agency\Services\TargetService;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 use Utd\Agency\Classes\Agencies\AgencyDataSearch;
+use Utd\Agency\Contracts\AgencyServiceInterface;
+
+// Import external classes via facade or config
+use App\Helpers\Common;
 
 class AgencyAppController extends Controller
 {
@@ -21,9 +24,15 @@ class AgencyAppController extends Controller
     
     protected $agencyService;
 
-    public function __construct(AgencyService $agencyService)
+    public function __construct(AgencyServiceInterface $agencyService = null)
     {
-        $this->agencyService = $agencyService;
+        // Use injected service if available, otherwise resolve from config
+        $this->agencyService = $agencyService ?? $this->getAgencyService();
+        
+        // If still null, throw exception
+        if (!$this->agencyService) {
+            throw new \RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
+        }
     }
 
     public function createAgency(Request $request)
@@ -169,9 +178,19 @@ class AgencyAppController extends Controller
 
         $keyword = $request->keyword;
         [$agencies, $agencyManger] = $this->agencyService->filter($keyword);
+        
+        // Check if SalaryTransaction module exists for resources
+        $filterAgancyResourceClass = class_exists('\\Modules\\SalaryTransaction\\Transformers\\FilterAgancyResource')
+            ? '\\Modules\\SalaryTransaction\\Transformers\\FilterAgancyResource'
+            : null;
+            
+        $filterAgencyMangerResourceClass = class_exists('\\Modules\\SalaryTransaction\\Transformers\\FilterAgencyMangerResource')
+            ? '\\Modules\\SalaryTransaction\\Transformers\\FilterAgencyMangerResource'
+            : null;
+        
         $data = [
-            'agencies' => FilterAgancyResource::collection($agencies),
-            'agency_masters' => FilterAgencyMangerResource::collection($agencyManger),
+            'agencies' => $filterAgancyResourceClass ? $filterAgancyResourceClass::collection($agencies) : $agencies,
+            'agency_masters' => $filterAgencyMangerResourceClass ? $filterAgencyMangerResourceClass::collection($agencyManger) : $agencyManger,
         ];
         return Common::apiResponse(1, '', $data);
     }
@@ -183,13 +202,17 @@ class AgencyAppController extends Controller
         $year = request()->year ?? now()->year;
         $agencyId = request()->agency_id ?? $user->agency_id;
 
-        if (!$user instanceof User) return;
+        $userModel = $this->getUserModel();
+        if (!$user instanceof $userModel) return;
         $userId        = $user->id;
 
         $cacheKey = 'cache-data-my-store-' . $user->id;
         if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
-            $targetService = new FixedTargetService($user);
-            ($targetService)->calculateTarget();
+            // Check if FixedTargetService module exists before using
+            if (class_exists('\\Modules\\FixedTarget\\Services\\FixedTargetService')) {
+                $targetService = new \Modules\FixedTarget\Services\FixedTargetService($user);
+                ($targetService)->calculateTarget();
+            }
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year, $agencyId);
