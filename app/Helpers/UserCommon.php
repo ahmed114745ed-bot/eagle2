@@ -493,11 +493,11 @@ class UserCommon
                 'type'     => $feature->name
             ]);
 
-            Log::info('Adding event ware to user', [
-                'user_id' => $user->id,
-                'ware_id' => $ware->id,
-                'feature' => $feature->name,
-            ]);
+            // Log::info('Adding event ware to user', [
+            //     'user_id' => $user->id,
+            //     'ware_id' => $ware->id,
+            //     'feature' => $feature->name,
+            // ]);
         }
 
 
