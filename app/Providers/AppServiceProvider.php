@@ -97,9 +97,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Increase memory limit for production
-        @ini_set('memory_limit', '512M');
-        
         $this->dashboardAdminConfig();
         $this->setupAppSettings();
         $this->setupLanguages();
