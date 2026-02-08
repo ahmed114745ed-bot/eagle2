@@ -51,11 +51,12 @@
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "*",
         "utd/agency": "*",
-        "utd/moments": "*",
-        "utd/reals": "*",
         "utd/gifts": "*",
+        "utd/moments": "*",
+        "utd/pk": "*",
+        "utd/reals": "*",
         "utd/room": "*",
-        "utd/pk": "*"
+        "utd/room-cup": "dev-achievmentPackage"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -166,10 +167,7 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/RoomCup",
-            "options": {
-                "symlink": true
-            }
+            "url": "packages/Utd/RoomCup"
         },
         {
             "type": "path", "url": "./packages/Utd/Gifts"

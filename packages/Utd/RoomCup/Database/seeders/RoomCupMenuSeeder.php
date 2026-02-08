@@ -13,9 +13,8 @@ class RoomCupMenuSeeder extends Seeder
             ->whereNull('uri')
             ->first();
 
-        $existingParent = Menu::whereId($currentParent->parent_id)->exists();
-
         if ($currentParent) {
+            $existingParent = Menu::whereId($currentParent->parent_id)->exists();
             if ($currentParent->parent_id != 0 && !$existingParent) {
                 $currentParent->update(['parent_id' => 0]);
             }
