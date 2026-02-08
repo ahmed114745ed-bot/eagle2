@@ -19,7 +19,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const units = ['attraction', 'charge', 'rooms', 'cp'];
+        const units = ['wealth', 'attraction', 'charge', 'rooms', 'cp'];
 
         units.forEach(unit => {
             const expInput = document.getElementById(`${unit}_exp`);
