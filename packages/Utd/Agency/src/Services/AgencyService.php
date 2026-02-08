@@ -674,20 +674,22 @@ class AgencyService implements AgencyServiceInterface
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
         $timezone = Common::timeZone();
-        $member = AgencyJoinRequest::where('user_id', $user->id)->where('status', 1)->first();
+        
+        // Check if user is owner of an agency
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
-        $joinedAgency = $member ??  $owner;
+        
+        // Check if user is member (joined) of an agency
+        $member = UsersJoinedAgency::where('user_id', $user->id)
+            ->where('agency_id', $agencyId ?? $user->agency_id)
+            ->first();
+        
+        $joinedAgency = $owner ?? $member;
         if (! $joinedAgency) {
             return [];
         }
-        $joinRecord = UsersJoinedAgency::where('user_id', $user->id)
-            ->where('agency_id', $user->agency_id)
-            ->latest('join_date')
-            ->first();
-
-        if (!$joinRecord) {
-            $joinRecord =  null;
-        }
+        
+        
+        $joinRecord = $member;
 
         $timezone = getTimezone();
         //        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
