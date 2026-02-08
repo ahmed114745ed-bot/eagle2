@@ -31,7 +31,7 @@
         }
     });
 }
-//dd($allGroupedPermissions);
+    //dd($allGroupedPermissions);
     $firstCategory = $categories->first()->slug ?? null;
 @endphp
 
@@ -40,7 +40,7 @@
     font-size: 12px;
 }
     .nav-tabs{
-        background: var(--box-background-color);
+        background: #f9f9f9;
     }
     .nav-link.active {
         background-color: var(--primary-color);
@@ -58,7 +58,7 @@
         gap: 15px;
     }
     .permission-group {
-        background-color: var(--box-background-color);
+        background-color: #f9f9f9;
         border-radius: 8px;
         padding: 15px;
     }

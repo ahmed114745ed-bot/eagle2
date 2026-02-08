@@ -158,6 +158,12 @@ class AuthController extends BaseAuthController
 
         return redirect()->intended($request->url ?? $this->redirectPath());
     }
+
+    public function getFirstUrl($user)
+    {
+        $firstPermission = $user->permissions()->orderBy('id', 'asc')->first();
+
+    }
     public function getSetting(Content $content)
     {
         $form = $this->settingForm();
