@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Log;
 use Utd\Gifts\Repositories\GiftRepository;
 use Utd\Gifts\Repositories\GiftLogRepository;
 use GuzzleHttp\Exception\BadResponseException;
+
+
+class GiftLogService
+{
+
+    public function __construct(
         private readonly GiftRepository $giftRepository,
         private readonly GiftLogRepository $giftLogRepository,
     ) {}
@@ -225,8 +231,7 @@ use GuzzleHttp\Exception\BadResponseException;
                 $roomBoomService = $this->getRoomBoomService();
                 $totalRoomGift = $roomBoomService ? $roomBoomService->getOrCreateTotalRoomGift($room->id, $todayStart) : null;
 
-                    $totalRoomGift->increment('current_total', $totalPrice);
-                }
+                $totalRoomGift->increment('current_total', $totalPrice);
             }
 
             foreach ($receivedUsers as $receivedUser) {
