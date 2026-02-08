@@ -364,7 +364,7 @@ Route::group(
         Route::prefix('emojis')->group(function () {
             Route::get('/{filter?}', [EmojiController::class, 'index']);
         });
-        Route::resource('percentage-games', PercentageGameController::class);
+       
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');
