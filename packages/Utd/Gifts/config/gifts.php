@@ -190,8 +190,8 @@ return [
     |
     */
     'services' => [
-        'gift' => env('GIFTS_GIFT_SERVICE', 'App\Tik\Services\GiftService'),
-        'gift_log' => env('GIFTS_GIFT_LOG_SERVICE', 'App\Tik\Services\GiftLogService'),
+        'gift' => env('GIFTS_GIFT_SERVICE', 'Utd\Gifts\Services\GiftService'),
+        'gift_log' => env('GIFTS_GIFT_LOG_SERVICE', 'Utd\Gifts\Services\GiftLogService'),
         'lucky_gift' => env('GIFTS_LUCKY_GIFT_SERVICE', 'App\Services\LuckyGiftService'),
         'send_gift' => env('GIFTS_SEND_GIFT_SERVICE', 'App\Classes\Gifts\SendGiftService'),
         'gift_service' => env('GIFTS_SERVICE_CLASS', 'App\Services\Gifts\GiftService'),
