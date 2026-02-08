@@ -3,8 +3,9 @@
 namespace Utd\Agency\Services;
 
 use Illuminate\Support\Facades\Log;
+use Utd\Agency\Contracts\ExternalModuleInterface;
 
-class ExternalModuleResolver
+class ExternalModuleResolver implements ExternalModuleInterface
 {
     /**
      * Configuration cache
@@ -17,6 +18,68 @@ class ExternalModuleResolver
     public function __construct()
     {
         $this->config = config('agency-dependencies', []);
+    }
+    
+    /**
+     * Check if module is available
+     * Implementation of ExternalModuleInterface
+     */
+    public function isAvailable(): bool
+    {
+        // Generic check - you can customize based on specific module needs
+        return true;
+    }
+    
+    /**
+     * Get module service, helper, or model class
+     * Implementation of ExternalModuleInterface
+     * 
+     * @param string|null $identifier Optional identifier for getting specific models or services
+     * @return mixed
+     */
+    public function get($identifier = null)
+    {
+        if (!$identifier) {
+            return $this;
+        }
+        
+        // Parse the identifier (e.g., "models.gift_log" or "services.reals")
+        $parts = explode('.', $identifier);
+        
+        if (count($parts) === 2) {
+            $type = $parts[0]; // 'models', 'services', 'helpers'
+            $name = $parts[1]; // 'gift_log', 'reals', etc.
+            
+            // Map types to config structure
+            $typeMap = [
+                'models' => 'model',
+                'services' => 'service',
+                'helpers' => 'helper',
+                'entities' => 'entity',
+            ];
+            
+            $configType = $typeMap[$type] ?? $type;
+            
+            // Try to get from dependencies config
+            $class = $this->config['dependencies'][$type][$name] ?? null;
+            
+            if ($class && class_exists($class)) {
+                return $class;
+            }
+            
+            // Fallback to module-based lookup
+            foreach ($this->config['modules'] ?? [] as $moduleName => $moduleConfig) {
+                if (isset($moduleConfig[$configType])) {
+                    $moduleClass = $moduleConfig[$configType];
+                    // Simple name matching
+                    if (stripos($moduleClass, $name) !== false && class_exists($moduleClass)) {
+                        return $moduleClass;
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
     
     /**
