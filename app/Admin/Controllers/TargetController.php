@@ -716,79 +716,73 @@ class TargetController extends MainController
         //         HTML);
 
 
-        // $form->saving(function (Form $form) {
+        $form->saving(function (Form $form) {
 
 
-        //     $fields = [
-        //         'usd' => request()->usd,
-        //         'agency_share' => request()->agency_share,
-        //         'app_profit_percentage' => request()->app_profit_percentage,
-        //         'db_percentage' => request()->db_percentage,
-        //     ];
+            $fields = [
+                'usd' => request()->usd,
+                'agency_share' => request()->agency_share,
+                'app_profit_percentage' => request()->app_profit_percentage,
+                'db_percentage' => request()->db_percentage,
+            ];
 
-        //     $total = 0;
-        //     foreach ($fields as $key => $value) {
-        //         if ($value < 0) {
-        //             $error = new MessageBag(
-        //                 [
-        //                     'title'   => 'forbidden',
-        //                     'message' => __('The field :field must be a positive number.', ['field' => $key]),
-        //                 ]
-        //             );
-        //             return back()->with(compact('error'));
-        //         }
+            $total = 0;
+            foreach ($fields as $key => $value) {
+                if ($value < 0) {
+                    $error = new MessageBag(
+                        [
+                            'title'   => 'forbidden',
+                            'message' => __('The field :field must be a positive number.', ['field' => $key]),
+                        ]
+                    );
+                    return back()->with(compact('error'));
+                }
 
-        //         $total += $value;
-        //     }
-        //     if ($total > 100) {
-        //         $error = new MessageBag(
-        //             [
-        //                 'title'   => 'forbidden',
-        //                 'message' => __('The total percentage must be 100%.'),
-        //             ]
-        //         );
-        //         return back()->with(compact('error'));
-        //     }
-
-
-
-        //     if ($form->isEditing()) {
-        //         $target = $form->model();
-
-        //         $editData = [
-        //             'diamonds' => $form->diamonds,
-        //             'usd' => $form->usd,
-        //             'agency_share' => $form->agency_share,
-        //             'app_profit_percentage' => $form->app_profit_percentage,
-        //             'db_percentage' => $form->db_percentage,
-        //             'hours' => $form->hours,
-        //             'days' => $form->days,
-        //             'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
-        //             'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
-        //         ];
+                $total += $value;
+            }
+            if ($total > 100) {
+                $error = new MessageBag(
+                    [
+                        'title'   => 'forbidden',
+                        'message' => __('The total percentage must be 100%.'),
+                    ]
+                );
+                return back()->with(compact('error'));
+            }
 
 
-        //         $edit = TargetEdit::updateOrCreate(
-        //             ['target_id' => $target->id],
-        //             [
-        //                 'edited_by' => Auth::id(),
-        //                 'data' => $editData,
-        //                 'status' => 'pending',
-        //             ]
-        //         );
 
-        //         $target->under_edit = true;
-        //         $target->edit_id = $edit->id;
-        //         $target->save();
-        //         $url = url('admin/targets');
-        //         return redirect()->to($url);
-        //     }
-        // });
+            if ($form->isEditing()) {
+                $target = $form->model();
+
+                $editData = [
+                    'diamonds' => $form->diamonds,
+                    'usd' => $form->usd,
+                    'agency_share' => $form->agency_share,
+                    'app_profit_percentage' => $form->app_profit_percentage,
+                    'db_percentage' => $form->db_percentage,
+                    'hours' => $form->hours,
+                    'days' => $form->days,
+                    'reel' => $form->reel1 . ',' . $form->reel2 . ',' . $form->reel3,
+                    'moment' => $form->moment1 . ',' . $form->moment2 . ',' . $form->moment3,
+                ];
 
 
-        $form->saved(function (Form $form) {
-            $url = url('admin/agency-settings?firsttab=targets_table');
-            return redirect()->to($url);
+                $edit = TargetEdit::updateOrCreate(
+                    ['target_id' => $target->id],
+                    [
+                        'edited_by' => Auth::id(),
+                        'data' => $editData,
+                        'status' => 'pending',
+                    ]
+                );
+
+                $target->under_edit = true;
+                $target->edit_id = $edit->id;
+                $target->save();
+                $url = url('admin/targets');
+                return redirect()->to($url);
+            }
         });
 
         return $form;
