@@ -784,13 +784,7 @@ class TargetController extends MainController
                 return redirect()->to($url);
             }
         });
-
-
-        // $form->saved(function (Form $form) {
-        //     $url = url('admin/agency-settings?firsttab=targets_table');
-        //     return redirect()->to($url);
-        // });
-
+        
         return $form;
     }
 
