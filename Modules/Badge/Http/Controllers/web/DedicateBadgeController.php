@@ -27,8 +27,10 @@ class DedicateBadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-
-        $grid->model()->orderBy('priority', 'desc');
+        $lang = app()->getLocale();
+        $grid->model()->whereHas('images', function ($query) use ($lang) {
+            $query->where('language', $lang);
+        })->with('images')->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
         $grid->column('name', __('name'));

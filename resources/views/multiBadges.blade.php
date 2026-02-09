@@ -29,32 +29,57 @@
     @endforeach
 </ul>
 
+
 <div class="tab-content p-3 border border-top-0">
     @php $first = true; @endphp
     @foreach ($languages as $code => $label)
-        <div class="tab-pane fade {{ $first ? 'show active' : '' }}"
-             id="lang-{{ $code }}">
+        @php
+            $imageData = $badgeImages[$code] ?? null;
+        @endphp
 
-            {{-- Image --}}
+        <div class="tab-pane fade {{ $first ? 'show active' : '' }}" id="lang-{{ $code }}">
+
+           
             <div class="form-group">
                 <label>{{ __('Image') }} ({{ $label }})</label>
-                <input type="file"
-                       name="images[{{ $code }}][image]"
-                       class="form-control">
+                @if(!empty($imageData->show_image))
+                    <div>
+                        <img src="{{ getImagePath( $imageData->show_image) }}" alt="" height="80">
+                    </div>
+                @endif
+                <input type="file" name="images[{{ $code }}][image]" class="form-control">
             </div>
 
-            {{-- Default Image --}}
+            
             <div class="form-group">
                 <label>{{ __('Default Image') }} ({{ $label }})</label>
-                <input type="file"
-                       name="images[{{ $code }}][default_image]"
-                       class="form-control">
+                @if(!empty($imageData->image))
+                    <div>
+                        <img src="{{ getImagePath( $imageData->image) }}" alt="" height="80">
+                    </div>
+                @endif
+                <input type="file" name="images[{{ $code }}][default_image]" class="form-control">
+            </div>
+
+            
+            <div class="form-group">
+                <label>{{ __('Image Type') }} ({{ $label }})</label>
+                <select name="images[{{ $code }}][image_type]" class="form-control" required>
+                    @foreach(\App\Enums\ImageType::options() as $key => $val)
+                        <option value="{{ $key }}" {{ ($imageData->image_type ?? '') == $key ? 'selected' : '' }}>
+                            {{ $val }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
 
         </div>
         @php $first = false; @endphp
     @endforeach
 </div>
+
+
+
 
 
 <script>
@@ -74,4 +99,7 @@
         });
     });
 </script>
+
+
+
 
