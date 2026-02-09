@@ -53,7 +53,6 @@ class BadgeController extends MainController
     {
         $grid = new Grid(new Badge());
         $lang = app()->getLocale();
-        dd($lang);
         $grid->model()->where('language', $lang)->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
