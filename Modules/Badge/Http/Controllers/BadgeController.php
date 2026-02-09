@@ -31,9 +31,6 @@ class BadgeController extends Controller
             ->active()
             ->with([
                 'badge:id,type',
-                'badge.images' => function ($query) {
-                    $query->where('language', app()->getLocale());
-                }
 
             ])->get();
 
