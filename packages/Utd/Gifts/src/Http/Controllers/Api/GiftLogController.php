@@ -24,39 +24,14 @@ use Utd\Gifts\Services\LuckyGiftV2Service;
 
 class GiftLogController extends Controller
 {
-    // Resolved classes from config
-    protected $Common;
-    protected $UserHandling;
-    protected $CustomNotification;
-    protected $GiftLogResource;
-    protected $GiftLogUtdResource;
-    protected $User;
-    protected $Agency;
-    protected $Cp;
-    protected $AppFeature;
-    protected $CoreWallet;
-    protected $UserSallary;
-    protected $RemainingDiamond;
-    protected $MonthlyDiamondReceive;
-    protected $LuckyGiftService;
-    protected $SendGiftService;
-    protected $GiftService;
-    protected $RoomLevelServices;
-    protected $UpdateUserWhenSendGift;
-    protected $CleanGiftLogsJob;
-    protected $AllOpeningRoomsZegoRequest;
-    protected $UpdateUserDataWhenSendGift;
-    protected $UpdatePkAndSendToZigoJob;
-    protected $GiftBannerEvent;
-    protected $NotInfMoneyException;
-    protected $UserCommon;
+    /**
+     * Internal cache for resolved services and helpers
+     */
+    private $instances = [];
 
-    private $roomTopUsersRepository;
-    private $giftLogService;
-    
     public function __construct()
     {
-        // Load only essential services - others loaded on-demand via properties
+        // Load only essential services - others loaded on-demand via __get
     }
 
     /**
@@ -78,8 +53,8 @@ class GiftLogController extends Controller
     // Lazy loading via magic method - loads only when accessed
     public function __get($name)
     {
-        if (!isset($this->$name)) {
-            $this->$name = match ($name) {
+        if (!isset($this->instances[$name])) {
+            $this->instances[$name] = match ($name) {
                 // Internal package classes
                 'giftLogService' => app(GiftLogService::class),
                 'GiftService' => app(GiftService::class),
@@ -114,7 +89,7 @@ class GiftLogController extends Controller
                 default => null,
             };
         }
-        return $this->$name;
+        return $this->instances[$name];
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)

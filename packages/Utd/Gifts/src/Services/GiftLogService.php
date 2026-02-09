@@ -28,19 +28,55 @@ class GiftLogService
     private function getRoomTopUsersRepository()
     {
         $class = 'App\\Contracts\\RoomTopUsersRepositoryContract';
-        return class_exists($class) ? app($class) : null;
+        if (app()->bound($class)) {
+            return app($class);
+        }
+        return (interface_exists($class) || class_exists($class)) ? app($class) : null;
     }
 
     private function getRoomRepository()
     {
         $class = 'App\\Contracts\\RoomRepositoryContract';
-        return class_exists($class) ? app($class) : null;
+        
+        // Try bound contract first
+        if (app()->bound($class)) {
+            return app($class);
+        }
+
+        // Try if it exists
+        if (interface_exists($class) || class_exists($class)) {
+            try {
+                return app($class);
+            } catch (\Exception $e) {
+                Log::warning("GiftLogService: Could not resolve RoomRepositoryContract even though it exists. Error: " . $e->getMessage());
+            }
+        }
+
+        // Fallback to internal package interface if the contract is missing
+        $fallbackClass = 'Utd\\Room\\Repositories\\RoomRepoInterface';
+        if (app()->bound($fallbackClass)) {
+            return app($fallbackClass);
+        }
+
+        Log::error("GiftLogService: Room repository not found. Checked: $class, $fallbackClass");
+        return null;
     }
 
     private function getUserRepository()
     {
+        // 1. Try resolving via agency package (most common)
         $class = 'Utd\\Agency\\Repositories\\UserRepository';
-        return class_exists($class) ? app($class) : null;
+        if (class_exists($class)) {
+            return app($class);
+        }
+
+        // 2. Try contract if exists
+        $contract = 'App\\Contracts\\UserRepositoryContract';
+        if (app()->bound($contract)) {
+            return app($contract);
+        }
+
+        return null;
     }
 
 
