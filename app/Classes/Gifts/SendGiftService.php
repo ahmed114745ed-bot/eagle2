@@ -358,7 +358,7 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room) :  array
     {
-        if (! PackageHelper::isInstalled('pk')) return;
+        if (! PackageHelper::isInstalled('pk')) return  [];
 
         if(!($pk instanceof Pk)) return [];
 

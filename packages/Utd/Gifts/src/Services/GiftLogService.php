@@ -49,12 +49,7 @@ class GiftLogService
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
-            // room_id 1
-            // owner id 1
             $data    = $request;
-            \Illuminate\Support\Facades\Log::info('GiftLogService::sendGift - transaction started', [
-                'request_data' => $data->all()
-            ]);
             $user    = $request->user();
             $userId  = $user->id;
             $ownerId = @$data['owner_id'];
@@ -818,12 +813,7 @@ class GiftLogService
     private function getSendGiftServiceInstance()
     {
         $class = 'App\\Classes\\Gifts\\SendGiftService';
-        $exists = class_exists($class);
-        \Illuminate\Support\Facades\Log::info('getSendGiftServiceInstance check', [
-            'class' => $class,
-            'exists' => $exists
-        ]);
-        return $exists ? new $class() : null;
+        return class_exists($class) ? new $class() : null;
     }
 
     private function getUpdateUserWhenSendGiftInstance()
