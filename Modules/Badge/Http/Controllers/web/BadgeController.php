@@ -9,9 +9,11 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Enums\BadgeType;
 use App\Enums\ImageType;
+
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
+use Modules\Badge\Entities\BadgeImage;
 use App\Admin\Controllers\MainController;
 
 class BadgeController extends MainController
@@ -53,12 +55,16 @@ class BadgeController extends MainController
     {
         $grid = new Grid(new Badge());
         $lang = app()->getLocale();
-        $grid->model()->where('language', $lang)->orderBy('priority', 'desc');
+        $grid->model()
+            ->whereHas('images', function ($query) use ($lang) {
+                $query->where('language', $lang);
+            })
+            ->with('images')->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
-        // $grid->column('name', __('name'));
+        $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
+            $grid->column('images.image', __('image'))->display(function ($path) {
                 /** @var Ware $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
@@ -68,7 +74,7 @@ class BadgeController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            // $filter->like('name', 'name');
+            $filter->like('name', 'name');
             $filter->equal('priority', 'Priority');
         });
         Admin::script("
@@ -86,6 +92,8 @@ class BadgeController extends MainController
     protected function form()
     {
         $form = new Form(new Badge());
+        $form->text('name', __('Name'))
+            ->rules('required|unique:badges,name,{{id}}');
 
         $form->select('type', __('Type'))
             ->options(BadgeType::options())
@@ -93,62 +101,72 @@ class BadgeController extends MainController
             ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
         $form->number('priority', __('Priority'))->min(0)->default(0)->required();
 
-        if (!$form->isEditing()) {
+        $form->html(function () use ($form) {
 
-            $form->html(view('multiBadges',));
-        } else {
-            $form->image('show_image', trans('img'))->name(function ($file) {
-                return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-            });
+            // Get existing images for this badge
+            $badgeImages = $form->model()->exists
+                ? $form->model()->images()->get()->keyBy('language')
+                : collect();
 
-            $form->file('image', __('Default Image'))->name(function ($file) {
-                return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
-            })->required();
-        }
+            return view('multiBadges', compact('badgeImages'));
+        });
 
 
-        $form->select('image_type', __('Image Type'))
-            ->options(ImageType::options())
-            ->default(ImageType::Image->value)
-            ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
+        $form->saved(function (Form $form) {
+            $images = request()->file('images');
+            $allData = request()->input('images', []);
 
-        if (!$form->isEditing()) {
-            $form->saving(function (Form $form) {
+            if (!$images && empty($allData)) {
+                throw new \Exception('Images are required');
+            }
 
-                $images = request()->file('images');
+            foreach ($allData as $lang => $dataInput) {
 
-                if (!$images) {
-                    throw new \Exception('Images are required');
+                // Find existing BadgeImage for this badge and language
+                $badgeImage = BadgeImage::where('badge_id', $form->model()->id)
+                    ->where('language', $lang)
+                    ->first();
+
+                $data = [
+                    'badge_id'   => $form->model()->id,
+                    'image_type' => $dataInput['image_type'] ?? ImageType::Image->value,
+                    'language'   => $lang,
+                ];
+
+                // Handle show_image
+                if (!empty($images[$lang]['image'])) {
+                    $file = $images[$lang]['image'];
+
+
+                    $data['image'] = Common::upload('badges', $file);
+                } elseif ($badgeImage) {
+                    // Keep existing if no new file uploaded
+                    $data['image'] = $badgeImage->show_image;
                 }
 
-                foreach ($images as $lang => $files) {
+                // Handle default_image
+                if (!empty($images[$lang]['default_image'])) {
+                    $file = $images[$lang]['default_image'];
 
-                    $data = [
-                        'type'       => $form->type,
-                        'priority'   => $form->priority,
-                        'image_type' => $form->image_type,
-                        'language'   => $lang,
-                    ];
 
-                    // ========== show_image ==========
-                    if (!empty($files['image'])) {
-                        $file = $files['image'];
-                        $data['show_image'] = Common::upload('badges', $file);
-                    }
 
-                    // ========== image ==========
-                    if (!empty($files['default_image'])) {
-                        $file = $files['default_image'];
-                        $data['image'] =  Common::upload('badges', $file);
-                    }
-
-                    Badge::create($data);
+                    $data['show_image'] = Common::upload('badges', $file);
+                } elseif ($badgeImage) {
+                    // Keep existing if no new file uploaded
+                    $data['show_image'] = $badgeImage->image;
                 }
-                 $url = url('admin/badges');
-                return redirect()->to($url);
-                return false;
-            });
-        }
+
+                if ($badgeImage) {
+                    // Update existing
+                    $badgeImage->update($data);
+                } else {
+                    // Create new if not exists
+                    BadgeImage::create($data);
+                }
+            }
+        });
+
+
 
         return $form;
     }

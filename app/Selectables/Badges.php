@@ -14,6 +14,10 @@ class Badges extends Selectable
 
     public function make()
     {
+        $lang = app()->getLocale();
+        $this->model()->whereHas('images', function ($query) use ($lang) {
+            $query->where('language', $lang);
+        })->with('images')->orderBy('priority', 'desc');
         $this->column('id', __('ID'));
         $this->column('name', __('name'));
         $this->column('image', __('image'))->display(function ($path) {
@@ -35,6 +39,5 @@ class Badges extends Selectable
             $filter->like('name', __('name'));
             $filter->equal('priority', __('Priority'));
         });
-        
     }
 }
