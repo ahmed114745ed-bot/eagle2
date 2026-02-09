@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\TimestampsWithTimezone;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class UserLuckProfile extends Model
+{
+    use HasFactory, TimestampsWithTimezone;
+
+    protected $fillable = [
+        'user_id',
+        'total_bets',
+        'total_profit',
+        'bet_count',
+        'win_count',
+        'first_bet_at',
+        'is_legacy_user',
+        'beginner_protection_ends_at',
+        'current_deviation',
+    ];
+
+    protected $casts = [
+        'first_bet_at' => 'datetime',
+        'beginner_protection_ends_at' => 'datetime',
+        'is_legacy_user' => 'boolean',
+        'total_bets' => 'decimal:2',
+        'total_profit' => 'decimal:2',
+        'current_deviation' => 'decimal:6',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+}

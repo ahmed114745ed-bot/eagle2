@@ -21,6 +21,7 @@ use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
 use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Traits\Gifts\LuckyGiftProbability;
+use App\Traits\Gifts\FairLuckIntegration;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
@@ -30,6 +31,7 @@ class LuckyGiftService
 
     use LuckyGiftProbability;
     use WinLuckyGift;
+    use FairLuckIntegration;
 
     private UpdateUserWhenSendGift $updateUserWhenSendGift;
 
@@ -385,42 +387,28 @@ class LuckyGiftService
             $appWallet->coins   += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
-            $isWinner       = $this->is_winner($gift);
 
-            $isPopular      = false;
             $totalGiftPrice = $giftPrice * $number;
-            $appWalletCoins = $appWallet->coins;
-            if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
-                $properties = $gift->luckyGift?->min_percentage;
+            $luckResult = $this->processFairLuckBet($user, $gift, $totalGiftPrice, $roomId);
+            $isWinner = $luckResult->isWinner;
+            $cashback_percentage = $luckResult->multiplier;
 
-                $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $totalGiftPrice, $properties);
-
+            $isPopular = false;
+            if ($isWinner) {
                 $cashback_value = $cashback_percentage * $giftPrice * $number;
-                if ($cashback_percentage > 0) {
 
-                    $user->enableSaving = false;
-                    $user->di           += $cashback_value;
-                    //                $user->save();
-                    $appWallet->coins -= $cashback_value;
-                    //                $appWallet->save();
-                    if ($cashback_percentage > 1) {
-                        $message = $this->winnerMessage($cashback_percentage);
-                    }
-                } else {
-                    $isWinner = false;
+                $user->enableSaving = false;
+                $user->di           += $cashback_value;
+                $appWallet->coins   -= $cashback_value;
+
+                if ($cashback_percentage > 1) {
+                    $message = $this->winnerMessage($cashback_percentage);
                 }
 
                 //send to zigo this data to show in all rooms if cashback percentage > 20
                 $isPopular = $this->isPopular($cashback_percentage);
 
                 if ($isPopular) {
-
-                    //  \Log::info('🚀 Sending Popular To Zego...', [
-                    //         'user_id'  => $userId,
-                    //         'owner_id' => $ownerId,
-                    //         'room_id'  => $room->id ?? null,
-                    //     ]);
-
                     $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
             } else {
