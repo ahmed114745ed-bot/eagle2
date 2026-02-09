@@ -43,9 +43,7 @@ class UpdatePkAndSendToZigoJob implements ShouldQueue
      */
     public function handle()
     {
-        info('UpdatePkAndSendToZigoJob');
         $lastPk = Room::select(['id'])->where('id', $this->roomId)->first()?->lastPk;
-        info('room query');
         (new SendGiftService())->updatePkScoresAndSendToZegoJob($lastPk, $this->userId, $this->roomId, $this->receivedIds, $this->totalPrice, $this->room);
     }
 }
