@@ -5,6 +5,8 @@ namespace Utd\Gifts\Services;
 use Utd\Gifts\Support\ModelResolver;
 use Utd\Gifts\Support\ClassResolver;
 use Utd\Gifts\Entities\UserGift;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Database\Eloquent\Collection;
@@ -812,14 +814,12 @@ class GiftLogService
 
     private function getSendGiftServiceInstance()
     {
-        $class = 'App\\Classes\\Gifts\\SendGiftService';
-        return class_exists($class) ? new $class() : null;
+        return new SendGiftService();
     }
 
     private function getUpdateUserWhenSendGiftInstance()
     {
-        $class = 'App\\Classes\\Gifts\\UpdateUserWhenSendGift';
-        return class_exists($class) ? new $class() : null;
+        return new UpdateUserWhenSendGift();
     }
 
     private function getCpModelClass()

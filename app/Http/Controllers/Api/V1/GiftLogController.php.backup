@@ -33,7 +33,7 @@ use App\Http\Controllers\Controller;
 use App\Tik\Services\GiftLogService;
 use App\Models\MonthlyDiamondReceive;
 use Illuminate\Support\Facades\Redis;
-use App\Classes\Gifts\SendGiftService;
+use Utd\Gifts\Services\SendGiftService;
 use Illuminate\Support\Facades\Config;
 use Modules\CP\Http\Services\CpService;
 use App\Exceptions\NotInfMoneyException;
@@ -47,7 +47,7 @@ use App\Http\Resources\GiftLogUtdResource;
 use App\Traits\Gifts\LuckyGiftProbability;
 
 use Illuminate\Database\Eloquent\Collection;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Contracts\RoomTopUsersRepositoryContract;

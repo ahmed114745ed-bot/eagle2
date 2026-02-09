@@ -2,7 +2,7 @@
 
 namespace Modules\Public\Http\Services;
 
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Models\EarnedDiamond;
 use App\Models\User;

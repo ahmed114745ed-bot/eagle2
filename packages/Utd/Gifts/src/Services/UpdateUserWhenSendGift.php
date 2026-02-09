@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Classes\Gifts;
+namespace Utd\Gifts\Services;
 
 use App\Classes\Enums\NotificationType;
 use App\Exceptions\NotInfMoneyException;
@@ -9,7 +9,7 @@ use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
 use Mockery\Exception;
 use Modules\Vip\Entities\Vip;
-use App\Models\UserGift;
+use Utd\Gifts\Entities\UserGift;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

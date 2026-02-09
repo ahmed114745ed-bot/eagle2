@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Services;
+namespace Utd\Gifts\Services;
 
 use Utd\Pk\Jobs\UpdatePkAndSendToZigoJob;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use Illuminate\Support\Collection;
