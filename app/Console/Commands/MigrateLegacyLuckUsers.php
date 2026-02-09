@@ -35,7 +35,7 @@ class MigrateLegacyLuckUsers extends Command
             $query->where('type', 6);
         })
         ->distinct()
-        ->pluck('user_id');
+        ->pluck('sender_id');
 
         $count = 0;
         foreach ($userIds as $userId) {
