@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use App\Support\PackageHelper;
-use Utd\Pk\Entities\Pk;
 use App\Models\Ban;
 use App\Models\Pack;
 use App\Models\Role;
@@ -40,10 +39,10 @@ use Modules\Events\Entities\Winner;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
-use Modules\Events\Entities\PkEvent;
+use Utd\Pk\Entities\PkEvent;
 use Illuminate\Support\Facades\Cache;
 use Modules\Badge\Entities\UserBadge;
-use Modules\Events\Entities\PkWinner;
+use Utd\Pk\Entities\PkWinner;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\InfoTrait;
 use App\Traits\RoomTrait;
@@ -87,16 +86,18 @@ class Common
 
         if ($event_type == 'pk_event') {
 
-            $event = PkEvent::PreviousEvent()->latest()->first();
+            if (PackageHelper::isInstalled('pk')){
+                $event = PkEvent::PreviousEvent()->latest()->first();
 
-            if ($event) {
-                $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
-                    ->where('pk_type', 'pk-star')
-                    ->where('level', 1)
-                    ->first();
+                if ($event) {
+                    $pk_winner = PkWinner::with('user')->where('pk_event_id', $event->id)
+                        ->where('pk_type', 'pk-star')
+                        ->where('level', 1)
+                        ->first();
 
-                if ($pk_winner) {
-                    $avatar = @$pk_winner?->user?->profile?->avatar;
+                    if ($pk_winner) {
+                        $avatar = @$pk_winner?->user?->profile?->avatar;
+                    }
                 }
             }
         } else if ($event_type == 'weekly_star') {

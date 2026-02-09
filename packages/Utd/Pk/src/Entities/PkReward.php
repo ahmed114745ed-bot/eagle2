@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Entities;
+namespace Utd\Pk\Entities;
 
 use App\Models\Ware;
 use App\Helpers\Common;
@@ -80,7 +80,7 @@ class PkReward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->type === 'badge') {
+            } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
                 $file = request('target4', $model->target);
@@ -104,7 +104,7 @@ class PkReward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->type === 'badge') {
+            } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
                 $file = request('target4', $model->target);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Entities;
+namespace Utd\Pk\Entities;
 
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
@@ -50,7 +50,6 @@ class PkEvent extends Model
             } else {
                 $model->start_date = $model->attributes['start_date'];
             }
-            //  $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
             $model->end_date = Carbon::createFromFormat('Y-m-d', $model->attributes['start_date'])->addWeek();
             $model->admin_id = Auth::id();
         });
@@ -64,37 +63,9 @@ class PkEvent extends Model
                 } else {
                     $model->start_date = $model->attributes['start_date'];
                 }
-                //  $model->start_date = self::convertArabicNumbers($model->attributes['start_date']);
                 $model->end_date = Carbon::createFromFormat('Y-m-d', $model->attributes['start_date'])->addWeek();
                 $model->editor_id = Auth::id();
-                // $model->admin_id = Auth::id();
             }
         });
     }
-
-    /* protected static function convertArabicNumbers($string) {
-        $newNumbers = range(0, 9);
-        $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        return str_replace($arabicNumbers, $newNumbers, $string);
-    }
-
-    public function getStartDateAttribute($value)
-    {
-        $date = self::convertArabicNumbers($value);
-        return Carbon::parse($date, '-03:00')->subDay()->startOfDay();
-
-    }
-    public function getEndDateAttribute($value)
-    {
-        return Carbon::parse($value)->subDay()->endOfDay();
-    }
-
-    public function getStartDateLocalAttribute()
-    {
-        return Carbon::parse($this->attributes['start_date'])->subDay()->toDateString();
-    }
-    public function getEndDateLocalAttribute($value)
-    {
-        return Carbon::parse($this->attributes['end_date'])->subDay()->toDateString();
-    }*/
 }

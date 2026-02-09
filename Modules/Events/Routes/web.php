@@ -1,7 +1,5 @@
 <?php
 
-use Modules\Events\Http\Controllers\web\PkEventController;
-use Modules\Events\Http\Controllers\web\PkEventGiftController;
 use Modules\Events\Http\Controllers\web\TargetEventController;
 use Modules\Events\Http\Controllers\web\RewardTargetController;
 use Modules\Events\Http\Controllers\web\WeeklyEventGiftNController;
@@ -36,7 +34,6 @@ Route::group(
         Route::resource('event-period', 'EventPeriodController');
         Route::resource('weekly-events-new', 'WeeklyEventNController');
         Route::resource('target-events', TargetEventController::class);
-        Route::resource('pk-events', PkEventController::class);
         Route::prefix('weekly-events-gift/{weekly_event_id}')->group(function () {
             Route::get('/', [WeeklyEventGiftNController::class, 'index']);
             Route::get('/{level}/create', [WeeklyEventGiftNController::class, 'create']);
@@ -46,18 +43,6 @@ Route::group(
             Route::put('/{id}', [WeeklyEventGiftNController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [WeeklyEventGiftNController::class, 'destroy'])->where('id', '[0-9]+');
         });
-
-        Route::prefix('pk-events-gift/{pk_type}/{pk_event_id}')->group(function () {
-            Route::get('/', [PkEventGiftController::class, 'index']);
-            Route::get('/{level}/create', [PkEventGiftController::class, 'create']);
-            Route::post('/{level}', [PkEventGiftController::class, 'store']);
-            Route::get('/{id}', [PkEventGiftController::class, 'show'])->where('id', '[0-9]+');
-            Route::get('/{id}/edit', [PkEventGiftController::class, 'edit'])->where('id', '[0-9]+');
-            Route::put('/{id}', [PkEventGiftController::class, 'update'])->where('id', '[0-9]+');
-            Route::delete('/{id}', [PkEventGiftController::class, 'destroy'])->where('id', '[0-9]+');
-        });
-
-    
 
         Route::delete('target-events-gift/{id}/{targets}', [RewardTargetController::class, 'destroyBulk'])
         ->where('targets', '.*');

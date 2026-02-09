@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\PK;
+namespace Utd\Pk\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
-use App\Http\Resources\Dashboard\Events\AdminPKEventsResource;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
+use Utd\Pk\Http\Resources\AdminPKEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkReward;
 
-class AdminPKEventsRewords extends Controller
+class AdminPKEventsRewardsController extends Controller
 {
     use DashBoardTrait;
+
     public function index(Request $request)
     {
         $type = $request->input('type');
@@ -21,9 +22,9 @@ class AdminPKEventsRewords extends Controller
         $level3 = PkReward::where('pk_event_id', $id)->where('pk_type', $type)->where('level', 3)->get();
 
         return [
-            'level1' => AdminPKEventRewords::collection($level1),
-            'level2' => AdminPKEventRewords::collection($level2),
-            'level3' => AdminPKEventRewords::collection($level3),
+            'level1' => AdminPKEventRewardsResource::collection($level1),
+            'level2' => AdminPKEventRewardsResource::collection($level2),
+            'level3' => AdminPKEventRewardsResource::collection($level3),
         ];
     }
 
@@ -51,16 +52,15 @@ class AdminPKEventsRewords extends Controller
             'expire'       =>  $request->expire,
             'level'        => $request->level ,
             'type'         => $request->type ,
-            'target'         => $request->type !== 'achievement' ? $request->target : $img ?? 'sasa' ,
+            'target'       => $request->type !== 'achievement' ? $request->target : $img ?? '' ,
         ]);
         return $img ;
     }
 
-
     public function show(string $id)
     {
         $data = PkReward::find($id);
-        return new AdminPKEventsResource( $data);
+        return new AdminPKEventsResource($data);
     }
 
     public function update(Request $request, $id)

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\Pk\Http\Controllers\Utd;
 
 use Exception;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkReward;
-use App\Http\Resources\PkEventResource;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkReward;
+use Utd\Pk\Http\Resources\PkEventResource;
 use Illuminate\Support\Facades\Validator;
 
 class PkEventController extends Controller

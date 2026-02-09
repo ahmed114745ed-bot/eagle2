@@ -7,8 +7,8 @@ use App\Models\Config;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkWinner;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkWinner;
 use Modules\Events\Entities\WeeklyStar;
 
 class PermissionNullCategory extends Seeder

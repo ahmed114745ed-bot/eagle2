@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\PK;
+namespace Utd\Pk\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkReward;
 
 class AdminPKEventsController extends Controller
 {
@@ -60,7 +60,4 @@ class AdminPKEventsController extends Controller
         $PkEvent->delete();
         return 200;
     }
-
-
-
 }

@@ -4,8 +4,6 @@ namespace Modules\Events\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Modules\Events\Console\PkEventCommand;
-use Modules\Events\Console\PKEventWinnerCommand;
 use Modules\Events\Console\WeeklyStarUpdate;
 use Modules\Events\Console\WeeklyStarWinner;
 
@@ -34,9 +32,10 @@ class EventsServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         $this->commands([
-                            WeeklyStarWinner::class, WeeklyStarUpdate::class, PkEventCommand::class,
-                            PKEventWinnerCommand::class
-                        ]);
+            WeeklyStarWinner::class,
+            WeeklyStarUpdate::class,
+            // PK commands moved to packages/Utd/Pk/src/Console
+        ]);
     }
 
     /**

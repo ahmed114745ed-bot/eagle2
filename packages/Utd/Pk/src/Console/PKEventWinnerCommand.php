@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Console;
+namespace Utd\Pk\Console;
 
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
@@ -12,15 +12,15 @@ use App\Models\GiftLog;
 use App\Helpers\UserCommon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkWinner;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkWinner;
 use Utd\Achievements\Entities\UserAchievementLevel;
 
 class PKEventWinnerCommand extends Command
 {
     protected $signature = 'pk-event-winner';
 
-    protected $description = 'Command description';
+    protected $description = 'Process PK event winners and assign rewards';
 
     public function handle()
     {
@@ -32,8 +32,6 @@ class PKEventWinnerCommand extends Command
         $this->processEventParticipants($pkEvent, 'sender', 'pk-king');
         $this->processEventParticipants($pkEvent, 'receiver', 'pk-star');
         $this->processEventParticipants($pkEvent, 'roomowner', 'pk-room');
-
-        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
     }
 
     protected function getCurrentPkEvent()
@@ -98,7 +96,6 @@ class PKEventWinnerCommand extends Command
 
             switch ($reward->type) {
                 case "coins":
-
                     $amountBefore = $user->di;
                     $user->di += $reward->target;
                     $user->save();

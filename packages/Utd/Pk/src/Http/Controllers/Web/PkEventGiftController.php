@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Http\Controllers\web;
+namespace Utd\Pk\Http\Controllers\Web;
 
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -13,7 +13,7 @@ use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkReward;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Utd\Achievements\Entities\Achievement;
@@ -23,6 +23,7 @@ class PkEventGiftController extends MainController
 
     use HasResourceActions;
     public $permission_name = 'pk-event-rewards';
+
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("pk_event");
@@ -30,7 +31,7 @@ class PkEventGiftController extends MainController
 
     public function index(Content $content)
     {
-        $url = url('/admin/pk-events'); // Define your button URL
+        $url = url('/admin/pk-events');
         $back = __(' back');
         $buttonHTML = <<<HTML
     <a href="{$url}" class="btn btn-sm btn-success" style="margin-bottom: 20px;">
@@ -44,11 +45,12 @@ class PkEventGiftController extends MainController
             ->breadcrumb(
                 ['text' => trans('admin.eventGift')]
             )
-            ->row($buttonHTML) // Add the button row
-            ->row($this->grid1()) // First grid
-            ->row($this->grid2()) // Second grid
-            ->row($this->grid3())); // Third grid
+            ->row($buttonHTML)
+            ->row($this->grid1())
+            ->row($this->grid2())
+            ->row($this->grid3()));
     }
+
     public function create(Content $content)
     {
         return parent::create($content
@@ -79,7 +81,6 @@ class PkEventGiftController extends MainController
             ->description(trans('admin.description'))
             ->body($this->detail($id)));
     }
-
 
     /**
      * Title for current resource.
@@ -126,7 +127,6 @@ class PkEventGiftController extends MainController
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
-                    // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->target;
@@ -134,7 +134,6 @@ class PkEventGiftController extends MainController
                     $path = 'coin.png';
                 }
 
-                /** @var Gift $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
@@ -152,22 +151,21 @@ class PkEventGiftController extends MainController
             $add = __('add');
             $gifts = __('winner first gifts');
             $customButtonHTML = <<<HTML
-
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                     <i class="fa fa-plus"></i> {$add}
                 </a>
                 <h3 style="margin-right: 10px;">$gifts</h3>
-
             HTML;
             $tools->append($customButtonHTML);
         });
         Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+        if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
         return $grid;
     }
+
     protected function grid2()
     {
         $pkType = request('pk_type');
@@ -200,7 +198,6 @@ class PkEventGiftController extends MainController
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
-                    // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->target;
@@ -208,7 +205,6 @@ class PkEventGiftController extends MainController
                     $path = 'coin.png';
                 }
 
-                /** @var Gift $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
@@ -233,7 +229,7 @@ class PkEventGiftController extends MainController
             $tools->append($customButtonHTML);
         });
         Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+        if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
@@ -273,7 +269,6 @@ class PkEventGiftController extends MainController
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
-                    // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->target;
@@ -281,7 +276,6 @@ class PkEventGiftController extends MainController
                     $path = 'coin.png';
                 }
 
-                /** @var Gift $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
@@ -306,7 +300,7 @@ class PkEventGiftController extends MainController
             $tools->append($customButtonHTML);
         });
         Admin::script("
-        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+        if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
@@ -322,20 +316,7 @@ class PkEventGiftController extends MainController
      */
     protected function detail($id)
     {
-        //        $show = new Show(PkEvent::findOrFail($id));
-
-        //        $show->field('id', __('Id'));
-        //        $show->field('admin_id', __('Admin id'));
-        //        $show->field('start_date', __('Start date'));
-        //        $show->field('end_date', __('End date'));
-        //        $show->field('editor_id', __('Editor id'));
-        //        $show->field('description_en', __('Description en'));
-        //        $show->field('description_ar', __('Description ar'));
-        //        $show->field('deleted_at', __('Deleted at'));
-        //        $show->field('created_at', __('Created at'));
-        //        $show->field('updated_at', __('Updated at'));
-
-        //        return $show;
+        // Intentionally left empty
     }
 
     /**
@@ -382,7 +363,6 @@ class PkEventGiftController extends MainController
         $form->number('expire', __('expire'));
 
         $form->saved(function (Form $form) {
-
             $route = url('admin/pk-events-gift/' . request('pk_type') . '/' . request('pk_event_id'));
             return redirect($route);
         });

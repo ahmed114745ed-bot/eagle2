@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Utd\Pk\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -44,8 +44,6 @@ class PkEventResource extends JsonResource
             'pk_event_id' => $this->pk_event_id,
             'level' => $this->level,
             'pk_type' => $this->pk_type,
-
-
         ];
     }
 }

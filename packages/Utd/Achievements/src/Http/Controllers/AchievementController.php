@@ -5,12 +5,13 @@ namespace Utd\Achievements\Http\Controllers;
 use App\Helpers\Common;
 use App\Http\Resources\AchievementValidImagesResource;
 use App\Models\AchievementValidImage;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkReward;
 use Modules\Events\Entities\Reward;
 use Modules\Events\Entities\RewardTarget;
 use Modules\Events\Entities\WeeklyStar;
@@ -101,9 +102,12 @@ class AchievementController extends Controller
                 }])
                 ->distinct()
                 ->get();
-            $pkEvent = PkEvent::currentEvent()->with(['rewards' => function ($query) {
-                $query->where('type', 'achievement');
-            }])->first();
+
+            if (PackageHelper::isInstalled('pk')){
+                $pkEvent = PkEvent::currentEvent()->with(['rewards' => function ($query) {
+                    $query->where('type', 'achievement');
+                }])->first();
+            }
 
             $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
                 $query->where('type', 'achievement');
@@ -122,11 +126,16 @@ class AchievementController extends Controller
                 'invalid_image' => '',
                 'target_type' => '',
             ];
-            $pkArray = ($pkEvent?->rewards->map(fn($e) =>
-            /** @var PkReward $e*/
-            collect(
-                ['image' => $e->target, 'name' => 'event' .'_'. $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,]
-            )->merge($append))->toArray()) ?? [];
+
+            $pkArray = [];
+            if (PackageHelper::isInstalled('pk')){
+                $pkArray = ($pkEvent?->rewards->map(fn($e) =>
+                    /** @var PkReward $e*/
+                collect(
+                    ['image' => $e->target, 'name' => 'event' .'_'. $e->target, 'target' => __($e->pk_type) . ' top ' . $e->level,]
+                )->merge($append))->toArray()) ?? [];
+            }
+
             $chargeArray = $chargeEvent?->pluck('rewards')->flatten()->map(function ($e) use ($append) {
                 /** @var RewardTarget $e */
                 return collect(['image' => @$e->getAttribute('target'), 'name' => 'event' .'_'. $e->getAttribute('target'), 'target' => __('target-events')])->merge($append);

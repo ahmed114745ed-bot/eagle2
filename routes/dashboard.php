@@ -36,8 +36,6 @@ use App\Http\Controllers\Dashboard\Events\Chargebenefit\AdminChargebenefitContro
 use App\Http\Controllers\Dashboard\Events\Chargebenefit\AdminChargebenefitRewordsController;
 use App\Http\Controllers\Dashboard\Events\PeriodEvent\AdminPeriodEventController;
 use App\Http\Controllers\Dashboard\Events\PeriodEvent\AdminPeriodEventRewordsController;
-use App\Http\Controllers\Dashboard\Events\PK\AdminPKEventsController;
-use App\Http\Controllers\Dashboard\Events\PK\AdminPKEventsRewords;
 use App\Http\Controllers\Dashboard\Events\WeeklyStar\AdminWeeklyStarEvents;
 use App\Http\Controllers\Dashboard\Events\WeeklyStar\AdminWeeklyStarEventsRewords;
 use App\Http\Controllers\Dashboard\GroupChat\AdminGroupChatController;
@@ -244,8 +242,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     Route::resource('admin-reels',AdminReelsController::class);
 
     //************************** start Events ************************* \\
-        Route::resource('admin-event-pk',AdminPKEventsController::class);
-        Route::resource('admin-event-pk-rewords',AdminPKEventsRewords::class);
+        // PK routes moved to packages/Utd/Pk/Routes/dashboard.php
 
         Route::resource('admin-event-WeeklyStar',AdminWeeklyStarEvents::class);
         Route::resource('admin-event-WeeklyStar-rewords',AdminWeeklyStarEventsRewords::class);

@@ -1,29 +1,26 @@
 <?php
 
-namespace Modules\Events\Console;
+namespace Utd\Pk\Console;
 
 use Carbon\Carbon;
 use App\Helpers\Common;
 use Illuminate\Console\Command;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkReward;
 
 class PkEventCommand extends Command
 {
     protected $signature = 'pk-event-update';
 
-    protected $description = 'Command description';
+    protected $description = 'Auto-create new PK event when current one ends';
 
     public function handle()
     {
         $pkEvent = PkEvent::endToday()->first();
 
-
         if (!$pkEvent) {
             return '';
         }
-        $timezone = Common::timeZone();
-//        if (Carbon::parse($pkEvent->end_date, $timezone)->endOfDay() == now($timezone) || $pkEvent->end_date == Carbon::yesterday($timezone)->toDateString()) {
 
         $lastEndDate = PkEvent::max('end_date');
         $newStartDate = Carbon::parse($lastEndDate)->toDateString();
@@ -38,14 +35,11 @@ class PkEventCommand extends Command
         $newPkEvent->save();
 
         $this->repeatRewards($pkEvent, $newPkEvent->id);
-
-//        $this->info(now()->toDateTimeString() . ' ' . $this->signature . ' Run successful...');
     }
-
 
     public function repeatRewards(PkEvent $pkEvent, int $pkEventNewId)
     {
-        $columns         = [
+        $columns = [
             "pk_event_id",
             "type",
             "level",
@@ -57,7 +51,7 @@ class PkEventCommand extends Command
         ];
         $previousRewards = $pkEvent->rewards()->get($columns)->toArray();
 
-        $reward  = new PkReward;
+        $reward = new PkReward;
         $appends = $reward->getAppends();
         foreach ($previousRewards as &$previousReward) {
             $previousReward['pk_event_id'] = $pkEventNewId;
@@ -70,6 +64,5 @@ class PkEventCommand extends Command
         }
 
         PkReward::query()->insert($previousRewards);
-//        $this->info($this->signature . ' Run successfully');
     }
 }

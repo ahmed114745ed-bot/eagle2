@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Events\Http\Controllers\web;
+namespace Utd\Pk\Http\Controllers\Web;
 
 use App\Models\Ware;
 use Encore\Admin\Form;
@@ -15,8 +15,8 @@ use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
-use Modules\Events\Entities\PkEvent;
-use Modules\Events\Entities\PkReward;
+use Utd\Pk\Entities\PkEvent;
+use Utd\Pk\Entities\PkReward;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -25,9 +25,8 @@ class PkEventController extends MainController
 
     use HasResourceActions;
 
-
-
     public $permission_name = 'pk-event';
+
     public function __construct()
     {
         (new AppFeatureService)->validateStatusEnable("pk_event");
@@ -39,8 +38,6 @@ class PkEventController extends MainController
             ->title(__('pk-events'))
             ->row(function (Row $row) {
 
-                //                $row->column(3, view('event_settings'));
-
                 $row->column(12, function (Column $column) {
                     $column->row(view('event_taps'));
                     $column->row($this->grid2());
@@ -48,7 +45,6 @@ class PkEventController extends MainController
                 });
             });
     }
-
 
     /**
      * Edit interface.
@@ -78,6 +74,7 @@ class PkEventController extends MainController
 
         return $form;
     }
+
     /**
      * Make a grid builder.
      *
@@ -89,7 +86,6 @@ class PkEventController extends MainController
         $grid->model()->orderByDesc("id");
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
-
 
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
@@ -105,7 +101,6 @@ class PkEventController extends MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     if ($this->input) {
-
                         $query->whereDate('end_date', convertArabicToEnglishNumbers($this->input));
                     }
                 }, __('End Date'), 'to_date')
@@ -164,7 +159,6 @@ class PkEventController extends MainController
         return $show;
     }
 
-
     public function store()
     {
         $data = request()->all();
@@ -185,13 +179,13 @@ class PkEventController extends MainController
 
         $form->display(__('admin.ID'));
         $form = new Form(new PkEvent());
-        $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
+        $lastStartDate = PkEvent::max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
         $form->date('start_date_local', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
 
-                $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
+                $lastStartDate = PkEvent::max('start_date');
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
                 if ($minStartDate) {
@@ -205,14 +199,8 @@ class PkEventController extends MainController
                 }
             });
 
-        // $form->belongsToMany('gifts', Gifts::class)
-        //     ->rules('required|array|size:3', [
-        //         'size' => __('choose only 3 gifts.'),
-        //     ]);
-
         return $form;
     }
-
 
     public function show($id, Content $content)
     {
@@ -226,10 +214,8 @@ class PkEventController extends MainController
             });
     }
 
-
     protected function PkEvent($id)
     {
-
         $grid = new Grid(new PkEvent());
         $grid->model()->where('id', $id);
 
@@ -243,19 +229,17 @@ class PkEventController extends MainController
 
         return $grid;
     }
+
     protected function rewardList($id)
     {
-
         $grid = new Grid(new PkReward);
         $grid->model()->where('pk_event_id', $id);
 
         $grid->column('level', trans('level'));
         $grid->column('type', trans('type'))->display(function ($type) {
-
-            return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
+            return $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
         });
         $grid->column('target', trans('target'))->display(function ($target) {
-
             if ($this->type == "coins") {
                 return $target;
             } elseif ($this->type == "ware") {

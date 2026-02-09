@@ -69,7 +69,6 @@ use App\Http\Controllers\utd\PagesController;
 use App\Http\Controllers\utd\ParentUsersController;
 use App\Http\Controllers\utd\PaymentGateWayController;
 use App\Http\Controllers\utd\PercentageTargetController;
-use App\Http\Controllers\utd\PkEventController;
 use App\Http\Controllers\utd\QuestionController;
 use App\Http\Controllers\utd\ReelsController;
 use App\Http\Controllers\utd\ReportController;
@@ -848,22 +847,7 @@ Route::middleware([])->group(function () {
         Route::post('/update/{id}', [WeeklyEventController::class, 'updateGift']);
     });
 
-    Route::prefix('pk-events')->group(function () {
-        Route::get('/', [PkEventController::class, 'index']);
-        Route::get('/show/{id}', [PkEventController::class, 'show']);
-        Route::post('/create', [PkEventController::class, 'store']);
-        Route::delete('/delete/{id}', [PkEventController::class, 'destroy']);
-        Route::post('/update/{id}', [PkEventController::class, 'update']);
-        Route::get('/default-date', [PkEventController::class, 'defaultDate']);
-    });
-
-    Route::prefix('pk-events-gift')->group(function () {
-        Route::get('/', [PkEventController::class, 'allGifts']);
-        Route::get('/show/{id}', [PkEventController::class, 'showGift']);
-        Route::post('/create', [PkEventController::class, 'storeGift']);
-        Route::delete('/delete/{id}', [PkEventController::class, 'destroyGift']);
-        Route::post('/update/{id}', [PkEventController::class, 'updateGift']);
-    });
+    // PK routes moved to packages/Utd/Pk/Routes/utd.php
 
     Route::prefix('event-reports')->group(function () {
         Route::get('/', [ReportController::class, 'eventReports']);

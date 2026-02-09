@@ -6,6 +6,8 @@ use App\Contracts\PkRepositoryContract;
 use Utd\Pk\Entities\Pk;
 use Utd\Pk\Observers\PKObserver;
 use Utd\Pk\Repositories\PkRepository;
+use Utd\Pk\Console\PkEventCommand;
+use Utd\Pk\Console\PKEventWinnerCommand;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -13,6 +15,16 @@ use Illuminate\Support\ServiceProvider;
 class PkServiceProvider extends ServiceProvider
 {
     protected $namespace = 'Utd\\Pk\\Http\\Controllers';
+
+    /**
+     * The commands to be registered.
+     *
+     * @var array
+     */
+    protected $commands = [
+        PkEventCommand::class,
+        PKEventWinnerCommand::class,
+    ];
 
     /**
      * Register the service provider.
@@ -37,6 +49,7 @@ class PkServiceProvider extends ServiceProvider
         $this->registerMigrations();
         $this->registerPublishing();
         $this->registerObservers();
+        $this->registerCommands();
     }
 
     /**
@@ -50,14 +63,42 @@ class PkServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register console commands.
+     *
+     * @return void
+     */
+    protected function registerCommands(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands($this->commands);
+        }
+    }
+
+    /**
      * Register the package routes.
      *
      * @return void
      */
     protected function registerRoutes(): void
     {
+        // API routes for room PK
         Route::middleware('api')
             ->group(__DIR__ . '/../Routes/api.php');
+
+        // Web routes for admin panel
+        Route::group([], function () {
+            $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
+        });
+
+        // UTD API routes
+        Route::group([], function () {
+            $this->loadRoutesFrom(__DIR__ . '/../Routes/utd.php');
+        });
+
+        // Dashboard API routes
+        Route::group([], function () {
+            $this->loadRoutesFrom(__DIR__ . '/../Routes/dashboard.php');
+        });
     }
 
     /**
