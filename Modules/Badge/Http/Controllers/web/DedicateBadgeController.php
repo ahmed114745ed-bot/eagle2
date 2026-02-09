@@ -35,7 +35,8 @@ class DedicateBadgeController extends MainController
         $grid->column('id', __('ID'));
         $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
-            $grid->column('image', __('image'))->display(function ($path) {
+            $grid->column('images.image', __('image'))->display(function ($path) {
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
