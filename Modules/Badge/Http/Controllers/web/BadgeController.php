@@ -68,7 +68,7 @@ class BadgeController extends MainController
                 $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50, objectFit: 'cover');
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
         $grid->column('priority', __('Priority'))->sortable();
