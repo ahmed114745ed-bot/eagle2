@@ -142,7 +142,7 @@ class BadgeController extends MainController
                     $data['image'] = Common::upload('badges', $file);
                 } elseif ($badgeImage) {
                     // Keep existing if no new file uploaded
-                    $data['image'] = $badgeImage->show_image;
+                    $data['image'] = $badgeImage->image;
                 }
 
                 // Handle default_image
@@ -154,7 +154,7 @@ class BadgeController extends MainController
                     $data['show_image'] = Common::upload('badges', $file);
                 } elseif ($badgeImage) {
                     // Keep existing if no new file uploaded
-                    $data['show_image'] = $badgeImage->image;
+                    $data['show_image'] = $badgeImage->show_image;
                 }
 
                 if ($badgeImage) {
