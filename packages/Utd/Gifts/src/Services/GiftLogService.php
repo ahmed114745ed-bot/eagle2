@@ -808,7 +808,7 @@ class GiftLogService
 
     private function getUpdatePkJobClass()
     {
-        $class = 'Utd\\Room\\Jobs\\UpdatePkAndSendToZigoJob';
+        $class = 'Utd\\Pk\\Jobs\\UpdatePkAndSendToZigoJob';
         return class_exists($class) ? $class : null;
     }
 
