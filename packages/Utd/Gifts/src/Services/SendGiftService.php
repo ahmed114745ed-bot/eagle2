@@ -235,9 +235,13 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $room)
     {
+        info('no Installed');
         if (! PackageHelper::isInstalled('pk')) return;
+        info('is Installed');
 
+        info('not instance');
         if (!($pk instanceof Pk)) return;
+        info('is instance');
 
 //        $m      = explode(',', $microphone);
 //        $mic_1  = @$m[1] ?? 0;
