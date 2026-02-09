@@ -193,10 +193,10 @@ return [
         'gift' => env('GIFTS_GIFT_SERVICE', 'App\Tik\Services\GiftService'),
         'gift_log' => env('GIFTS_GIFT_LOG_SERVICE', 'App\Tik\Services\GiftLogService'),
         'lucky_gift' => env('GIFTS_LUCKY_GIFT_SERVICE', 'App\Services\LuckyGiftService'),
-        'send_gift' => env('GIFTS_SEND_GIFT_SERVICE', 'App\Classes\Gifts\SendGiftService'),
+        'send_gift' => env('GIFTS_SEND_GIFT_SERVICE', 'Utd\Gifts\Services\SendGiftService'),
         'gift_service' => env('GIFTS_SERVICE_CLASS', 'App\Services\Gifts\GiftService'),
         'room_level' => env('GIFTS_ROOM_LEVEL_SERVICE', 'App\Services\RoomLevelServices'),
-        'update_user_when_send_gift' => env('GIFTS_UPDATE_USER_SERVICE', 'App\Classes\Gifts\UpdateUserWhenSendGift'),
+        'update_user_when_send_gift' => env('GIFTS_UPDATE_USER_SERVICE', 'Utd\Gifts\Services\UpdateUserWhenSendGift'),
     ],
 
     /*

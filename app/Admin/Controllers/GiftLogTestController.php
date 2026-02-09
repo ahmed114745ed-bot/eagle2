@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\DataUserResource;

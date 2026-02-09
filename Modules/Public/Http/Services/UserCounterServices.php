@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Modules\Public\Entities\UserCounter;
 use Modules\Public\Entities\levelInterval;
 use Modules\Public\Jobs\RewardWinnerLevel;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Modules\Public\Events\UnreadCounterGroup;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;

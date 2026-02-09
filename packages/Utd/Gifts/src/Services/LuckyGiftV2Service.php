@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Gifts;
+namespace Utd\Gifts\Services;
 
 use Utd\Gifts\Services\SendGiftService;
 use Utd\Gifts\Services\UpdateUserWhenSendGift;
@@ -13,7 +13,7 @@ use App\Jobs\LogUserCoinProfit;
 use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
 use App\Models\Cp;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Traits\Gifts\LuckyGiftProbability;
@@ -24,7 +24,7 @@ use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
 use Modules\CP\Http\Services\CpService;
 
-class LuckyGiftService
+class LuckyGiftV2Service
 {
 
     use LuckyGiftProbability;

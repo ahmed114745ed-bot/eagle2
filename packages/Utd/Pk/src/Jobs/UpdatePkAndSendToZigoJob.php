@@ -2,7 +2,7 @@
 
 namespace Utd\Pk\Jobs;
 
-use App\Classes\Gifts\SendGiftService;
+use Utd\Gifts\Services\SendGiftService;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Illuminate\Bus\Queueable;

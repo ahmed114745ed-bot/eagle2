@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Classes\Gifts\SendGiftService;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
 use App\Models\Cp;
 use App\Models\Gift;

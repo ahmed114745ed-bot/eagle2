@@ -17,6 +17,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Utd\Gifts\Support\ClassResolver;
 use Utd\Gifts\Services\GiftLogService;
 use Utd\Gifts\Services\GiftService;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\LuckyGiftService;
+use Utd\Gifts\Services\LuckyGiftV2Service;
 
 class GiftLogController extends Controller
 {
@@ -95,10 +99,11 @@ class GiftLogController extends Controller
                 'UserSallary' => ClassResolver::model('user_salary'),
                 'RemainingDiamond' => ClassResolver::model('remaining_diamond'),
                 'MonthlyDiamondReceive' => ClassResolver::model('monthly_diamond_receive'),
-                'LuckyGiftService' => ClassResolver::getService('lucky_gift'),
-                'SendGiftService' => ClassResolver::service('send_gift'),
+                'LuckyGiftService' => app(LuckyGiftService::class),
+                'LuckyGiftV2Service' => app(LuckyGiftV2Service::class),
+                'SendGiftService' => app(SendGiftService::class),
                 'RoomLevelServices' => ClassResolver::getService('room_level'),
-                'UpdateUserWhenSendGift' => ClassResolver::service('update_user_when_send_gift'),
+                'UpdateUserWhenSendGift' => app(UpdateUserWhenSendGift::class),
                 'CleanGiftLogsJob' => ClassResolver::job('clean_gift_logs'),
                 'AllOpeningRoomsZegoRequest' => ClassResolver::job('all_opening_rooms_zego_request'),
                 'UpdateUserDataWhenSendGift' => ClassResolver::job('update_user_data_when_send_gift'),
@@ -316,9 +321,7 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request)
     {
-        // Get the class name from ClassResolver and instantiate it
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
-        $updateUserWhenSendGift = class_exists($updateUserWhenSendGiftClass) ? new $updateUserWhenSendGiftClass() : null;
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
 
         $close_open_gifts = settings()->get('close_open_gifts');
 
@@ -429,8 +432,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
-        $updateUserWhenSendGift = class_exists($updateUserWhenSendGiftClass) ? new $updateUserWhenSendGiftClass() : null;
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -453,8 +455,8 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            if ($this->LuckyGiftService) {
-                $data = $this->LuckyGiftService->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
             } else {
                 throw new \Exception(__('api_responses.service_not_found'));
             }
@@ -467,8 +469,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V2(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
-        $updateUserWhenSendGift = class_exists($updateUserWhenSendGiftClass) ? new $updateUserWhenSendGiftClass() : null;
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -491,8 +492,8 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            if ($this->LuckyGiftService) {
-                $data = $this->LuckyGiftService->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
             } else {
                 throw new \Exception(__('api_responses.service_not_found'));
             }
@@ -505,8 +506,7 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2V3(Request $request)
     {
-        $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
-        $updateUserWhenSendGift = class_exists($updateUserWhenSendGiftClass) ? new $updateUserWhenSendGiftClass() : null;
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
@@ -529,8 +529,8 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            if ($this->LuckyGiftService) {
-                $data = $this->LuckyGiftService->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
             } else {
                 throw new \Exception(__('api_responses.service_not_found'));
             }
