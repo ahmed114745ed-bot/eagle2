@@ -37,7 +37,7 @@ class GiftLogService
     private function getRoomRepository()
     {
         $class = 'App\\Contracts\\RoomRepositoryContract';
-        
+
         // Try bound contract first
         if (app()->bound($class)) {
             return app($class);
@@ -224,7 +224,9 @@ class GiftLogService
 
             if ($room->lastPk != null) {
                 $updatePkJobClass = $this->getUpdatePkJobClass();
+                info('lastPk');
                 if ($updatePkJobClass) {
+                    info('updatePkJobClass');
                     dispatch(new $updatePkJobClass($user->id, $room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $room))
                         ->afterCommit()
                         ->onQueue('updatePk');
