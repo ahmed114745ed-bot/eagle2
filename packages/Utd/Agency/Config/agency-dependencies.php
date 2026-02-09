@@ -43,7 +43,7 @@ return [
         'services' => [
             'agency_service' => \App\Tik\Services\AgencyService::class,
             'charge_service' => \App\Tik\Services\ChargeRepoService::class,
-            'agency_host_invite_service' => \App\Tik\Services\AgencyHostInviteService::class,
+            'agency_host_invite_service' => \Utd\Agency\Services\AgencyHostInviteService::class,
             'app_feature_service' => \App\Services\AppFeatureService::class,
             'user_service' => \App\Admin\Services\UserService::class,
             'admin_agency_service' => \App\Admin\Services\AgencyService::class,

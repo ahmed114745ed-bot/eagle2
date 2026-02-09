@@ -20,7 +20,7 @@ use App\Models\User;
 use App\Repositories\Community\SearchRepository;
 use App\Services\ProfileService;
 use App\Services\UserService;
-use App\Tik\Services\GiftLogService;
+use Utd\Gifts\Services\GiftLogService;
 use App\Contracts\RoomServiceContract;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;

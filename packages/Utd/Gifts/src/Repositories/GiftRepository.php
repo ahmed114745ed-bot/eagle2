@@ -5,10 +5,11 @@ namespace Utd\Gifts\Repositories;
 use Utd\Gifts\Entities\Gift;
 use Illuminate\Support\Facades\Auth;
 use Utd\Gifts\Contracts\GiftRepositoryContract;
+use App\Contracts\GiftRepositoryContract as AppGiftRepositoryContract;
 
 
 
-class GiftRepository extends AbstractRepository implements GiftRepositoryContract
+class GiftRepository extends AbstractRepository implements GiftRepositoryContract, AppGiftRepositoryContract
 {
     public function __construct()
     {

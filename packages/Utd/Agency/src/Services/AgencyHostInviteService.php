@@ -2,12 +2,13 @@
 
 namespace Utd\Agency\Services;
 
+use Utd\Agency\Contracts\AgencyHostInviteServiceInterface;
 use Utd\Agency\Repositories\AdminRepository;
 use Utd\Agency\Repositories\AgencyHostInviteRepository;
 use Utd\Agency\Repositories\UserRepository;
 use Exception;
 
-class AgencyHostInviteService
+class AgencyHostInviteService implements AgencyHostInviteServiceInterface
 {
     public function __construct(
         private readonly AgencyHostInviteRepository $agencyHostInviteRepository,
@@ -39,9 +40,9 @@ class AgencyHostInviteService
         return true;
     }
 
-    public function hostInvitation()
+    public function hostInvitation($request = null)
     {
-        $user = $this->get_user(request());
+        $user = $this->get_user($request ?? request());
         if (!$user) throw new Exception('لا يوجد مستخدم!');
         return $this->agencyHostInviteRepository->getByAgencyId($user->agency_id);
     }
@@ -63,6 +64,68 @@ class AgencyHostInviteService
         }
 
         return true;
+    }
+
+    /**
+     * Send invitation to host
+     */
+    public function sendInvitation(int $agencyId, int $hostId, array $data = [])
+    {
+        $check = $this->agencyHostInviteRepository->check($agencyId, $hostId);
+        if ($check != null && $check->created_at->addDays(7) > now() && $check->status == 0) {
+            throw new Exception('لم يمر علي اخر دعوه 7 ايام!');
+        }
+
+        $inviteData = array_merge([
+            'agency_id' => $agencyId,
+            'user_id' => $hostId,
+            'status' => 0,
+        ], $data);
+
+        return $this->agencyHostInviteRepository->create($inviteData);
+    }
+
+    /**
+     * Accept invitation
+     */
+    public function acceptInvitation(int $invitationId)
+    {
+        $invitation = $this->agencyHostInviteRepository->findOrFail($invitationId);
+        
+        if ($invitation->created_at->addDays(7) < now()) {
+            $this->agencyHostInviteRepository->updateStatus($invitation, 3);
+            throw new Exception('لقد مر اكثر من 7 ايام علي الدعوه');
+        }
+
+        $this->agencyHostInviteRepository->updateStatus($invitation, 1);
+        
+        $user = $this->userRepository->findById($invitation->user_id);
+        if ($user) {
+            $this->userRepository->updateAgencyId($user, $invitation->agency_id);
+        }
+
+        return $invitation;
+    }
+
+    /**
+     * Reject invitation
+     */
+    public function rejectInvitation(int $invitationId)
+    {
+        $invitation = $this->agencyHostInviteRepository->findOrFail($invitationId);
+        $this->agencyHostInviteRepository->updateStatus($invitation, 2);
+        return $invitation;
+    }
+
+    /**
+     * Get pending invitations for host
+     */
+    public function getPendingInvitations(int $hostId)
+    {
+        return $this->agencyHostInviteRepository->model
+            ->where('user_id', $hostId)
+            ->where('status', 0)
+            ->get();
     }
 
     public function get_user($request)
