@@ -303,7 +303,12 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request)
     {
-        // Get the class name from ClassResolver and instantiate it
+        \Illuminate\Support\Facades\Log::info('gift_queue_cp: send_gift service resolution', [
+            'config_value' => config('gifts.services.send_gift'),
+            'resolved_class' => ClassResolver::service('send_gift'),
+            'class_exists' => class_exists(ClassResolver::service('send_gift') ?: ''),
+        ]);
+
         $updateUserWhenSendGiftClass = ClassResolver::service('update_user_when_send_gift') ?: '\App\Classes\Gifts\UpdateUserWhenSendGift';
         $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
         
@@ -313,7 +318,6 @@ class GiftLogController extends Controller
             return $this->Common::apiResponse(0, __('Send gift stopped by admin'));
         }
 
-        // Update when sending the gift
         $validator = Validator::make($request->all(), [
             'id'       => 'required',
             'owner_id' => 'nullable',
@@ -326,7 +330,6 @@ class GiftLogController extends Controller
             return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-        // Ensure giftLogService is initialized
         if (!$this->giftLogService) {
             $this->giftLogService = app(\Utd\Gifts\Services\GiftLogService::class);
         }
