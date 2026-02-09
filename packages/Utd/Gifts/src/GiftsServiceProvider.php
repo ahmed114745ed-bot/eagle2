@@ -31,6 +31,10 @@ class GiftsServiceProvider extends ServiceProvider
         // Bind Repository Contracts
         $this->app->singleton(\App\Contracts\GiftLogRepositoryContract::class, \Utd\Gifts\Repositories\GiftLogRepository::class);
         $this->app->singleton(\App\Contracts\GiftRepositoryContract::class, \Utd\Gifts\Repositories\GiftRepository::class);
+        
+        // Bind package repositories to themselves for direct resolution
+        $this->app->singleton(\Utd\Gifts\Repositories\GiftRepository::class);
+        $this->app->singleton(\Utd\Gifts\Repositories\GiftLogRepository::class);
 
         // Bind GiftSenderInterface (NEW - Main service)
         $this->app->singleton(GiftSenderInterface::class, GiftSenderService::class);
@@ -41,14 +45,17 @@ class GiftsServiceProvider extends ServiceProvider
         });
 
         // Bind old services for backward compatibility
-        $this->app->bind(\Utd\Gifts\Services\GiftService::class, function($app) {
+        $this->app->singleton(\Utd\Gifts\Services\GiftService::class, function($app) {
             return new \Utd\Gifts\Services\GiftService(
                 $app->make(\Utd\Gifts\Repositories\GiftRepository::class)
             );
         });
 
-        $this->app->bind(\Utd\Gifts\Services\GiftLogService::class, function($app) {
-            return $app->make(\Utd\Gifts\Services\GiftLogService::class);
+        $this->app->singleton(\Utd\Gifts\Services\GiftLogService::class, function($app) {
+            return new \Utd\Gifts\Services\GiftLogService(
+                $app->make(\Utd\Gifts\Repositories\GiftRepository::class),
+                $app->make(\Utd\Gifts\Repositories\GiftLogRepository::class)
+            );
         });
 
         if (!class_exists('App\Tik\Services\GiftService', false)) {

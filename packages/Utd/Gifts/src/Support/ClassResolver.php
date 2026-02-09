@@ -14,7 +14,8 @@ class ClassResolver
      */
     public static function model(string $key): ?string
     {
-        return config("gifts.models.{$key}");
+        $class = config("gifts.models.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -22,7 +23,8 @@ class ClassResolver
      */
     public static function controller(string $key): ?string
     {
-        return config("gifts.controllers.{$key}");
+        $class = config("gifts.controllers.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -30,7 +32,8 @@ class ClassResolver
      */
     public static function helper(string $key): ?string
     {
-        return config("gifts.helpers.{$key}");
+        $class = config("gifts.helpers.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -47,7 +50,8 @@ class ClassResolver
      */
     public static function service(string $key): ?string
     {
-        return config("gifts.services.{$key}");
+        $class = config("gifts.services.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -55,7 +59,8 @@ class ClassResolver
      */
     public static function resource(string $key): ?string
     {
-        return config("gifts.resources.{$key}");
+        $class = config("gifts.resources.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -63,7 +68,8 @@ class ClassResolver
      */
     public static function facade(string $key): ?string
     {
-        return config("gifts.facades.{$key}");
+        $class = config("gifts.facades.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -71,7 +77,8 @@ class ClassResolver
      */
     public static function job(string $key): ?string
     {
-        return config("gifts.jobs.{$key}");
+        $class = config("gifts.jobs.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -79,7 +86,8 @@ class ClassResolver
      */
     public static function event(string $key): ?string
     {
-        return config("gifts.events_classes.{$key}");
+        $class = config("gifts.events_classes.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -87,7 +95,8 @@ class ClassResolver
      */
     public static function trait(string $key): ?string
     {
-        return config("gifts.traits.{$key}");
+        $class = config("gifts.traits.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -95,7 +104,8 @@ class ClassResolver
      */
     public static function action(string $key): ?string
     {
-        return config("gifts.actions.{$key}");
+        $class = config("gifts.actions.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -103,7 +113,8 @@ class ClassResolver
      */
     public static function form(string $key): ?string
     {
-        return config("gifts.forms.{$key}");
+        $class = config("gifts.forms.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -111,7 +122,8 @@ class ClassResolver
      */
     public static function exception(string $key): ?string
     {
-        return config("gifts.exceptions.{$key}");
+        $class = config("gifts.exceptions.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -119,7 +131,8 @@ class ClassResolver
      */
     public static function contract(string $key): ?string
     {
-        return config("gifts.contracts.{$key}");
+        $class = config("gifts.contracts.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**
@@ -127,7 +140,8 @@ class ClassResolver
      */
     public static function observer(string $key): ?string
     {
-        return config("gifts.observers.{$key}");
+        $class = config("gifts.observers.{$key}");
+        return $class && class_exists($class) ? $class : null;
     }
 
     /**

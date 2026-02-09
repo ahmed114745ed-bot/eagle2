@@ -2,10 +2,8 @@
 
 namespace Utd\Gifts\Http\Controllers\Api;
 
-use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
 use Utd\Gifts\Entities\Gift;
-use Utd\Room\Entities\Room;
 use Illuminate\Http\Request;
 use GuzzleHttp\Promise\Utils;
 use Utd\Gifts\Entities\GiftLog;
@@ -14,93 +12,84 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Config;
-use Modules\CP\Http\Services\CpService;
-use Modules\CP\Http\Services\CpServices;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Collection;
-use Utd\Achievements\Jobs\CalculateAchievement;
-use Utd\Room\Services\RoomAchievementTargetService;
-use Modules\Public\Http\Services\UpgradeRoomLevelServices;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 use Utd\Gifts\Support\ClassResolver;
+use Utd\Gifts\Services\GiftLogService;
+use Utd\Gifts\Services\GiftService;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\LuckyGiftService;
+use Utd\Gifts\Services\LuckyGiftV2Service;
 
 class GiftLogController extends Controller
 {
-    // Resolved classes from config
-    protected $Common;
-    protected $UserHandling;
-    protected $CustomNotification;
-    protected $GiftLogResource;
-    protected $GiftLogUtdResource;
-    protected $User;
-    protected $Agency;
-    protected $Cp;
-    protected $AppFeature;
-    protected $CoreWallet;
-    protected $UserSallary;
-    protected $RemainingDiamond;
-    protected $MonthlyDiamondReceive;
-    protected $LuckyGiftService;
-    protected $SendGiftService;
-    protected $GiftService;
-    protected $RoomLevelServices;
-    protected $UpdateUserWhenSendGift;
-    protected $CleanGiftLogsJob;
-    protected $AllOpeningRoomsZegoRequest;
-    protected $UpdateUserDataWhenSendGift;
-    protected $UpdatePkAndSendToZigoJob;
-    protected $GiftBannerEvent;
-    protected $NotInfMoneyException;
-    protected $UserCommon;
+    /**
+     * Internal cache for resolved services and helpers
+     */
+    private $instances = [];
 
-    private $roomTopUsersRepository;
-    private $giftLogService;
-    
     public function __construct()
     {
-        // Resolve all external classes from config
-        $this->Common = ClassResolver::helper('common');
-        $this->UserCommon = ClassResolver::helper('user_common');
-        $this->UserHandling = ClassResolver::facade('user_handling');
-        $this->CustomNotification = ClassResolver::facade('custom_notification');
-        $this->GiftLogResource = ClassResolver::resource('gift_log');
-        $this->GiftLogUtdResource = ClassResolver::resource('gift_log_utd');
-        
-        // Models
-        $this->User = ClassResolver::model('user');
-        $this->Agency = ClassResolver::model('agency');
-        $this->Cp = ClassResolver::model('cp');
-        $this->AppFeature = ClassResolver::model('app_feature');
-        $this->CoreWallet = ClassResolver::model('core_wallet');
-        $this->UserSallary = ClassResolver::model('user_salary');
-        $this->RemainingDiamond = ClassResolver::model('remaining_diamond');
-        $this->MonthlyDiamondReceive = ClassResolver::model('monthly_diamond_receive');
-        
-        // Services
-        $this->LuckyGiftService = app(ClassResolver::service('lucky_gift'));
-        $this->SendGiftService = ClassResolver::service('send_gift');
-        $this->GiftService = ClassResolver::service('gift_service');
-        $this->RoomLevelServices = app(ClassResolver::service('room_level'));
-        $this->UpdateUserWhenSendGift = ClassResolver::service('update_user_when_send_gift');
-        
-        // Jobs
-        $this->CleanGiftLogsJob = ClassResolver::job('clean_gift_logs');
-        $this->AllOpeningRoomsZegoRequest = ClassResolver::job('all_opening_rooms_zego_request');
-        $this->UpdateUserDataWhenSendGift = ClassResolver::job('update_user_data_when_send_gift');
-        $this->UpdatePkAndSendToZigoJob = ClassResolver::job('update_pk_and_send_to_zigo');
-        
-        // Events
-        $this->GiftBannerEvent = ClassResolver::event('gift_banner');
-        
-        // Exceptions
-        $this->NotInfMoneyException = ClassResolver::exception('not_inf_money');
-        
-        // Contracts & Repository
-        $roomTopUsersRepositoryClass = ClassResolver::contract('room_top_users_repository');
-        $this->roomTopUsersRepository = app($roomTopUsersRepositoryClass);
-        
-        $giftLogServiceClass = ClassResolver::service('gift_log');
-        $this->giftLogService = app($giftLogServiceClass);
+        // Load only essential services - others loaded on-demand via __get
+    }
+
+    /**
+     * Safe API response helper
+     */
+    private function apiResponse($status, $message, $data = null, $code = 200)
+    {
+        $commonClass = $this->Common;
+        if ($commonClass) {
+            return $commonClass::apiResponse($status, $message, $data, $code);
+        }
+        return response()->json([
+            'status' => (bool)$status,
+            'message' => $message,
+            'data' => $data
+        ], $code);
+    }
+    
+    // Lazy loading via magic method - loads only when accessed
+    public function __get($name)
+    {
+        if (!isset($this->instances[$name])) {
+            $this->instances[$name] = match ($name) {
+                // Internal package classes
+                'giftLogService' => app(GiftLogService::class),
+                'GiftService' => app(GiftService::class),
+
+                // External components
+                'Common' => ClassResolver::helper('common'),
+                'UserCommon' => ClassResolver::helper('user_common'),
+                'UserHandling' => ClassResolver::facade('user_handling'),
+                'CustomNotification' => ClassResolver::facade('custom_notification'),
+                'GiftLogResource' => ClassResolver::resource('gift_log'),
+                'GiftLogUtdResource' => ClassResolver::resource('gift_log_utd'),
+                'User' => ClassResolver::model('user'),
+                'Agency' => ClassResolver::model('agency'),
+                'Cp' => ClassResolver::model('cp'),
+                'AppFeature' => ClassResolver::model('app_feature'),
+                'CoreWallet' => ClassResolver::model('core_wallet'),
+                'UserSallary' => ClassResolver::model('user_salary'),
+                'RemainingDiamond' => ClassResolver::model('remaining_diamond'),
+                'MonthlyDiamondReceive' => ClassResolver::model('monthly_diamond_receive'),
+                'LuckyGiftService' => app(LuckyGiftService::class),
+                'LuckyGiftV2Service' => app(LuckyGiftV2Service::class),
+                'SendGiftService' => app(SendGiftService::class),
+                'RoomLevelServices' => ClassResolver::getService('room_level'),
+                'UpdateUserWhenSendGift' => app(UpdateUserWhenSendGift::class),
+                'CleanGiftLogsJob' => ClassResolver::job('clean_gift_logs'),
+                'AllOpeningRoomsZegoRequest' => ClassResolver::job('all_opening_rooms_zego_request'),
+                'UpdateUserDataWhenSendGift' => ClassResolver::job('update_user_data_when_send_gift'),
+                'UpdatePkAndSendToZigoJob' => ClassResolver::job('update_pk_and_send_to_zigo'),
+                'GiftBannerEvent' => ClassResolver::event('gift_banner'),
+                'NotInfMoneyException' => ClassResolver::exception('not_inf_money'),
+                'roomTopUsersRepository' => app(ClassResolver::contract('room_top_users_repository')),
+                default => null,
+            };
+        }
+        return $this->instances[$name];
     }
 
     public function updateRoomPercentageAndHost($ownerId, array $receiverIds, $totalCoins, $coinsPerUser)
@@ -195,8 +184,8 @@ class GiftLogController extends Controller
     public function sendToZego($gift, $to_id, $totalPrice, $receiversIds, $room, ?string $toName, $ownerId, $number, $user, $firstReceiver, ?bool $isToZigo = false): array
     {
 
-
-        $userCoins = User::where('id', $user->id)->value('di') ?? 0;
+        $userClass = $this->User;
+        $userCoins = $userClass ? $userClass::where('id', $user->id)->value('di') ?? 0 : 0;
 
         $zigoData = collect(
             [
@@ -299,7 +288,7 @@ class GiftLogController extends Controller
 
                 //                $this->Common::sendToZego('SendCustomCommand', $zigoData['room_id'], $zigoData['sender_id'], $json);
 
-                $AllOpeningRoomsZegoRequestClass = $this->AllOpeningRoomsZegoRequest;
+                $AllOpeningRoomsZegoRequestClass = ClassResolver::job('all_opening_rooms_zego_request');
                 dispatchJobToQueue(new $AllOpeningRoomsZegoRequestClass($json, $zigoData['sender_id'], $zigoData['room_id']), 'heavyProcessing');
             }
         }
@@ -307,16 +296,14 @@ class GiftLogController extends Controller
     }
     public function gift_queue_cp(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
-        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
-        
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
+
         $close_open_gifts = settings()->get('close_open_gifts');
 
         if ($close_open_gifts == 1) {
-            return $this->Common::apiResponse(0, __('Send gift stopped by admin'));
+            return $this->apiResponse(0, __('Send gift stopped by admin'));
         }
 
-        // Update when sending the gift
         $validator = Validator::make($request->all(), [
             'id'       => 'required',
             'owner_id' => 'nullable',
@@ -326,13 +313,17 @@ class GiftLogController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+        }
+
+        if (!$this->giftLogService) {
+            $this->giftLogService = app(\Utd\Gifts\Services\GiftLogService::class);
         }
 
         try {
             $message = $this->giftLogService->sendGift($request, $updateUserWhenSendGift);
         } catch (\Exception $e) {
-            return $this->Common::apiResponse(false, $e->getMessage());
+            return $this->apiResponse(false, $e->getMessage());
         }
 
         settings()->set('gift_send', true);
@@ -346,7 +337,7 @@ class GiftLogController extends Controller
         $data = [
             'ids' => $idsArray
         ];
-        return $this->Common::apiResponse(true, $message,   $data);
+        return $this->apiResponse(true, $message,   $data);
     }
 
 
@@ -356,8 +347,9 @@ class GiftLogController extends Controller
     {
         $userId = $request->user()->id;
         if ($request->user_id) {
-            $user = User::where('id', $request->user_id)->exists();
-            if (!$user) return $this->Common::apiResponse(0, 'not found', null, 404);
+            $userClass = $this->User;
+            $user = $userClass ? $userClass::where('id', $request->user_id)->exists() : false;
+            if (!$user) return $this->Common ? $this->apiResponse(0, 'not found', null, 404) : response()->json(['message' => 'not found'], 404);
             $userId = $request->user_id;
         }
         $giftTotal = GiftLog::where(function ($q) use ($userId) {
@@ -378,9 +370,12 @@ class GiftLogController extends Controller
             ->with('gift')
             ->get();
 
-        GiftLogResource::setGiftTotal($giftTotal);
+        if ($this->GiftLogResource) {
+            $this->GiftLogResource::setGiftTotal($giftTotal);
+            return $this->Common ? $this->apiResponse(1, 'ok', $this->GiftLogResource::collection($gl)) : response()->json(['data' => $gl]);
+        }
 
-        return $this->Common::apiResponse(1, 'ok', GiftLogResource::collection($gl));
+        return $this->Common ? $this->apiResponse(1, 'ok', $gl) : response()->json(['data' => $gl]);
     }
 
     /**
@@ -411,12 +406,11 @@ class GiftLogController extends Controller
 
     public function sendLuckyGift2(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
-        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
-            return $this->Common::apiResponse(0, __('api_responses.try_again'));
+            return $this->apiResponse(0, __('api_responses.try_again'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -428,29 +422,32 @@ class GiftLogController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         $data = $request->all();
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
+            } else {
+                throw new \Exception(__('api_responses.service_not_found'));
+            }
         } catch (\Exception $e) {
-            return $this->Common::apiResponse(0, $e->getMessage());
+            return $this->apiResponse(0, $e->getMessage());
         }
-        return $this->Common::apiResponse(1, __('api_responses.success'), $data);
+        return $this->apiResponse(1, __('api_responses.success'), $data);
     }
 
 
     public function sendLuckyGift2V2(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
-        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
-            return $this->Common::apiResponse(0, __('api_responses.try_again'));
+            return $this->apiResponse(0, __('api_responses.try_again'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -462,29 +459,32 @@ class GiftLogController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         $data = $request->all();
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
+            } else {
+                throw new \Exception(__('api_responses.service_not_found'));
+            }
         } catch (\Exception $e) {
-            return $this->Common::apiResponse(0, $e->getMessage());
+            return $this->apiResponse(0, $e->getMessage());
         }
-        return $this->Common::apiResponse(1, __('api_responses.success'), $data);
+        return $this->apiResponse(1, __('api_responses.success'), $data);
     }
 
 
     public function sendLuckyGift2V3(Request $request)
     {
-        $updateUserWhenSendGiftClass = $this->UpdateUserWhenSendGift;
-        $updateUserWhenSendGift = new $updateUserWhenSendGiftClass();
+        $updateUserWhenSendGift = $this->UpdateUserWhenSendGift;
         
         $stopLucky = settings()->get('stop_luckyGift');
         if ($stopLucky == 1) {
-            return $this->Common::apiResponse(0, __('api_responses.try_again'));
+            return $this->apiResponse(0, __('api_responses.try_again'));
         }
 
         $validator = Validator::make($request->all(), [
@@ -496,18 +496,22 @@ class GiftLogController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         $data = $request->all();
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+            if ($this->LuckyGiftV2Service) {
+                $data = $this->LuckyGiftV2Service->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+            } else {
+                throw new \Exception(__('api_responses.service_not_found'));
+            }
         } catch (\Exception $e) {
-            return $this->Common::apiResponse(0, $e->getMessage());
+            return $this->apiResponse(0, $e->getMessage());
         }
-        return $this->Common::apiResponse(1, __('api_responses.success'), $data);
+        return $this->apiResponse(1, __('api_responses.success'), $data);
     }
 
 
@@ -523,10 +527,10 @@ class GiftLogController extends Controller
 
     //     //validation parameter
     //     if (!$data['id'] || !$data['owner_id'] || !$data['toUid'] || !$data['num'])
-    //         return $this->Common::apiResponse(0, __('api_responses.missing_params'), $data);
+    //         return $this->apiResponse(0, __('api_responses.missing_params'), $data);
 
     //     //validation if pass num < 1
-    //     if ($data['num'] < 1) return $this->Common::apiResponse(0, 'The number of gifts cannot be less than 1', null, 422);
+    //     if ($data['num'] < 1) return $this->apiResponse(0, 'The number of gifts cannot be less than 1', null, 422);
 
     //     //get the gift data from id in the parameter
     //     $gift = Gift::query()->select([
@@ -534,14 +538,14 @@ class GiftLogController extends Controller
     //         'show_img2'
     //     ])->where('type', 6)->where('id', $giftId)->where('enable', 1)->first();
     //     // Validation if gift return null
-    //     if (!$gift) return $this->Common::apiResponse(0, 'Gift does not exist or has been removed', null, 404);
+    //     if (!$gift) return $this->apiResponse(0, 'Gift does not exist or has been removed', null, 404);
     //     // receivers ids
     //     $receiversIds = explode(',', $data['toUid']);
     //     $numberOfGift = $number * count($receiversIds);
     //     $totalPrice   = $gift->price * $numberOfGift;
 
     //     // if user didn't have inf coins throw exception
-    //     if ($user->di < $totalPrice) return $this->Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+    //     if ($user->di < $totalPrice) return $this->apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
 
     //     $roomKey = '';
     //     // Get Room Data
@@ -550,15 +554,15 @@ class GiftLogController extends Controller
     //         ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
     //         ->first();
     //     // Validation if no room
-    //     if (!$room) return $this->Common::apiResponse(0, 'room does not exist', null, 404);
+    //     if (!$room) return $this->apiResponse(0, 'room does not exist', null, 404);
 
     //     // if not a visitor in this room
     //     $roomVisitors   = explode(",", $room->room_visitor);
     //     $roomVisitors[] = $ownerId;
-    //     if (!in_array($userId, $roomVisitors)) return $this->Common::apiResponse(0, 'you are not in this room', null, 403);
+    //     if (!in_array($userId, $roomVisitors)) return $this->apiResponse(0, 'you are not in this room', null, 403);
 
     //     // validation if this gift vip < user vip then throw Exception
-    //     /*if (@$user->UserVip->level ?? 0 < $gift->vip_level) return $this->Common::apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');*/
+    //     /*if (@$user->UserVip->level ?? 0 < $gift->vip_level) return $this->apiResponse(0, 'vip ' . $gift->vip_level . ' to send this gift');*/
 
     //     $wallets = CoreWallet::query()->whereIn('id', [1, 2])->get();
     //     $owner_wallet = $wallets->where('id', 2)->first();
@@ -567,7 +571,7 @@ class GiftLogController extends Controller
     //     try {
     //         $updateUserWhenSendGift->send($totalPrice, $user);
     //     } catch (NotInfMoneyException $e) {
-    //         return $this->Common::apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
+    //         return $this->apiResponse(0, 'Insufficient balance, please go to recharge!', null, 407);
     //     }
     //     // get received users data
     //     $receivedUsers = User::withoutAppends()->whereIn('id', $receiversIds)->select(['id', 'name'])->get();
@@ -668,7 +672,7 @@ class GiftLogController extends Controller
     //         $positions[] = -1;
     //     }
 
-    //     return $this->Common::apiResponse(1, $sendMessage, [
+    //     return $this->apiResponse(1, $sendMessage, [
     //         'gift_image'      => $gift->img,
     //         'receiver_name'   => $to,
     //         'sender_name'  => $user->name ?? '',
@@ -684,7 +688,7 @@ class GiftLogController extends Controller
     // {
     //     $stopLucky = settings()->get('stop_luckyGift');
     //     if ($stopLucky == 1) {
-    //         return $this->Common::apiResponse(0, __('api_responses.try_again'));
+    //         return $this->apiResponse(0, __('api_responses.try_again'));
     //     }
 
     //     $validator = Validator::make($request->all(), [
@@ -696,7 +700,7 @@ class GiftLogController extends Controller
     //     ]);
 
     //     if ($validator->fails()) {
-    //         return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+    //         return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
     //     }
 
     //     $data = $request->all();
@@ -705,16 +709,16 @@ class GiftLogController extends Controller
     //     try {
     //         $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
     //     } catch (\Exception $e) {
-    //         return $this->Common::apiResponse(0, $e->getMessage());
+    //         return $this->apiResponse(0, $e->getMessage());
     //     }
-    //     return $this->Common::apiResponse(1, __('api_responses.success'), $data);
+    //     return $this->apiResponse(1, __('api_responses.success'), $data);
     // }
 
     // public function sendLuckyGift3(Request $request, UpdateUserWhenSendGift $updateUserWhenSendGift)
     // {
     //     $stopLucky = settings()->get('stop_luckyGift');
     //     if ($stopLucky == 1) {
-    //         return $this->Common::apiResponse(0, __('api_responses.try_again'));
+    //         return $this->apiResponse(0, __('api_responses.try_again'));
     //     }
 
     //     $validator = Validator::make($request->all(), [
@@ -726,7 +730,7 @@ class GiftLogController extends Controller
     //     ]);
 
     //     if ($validator->fails()) {
-    //         return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+    //         return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
     //     }
 
     //     $data = $request->all();
@@ -735,9 +739,9 @@ class GiftLogController extends Controller
     //     try {
     //         $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift3($data, $user, $updateUserWhenSendGift);
     //     } catch (\Exception $e) {
-    //         return $this->Common::apiResponse(0, $e->getMessage());
+    //         return $this->apiResponse(0, $e->getMessage());
     //     }
-    //     return $this->Common::apiResponse(1, __('api_responses.success'), $data);
+    //     return $this->apiResponse(1, __('api_responses.success'), $data);
     // }
 
     // public function sendToZegoLuckyGift($zigoData)
@@ -793,7 +797,7 @@ class GiftLogController extends Controller
 
     public function ofLucky()
     {
-        return $this->Common::apiResponse(0, __('api_responses.update_your_version'));
+        return $this->apiResponse(0, __('api_responses.update_your_version'));
     }
 
     public function myGiftInfo($id, Request $request)
@@ -804,14 +808,14 @@ class GiftLogController extends Controller
             'start_date' => 'nullable|date_format:Y-m-d',
         ]);
         if ($validator->fails()) {
-            return $this->Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
+            return $this->apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
         try {
             $data = $this->giftLogService->userGiftIfo($id, $request->type, $request->start_date, $request->end_date, $request->per_page, $request->page);
-            return $this->Common::apiResponse(1, __('api_responses.success'), GiftLogUtdResource::collection($data));
+            return $this->apiResponse(1, __('api_responses.success'), GiftLogUtdResource::collection($data));
         } catch (\Exception $e) {
-            return $this->Common::apiResponse(0, $e->getMessage());
+            return $this->apiResponse(0, $e->getMessage());
         }
     }
 

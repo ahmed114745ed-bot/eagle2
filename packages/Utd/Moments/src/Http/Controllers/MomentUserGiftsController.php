@@ -15,7 +15,7 @@ use Utd\Moments\Entities\Moment;
 use App\Exceptions\NotInfMoneyException;
 use Utd\Moments\Entities\MomentUserGift;
 use Illuminate\Contracts\Support\Renderable;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Utd\Moments\Transformers\MomentGiftUserResource;
 
 

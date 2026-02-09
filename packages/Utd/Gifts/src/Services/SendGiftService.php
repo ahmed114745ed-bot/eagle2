@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Classes\Gifts;
+namespace Utd\Gifts\Services;
 
 use App\Enums\UserDiamondLogType;
 use App\Helpers\UserDiamondLogHelper;
 use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
 use Carbon\Carbon;
-use App\Models\Gift;
+use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Family;
 use App\Helpers\Common;
-use App\Models\GiftLog;
+use Utd\Gifts\Entities\GiftLog;
 use App\Models\AppFeature;
 use App\Models\FamilyRank;
 use App\Models\FamilyLevel;
@@ -358,7 +358,7 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob2($pk, $receivedIds, $giftPrice, $room) :  array
     {
-        if (! PackageHelper::isInstalled('pk')) return;
+        if (! PackageHelper::isInstalled('pk')) return  [];
 
         if(!($pk instanceof Pk)) return [];
 

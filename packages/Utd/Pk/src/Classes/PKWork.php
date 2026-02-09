@@ -2,7 +2,7 @@
 
 namespace Utd\Pk\Classes;
 
-use App\Classes\Gifts\SendGiftService;
+use Utd\Gifts\Services\SendGiftService;
 use App\Interfaces\RoomJobInterface;
 use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;

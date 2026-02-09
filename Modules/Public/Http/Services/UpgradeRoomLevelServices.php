@@ -3,7 +3,7 @@
 namespace Modules\Public\Http\Services;
 
 use Modules\Public\Jobs\RewardWinnerLevel;
-use App\Classes\Gifts\UpdateUserWhenSendGift;
+use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use Utd\Room\Entities\Room;
 use Modules\Public\Entities\WinnerLevelInterval;
 
