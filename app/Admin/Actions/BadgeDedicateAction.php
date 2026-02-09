@@ -38,7 +38,7 @@ class BadgeDedicateAction extends Action
 
             $this->userBadge($user->id, $badge->id, $request->days, 'dedicate');
          
-                $images =   $badge->images->firstWhere('language', app()->getLocale())?->image;
+                $images =   $badge->images;
                 
        
             CustomNotification::dedicateBadges($user, $request->days, $badge->name, $images);
