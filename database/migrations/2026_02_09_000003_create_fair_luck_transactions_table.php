@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('fair_luck_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('gift_id')->index()->constrained()->onDelete('cascade');
+            $table->unsignedInteger('gift_id')->index();
+            $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
             $table->decimal('bet_amount', 15, 2);
             $table->boolean('is_winner')->default(false)->index();
             $table->unsignedInteger('multiplier')->nullable();
