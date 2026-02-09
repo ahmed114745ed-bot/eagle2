@@ -30,4 +30,11 @@ class AgencyHostInviteRepository extends AbstractRepository
         $agencyHostInvite->update(['status' => $status]);
         return true;
     }
+
+    public function getPendingByUserId($userId)
+    {
+        return $this->model->where('user_id', $userId)
+            ->where('status', 0)
+            ->get();
+    }
 }

@@ -30,4 +30,9 @@ class NullGiftRepository implements GiftRepositoryContract
     {
         return false;
     }
+
+    public function allAchievementGift()
+    {
+        return collect();
+    }
 }

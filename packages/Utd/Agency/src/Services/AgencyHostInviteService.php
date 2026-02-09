@@ -122,10 +122,7 @@ class AgencyHostInviteService implements AgencyHostInviteServiceInterface
      */
     public function getPendingInvitations(int $hostId)
     {
-        return $this->agencyHostInviteRepository->model
-            ->where('user_id', $hostId)
-            ->where('status', 0)
-            ->get();
+        return $this->agencyHostInviteRepository->getPendingByUserId($hostId);
     }
 
     public function get_user($request)

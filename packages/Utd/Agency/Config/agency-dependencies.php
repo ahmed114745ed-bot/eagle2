@@ -41,7 +41,7 @@ return [
         
         // Services mapping
         'services' => [
-            'agency_service' => \App\Tik\Services\AgencyService::class,
+            'agency_service' => \Utd\Agency\Services\AgencyService::class,
             'charge_service' => \App\Tik\Services\ChargeRepoService::class,
             'agency_host_invite_service' => \Utd\Agency\Services\AgencyHostInviteService::class,
             'app_feature_service' => \App\Services\AppFeatureService::class,
