@@ -66,6 +66,7 @@ trait ZegoTrait
     }
     public static function sendToZego($Action, $RoomId, $FromUserId, $MessageContent, $IsTest = 'false')
     {
+        info($MessageContent);
         $url = 'https://rtc-api.zego.im';
         // $AppId = self::getConf('zego_app_id');
         $AppId = self::zegoData('zego_app_id');
@@ -89,7 +90,7 @@ trait ZegoTrait
         ];
         $headers = [];
         try {
-          
+
             return  Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
         } catch (\Exception $exception) {
         }
