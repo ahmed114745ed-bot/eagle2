@@ -1765,7 +1765,8 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            // $url = getImagePath($badge->badge->image);
+            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
@@ -1786,7 +1787,7 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');

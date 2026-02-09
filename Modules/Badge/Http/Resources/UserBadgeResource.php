@@ -15,9 +15,10 @@ class UserBadgeResource extends JsonResource
      */
     public function toArray($request)
     {
+        $badge = $this->badge->images->firstWhere('language', app()->getLocale());
         return [
-            'image' => $this->badge->image,
-            'image_type' => @$this->badge->image_type ?? '',
+            'image' => $badge->image ?? '',
+            'image_type' => $badge->image_type ?? '',
 
         ];
     }
