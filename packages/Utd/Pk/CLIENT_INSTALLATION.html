@@ -139,7 +139,7 @@
     <div class="step">
         <span class="step-num">4</span> <strong>Run Setup Commands</strong>
         <p>Run migrations, seeders, and clear cache:</p>
-        <pre><code>php artisan migrate; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
+        <pre><code>php artisan migrate; php artisan db:seed --class=PermissionTypeSeeder; php artisan db:seed --class="Utd\Pk\Database\Seeders\PkDatabaseSeeder"; php artisan optimize:clear</code></pre>
     </div>
 
     <h2>Verify Installation</h2>

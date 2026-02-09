@@ -37,7 +37,7 @@ use Illuminate\Validation\ValidationException;
 use App\Http\Requests\Api\V1\Room\CommentRequest;
 use Utd\Room\Http\Resources\EnterRoomCollection;
 use Utd\Room\Http\Resources\RoomVisitorsResource;
-use Modules\Charizma\Http\Services\UserCharismaService;
+use App\Contracts\UserCharismaServiceContract;
 use App\Contracts\UserAchievementContract;
 use App\Support\PackageHelper;
 use Utd\RoomBoom\Entities\RoomBoom;
@@ -243,7 +243,7 @@ class RoomController extends Controller
 
     private function roomCharisma(int $room_id)
     {
-        return (new UserCharismaService())->roomCharisma($room_id);
+        return app(UserCharismaServiceContract::class)->roomCharisma($room_id);
     }
 
     /**
@@ -973,7 +973,7 @@ class RoomController extends Controller
         if (!$room) return;
         if ($result) {
 
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Utd\Gifts\Services;
 
+use App\Support\PackageHelper;
 use Utd\Pk\Jobs\UpdatePkAndSendToZigoJob;
 use Utd\Gifts\Entities\Gift;
 use Utd\Room\Entities\Room;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Utd\Gifts\Services\SendGiftService;
 use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Contracts\RoomTopUsersRepositoryContract;
-use Modules\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
+use Utd\Charizma\Jobs\UpdateUsersAndSendCharismaToZigo;
 
 class LuckyGiftService
 {
@@ -102,7 +103,7 @@ class LuckyGiftService
         if (!$user) return;
         if ($room->lastPk) {
             dispatch(new UpdatePkAndSendToZigoJob($userId, $room->id, $receiversIds, ($price), $room->microphone))->onQueue('updatePkAndSendToZigo');
-        }else if ($room->charizma_status){
+        }else if ($room->charizma_status && PackageHelper::isInstalled('charisma')){
             dispatch(new UpdateUsersAndSendCharismaToZigo($room, $receiversIds, $price, $userId))->onQueue('default');
         }
         $updateUserWhenSendGift = new UpdateUserWhenSendGift();

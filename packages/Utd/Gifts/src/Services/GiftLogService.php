@@ -2,6 +2,7 @@
 
 namespace Utd\Gifts\Services;
 
+use App\Support\PackageHelper;
 use Utd\Gifts\Support\ModelResolver;
 use Utd\Gifts\Support\ClassResolver;
 use Utd\Gifts\Entities\UserGift;
@@ -896,13 +897,15 @@ class GiftLogService
 
     private function hasCharizmaJob(): bool
     {
-        return class_exists('\\Modules\\Charizma\\Jobs\\UpdateSendCharismaToZigo');
+        return class_exists('\\Utd\\Charizma\\Jobs\\UpdateSendCharismaToZigo');
     }
 
     private function getCharizmaJob($roomId, $userIds, $amount, $senderId)
     {
-        if ($this->hasCharizmaJob()) {
-            return new \Modules\Charizma\Jobs\UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
+        if (PackageHelper::isInstalled('charisma')){
+            if ($this->hasCharizmaJob()) {
+                return new \Utd\Charizma\Jobs\UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
+            }
         }
         return null;
     }

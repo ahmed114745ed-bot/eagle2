@@ -818,12 +818,14 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'gift-target-event', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
-                    ['key' => 'pk-event', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'pk-event-rewards', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
+                    ...(PackageHelper::isInstalled('pk') ? [
+                        ['key' => 'pk-event', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                        ['key' => 'pk-event-rewards', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                    ] : []),
                     ['key' => 'general-roles', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],

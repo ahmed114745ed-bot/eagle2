@@ -11,6 +11,7 @@ use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
+use App\Support\PackageHelper;
 use App\Tik\DTO\ReceiverGiftDTO;
 use Carbon\Carbon;
 use GuzzleHttp\Promise\Utils;
@@ -20,7 +21,7 @@ use Utd\Gifts\Services\SendGiftService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Modules\Charizma\Jobs\UpdateSendCharismaToZigo;
+use Utd\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Modules\CP\Http\Services\CpService;
 use App\Tik\Repositories\GiftRepository;
 use App\Contracts\RoomRepositoryContract;
@@ -148,7 +149,7 @@ class GiftLogService
             $cpId =  Cp::where(function ($query) use ($user) {
                 $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
             })->whereIn('status', [1, 4])->first();
-           
+
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
 
@@ -171,10 +172,12 @@ class GiftLogService
                     ->onQueue('updatePk');
             }
 
-            if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
-                    ->afterCommit()
-                    ->onQueue('default');
+            if (PackageHelper::isInstalled('charisma')){
+                if ($room->charizma_status) {
+                    dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))
+                        ->afterCommit()
+                        ->onQueue('default');
+                }
             }
 
             $realPrice = (int)($number * $gift->price);
@@ -372,7 +375,9 @@ class GiftLogService
             }
 
             if ($room->charizma_status) {
-                dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
+                if ($room->charizma_status) {
+                    dispatch(new UpdateSendCharismaToZigo($room->id, $receivedUsers->pluck('id')->toArray(), ($gift->price * $number), $userId))->onQueue('default');
+                }
             }
 
             $realPrice = (int)($number * $gift->price);

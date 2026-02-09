@@ -41,6 +41,8 @@ use App\Repositories\User\UserRepo;
 use App\Repositories\User\UserRepoInterface;
 use App\Services\Gifts\LuckyGiftService;
 use App\Services\RedisService;
+use App\Contracts\UserCharismaServiceContract;
+use App\Services\Null\NullUserCharismaService;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -88,6 +90,11 @@ class AppServiceProvider extends ServiceProvider
             $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);
         } else {
             $this->app->bind(ShippingAgencyRepositoryInterface::class, NullShippingAgencyRepository::class);
+        }
+
+        // Charizma service fallback
+        if (!$this->app->bound(UserCharismaServiceContract::class)) {
+            $this->app->bind(UserCharismaServiceContract::class, NullUserCharismaService::class);
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

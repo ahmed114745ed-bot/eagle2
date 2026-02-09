@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "23edb4d02d16e4ad91b831e1b3450c85",
+    "content-hash": "4da454f26dbc971ce0a19daecba35780",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14468,6 +14468,45 @@
             }
         },
         {
+            "name": "utd/charizma",
+            "version": "dev-achievmentPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Charizma",
+                "reference": "63857da7d933becac8e343a369580e7269e59122"
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Charizma\\CharizmaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Charizma\\": "src/",
+                    "Utd\\Charizma\\Database\\Seeders\\": "Database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "UTD",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Charizma/Charisma feature package for Eagle application",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "utd/gifts",
             "version": "dev-achievmentPackage",
             "dist": {
@@ -15498,7 +15537,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/room-cup": 20
+        "utd/achievements": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

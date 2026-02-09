@@ -22,7 +22,7 @@ use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\CountryRepository;
 use Utd\Room\Repositories\RoomRepoInterface;
 use App\Tik\Repositories\RequestBackgroundImageRepository;
-use Modules\Charizma\Http\Services\UserCharismaService;
+use App\Contracts\UserCharismaServiceContract;
 use Modules\TaskStream\Services\TaskStreamService;
 use App\Contracts\GiftLogRepositoryContract;
 
@@ -257,7 +257,7 @@ class RoomRepoService
         $userDataWithCharisma = [];
 
         if (isset($room->charizma_status)) {
-            $userCharismaService = new UserCharismaService();
+            $userCharismaService = app(UserCharismaServiceContract::class);
             $userCharismaService->resetUserCharisma($user->id, $room->id);
             $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom($room, [$user->id]);
             $isToZegoCharisma = true;
@@ -301,7 +301,7 @@ class RoomRepoService
         $userDataWithCharisma = [];
 
         if (isset($room->charizma_status)) {
-            $userCharismaService = new UserCharismaService();
+            $userCharismaService = app(UserCharismaServiceContract::class);
             $userCharismaService->resetUserCharisma($user->id, $room->id);
             $userDataWithCharisma = $userCharismaService->addTotalEarnedCoinsInUserRoom2($room, [$user->id]);
             $isToZegoCharisma = true;

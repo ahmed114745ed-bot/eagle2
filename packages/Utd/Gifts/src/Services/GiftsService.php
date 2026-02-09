@@ -3,6 +3,7 @@
 namespace Utd\Gifts\Services;
 
 use Utd\Gifts\Contracts\GiftsContract;
+use App\Contracts\GiftsContract as AppGiftsContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Utd\Gifts\Entities\Gift;
@@ -15,7 +16,7 @@ use Utd\Gifts\Support\ModelResolver;
  * GiftsService
  * 
  */
-class GiftsService implements GiftsContract
+class GiftsService implements GiftsContract, AppGiftsContract
 {
     /**
      * 

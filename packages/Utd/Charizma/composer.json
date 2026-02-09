@@ -1,0 +1,30 @@
+{
+    "name": "utd/charizma",
+    "description": "Charizma/Charisma feature package for Eagle application",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTD",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Charizma\\": "src/",
+            "Utd\\Charizma\\Database\\Seeders\\": "Database/seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Charizma\\CharizmaServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

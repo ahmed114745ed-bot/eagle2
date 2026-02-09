@@ -20,7 +20,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\CP\Http\Services\CpServices;
 use Illuminate\Support\Facades\Validator;
-use Modules\Charizma\Http\Services\UserCharismaService;
+use App\Contracts\UserCharismaServiceContract;
 
 class MicrophoneController extends Controller
 {
@@ -79,7 +79,7 @@ class MicrophoneController extends Controller
 
         if ($room) {
             UserHandling::calcTime($data['user_id']);
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($data['user_id'], $room->id);
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($data['user_id'], $room->id);
             return Common::apiResponse(1, __('api_responses.success'));
         } else {
             return Common::apiResponse(0, __('api_responses.failed'), null, 400);
@@ -97,7 +97,7 @@ class MicrophoneController extends Controller
 
         if ($room) {
             UserHandling::calcTime($data['user_id']);
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($data['user_id'], $room->id);
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($data['user_id'], $room->id);
             return Common::apiResponse(1, __('api_responses.success'));
         } else {
             return Common::apiResponse(0, __('api_responses.failed'), null, 400);

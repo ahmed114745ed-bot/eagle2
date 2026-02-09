@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Database\Eloquent\Model;
 use Modules\TaskStream\Entities\TaskStream;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
 use Utd\Pk\Entities\Pk;
@@ -23,6 +24,7 @@ class PackageHelper
         'taskStream' => TaskStream::class,
         'roomBoom' => RoomBoom::class,
         'roomCup' => RoomCupTarget::class,
+        'charisma' => ExtraDataInRoom::class,
     ];
 
     /**

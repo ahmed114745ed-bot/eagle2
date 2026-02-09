@@ -2,24 +2,22 @@
 
 namespace Utd\Room\Services;
 
+use App\Support\PackageHelper;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Jobs\ResetCharisma;
+use Utd\Charizma\Jobs\ResetCharisma;
 use Utd\Room\Entities\EnteredRoom;
 use Utd\Room\Entities\RoomVisitor;
 use Exception;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Model;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Agency\Repositories\UserRepository;
 use App\Jobs\SendNotificationToAllFollowers;
 use Utd\Room\Http\Resources\EnterRoomCollection;
 use Illuminate\Support\Facades\Schema;
-use Modules\Charizma\Http\Services\UserCharismaService;
+use App\Contracts\UserCharismaServiceContract;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Events\Chat;
@@ -95,7 +93,7 @@ class EntranceRoomService implements EnteranceRoomContract
     {
         $userId = $user->id;
         if (@$room->charizma_status) {
-            $userCharismaService = new UserCharismaService();
+            $userCharismaService = app(UserCharismaServiceContract::class);
             $userCharismaService->resetUserCharisma($userId, $room->id);
             $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$userId]);
 
@@ -340,7 +338,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
     private function handleCharismaStatusOnLogout($room, $user, $ownerId)
     {
-        $userCharismaService = new UserCharismaService();
+        $userCharismaService = app(UserCharismaServiceContract::class);
         $userCharismaService->resetUserCharisma($user->id, $room->id);
         $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
@@ -357,7 +355,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
     private function handleCharismaStatusOnLogout2($room, $user, $ownerId)
     {
-        $userCharismaService = new UserCharismaService();
+        $userCharismaService = app(UserCharismaServiceContract::class);
         $userCharismaService->resetUserCharisma($user->id, $room->id);
         $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
 
@@ -382,7 +380,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         if (!$room) return;
         if ($result) {
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
 
@@ -396,7 +394,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         if (!$room) return;
         if ($result) {
-            (new UserCharismaService())->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
         }
     }
 
@@ -478,11 +476,14 @@ class EntranceRoomService implements EnteranceRoomContract
 
     private function updateRoom($user_id, $owner_id, Room &$room)
     {
-        if ($room->charizma_status && ($room->charizma_timestamp + 86400) < now()->timestamp) {
-            $room->charizma_timestamp = null;
-            $room->charizma_status = false;
-            dispatch(new ResetCharisma($room->id));
+        if (PackageHelper::isInstalled('charisma')){
+            if ($room->charizma_status && ($room->charizma_timestamp + 86400) < now()->timestamp) {
+                $room->charizma_timestamp = null;
+                $room->charizma_status = false;
+                dispatch(new ResetCharisma($room->id));
+            }
         }
+
         if ($room->uid == $user_id) {
             $room->is_live = true;
         }

@@ -63,7 +63,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Modules\AreaManager\Entities\AreaManager;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\AreaManager\Entities\SubAreaManager;
-use Modules\Charizma\Http\Services\UserCharismaService;
 
 class Common
 {

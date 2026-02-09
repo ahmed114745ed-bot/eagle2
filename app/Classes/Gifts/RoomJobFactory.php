@@ -7,6 +7,7 @@ use App\Jobs\TestTestCharizma;
 use App\Soalfna\DTO\RoomJob;
 use App\Support\PackageHelper;
 use Utd\Pk\Classes\PKWork;
+use Utd\Charizma\Classes\CharismaWork;
 
 class RoomJobFactory
 {
@@ -16,9 +17,11 @@ class RoomJobFactory
     public function setType($type): static
     {
         if ($type == 'charisma'){
-            $this->type = 'charisma';
-            $this->roomJob = new CharismaWork();
-        }elseif ($type == 'pk'){
+            if (PackageHelper::isInstalled('charisma')){
+                $this->type = 'charisma';
+                $this->roomJob = new CharismaWork();
+            }
+        } elseif ($type == 'pk'){
             if (PackageHelper::isInstalled('pk')){
                 $this->type = 'pk';
                 $this->roomJob = new PKWork();

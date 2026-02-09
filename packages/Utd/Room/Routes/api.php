@@ -46,7 +46,7 @@ Route::prefix('api')->middleware(['auth:sanctum', 'checkLatestToken', 'generalBa
         Route::post('charge_dollar_for_owner', [ChargeController::class, 'charge_co_for_owner']);
         Route::post('{room_id}/disable-writing', [RoomController::class, 'disable_writing']);
         Route::post('pk/change-image', [RoomController::class, 'changeRoomImage']);
-        Route::post('/{id}/edit', [EnteranceController::class, 'update']);
+        Route::post('/{id}/edit', [EnteranceController::class, 'updateRoomVisitorsupdate']);
         Route::post('firstOfRoom', [RoomController::class, 'firstOfRoom']);
         Route::post('admins', [RoomController::class, 'getAdmins']);
         Route::post('request-background-image', [RequestBackgroundImageController::class, 'RequestBackgroundImage']);
