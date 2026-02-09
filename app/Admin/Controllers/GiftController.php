@@ -132,7 +132,7 @@ class GiftController extends MainController
             $tabs = ['all' => __('All')];
 
             // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
-            $categories = GiftCategory::all();
+            $categories = GiftCategory::orderBy('sort', 'asc')->get();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
                 $tabs[$category->id] = $title;
