@@ -75,8 +75,8 @@ class BadgeController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            $filter->like('name', 'name');
-            $filter->equal('priority', 'Priority');
+            $filter->like('name', __('name'));
+            $filter->equal('priority', __('Priority'));
         });
         Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
