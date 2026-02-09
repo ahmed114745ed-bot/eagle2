@@ -18,8 +18,8 @@
 
 <ul class="nav nav-tabs" role="tablist">
     @foreach ($languages as $code => $label)
-        <li class="nav-item {{ $code === $selectedLang ? 'active' : '' }}">
-            <a class="nav-link"
+        <li class="nav-item">
+            <a class="nav-link {{ $code === $selectedLang ? 'active' : '' }}"
                href="#lang-{{ $code }}"
                data-toggle="tab"
                data-lang="{{ $code }}">
@@ -37,7 +37,7 @@
             $imageData = $badgeImages[$code] ?? null;
         @endphp
 
-        <div class="tab-pane fade {{ $first ? 'show active' : '' }}" id="lang-{{ $code }}">
+        <div class="tab-pane fade {{ $code === $selectedLang ? 'show active' : '' }}" id="lang-{{ $code }}">
 
            
             <div class="form-group">
@@ -85,8 +85,8 @@
 <script>
     $(document).ready(function () {
 
-        // Force first tab to show on initial load
-        $('.nav-tabs li.active a').tab('show');
+        // Force selected tab to show on initial load
+        $('.nav-tabs a.active').tab('show');
 
         // Save selected tab when user switches
         $('.nav-tabs a[data-toggle="tab"]').on('click', function () {
