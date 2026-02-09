@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4da454f26dbc971ce0a19daecba35780",
+    "content-hash": "bf5f5d371b7568e07e2a2359ac5e8ea7",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14599,7 +14599,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Pk",
-                "reference": "a139aa14176b143a616732776379cac551d8a89b"
+                "reference": "d19cd4b293f466466c52c6b38df2409972acf2c0"
             },
             "require": {
                 "php": "^8.1"
@@ -14614,7 +14614,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "Utd\\Pk\\": "src/"
+                    "Utd\\Pk\\": "src/",
+                    "Utd\\Pk\\Database\\Seeders\\": "Database/seeders/"
                 }
             },
             "license": [
@@ -14628,7 +14629,6 @@
             ],
             "description": "PK (Player vs Player) package for Eagle application",
             "transport-options": {
-                "symlink": true,
                 "relative": true
             }
         },
@@ -15537,7 +15537,8 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "fruitcake/laravel-cors": 20,
-        "utd/achievements": 20
+        "utd/achievements": 20,
+        "utd/pk": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,

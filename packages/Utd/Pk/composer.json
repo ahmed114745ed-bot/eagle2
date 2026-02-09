@@ -14,7 +14,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Utd\\Pk\\": "src/"
+            "Utd\\Pk\\": "src/",
+            "Utd\\Pk\\Database\\Seeders\\": "Database/seeders/"
         }
     },
     "extra": {
