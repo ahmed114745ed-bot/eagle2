@@ -21,10 +21,9 @@ class BadgeController extends Controller
         }
 
         $user = User::find($userId);
-        $userTypes = $user->user_types ?? [];
-
-        // get config/type badges (from $this->badges)
-        $configBadges = $this->badges($userTypes);
+        if (!$user) {
+            return Common::apiResponse(0, 'User not found', null, 404);
+        }
 
         // get user badges from DB
         $userBadges = UserBadge::query()
@@ -36,22 +35,12 @@ class BadgeController extends Controller
                     $query->where('language', app()->getLocale());
                 }
 
-            ])
-            ->get()
-            ->filter(fn($userBadge) => $userBadge->badge !== null);
-
-        // combine both sources into top and regular
-        $top = collect($configBadges['top'] ?? [])
-            ->map(fn($badge) => [
-                'image' => $badge['image'] ?? $badge,
-                'image_type' => $badge['image_type'] ?? '',
-            ])
-            ->merge(UserBadgeResource::collection(
-                $userBadges->where('badge.type', 'top')
-            ));
+            ])->get();
 
         $data = [
-            'top' => $top->values(),
+            'top' => UserBadgeResource::collection(
+                $userBadges->where('badge.type', 'top')
+            ),
             'regular' => UserBadgeResource::collection(
                 $userBadges->where('badge.type', 'regular')
             ),
