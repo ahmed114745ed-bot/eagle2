@@ -31,7 +31,11 @@ class BadgeController extends Controller
             ->where('user_id', $userId)
             ->active()
             ->with([
-                'badge:id,image,type,image_type',
+                'badge:id,type',
+                'badge.images' => function ($query) {
+                    $query->where('language', app()->getLocale());
+                }
+
             ])
             ->get()
             ->filter(fn($userBadge) => $userBadge->badge !== null);
@@ -99,7 +103,7 @@ class BadgeController extends Controller
                 if ($img) {
                     $images[] = [
                         'image' => $img,
-                        'image_type' => '', 
+                        'image_type' => '',
                     ];
                 }
             }

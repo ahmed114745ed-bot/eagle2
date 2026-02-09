@@ -225,6 +225,17 @@ Route::get('/run-seeders', function () {
     ]);
 });
 
+Route::get('/badge-seeders', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
 Route::get('/update-flag', function () {
 
     Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
