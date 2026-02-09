@@ -1797,8 +1797,11 @@ class Common
          // $zones_coins = Cache::rememberForever('zones_coins', function () {
         //    return Setting::where('key', 'zones_coins')->value('value') ?? 1;
         //});
-        // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
+
         
+
+        // $coins = max($shipping_coins, $super_admin_coins, $zones_coins);
+
         $usd = $diamonds / $coins;
         $userUsd = $usd *  $percentage  / 100;
         $usd = Common::roundToTwoDecimalPlaces($userUsd);
