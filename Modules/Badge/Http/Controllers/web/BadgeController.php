@@ -6,6 +6,7 @@ namespace Modules\Badge\Http\Controllers\web;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use App\Helpers\Common;
 use App\Enums\BadgeType;
 use App\Enums\ImageType;
 use Encore\Admin\Facades\Admin;
@@ -51,11 +52,12 @@ class BadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-
-        $grid->model()->orderBy('priority', 'desc');
+        $lang = app()->getLocale();
+        dd($lang);
+        $grid->model()->where('language', $lang)->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
-        $grid->column('name', __('name'));
+        // $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 /** @var Ware $this */
@@ -67,7 +69,7 @@ class BadgeController extends MainController
 
         $grid->filter(function ($filter) {
             $filter->expand();
-            $filter->like('name', 'name');
+            // $filter->like('name', 'name');
             $filter->equal('priority', 'Priority');
         });
         Admin::script("
@@ -86,27 +88,68 @@ class BadgeController extends MainController
     {
         $form = new Form(new Badge());
 
-        $form->text('name', __('Name'))
-            ->rules('required|unique:badges,name,{{id}}');
-
-        $form->image('show_image', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
-        });
-
-        $form->file('image', __('Default Image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
-        })->required();
         $form->select('type', __('Type'))
             ->options(BadgeType::options())
             ->default(BadgeType::Regular->value)
             ->rules('required|in:' . implode(',', array_keys(BadgeType::options())));
+        $form->number('priority', __('Priority'))->min(0)->default(0)->required();
+
+        if (!$form->isEditing()) {
+
+            $form->html(view('multiBadges',));
+        } else {
+            $form->image('show_image', trans('img'))->name(function ($file) {
+                return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            });
+
+            $form->file('image', __('Default Image'))->name(function ($file) {
+                return now()->timestamp . rand(0, 999) . '.' . $file->getClientOriginalExtension();
+            })->required();
+        }
+
+
         $form->select('image_type', __('Image Type'))
             ->options(ImageType::options())
             ->default(ImageType::Image->value)
             ->rules('required|in:' . implode(',', array_keys(ImageType::options())));
 
-        $form->number('priority', __('Priority'))->min(0)->default(0)->required();
+        if (!$form->isEditing()) {
+            $form->saving(function (Form $form) {
 
+                $images = request()->file('images');
+
+                if (!$images) {
+                    throw new \Exception('Images are required');
+                }
+
+                foreach ($images as $lang => $files) {
+
+                    $data = [
+                        'type'       => $form->type,
+                        'priority'   => $form->priority,
+                        'image_type' => $form->image_type,
+                        'language'   => $lang,
+                    ];
+
+                    // ========== show_image ==========
+                    if (!empty($files['image'])) {
+                        $file = $files['image'];
+                        $data['show_image'] = Common::upload('badges', $file);
+                    }
+
+                    // ========== image ==========
+                    if (!empty($files['default_image'])) {
+                        $file = $files['default_image'];
+                        $data['image'] =  Common::upload('badges', $file);
+                    }
+
+                    Badge::create($data);
+                }
+                 $url = url('admin/badges');
+                return redirect()->to($url);
+                return false;
+            });
+        }
 
         return $form;
     }
