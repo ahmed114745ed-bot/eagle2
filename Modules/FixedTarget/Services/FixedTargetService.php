@@ -221,27 +221,30 @@ class FixedTargetService
         ];
         if (0 < $t) $values['sallary'] = $t;
 
-        $userSalary = UserSallary::query()->where([
-            'user_id' => $user->id,
-            'month' => $this->month,
-            'year' => $this->year,
-            'user_agency_id' => $user->agency_id,
-            'is_finished' =>  0,
-        ])->lock()->first();
-        if ($userSalary) {
-            $values['remaining_diamond'] =  ($month_received - (@$target->diamonds ?? 0));
-            $userSalary->update($values);
-        } else {
-            $userSalary = UserSallary::query()->create([
+        \DB::transaction(function () use ($user, $values, $month_received, $target) {
+            $userSalary = UserSallary::query()->where([
                 'user_id' => $user->id,
                 'month' => $this->month,
                 'year' => $this->year,
                 'user_agency_id' => $user->agency_id,
-                'remaining_diamond'   => ($month_received - (@$target->diamonds ?? 0)),
-                'target_id' =>  @$target->id,
-                ...$values
-            ])->lock();
-        }
+                'is_finished' => 0,
+            ])->lockForUpdate()->first();
+
+            if ($userSalary) {
+                $values['remaining_diamond'] = ($month_received - (@$target->diamonds ?? 0));
+                $userSalary->update($values);
+            } else {
+                UserSallary::query()->create([
+                    'user_id' => $user->id,
+                    'month' => $this->month,
+                    'year' => $this->year,
+                    'user_agency_id' => $user->agency_id,
+                    'remaining_diamond' => ($month_received - (@$target->diamonds ?? 0)),
+                    'target_id' => @$target->id,
+                    ...$values
+                ]);
+            }
+        });
     }
 
     /**
@@ -305,28 +308,41 @@ class FixedTargetService
                 $hours = $times?->hnum ?? 0;
                 $days = $times ? $user->monthly_days : 0;
 
-
-                UserSallary::updateOrCreate(
-                    [
+                \DB::transaction(function () use ($user, $month_received, $hours, $days) {
+                    $userSalary = UserSallary::query()->where([
                         'user_id' => $user->id,
                         'month' => $this->month,
                         'year' => $this->year,
                         'user_agency_id' => $user->agency_id,
                         'is_finished' => 0
-                    ],
-                    [
+                    ])->lockForUpdate()->first();
+
+                    $data = [
                         'agency_sallary' => 0,
                         'sallary' => 0,
-                        'achieved_hours' =>   $hours ?? 0,
-                        'achieved_days' =>  $days ?? 0,
-                        'achieved_diamond' =>  $month_received,
+                        'achieved_hours' => $hours ?? 0,
+                        'achieved_days' => $days ?? 0,
+                        'achieved_diamond' => $month_received,
                         'app_profit' => 0,
-                        'dB' =>  0,
+                        'dB' => 0,
                         'diamond' => $month_received . ' / ' . 0,
-                        'target_diamonds'     => 0,
-                        'remaining_diamond'   => ($month_received -  0),
-                    ]
-                );
+                        'target_diamonds' => 0,
+                        'remaining_diamond' => ($month_received - 0),
+                    ];
+
+                    if ($userSalary) {
+                        $userSalary->update($data);
+                    } else {
+                        UserSallary::query()->create([
+                            'user_id' => $user->id,
+                            'month' => $this->month,
+                            'year' => $this->year,
+                            'user_agency_id' => $user->agency_id,
+                            'is_finished' => 0,
+                            ...$data
+                        ]);
+                    }
+                });
             }
         }
         return $user;
