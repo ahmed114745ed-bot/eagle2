@@ -27,7 +27,7 @@ class DedicateBadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-        $lang = 'en';
+        $lang = app()->getLocale();
         $grid->model()->whereHas('images', function ($query) use ($lang) {
             $query->where('language', $lang);
         })->with('images')->orderBy('priority', 'desc');
@@ -39,7 +39,7 @@ class DedicateBadgeController extends MainController
                 $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
-                return handleShowImageWithTypes($this->id, $url, 50, 50);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
             });
         }
 
