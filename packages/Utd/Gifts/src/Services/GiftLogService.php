@@ -49,8 +49,6 @@ class GiftLogService
     {
         return DB::transaction(function () use ($request, $updateUserWhenSendGift) {
 
-            // room_id 1
-            // owner id 1
             $data    = $request;
             $user    = $request->user();
             $userId  = $user->id;
