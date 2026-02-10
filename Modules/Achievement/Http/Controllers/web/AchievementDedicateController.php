@@ -73,7 +73,7 @@ class AchievementDedicateController extends MainController
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             'admin',
             'customAchievement',
-            'customAchievement.images' => fn($q) => $q->where('language', app()->getLocale())->select('id', 'achievement_id', 'image')
+            'customAchievement.images',
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->when(
