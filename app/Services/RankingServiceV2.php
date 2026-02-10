@@ -266,7 +266,7 @@ class rankingServiceV2
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = @$user->profile?->age ?? '';
-        $arr['user']['color_name'] = UserPackHelper::getColorName($user);
+        $arr['user']['color_name'] = (string) UserPackHelper::getColorName($user);
         $arr['user']['achievement_images'] = $achievement_images;
 
         $dataArray = $data->toArray();
@@ -756,7 +756,7 @@ class rankingServiceV2
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = @$user->profile?->age ?? '';
-        $arr['user']['color_name'] = $color_name ?? '';
+        $arr['user']['color_name'] = (string) $color_name ?? '';
         $arr['user']['achievement_images'] = $achievement_images;
 
 
@@ -860,7 +860,7 @@ class rankingServiceV2
         $arr['user']['country'] =  @$user->country;
         $arr['user']['manger_type'] = !$user->mangerType ? null : new MangerTypeResource(@$user->mangerType);
         $arr['user']['age'] = @$user->profile?->age ?? '';
-        $arr['user']['color_name'] = $color_name ?? '';
+        $arr['user']['color_name'] = (string) $color_name ?? '';
         $arr['user']['achievement_images'] = $achievement_images;
 
 
