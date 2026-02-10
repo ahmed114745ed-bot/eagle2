@@ -11,17 +11,14 @@ use Modules\Vip\Helpers\VipCommon;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
 use Modules\Vip\Traits\HandlesApiExceptions;
-use App\Tik\Repositories\{
-    PackRepository,
-    UserRepository,
-    WareRepository,
-};
-use Modules\Vip\Repositories\{
-    OvipRepository,
-    VipRepository,
-    VipPrivilegeRepository
-    ,UserVipRepository
-};
+use App\Tik\Repositories\PackRepository;
+use App\Tik\Repositories\WareRepository;
+use Utd\Agency\Repositories\UserRepository;
+use Modules\Vip\Repositories\OvipRepository;
+use Modules\Vip\Repositories\VipRepository;
+use Modules\Vip\Repositories\VipPrivilegeRepository;
+use Modules\Vip\Repositories\UserVipRepository;
+
 
 class VipService
 {
@@ -117,7 +114,7 @@ class VipService
         $isUsed = (bool) $request->type;
 
         if ($isUsed) {
-           
+
             VipCommon::handleVipActivation($userVip);
         } else {
             VipCommon::deactivateVip($userVip);
@@ -164,10 +161,10 @@ class VipService
     {
         $vipPrivilege = $this->vipPrivilegeRepository->findById($request->vipPrivilege_id);
         $vip = $this->ovipRepository->findById($request->ovip_id);
-    
+
         $image = $request->hasFile('image') ? Common::upload('images', $request->file('image')) : null;
         $img2  = $request->hasFile('img2')  ? Common::upload('images', $request->file('img2'))  : null;
-    
+
         $data = [
             'get_type'            => 1,
             'type'                => $vipPrivilege->type,
@@ -183,12 +180,12 @@ class VipService
             'enable'              => 1,
             'is_active_for_vip'   => 1,
         ];
-    
+
         $ware = $this->wareRepository->findById($request->ware_id);
-    
+
         $ware ? $this->wareRepository->update($data, $ware->id)
               : $this->wareRepository->create($data);
-    
+
         return true;
     }
 
@@ -250,11 +247,11 @@ class VipService
 
                     VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id ,$total,'buy-with-active');
 
-                }               
+                }
 
 
                 VipCommon::handleVipActivation($userVip);
-                
+
                 DB::commit();
 
                 $remainingDays = $ex ? Carbon::parse($ex)->diffInDays(now()) : 0;
@@ -263,7 +260,7 @@ class VipService
                 return Common::apiResponse(true, 'done', null, 201);
             } catch (\Throwable $e) {
                 DB::rollBack();
-                throw $e; 
+                throw $e;
             }
         });
     }
@@ -291,7 +288,7 @@ class VipService
                 $from->decrement('di', $total);
                 $this->packRepository->deleteExpirePack();
 
-              
+
                 VipCommon::createUserVip($vip ,$user ,($expire * $qty)  , null ,'',$qty ,$sender_id,$total,'buy-vips-per');
 
                 DB::commit();
@@ -344,20 +341,20 @@ class VipService
     {
         $userVips = $this->userVipRepository->getAllByUserId($userId);
         $vipPrivileges = $this->vipPrivilegeRepository->all();
-    
+
         $oVips = $userVips->pluck('OVip')->filter();
         $levels = $oVips->pluck('level')->unique();
         $types = $vipPrivileges->pluck('type')->unique();
-    
+
         $wares = $this->wareRepository->getOVip($levels, $types);
-    
+
         $userVips->each(function ($userVip) use ($wares) {
             if ($oVip = $userVip->OVip) {
                 $filteredWares = $wares->where('level', $oVip->level);
                 $oVip->setRelation('wares', $filteredWares);
             }
         });
-    
+
         return [
             'all_privileges' => $vipPrivileges,
             'o_vips'         => $userVips,
