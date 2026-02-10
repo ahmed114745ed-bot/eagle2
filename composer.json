@@ -52,6 +52,7 @@
         "utd/achievements": "dev-achievmentPackage",
         "utd/agency": "*",
         "utd/charizma": "*",
+        "utd/family": "*",
         "utd/gifts": "*",
         "utd/moments": "*",
         "utd/pk": "dev-achievmentPackage",
@@ -173,6 +174,13 @@
         {
             "type": "path",
             "url": "packages/Utd/Pk"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Family",
+            "options": {
+                "symlink": true
+            }
         }
     ]
 }
