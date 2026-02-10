@@ -233,10 +233,12 @@ class AchievementDedicateController extends MainController
     protected function form()
     {
         $form = new Form(new UserAchievementLevel());
+        $form->html('<div class="full-column-width">');
         $form->belongsTo('user_id', AllUsers::class, trans('user'));
         $form->belongsTo('custom_achievement_id', CustomAchievements::class, trans('Custom achievement'));
         $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
         $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');
+        $form->html('</div>');
         return $form;
     }
 }
