@@ -13,14 +13,15 @@ class ProbabilityEngine
     {
         $adjustmentFactor = (float) FairLuckSetting::getByKey('adjustment_factor', 0.5);
 
-        // adjust probability based on deviation
-        // If deviation is positive (user lost more), increase probability
-        $adjustedProb = $baseProb + ($deviation * $adjustmentFactor);
+        // Adjust probability based on deviation
+        // If deviation is negative (user lost more), increase probability
+        // If deviation is positive (user won more), decrease probability
+        $adjustedProb = $baseProb - ($deviation * $adjustmentFactor);
 
         // Apply beginner boost
         $finalProb = $adjustedProb * $protectionMultiplier;
 
-        // Clamp values between 5% and 95%
-        return max(0.05, min(0.95, $finalProb));
+        // Clamp values between 0.5% and 95%
+        return max(0.005, min(0.95, $finalProb));
     }
 }

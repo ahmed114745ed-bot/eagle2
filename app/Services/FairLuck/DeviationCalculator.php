@@ -9,10 +9,10 @@ class DeviationCalculator
     /**
      * Calculate current deviation from target loss rate.
      * 
-     * Formula: (Actual Loss - Target Loss) / Total Bets
+     * Formula: (Target Loss - Actual Loss) / Total Bets
      * 
-     * Positive deviation: User lost MORE than target (good for user) -> increase win chance
-     * Negative deviation: User lost LESS than target (bad for user, user is winning) -> decrease win chance
+     * Negative deviation: User lost MORE than target (deficit) -> increase win chance
+     * Positive deviation: User lost LESS than target (surplus) -> decrease win chance
      */
     public function calculate(float $totalBets, float $totalProfit): float
     {
@@ -25,6 +25,7 @@ class DeviationCalculator
         $actualLoss = -$totalProfit; // Profit is negative for loss
         $targetLoss = $totalBets * $targetLossRate;
 
-        return ($actualLoss - $targetLoss) / $totalBets;
+        // Alignment with spec: Negative = lost more than target
+        return ($targetLoss - $actualLoss) / $totalBets;
     }
 }

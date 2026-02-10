@@ -24,12 +24,31 @@ class MultiplierSelector
         $weights = [];
         
         foreach ($multipliers as $m) {
-            if ($deviation > 0.05) { // User lost a lot, favor high multipliers
-                $weights[] = $m >= 100 ? 50 : 10;
-            } elseif ($deviation < -0.05) { // User is winning, favor low multipliers
-                $weights[] = $m <= 20 ? 100 : 1;
-            } else { // Normal balanced distribution
-                $weights[] = $this->getNormalWeight($m);
+            if ($deviation < -0.15) { // User in significant deficit (Lost > 15% more than target)
+                // Reward user: favor high multipliers but be less aggressive with jackpots
+                if ($m >= 500) {
+                    $weights[] = 5; // Moderate weight for jackpots
+                } else {
+                    $weights[] = $m >= 100 ? 50 : 10;
+                }
+            } elseif ($deviation > 0.01) { // User is winning or in surplus
+                // BE VERY STRICT
+                // Absolutely no multipliers above 20x if user is even slightly in surplus
+                if ($m > 20) {
+                    $weights[] = 0;
+                } else {
+                    // Favor the smallest multiplier (5x) heavily
+                    $weights[] = $m == 5 ? 1000 : 1;
+                }
+            } else { // Normal balanced distribution (-0.15 < dev < 0.01)
+                $weight = $this->getNormalWeight($m);
+                // In normal state, only allow up to 100x.
+                // 250x, 500x and 1000x are reserved ONLY for users in significant deficit.
+                if ($m >= 250) {
+                    $weights[] = 0; 
+                } else {
+                    $weights[] = $weight;
+                }
             }
         }
 
@@ -54,6 +73,9 @@ class MultiplierSelector
     private function weightedRandom(array $values, array $weights): int
     {
         $totalWeight = array_sum($weights);
+        if ($totalWeight <= 0) {
+            return $values[0];
+        }
         $random = rand(1, $totalWeight);
         $currentWeight = 0;
 
@@ -65,5 +87,24 @@ class MultiplierSelector
         }
 
         return $values[0];
+    }
+
+    /**
+     * Calculate the expected multiplier value based on normal weights.
+     * This is used to determine the ideal base win probability.
+     */
+    public function getExpectedMultiplier(): float
+    {
+        $availableMultipliers = FairLuckSetting::getByKey('available_multipliers', [5, 10, 20, 50, 100, 250, 500, 1000]);
+        $totalWeight = 0;
+        $totalValue = 0;
+
+        foreach ($availableMultipliers as $m) {
+            $weight = $this->getNormalWeight($m);
+            $totalWeight += $weight;
+            $totalValue += ($m * $weight);
+        }
+
+        return $totalWeight > 0 ? ($totalValue / $totalWeight) : 10.0;
     }
 }

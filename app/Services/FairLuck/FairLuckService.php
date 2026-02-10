@@ -2,6 +2,8 @@
 
 namespace App\Services\FairLuck;
 
+use App\Models\CoreWallet;
+use App\Models\FairLuckSetting;
 use App\Models\FairLuckTransaction;
 use App\Models\Gift;
 use App\Models\User;
@@ -29,22 +31,41 @@ class FairLuckService
             $protectionMultiplier = $this->beginnerProtection->getMultiplier($profile);
             $isProtected = $this->beginnerProtection->isUnderProtection($profile);
 
-            // 3. Get Base Probability from Gift (Dashboard Setting)
-            $baseProb = ((int) ($gift->luckyGift?->win_probability ?? 30)) / 100;
+            // 3. Dynamic Base Probability Calculation (Ignoring Dashboard setting for precise RTP control)
+            // Goal: Base Probability * Expected Multiplier = (1 - Target Loss Rate)
+            $targetLossRate = (float) FairLuckSetting::getByKey('target_loss_rate', 0.01);
+            $targetRTP = 1.0 - $targetLossRate;
+            $expectedMultiplier = $this->multiplierSelector->getExpectedMultiplier();
+            
+            // The probability required to hit the target RTP
+            $baseProb = $targetRTP / $expectedMultiplier;
 
-            // 4. Calculate Win Probability
+            // 4. Calculate Win Probability with Deviation Adjustment
             $probability = $this->probabilityEngine->calculate($baseProb, $deviationBefore, $protectionMultiplier);
 
             // 5. Determine Win/Loss
             $random = mt_rand(0, 10000) / 10000;
             $isWinner = $random <= $probability;
 
+            // 6. Check App Wallet Budget (Security Layer)
+            $appWallet = CoreWallet::where('name', 'app_wallet')->first();
+            
             $multiplier = 0;
             $profitAmount = 0;
 
             if ($isWinner) {
-                // 6. Select Multiplier
+                // 7. Select Multiplier
                 $multiplier = $this->multiplierSelector->select($deviationBefore);
+                $winTotalAmount = $multiplier * $betAmount;
+
+                // If app wallet can't afford the win, force a loss or 0 win
+                if ($appWallet && $appWallet->coins < $winTotalAmount) {
+                    $isWinner = false;
+                    $multiplier = 0;
+                }
+            }
+
+            if ($isWinner) {
                 // Profit = (multiplier * bet) - bet
                 $profitAmount = ($multiplier * $betAmount) - $betAmount;
             } else {
@@ -52,16 +73,16 @@ class FairLuckService
                 $profitAmount = -$betAmount;
             }
 
-            // 7. Calculate New Deviation (based on updated stats)
+            // 8. Calculate New Deviation (based on updated stats)
             $newDeviation = $this->deviationCalculator->calculate(
                 $profile->total_bets + $betAmount,
                 $profile->total_profit + $profitAmount
             );
 
-            // 8. Update User Profile
+            // 9. Update User Profile
             $this->profileManager->updateStats($profile, $betAmount, $profitAmount, $isWinner, $newDeviation);
 
-            // 9. Log Transaction
+            // 10. Log Transaction
             FairLuckTransaction::create([
                 'user_id' => $user->id,
                 'gift_id' => $gift->id,

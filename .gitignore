@@ -32,3 +32,4 @@ gcp.json
 /config/laravel-ffmpeg.php
 /config/filesystem.php
 /bootstrap/cache/
+/001-fair-luck-algorithm/
