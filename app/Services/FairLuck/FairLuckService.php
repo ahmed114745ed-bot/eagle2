@@ -59,10 +59,10 @@ class FairLuckService
                 $winTotalAmount = $multiplier * $betAmount;
 
                 // If app wallet can't afford the win, force a loss or 0 win
-                if ($appWallet && $appWallet->coins < $winTotalAmount) {
+                /*if ($appWallet && $appWallet->coins < $winTotalAmount) {
                     $isWinner = false;
                     $multiplier = 0;
-                }
+                }*/
             }
 
             if ($isWinner) {
