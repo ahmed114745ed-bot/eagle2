@@ -52,6 +52,7 @@
         "utd/achievements": "dev-achievmentPackage",
         "utd/agency": "*",
         "utd/charizma": "dev-achievmentPackage",
+        "utd/cp": "dev-achievmentPackage",
         "utd/gifts": "*",
         "utd/moments": "*",
         "utd/pk": "dev-achievmentPackage",
@@ -69,7 +70,8 @@
             "App\\": "app/",
             "Modules\\": "Modules/",
             "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+            "Database\\Seeders\\": "database/seeders/",
+            "Utd\\CP\\Database\\Seeders\\": "vendor/utd/cp/Database/Seeders/"
 
         },
         "files": [
