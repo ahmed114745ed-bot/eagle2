@@ -37,7 +37,6 @@ Route::group(
     function () {
         Route::resource('achievements', AchievementsController::class);
         Route::post('/store-user-achievement', [AchievementLevelsModuleController::class, 'store'])->name('store-user-achievement');
-         Route::post('/store-custom-achievement', [AchievementLevelsModuleController::class, 'storeCustomAchievement'])->name('store-custom-achievement');
         Route::get('/get-achievement-levels/{achievementId}', [AchievementLevelsModuleController::class, 'getAchievementLevels'])->name('get-achievement-levels');
         Route::get('/get-view-page', [AchievementLevelsModuleController::class, 'viewPage'])->name('get-view-page');
         Route::resource('user-achievement-levels', UserAchievementLevelController::class);

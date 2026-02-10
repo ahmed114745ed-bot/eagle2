@@ -3,14 +3,13 @@
 namespace Modules\Achievement\Http\Controllers\web;
 
 use Carbon\Carbon;
+use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Illuminate\Http\Request;
+use App\Selectables\AllUsers;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use App\Models\AchievementValidImage;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
-use Modules\Achievement\Entities\CustomAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
@@ -31,10 +30,11 @@ class AchievementDedicateController extends MainController
 
     public function create(Content $content)
     {
-        $achievementValidImage = AchievementValidImage::get();
+
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage'))));
+            //  ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
+            ->body($this->form()));
     }
 
     /**
@@ -230,34 +230,13 @@ class AchievementDedicateController extends MainController
     }
 
 
-
-
-    public function searchAchievement(Request $request)
+    protected function form()
     {
-        $key = $request->search;
-        $perPage = 10;
-        $currentPage = request()->has('page') ? request()->page : 1;
-        $language = app()->getLocale();
-        $achievement = CustomAchievement::query()
-            ->join('custom_achievement_images', function ($join) use ($language) {
-                $join->on('custom_achievement_images.achievement_id', '=', 'custom_achievements.id')
-                    ->where('custom_achievement_images.language', $language);
-            })
-            ->where(function ($query) use ($key) {
-                $query->where('custom_achievements.name', 'like', '%' . $key . '%')
-                    ->orWhere('custom_achievements.id', 'like', '%' . $key . '%');
-            })
-            ->when(isset($family), function ($query) {
-                $query->where(function ($query) {
-                    $query->where('users.family_id', null)->orWhere('users.family_id', 0);
-                });
-            })
-            ->select([
-                'custom_achievements.id',
-                DB::raw('concat(custom_achievements.name) as name'),
-                'custom_achievement_images.image',
-            ])
-            ->paginate($perPage, ['*'], 'page', $currentPage);
-        return response()->json($achievement);
+        $form = new Form(new UserAchievementLevel());
+        $form->belongsTo('user_id', AllUsers::class, trans('user'));
+        $form->belongsTo('custom_achievement_id', CustomAchievements::class, trans('Custom achievement'));
+        $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
+        $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');
+        return $form;
     }
 }
