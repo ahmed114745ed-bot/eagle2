@@ -51,7 +51,7 @@
         "stripe/stripe-php": "^9.9",
         "utd/achievements": "dev-achievmentPackage",
         "utd/agency": "*",
-        "utd/charizma": "*",
+        "utd/charizma": "dev-achievmentPackage",
         "utd/gifts": "*",
         "utd/moments": "*",
         "utd/pk": "dev-achievmentPackage",
