@@ -2090,7 +2090,7 @@ class Common
                     'url' => $agency ? url("admin/agencies/profile/{$agency->id}") : '#',
                     'image_color' => $owner->color_image ?? null,
                     'id_image' => $owner?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($owner->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip($owner->id, 18, 'color') : null),
                 ];
 
             case 'bd':
@@ -2134,7 +2134,7 @@ class Common
                     'url' => $user ? url("admin/users/{$user->id}") : '#',
                     'image_color' => $user->color_image ?? null,
                     'id_image' => $user?->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip($user->id, 18, 'color') : null),
                 ];
 
             default:
@@ -2340,7 +2340,7 @@ class Common
                     'url' => $resource->receiver ? url($prefix . "/users/{$resource->receiver->id}") : '#',
                     'image_color'          => @$resource->receiver->color_image,
                     'id_image'             => @$resource->receiver->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$resource->receiver->id, 18, 'color') : null),
 
                 ];
             default:

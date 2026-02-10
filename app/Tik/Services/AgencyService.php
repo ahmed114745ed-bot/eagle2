@@ -157,7 +157,7 @@ class AgencyService
                     'minutes' => $minutes,
                     'image_color'          => @$user->color_image,
                     'id_image'             => @$user->specialId?->ware?->show_img ?? '',
-                    'colored_name' => $hasColor ? Common::wareUserVip(@$user->id, 18, 'color') ?? '' : '',
+                    'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip(@$user->id, 18, 'color') : null),
                 ],
 
                 'target' => floor($target),

@@ -93,7 +93,7 @@ class UserCommon
     public static function getColoredName(User $user)
     {
         $hasColor  = Common::hasInPack(@$user?->senderShippingAgency?->owner?->id, 18, true);
-        $colorName = $hasColor ? common::wareUserVip(@$user?->senderShippingAgency?->owner?->id, 18, 'color') ?? '' : '';
+        $colorName = (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$user?->senderShippingAgency?->owner?->id, 18, 'color') : null);
         return $colorName;
     }
 

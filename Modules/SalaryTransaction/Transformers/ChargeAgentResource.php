@@ -41,7 +41,7 @@ class ChargeAgentResource extends JsonResource
             'charge_count' => $this->receiveShippingAgencyCharges->count() ?? 0,
             'image_color'          => @$user->color_image ?? null,
             'id_image'             => @$user->specialId?->ware?->show_img ?? '',
-            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip($user->id, 18, 'color') : null),
             'status'       => @$user->online,
             // 'charge_count' => $userDetails->charges_count ?? 0,
         ];
