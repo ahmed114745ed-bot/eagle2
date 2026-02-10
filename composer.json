@@ -164,15 +164,15 @@
             "url": "packages/Utd/RoomCup"
         },
         {
-            "type": "path",
-            "url": "packages/Utd/Charizma"
-        },
-        {
             "type": "path", "url": "./packages/Utd/Gifts"
         },
         {
             "type": "path",
             "url": "packages/Utd/Pk"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Charizma"
         }
     ]
 }
