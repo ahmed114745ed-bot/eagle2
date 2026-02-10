@@ -668,8 +668,8 @@ class rankingServiceV2
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
-            $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') : null;
+            $item->color_name = (is_string($color) && $color !== 'NULL') ? $color : '';
         });
 
         $achievement_images = [];
@@ -772,8 +772,8 @@ class rankingServiceV2
     {
         $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
-            $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') : null;
+            $item->color_name = (is_string($color) && $color !== 'NULL') ? $color : '';
         });
 
         $achievement_images = [];
