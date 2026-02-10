@@ -74,7 +74,7 @@ class AchievementLevelsModuleController extends Controller
                 'admin_id' =>  $adminId,
             ];
 
-           UserAchievementLevel::create($attributes);
+            UserAchievementLevel::create($attributes);
         } elseif ($achievementLevel != null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
@@ -94,6 +94,27 @@ class AchievementLevelsModuleController extends Controller
 
             UserAchievementLevel::create($attributes);
         }
+
+        return redirect()->route(nameRoute('admin.achievement-dedicate.index'));
+    }
+
+
+    public function storeCustomAchievement(Request $request)
+    {
+        $customAchievementId = request('custom_achievement_id');
+        $userId = request('user_id');
+
+
+        $adminId = Auth::user()->id;
+
+        $attributes = [
+            'user_id'       => $userId,
+            'admin_id' =>  $adminId,
+            'custom_achievement_id' => $customAchievementId,
+            'receive_type' => 'dedicate_custom_achievement',
+        ];
+
+        UserAchievementLevel::create($attributes);
 
         return redirect()->route(nameRoute('admin.achievement-dedicate.index'));
     }

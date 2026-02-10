@@ -15,7 +15,22 @@ class UserAchievementLevel extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $fillable = ['id', 'achievement_level_id', 'user_id', 'gift_achievement_id', 'unique_value', 'end_at', 'is_enable', 'achievement_id', 'custom_image', 'picked', 'file', 'admin_id'];
+    protected $fillable = [
+        'id',
+        'achievement_level_id',
+        'user_id',
+        'gift_achievement_id',
+        'unique_value',
+        'end_at',
+        'is_enable',
+        'achievement_id',
+        'custom_image',
+        'picked',
+        'file',
+        'admin_id',
+        'receive_type',
+        'custom_achievement_id',
+    ];
 
     protected $guarded = [];
 
@@ -44,6 +59,11 @@ class UserAchievementLevel extends Model
         return $this->belongsTo(GiftAchievement::class, 'gift_achievement_id');
     }
 
+    public function customAchievement(): BelongsTo
+    {
+        return $this->belongsTo(CustomAchievement::class, 'custom_achievement_id');
+    }
+
     // public function achievement()
     // {
     //     return $this->belongsTo(Achievement::class, 'achievement_id');
@@ -61,6 +81,6 @@ class UserAchievementLevel extends Model
 
     public function scopeUserPickProfile(Builder $builder): Builder
     {
-        return $builder->where('picked', 1)->whereDoesntHave('achievement', fn ($q) => $q->where('type', AchievementType::ROOM_TARGET->getValue()));
+        return $builder->where('picked', 1)->whereDoesntHave('achievement', fn($q) => $q->where('type', AchievementType::ROOM_TARGET->getValue()));
     }
 }

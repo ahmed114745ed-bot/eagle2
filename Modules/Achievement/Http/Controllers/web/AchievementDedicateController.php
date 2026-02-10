@@ -4,10 +4,13 @@ namespace Modules\Achievement\Http\Controllers\web;
 
 use Carbon\Carbon;
 use Encore\Admin\Grid;
+use Illuminate\Http\Request;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\DB;
 use App\Models\AchievementValidImage;
 use App\Admin\Controllers\MainController;
+use Modules\Achievement\Entities\CustomAchievement;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
@@ -68,7 +71,9 @@ class AchievementDedicateController extends MainController
             'user.profile',
             'user',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'admin'
+            'admin',
+            'customAchievement',
+            'customAchievement.images' => fn($q) => $q->where('language', app()->getLocale())->select('id', 'achievement_id', 'image')
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->when(
@@ -89,7 +94,7 @@ class AchievementDedicateController extends MainController
             )
             ->where(function ($q) {
                 $q->whereNotNull('custom_image')
-                    ->orWhereNotNull('file');
+                    ->orWhereNotNull('file')->orWhereNotNull('custom_achievement_id');
             })
             ->orderByDesc('id');
 
@@ -161,7 +166,7 @@ class AchievementDedicateController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('file', __('image'))->display(function ($img) {
                 $defaultImage = asset("images/background_room.jpg");
-                $path = getImagePath($img ?? $this->custom_image);
+                $path = getImagePath($img ?? $this->custom_image ?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image);
                 if (!isImageExists($path)) {
                     $path = $defaultImage;
                 }
@@ -222,5 +227,37 @@ class AchievementDedicateController extends MainController
 
 
         return $grid;
+    }
+
+
+
+
+    public function searchAchievement(Request $request)
+    {
+        $key = $request->search;
+        $perPage = 10;
+        $currentPage = request()->has('page') ? request()->page : 1;
+        $language = app()->getLocale();
+        $achievement = CustomAchievement::query()
+            ->join('custom_achievement_images', function ($join) use ($language) {
+                $join->on('custom_achievement_images.achievement_id', '=', 'custom_achievements.id')
+                    ->where('custom_achievement_images.language', $language);
+            })
+            ->where(function ($query) use ($key) {
+                $query->where('custom_achievements.name', 'like', '%' . $key . '%')
+                    ->orWhere('custom_achievements.id', 'like', '%' . $key . '%');
+            })
+            ->when(isset($family), function ($query) {
+                $query->where(function ($query) {
+                    $query->where('users.family_id', null)->orWhere('users.family_id', 0);
+                });
+            })
+            ->select([
+                'custom_achievements.id',
+                DB::raw('concat(custom_achievements.name) as name'),
+                'custom_achievement_images.image',
+            ])
+            ->paginate($perPage, ['*'], 'page', $currentPage);
+        return response()->json($achievement);
     }
 }

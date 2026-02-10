@@ -28,7 +28,6 @@ use App\Http\Controllers\HealthCheckController;
 use App\Http\Controllers\NowPaymentsController;
 use App\Http\Controllers\RoomSettingController;
 use App\Http\Controllers\TestDiamondController;
-use Modules\Vip\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\V1\AgoraController;
 use App\Http\Controllers\Api\V1\ColorController;
@@ -47,6 +46,7 @@ use App\Http\Controllers\Api\V1\RankingController;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
+use Modules\Vip\Http\Controllers\Api\VipController;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\GroupChatController;
 use App\Http\Controllers\Api\V1\BackgroundController;
@@ -73,6 +73,7 @@ use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
 use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
 use App\Http\Controllers\MallController as ControllersMallController;
+use Modules\Achievement\Http\Controllers\web\AchievementDedicateController;
 
 
 Route::get('/health', [HealthCheckController::class, 'status']);
@@ -155,6 +156,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('language', [LanguageController::class, 'searchLanguage'])->name('language');
         Route::get('get-country-users', [UserController::class, 'bdCountryUsers'])->name('country-users');
         Route::get('users-area-manager', [UserController::class, 'usersAreaManager'])->name('users-area-manager');
+        Route::get('custom-achievements', [AchievementDedicateController::class, 'searchAchievement'])->name('custom-achievements');
     });
 
     // authorization
