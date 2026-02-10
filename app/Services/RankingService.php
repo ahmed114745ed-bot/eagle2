@@ -491,7 +491,8 @@ class RankingService
 
             $hasColor = Common::hasInPack($user->id, 18, true);
 
-            $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
+            $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') : null;
+            $color_name = is_string($color_name) ? $color_name : '';
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
                     if ($medal->achievementLevel) {
@@ -572,7 +573,8 @@ class RankingService
 
             $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
-            $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+            $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') : null;
+            $color_name = is_string($color_name) ? $color_name : '';
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
                     if ($medal->achievementLevel) {
@@ -735,7 +737,8 @@ class RankingService
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
         $hasColor = Common::hasInPack($user->id, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
+        $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') : null;
+        $color_name = is_string($color_name) ? $color_name : '';
 
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
@@ -839,7 +842,8 @@ class RankingService
         $vip_level_img  = Common::ovip_center_rank_img_v2($arr['user']);
         $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') : null;
+        $color_name = is_string($color_name) ? $color_name : '';
 
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
