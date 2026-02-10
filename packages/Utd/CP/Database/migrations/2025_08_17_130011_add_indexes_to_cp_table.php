@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('cps', function (Blueprint $table) {
-            $table->index('status', 'idx_status');
-            $table->index('cp_relation_id', 'idx_relation');
+            $table->dropIndex('idx_status');
+            $table->dropIndex('idx_relation');
         });
     }
 };

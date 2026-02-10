@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cp_relations', function (Blueprint $table) {
-            $table->string('type');
+        Schema::table('cp_level_gifts', function (Blueprint $table) {
+            $table->string('sub_type')->nullable(false)->change();
         });
     }
 };
