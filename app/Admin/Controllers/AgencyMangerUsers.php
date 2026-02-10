@@ -11,6 +11,7 @@ use Encore\Admin\Facades\Admin;
 // use Encore\Admin\Actions\Response;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\AgencyPackageHelper;
+use App\Support\PackageHelper;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 
@@ -193,7 +194,9 @@ class AgencyMangerUsers extends MainController
         $show->field('dress_3', __('Dress 3'));
         $show->field('dress_4', __('Dress 4'));
         $show->field('dress_5', __('Dress 5'));
-        $show->field('cp_card', __('Cp card'));
+        if (PackageHelper::isInstalled('cp')) {
+            $show->field('cp_card', __('Cp card'));
+        }
         $show->field('keys_num', __('Keys num'));
         $show->field('nickname', __('Nickname'));
         $show->field('idno', __('Idno'));

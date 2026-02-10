@@ -5,6 +5,7 @@ namespace Utd\Room\Http\Controllers\Api;
 use App\Http\Resources\Api\V1\RoomAdminsResource;
 use Exception;
 use Carbon\Carbon;
+use Utd\CP\Entities\CpRoomHistory;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -21,7 +22,6 @@ use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
 use Utd\Room\Services\RoomRepoService;
 use Modules\LuckyBox\Entities\BoxUse;
-use Modules\CP\Entities\CpRoomHistory;
 use Utd\Room\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -320,16 +320,21 @@ class RoomController extends Controller
 
     public function removeUserCpInRoom(mixed $userId): void
     {
-        CpRoomHistory::where("user_one_id", $userId)
-            ->orWhere("user_two_id", $userId)->delete();
+        if (PackageHelper::isInstalled('cp')) {
+            CpRoomHistory::where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId)->delete();
+        }
     }
 
     public function sendCpLovelyMessage($roomId, $user)
     {
-        $cpRoomHistories = CpRoomHistory::where("room_id", $roomId)->get(['index1', 'index2']);
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
+        $indices = [];
+        if (PackageHelper::isInstalled('cp')) {
+            $cpRoomHistories = CpRoomHistory::where("room_id", $roomId)->get(['index1', 'index2']);
+            $indices = $cpRoomHistories->map(function ($history) {
+                return [$history->index1, $history->index2];
+            })->toArray();
+        }
 
         $json = $this->cpMapJson($indices);
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use App\Helpers\UserCommon;
+use App\Support\PackageHelper;
 
 class chargUsersSleemController extends AdminController
 {
@@ -91,7 +92,9 @@ class chargUsersSleemController extends AdminController
         $show->field('dress_2', __('Dress 2'));
         $show->field('dress_3', __('Dress 3'));
         $show->field('dress_4', __('Dress 4'));
-        $show->field('cp_card', __('Cp card'));
+        if (PackageHelper::isInstalled('cp')) {
+            $show->field('cp_card', __('Cp card'));
+        }
         $show->field('keys_num', __('Keys num'));
         $show->field('nickname', __('Nickname'));
         $show->field('idno', __('Idno'));

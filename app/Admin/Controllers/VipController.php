@@ -33,6 +33,23 @@ class VipController extends MainController
         (new AppFeatureService)->validateStatusEnable("vips");
     }
 
+    protected function getVipTypeOptions(): array
+    {
+        $options = [
+            1 => __('broadcaster'),
+            2 => __('honor'),
+            4 => __('room'),
+            5 => __('charge'),
+        ];
+
+        if (PackageHelper::isInstalled('cp')) {
+            $options[3] = __('cp');
+        }
+
+        ksort($options);
+        return $options;
+    }
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -56,15 +73,7 @@ class VipController extends MainController
         $grid->model()->where('type', 2)->orderByDesc('type')->orderBy('exp');
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]
-        );
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
@@ -100,15 +109,7 @@ class VipController extends MainController
         $grid->model()->where('type', 1)->orderByDesc('type')->orderBy('exp');
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]
-        );
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
@@ -125,6 +126,9 @@ class VipController extends MainController
     }
     public function cpIndex(Content $content)
     {
+        if (!PackageHelper::isInstalled('cp')) {
+            abort(404);
+        }
         return $content
             ->title(trans('charge level'))
             ->body($this->cpGrid());
@@ -136,15 +140,7 @@ class VipController extends MainController
         $grid->model()->where('type', 3)->orderByDesc('type')->orderBy('exp');
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]
-        );
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
@@ -174,15 +170,7 @@ class VipController extends MainController
         $grid->model()->where('type', 4)->orderByDesc('type')->orderBy('exp');
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]
-        );
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
@@ -211,15 +199,7 @@ class VipController extends MainController
         $grid->model()->where('type', 5)->orderByDesc('type')->orderBy('exp');
         $grid->quickSearch();
         $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select(
-            [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]
-        );
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
@@ -309,8 +289,12 @@ class VipController extends MainController
             $tabs = [
                 'Appsender' => __('AppSender'),
                 'Appreceived' => __('AppReceived'),
-                'Appcp' => __('AppCP'), 'Appcharge' => __('AppCharge'),
+                'Appcharge' => __('AppCharge'),
             ];
+
+            if (PackageHelper::isInstalled('cp')) {
+                $tabs['Appcp'] = __('AppCP');
+            }
 
             if (PackageHelper::isInstalled('room')){
                 $tabs['Approom'] = __('AppRoom');
@@ -419,22 +403,10 @@ class VipController extends MainController
         if ($form->isCreating()) {
             $form->hidden('type')->default($currentType);
 
-            $typeLabels = [
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ];
-            $form->display('type_display', __('Type'))->default($typeLabels[$currentType]);
+            $typeLabels = $this->getVipTypeOptions();
+            $form->display('type_display', __('Type'))->default($typeLabels[$currentType] ?? '');
         } else {
-            $form->select('type', __('Type'))->options([
-                1 => __('broadcaster'),
-                2 => __('honor'),
-                3 => __('cp'),
-                4 => __('room'),
-                5 => __('charge'),
-            ]);
+            $form->select('type', __('Type'))->options($this->getVipTypeOptions());
         }
 
         //        $form->textarea('name_ar', __('name_ar'));

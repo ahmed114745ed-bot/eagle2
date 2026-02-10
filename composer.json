@@ -173,6 +173,10 @@
         {
             "type": "path",
             "url": "packages/Utd/Charizma"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/CP"
         }
     ]
 }

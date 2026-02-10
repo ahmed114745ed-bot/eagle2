@@ -4,13 +4,11 @@ namespace App\Http\Resources\Api\V1;
 
 use App\Models\GiftLog;
 
-use Illuminate\Support\Facades\Cache;
-use Modules\CP\Entities\Cp;
-use Illuminate\Http\Request;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\DB;
-use Modules\CP\Transformers\CpDataResource;
-use Modules\CP\Transformers\CpListResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\CP\Entities\Cp;
+use Utd\CP\Transformers\CpDataResource;
 
 class DataUserResource extends JsonResource
 {
@@ -56,30 +54,36 @@ class DataUserResource extends JsonResource
             ->with('gift')->take(3)
             ->get();
 
-        $data = Cp::with([
-            'relation:id,title,type',
-            'toUser.profile',
-            'fromUser.profile',
-            'toUser.packs',
-            'fromUser.packs',
-        ])
-            ->whereHas("cpRelation", function ($q) {
-                $q->where('type', "!=", 'solution');
-            })
-            ->where(function ($query) use ($userId) {
-                $query->where('user_one_id', $userId)
-                    ->orWhere('user_two_id', $userId);
-            })
-            ->whereIn('status', [1, 4])
-            ->orderByDesc('di')->get();
+        $mainCp = null;
+        if (PackageHelper::isInstalled('cp')){
+            $data = Cp::with([
+                'relation:id,title,type',
+                'toUser.profile',
+                'fromUser.profile',
+                'toUser.packs',
+                'fromUser.packs',
+            ])
+                ->whereHas("cpRelation", function ($q) {
+                    $q->where('type', "!=", 'solution');
+                })
+                ->where(function ($query) use ($userId) {
+                    $query->where('user_one_id', $userId)
+                        ->orWhere('user_two_id', $userId);
+                })
+                ->whereIn('status', [1, 4])
+                ->orderByDesc('di')->get();
 
-        $mainCp = $data->firstWhere('relation.type', 'lovely');
+            $mainCp = $data->firstWhere('relation.type', 'lovely');
+            if ($mainCp) {
+                $mainCp = new CpDataResource($mainCp);
+            }
+        }
 
         return [
             'family_data'          => @$f,
             'achievement_images' => $achievement_images,
             'gifts' =>  GiftLogResource::collection($gifts),
-            'cp' => $mainCp ? new CpDataResource($mainCp) : null,
+            'cp' => $mainCp,
             'is_followed' => $this->isFollowedBy(auth()->id()),
             'colored_name' => $this->color_image,
             'image_color'          => @$this->color_image,

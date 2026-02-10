@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Modules\CP\Database\Seeders\CPDatabaseSeeder;
+use Utd\CP\Database\Seeders\CPDatabaseSeeder;
 use Modules\Form\Database\Seeders\AgencyAndBdFormsSeeder;
 use Modules\Form\Database\Seeders\CustomFieldWidgetSeeder;
 use Utd\RoomCup\Database\Seeders\RoomCupDatabaseSeeder;

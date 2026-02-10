@@ -6,13 +6,13 @@ use App\Helpers\Common;
 
 use App\Models\configesModel;
 use App\Support\PackageHelper;
+use Utd\CP\Entities\CpRoomHistory;
 use Utd\Pk\Entities\Pk;
 use Utd\Pk\Http\Resources\PkCollection;
 use Utd\Room\Entities\RequestBackgroundImage;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
-use Modules\CP\Entities\CpRoomHistory;
 
 class EnterRoomCollection extends JsonResource
 {
@@ -32,11 +32,13 @@ class EnterRoomCollection extends JsonResource
         $owner = $this->owner;
         $vip_level_img = Common::ovip_center_rank_img($owner->id);
 
-        $cpRoomHistories = CpRoomHistory::where('room_id',$this->id)->get(['index1', 'index2']);
-
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
+        $indices = [];
+        if (PackageHelper::isInstalled('cp')) {
+            $cpRoomHistories = CpRoomHistory::where('room_id', $this->id)->get(['index1', 'index2']);
+            $indices = $cpRoomHistories->map(function ($history) {
+                return [$history->index1, $history->index2];
+            })->toArray();
+        }
 
         /** @var User $owner*/
         return [

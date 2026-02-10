@@ -13,7 +13,6 @@
     "Public": true,
     "AgencyApp": false,
     "Whatsapp": true,
-    "CP": true,
     "ConfigApp": true,
     "ServerControl": true,
     "SalaryTransaction": true,

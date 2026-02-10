@@ -2,17 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use App\Helpers\WebPHelper;
-use App\Http\Services\BannerServices;
 use App\Models\Banner;
+use App\Support\PackageHelper;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Illuminate\Validation\Rule;
-use Illuminate\Http\UploadedFile;
 
-class   BannerController extends MainController
+class BannerController extends MainController
 {
     /**
      * Title for current resource.
@@ -153,17 +150,22 @@ class   BannerController extends MainController
             1 => __('Yes'),
             0 => __('No'),
         ])->when(1, function (Form $form) {
-            $form->select('event_type', trans('events'))->options([
+            $eventOptions = [
                 'event' => __('events'),
                 'pk_event' => __('pk event'),
                 'weekly_star' => __('weekly star'),
                 'charge_event' => __('charge event'),
                 'event_period' => __('event period'),
-                'cp_event' => __('cp event'),
-            ]);
+            ];
+
+            if (PackageHelper::isInstalled('cp')) {
+                $eventOptions['cp_event'] = __('cp event');
+            }
+
+            $form->select('event_type', trans('events'))->options($eventOptions);
         });
 
-    
+
         return $form;
     }
 }

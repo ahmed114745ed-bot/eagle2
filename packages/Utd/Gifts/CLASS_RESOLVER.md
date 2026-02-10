@@ -37,7 +37,7 @@ return [
     'models' => [
         'user' => 'App\Models\User',
         'agency' => 'App\Models\Agency',
-        'cp' => 'App\Models\Cp',
+        'cp' => 'Utd\CP\Entities\Cp',
         'setting' => 'App\Models\Setting',
         // ... المزيد
     ],

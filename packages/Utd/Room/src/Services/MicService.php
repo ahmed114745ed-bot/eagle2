@@ -2,32 +2,30 @@
 
 namespace Utd\Room\Services;
 
+use App\Support\PackageHelper;
 use Exception;
 
 use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Facades\RoomHelper;
-use App\Models\Cp;
 use App\Contracts\PkRepositoryContract;
+use Utd\CP\Entities\CpRoomHistory;
+use Utd\CP\Enums\CpStatus;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\PkRepository;
 use App\Tik\Repositories\TimeLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
 use Illuminate\Support\Facades\Log;
-use Modules\CP\Entities\CpRoomHistory;
-use Modules\CP\Enums\CpStatus;
 
 class MicService
 {
     public function __construct(
-
         private readonly RoomRepository $roomRepository,
         private readonly LiveTimeRepository $liveTimeRepository,
         private readonly UserRepository $userRepository,
         private readonly PkRepositoryContract $pkRepository,
         private readonly TimeLogRepository $timeLogRepository,
-
     ) {}
 
 
@@ -98,8 +96,7 @@ class MicService
 
 
         if (in_array($user->id, $mic_arr)) {
-            CpRoomHistory::where("user_one_id", $user->id)
-                ->orWhere("user_two_id", $user->id)->delete();
+            $this->deleteCpRoomHistoryForUser($user->id);
 
             $key = array_search($user->id, $mic_arr);
             $old = $main_mic[$key] ?? '0';
@@ -169,14 +166,12 @@ class MicService
         if ($existingMic) {
 
             if ($existingMic->position !== $position) {
-        
-                CpRoomHistory::where("user_one_id", $user->id)
-                    ->orWhere("user_two_id", $user->id)
-                    ->delete();
+
+                $this->deleteCpRoomHistoryForUser($user->id);
 
                 $existingMic->delete();
             } else {
-            
+
             }
         }
 
@@ -220,9 +215,8 @@ class MicService
 
     public function handleCpLovely($user, $room, $position)
     {
-
-
-        $existingCps = Cp::where(function ($query) use ($user) {
+        if (! PackageHelper::isInstalled('cp')) return false;
+        $existingCps = \Utd\CP\Entities\Cp::where(function ($query) use ($user) {
             $query->where("user_one_id", $user->id)
                 ->orWhere("user_two_id", $user->id);
         })->whereIn("status", [
@@ -238,10 +232,7 @@ class MicService
             return true;
         }
 
-
         $userSeats = $this->getUserNearby($position, $room->mode);
-
-
 
 //        $micSeats = array_map(function ($v) {
 //            return is_numeric($v) ? (int)$v : null;
@@ -255,8 +246,6 @@ class MicService
         foreach ($userSeats as $neighborPosition) {
 
             $userOtherId = $micSeats[$neighborPosition] ?? null;
-
-
 
             $existingCp = $this->checkExistingCpLovly($user->id, $userOtherId);
             if ($existingCp) {
@@ -334,10 +323,13 @@ class MicService
 
     public function sendCpLovelyMessage($room, $user)
     {
-        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
+        $indices = [];
+        if (PackageHelper::isInstalled('cp')) {
+            $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
+            $indices = $cpRoomHistories->map(function ($history) {
+                return [$history->index1, $history->index2];
+            })->toArray();
+        }
 
         $json = $this->cpMapJson($indices);
 
@@ -356,6 +348,8 @@ class MicService
     }
     public function handleCpRoomHistory($user, $room, $index1, $index2, $userOtherId)
     {
+        if (! PackageHelper::isInstalled('cp')) return;
+
         $cpRoomHistory = CpRoomHistory::where("user_one_id", $user->id)
             ->where("user_two_id", $userOtherId)
             ->orWhere(function ($query) use ($user, $userOtherId) {
@@ -381,7 +375,9 @@ class MicService
     }
     public function checkExistingCpLovly($userId, $otherUserId)
     {
-        return Cp::where(function ($query) use ($userId, $otherUserId) {
+        if (! PackageHelper::isInstalled('cp')) return false;
+
+        return \Utd\CP\Entities\Cp::where(function ($query) use ($userId, $otherUserId) {
             $query->where("user_one_id", $userId)
                 ->where("user_two_id", $otherUserId)
                 ->orWhere(function ($query) use ($userId, $otherUserId) {
@@ -582,8 +578,10 @@ class MicService
     }
     public function removeUserCpInRoom(mixed $userId): void
     {
-        CpRoomHistory::where("user_one_id", $userId)
-            ->orWhere("user_two_id", $userId)->delete();
+        if (PackageHelper::isInstalled('cp')) {
+            CpRoomHistory::where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId)->delete();
+        }
     }
     public function mic($data, $type)
     {
@@ -801,5 +799,13 @@ class MicService
     public function updateMic($room, $mic)
     {
         $this->roomRepository->updateMicRoom($room, $mic);
+    }
+
+    private function deleteCpRoomHistoryForUser($userId): void
+    {
+        if (PackageHelper::isInstalled('cp')) {
+            CpRoomHistory::where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId)->delete();
+        }
     }
 }

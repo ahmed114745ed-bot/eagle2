@@ -3,34 +3,25 @@
 namespace App\Services;
 
 use App\Support\PackageHelper;
+use Utd\CP\Transformers\RankingResource;
+use Utd\CP\Transformers\TopRankingResource;
 use Utd\Pk\Entities\Pk;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Helpers\LogHelper;
-use App\helper\RankingHelper;
-
-use Illuminate\Log\LogManager;
 use App\Helpers\UserPackHelper;
 use App\Helpers\UserLevelHelper;
-
-use Illuminate\Pagination\Paginator;
 use App\Http\Resources\TopUserResource;
 use App\Repositories\RankingRepository;
-use App\Http\Resources\Api\V1\RoomResource;
 use App\Http\Resources\GameRankingResource;
-
-use Modules\CP\Transformers\RankingResource;
 use App\Http\Resources\RankingUserV2Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\CP\Transformers\TopRankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\RoomRankingResource;
-use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
 use App\Http\Resources\RankingGameCollectionResource;
 use App\Contracts\UserAchievementContract;
-use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use App\Contracts\CpRepositoryContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 use App\Contracts\GiftLogRepositoryContract;
 
@@ -44,7 +35,7 @@ class RankingService
         private readonly ?GiftLogRepositoryContract $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementContract $achievementService,
-        RepositoriesCpRepository $cpRepository
+        CpRepositoryContract $cpRepository
     ) {
         $this->cpRepository = $cpRepository;
         $this->rankingRepo = $rankingRepo;
@@ -932,6 +923,11 @@ class RankingService
         $cp_top_2 = $data->take(2);
         $topGamer = $this->coinGameUserRepository->topThree();
 
+        $topCp = [];
+        if (PackageHelper::isInstalled('cp') && $cp_top_2->isNotEmpty()) {
+            $topCp = array_values(RankingResource::collection($cp_top_2)->toArray(request()));
+        }
+
         return Common::apiResponse(
             1,
             '',
@@ -939,7 +935,7 @@ class RankingService
                 'sender' => $img,
                 'receiver' => $receiverImage,
                 'room' => $roomImage,
-                'top_cp' => array_values(RankingResource::collection($cp_top_2)->toArray(request())),
+                'top_cp' => $topCp,
                 'top_gamer' => GameRankingResource::collection($topGamer),
             ]
         );
@@ -1085,11 +1081,17 @@ class RankingService
         $cp_top_2 = $data->take(3);
         //dd($cp_top_2 -> toArray());
         $topGamer = $this->coinGameUserRepository->topThree();
+
+        $topCp = [];
+        if (PackageHelper::isInstalled('cp') && $cp_top_2->isNotEmpty()) {
+            $topCp = array_values(TopRankingResource::collection($cp_top_2)->toArray(request()));
+        }
+
         return [
             'sender'    => $this->getRankUserAvatars('sender', 'daily'),
             'receiver'  => $this->getRankUserAvatars('receiver', 'daily'),
             'room'      => $this->getRankRoomAvatars('roomOwner', 'daily'),
-            'top_cp' => array_values(TopRankingResource::collection($cp_top_2)->toArray(request())),
+            'top_cp' => $topCp,
             'top_gamer' => GameRankingResource::collection($topGamer),
         ];
     }

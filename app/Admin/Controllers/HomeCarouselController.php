@@ -13,6 +13,7 @@ use App\Helpers\WebPHelper;
 use App\Models\HomeCarousel;
 use Illuminate\Http\Request;
 use App\Selectables\Countries;
+use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
@@ -510,14 +511,20 @@ class HomeCarouselController extends MainController
         })->when('link', function (Form $form) {
             $form->url('url', trans('url'))->rules('nullable|url');
         })->when('event', function (Form $form) {
-            $form->select('event_type', trans('events'))->options([
+            $eventOptions = [
                 'event' => __('events'),
                 'pk_event' => __('pk_event'),
                 'weekly_star' => __('weekly_star'),
                 'charge_event' => __('charge_event'),
                 'event_period' => __('event_period'),
-                'weekly_cp' => __('weekly_cp'),
-            ])->when('event', fn(Form $form) => $form->url('url', trans('url')));
+            ];
+
+            if (PackageHelper::isInstalled('cp')) {
+                $eventOptions['weekly_cp'] = __('weekly_cp');
+            }
+
+            $form->select('event_type', trans('events'))->options($eventOptions)
+                ->when('event', fn(Form $form) => $form->url('url', trans('url')));
         });
     }
 

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CP Package - Client Installation Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #333;
+            line-height: 1.7;
+        }
+        h1 {
+            color: #ec4899;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #be185d;
+            margin-top: 35px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+        .step {
+            background: #fdf2f8;
+            border-left: 4px solid #ec4899;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .step-num {
+            background: #ec4899;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 14px;
+            color: #ec4899;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #fdf2f8;
+        }
+        @media print {
+            body { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>💕 CP Package<br>Installation Guide</h1>
+
+    <h2>Requirements</h2>
+    <ul>
+        <li>PHP 8.1 or higher</li>
+        <li>Laravel 10.x or 11.x</li>
+        <li>MySQL 5.7 or higher</li>
+        <li>Laravel Sanctum installed</li>
+    </ul>
+
+    <h2>Installation Steps</h2>
+
+    <div class="step">
+        <span class="step-num">1</span> <strong>Copy the Package</strong>
+        <p>Copy the <code>CP</code> folder to:</p>
+        <pre><code>packages/Utd/CP</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">2</span> <strong>Update composer.json</strong>
+        <p>Add this to your project's <code>composer.json</code> in the "repositories" section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/CP"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">3</span> <strong>Install the Package</strong>
+        <pre><code>composer require utd/cp</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-num">4</span> <strong>Run Setup Commands</strong>
+        <p>Run migrations, seeders, and clear cache:</p>
+        <pre><code>php artisan migrate; php artisan db:seed --class=Utd\CP\Database\Seeders\CPDatabaseSeeder; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
+    </div>
+
+    <h2>Verify Installation</h2>
+    
+    <p>Check if routes are registered:</p>
+    <pre><code>php artisan route:list | findstr cp</code></pre>
+
+    <div class="success">
+        <strong>✅ Done!</strong> If CP routes appear, your installation is complete.
+    </div>
+
+    <h2>API Endpoints</h2>
+    
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/cp-relations</code></td>
+            <td>Get relation types</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/make-cp-request</code></td>
+            <td>Send CP request</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/get-cp-request</code></td>
+            <td>Get pending requests</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/respond-request</code></td>
+            <td>Accept/reject request</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/cp-ranking</code></td>
+            <td>Get CP rankings</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/cp-profile</code></td>
+            <td>Get CP profile</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/weekly-cp/details</code></td>
+            <td>Weekly CP details</td>
+        </tr>
+    </table>
+
+    <h2>Scheduled Commands</h2>
+    
+    <p>Add to your <code>app/Console/Kernel.php</code>:</p>
+    <pre><code>$schedule->command('weekly-cp-winner')->weeklyOn(1, '00:00');</code></pre>
+
+    <div class="note">
+        <strong>⚠️ Having Issues?</strong><br>
+        Run: <pre><code>php artisan route:list | findstr cp</code></pre>
+        If no routes appear, contact support.
+    </div>
+
+    <div class="footer">
+        <p>CP Package v1.0.0 | February 2026</p>
+    </div>
+
+</body>
+</html>

@@ -742,28 +742,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Cp',
-                'sort' => 27,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 27],
-                ],
-                'permissions' => [
-
-                    ['key' => 'cp-report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['cancel-cp-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'cancel-cp-switch'],
-                    ],],
-                    ['key' => 'cp-relation', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
-                    ],],
-                    ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Group chat',
                 'sort' => 29,
                 'types' => [
@@ -1285,6 +1263,31 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
                     ['key' => 'room-cup-reports', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('cp')) {
+            $categories[] = [
+                'name' => 'Cp',
+                'sort' => 27,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 27],
+                ],
+                'permissions' => [
+
+                    ['key' => 'cp-report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['cancel-cp-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'cancel-cp-switch'],
+                    ],],
+                    ['key' => 'cp-relation', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'weekly-cp', 'except' => ['show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
+                    ],],
+                    ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
                 ],

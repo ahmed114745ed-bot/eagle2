@@ -12,7 +12,6 @@ use App\Helpers\UserCoinLogHelper;
 use App\Jobs\LogUserCoinProfit;
 use App\Jobs\LogUserCumulativeCoinProfit;
 use App\Models\CoreWallet;
-use App\Models\Cp;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
@@ -22,7 +21,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
-use Modules\CP\Http\Services\CpService;
 
 class LuckyGiftService
 {

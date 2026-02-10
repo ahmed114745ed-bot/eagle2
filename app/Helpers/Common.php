@@ -52,7 +52,7 @@ use App\Traits\HelperTraits\AdminTrait;
 use App\Traits\HelperTraits\CalcsTrait;
 use App\Traits\HelperTraits\MoneyTrait;
 use Illuminate\Support\Facades\Storage;
-use Modules\CP\Entities\WeeklyCpWinner;
+use Utd\CP\Entities\WeeklyCpWinner;
 use Modules\Events\Entities\WeeklyStar;
 use App\Traits\HelperTraits\FilterTrait;
 use App\Jobs\SendFirebaseNotificationJob;
@@ -128,8 +128,13 @@ class Common
         } else if ($event_type == 'weekly_cp') {
             $event = WeeklyStar::WeeklyCP()->previousEvent()->first();
             if ($event) {
-                $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')->where('weekly_cp_id', $event->id)
-                    ->where('level', 1)->first();
+                $weekly_star = null;
+                if (PackageHelper::isInstalled('pk')){
+                    $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')
+                        ->where('weekly_cp_id', $event->id)
+                        ->where('level', 1)->first();
+                }
+
                 if ($weekly_star) {
                     $avatar = @$weekly_star->userOne->profile->avatar;
                     $avatarCp2 = @$weekly_star->userTwo->profile->avatar;

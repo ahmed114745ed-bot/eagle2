@@ -142,7 +142,7 @@ return [
         
         'null_agency' => env('GIFTS_NULL_AGENCY_MODEL', 'App\Models\NullAgency'),
         
-        'cp' => env('GIFTS_CP_MODEL', 'App\Models\Cp'),
+        'cp' => env('GIFTS_CP_MODEL', 'Utd\\CP\\Entities\\Cp'),
         
         'pk' => env('GIFTS_PK_MODEL', 'Utd\Pk\Entities\Pk'),
         

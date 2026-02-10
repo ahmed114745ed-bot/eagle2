@@ -7,7 +7,6 @@ use App\Enums\GiftSourceType;
 use App\Enums\UserCoinLogType;
 use App\Helpers\CacheHelper;
 use App\Helpers\UserCoinLogHelper;
-use App\Models\Cp;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\UserGift;
@@ -22,7 +21,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Utd\Charizma\Jobs\UpdateSendCharismaToZigo;
-use Modules\CP\Http\Services\CpService;
+use App\Contracts\CpServiceContract;
 use App\Tik\Repositories\GiftRepository;
 use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
@@ -145,10 +144,12 @@ class GiftLogService
             $fromName = $user->name;
             $sendGiftServices = new SendGiftService();
 
-
-            $cpId =  Cp::where(function ($query) use ($user) {
-                $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
-            })->whereIn('status', [1, 4])->first();
+            $cpId = null;
+            if (PackageHelper::isInstalled('cp')){
+                $cpId = \Utd\CP\Entities\Cp::where(function ($query) use ($user) {
+                    $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
+                })->whereIn('status', [1, 4])->first();
+            }
 
             $cpIds = [];
             $cpEnableAllGifts = getCpGiftsStatus('cp_enable_all_gifts') ?? 1;
@@ -157,8 +158,8 @@ class GiftLogService
             if ($cpId != null) {
                  if ($cpEnableAllGifts || ($gift->category && $gift->category->type === 'cp')) {
                     try {
-
-                        $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                        $cpService = app(CpServiceContract::class);
+                        $cpIds = $cpService->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     } catch (\Exception $e) {
 
                     }
@@ -355,17 +356,21 @@ class GiftLogService
             //send to zego if pk not null
             $promises = Common::sendToZego3('SendCustomCommand', $room->id, $userId, $jsonSendGiftData);
 
-            $cpId =  Cp::where(function ($query) use ($user) {
-                $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
-            })->whereIn('status', [1, 4])->first();
+            $cpId = null;
+            if (PackageHelper::isInstalled('cp')){
+                $cpId = \Utd\CP\Entities\Cp::where(function ($query) use ($user) {
+                    $query->where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id);
+                })->whereIn('status', [1, 4])->first();
+            }
+
             $cpIds = [];
             //check type of cp
             if ($cpId != null) {
                 try {
-                    $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
+                    $cpService = app(CpServiceContract::class);
+                    $cpIds = $cpService->processCpWhenSendGift($user, $receivedUsers, $giftId, $totalPriceForOnlyReceiver);
                     // dd($cpIds);
                 } catch (\Exception $e) {
-
                 }
             }
 

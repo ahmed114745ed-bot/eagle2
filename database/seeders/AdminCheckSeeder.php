@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cp;
+use Utd\CP\Entities\Cp;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Modules\SalaryTransaction\Entities\AdminCheck;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use Modules\CP\Entities\CpLevel;
+use Utd\CP\Entities\CpLevel;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CpUserResource extends JsonResource

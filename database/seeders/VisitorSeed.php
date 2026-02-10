@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cp;
+use Utd\CP\Entities\Cp;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\GiftLog;

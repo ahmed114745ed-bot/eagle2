@@ -289,7 +289,9 @@ Route::group(
         Route::resource('vips', 'VipController');
         Route::get('vips-sender', [VipController::class, 'senderIndex']);
         Route::get('vips-receiver', [VipController::class, 'receiverIndex']);
-        Route::get('vips-cp', [VipController::class, 'cpIndex']);
+        if (\App\Support\PackageHelper::isInstalled('cp')) {
+            Route::get('vips-cp', [VipController::class, 'cpIndex']);
+        }
         Route::get('vips-room', [VipController::class, 'roomIndex']);
         Route::get('vips-charge', [VipController::class, 'chargeIndex']);
         // Room routes moved to packages/Utd/Room/Routes/web.php

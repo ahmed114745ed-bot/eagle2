@@ -78,6 +78,7 @@
 
 
                     <div class="box-body no-padding" style="margin: 10px">
+                        @if(\App\Support\PackageHelper::isInstalled('cp'))
                         @php
                             $role = \Modules\Events\Entities\GeneralRole::where("type","weekly_cp")->first();
                         @endphp
@@ -85,6 +86,7 @@
                             <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">
                                 {{ auth()->user()->lan == "en" ? @$role->desc_en : @$role->desc_ar }}
                             </a>
+                        @endif
                         @endif
                         
                     </div>

@@ -7,7 +7,7 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Modules\CP\Entities\CpLevelGift;
+use Utd\CP\Entities\CpLevelGift;
 
 class LevelGiftController extends Controller
 {

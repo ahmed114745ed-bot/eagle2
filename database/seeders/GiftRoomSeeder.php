@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Cp;
+use Utd\CP\Entities\Cp;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use App\Models\Agency;

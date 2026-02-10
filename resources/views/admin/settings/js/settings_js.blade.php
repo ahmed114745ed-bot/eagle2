@@ -19,7 +19,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const units = ['attraction', 'charge', 'rooms', 'cp'];
+        const units = ['attraction', 'charge', 'rooms'@if(\App\Support\PackageHelper::isInstalled('cp')), 'cp'@endif];
 
         units.forEach(unit => {
             const expInput = document.getElementById(`${unit}_exp`);

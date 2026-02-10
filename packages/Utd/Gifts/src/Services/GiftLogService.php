@@ -884,15 +884,12 @@ class GiftLogService
      */
     private function hasCpService(): bool
     {
-        return class_exists('\\Modules\\CP\\Http\\Services\\CpService');
+        return PackageHelper::isInstalled('cp');
     }
 
     private function getCpService()
     {
-        if ($this->hasCpService()) {
-            return ClassResolver::getService('cp_service') ?? new \Modules\CP\Http\Services\CpService();
-        }
-        return null;
+        return app(\App\Contracts\CpServiceContract::class);
     }
 
     private function hasCharizmaJob(): bool

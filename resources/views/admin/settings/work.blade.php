@@ -214,6 +214,7 @@
                     </form>
                 </div>
 
+                @if(\App\Support\PackageHelper::isInstalled('cp'))
                 <!-- CP Card -->
                 <div class="exp-card">
                     <form action="{{ route('admin.ovip-config') }}" method="POST" class="settings-form">
@@ -259,6 +260,7 @@
                         </div>
                     </form>
                 </div>
+                @endif
             </div>
         </div>
 

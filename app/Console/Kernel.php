@@ -2,14 +2,17 @@
 
 namespace App\Console;
 
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Models\Setting;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Cache;
 use Modules\TaskStream\Jobs\PkSessionJob;
 use Illuminate\Console\Scheduling\Schedule;
-use Modules\CP\Console\WeeklyCpWinnerConsole;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Utd\CP\Console\WeeklyCpWinnerConsole;
 
 class Kernel extends ConsoleKernel
 {
@@ -19,8 +22,16 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
-        WeeklyCpWinnerConsole::class
     ];
+
+    public function __construct(Application $app, Dispatcher $events)
+    {
+        parent::__construct($app, $events);
+
+        if (PackageHelper::isInstalled('cp')) {
+            $this->commands[] = WeeklyCpWinnerConsole::class;
+        }
+    }
 
     protected function schedule(Schedule $schedule): void
     {

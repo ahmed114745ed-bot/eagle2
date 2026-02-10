@@ -29,7 +29,7 @@ use Utd\Agency\Entities\AdditionalInfo;
 use Modules\Badge\Entities\Badge;
 use Modules\Badge\Entities\UserBadge;
 use Modules\Chat\Traits\ChatUserTrait;
-use Modules\CP\Entities\Cp;
+use Utd\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Modules\LuckyBox\Entities\UserLuckyGift;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
@@ -188,7 +188,8 @@ class User extends Authenticatable
 
     public function cpsAsOne()
     {
-        return $this->hasMany(Cp::class, 'user_one_id');
+        return PackageHelper::checkRelation($this, 'cp', 'hasMany') ??
+            $this->hasMany(Cp::class, 'user_one_id');
     }
 
     public function userBadges()
@@ -205,7 +206,8 @@ class User extends Authenticatable
 
     public function cpsAsTwo()
     {
-        return $this->hasMany(Cp::class, 'user_two_id');
+        return PackageHelper::checkRelation($this, 'cp', 'hasMany') ??
+            $this->hasMany(Cp::class, 'user_two_id');
     }
 
     public function allCps()
@@ -1870,12 +1872,12 @@ class User extends Authenticatable
         if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             return $this->nullRelation();
         }
-        
+
         // Check if table exists before loading relation
         if (!$this->tableExists('agencies')) {
             return $this->nullRelation();
         }
-        
+
         return $this->hasOne(\Utd\Agency\Entities\ShippingAgency::class, 'app_owner_id');
     }
 
@@ -1884,7 +1886,7 @@ class User extends Authenticatable
         if (!class_exists(\Utd\Agency\Entities\ShippingAgency::class)) {
             return false;
         }
-        
+
         try {
             return $this->shippingAgency()->exists();
         } catch (\Exception $e) {

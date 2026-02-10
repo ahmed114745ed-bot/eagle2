@@ -6,6 +6,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use App\Models\VipAuth;
 use Encore\Admin\Layout\Content;
 use App\Services\AppFeatureService;
@@ -89,12 +90,15 @@ class VipAuthController extends Controller
         $grid = new Grid(new VipAuth);
 
         $grid->id('ID');
-        $grid->column('type',trans ('type'))->select (
-            [
-                3=>trans('vip'),
-                5=>trans ('guardian cp')
-            ]
-        );
+
+        $typeOptions = [
+            3 => trans('vip'),
+        ];
+        if (PackageHelper::isInstalled('cp')) {
+            $typeOptions[5] = trans('guardian cp');
+        }
+
+        $grid->column('type',trans ('type'))->select($typeOptions);
         $grid->column('level',trans ('level'));
         $grid->column('enable',trans ('enable'))->switch (Common::getSwitchStates ());
         $grid->column('name',trans ('name'));
@@ -138,12 +142,15 @@ class VipAuthController extends Controller
         $form = new Form(new VipAuth);
 
         $form->display('ID');
-        $form->select('type', trans('type'))->options (
-            [
-                3=>trans('vip'),
-                5=>trans ('guardian cp')
-            ]
-        );
+
+        $typeOptions = [
+            3 => trans('vip'),
+        ];
+        if (PackageHelper::isInstalled('cp')) {
+            $typeOptions[5] = trans('guardian cp');
+        }
+
+        $form->select('type', trans('type'))->options($typeOptions);
         $form->text('level', trans('level'));
         $form->switch('enable', trans('enable'))->states (Common::getSwitchStates ());
         $form->text('name', trans('name'));

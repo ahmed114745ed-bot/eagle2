@@ -32,7 +32,7 @@ use App\Contracts\RoomGameContract;
 use App\Tik\Repositories\WareRepository;
 use App\Repositories\BlackListRepository;
 use App\Repositories\User\UserRepository;
-use Modules\CP\Repositories\CpRepository;
+use App\Contracts\CpRepositoryContract;
 use Utd\Agency\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -75,7 +75,7 @@ class UserService
         private readonly AgencySalaryRepository $agencySalaryRepository,
         private readonly RoomVisitorRepositoryContract $roomVisitorRepository,
         private readonly BdRepository $bdRepository,
-        private readonly CpRepository $cpRepository,
+        private readonly CpRepositoryContract $cpRepository,
         private readonly WareRepository $wareRepository,
         private readonly UserRepository $userRepository,
         private readonly PackRepository $packRepository,

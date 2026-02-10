@@ -7,6 +7,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
@@ -259,7 +260,9 @@ class ReportUserController extends MainController
         $show->field('dress_2', __('Dress 2'));
         $show->field('dress_3', __('Dress 3'));
         $show->field('dress_4', __('Dress 4'));
-        $show->field('cp_card', __('Cp card'));
+        if (PackageHelper::isInstalled('cp')) {
+            $show->field('cp_card', __('Cp card'));
+        }
         $show->field('keys_num', __('Keys num'));
         $show->field('nickname', __('Nickname'));
         $show->field('idno', __('Idno'));
@@ -352,7 +355,9 @@ class ReportUserController extends MainController
         $form->number('dress_2', __('Dress 2'));
         $form->number('dress_3', __('Dress 3'));
         $form->number('dress_4', __('Dress 4'));
-        $form->number('cp_card', __('Cp card'));
+        if (PackageHelper::isInstalled('cp')) {
+            $form->number('cp_card', __('Cp card'));
+        }
         $form->number('keys_num', __('Keys num'));
         $form->text('nickname', __('Nickname'));
         $form->text('idno', __('Idno'));

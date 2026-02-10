@@ -4,6 +4,7 @@ namespace Modules\Events\Entities;
 
 use App\Models\Gift;
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,10 +12,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Modules\CP\Entities\WeeklyCpGift;
-use Modules\CP\Entities\WeeklyCpWinner;
-use Modules\CP\Traits\CpWeeklyStar;
+use App\Traits\CpWeeklyStar;
 use Modules\Events\Traits\EventModel;
+use Utd\CP\Entities\WeeklyCpGift;
+use Utd\CP\Entities\WeeklyCpWinner;
 
 class WeeklyStar extends Model
 {
@@ -46,7 +47,8 @@ class WeeklyStar extends Model
 
     public function weeklyCpGifts()
     {
-        return $this->hasMany(WeeklyCpGift::class, 'weekly_cp_id');
+        return PackageHelper::checkRelation($this, 'cp', 'hasMany') ??
+            $this->hasMany(WeeklyCpGift::class, 'weekly_cp_id');
     }
 
     public function WeeklyStarGifts()
@@ -56,7 +58,8 @@ class WeeklyStar extends Model
 
     public function WeeklyCpWinners()
     {
-        return $this->hasMany(WeeklyCpWinner::class, 'weekly_cp_id');
+        return PackageHelper::checkRelation($this, 'cp', 'hasMany') ??
+            $this->hasMany(WeeklyCpWinner::class, 'weekly_cp_id');
     }
 
 

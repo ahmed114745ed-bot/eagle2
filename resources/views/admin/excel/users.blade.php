@@ -41,7 +41,9 @@
                     <th>Dress 2</th>
                     <th>Dress 3</th>
                     <th>Dress 4</th>
+                    @if(\App\Support\PackageHelper::isInstalled('cp'))
                     <th>CP Card</th>
+                    @endif
                     <th>Keys Num</th>
                     <th>Nickname</th>
                     <th>ID No</th>
@@ -148,8 +150,10 @@
                         <td>{{ $user->dress_2 }}</td>
                         <td>{{ $user->dress_3 }}</td>
                         <td>{{ $user->dress_4 }}</td>
+                        @if(\App\Support\PackageHelper::isInstalled('cp'))
                         <td>{{ $user->cp_card }}</td>
-                        <td>{{ $user->keys_num }}</td>
+                        @endif
+                        <td>{{ $user->keys_num }}</td></td>
                         <td>{{ $user->nickname }}</td>
                         <td>{{ $user->idno }}</td>
                         <td>{{ $user->mykeep }}</td>

@@ -1,6 +1,8 @@
 <?php
 namespace App\Providers;
 
+use App\Contracts\CpRepositoryContract;
+use App\Contracts\CpServiceContract;
 use App\Contracts\EnteranceRoomContract;
 use App\Contracts\NewRoomBoomGiftServiceContract;
 use App\Contracts\RoomGameContract;
@@ -14,6 +16,8 @@ use App\Contracts\AchievementContract;
 use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
 use App\Contracts\RealsContract;
+use App\Services\Null\NullCpRepository;
+use App\Services\Null\NullCpService;
 use App\Services\Null\NullEntranceRoomService;
 use App\Services\Null\NullNewRoomBoomGiftService;
 use App\Contracts\GiftLogRepositoryContract;
@@ -163,6 +167,22 @@ class FeatureServiceProvider extends ServiceProvider
             $this->app->singleton(
                 PkRepositoryContract::class,
                 NullPkRepository::class
+            );
+        }
+
+        // CP Feature
+        if (!$this->app->bound(CpServiceContract::class)) {
+            $this->app->singleton(
+                CpServiceContract::class,
+                NullCpService::class
+            );
+        }
+
+        // CP Repository Feature
+        if (!$this->app->bound(CpRepositoryContract::class)) {
+            $this->app->singleton(
+                CpRepositoryContract::class,
+                NullCpRepository::class
             );
         }
     }

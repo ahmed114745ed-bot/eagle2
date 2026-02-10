@@ -12,7 +12,7 @@ use Encore\Admin\Show;
 use Modules\Events\Entities\Reward;
 use Modules\Tasks\Entities\Day;
 use Encore\Admin\Form\Request;
-use Modules\CP\Entities\CpLevelGift;
+use Utd\CP\Entities\CpLevelGift;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Layout\Content;
 use Utd\Achievements\Entities\Achievement;

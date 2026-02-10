@@ -5,7 +5,7 @@ namespace App\Http\Controllers\utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\CP\Entities\CpLevel;
+use Utd\CP\Entities\CpLevel;
 
 class LevelController extends Controller
 {

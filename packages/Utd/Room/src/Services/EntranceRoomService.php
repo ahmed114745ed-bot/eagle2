@@ -3,6 +3,7 @@
 namespace Utd\Room\Services;
 
 use App\Support\PackageHelper;
+use Utd\CP\Entities\CpRoomHistory;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -25,7 +26,6 @@ use Modules\Chat\Events\Conversation;
 use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
-use Modules\CP\Entities\CpRoomHistory;
 use Modules\TaskStream\Services\TaskStreamService;
 use Utd\Room\Entities\TotalRoomGift;
 use Carbon\Carbon;
@@ -268,16 +268,21 @@ class EntranceRoomService implements EnteranceRoomContract
 
     public function removeUserCpInRoom(mixed $userId): void
     {
-        CpRoomHistory::where("user_one_id", $userId)
-            ->orWhere("user_two_id", $userId)->delete();
+        if (PackageHelper::isInstalled('cp')) {
+            CpRoomHistory::where("user_one_id", $userId)
+                ->orWhere("user_two_id", $userId)->delete();
+        }
     }
 
     public function sendCpLovelyMessage($room, $user)
     {
-        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
+        $indices = [];
+        if (PackageHelper::isInstalled('cp')) {
+            $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
+            $indices = $cpRoomHistories->map(function ($history) {
+                return [$history->index1, $history->index2];
+            })->toArray();
+        }
 
         $json = $this->cpMapJson($indices);
 

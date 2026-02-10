@@ -2,20 +2,20 @@
 
 namespace App\Jobs;
 
+use App\Support\PackageHelper;
 use Utd\Gifts\Services\SendGiftService;
 use Utd\Gifts\Services\UpdateUserWhenSendGift;
 use App\Helpers\UserCommon;
-use App\Models\Cp;
 use App\Models\Gift;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Contracts\RoomTopUsersRepositoryContract;
+use App\Contracts\CpServiceContract;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Modules\CP\Http\Services\CpService;
 
 class UpdateUserDataWhenSendGift implements ShouldQueue
 {
@@ -47,7 +47,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                            'owner' => function ($query) {
                                $query->withoutAppends();
                            }
-                       ])->first(); 
+                       ])->first();
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
                                       ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
@@ -72,13 +72,14 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
 
         $price = $number * ($gift->price * $hostPercentage);
 
-        $cpId = Cp::where('user_one_id',  $user->id)->orWhere('user_two_id',  $user->id)->whereIn('status', [1, 4])->first();
-
         $cpIds = [];
-        if ($cpId != null) {
-     
-            $cpIds = (new CpService())->processCpWhenSendGift($user, $receivedUsers, $gift->id, $price);
-
+        if (PackageHelper::isInstalled('cp')) {
+            $cpModel = \Utd\CP\Entities\Cp::class;
+            $cpId = $cpModel::where('user_one_id', $user->id)->orWhere('user_two_id', $user->id)->whereIn('status', [1, 4])->first();
+            if ($cpId != null) {
+                $cpService = app(CpServiceContract::class);
+                $cpIds = $cpService->processCpWhenSendGift($user, $receivedUsers, $gift->id, $price);
+            }
         }
 
         $sendGiftServices = new SendGiftService();
