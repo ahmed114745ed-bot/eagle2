@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charizma Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #7c3aed;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #6d28d9;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7c3aed;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #7c3aed;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #8b5cf6;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #f5f3ff;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #c4b5fd;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #6d28d9;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #7c3aed;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #f5f3ff;
+            border-left: 4px solid #7c3aed;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #6d28d9;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #f5f3ff;
+            border: 1px solid #ddd6fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6d28d9;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #ddd6fe;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f5f3ff;
+            font-weight: bold;
+            color: #6d28d9;
+        }
+        
+        tr:nth-child(even) {
+            background: #faf5ff;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .file-structure {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>✨ Charizma Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the Charizma package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: February 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#requirements">2. Requirements</a></li>
+            <li><a href="#installation">3. Installation Steps</a></li>
+            <li><a href="#configuration">4. Configuration</a></li>
+            <li><a href="#database">5. Database Tables</a></li>
+            <li><a href="#routes">6. Routes & API</a></li>
+            <li><a href="#verification">7. Verification</a></li>
+            <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <h1 id="overview">1. Overview</h1>
+    
+    <h2>1.1 What is Charizma?</h2>
+    <p>Charizma is a feature that tracks and displays user earnings/contributions within rooms. It provides real-time tracking of user activity and earned coins while on microphone positions in rooms.</p>
+    
+    <h2>1.2 Key Features</h2>
+    <ul>
+        <li><strong>Room Charizma Tracking</strong> - Tracks user earnings per room</li>
+        <li><strong>Microphone Position Integration</strong> - Links charizma data to mic positions</li>
+        <li><strong>Charizma Status Toggle</strong> - Enable/disable charizma per room</li>
+        <li><strong>Automatic Reset</strong> - Reset charizma data with scheduled jobs</li>
+        <li><strong>Real-time Updates</strong> - Live tracking of user contributions</li>
+    </ul>
+
+    <h2>1.3 How It Works</h2>
+    <ol>
+        <li>Room owner enables charizma status for their room</li>
+        <li>Users join microphone positions in the room</li>
+        <li>System tracks earnings/contributions for each user</li>
+        <li>Charizma data is stored in <code>extra_data_in_rooms</code> table</li>
+        <li>Data can be reset manually or via scheduled jobs</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Requirements -->
+    <h1 id="requirements">2. Requirements</h1>
+    
+    <h2>2.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Sanctum</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>2.2 Required Dependencies</h2>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Purpose</th>
+            <th>Required</th>
+        </tr>
+        <tr>
+            <td>Utd/Room</td>
+            <td>Room system (provides Room model & microphones)</td>
+            <td><strong>Yes</strong></td>
+        </tr>
+    </table>
+
+    <div class="warning">
+        <div class="warning-title">⚠️ Important</div>
+        <p>The <code>Utd/Room</code> package must be installed and migrated before installing Charizma, as it depends on the <code>rooms</code> table.</p>
+    </div>
+
+    <h2>2.3 Database Changes</h2>
+    <p>The package will create/modify the following:</p>
+    
+    <h3>New Tables</h3>
+    <ul>
+        <li><code>extra_data_in_rooms</code> - Stores user charizma data per room</li>
+    </ul>
+
+    <h3>Modified Tables</h3>
+    <ul>
+        <li><code>rooms</code> - Adds <code>charizma_status</code> and <code>charizma_timestamp</code> columns</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Installation -->
+    <h1 id="installation">3. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>Charizma</code> folder to your project:</p>
+        <pre><code>packages/Utd/Charizma</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Charizma"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/charizma</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Migrations</span>
+        <p>Run migrations and clear cache:</p>
+        <pre><code>php artisan migrate; php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Configuration -->
+    <h1 id="configuration">4. Configuration</h1>
+
+    <h2>4.1 Environment Variables</h2>
+    <p>Add these to your <code>.env</code> file:</p>
+
+    <pre><code># Charizma Package Configuration
+CHARIZMA_ENABLED=true</code></pre>
+
+    <h2>4.2 App Feature</h2>
+    <p>Ensure the <code>charizma</code> feature is enabled in your app features:</p>
+    <pre><code>// The routes use 'appFeatureEnable:charizma' middleware
+// Make sure this feature exists in your app_features table</code></pre>
+
+    <h2>4.3 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=charizma-config</code></pre>
+
+    <h2>4.4 Contract Binding</h2>
+    <p>The package automatically binds the following contract:</p>
+    <pre><code>App\Contracts\UserCharismaServiceContract
+→ Utd\Charizma\Services\UserCharismaService</code></pre>
+    
+    <p>If the package is not installed, a null implementation should be used:</p>
+    <pre><code>App\Contracts\UserCharismaServiceContract
+→ App\Services\Null\NullUserCharismaService</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Database -->
+    <h1 id="database">5. Database Tables Reference</h1>
+
+    <h2>5.1 extra_data_in_rooms</h2>
+    <p>Stores user charizma/earnings data per room.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>int (auto)</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>user_id</td>
+            <td>bigint</td>
+            <td>Reference to users table</td>
+        </tr>
+        <tr>
+            <td>room_id</td>
+            <td>int</td>
+            <td>Reference to rooms table</td>
+        </tr>
+        <tr>
+            <td>total</td>
+            <td>decimal(10,2)</td>
+            <td>Total earned coins/contribution</td>
+        </tr>
+        <tr>
+            <td>created_at</td>
+            <td>timestamp</td>
+            <td>Record creation time</td>
+        </tr>
+        <tr>
+            <td>updated_at</td>
+            <td>timestamp</td>
+            <td>Last update time</td>
+        </tr>
+    </table>
+
+    <h2>5.2 rooms (Modified Columns)</h2>
+    <p>New columns added to the rooms table.</p>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>charizma_status</td>
+            <td>boolean</td>
+            <td>Whether charizma is enabled for the room (default: false)</td>
+        </tr>
+        <tr>
+            <td>charizma_timestamp</td>
+            <td>integer</td>
+            <td>Timestamp when charizma was last reset (nullable)</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Routes -->
+    <h1 id="routes">6. Routes & API</h1>
+
+    <h2>6.1 API Routes (Mobile App)</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>URI</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/charisma/change-status</td>
+            <td>Toggle charizma status for a room</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td>/api/charisma/reset</td>
+            <td>Reset charizma data for a room</td>
+        </tr>
+    </table>
+
+    <h2>6.2 Middleware</h2>
+    <p>All routes are protected with:</p>
+    <ul>
+        <li><code>auth:sanctum</code> - Authentication required</li>
+        <li><code>appFeatureEnable:charizma</code> - Feature must be enabled</li>
+        <li><code>update.last.seen</code> - Updates user last seen timestamp</li>
+    </ul>
+
+    <h2>6.3 Verify Routes</h2>
+    <pre><code>php artisan route:list | findstr charisma</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Verification -->
+    <h1 id="verification">7. Verification</h1>
+
+    <h2>7.1 Installation Checklist</h2>
+    <table>
+        <tr>
+            <th>Step</th>
+            <th>Command/Action</th>
+            <th>Expected Result</th>
+        </tr>
+        <tr>
+            <td>1. Package Installed</td>
+            <td><code>composer show utd/charizma</code></td>
+            <td>Package info displayed</td>
+        </tr>
+        <tr>
+            <td>2. Migrations Run</td>
+            <td><code>php artisan migrate:status</code></td>
+            <td>All charizma migrations "Ran"</td>
+        </tr>
+        <tr>
+            <td>3. Routes Registered</td>
+            <td><code>php artisan route:list</code></td>
+            <td>Charisma routes visible</td>
+        </tr>
+        <tr>
+            <td>4. Table Created</td>
+            <td>Check database</td>
+            <td><code>extra_data_in_rooms</code> table exists</td>
+        </tr>
+        <tr>
+            <td>5. Columns Added</td>
+            <td>Check rooms table</td>
+            <td><code>charizma_status</code> column exists</td>
+        </tr>
+    </table>
+
+    <h2>7.2 Test API Endpoints</h2>
+    <p>Using cURL or Postman:</p>
+    <pre><code># Test Change Status
+curl -X POST "https://your-domain.com/api/charisma/change-status" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d "room_id=1&status=true"
+
+# Test Reset Charizma
+curl -X POST "https://your-domain.com/api/charisma/reset" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d "room_id=1"</code></pre>
+
+    <div class="success">
+        <strong>✅ Success!</strong>
+        <p>If the API returns successful responses, your installation is complete!</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Troubleshooting -->
+    <h1 id="troubleshooting">8. Troubleshooting</h1>
+
+    <h2>8.1 Common Issues</h2>
+
+    <h3>Issue: Route Not Found (404)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>php artisan optimize:clear</code></pre>
+    </div>
+
+    <h3>Issue: Migration Errors (Foreign Key)</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure Utd/Room package is installed and migrated first:</p>
+        <pre><code># Install Room package first
+composer require utd/room
+php artisan migrate
+
+# Then install Charizma
+composer require utd/charizma
+php artisan migrate</code></pre>
+    </div>
+
+    <h3>Issue: Class Not Found Errors</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <pre><code>composer dump-autoload
+php artisan cache:clear</code></pre>
+    </div>
+
+    <h3>Issue: Feature Not Enabled Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure the <code>charizma</code> feature is enabled in your app features table or configuration.</p>
+    </div>
+
+    <h3>Issue: Contract Binding Error</h3>
+    <div class="step">
+        <strong>Solution:</strong>
+        <p>Ensure the contract exists in <code>app/Contracts</code>:</p>
+        <pre><code>App\Contracts\UserCharismaServiceContract</code></pre>
+        <p>And the null service exists:</p>
+        <pre><code>App\Services\Null\NullUserCharismaService</code></pre>
+    </div>
+
+    <h2>8.2 Rollback Migrations</h2>
+    <p>To rollback charizma migrations:</p>
+    <pre><code># Rollback all charizma migrations
+php artisan migrate:rollback --path=packages/Utd/Charizma/Database/migrations
+
+# Or rollback specific batch
+php artisan migrate:rollback --step=1</code></pre>
+
+    <h2>8.3 Log Files</h2>
+    <p>Check Laravel logs for detailed error information:</p>
+    <pre><code>storage/logs/laravel.log</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Final Section -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h1 style="border: none;">🎉 Installation Complete!</h1>
+        <p style="font-size: 18px; margin-top: 20px;">Your Charizma package is now ready to use.</p>
+        
+        <div style="margin-top: 40px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+            <h3 style="color: #7c3aed;">Quick Links:</h3>
+            <ul>
+                <li>Change Status: <code>POST /api/charisma/change-status</code></li>
+                <li>Reset: <code>POST /api/charisma/reset</code></li>
+            </ul>
+        </div>
+        
+        <p style="margin-top: 40px; color: #64748b;">For support, contact the development team.</p>
+        <p style="margin-top: 60px; color: #94a3b8; font-size: 14px;">
+            Document Version: 1.0.0<br>
+            Last Updated: February 2026
+        </p>
+    </div>
+
+</body>
+</html>

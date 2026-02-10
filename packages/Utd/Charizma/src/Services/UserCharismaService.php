@@ -52,7 +52,7 @@ class UserCharismaService implements UserCharismaServiceContract
         }
     }
 
-    public function addTotalEarnedCoinsInUserRoom(Room $room, array $userIds, $earnedCoins = null): false|array
+    public function addTotalEarnedCoinsInUserRoom($room, array $userIds, $earnedCoins = null): false|array
     {
         $roomId = $room->id;
 
@@ -90,7 +90,7 @@ class UserCharismaService implements UserCharismaServiceContract
         return $allDataChanges;
     }
 
-    public function addTotalEarnedCoinsInUserRoom2(Room $room, array $userIds, $earnedCoins = null): false|array
+    public function addTotalEarnedCoinsInUserRoom2($room, array $userIds, $earnedCoins = null): false|array
     {
         $roomId = $room->id;
 
