@@ -129,6 +129,10 @@ class UserAchievementService
             ->where('is_enable', true)
             ->where('picked', true)
             ->with('customAchievement')
+            ->where(function ($query) {
+                $query->whereNull('end_at')
+                    ->orWhere('end_at', '>', now());
+            })
             ->leftJoin('achievement_levels', 'user_achievement_levels.achievement_level_id', 'achievement_levels.id')
             ->leftJoin('achievements', 'achievement_levels.achievement_id', 'achievements.id')
             ->orderByDesc('achievements.id')
