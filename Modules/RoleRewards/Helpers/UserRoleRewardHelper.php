@@ -88,7 +88,10 @@ class UserRoleRewardHelper
         } elseif ($reward->type === "achievement") {
             UserAchievementLevel::create([
                 'user_id'      => $user->id,
-                'custom_image' => $reward->reward_achievement,
+                //'custom_image' => $reward->reward_achievement,
+                'custom_achievement_id' => $reward->rewardable_id,
+                'receive_type' => $receiveType,
+                'end_at' => $reward->expire,
             ]);
         } elseif ($reward->type === "badge") {
             Common::userBadge($user->id, $reward->rewardable_id, $reward->expire, $receiveType);
@@ -104,7 +107,7 @@ class UserRoleRewardHelper
             UserCommon::removeEventsWareFromUser($user, $reward->rewardable_id, $reward->receive_type);
         } elseif ($reward->rewardable_type === self::mapTypeToModel('achievement')) {
             UserAchievementLevel::where('user_id', $user->id)
-                ->where('custom_image', $reward->rewardable_id)
+                ->where('custom_achievement_id', $reward->rewardable_id)
                 ->where('receive_type',  $reward->receive_type)
                 ->delete();
         } elseif ($reward->rewardable_type === self::mapTypeToModel('badge')) {
