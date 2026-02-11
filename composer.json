@@ -54,6 +54,7 @@
         "utd/charizma": "*",
         "utd/cp": "*",
         "utd/gifts": "*",
+        "utd/lucky-box": "dev-achievmentPackage",
         "utd/moments": "*",
         "utd/pk": "*",
         "utd/reals": "*",
