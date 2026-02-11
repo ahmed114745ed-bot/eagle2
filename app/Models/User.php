@@ -1762,16 +1762,17 @@ class User extends Authenticatable
     public function userBadge()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'regular'))->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'regular'))->active()->with("badge.images")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            // $url = getImagePath($badge->badge->image);
-            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
+            $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
+                ?? $badge->badge?->images?->first()?->image
+                ?? $badge->badge?->image;
+            $url = getImagePath($badgeImage);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
-                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
@@ -1784,15 +1785,17 @@ class User extends Authenticatable
     public function userBadgeTop()
     {
 
-        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'top'))->active()->with("badge")->get();
+        $userBadges = UserBadge::where('user_id', $this->id)->whereHas('badge', fn($q) => $q->where('type', 'top'))->active()->with("badge.images")->get();
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
+            $badgeImage = $badge->badge?->images?->firstWhere('language', app()->getLocale())?->image
+                ?? $badge->badge?->images?->first()?->image
+                ?? $badge->badge?->image;
+            $url = getImagePath($badgeImage);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
-                //'<img src="' . e($url) . '" alt="' . e($badge) . '" style="width: 100px; height: 100px; object-fit: contain; border-radius: 4px; margin-right: 4px;">';
             }
         }
 
