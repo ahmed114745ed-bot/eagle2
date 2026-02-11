@@ -128,8 +128,10 @@ class MilestoneHelper
             case 'achievement':
                 UserAchievementLevel::create([
                     'user_id' => $user->id,
-                    'custom_image' => $mr->reward,
+                    // 'custom_image' => $mr->reward,
+                    'custom_achievement_id' => $mr->rewardable_id,
                     'receive_type' => $receiveType,
+                    'end_at' => $mr->expire,
                 ]);
                 break;
         }
