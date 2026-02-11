@@ -153,6 +153,12 @@ class LevelGiftController extends MainController
             $actions->disableView();
         });
 
+         Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
+
         return $grid;
     }
 
