@@ -267,7 +267,7 @@ class SuperPackageController extends MainController
                     } elseif ($reward->type == 'achievement') {
                         $achievement = CustomAchievement::find($reward->target);
                         $name = $achievement->name ?? 'Achievement';
-                        $url = getImagePath($achievement->images?->firstWhere('language', app()->getLocale())?->image ?? '');
+                        $url = getImagePath($achievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '');
                     }
 
                     $defaultImage = asset('images/reward.jpg');
