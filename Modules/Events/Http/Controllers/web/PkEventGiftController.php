@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\PkReward;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 

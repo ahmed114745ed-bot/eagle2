@@ -30,7 +30,7 @@ class PkReward extends Model
     {
         return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
-    
+
     public function rewardsPk()
     {
         return $this->belongsToMany(PkWinner::class, 'pk_winner_id', 'pk_reward_id');
@@ -86,15 +86,10 @@ class PkReward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->type === 'badge') {
+            } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -110,15 +105,10 @@ class PkReward extends Model
                 $model->target = request('target2', $model->target);
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
-            }elseif ($model->type === 'badge') {
+            } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
 
             unset($model->target1);
