@@ -57,15 +57,16 @@ class MultiplierSelector
 
     private function getNormalWeight(int $multiplier): int
     {
+        // Extreme weights for small multipliers to maximize playtime (Super Low Volatility)
         return match ($multiplier) {
-            5 => 500,
-            10 => 300,
-            20 => 100,
-            50 => 50,
-            100 => 20,
-            250 => 10,
-            500 => 5,
-            1000 => 2,
+            5 => 2000,  // Was 800 - Heavily favor the lowest win to keep balance stable
+            10 => 800,  // Was 400
+            20 => 200,  // Was 150
+            50 => 20,   // Was 40
+            100 => 5,   // Was 10
+            250 => 1,   // Was 5
+            500 => 0,   // Reserved for deficit only
+            1000 => 0,  // Reserved for deficit only
             default => 1,
         };
     }

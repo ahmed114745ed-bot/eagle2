@@ -2,7 +2,6 @@
 
 namespace App\Services\FairLuck;
 
-use App\Models\CoreWallet;
 use App\Models\FairLuckSetting;
 use App\Models\FairLuckTransaction;
 use App\Models\Gift;
@@ -58,9 +57,6 @@ class FairLuckService2
             $random = mt_rand(0, 10000) / 10000;
             $isWinner = $random <= $probability;
 
-            // 5. App Wallet Security
-            $appWallet = CoreWallet::where('name', 'app_wallet')->first();
-            
             $multiplier = 0;
             $profitAmount = 0;
 
@@ -82,12 +78,6 @@ class FairLuckService2
                 }
 
                 $winTotalAmount = $multiplier * $betAmount;
-
-                // Budget Check
-                if ($appWallet && $appWallet->coins < $winTotalAmount) {
-                    $isWinner = false;
-                    $multiplier = 0;
-                }
             }
 
             if ($isWinner) {

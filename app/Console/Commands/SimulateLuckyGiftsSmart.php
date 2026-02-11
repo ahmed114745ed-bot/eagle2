@@ -4,17 +4,17 @@ namespace App\Console\Commands;
 
 use App\Models\Gift;
 use App\Models\User;
-use App\Services\FairLuck\FairLuckService2;
+use App\Services\FairLuck\FairLuckService3;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
-class SimulateLuckyGiftsDual extends Command
+class SimulateLuckyGiftsSmart extends Command
 {
-    protected $signature = 'simulate:lucky-gifts-dual {gift_id?} {--trials=1000} {--balance=30000} {--userId=}';
-    protected $description = 'Simulate the Dual Algorithm system (System 2) and generate an HTML report';
+    protected $signature = 'simulate:lucky-gifts-smart {gift_id?} {--trials=1000} {--balance=30000} {--userId=}';
+    protected $description = 'Simulate the Smart Hybrid Algorithm (System 3) and generate an HTML report';
 
-    public function handle(FairLuckService2 $fairLuckService)
+    public function handle(FairLuckService3 $fairLuckService)
     {
         $initialBalance = (int) $this->option('balance');
         $maxTrials = (int) $this->option('trials');
@@ -38,7 +38,7 @@ class SimulateLuckyGiftsDual extends Command
         } else {
             $user = User::factory()->create([
                 'di' => $initialBalance,
-                'name' => 'DualAlgoPlayer_' . now()->timestamp,
+                'name' => 'SmartPlayer_' . now()->timestamp,
             ]);
         }
 
@@ -46,7 +46,7 @@ class SimulateLuckyGiftsDual extends Command
         $profile->is_legacy_user = true; 
         $profile->save();
 
-        $this->info("👤 User: {$user->name} (SYSTEM 2) | Initial Balance: {$initialBalance} | Gift: {$gift->name}");
+        $this->info("👤 User: {$user->name} (SYSTEM 3) | Initial Balance: {$initialBalance} | Gift: {$gift->name}");
 
         $history = [];
         $totalBetsCount = 0;
@@ -60,7 +60,7 @@ class SimulateLuckyGiftsDual extends Command
             $totalSpentCoins += $gift->price;
             $totalBetsCount++;
 
-            // Process via FairLuckService2
+            // Process via FairLuckService3
             $result = $fairLuckService->processBet($user, $gift, $gift->price);
             
             $winAmount = $result->isWinner ? ($result->multiplier * $gift->price) : 0;
@@ -75,7 +75,7 @@ class SimulateLuckyGiftsDual extends Command
                 'win_amount' => $winAmount,
                 'balance_after' => $currentBalance,
                 'deviation' => number_format($result->newDeviation, 4),
-                'mode' => $result->isRecovery ? 'RECOVERY 🛠️' : 'MACRO 🚀',
+                'mood' => $result->mood,
             ];
 
             $user->di = $currentBalance;
@@ -85,8 +85,9 @@ class SimulateLuckyGiftsDual extends Command
         $this->generateHtmlReport($user, $gift, $initialBalance, $totalBetsCount, $totalSpentCoins, $totalWonCoins, $currentBalance, $history);
 
         $this->info("---------------------------------------");
-        $this->info("🏁 Dual Algo Simulation Finished!");
-        $this->info("Final Balance: " . number_format($currentBalance) . " coins");
+        $this->info("🏁 Smart Simulation Finished!");
+        $this->info("Final Balance: " . number_format($currentBalance));
+        $this->info("RTP: " . number_format(($totalWonCoins / ($totalSpentCoins ?: 1)) * 100, 2) . "%");
         $this->info("---------------------------------------");
 
         return 0;
@@ -103,39 +104,40 @@ class SimulateLuckyGiftsDual extends Command
         <html lang='ar' dir='rtl'>
         <head>
             <meta charset='UTF-8'>
-            <title>تقرير النظام المزدوج - {$user->name}</title>
+            <title>تقرير النظام الذكي - {$user->name}</title>
             <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
             <style>
-                body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                .win-row { background-color: #e8f5e9 !important; }
-                .recovery-row { background-color: #fff3e0 !important; }
-                .badge-macro { background-color: #0d6efd; color: white; }
-                .badge-recovery { background-color: #fd7e14; color: white; }
+                body { background-color: #f0f2f5; font-family: 'Segoe UI', serif; }
+                .win-row { background-color: #d1e7dd !important; }
+                .mood-Recovery { color: #dc3545; font-weight: bold; }
+                .mood-Generous { color: #198754; font-weight: bold; }
+                .mood-Stable { color: #0d6efd; }
             </style>
         </head>
         <body>
             <div class='container py-5'>
-                <h1 class='text-center mb-4'>📊 تقرير النظام المزدوج (Dual Algorithm)</h1>
-                <div class='row text-center mb-4 card p-4 shadow-sm bg-white'>
+                <h1 class='text-center mb-4'>🧠 تقرير النظام الهجين الذكي (Service 3)</h1>
+                <div class='row text-center mb-4 card p-4 shadow-sm'>
                    <div class='col-12 row'>
-                        <div class='col'><h5>الرصيد الابتدائي</h5><p class='h4 text-secondary'>" . number_format($initial) . "</p></div>
-                        <div class='col'><h5>الرصيد النهائي</h5><p class='h4'>" . number_format($final) . "</p></div>
-                        <div class='col'><h5>صافي النتيجة</h5><p class='h4 {$netClass}'>" . number_format($net) . "</p></div>
-                        <div class='col'><h5>إجمالي المراهنات</h5><p class='h4'>" . number_format($count) . "</p></div>
+                        <div class='col'><h5>الرصيد الابتدائي</h5><p class='h3 text-secondary'>" . number_format($initial) . "</p></div>
+                        <div class='col'><h5>إجمالي المدفوع</h5><p class='h3 text-danger'>" . number_format($spent) . "</p></div>
+                        <div class='col'><h5>إجمالي المكسب</h5><p class='h3 text-success'>" . number_format($won) . "</p></div>
+                        <div class='col'><h5>الرصيد النهائي</h5><p class='h3'>" . number_format($final) . "</p></div>
+                        <div class='col'><h5>صافي النتجية</h5><p class='h3 {$netClass}'>" . number_format($net) . "</p></div>
+                        <div class='col'><h5>المراهنات</h5><p class='h4'>" . number_format($count) . "</p></div>
                         <div class='col'><h5>نسبة RTP</h5><p class='h4'>" . number_format($rtp, 2) . "%</p></div>
                    </div>
                 </div>
-                <div class='table-responsive'>
-                    <table class='table table-bordered bg-white'>
+                <div class='table-responsive card shadow'>
+                    <table class='table table-hover mb-0'>
                         <thead class='table-dark'>
                             <tr>
-                                <th>#</th>
-                                <th>الرصيد قبل</th>
-                                <th>الوضع</th>
+                                <th>الخطوة</th>
+                                <th>الحالة (Mood)</th>
                                 <th>النتيجة</th>
                                 <th>المضاعف</th>
                                 <th>المكسب</th>
-                                <th>الرصيد بعد</th>
+                                <th>الرصيد</th>
                                 <th>الانحراف</th>
                             </tr>
                         </thead>
@@ -143,15 +145,12 @@ class SimulateLuckyGiftsDual extends Command
 
         foreach ($history as $h) {
             $rowClass = $h['outcome'] === 'WIN' ? 'win-row' : '';
-            if ($h['mode'] !== 'MACRO 🚀') $rowClass = 'recovery-row';
-            $badgeClass = str_contains($h['mode'], 'MACRO') ? 'badge-macro' : 'badge-recovery';
             
             $html .= "
                             <tr class='{$rowClass}'>
                                 <td>{$h['step']}</td>
-                                <td>" . number_format($h['balance_before']) . "</td>
-                                <td><span class='badge {$badgeClass}'>{$h['mode']}</span></td>
-                                <td>" . $h['outcome'] . "</td>
+                                <td class='mood-{$h['mood']}'>{$h['mood']}</td>
+                                <td>" . ($h['outcome'] == 'WIN' ? '✅ فوز' : '❌ خسارة') . "</td>
                                 <td>" . $h['multiplier'] . "</td>
                                 <td>" . number_format($h['win_amount']) . "</td>
                                 <td>" . number_format($h['balance_after']) . "</td>
@@ -167,7 +166,7 @@ class SimulateLuckyGiftsDual extends Command
         </body>
         </html>";
 
-        File::put(public_path('dual_lucky_report.html'), $html);
-        $this->info("📍 Report generated: " . public_path('dual_lucky_report.html'));
+        File::put(public_path('smart_lucky_report.html'), $html);
+        $this->info("📍 Report generated: " . public_path('smart_lucky_report.html'));
     }
 }

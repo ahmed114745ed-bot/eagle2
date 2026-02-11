@@ -23165,7 +23165,6 @@ namespace  {
             class RedisService extends \App\Facades\RedisService {}
             class PDF extends \Mccarlosen\LaravelMpdf\Facades\LaravelMpdf {}
             class Debugbar extends \Barryvdh\Debugbar\Facades\Debugbar {}
-            class Pdf extends \Barryvdh\DomPDF\Facade\Pdf {}
             class Admin extends \Encore\Admin\Facades\Admin {}
             class Image extends \Intervention\Image\Facades\Image {}
             class Firebase extends \Kreait\Laravel\Firebase\Facades\Firebase {}

@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\File;
 
 class SimulateLuckyGiftsHtml extends Command
 {
-    protected $signature = 'simulate:lucky-gifts-html {gift_id?}';
-    protected $description = 'Simulate natural gameplay starting with 30,000 coins and generate an HTML report';
+    protected $signature = 'simulate:lucky-gifts-html {gift_id?} {--trials=1000} {--balance=30000} {--userId=}';
+    protected $description = 'Simulate natural gameplay (System 1) and generate an HTML report';
 
     public function handle(FairLuckService $fairLuckService)
     {
-        $initialBalance = 30000;
+        $initialBalance = (int) $this->option('balance');
+        $maxTrials = (int) $this->option('trials');
+        $userId = $this->option('userId');
         
         // Find a lucky gift
         $giftQuery = Gift::where('type', 6)->where('enable', 1);
@@ -29,31 +31,29 @@ class SimulateLuckyGiftsHtml extends Command
 
         $gift = Gift::with('luckyGift')->find($giftId);
         
-        $initialBalance = 1000000; // Increase balance to 1M to see 1000 trials clearly
-        $user = User::factory()->create([
-            'di' => $initialBalance,
-            'name' => 'VeteranPlayer_' . now()->timestamp,
-        ]);
+        if ($userId) {
+            $user = User::findOrFail($userId);
+            $user->di = $initialBalance;
+            $user->save();
+        } else {
+            $user = User::factory()->create([
+                'di' => $initialBalance,
+                'name' => 'OriginalAlgoPlayer_' . now()->timestamp,
+            ]);
+        }
 
         // Force this user to be a "NON-BEGINNER" (Legacy User)
-        // This ensures they don't get the beginner boost probabilities
         $profile = \App\Models\UserLuckProfile::firstOrCreate(['user_id' => $user->id]);
         $profile->is_legacy_user = true; 
-        $profile->bet_count = 1000;
-        $profile->total_bets = 1500000; // Legacy 1.5M bets
-        $profile->total_profit = -15000; // Perfect 1% loss history
-        $profile->first_bet_at = now()->subDays(10);
         $profile->save();
 
-        $this->info("👤 User: {$user->name} (VETERAN) | Initial Balance: {$initialBalance} | Gift: {$gift->name} ({$gift->price})");
+        $this->info("👤 User: {$user->name} (SYSTEM 1) | Initial Balance: {$initialBalance} | Gift: {$gift->name}");
 
         $history = [];
         $totalBetsCount = 0;
         $totalWonCoins = 0;
         $totalSpentCoins = 0;
         $currentBalance = $initialBalance;
-
-        $maxTrials = 1000; 
 
         while ($currentBalance >= $gift->price && $totalBetsCount < $maxTrials) { 
             $balanceBefore = $currentBalance;
@@ -129,23 +129,12 @@ class SimulateLuckyGiftsHtml extends Command
             <div class='container'>
                 <div class='card p-4'>
                     <h1 class='text-center mb-4'>📊 تقرير محاكاة حظ المستخدم (طبيعي)</h1>
-                    <div class='row text-center'>
-                        <div class='col-md-3'>
-                            <h5>الرصيد الابتدائي</h5>
-                            <p class='h4 text-primary'>".number_format($initial)."</p>
-                        </div>
-                        <div class='col-md-3'>
-                            <h5>إجمالي الرهانات</h5>
-                            <p class='h4'>".number_format($count)."</p>
-                        </div>
-                        <div class='col-md-3'>
-                            <h5>الرصيد النهائي</h5>
-                            <p class='h4'>".number_format($final)."</p>
-                        </div>
-                        <div class='col-md-3'>
-                            <h5>صافي الربح/الخسارة</h5>
-                            <p class='h4 {$netClass}'>".number_format($net)."</p>
-                        </div>
+                    <div class='row text-center mb-4'>
+                        <div class='col'><h5>الرصيد الابتدائي</h5><p class='h4 text-secondary'>".number_format($initial)."</p></div>
+                        <div class='col'><h5>الرصيد النهائي</h5><p class='h4'>".number_format($final)."</p></div>
+                        <div class='col'><h5>صافي النتيجة</h5><p class='h4 {$netClass}'>".number_format($net)."</p></div>
+                        <div class='col'><h5>إجمالي المراهنات</h5><p class='h4'>".number_format($count)."</p></div>
+                        <div class='col'><h5>نسبة RTP</h5><p class='h4'>".number_format($rtp, 2)."%</p></div>
                     </div>
                     <div class='row text-center mt-3'>
                         <div class='col-md-4'>

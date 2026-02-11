@@ -37,13 +37,13 @@ class DualAlgorithmEngine
         }
 
         // Recovery Mode Logic:
-        // We want to recover the surplus but keep the user engaged.
-        // Randomized probability multiplier to avoid fixed rhythm (0.4 to 0.7)
-        $probMultiplier = mt_rand(40, 70) / 100;
+        // Soft recovery to maximize playtime while still being in a controlled profit state.
+        // Randomized probability multiplier (0.7 to 0.9)
+        $probMultiplier = mt_rand(70, 90) / 100;
 
         return [
             'prob_multiplier' => $probMultiplier,
-            'max_multiplier' => 50, // Allow up to 50x as "bait" wins
+            'max_multiplier' => 50, // Allow up to 50x during soft recovery
             'force_low_multipliers' => true
         ];
     }
