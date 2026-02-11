@@ -3,16 +3,17 @@
 namespace Modules\Public\Http\Controllers\web;
 
 
-use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Encore\Admin\Admin;
 use App\Selectables\OVips;
 use App\Selectables\Wares;
 use Encore\Admin\Layout\Content;
+use App\Selectables\CustomAchievements;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Entities\RewardLevelInterval;
-use Encore\Admin\Admin;
 
 class RewardLevelIntervalController extends MainController
 {
@@ -98,7 +99,7 @@ class RewardLevelIntervalController extends MainController
                 ]);
             });
         });
-        $grid->model()->with(['ware', 'vip'])->where('level_interval_id', $level_interval);
+        $grid->model()->with(['ware', 'vip','customAchievement'])->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
@@ -109,8 +110,7 @@ class RewardLevelIntervalController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
 
@@ -125,7 +125,7 @@ class RewardLevelIntervalController extends MainController
                 // $vips = Badge::find($this->target);
                 $path = @$this->badge->image ?? '';
             } elseif ($this->type == 'achievement') {
-                $path = $this->target;
+                $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
             } else {
                 $path = 'coin.png';
             }
@@ -192,9 +192,8 @@ class RewardLevelIntervalController extends MainController
                 $form->number('target3', __('coins'));
             })
             ->when('achievement', function () use ($form) {
-                $form->image('target4', __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                });
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire', __('expire'));
             })
             ->rules('required');
@@ -229,7 +228,7 @@ class RewardLevelIntervalController extends MainController
                     $form->expire = null;
                     break;
                 case 'achievement':
-                    if (!$form->target4) $errors[] = __('image') . ' ' . __('is required');
+                    if (!$form->target4) $errors[] = __('custom_achievement') . ' ' . __('is required');
                     if (empty($form->expire) || !is_numeric($form->expire)) $errors[] = __('expire') . ' ' . __('is required and must be numeric');
                     break;
             }

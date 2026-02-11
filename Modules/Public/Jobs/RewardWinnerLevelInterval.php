@@ -2,10 +2,12 @@
 
 namespace Modules\Public\Jobs;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\UserCommon;
 use Illuminate\Bus\Queueable;
+use Modules\Vip\Entities\OVip;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Modules\Public\Entities\LevelInterval;
@@ -14,7 +16,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Vip\Entities\OVip;
 
 class RewardWinnerLevelInterval implements ShouldQueue
 {
@@ -59,14 +60,18 @@ class RewardWinnerLevelInterval implements ShouldQueue
                         $user->save();
                     } elseif ($rewad->type == "vip") {
                         $vip = OVip::query()->find($rewad->target);
-                        if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-interval');
+                        if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire, null, 'reward-winner-interval');
                     } elseif ($rewad->type == "ware") {
                         $ware = Ware::query()->find($rewad->target);
-                        if ($ware) UserCommon::addWareToUser($user, $ware, $rewad->expire,null,'reward-winner-interval');
+                        if ($ware) UserCommon::addWareToUser($user, $ware, $rewad->expire, null, 'reward-winner-interval');
                     } elseif ($rewad->type == "achievement") {
+                        $dateTimestamp = Carbon::parse($rewad->expire)->format("Y-m-d H:i:s");
+
                         $attributes = [
                             'user_id'       => $user->id,
-                            'custom_image' => $rewad->target,
+                            'custom_achievement_id' => $rewad->target,
+                            'end_at' => $dateTimestamp,
+                            'receive_type' => 'level-interval',
                         ];
 
                         UserAchievementLevel::create($attributes);
