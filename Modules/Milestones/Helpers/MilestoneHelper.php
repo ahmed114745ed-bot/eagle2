@@ -126,10 +126,14 @@ class MilestoneHelper
                 break;
 
             case 'achievement':
+                $dateTimestamp = Carbon::parse($mr->expire)->format("Y-m-d H:i:s");
+
                 UserAchievementLevel::create([
                     'user_id' => $user->id,
-                    'custom_image' => $mr->reward,
+                    // 'custom_image' => $mr->reward,
+                    'custom_achievement_id' => $mr->rewardable_id,
                     'receive_type' => $receiveType,
+                    'end_at' => $dateTimestamp,
                 ]);
                 break;
         }

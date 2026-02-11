@@ -3,10 +3,12 @@
 namespace Modules\Achievement\Http\Controllers\web;
 
 use Carbon\Carbon;
+use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use App\Selectables\AllUsers;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Models\AchievementValidImage;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Modules\Achievement\Entities\UserAchievementLevel;
 
@@ -28,10 +30,11 @@ class AchievementDedicateController extends MainController
 
     public function create(Content $content)
     {
-        $achievementValidImage = AchievementValidImage::get();
+
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-            ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage'))));
+            //  ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
+            ->body($this->form()));
     }
 
     /**
@@ -68,7 +71,9 @@ class AchievementDedicateController extends MainController
             'user.profile',
             'user',
             'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'admin'
+            'admin',
+            'customAchievement',
+            'customAchievement.images',
         ])
             ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
             ->when(
@@ -89,7 +94,7 @@ class AchievementDedicateController extends MainController
             )
             ->where(function ($q) {
                 $q->whereNotNull('custom_image')
-                    ->orWhereNotNull('file');
+                    ->orWhereNotNull('file')->orWhereNotNull('custom_achievement_id');
             })
             ->orderByDesc('id');
 
@@ -161,7 +166,7 @@ class AchievementDedicateController extends MainController
         if (!request()->filled('_export_')) {
             $grid->column('file', __('image'))->display(function ($img) {
                 $defaultImage = asset("images/background_room.jpg");
-                $path = getImagePath($img ?? $this->custom_image);
+                $path = getImagePath($img ?? $this->custom_image ?? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image);
                 if (!isImageExists($path)) {
                     $path = $defaultImage;
                 }
@@ -222,5 +227,29 @@ class AchievementDedicateController extends MainController
 
 
         return $grid;
+    }
+
+
+    protected function form()
+    {
+        $form = new Form(new UserAchievementLevel());
+        $form->html('<div class="full-column-width">');
+        $form->belongsTo('user_id', AllUsers::class, trans('user'));
+        $form->belongsTo('custom_achievement_id', CustomAchievements::class, trans('Custom achievement'));
+        $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
+        $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');
+        $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
+        return $form;
     }
 }

@@ -676,6 +676,7 @@
                 @if ($remaining_diamonds_action)
                     <button onclick="showSection('remaining_diamonds')">{{ __('remaining diamonds') }}</button>
                 @endif
+                <button onclick="showSection('convert_diamonds')">{{ __('convert diamonds') }}</button>
 
             </div>
         </div>
@@ -779,6 +780,48 @@
                     </div>
 
                 @endif
+
+
+                 <div id="convert_diamonds" class="settings-section p-4 shadow-sm rounded bg-white">
+
+                        <form method="POST" action="{{ route('admin.app.settings.update') }}">
+                            @csrf
+
+                            <!-- Exchange Type -->
+                            <div class="mb-3">
+                                <label for="convert_diamonds" class="form-label fw-semibold">{{ __('convert diamonds to coins according') }}</label>
+
+                                <select name="convert_diamonds" id="convert_diamonds" class="form-select form-select-lg">
+                                    <option value="zones_coins" {{ $settings['convert_diamonds']=='zones_coins' ? 'selected' : '' }}>
+                                        {{ __('Zones') }}
+                                    </option>
+                                    <option value="super_admin_coins" {{ $settings['convert_diamonds']=='super_admin_coins' ? 'selected' : '' }}>
+                                        {{ __('Super Admin') }}
+                                    </option>
+                                    <option value="shipping_coins" {{ $settings['convert_diamonds']=='shipping_coins' ? 'selected' : '' }}>
+                                        {{ __('Agency Charge') }}
+                                    </option>
+                                     <option value="user_coins" {{ $settings['convert_diamonds']=='user_coins' ? 'selected' : '' }}>
+                                        {{ __('The User') }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            {{-- <!-- Context Text -->
+                            <div class="alert alert-info mt-3">
+                                <i class="fa fa-info-circle me-1"></i>
+                                {{ __('Remaining diamonds from last month that the host user can convert to coins, keep as diamonds, or leave unchanged.') }}
+                            </div> --}}
+
+                            <!-- Save Button -->
+                            <div class="d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn btn-success btn-lg px-4 fw-bold shadow">
+                                    <i class="fa fa-check-circle me-1"></i> {{ __('Save') }}
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
 
 
 

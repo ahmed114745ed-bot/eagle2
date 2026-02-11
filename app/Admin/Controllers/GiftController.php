@@ -132,7 +132,7 @@ class GiftController extends MainController
             $tabs = ['all' => __('All')];
 
             // هات كل الكاتيجوري وطلع الترجمة حسب اللغة الحالية
-            $categories = GiftCategory::all();
+            $categories = GiftCategory::orderBy('sort', 'asc')->get();
             foreach ($categories as $category) {
                 $title = $category->title[$locale] ?? $category->title['en'] ?? '';
                 $tabs[$category->id] = $title;
@@ -223,6 +223,14 @@ class GiftController extends MainController
             $batch->disableDelete();
             $batch->add(new MoveGroupsGifts());
         });
+        if (request('filter')) {
+            $grid->tools(function ($tools) {
+                $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
+            });
+        }
+
+        $grid->disableCreateButton();
+
         return $grid;
     }
 
@@ -238,19 +246,7 @@ class GiftController extends MainController
     protected function detail($id)
     {
         $show = new Show(Gift::findOrFail($id));
-        // $show->id('ID');
-        // $show->name(__('name'));
-        // $show->e_name(__('e_name'));
-        // $show->type(__('type'));
-        // $show->vip_level(__('vip_level'));
-        // $show->hot(__('hot'));
-        // $show->is_play('is_play');
-        // $show->price(__('price'));
-        // $show->img(__('img'));
-        // $show->show_img(('show_img'));
-        // $show->show_img2('show_img2');
-        // $show->sort('sort');
-        // $show->enable('enable');
+
         $this->extendShow($show);
         return $show;
     }
@@ -262,6 +258,7 @@ class GiftController extends MainController
      */
     protected function form($id = null)
     {
+
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
         $type = old('type', $form->model()->type ?? null);
@@ -271,7 +268,8 @@ class GiftController extends MainController
 
 
         // Build Gift Category options
-        $categories = GiftCategory::all();
+        $categories = GiftCategory::where('id', request('type'))->get();
+        //  dd($categories);
         $locale = App::getLocale();
 
         $form->html(view('admin.gift_type', [
@@ -285,36 +283,32 @@ class GiftController extends MainController
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
 
-        //  $form->number('vip_level', __('vip_level'))->min(0)->placeholder(__('less than 256'))->attribute(['id' => 'vip_level']);
 
-        $form->file('img', __('img')) ->name(function ($file) {
-                // الحصول على الامتداد الحقيقي مع fallback
-                $extension = $file->getClientOriginalExtension();
-                if (empty($extension)) {
-                    $extension = $file->guessExtension();
-                }
-                return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
-            })
-            ->default('1.png');
-        // $form->file('show_img', __('show_img'))->name(function ($file) {
-        //     return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-        // })->required();
+        $form->file('img', __('img'))->name(function ($file) {
+            // الحصول على الامتداد الحقيقي مع fallback
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
+            return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+        }) ->default('1.png');
+       
 
-        $form->file('show_img', __('show_img')) ->name(function ($file) {
-                // الحصول على الامتداد الحقيقي مع fallback
-                $extension = $file->getClientOriginalExtension();
-                if (empty($extension)) {
-                    $extension = $file->guessExtension();
-                }
+        $form->file('show_img', __('show_img'))->name(function ($file) {
+            // الحصول على الامتداد الحقيقي مع fallback
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
 
-                // تطبيع الامتدادات
-                $extension = strtolower($extension);
-                if ($extension === 'svg') {
-                    return 'svga_' . Str::random(8) . '.svg';
-                }
+            // تطبيع الامتدادات
+            $extension = strtolower($extension);
+            if ($extension === 'svg') {
+                return 'svga_' . Str::random(8) . '.svg';
+            }
 
-                return 'animation_' . Str::random(8) . '.' . $extension;
-            })->required();
+            return 'animation_' . Str::random(8) . '.' . $extension;
+        })->required();
         $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
@@ -365,56 +359,55 @@ class GiftController extends MainController
             }
         });
 
-         $form->saving(function (Form $form) {
-                $hasShowImg = $form->show_img || $form->model()->show_img;
-                $img2 = $form->img;
-                $wareId = $form->model()->id;
+        $form->saving(function (Form $form) {
+            $hasShowImg = $form->show_img || $form->model()->show_img;
+            $img2 = $form->img;
+            $wareId = $form->model()->id;
 
-       
 
-                $hasImg2 = $img2 || $form->model()->img;
 
-                if (!$hasShowImg && !$hasImg2) {
-                    $error = new MessageBag([
-                        'title'   => 'Error',
-                        'message' => 'Please upload at least one image',
+            $hasImg2 = $img2 || $form->model()->img;
+
+            if (!$hasShowImg && !$hasImg2) {
+                $error = new MessageBag([
+                    'title'   => 'Error',
+                    'message' => 'Please upload at least one image',
+                ]);
+                return back()->with(compact('error'));
+            }
+
+            // معالجة show_img
+            if ($form->img instanceof UploadedFile) {
+                $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+
+                // الحصول على الامتداد الحقيقي
+                $originalExt = strtolower($form->img->getClientOriginalExtension());
+                $guessedExt = strtolower($form->img->guessExtension());
+
+                // إعطاء الأولوية للامتداد الأصلي
+                $ext = !empty($originalExt) ? $originalExt : $guessedExt;
+
+
+
+                if (!in_array($ext, $allowedExtensions)) {
+                    throw ValidationException::withMessages([
+                        'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
                     ]);
-                    return back()->with(compact('error'));
                 }
 
-                // معالجة show_img
-                if ($form->img instanceof UploadedFile) {
-                    $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
+                $form->image_type = $ext;
+            }
 
-                    // الحصول على الامتداد الحقيقي
-                    $originalExt = strtolower($form->img->getClientOriginalExtension());
-                    $guessedExt = strtolower($form->img->guessExtension());
+            // معالجة img2 - الحل الرئيسي للمشكلة
+            if ($hasShowImg instanceof UploadedFile) {
+                /** @var FileService $fileService*/
+                $fileService = app(FileService::class);
+                $ext = $fileService->getExtension($hasShowImg, $wareId, getFromService: true);
 
-                    // إعطاء الأولوية للامتداد الأصلي
-                    $ext = !empty($originalExt) ? $originalExt : $guessedExt;
-
-               
-
-                    if (!in_array($ext, $allowedExtensions)) {
-                        throw ValidationException::withMessages([
-                            'img' => ['Invalid file type. Allowed extensions are: ' . implode(', ', $allowedExtensions)],
-                        ]);
-                    }
-
-                    $form->image_type = $ext;
-                }
-
-                // معالجة img2 - الحل الرئيسي للمشكلة
-                if ($hasShowImg instanceof UploadedFile) {
-                    /** @var FileService $fileService*/
-                    $fileService = app( FileService::class);
-                    $ext = $fileService->getExtension($hasShowImg, $wareId, getFromService: true);
-
-                    // $form->input('detected_profile_frame_type', $ext);
-                    $form->image_type = $ext;
-                   
-                }
-            });
+                // $form->input('detected_profile_frame_type', $ext);
+                $form->image_type = $ext;
+            }
+        });
 
         // After saving, create or update LuckyGift
         $form->saved(function (Form $form) {
@@ -434,7 +427,10 @@ class GiftController extends MainController
             }
         });
 
-
+        $form->saved(function (Form $form) {
+            $url = url('admin/gifts?filter=' . $form->model()->gift_category_id);
+            return redirect()->to($url);
+        });
         return $form;
     }
 

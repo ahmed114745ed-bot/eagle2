@@ -14,6 +14,7 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\PkReward;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 
@@ -97,7 +98,7 @@ class PkEventGiftController extends MainController
         $pkType = request('pk_type');
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
-        $grid->model()->orderBy('level');
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->orderBy('level');
         $grid->column('created_at')->hide();
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 1);
         $grid->column('id', __('Id'));
@@ -113,22 +114,22 @@ class PkEventGiftController extends MainController
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -173,7 +174,7 @@ class PkEventGiftController extends MainController
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -187,22 +188,22 @@ class PkEventGiftController extends MainController
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -244,7 +245,7 @@ class PkEventGiftController extends MainController
         $pkType = request('pk_type');
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
-        $grid->model()->orderBy('level');
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->orderBy('level');
         $grid->column('created_at')->hide();
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 3);
         $grid->column('id', __('Id'));
@@ -259,23 +260,24 @@ class PkEventGiftController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+               
+               return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware =$this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    //$path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -372,9 +374,10 @@ class PkEventGiftController extends MainController
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
             })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                // $form->image("target4", __('image'))->name(function ($file) {
+                //     return now()->timestamp . '.' . $file->guessExtension();
+                // })->disk('gcs');
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
             });
         $form->number('expire', __('expire'));
 

@@ -332,6 +332,11 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+
+         Route::prefix('gifts')->group(function () {
+            Route::get('/{type}/create', [GiftController::class, 'create']);
+            Route::post('/{type}', [GiftController::class, 'store']);
+        });
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 

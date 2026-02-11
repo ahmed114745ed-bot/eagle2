@@ -19,6 +19,8 @@ return [
     'create'                => 'انشاء',
     'not_in_same_country' => 'ليس في نفس البلد',
     'delete'                => 'مسح',
+    "searchAchievements" => "البحث عن الإنجازات",
+
     "password_incorrect" => 'كلمة المرور غير صحيحة',
     "username_not_found" => 'اسم المستخدم غير موجود',
     'is_preview' => 'عرض مباشر',

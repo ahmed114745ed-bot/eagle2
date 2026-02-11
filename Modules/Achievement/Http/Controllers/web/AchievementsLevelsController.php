@@ -72,14 +72,14 @@ class AchievementsLevelsController extends MainController
             $url = getImagePath($path);
             $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
 
-            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
+            return '<div style="direction:ltr;">' . $mediaHtml . '</div>';
         });
         $grid->column('invalid_image', __('Invalid image'))->display(function ($path) {
             /** @var Ware $this */
             $url = getImagePath($path);
             $mediaHtml = handleShowImageWithTypes($this->id, $url, 50, 50);
 
-            return '<div style="direction:ltr;">'.$mediaHtml.'</div>';
+            return '<div style="direction:ltr;">' . $mediaHtml . '</div>';
         });
         $grid->column('ar_description', __('ar_description'));
         $grid->column('en_description', __('en_description'));
@@ -141,6 +141,16 @@ class AchievementsLevelsController extends MainController
         $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
             return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
         })->rules('required');
+        $form->select('image_type', __('image_type'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+                'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
+
+            ]
+        )->required();
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
         $form->saving(function (Form $form) {

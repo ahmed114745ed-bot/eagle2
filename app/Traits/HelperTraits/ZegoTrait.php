@@ -90,8 +90,26 @@ trait ZegoTrait
         $headers = [];
         try {
           
-            return  Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
+            $response = Http::withHeaders($headers)->acceptJson()->timeout(20)->get($url, $params)->json();
+            
+            // Log failed Zego API calls for debugging
+            if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+                Log::warning('ZegoTrait::sendToZego failed', [
+                    'action' => $Action,
+                    'roomId' => $RoomId,
+                    'fromUserId' => $FromUserId,
+                    'response' => $response,
+                ]);
+            }
+            
+            return $response;
         } catch (\Exception $exception) {
+            Log::error('ZegoTrait::sendToZego exception', [
+                'action' => $Action,
+                'roomId' => $RoomId,
+                'fromUserId' => $FromUserId,
+                'error' => $exception->getMessage(),
+            ]);
         }
 
         return null;

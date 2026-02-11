@@ -18,7 +18,7 @@ class OctaneCacheClearing
         // For admin sorting operations
         if ($request->is('admin/*') && $request->method() === 'POST') {
             // Clear cache tags
-            \Illuminate\Support\Facades\Cache::tags(['gift_categories', 'admin_data'])->flush();
+           // \Illuminate\Support\Facades\Cache::tags(['gift_categories', 'admin_data'])->flush();
         }
 
         $response = $next($request);

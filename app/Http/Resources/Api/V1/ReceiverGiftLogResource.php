@@ -27,7 +27,7 @@ class ReceiverGiftLogResource extends JsonResource
             'image_color'          => @$this->receiver->color_image,
             'id_image'             => @$this->receiver->specialId?->ware?->show_img ?? '',
             'level' => Common::level_center_min(@$this->receiver->id), // refactor
-            'colored_name' => $hasColor ? common::wareUserVip(@$this->receiver->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$this->receiver->id, 18, 'color') : null),
 
         ];
 

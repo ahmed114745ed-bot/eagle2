@@ -165,7 +165,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.store-user-achievement') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+    <form method="POST" action="{{ route('admin.store-custom-achievement') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
         @csrf
 <br>
 <br>
@@ -179,63 +179,20 @@
             </div>
         </div>
 
-        <input type="hidden" id="achievement_id" value="" name="achievement_id">
+         <div class="form-section active">
+            <div class="form-group mb-3">
+                <label for="custom_achievement_id" class="form-label">{{ __('Custom achievement') }}</label>
+                <select name="custom_achievement_id" id="custom_achievement_id" class="form-control select2" required>
+                    <option value="">{{ __('select Custom achievement') }}</option>
+                </select>
+
+            </div>
+        </div>
+
+       
         <br>
         <br>
-        <div class="form-section" id="achievementLevelDiv" style="display: none;">
-            <div class="form-group mb-3">
-                <label for="achievement_level_id" class="form-label">{{ __('admin.achievementLevel') }}</label>
-                <select name="achievement_level_id" id="achievement_level_id" class="form-control">
-                    <option value="">{{ __('admin.selectAchievementLevel') }}</option>
-                </select>
-            </div>
-        </div>
 
-        <div class="form-section" id="file_image">
-            <div class="form-group mb-3">
-                <label for="file_image_select" class="form-label">{{ __('admin.type_file') }}</label>
-                <select name="file_image_select" id="file_image_select" class="form-control" required>
-                    <option value="">{{ __('admin.type_file') }}</option>
-                    <option value="file">{{ __('admin.file') }}</option>
-                    <option value="image">{{ __('admin.Image') }}</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-section" id="file_input" style="display: none;">
-            <div class="form-group mb-3">
-                <label class="form-label">{{ __('admin.select_file') }}</label> 
-                <div class="file-upload-wrapper">
-                    <label for="custom_file" class="file-upload-label">
-                        <i class="fas fa-cloud-upload-alt me-2"></i>
-                        {{ __('admin.choose_file') }}
-                        <span id="file-name" class="d-block text-muted small mt-1"></span>
-                    </label>
-                    <input type="file" id="custom_file" name="custom_file" class="file-upload-input" accept="image/*,.pdf,.doc,.docx">
-                </div>
-                <!-- Add this preview container -->
-                <div id="file-preview-container" class="mt-3" style="display: none;">
-                    <div class="preview-content"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-section" id="imageDiv" style="display: none;">
-            <div class="form-group mb-3">
-                <label class="form-label">{{ __('admin.selectImage') }}</label>
-                <div class="image-scroll-container">
-                    @foreach ($achievementValidImage as $data)
-                        @if (!empty($data->file))
-                            <label class="image-option">
-                                <input type="radio" name="custom_image" value="{{ $data->file }}" class="d-none">
-                                <img src="{{ getImagePath($data->file) }}" 
-                                    class="uniform-image img-thumbnail">
-                            </label>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-        </div>
 
 
     <br>
@@ -347,124 +304,117 @@
         }
 
 
-        $('#achievement_id').change(function() {
-            var achievementId = $(this).val();
-            $('#achievementLevelDiv, #imageDiv, #gift_achievement_div, #file_image').hide();
-            let selected = $(this).find(':selected').data('type');
 
-            if (selected == '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}') {
-                $('#gift_achievement_div').fadeIn();
-            } else if (achievementId === '') {
-                $('#file_image').show();
-                $('#gift_achievement_div').hide();
-                $('#achievementLevelDiv').hide();
-            } else if (selected !== '{{\Modules\Achievement\Enums\AchievementType::GIFT_TARGET}}' || selected !== '') {
-                $('#gift_achievement_div').hide();
-                $('#achievementLevelDiv').show();
-            }
 
-            if (achievementId) {
-                $.ajax({
-                    url: '/admin/get-achievement-levels/' + achievementId,
-                    type: 'GET',
-                    success: function(data) {
-                        $('#achievement_level_id').empty();
-                        $('#achievement_level_id').append('<option value="">{{ __('admin.selectAchievementLevel') }}</option>');
 
-                        $.each(data, function(key, value) {
-                            $('#achievement_level_id').append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            }
-        });
 
-        $('#file_image_select').change(function() {
-            var selectedValue = $(this).val();
 
-            if (selectedValue == 'file') {
-                $('#file_input').fadeIn();
-                $('#imageDiv').hide();
-            } else if (selectedValue == 'image') {
-                $('#imageDiv').show();
-                $('#file_input').hide();
-            } else {
-                $('#file_input').hide();
-                $('#imageDiv').hide();
-            }
-        });
+        // $('#custom_achievement_id').select2({
+        //     ajax: {
+        //         url: '{{ route("search.custom-achievements") }}',
+        //         dataType: 'json',
+        //         delay: 250,
+        //         data: function(params) {
+        //             return {
+        //                 search: params.term,
+        //                 type: 'public',
+        //                 page: params.page || 1
+        //             };
+        //         },
+        //         processResults: function(data, params) {
+        //             params.page = params.page || 1;
+        //             return {
+        //                 results: data.data.map(function(achievement) {
+        //                     return {
+        //                         id: achievement.id,
+        //                         text: achievement.name || '',
+        //                         image: achievement.image? "{{ getImagePath('__PATH__') }}".replace('__PATH__', achievement.image)
+        //                                         : "{{ asset('images/default-user.png') }}",
+        //                     };
+        //                 }),
+        //                 pagination: {
+        //                     more: (params.page * 10) < data.total
+        //                 }
+        //             };
+        //         },
+        //         cache: true
+        //     },
+        //     templateResult: formatAchievement,
+        //     templateSelection: formatAchievementSelection,
+        //     placeholder: '{{ __("admin.searchAchievements") }}',
+        //     minimumInputLength: 1
+        // });
 
-        $(document).on('change', 'input[name="custom_image"]', function() {
-            $('.image-option').removeClass('selected');
-            $(this).closest('.image-option').addClass('selected');
-        });
-
-        $('#custom_file').change(function(e) {
-            const file = e.target.files[0];
-            const previewContainer = $('#file-preview-container');
-            const previewContent = previewContainer.find('.preview-content');
-
-            $('#file-name').text(file.name);
-
-            previewContent.empty();
-
-            if (file) {
-                previewContainer.show();
-
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        previewContent.html(`<img src="${e.target.result}" class="img-fluid" alt="Preview">`);
+        $('#custom_achievement_id').select2({
+    ajax: {
+        url: '{{ route("search.custom-achievements") }}',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                search: params.term || '', // empty string for initial load
+                type: 'public',
+                page: params.page || 1
+            };
+        },
+        processResults: function(data, params) {
+            params.page = params.page || 1;
+            return {
+                results: data.data.map(function(achievement) {
+                    return {
+                        id: achievement.id,
+                        text: achievement.name || '',
+                        image: achievement.image
+                            ? "{{ getImagePath('__PATH__') }}".replace('__PATH__', achievement.image)
+                            : "{{ asset('images/default-user.png') }}"
                     };
-                    reader.readAsDataURL(file);
-                } else if (file.type === 'application/pdf') {
-                    const objectUrl = URL.createObjectURL(file);
-                    previewContent.html(`
-                <iframe src="${objectUrl}" class="pdf-preview"></iframe>
-            `);
-                } else if (file.type.includes('word') || file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
-                    previewContent.html(`
-                <div class="doc-preview">
-                    <i class="fas fa-file-word fa-3x text-primary"></i>
-                    <p class="mt-2">${file.name}</p>
-                </div>
-            `);
-                } else {
-                    previewContent.html(`
-                <div class="doc-preview">
-                    <i class="fas fa-file fa-3x text-secondary"></i>
-                    <p class="mt-2">${file.name}</p>
-                </div>
-            `);
+                }),
+                pagination: {
+                    more: (params.page * 10) < data.total
                 }
-            } else {
-                previewContainer.hide();
+            };
+        },
+        cache: true
+    },
+    templateResult: formatAchievement,
+    templateSelection: formatAchievementSelection,
+    placeholder: '{{ __("admin.searchAchievements") }}',
+    minimumInputLength: 0, // allow empty search
+});
+
+
+        function formatAchievement(achievement) {
+            if (!achievement.id) return achievement.text;
+
+            var $container = $(
+                '<div class="d-flex align-items-center">' +
+                '<img src="' + achievement.image + '" class="rounded-circle me-2" width="30" height="30">' +
+                '<span>' + achievement.text + '</span>' +
+                '</div>'
+            );
+            return $container;
+        }
+
+        function formatAchievementSelection(achievement) {
+            if (!achievement.id) return achievement.text;
+
+            return $(
+                '<div class="d-flex align-items-center">' +
+                '<img src="' + achievement.image + '" class="rounded-circle me-2" width="20" height="20">' +
+                '<span>' + achievement.text + '</span>' +
+                '</div>'
+            );
+        }
+
+        $('#custom_achievement_id').on('select2:open', function() {
+            var select = $(this);
+            if (!select.data('loaded')) {
+                select.select2('open'); // ensure dropdown opens
+                select.data('loaded', true);
             }
         });
 
-        $('input[name="custom_image"]').change(function() {
-            $('.image-option').removeClass('selected');
-            const selectedOption = $(this).closest('.image-option');
-            selectedOption.addClass('selected');
 
-            selectedOption[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        });
-
-        (function() {
-            'use strict';
-            var forms = document.querySelectorAll('.needs-validation');
-
-            Array.prototype.slice.call(forms)
-                .forEach(function(form) {
-                    form.addEventListener('submit', function(event) {
-                        if (!form.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                        }
-
-                        form.classList.add('was-validated');
-                    }, false);
-                });
-        })();
+       
     });
 </script>

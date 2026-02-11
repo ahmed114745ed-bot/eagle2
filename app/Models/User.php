@@ -1766,7 +1766,8 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            // $url = getImagePath($badge->badge->image);
+            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
@@ -1787,7 +1788,7 @@ class User extends Authenticatable
 
         $html = '<div class="user-type-badges">';
         foreach ($userBadges as $badge) {
-            $url = getImagePath($badge->badge->image);
+            $url = getImagePath($badge->badge->images->firstWhere('language', app()->getLocale())->image);
 
             if ($url) {
                 $html .= handleShowImageWithTypes($badge->id, $url, 100, 100, 4, 'contain');
@@ -2230,7 +2231,7 @@ class User extends Authenticatable
             'color'          => $color ?? '',
             'vip_gifts'      => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name'   => $hasColor ? Common::wareUserVipV2($this, 18, 'color') ?? '' : '',
+            'colored_name'   => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVipV2($this, 18, 'color') : null),
         ];
     }
 

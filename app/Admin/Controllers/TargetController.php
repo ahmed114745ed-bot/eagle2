@@ -97,7 +97,9 @@ class TargetController extends MainController
 
         $grid->model()->orderBy('diamonds', 'asc');
 
-        $coins = Common::getMaxCoins();
+        // $coins = Common::getMaxCoins();
+        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $coins = Common::getSettingValue($convertDiamond) ?? 1;
 
         $this->addLevelColumn($grid);
         $this->addDiamondsColumn($grid, $coins);
@@ -513,7 +515,7 @@ class TargetController extends MainController
         $form = new Form(new Target);
         $this->disableFormTools($form);
 
-        $coins = Common::getMaxCoins();
+        //  $coins = Common::getMaxCoins();
 
 
 
@@ -556,6 +558,8 @@ class TargetController extends MainController
             ->rules('min:0')
             ->default(100)
             ->disable();
+        $convertDiamond =  Common::getSettingValue('convert_diamonds') ?? 'zones_coins';
+        $coins = Common::getSettingValue($convertDiamond) ?? 1;
         $form->html('
         <script>
             $(document).ready(function () {
@@ -692,9 +696,8 @@ class TargetController extends MainController
                     admin_warning('تحذير', __('target_change_warning'));
                 }
             }
-        });
 
-        $form->html(<<<HTML
+            $form->html(<<<HTML
                 <script>
                     Dcat.ready(function () {
                         let hasWarning = $('div.alert-warning:contains("بعض المستخدمين")').length > 0;
@@ -710,6 +713,9 @@ class TargetController extends MainController
                     });
                 </script>
                 HTML);
+        });
+
+
 
 
         $form->saving(function (Form $form) {
@@ -781,14 +787,11 @@ class TargetController extends MainController
             }
         });
 
-
-        $form->saved(function (Form $form) {
-            $url = url('admin/agency-settings?firsttab=targets_table');
-            return redirect()->to($url);
-        });
-
         return $form;
     }
+
+
+
 
     public function update($id)
     {
@@ -917,7 +920,7 @@ class TargetController extends MainController
                 $this->applyPendingEdit($target);
                 \App\Jobs\ProcessTargetDiamonds::dispatch($target)->onQueue('default');
             } catch (\Throwable $e) {
-              //  \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
+                //  \Log::error("فشل في تأكيد التارجيت رقم {$target->id}: " . $e->getMessage());
             }
         }
         admin_toastr(__('update_start'), 'info');

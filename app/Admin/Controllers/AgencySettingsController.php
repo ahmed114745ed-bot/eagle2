@@ -90,6 +90,7 @@ class AgencySettingsController extends MainController
     {
         $default = [
             'remaining_diamonds'     => 'nothing',
+            'convert_diamonds'       => 'zones_coins',
         ];
 
         $settings = [];

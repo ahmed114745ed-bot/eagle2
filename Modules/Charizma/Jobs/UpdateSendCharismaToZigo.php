@@ -18,6 +18,16 @@ class UpdateSendCharismaToZigo implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     * Number of times the job may be attempted.
+     */
+    public int $tries = 3;
+
+    /**
+     * Number of seconds to wait before retrying the job.
+     */
+    public int $backoff = 2;
+
+    /**
      * Create a new job instance.
      *
      * @return void
@@ -34,18 +44,65 @@ class UpdateSendCharismaToZigo implements ShouldQueue
      */
     public function handle()
     {
-        $room = Room::where(['id' => $this->roomId])->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')->first();
-        
-        $data =
-            (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $this->userIds, $this->earnedCoinsPerUser);
+        $room = Room::where(['id' => $this->roomId])
+            ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone,charizma_status')
+            ->first();
+
+        if (!$room) {
+            Log::warning('UpdateSendCharismaToZigo: Room not found', ['roomId' => $this->roomId]);
+            return;
+        }
+
+        if (!$room->charizma_status) {
+            Log::info('UpdateSendCharismaToZigo: Charizma disabled for room', ['roomId' => $this->roomId]);
+            return;
+        }
+
+        $data = (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $this->userIds, $this->earnedCoinsPerUser);
+
+        if (empty($data)) {
+            Log::info('UpdateSendCharismaToZigo: No charisma data to send', [
+                'roomId' => $this->roomId,
+                'userIds' => $this->userIds,
+            ]);
+            return;
+        }
+
         $ms = [
             'messageContent' => [
                 "message" => "updateCharisma",
                 "data" => $data,
             ]
         ];
-        $json = json_encode ($ms);
+        $json = json_encode($ms);
 
-        Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
+        $response = Common::sendToZego('SendCustomCommand', $room->id, $this->userId, $json);
+
+        if ($response === null || (isset($response['Code']) && $response['Code'] != 0)) {
+            Log::error('UpdateSendCharismaToZigo: Zego API failed', [
+                'roomId' => $this->roomId,
+                'userId' => $this->userId,
+                'response' => $response,
+                'attempt' => $this->attempts(),
+            ]);
+
+            // Throw exception to trigger retry
+            if ($this->attempts() < $this->tries) {
+                throw new \Exception('Zego API call failed, retrying...');
+            }
+        }
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(?\Throwable $exception): void
+    {
+        Log::error('UpdateSendCharismaToZigo: Job failed permanently', [
+            'roomId' => $this->roomId,
+            'userId' => $this->userId,
+            'userIds' => $this->userIds,
+            'exception' => $exception?->getMessage(),
+        ]);
     }
 }
