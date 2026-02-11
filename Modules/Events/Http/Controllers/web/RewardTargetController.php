@@ -76,7 +76,7 @@ class RewardTargetController extends MainController
         $target = ChargeTargetEvent::query()->find($charge_event_id);
         $grid = new Grid(new RewardTarget());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("charge_event_id", $charge_event_id);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("charge_event_id", $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
 

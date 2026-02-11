@@ -128,7 +128,7 @@ class UserAchievementService
             ->where('user_id', $user->id)
             ->where('is_enable', true)
             ->where('picked', true)
-            ->with('customAchievement')
+            ->with('customAchievement', 'customAchievement.images')
             ->where(function ($query) {
                 $query->whereNull('end_at')
                     ->orWhere('end_at', '>', now());

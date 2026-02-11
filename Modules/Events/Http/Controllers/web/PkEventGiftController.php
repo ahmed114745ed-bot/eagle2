@@ -98,7 +98,7 @@ class PkEventGiftController extends MainController
         $pkType = request('pk_type');
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->orderBy('level');
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->orderBy('level');
         $grid->column('created_at')->hide();
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 1);
         $grid->column('id', __('Id'));
@@ -174,7 +174,7 @@ class PkEventGiftController extends MainController
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -245,7 +245,7 @@ class PkEventGiftController extends MainController
         $pkType = request('pk_type');
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->orderBy('level');
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->orderBy('level');
         $grid->column('created_at')->hide();
         $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 3);
         $grid->column('id', __('Id'));

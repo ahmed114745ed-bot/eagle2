@@ -193,7 +193,7 @@ class RankingTypeController extends MainController
     public function getRewards($id)
     {
         // Load the RankingRange and its rewards
-        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge','rewards.customAchievement'])->findOrFail($id);
+        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge','rewards.customAchievement','rewards.customAchievement.images'])->findOrFail($id);
         $members = $model->rewards->map(function ($reward) {
 
             $gift = '';

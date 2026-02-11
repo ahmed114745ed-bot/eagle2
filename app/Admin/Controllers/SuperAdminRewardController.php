@@ -249,6 +249,8 @@ class SuperAdminRewardController extends MainController
                 'ware:id,name,img2,show_img',
                 'vip:id,name,img',
                 'badge:id,name,image',
+                "customAchievement",
+                'customAchievement.images',
             ])
             ->select('id', 'type', 'target', 'expire', 'quantity', 'super_package_id')
             ->get()
@@ -279,8 +281,8 @@ class SuperAdminRewardController extends MainController
                         break;
 
                     case 'achievement':
-                        $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
-                        $path  = $memper->target;
+                        $gifts = $memper->customAchievement?->name ?? '';
+                        $path  = $memper->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
                 }
 

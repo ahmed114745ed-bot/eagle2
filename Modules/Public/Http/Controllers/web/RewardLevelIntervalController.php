@@ -99,7 +99,7 @@ class RewardLevelIntervalController extends MainController
                 ]);
             });
         });
-        $grid->model()->with(['ware', 'vip','customAchievement'])->where('level_interval_id', $level_interval);
+        $grid->model()->with(['ware', 'vip','customAchievement','customAchievement.images'])->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {

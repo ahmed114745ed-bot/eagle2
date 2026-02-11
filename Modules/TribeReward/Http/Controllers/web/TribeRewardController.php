@@ -53,7 +53,7 @@ class TribeRewardController extends MainController
         $grid = new Grid(new TribeReward());
 
         $tribe_top_id = request('tribe_top_id');
-        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement'])->where('tribe_top_id', $tribe_top_id);
+        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement','customAchievement.images'])->where('tribe_top_id', $tribe_top_id);
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('type', __('Type'));

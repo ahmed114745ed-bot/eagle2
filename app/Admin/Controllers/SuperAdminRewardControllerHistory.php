@@ -440,8 +440,8 @@ class SuperAdminRewardControllerHistory extends MainController
                         break;
 
                     case 'achievement':
-                        $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
-                        $path  = $memper->target;
+                        $gifts = $memper->customAchievement?->name ?? '';
+                        $path  = $memper->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
                 }
 

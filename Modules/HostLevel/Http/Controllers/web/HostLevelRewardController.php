@@ -78,7 +78,7 @@ class HostLevelRewardController extends MainController
     {
         $host_level_id = request('host_level_id');
         $grid = new Grid(new HostLevelReward());
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("host_level_id", $host_level_id);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("host_level_id", $host_level_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         if (!request()->filled('_export_')) {
