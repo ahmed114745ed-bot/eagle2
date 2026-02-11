@@ -556,7 +556,8 @@ class User extends Authenticatable
             return;
         }
 
-        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
+//        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
+        return @$this->profile()->first()->avatar ?: "images/businessman-icon.jpg";
     }
 
     public function profile()
