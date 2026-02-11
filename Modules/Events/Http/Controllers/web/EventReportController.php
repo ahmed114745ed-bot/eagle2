@@ -326,8 +326,8 @@ class EventReportController extends MainController
                     $name = @$reward?->target;
                     $img = asset('coin.png');
                 } elseif ($reward->type == "achievement") {
-                    $name = "Achievement";
-                    $img = getDriverUrl() . '/' . $reward?->target;
+                    $name = @$reward->customAchievement?->name ?? '';
+                    $img = getImagePath($reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? "");
                 } else {
                     $name = "-";
                     $img = asset('coin.png');

@@ -122,7 +122,7 @@ class WinnerRankingController extends  MainController
                 'vip'         => $this->reward->vip?->name,
                 'badge'       => $this->reward->badge?->name,
                 'coins'       => $this->reward->target,
-                'achievement' =>  $path = $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ??  '',
+                'achievement' =>  $this->reward->customAchievement?->name ?? '',
                 default       => '',
             };
         });
@@ -132,7 +132,7 @@ class WinnerRankingController extends  MainController
                 'ware'        => $this->reward->ware->img2 ?? $this->reward->ware->show_img,
                 'vip'         => $this->reward->vip->img ?? '',
                 'badge'       => $this->reward->badge->image ?? '',
-                'achievement' => $this->reward->customAchievement?->name ?? '',
+                'achievement' => $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '',
                 default       => 'coin.png',
             };
 

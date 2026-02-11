@@ -47,7 +47,7 @@ class AdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type)->with(['ware','vip','badge'])->whereRaw('no_reward - gave_reward_no != 0');
+        $grid->model()->where('type',  $type)->with(['ware','vip','badge','customAchievement','customAchievement.images'])->whereRaw('no_reward - gave_reward_no != 0');
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
@@ -62,8 +62,7 @@ class AdminRewardController extends MainController
             } elseif ($this->type == "coin") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
@@ -78,7 +77,7 @@ class AdminRewardController extends MainController
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } else {
                     $path = 'coin.png';
                 }

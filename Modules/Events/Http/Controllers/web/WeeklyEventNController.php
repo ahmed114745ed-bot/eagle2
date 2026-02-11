@@ -235,17 +235,16 @@ class WeeklyEventNController extends MainController
             if ($this->type == "coins") {
                 return $target;
             } elseif ($this->type == "ware") {
-                $ware = Ware::find($target);
+                $ware = $this->ware;
                 return  $ware ? ($ware->name ?? '') : "";
             } elseif ($this->type == "vip") {
-                $vip = OVip::find($target);
+                $vip = $this->vip;
                 return  $vip ? ($vip->name ?? '') : "";
             } elseif ($this->type == "badge") {
-                $vip = Badge::find($target);
+                $vip = $this->badge;
                 return $vip ? (@$vip->name ?? '') : "";
             } else {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('expire', trans('expire'));
