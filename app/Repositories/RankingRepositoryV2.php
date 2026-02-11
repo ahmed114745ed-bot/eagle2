@@ -194,6 +194,14 @@ class RankingRepositoryV2
             ->where('role', $role)
             ->where('ranker_type', User::class)
             ->where('type', $rankingType)
+            ->when($role === 'roomOwner', function ($query) {
+                return $query->whereExists(function ($sub) {
+                    $sub->selectRaw(1)
+                        ->from('rooms')
+                        ->whereColumn('rooms.uid', 'gift_rankings.ranker_id')
+                        ->where('rooms.room_status', '!=', '4');
+                });
+            })
             ->orderByDesc('total_gifts')
             ->take($perPage)
             ->get();
