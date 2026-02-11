@@ -270,7 +270,6 @@ class GiftLogService
 
                     $totalRoomGift = $this->getOrCreateTotalRoomGift($room->id, $todayStart);
 
-                    info($totalPrice);
                     $totalRoomGift->increment('current_total', $totalPrice);
                 }
             }
