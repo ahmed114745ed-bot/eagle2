@@ -10,6 +10,7 @@ use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PkReward extends Model
@@ -25,6 +26,11 @@ class PkReward extends Model
         return $this->belongsTo(PkEvent::class, 'pk_event_id');
     }
 
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
+    }
+    
     public function rewardsPk()
     {
         return $this->belongsToMany(PkWinner::class, 'pk_winner_id', 'pk_reward_id');
