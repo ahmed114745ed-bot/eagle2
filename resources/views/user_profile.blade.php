@@ -1132,7 +1132,7 @@
                 <div class="meta-item">
                     <span class="meta-label">{{__('type')}}:</span>
                    
-                    {!! @$user->userTypeBadge() !!}{!! @$user->userBadgeTop() !!}
+                    {!! @$user->userBadgeTop() !!}
                 </div>
 
             </div>

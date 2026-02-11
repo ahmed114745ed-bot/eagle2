@@ -36,7 +36,7 @@ class MyDataForAgancyResource extends JsonResource
             'profile' => new ProfileForAjancyResource(@$this->profile), // both
             'has_color_name' => false,
             'gender' => $this->gender,
-            'colored_name' => $hasColor ? common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$this->id, 18, 'color') : null),
 
         ];
 

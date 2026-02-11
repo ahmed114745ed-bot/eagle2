@@ -89,8 +89,9 @@ class UserRewardsWeeklyCp
         $dateTimestamp = Carbon::parse($expire)->format('Y-m-d H:i:s');
 
         $attributes = [
-            'custom_image' => $itemId,
+            'custom_achievement_id' => $itemId,
             'end_at'       => $dateTimestamp,
+            'receive_type' => 'weekly-cp',
         ];
 
         UserAchievementLevel::create(array_merge($attributes, ['user_id' => $userOne->id]));

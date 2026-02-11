@@ -15,6 +15,7 @@ use Encore\Admin\Auth\Permission;
 use Modules\Badge\Entities\Badge;
 use App\Services\AppFeatureService;
 use Modules\Events\Entities\Reward;
+use App\Selectables\CustomAchievements;
 use Modules\Events\Entities\WeeklyStar;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
@@ -129,7 +130,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -143,7 +144,7 @@ class WeeklyEventGiftNController extends MainController
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                 return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
@@ -158,7 +159,7 @@ class WeeklyEventGiftNController extends MainController
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -204,7 +205,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -217,24 +218,24 @@ class WeeklyEventGiftNController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+
+                return $this->customAchievement?->name ?? '';
             }
         });
 
         if (!request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
                 if ($this->type == 'ware') {
-                    $ware = Ware::find($this->target);
+                    $ware = $this->ware;
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = $this->vip;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -278,7 +279,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -292,7 +293,7 @@ class WeeklyEventGiftNController extends MainController
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         if (!request()->filled('_export_')) {
@@ -307,7 +308,7 @@ class WeeklyEventGiftNController extends MainController
                     // $vips = Badge::find($this->target);
                     $path = @$this->badge->image ?? '';
                 } elseif ($this->type == 'achievement') {
-                    $path = $this->target;
+                    $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
                     $path = 'coin.png';
                 }
@@ -375,9 +376,12 @@ class WeeklyEventGiftNController extends MainController
             ->when("coins", function () use ($form) {
                 $form->number("target3", __("coins"));
             })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                // $form->image("target4", __('image'))->name(function ($file) {
+                //     return now()->timestamp . '.' . $file->guessExtension();
+                // })->disk('gcs');
+
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire', __('expire'))->default(1);
             })->rules('required');
 

@@ -109,7 +109,7 @@ class RoleRewardsController extends MainController
                 } elseif ($this->type === "achievement") {
                     $path = $this?->reward_achievement;
                 } elseif ($this->type === "badge") {
-                    $path = $this->rewardable?->icon;
+                    $path = $this->rewardable?->images->firstWhere('language', app()->getLocale())?->image;
                 } else {
                     $path = 'coin.png';
                 }
