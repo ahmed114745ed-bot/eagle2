@@ -54,7 +54,7 @@ class NormalBoxRtmJob implements ShouldQueue
                 ]
             ];
             $json = json_encode($m);
-            Common::sendToZego('SendCustomCommand', @$room->id, @$userRoomVisit->user_id, $json);
+            Common::sendToZego('SendCustomCommand', @$room->id, $userRoomVisit, $json);
         }
     }
 }

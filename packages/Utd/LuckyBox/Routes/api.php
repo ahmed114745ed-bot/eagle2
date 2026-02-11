@@ -28,61 +28,61 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
     }
 );
 
-Route::get('/test-room-zego', function (Request $request) {
-    $roomId = $request->query('room_id');
-
-    if (!$roomId) {
-        return response()->json([
-            'status' => 0,
-            'message' => 'room_id is required',
-        ], 422);
-    }
-
-    $room = Room::find($roomId);
-
-    $payload = [
-        'messageContent' => [
-            'message' => 'hideluckybox',
-            'ownerBoxId' => $room->uid,
-            'ownerBoxName' => 'test',
-            'boxCoins' => 'test',
-            'boxId' => $roomId,
-            'boxType' => 'normal',
-            'numOfBoxes' => 'remaining',
-        ],
-    ];
-
-    $json = json_encode($payload);
-
-    $payload2 = [
-        'messageContent' => [
-            'message' => 'winnerLuckyBox',
-            'boxUId' => $room->uid,
-            'ownerId' => $room->uid,
-            'ownerName' => '',
-            'ownerImage' => '',
-            'ownerUuId' => 1,
-            'winners' => [],
-        ],
-    ];
-    $json2 = json_encode($payload2);
-
-    try {
-        Common::sendToZego('SendCustomCommand', $roomId, 1, $json);
-        Common::sendToZego('SendCustomCommand', $roomId, 1, $json2);
-
-        return response()->json([
-            'status' => 1,
-            'message' => 'Zego test message sent successfully',
-            'room_id' => $roomId,
-            'payload' => $payload,
-            'payload2' => $payload2,
-        ]);
-    } catch (\Throwable $th) {
-        return response()->json([
-            'status' => 0,
-            'message' => 'Failed to send test message',
-            'error' => $th->getMessage(),
-        ], 500);
-    }
-});
+//Route::get('/test-room-zego', function (Request $request) {
+//    $roomId = $request->query('room_id');
+//
+//    if (!$roomId) {
+//        return response()->json([
+//            'status' => 0,
+//            'message' => 'room_id is required',
+//        ], 422);
+//    }
+//
+//    $room = Room::find($roomId);
+//
+//    $payload = [
+//        'messageContent' => [
+//            'message' => 'hideluckybox',
+//            'ownerBoxId' => $room->uid,
+//            'ownerBoxName' => 'test',
+//            'boxCoins' => 'test',
+//            'boxId' => $roomId,
+//            'boxType' => 'normal',
+//            'numOfBoxes' => 'remaining',
+//        ],
+//    ];
+//
+//    $json = json_encode($payload);
+//
+//    $payload2 = [
+//        'messageContent' => [
+//            'message' => 'winnerLuckyBox',
+//            'boxUId' => $room->uid,
+//            'ownerId' => $room->uid,
+//            'ownerName' => '',
+//            'ownerImage' => '',
+//            'ownerUuId' => 1,
+//            'winners' => [],
+//        ],
+//    ];
+//    $json2 = json_encode($payload2);
+//
+//    try {
+//        Common::sendToZego('SendCustomCommand', $roomId, 1, $json);
+//        Common::sendToZego('SendCustomCommand', $roomId, 1, $json2);
+//
+//        return response()->json([
+//            'status' => 1,
+//            'message' => 'Zego test message sent successfully',
+//            'room_id' => $roomId,
+//            'payload' => $payload,
+//            'payload2' => $payload2,
+//        ]);
+//    } catch (\Throwable $th) {
+//        return response()->json([
+//            'status' => 0,
+//            'message' => 'Failed to send test message',
+//            'error' => $th->getMessage(),
+//        ], 500);
+//    }
+//});

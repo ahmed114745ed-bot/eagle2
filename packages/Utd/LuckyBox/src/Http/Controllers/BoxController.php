@@ -43,7 +43,6 @@ class BoxController extends Controller
     public function send(Request $request)
     {
         $user = $request->user();
-        $timestamp = Carbon::now()->timestamp;
 
         $roomUid = $request->room_uid;
         $roomId = $request->room_id;
@@ -62,7 +61,6 @@ class BoxController extends Controller
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
         if ($user->di < $box->coins) return Common::apiResponse(0, __('low balance'), null, 407);
 
-        $userBoxes = BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
         $label = '';
 
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
@@ -74,8 +72,6 @@ class BoxController extends Controller
 
     public function sendTest(Request $request, $user)
     {
-        $timestamp = Carbon::now()->timestamp;
-
         if (!$request->box_id || !$request->room_uid) return Common::apiResponse(0, 'missing params', null, 422);
         $room = Room::query()->where('uid', $request->room_uid)->first();
         if (!$room) return Common::apiResponse(0, 'room not found', null, 404);
@@ -84,7 +80,6 @@ class BoxController extends Controller
         if (($box->type == 0) && !$request->users_num) return Common::apiResponse(0, 'missing number of users', null, 422);
         if ($user->di < $box->coins) return Common::apiResponse(0, __('low balance'), null, 407);
 
-        $userBoxes = BoxUse::where('end_at', '>=', $timestamp)->where('user_id', $user->id)->exists();
         $label = '';
 
         if ($request->label && $box->type == 1 && $box->has_label == 1) {
