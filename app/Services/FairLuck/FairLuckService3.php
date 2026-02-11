@@ -120,21 +120,17 @@ class FairLuckService3
             $baseWeight = $this->getNaturalWeight($m);
             
             if ($deviation > 0.02) { 
-                // User is winning, suppress high multipliers aggressively.
-                // Maximum allowed is 20x, but 5x-10x is most likely.
                 if ($m > 20) {
                     $weights[] = 0;
                 } elseif ($m > 5) {
-                    $weights[] = (int)($baseWeight * 0.1); // 90% reduction
+                    $weights[] = (int)($baseWeight * 0.1); 
                 } else {
-                    $weights[] = $baseWeight * 3; // Focus on 5x
+                    $weights[] = $baseWeight * 3; 
                 }
             } elseif ($deviation < -0.15) {
-                // User is in deficit, high multipliers are much more likely
                 if ($m >= 250) $weights[] = $baseWeight * 5 * $chaos;
                 else $weights[] = $baseWeight;
             } else {
-                // Normal state
                 $weights[] = $baseWeight * $chaos;
             }
         }
