@@ -158,7 +158,8 @@ class ChargeEventController extends Controller
             } elseif ($reward->type == "achievement") {
                 $attributes = [
                     'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
+                    'receive_type' => 'charge-event',
+                    'custom_achievement_id' => $reward->target,
                 ];
                 UserAchievementLevel::create($attributes);
             } elseif ($reward->type == 'badge') {
