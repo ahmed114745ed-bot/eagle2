@@ -82,7 +82,7 @@ class MilestoneRewardController
             } elseif ($this->type === "vip") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "achievement") {
-                return $this->rewardable?->title ?? "-";
+                return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "badge") {
                 return $this->rewardable?->title ?? "-";
             }
