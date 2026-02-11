@@ -6,6 +6,7 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
+use Modules\Badge\Entities\Badge;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Modules\Achievement\Entities\CustomAchievement;
@@ -22,6 +23,11 @@ class TribeReward extends Model
     public function vip()
     {
         return $this->hasOne(OVip::class, 'id', 'target');
+    }
+
+    public function badge()
+    {
+        return $this->hasOne(Badge::class, 'id', 'target');
     }
 
     public function customAchievement()
