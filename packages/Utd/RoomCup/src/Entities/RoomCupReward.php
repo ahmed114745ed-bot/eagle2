@@ -6,6 +6,8 @@ use App\Support\PackageHelper;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\TotalRoomGift;
 
 class RoomCupReward extends Model
 {
@@ -22,11 +24,8 @@ class RoomCupReward extends Model
 
     public function gift(): BelongsTo
     {
-        if (PackageHelper::isInstalled('room')) {
-            $totalRoomGiftClass = \Utd\Room\Entities\TotalRoomGift::class;
-            return $this->belongsTo($totalRoomGiftClass, 'total_room_gift_id');
-        }
-        return $this->belongsTo(self::class, 'id'); // Null relation fallback
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(TotalRoomGift::class, 'total_room_gift_id');
     }
 
     public function user(): BelongsTo
@@ -36,11 +35,8 @@ class RoomCupReward extends Model
 
     public function room(): BelongsTo
     {
-        if (PackageHelper::isInstalled('room')) {
-            $roomClass = \Utd\Room\Entities\Room::class;
-            return $this->belongsTo($roomClass, 'room_id');
-        }
-        return $this->belongsTo(self::class, 'id'); // Null relation fallback
+        return PackageHelper::checkRelation($this, 'room', 'belongsTo') ??
+            $this->belongsTo(Room::class, 'room_id');
     }
 
     public function target(): BelongsTo

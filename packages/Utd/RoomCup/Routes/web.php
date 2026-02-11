@@ -21,8 +21,8 @@ Route::resource('room-cup-reports', RoomCupReportsController::class);
 Route::get('/cup-targets-view', [RoomCupTargetController::class, 'cupTargetHtml'])->withoutMiddleware(['web', 'admin']);
 
 // Manual trigger route (for testing)
-Route::get('/roomcup/calculate-rewards', function () {
-    Artisan::call('roomcup:calculate-rewards');
-    $output = Artisan::output();
-    return response()->json(['output' => $output]);
-});
+//Route::get('/roomcup/calculate-rewards', function () {
+//    Artisan::call('roomcup:calculate-rewards');
+//    $output = Artisan::output();
+//    return response()->json(['output' => $output]);
+//});
