@@ -757,24 +757,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Lucky box',
-                'sort' => 30,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 30],
-                ],
-                'permissions' => [
-                    ['key' => 'boxes', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'box-use', 'except' => ['create'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show'],
-                    ],],
-                    ['key' => 'box-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Events',
                 'sort' => 31,
                 'types' => [
@@ -1288,6 +1270,27 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete',],
                     ],],
                     ['key' => 'cp-setting', 'except' => ['show', 'create', 'edit', 'delete'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('luckyBox')) {
+            $categories[] = [
+                'name' => 'Lucky box',
+                'sort' => 30,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 30],
+                ],
+                'permissions' => [
+                    ['key' => 'boxes', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'box-use', 'except' => ['create'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show'],
+                    ],],
+                    ['key' => 'box-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
                     ],],
                 ],

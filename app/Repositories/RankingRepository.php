@@ -20,12 +20,17 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\CoinGameUserMergedMonthly;
 use Utd\Achievements\Enums\AchievementType;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
-use Modules\LuckyBox\Entities\UserLuckyGift;
+use Utd\LuckyBox\Entities\UserLuckyGift;
+use App\Support\PackageHelper;
 
 class RankingRepository
 {
     public function getUserLuckyGifts($type, $limit)
     {
+        if (!PackageHelper::isInstalled('luckyBox')) {
+            return collect();
+        }
+
         $query = UserLuckyGift::query();
         $this->applyDateFilters($query, $type);
 

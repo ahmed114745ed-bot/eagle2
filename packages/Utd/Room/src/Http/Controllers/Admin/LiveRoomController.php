@@ -22,7 +22,7 @@ use App\Models\Admin as AdminModel;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Support\Facades\Cache;
-use Modules\LuckyBox\Entities\BoxUse;
+use Utd\LuckyBox\Entities\BoxUse;
 
 class LiveRoomController extends \App\Admin\Controllers\MainController
 {
@@ -151,29 +151,32 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         );
 
         // 5. Boxes in Room
-        $query = BoxUse::where('room_id', $room->id)
-            ->with(['user.profile', 'picks', 'box']);
+        $boxes = null;
+        if (PackageHelper::isInstalled('luckyBox')) {
+            $query = BoxUse::where('room_id', $room->id)
+                ->with(['user.profile', 'picks', 'box']);
 
-        if (request('type') !== null && request('type') !== '') {
-            $query->where('type', request('type'));
-        }
-
-        if (request('status')) {
-            $now = \Carbon\Carbon::now()->timestamp;
-            switch (request('status')) {
-                case 'active':
-                    $query->where('is_closed', false)->where('end_at', '>', $now);
-                    break;
-                case 'closed':
-                    $query->where('is_closed', true);
-                    break;
-                case 'expired':
-                    $query->where('end_at', '<=', $now);
-                    break;
+            if (request('type') !== null && request('type') !== '') {
+                $query->where('type', request('type'));
             }
-        }
 
-        $boxes = $query->orderByDesc('created_at')->paginate(15);
+            if (request('status')) {
+                $now = \Carbon\Carbon::now()->timestamp;
+                switch (request('status')) {
+                    case 'active':
+                        $query->where('is_closed', false)->where('end_at', '>', $now);
+                        break;
+                    case 'closed':
+                        $query->where('is_closed', true);
+                        break;
+                    case 'expired':
+                        $query->where('end_at', '<=', $now);
+                        break;
+                }
+            }
+
+            $boxes = $query->orderByDesc('created_at')->paginate(15);
+        }
 
         $roomTypes = RoomCategory::where('enable', 1)->get();
 

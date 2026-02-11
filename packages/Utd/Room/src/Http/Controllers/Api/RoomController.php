@@ -21,7 +21,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\MultiQueryPagination;
 use Illuminate\Support\Facades\Auth;
 use Utd\Room\Services\RoomRepoService;
-use Modules\LuckyBox\Entities\BoxUse;
+use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Room\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\RoomResource;
@@ -184,7 +184,7 @@ class RoomController extends Controller
         $collections = [
             'charisma' => $this->roomCharisma($owner_id),
             'achievements' => $this->achievementLevels($owner_id),
-            'boxes' => BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())),
+            'boxes' => PackageHelper::isInstalled('luckyBox') ? BoxUseResource::collection($this->getBoxes($owner_id, Auth::id())) : [],
             'open_boom' => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
@@ -215,7 +215,7 @@ class RoomController extends Controller
         $collections = [
             'charisma' => $this->roomCharisma($room->id),
             'achievements' => $this->achievementLevels($owner_id),
-            'boxes' => BoxUseResource::collection($this->getBoxes($room->id, Auth::id())),
+            'boxes' => PackageHelper::isInstalled('luckyBox') ? BoxUseResource::collection($this->getBoxes($room->id, Auth::id())) : [],
             'open_boom' => $openBoom ? new RoomBoomResource($openBoom) : null,
         ];
         return Common::apiResponse(true, 'successfully', $collections);
@@ -223,6 +223,10 @@ class RoomController extends Controller
 
     private function getBoxes($roomId, $userId)
     {
+        if (!PackageHelper::isInstalled('luckyBox')) {
+            return collect();
+        }
+
         return BoxUse::query()
             ->with('user', fn($q) => $q->with('profile')->withoutAppends()->select(['id', 'name', 'uuid']))
             ->where('room_id', $roomId)

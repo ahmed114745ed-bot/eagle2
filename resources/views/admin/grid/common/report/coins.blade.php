@@ -24,9 +24,10 @@
 <div class="col">
 
     @if(request()->name == 'lucky_gift' || request()->name == null)
+        @if(\App\Support\PackageHelper::isInstalled('luckyBox'))
         <div class="col my-1 form-Roles">
             @php
-                $subQuery = \Modules\LuckyBox\Entities\UserLuckyGift::query()
+                $subQuery = \Utd\LuckyBox\Entities\UserLuckyGift::query()
                                  ->selectRaw(
                                         'MIN(user_lucky_gifts.created_at) as earliest_created_at, ' .
                                         'SUM(user_lucky_gifts.number) as total_number, ' .
@@ -72,6 +73,11 @@
             <label class="form-label">حاصل الفرق</label>
             <input type="text" class="form-control " id="sender" name="sender"  value="{{ @$totalNumberWin->grand_total_number_win - @$totalNumberWin->grand_total_number_cost }}" >
         </div>
+        @else
+        <div class="col my-1">
+            <p class="text-muted">LuckyBox package is not installed</p>
+        </div>
+        @endif
     @elseif(request()->name == 'games')
             <div class="col my-1 form-Roles">
                 @php

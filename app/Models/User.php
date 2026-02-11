@@ -31,7 +31,7 @@ use Modules\Badge\Entities\UserBadge;
 use Modules\Chat\Traits\ChatUserTrait;
 use Utd\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
-use Modules\LuckyBox\Entities\UserLuckyGift;
+use Utd\LuckyBox\Entities\UserLuckyGift;
 use Modules\SalaryTransaction\Entities\ChargeAgency;
 use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
@@ -465,7 +465,8 @@ class User extends Authenticatable
 
     public function luckyGifts()
     {
-        return $this->hasMany(UserLuckyGift::class);
+        return PackageHelper::checkRelation($this, 'luckyBox', 'hasMany') ??
+            $this->hasMany(UserLuckyGift::class);
     }
 
     public function follows()

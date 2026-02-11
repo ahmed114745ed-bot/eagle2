@@ -7,7 +7,8 @@ use Encore\Admin\Grid;
 
 use App\Models\CoinGameUser;
 use Encore\Admin\Layout\Content;
-use Modules\LuckyBox\Entities\UserLuckyGift;
+use Utd\LuckyBox\Entities\UserLuckyGift;
+use App\Support\PackageHelper;
 
 class CoinReportController extends MainController
 {
@@ -44,6 +45,10 @@ class CoinReportController extends MainController
 
     protected function lucky_gift()
     {
+        if (!PackageHelper::isInstalled('luckyBox')) {
+            return new Grid(new \App\Models\User()); // Empty grid fallback
+        }
+
         $grid = new Grid(new UserLuckyGift());
         $countryID = session('filter_country_id');
 

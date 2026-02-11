@@ -20,7 +20,7 @@
     "DailyPrize": true,
     "Tasks": true,
     "Wallet": true,
-    "LuckyBox": true,
+    "LuckyBox": false,
     "TribeReward": true,
     "Vip": true,
     "Badge": true,

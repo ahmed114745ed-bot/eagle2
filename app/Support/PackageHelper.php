@@ -7,6 +7,7 @@ use Modules\TaskStream\Entities\TaskStream;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\CP\Entities\Cp;
+use Utd\LuckyBox\Entities\Box;
 use Utd\Moments\Entities\Moment;
 use Utd\Reals\Entities\Real;
 use Utd\Pk\Entities\Pk;
@@ -27,6 +28,7 @@ class PackageHelper
         'roomCup' => RoomCupTarget::class,
         'charisma' => ExtraDataInRoom::class,
         'cp' => Cp::class,
+        'luckyBox' => Box::class,
     ];
 
     /**

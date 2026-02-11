@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Jobs;
 
-use App\Jobs\OpenBoxJob;
+use Utd\LuckyBox\Jobs\OpenBoxJob;
 use Illuminate\Support\Facades\Redis;
 use Tests\TestCase;
 

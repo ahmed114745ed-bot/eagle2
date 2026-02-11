@@ -6,7 +6,8 @@ use App\Helpers\Common;
 use App\Models\CoinGameUser;
 use App\Models\GiftLog;
 use App\Models\UserCoinLog;
-use Modules\LuckyBox\Entities\UserLuckyGift;
+use Utd\LuckyBox\Entities\UserLuckyGift;
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -34,13 +35,16 @@ class LogAppProfitCoinsCommand extends Command
                     'type' => 'game',
                     'sub_type' => 'coin_game_users'
                 ],
-                [
+            ];
+
+            if (PackageHelper::isInstalled('luckyBox')) {
+                $tables[] = [
                     'table' => 'user_lucky_gifts',
                     'user_column' => 'user_id',
                     'type' => 'lucky',
                     'sub_type' => 'user_lucky_gifts'
-                ]
-            ];
+                ];
+            }
 
             foreach ($tables as $config) {
                 $this->processTable(
@@ -84,8 +88,10 @@ class LogAppProfitCoinsCommand extends Command
                         break;
 
                     case 'user_lucky_gifts':
-                        $luckyGift = UserLuckyGift::with('gift')->find($row->id);
-                        $itemName = $luckyGift?->gift?->name ?? '';
+                        if (PackageHelper::isInstalled('luckyBox')) {
+                            $luckyGift = UserLuckyGift::with('gift')->find($row->id);
+                            $itemName = $luckyGift?->gift?->name ?? '';
+                        }
                         break;
 
                     case 'coin_game_users':

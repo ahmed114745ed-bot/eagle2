@@ -1,0 +1,29 @@
+{
+    "name": "utd/lucky-box",
+    "description": "Lucky Box Package - Manage lucky boxes and rewards in rooms",
+    "type": "library",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "UTD Team"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\LuckyBox\\": "src/",
+            "Utd\\LuckyBox\\Database\\Seeders\\": "Database/Seeders/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\LuckyBox\\LuckyBoxServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

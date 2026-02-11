@@ -37,8 +37,6 @@ use App\Http\Controllers\utd\AppearChargerAgencyController;
 use App\Http\Controllers\utd\BanController;
 use App\Http\Controllers\utd\BannerController;
 use App\Http\Controllers\utd\BlackListController;
-use App\Http\Controllers\utd\BoxController;
-use App\Http\Controllers\utd\BoxUserController;
 use App\Http\Controllers\utd\ChargeAgencyController;
 use App\Http\Controllers\utd\ChargeCountryController;
 use App\Http\Controllers\utd\ChargeReportController;
@@ -255,25 +253,6 @@ Route::middleware([])->group(function () {
         Route::post('/delete/{id}', [EmojiController::class, 'delete']);
         Route::post('/delete-all', [EmojiController::class, 'delete_all']);
         Route::get('/{id}', [EmojiController::class, 'show']);
-    });
-
-
-    Route::prefix('boxes')->group(function () {
-        Route::get('/', [BoxController::class, 'index']);
-        Route::post('/create', [BoxController::class, 'store']);
-        Route::post('/update/{id}', [BoxController::class, 'update']);
-        Route::post('/delete/{id}', [BoxController::class, 'delete']);
-        Route::post('/delete-all', [BoxController::class, 'delete_all']);
-        Route::get('/{id}', [BoxController::class, 'show']);
-    });
-
-
-    Route::prefix('thrown-boxes')->group(function () {
-        Route::get('/', [BoxUserController::class, 'index']);
-        Route::post('/update/{id}', [BoxUserController::class, 'update']);
-        Route::post('/delete/{id}', [BoxUserController::class, 'delete']);
-        Route::post('/delete-all', [BoxUserController::class, 'delete_all']);
-        Route::get('/{id}', [BoxUserController::class, 'show']);
     });
 
 

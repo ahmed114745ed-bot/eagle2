@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuckyBox Package - Installation Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #fff;
+        }
+        
+        .cover-page {
+            text-align: center;
+            padding: 100px 20px;
+            page-break-after: always;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .cover-page h1 {
+            font-size: 48px;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+        
+        .cover-page .subtitle {
+            font-size: 24px;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        
+        .cover-page .version {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-top: 60px;
+        }
+        
+        .cover-page .date {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            color: #059669;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #10b981;
+        }
+        
+        h2 {
+            font-size: 22px;
+            color: #10b981;
+            margin: 30px 0 15px 0;
+        }
+        
+        h3 {
+            font-size: 18px;
+            color: #34d399;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin: 10px 0;
+        }
+        
+        .toc {
+            background: #ecfdf5;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+            page-break-after: always;
+        }
+        
+        .toc h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+        
+        .toc ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .toc li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #a7f3d0;
+        }
+        
+        .toc li:last-child {
+            border-bottom: none;
+        }
+        
+        .toc a {
+            color: #059669;
+            text-decoration: none;
+        }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            color: #10b981;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        pre code {
+            background: none;
+            color: #e2e8f0;
+            padding: 0;
+        }
+        
+        .note {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .note-title {
+            font-weight: bold;
+            color: #059669;
+            margin-bottom: 5px;
+        }
+        
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .warning-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 5px;
+        }
+        
+        .success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .step {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #059669;
+            display: inline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            border: 1px solid #a7f3d0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #ecfdf5;
+            font-weight: bold;
+            color: #059669;
+        }
+        
+        tr:nth-child(even) {
+            background: #ecfdf5;
+        }
+        
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .checkmark {
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+        
+        @media print {
+            body {
+                padding: 20px;
+            }
+            
+            pre {
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+            
+            .cover-page {
+                min-height: auto;
+                padding: 50px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <h1>🎁 LuckyBox Package</h1>
+        <div class="subtitle">Installation & Setup Guide</div>
+        <p>A comprehensive guide to install and configure the LuckyBox package for Laravel applications</p>
+        <div class="version">Version 1.0.0</div>
+        <div class="date">Last Updated: February 2026</div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h2>📋 Table of Contents</h2>
+        <ul>
+            <li><a href="#overview">1. Overview</a></li>
+            <li><a href="#requirements">2. Requirements</a></li>
+            <li><a href="#installation">3. Installation Steps</a></li>
+            <li><a href="#configuration">4. Configuration</a></li>
+            <li><a href="#database">5. Database Tables</a></li>
+            <li><a href="#routes">6. Routes & API</a></li>
+            <li><a href="#verification">7. Verification</a></li>
+            <li><a href="#troubleshooting">8. Troubleshooting</a></li>
+        </ul>
+    </div>
+
+    <!-- Section 1: Overview -->
+    <h1 id="overview">1. Overview</h1>
+    
+    <h2>1.1 What is LuckyBox?</h2>
+    <p>LuckyBox is a gamification feature that allows users to send coin-filled boxes in rooms. Other users can pick up these boxes to win coins, creating an engaging interactive experience.</p>
+    
+    <h2>1.2 Key Features</h2>
+    <ul>
+        <li><strong>Normal Boxes</strong> - Standard boxes with configurable coin amounts and user limits</li>
+        <li><strong>Super Boxes</strong> - Special boxes with higher rewards</li>
+        <li><strong>Room Integration</strong> - Boxes appear in real-time in rooms</li>
+        <li><strong>Coin Distribution</strong> - Automatic coin distribution to box pickers</li>
+        <li><strong>Box Duration</strong> - Configurable time limits for boxes</li>
+        <li><strong>Lucky Gifts</strong> - Additional gift rewards system</li>
+    </ul>
+
+    <h2>1.3 How It Works</h2>
+    <ol>
+        <li>User creates a box with specified coins and user limit</li>
+        <li>Box appears in the room with a countdown timer</li>
+        <li>Other users in the room can pick up the box</li>
+        <li>Coins are distributed to users who picked up the box</li>
+        <li>Remaining coins return to the box creator if time expires</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <!-- Section 2: Requirements -->
+    <h1 id="requirements">2. Requirements</h1>
+    
+    <h2>2.1 Backend Requirements</h2>
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Minimum Version</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>PHP</td>
+            <td>8.1 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Framework</td>
+            <td>10.x or 11.x</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>Laravel Sanctum</td>
+            <td>Latest</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+        <tr>
+            <td>MySQL</td>
+            <td>5.7 or higher</td>
+            <td><span class="checkmark">✓</span></td>
+        </tr>
+    </table>
+
+    <h2>2.2 Package Dependencies</h2>
+    <table>
+        <tr>
+            <th>Package</th>
+            <th>Purpose</th>
+            <th>Required</th>
+        </tr>
+        <tr>
+            <td>Utd/Room</td>
+            <td>Room integration for box display</td>
+            <td>Required</td>
+        </tr>
+        <tr>
+            <td>Utd/Gifts</td>
+            <td>For lucky gift rewards</td>
+            <td>Optional</td>
+        </tr>
+    </table>
+
+    <h2>2.3 Database Tables</h2>
+    <p>The package will create the following tables:</p>
+    <ul>
+        <li><code>boxs</code> - Box configurations (normal/super types)</li>
+        <li><code>box_uses</code> - Active box instances in rooms</li>
+        <li><code>user_box_gifts</code> - User rewards from picking boxes</li>
+        <li><code>pick_box_lists</code> - Queue for super box distribution</li>
+        <li><code>user_lucky_gifts</code> - Lucky gift rewards history</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <!-- Section 3: Installation -->
+    <h1 id="installation">3. Installation Steps</h1>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <span class="step-title">Copy the Package</span>
+        <p>Copy the <code>LuckyBox</code> folder to your project:</p>
+        <pre><code>packages/Utd/LuckyBox</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <span class="step-title">Update composer.json</span>
+        <p>Add the package path to your <code>composer.json</code> repositories section:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/LuckyBox"
+        }
+    ]
+}</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <span class="step-title">Install the Package</span>
+        <p>Run composer require:</p>
+        <pre><code>composer require utd/luckybox</code></pre>
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <span class="step-title">Run Setup Commands</span>
+        <p>Run migrations, seeders, and clear cache (all in one command):</p>
+        <pre><code>php artisan migrate; php artisan db:seed --class=Utd\LuckyBox\Database\Seeders\LuckyBoxDatabaseSeeder; php artisan db:seed --class=PermissionTypeSeeder; php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 4: Configuration -->
+    <h1 id="configuration">4. Configuration</h1>
+
+    <h2>4.1 Publish Configuration</h2>
+    <p>Publish the configuration file:</p>
+    <pre><code>php artisan vendor:publish --tag=luckybox-config</code></pre>
+
+    <h2>4.2 Configuration Options</h2>
+    <table>
+        <tr>
+            <th>Config Key</th>
+            <th>Description</th>
+            <th>Default</th>
+        </tr>
+        <tr>
+            <td><code>app_wallet_lucky_box</code></td>
+            <td>App wallet for box fees</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td><code>normal_box_duration</code></td>
+            <td>Duration for normal boxes (minutes)</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td><code>lucky_box_percentage</code></td>
+            <td>Platform fee percentage</td>
+            <td>0</td>
+        </tr>
+    </table>
+
+    <h2>4.3 Scheduled Commands</h2>
+    <p>Add to your <code>app/Console/Kernel.php</code>:</p>
+    <pre><code>$schedule->job(new \Utd\LuckyBox\Jobs\NormalLuckyBoxJob)->everyMinute();</code></pre>
+
+    <div class="page-break"></div>
+
+    <!-- Section 5: Database -->
+    <h1 id="database">5. Database Tables Reference</h1>
+
+    <h2>5.1 boxs (Box Templates)</h2>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>type</td>
+            <td>tinyint</td>
+            <td>0 = normal, 1 = super</td>
+        </tr>
+        <tr>
+            <td>coins</td>
+            <td>decimal</td>
+            <td>Coin amount</td>
+        </tr>
+        <tr>
+            <td>users</td>
+            <td>int</td>
+            <td>Max users who can pick</td>
+        </tr>
+        <tr>
+            <td>duration</td>
+            <td>int</td>
+            <td>Duration in minutes</td>
+        </tr>
+        <tr>
+            <td>image</td>
+            <td>string</td>
+            <td>Box image path</td>
+        </tr>
+        <tr>
+            <td>has_label</td>
+            <td>boolean</td>
+            <td>Show label on box</td>
+        </tr>
+    </table>
+
+    <h2>5.2 box_uses (Active Boxes)</h2>
+    <table>
+        <tr>
+            <th>Column</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>id</td>
+            <td>bigint</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>box_id</td>
+            <td>bigint</td>
+            <td>Reference to boxs table</td>
+        </tr>
+        <tr>
+            <td>user_id</td>
+            <td>bigint</td>
+            <td>User who sent the box</td>
+        </tr>
+        <tr>
+            <td>room_id</td>
+            <td>bigint</td>
+            <td>Room where box is active</td>
+        </tr>
+        <tr>
+            <td>coins</td>
+            <td>decimal</td>
+            <td>Total coins in box</td>
+        </tr>
+        <tr>
+            <td>end_at</td>
+            <td>timestamp</td>
+            <td>When box expires</td>
+        </tr>
+        <tr>
+            <td>used_num</td>
+            <td>int</td>
+            <td>Users who picked up</td>
+        </tr>
+        <tr>
+            <td>not_used_num</td>
+            <td>int</td>
+            <td>Remaining slots</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 6: Routes -->
+    <h1 id="routes">6. Routes & API</h1>
+
+    <h2>6.1 Mobile API Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/box/list</code></td>
+            <td>Get available box templates</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/box/send</code></td>
+            <td>Send a box to a room</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/box/pickup</code></td>
+            <td>Pick up a box</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/box/send_test</code></td>
+            <td>Test super box sending</td>
+        </tr>
+    </table>
+
+    <h2>6.2 UTD Admin API Routes</h2>
+    <table>
+        <tr>
+            <th>Method</th>
+            <th>Endpoint</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/utd/boxes</code></td>
+            <td>List all boxes</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/utd/boxes/create</code></td>
+            <td>Create a box template</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/utd/boxes/update/{id}</code></td>
+            <td>Update a box template</td>
+        </tr>
+        <tr>
+            <td>POST</td>
+            <td><code>/api/utd/boxes/delete/{id}</code></td>
+            <td>Delete a box template</td>
+        </tr>
+        <tr>
+            <td>GET</td>
+            <td><code>/api/utd/thrown-boxes</code></td>
+            <td>List active boxes in rooms</td>
+        </tr>
+    </table>
+
+    <h2>6.3 Web Admin Routes (Encore)</h2>
+    <table>
+        <tr>
+            <th>Route</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>/admin/lucky-boxes</code></td>
+            <td>Manage box templates</td>
+        </tr>
+        <tr>
+            <td><code>/admin/thrown-boxes</code></td>
+            <td>View active boxes</td>
+        </tr>
+        <tr>
+            <td><code>/admin/lucky-box-settings</code></td>
+            <td>Box configuration settings</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Section 7: Verification -->
+    <h1 id="verification">7. Verification</h1>
+
+    <h2>7.1 Check Routes</h2>
+    <p>Verify routes are registered:</p>
+    <pre><code>php artisan route:list | findstr box</code></pre>
+
+    <h2>7.2 Check Tables</h2>
+    <p>Verify tables exist in database:</p>
+    <pre><code>php artisan tinker
+>>> Schema::hasTable('boxs')
+>>> Schema::hasTable('box_uses')</code></pre>
+
+    <h2>7.3 Test API</h2>
+    <p>Test the box list endpoint:</p>
+    <pre><code>curl -X GET http://your-app.test/api/box/list \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+
+    <div class="success">
+        <strong>✅ Installation Complete!</strong>
+        <p>If all checks pass, your LuckyBox package is ready to use.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- Section 8: Troubleshooting -->
+    <h1 id="troubleshooting">8. Troubleshooting</h1>
+
+    <h2>8.1 Common Issues</h2>
+
+    <h3>Routes Not Found</h3>
+    <div class="warning">
+        <div class="warning-title">⚠️ Problem</div>
+        <p>Box routes are not appearing in route:list</p>
+    </div>
+    <div class="note">
+        <div class="note-title">Solution</div>
+        <p>Clear route cache and re-register:</p>
+        <pre><code>php artisan route:clear
+php artisan optimize:clear</code></pre>
+    </div>
+
+    <h3>Migration Errors</h3>
+    <div class="warning">
+        <div class="warning-title">⚠️ Problem</div>
+        <p>Tables already exist or foreign key errors</p>
+    </div>
+    <div class="note">
+        <div class="note-title">Solution</div>
+        <p>Rollback and re-run migrations:</p>
+        <pre><code>php artisan migrate:rollback --path=packages/Utd/LuckyBox/Database/migrations
+php artisan migrate --path=packages/Utd/LuckyBox/Database/migrations</code></pre>
+    </div>
+
+    <h3>Service Provider Not Loaded</h3>
+    <div class="warning">
+        <div class="warning-title">⚠️ Problem</div>
+        <p>Package features not working</p>
+    </div>
+    <div class="note">
+        <div class="note-title">Solution</div>
+        <p>Check if package is discovered:</p>
+        <pre><code>php artisan package:discover</code></pre>
+    </div>
+
+    <h2>8.2 Uninstall Package</h2>
+    <p>To completely remove the package:</p>
+    <pre><code># Rollback migrations
+php artisan migrate:rollback --path=packages/Utd/LuckyBox/Database/migrations
+
+# Remove from composer
+composer remove utd/luckybox
+
+# Clear cache
+php artisan optimize:clear</code></pre>
+
+</body>
+</html>

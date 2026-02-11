@@ -6,7 +6,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\BoxUse;
-use App\Jobs\OpenBoxJob;
+use Utd\LuckyBox\Jobs\OpenBoxJob;
 use App\Models\PickBoxList;
 use Utd\Room\Entities\RoomVisitor;
 use App\Models\UserBoxGift;

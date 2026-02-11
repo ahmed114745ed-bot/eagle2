@@ -13,12 +13,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Modules\LuckyBox\Traits\RoomBoxes;
+use Utd\Room\Traits\RoomBoxes;
 use Modules\Vip\Entities\Vip;
 use Modules\TaskStream\Entities\TaskStream;
 use Modules\TaskStream\Entities\TaskStreamRoom;
 use Modules\Chat\Entities\ChatMessage;
-use Modules\LuckyBox\Entities\BoxUse;
+use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
 
 /**
@@ -362,7 +362,8 @@ class Room extends Model
 
     public function boxUse()
     {
-        return $this->hasMany(BoxUse::class, 'room_id');
+        return PackageHelper::checkRelation($this, 'luckyBox', 'hasMany') ??
+            $this->hasMany(BoxUse::class, 'room_id');
     }
 
     public function backgroundImage()
