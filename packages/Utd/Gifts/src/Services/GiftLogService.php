@@ -3,6 +3,7 @@
 namespace Utd\Gifts\Services;
 
 use App\Support\PackageHelper;
+use Utd\Charizma\Jobs\UpdateSendCharismaToZigo;
 use Utd\Gifts\Support\ModelResolver;
 use Utd\Gifts\Support\ClassResolver;
 use Utd\Gifts\Entities\UserGift;
@@ -918,7 +919,7 @@ class GiftLogService
     {
         if (PackageHelper::isInstalled('charisma')) {
             if ($this->hasCharizmaJob()) {
-                return new \Utd\Charizma\Jobs\UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
+                return new UpdateSendCharismaToZigo($roomId, $userIds, $amount, $senderId);
             }
         }
         return null;

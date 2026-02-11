@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\RoomCup\Entities\RoomCupReward;
 use Utd\RoomCup\Helpers\RoomCupHelper;
@@ -114,7 +116,7 @@ class CalculateRoomCupRewards extends Command
 
     private function processGiftsInPeriod(Carbon $start, Carbon $end): void
     {
-        $totalRoomGiftClass = \Utd\Room\Entities\TotalRoomGift::class;
+        $totalRoomGiftClass = TotalRoomGift::class;
 
         $totalRoomGiftClass::whereBetween('created_at', [$start, $end])
             ->orderBy('id')
@@ -137,7 +139,7 @@ class CalculateRoomCupRewards extends Command
 
     private function processGift($gift): void
     {
-        $roomClass = \Utd\Room\Entities\Room::class;
+        $roomClass = Room::class;
 
         $this->line("📦 Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
         $this->logRoomCup("Processing RoomGift ID: {$gift->id} | Room: {$gift->room_id} | Total: {$gift->current_total}");
