@@ -145,7 +145,7 @@ class WeeklyCpGiftController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                 return $this->customAchievement?->name ?? '';
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('created_at', __('Created at'));
@@ -189,6 +189,7 @@ class WeeklyCpGiftController extends MainController
                 return @$this->target;
             } elseif ($this->type == "achievement") {
                 return $this->customAchievement?->name ?? '';
+            }
         });
         $grid->column('created_at', __('Created at'));
 
