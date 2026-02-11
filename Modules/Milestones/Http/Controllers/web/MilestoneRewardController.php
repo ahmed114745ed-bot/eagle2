@@ -97,9 +97,9 @@ class MilestoneRewardController
                 } elseif ($this->type === "vip") {
                     $path = $this->rewardable?->img;
                 } elseif ($this->type === "achievement") {
-                    $path = $this->reward;
-                } elseif ($this->type === "badge") {
                     $path = $this->rewardable?->images->firstWhere('language', app()->getLocale())?->image;
+                } elseif ($this->type === "badge") {
+                    $path = $this->rewardable?->image;
                 } else {
                     $path = 'coin.png';
                 }
