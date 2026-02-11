@@ -17,7 +17,7 @@ use Utd\LuckyBox\Http\Controllers\BoxController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->group(
+Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 'update.last.seen'])->prefix('api')->group(
     function () {
         Route::prefix('box')->group(function () {
             Route::get('list', [BoxController::class, 'index']);
