@@ -26,7 +26,19 @@ class ProbabilityEngine
         // Apply beginner boost
         $finalProb = $adjustedProb * $protectionMultiplier;
 
-        // Clamp values - Allow up to 99% win chance if they are losing, to force a hit
-        return max(0.01, min(0.99, $finalProb));
+        /**
+         * Clamping & Loss Distribution
+         * Instead of allowing 1% floor (which causes long losing streaks), 
+         * we set a 15% minimum to ensure "distributed" small wins.
+         * 
+         * AGGRESSIVE RECOVERY: If user is in profit (deviation > 0.05), lower the floor
+         * to force a faster drain.
+         */
+        $floor = 0.15;
+        if ($deviation > 0.05) {
+            $floor = max(0.001, 0.15 - ($deviation * 3.5));
+        }
+
+        return max($floor, min(0.99, $finalProb));
     }
 }

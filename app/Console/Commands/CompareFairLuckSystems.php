@@ -37,7 +37,7 @@ class CompareFairLuckSystems extends Command
         UserLuckProfile::where('user_id', $userId)->delete();
         $user->di = $balance;
         $user->save();
-        $this->call('simulate:lucky-gifts-html', [
+      /*  $this->call('simulate:lucky-gifts-html', [
             'gift_id' => $giftId,
             '--trials' => $trials,
             '--balance' => $balance,
@@ -55,7 +55,7 @@ class CompareFairLuckSystems extends Command
             '--balance' => $balance,
             '--userId' => $userId
         ]);
-
+*/
         // System 3
         $this->info("\n--- Running System 3 (Intelligent Hybrid) ---");
         UserLuckProfile::where('user_id', $userId)->delete();
