@@ -2,20 +2,21 @@
 
 namespace Modules\RoomBoom\Entities;
 
-use App\Helpers\Common;
 use App\Models\Gift;
 use App\Models\Ware;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Helpers\Common;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Modules\Achievement\Entities\CustomAchievement;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RoomBoomReward extends Model
 {
     protected $fillable = ['room_boom_level_id', 'target', 'target_type', 'priority', 'quantity', 'expire_days'];
 
-     protected $guarded = ['ware_target_id', 'gift_target_id'];
+    protected $guarded = ['ware_target_id', 'gift_target_id'];
 
     public function ware(): HasOne
     {
@@ -25,6 +26,11 @@ class RoomBoomReward extends Model
     public function gift(): HasOne
     {
         return $this->hasOne(Gift::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     public function ware_target(): BelongsTo
@@ -60,19 +66,10 @@ class RoomBoomReward extends Model
                     break;
 
                 case 'achievement':
-                    if (request()->hasFile('achievement_target')) {
-                        $file = request()->file('achievement_target');
-
-                        if ($file instanceof UploadedFile) {
-                            $url = Common::upload('roomBoom', $file);
-
-                            $model->target = $url;
-                        }
+                    if (isset($model->achievement_target)) {
+                        $model->target = $model->achievement_target;
                     }
-//                    if (isset($model->achievement_target)) {
-//                        $model->target = $model->achievement_target;
-//                        unset($model->achievement_target);
-//                    }
+
                     unset($model->achievement_target);
                     break;
 
