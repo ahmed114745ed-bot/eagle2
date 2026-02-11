@@ -254,7 +254,7 @@ class RoleRewardsController extends MainController
                     break;
                 case 'achievement':
                     $form->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
-                    $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
+                    $form->model()->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
                     break;
             }
         });

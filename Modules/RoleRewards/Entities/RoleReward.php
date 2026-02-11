@@ -9,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 
 class RoleReward extends Model
 {
-    protected $appends = ['rewardable_id2', 'rewardable_id3', 'rewardable_id1'];
+    protected $appends = ['rewardable_id2', 'rewardable_id3', 'rewardable_id1', 'reward_achievement'];
     protected $fillable = [
         'role_id',
         'rewardable_id',
@@ -38,6 +38,11 @@ class RoleReward extends Model
     }
 
     public function getRewardableId1Attribute()
+    {
+        return $this->rewardable_id;
+    }
+
+    public function getRewardAchievementAttribute()
     {
         return $this->rewardable_id;
     }
