@@ -501,7 +501,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                         </label>
                         <div class="image-preview-modern">
                             <img src="{{ getImagePath($imageData->show_image ?? $defaultImageData?->show_image) }}" 
-                                 alt="{{ __('Preview') }}"
+                               
                                  loading="lazy">
                         </div>
                         <input type="file"
@@ -518,7 +518,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                         </label>
                         <div class="image-preview-modern">
                             <img src="{{ getImagePath($imageData->image ?? $defaultImageData?->image) }}" 
-                                 alt="{{ __('Preview') }}"
+
                                  loading="lazy">
                         </div>
                         <input type="file"
