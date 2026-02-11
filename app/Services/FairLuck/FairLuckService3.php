@@ -43,15 +43,15 @@ class FairLuckService3
             $targetRTP = (1.0 - $targetLossRate);
             
             // Adaptive Base Probability
-            // Extreme Equilibrium: Target 99.5% RTP (0.5% App Profit)
-            $localTargetRTP = 0.995; 
+            // Dynamic Equilibrium: Use the targetRTP (usually 0.99 for 1% profit)
+            $localTargetRTP = $targetRTP; 
             
-            if ($deviation > 0.005) {
-                // User is slightly in profit, very gently slow down to 98%
-                $localTargetRTP = 0.98;
-            } elseif ($deviation < -0.005) {
-                // Safety Net: Immediate boost to 150% RTP to force a recovery
-                $localTargetRTP = 1.50 * $chaosFactor;
+            if ($deviation > 0.01) {
+                // User is in profit, gently slow down to 97%
+                $localTargetRTP = 0.97;
+            } elseif ($deviation < -0.02) {
+                // Safety Net: Immediate boost to force a recovery and keep user engaged
+                $localTargetRTP = 1.40 * $chaosFactor;
             }
 
             $expectedMultiplier = $this->multiplierSelector->getExpectedMultiplier();
@@ -141,8 +141,8 @@ class FairLuckService3
     private function getNaturalWeight(int $multiplier): int
     {
         return match ($multiplier) {
-            5 => 500, 10 => 300, 20 => 100, 50 => 50, 
-            100 => 20, 250 => 10, 500 => 5, 1000 => 2,
+            5 => 450, 10 => 250, 20 => 120, 50 => 60, 
+            100 => 30, 250 => 15, 500 => 10, 1000 => 5,
             default => 1,
         };
     }

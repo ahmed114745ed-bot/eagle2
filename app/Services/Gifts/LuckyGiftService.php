@@ -635,18 +635,17 @@ class LuckyGiftService
             $message = null;
 
             foreach ($receiversIds as $receiverId) {
-                $isWinner       = $this->is_winner($gift);
-                $isPopular      = false;
                 $totalGiftPrice = $giftPrice * $number;
+                $luckResult = $this->processFairLuckBet($user, $gift, $totalGiftPrice, $roomId);
+                
+                $isWinner = $luckResult->isWinner;
+                $cashback_percentage = $luckResult->multiplier;
+                
+                $isPopular = false;
                 $appWalletCoins = $appWallet->coins;
-                $cashback_percentage = 0;
                 $cashback_value = 0;
 
                 if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
-                    $properties = $gift->luckyGift?->min_percentage;
-
-                    $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $totalGiftPrice, $properties);
-
                     $cashback_value = $cashback_percentage * $giftPrice * $number;
                     if ($cashback_percentage > 0) {
 
@@ -667,6 +666,9 @@ class LuckyGiftService
                         $iterationPopular = true;
                         $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                     }
+                } else {
+                    $isWinner = false;
+                    $cashback_percentage = 0;
                 }
 
                 $current_win = (int)($totalGiftPrice * $cashback_percentage);

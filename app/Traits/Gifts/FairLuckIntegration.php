@@ -4,23 +4,23 @@ namespace App\Traits\Gifts;
 
 use App\Models\Gift;
 use App\Models\User;
-use App\Services\FairLuck\FairLuckService;
+use App\Services\FairLuck\FairLuckService3;
 use Illuminate\Support\Facades\App;
 
 trait FairLuckIntegration
 {
     /**
-     * @var FairLuckService
+     * @var FairLuckService3
      */
     protected $fairLuckService;
 
     /**
-     * Resolve FairLuckService if not already resolved.
+     * Resolve FairLuckService3 if not already resolved.
      */
-    protected function getFairLuckService(): FairLuckService
+    protected function getFairLuckService(): FairLuckService3
     {
         if (!$this->fairLuckService) {
-            $this->fairLuckService = App::make(FairLuckService::class);
+            $this->fairLuckService = App::make(FairLuckService3::class);
         }
         return $this->fairLuckService;
     }
