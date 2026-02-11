@@ -122,7 +122,7 @@ class HostLevelService
                 ];
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
-                if ($ware){
+                if ($ware) {
                     UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'host-level');
 
                     $wareName = $ware->name ?? __('a special ware');
@@ -132,10 +132,13 @@ class HostLevelService
                     ];
                 }
             } elseif ($reward->type == "achievement") {
+                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
                 $attributes = [
                     'user_id'       => $user->id,
                     'custom_achievement_id' => $reward->target,
                     'receive_type' => 'host-level',
+                    'end_at' => $dateTimestamp,
                 ];
                 UserAchievementLevel::create($attributes);
 

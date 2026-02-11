@@ -2,17 +2,18 @@
 
 namespace Modules\RoleRewards\Helpers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
 use Modules\Vip\Entities\OVip;
+use Modules\Badge\Entities\Badge;
 use App\Helpers\UserCoinLogHelper;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Modules\Achievement\Entities\UserAchievementLevel;
-use Modules\Badge\Entities\Badge;
 
 class UserRoleRewardHelper
 {
@@ -86,12 +87,14 @@ class UserRoleRewardHelper
             $ware = Ware::find($reward->rewardable_id);
             UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType);
         } elseif ($reward->type === "achievement") {
+            $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
             UserAchievementLevel::create([
                 'user_id'      => $user->id,
                 //'custom_image' => $reward->reward_achievement,
                 'custom_achievement_id' => $reward->rewardable_id,
                 'receive_type' => $receiveType,
-                'end_at' => $reward->expire,
+                'end_at' => $dateTimestamp,
             ]);
         } elseif ($reward->type === "badge") {
             Common::userBadge($user->id, $reward->rewardable_id, $reward->expire, $receiveType);

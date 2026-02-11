@@ -156,10 +156,13 @@ class ChargeEventController extends Controller
                 $ware = Ware::query()->find($reward->target);
                 UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, 'charge-event');
             } elseif ($reward->type == "achievement") {
+                $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+
                 $attributes = [
                     'user_id'       => $user->id,
                     'receive_type' => 'charge-event',
                     'custom_achievement_id' => $reward->target,
+                    'end_at' => $dateTimestamp,
                 ];
                 UserAchievementLevel::create($attributes);
             } elseif ($reward->type == 'badge') {

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 use Modules\RoleRewards\Helpers\UserRewardHelper;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
-use function Doctrine\Common\Cache\Psr6\get;
 
 class AdminUserController extends EncorUsersController
 {
