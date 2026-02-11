@@ -17,7 +17,9 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
 use Illuminate\Support\MessageBag;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 
@@ -125,18 +127,18 @@ class SuperPackageController extends MainController
                         break;
 
                     case 'achievement':
-                        $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
-                        $path = $reward->target;
+                        $gift = optional($reward->customAchievement)->name;
+                        $path = optional($reward->customAchievement)->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
                 }
 
                 $defaultImage = asset('images/reward.jpg');
 
-                    $url =  getImagePath($path) ?? $defaultImage;
+                $url =  getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
-                        $url = $defaultImage;
-                    }
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
                 $image = handleShowImageWithSvga(
                     $reward->id,
@@ -263,8 +265,9 @@ class SuperPackageController extends MainController
                         $name = $reward->target . 'coin';
                         $url = getImagePath('coin.png');
                     } elseif ($reward->type == 'achievement') {
-                        $name = 'Achievement';
-                        $url = getImagePath($reward->target);
+                        $achievement = CustomAchievement::find($reward->target);
+                        $name = $achievement->name ?? 'Achievement';
+                        $url = getImagePath($achievement->images?->firstWhere('language', app()->getLocale())?->image ?? '');
                     }
 
                     $defaultImage = asset('images/reward.jpg');
@@ -346,9 +349,8 @@ class SuperPackageController extends MainController
                 $form->number("target3", __("coins"));
             })
             ->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire', __('expire'))->default(1);
             });
 
@@ -445,7 +447,7 @@ class SuperPackageController extends MainController
                     $target = request('target3');
                     $fieldName = 'target3';
                 } elseif ($targetType === 'achievement') {
-                    $target = request()->hasFile('target4') ? request()->file('target4') : null;
+                    $target = request('target4');
                     $fieldName = 'target4';
                 }
 
@@ -473,12 +475,7 @@ class SuperPackageController extends MainController
             $action = request('action');
 
             if ($targetType) {
-                $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5');
-                // dd($target);
-                if ($targetType === 'achievement' && request()->hasFile('target4')) {
-                    $file = request()->file('target4');
-                    $target = $file->store('achievements', 'gcs');
-                }
+                $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5') ?? request('target4');
 
                 if ($target) {
                     $reward = new PackageReward();
