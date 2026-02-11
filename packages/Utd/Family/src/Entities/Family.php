@@ -1,11 +1,10 @@
 <?php
 
 namespace Utd\Family\Entities;
-use App\Models\User;
 
 use function request;
 use Utd\Family\Traits\ResourceTrait;
-use App\Traits\TimestampsWithTimezone;
+use Utd\Family\Traits\TimestampsWithTimezone;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,12 +21,12 @@ class Family extends Model
 
     public function users()
     {
-        return $this->hasManyThrough(User::class, FamilyUser::class, 'family_id', 'family_id');
+        return $this->hasManyThrough(family_model('user'), Familyfamily_model('user'), 'family_id', 'family_id');
     }
 
     public function owner()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(family_model('user'), 'user_id');
     }
 
     public function getMembersNumAttribute()
@@ -39,12 +38,12 @@ class Family extends Model
 
     public function members()
     {
-        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 0);
+        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', 0);
     }
 
     public function allMembers()
     {
-        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', '!=', 2);
+        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', '!=', 2);
     }
 
     public function currentLevel()
@@ -68,7 +67,7 @@ class Family extends Model
 
     public function admins()
     {
-        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 1);
+        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', 1);
     }
 
     public function getLevelAttribute()

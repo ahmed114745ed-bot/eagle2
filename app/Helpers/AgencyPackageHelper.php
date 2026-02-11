@@ -3,7 +3,6 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Facades\Schema;
-use Utd\Agency\Helpers\AgencyModelsHelper;
 
 /**
  * AgencyPackageHelper
@@ -14,19 +13,29 @@ class AgencyPackageHelper
 {
     private static ?bool $agencyTableExists = null;
     private static ?bool $userSallariesTableExists = null;
+
+    private static function getAgencyModelsHelper()
+    {
+        if (class_exists('Utd\Agency\Helpers\AgencyModelsHelper')) {
+            return 'Utd\Agency\Helpers\AgencyModelsHelper';
+        }
+        return null;
+    }
     
     /**
      * Check if Host Agency package is installed AND agencies table exists
      */
     public static function isAgencyInstalled(): bool
     {
+        $helper = self::getAgencyModelsHelper();
+
         // Check using package helper
-        if (!AgencyModelsHelper::isPackageAvailable()) {
+        if (!$helper || !$helper::isPackageAvailable()) {
             return false;
         }
         
         // Check class exists
-        $classExists = AgencyModelsHelper::getAgencyClass() !== null
+        $classExists = $helper::getAgencyClass() !== null
             || class_exists(\App\Models\Agency::class);
         
         if (!$classExists) {
@@ -100,7 +109,8 @@ class AgencyPackageHelper
      */
     public static function getAgencyClass(): ?string
     {
-        return AgencyModelsHelper::getAgencyClass() ?? (class_exists(\App\Models\Agency::class) ? \App\Models\Agency::class : null);
+        $helper = self::getAgencyModelsHelper();
+        return ($helper ? $helper::getAgencyClass() : null) ?? (class_exists(\App\Models\Agency::class) ? \App\Models\Agency::class : null);
     }
 
     /**
@@ -108,7 +118,8 @@ class AgencyPackageHelper
      */
     public static function getAgencyJoinRequestClass(): ?string
     {
-        return AgencyModelsHelper::getAgencyJoinRequestClass() ?? (class_exists(\App\Models\AgencyJoinRequest::class) ? \App\Models\AgencyJoinRequest::class : null);
+        $helper = self::getAgencyModelsHelper();
+        return ($helper ? $helper::getAgencyJoinRequestClass() : null) ?? (class_exists(\App\Models\AgencyJoinRequest::class) ? \App\Models\AgencyJoinRequest::class : null);
     }
 
     /**
@@ -116,7 +127,8 @@ class AgencyPackageHelper
      */
     public static function getAgencySalaryClass(): ?string
     {
-        return AgencyModelsHelper::getAgencySalaryClass() ?? (class_exists(\App\Models\AgencySallary::class) ? \App\Models\AgencySallary::class : null);
+        $helper = self::getAgencyModelsHelper();
+        return ($helper ? $helper::getAgencySalaryClass() : null) ?? (class_exists(\App\Models\AgencySallary::class) ? \App\Models\AgencySallary::class : null);
     }
 
     /**
@@ -124,7 +136,8 @@ class AgencyPackageHelper
      */
     public static function getAgencyUserJobClass(): ?string
     {
-        return AgencyModelsHelper::getAgencyUserJobClass() ?? (class_exists(\App\Models\AgencyUserJob::class) ? \App\Models\AgencyUserJob::class : null);
+        $helper = self::getAgencyModelsHelper();
+        return ($helper ? $helper::getAgencyUserJobClass() : null) ?? (class_exists(\App\Models\AgencyUserJob::class) ? \App\Models\AgencyUserJob::class : null);
     }
 
     /**

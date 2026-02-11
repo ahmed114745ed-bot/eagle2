@@ -2,14 +2,14 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
+use Utd\Family\Http\Controllers\Controller;
+
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Utd\Family\Entities\FamilyLevel;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
-use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyLevelController extends MainController
@@ -19,7 +19,7 @@ class FamilyLevelController extends MainController
     public $hiddenColumns = [];
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("families");
+        (new family_service('app_feature'))->validateStatusEnable("families");
     }
 
     public function index(Content $content)

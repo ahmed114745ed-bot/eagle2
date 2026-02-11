@@ -3,9 +3,7 @@
 namespace Utd\Family\Http\Resources;
 
 use Carbon\Carbon;
-use App\Models\User;
 use Utd\Family\Entities\Family;
-use App\Helpers\Common;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;
 use stdClass;
@@ -38,9 +36,9 @@ class NewFamilyUserResource extends JsonResource
 
                 ],
 
-                'vip'=>Common::ovip_center ($this), // both
-                'level'=> $this->user ? Common::level_center (@$this->user) : new stdClass(), // both
-                'frame'     => Common::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img2', true)?:Common::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img1', true),
+                'vip'=>family_helper('common')::ovip_center ($this), // both
+                'level'=> $this->user ? family_helper('common')::level_center (@$this->user) : new stdClass(), // both
+                'frame'     => family_helper('common')::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img2', true)?:family_helper('common')::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img1', true),
                 'frame_id'  => @$this->dress_1,
                 'type_user'            => intval(@$this->user->type_user) ?: 0, // both
                 "manger_type"          =>new MangerTypeResource(@$this->user->mangerType)

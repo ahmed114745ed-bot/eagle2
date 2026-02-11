@@ -2,8 +2,9 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
+use Utd\Family\Http\Controllers\Controller;
+
 use Utd\Family\Entities\FamilyUser;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;

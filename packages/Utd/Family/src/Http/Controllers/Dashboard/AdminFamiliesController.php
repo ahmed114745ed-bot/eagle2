@@ -2,10 +2,10 @@
 
 namespace Utd\Family\Http\Controllers\Dashboard;
 
-use App\Http\Controllers\Controller;
+use Utd\Family\Http\Controllers\Controller;
+
 use Utd\Family\Http\Resources\Dashboard\AdminFamiliesResource;
 use Utd\Family\Entities\Family;
-use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 
 class AdminFamiliesController extends Controller

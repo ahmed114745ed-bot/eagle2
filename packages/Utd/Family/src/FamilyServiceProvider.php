@@ -16,6 +16,8 @@ class FamilyServiceProvider extends ServiceProvider
             __DIR__ . '/../config/family.php', 'family'
         );
 
+        $this->registerAliases();
+
         // Bind Repositories
         $this->app->singleton(\Utd\Family\Repositories\FamilyRepository::class);
         $this->app->singleton(\Utd\Family\Repositories\FamilyUserRepository::class);
@@ -23,8 +25,32 @@ class FamilyServiceProvider extends ServiceProvider
         $this->app->singleton(\Utd\Family\Repositories\FamilyLevelRepository::class);
 
         // Bind Services
+        $this->app->singleton(\App\Contracts\FamilyContract::class, \Utd\Family\Services\FamilyService::class);
         $this->app->singleton(\Utd\Family\Services\FamilyService::class);
         $this->app->singleton(\Utd\Family\Services\FamilyLevelService::class);
+    }
+
+    protected function registerAliases(): void
+    {
+        // For Controller inheritance
+        if (!class_exists('Utd\Family\Http\Controllers\Controller')) {
+            class_alias(config('family.controllers.base', \App\Http\Controllers\Controller::class), 'Utd\Family\Http\Controllers\Controller');
+        }
+
+        // For Repository inheritance
+        if (!class_exists('Utd\Family\Repositories\AbstractRepository')) {
+            class_alias(config('family.repositories.abstract', \App\Tik\Repositories\AbstractRepository::class), 'Utd\Family\Repositories\AbstractRepository');
+        }
+
+        // For Room Repository Contract (used in FamilyService constructor)
+        if (!interface_exists('Utd\Family\Services\RoomRepositoryContract')) {
+            class_alias(config('family.contracts.room_repository', \App\Contracts\RoomRepositoryContract::class), 'Utd\Family\Services\RoomRepositoryContract');
+        }
+
+        // For Dashboard Trait
+        if (!interface_exists('Utd\Family\Traits\DashBoardTrait')) {
+            class_alias(config('family.traits.dashboard', \App\Traits\Dashboard\DashBoardTrait::class), 'Utd\Family\Traits\DashBoardTrait');
+        }
     }
 
     /**
@@ -54,6 +80,11 @@ class FamilyServiceProvider extends ServiceProvider
 
         // Publishing files
         if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Utd\Family\Console\InstallFamilyCommand::class,
+                \Utd\Family\Console\UninstallFamilyCommand::class,
+            ]);
+
             // Publishing configuration
             $this->publishes([
                 __DIR__ . '/../config/family.php' => config_path('family.php'),

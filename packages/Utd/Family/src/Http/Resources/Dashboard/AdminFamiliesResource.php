@@ -3,7 +3,6 @@
 namespace Utd\Family\Http\Resources\Dashboard;
 
 use Utd\Family\Entities\FamilyLevel;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

@@ -1,10 +1,9 @@
 <?php
 
 namespace Utd\Family\Entities;
-use App\Models\User;
 
-use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Family\Traits\TimestampsWithTimezone;
 
 class FamilyLevel extends Model
 {

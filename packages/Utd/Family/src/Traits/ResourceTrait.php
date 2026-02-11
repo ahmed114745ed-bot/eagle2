@@ -3,7 +3,6 @@
 namespace Utd\Family\Traits;
 
 use Utd\Family\Entities\FamilyUser;
-use App\Models\User;
 
 trait ResourceTrait
 {
@@ -23,7 +22,7 @@ trait ResourceTrait
 
     public function usersRequests()
     {
-        return $this->hasManyThrough(User::class, FamilyUser::class, 'family_id', 'family_id')->where('family_user.status', 0);
+        return $this->hasManyThrough(family_model('user'), Familyfamily_model('user'), 'family_id', 'family_id')->where('family_user.status', 0);
     }
 
     public function getUsersRequestsCountAttribute()

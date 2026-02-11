@@ -2,17 +2,10 @@
 
 namespace Utd\Family\Http\Resources;
 
-use App\Helpers\Common;
-use App\Http\Resources\CountryResource;
-use App\Models\Agency;
-use App\Models\AgencyJoinRequest;
-use App\Models\Country;
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
-use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use Modules\Vip\Entities\Vip;
-use App\Models\Ware;
 use Carbon\Carbon;
 use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -59,7 +52,7 @@ class MembersUserResource extends JsonResource
                 'sender_img' => @$this->getImageReceiverOrSender('sender_id',2)->img,
             ],*/
             'frame_id' => @$this->dress_1,
-            'frame' => Common::getUserDress(@$this->id, @$this->dress_1, 4, 'img2', true) ?: Common::getUserDress(@$this->id, @$this->dress_1, 4, 'img1', true),
+            'frame' => family_helper('common')::getUserDress(@$this->id, @$this->dress_1, 4, 'img2', true) ?: family_helper('common')::getUserDress(@$this->id, @$this->dress_1, 4, 'img1', true),
             'is_family_admin'=> @$this->is_family_admin,
         ];
 

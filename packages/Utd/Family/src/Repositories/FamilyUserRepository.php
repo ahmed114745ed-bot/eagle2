@@ -2,6 +2,8 @@
 
 namespace Utd\Family\Repositories;
 
+use Utd\Family\Repositories\AbstractRepository;
+
 use Utd\Family\Entities\FamilyUser;
 
 

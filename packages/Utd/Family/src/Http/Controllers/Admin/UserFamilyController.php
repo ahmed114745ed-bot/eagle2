@@ -2,45 +2,30 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
+use Utd\Family\Http\Controllers\Controller;
+
 use Carbon\Carbon;
-use App\Models\Pack;
-use App\Models\User;
-use App\Models\Ware;
-use App\Models\Agency;
 use Utd\Family\Entities\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Country;
 use Modules\Vip\Entities\UserVip;
-use App\Models\MangerType;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
-use App\Facades\UserHandling;
 use Encore\Admin\Widgets\Box;
 use Encore\Admin\Widgets\Tab;
-use App\Admin\Widgets\InfoBox;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Validation\Rule;
-use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 
 use Encore\Admin\Auth\Permission;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use App\Admin\Selectable\ImageColors;
-use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
-use App\Helpers\AgencyPackageHelper;
 use Utd\Family\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
-use App\Admin\Widgets\Table as TableWidget;
 use Encore\Admin\Widgets\Table;
 
 use Modules\SwitchAccount\Entities\UserAccount;
-use App\Contracts\UserAchievementContract;
 // use Encore\Admin\Actions\Response;
 
 class UserFamilyController extends MainController
@@ -148,8 +133,8 @@ class UserFamilyController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('family_id', __('Family'))->select(Common::by_family_filter());
-                $filter->equal('UserVip.vip_id', __('vip'))->select(Common::by_ovip_filter());
+                $filter->equal('family_id', __('Family'))->select(family_helper('common')::by_family_filter());
+                $filter->equal('UserVip.vip_id', __('vip'))->select(family_helper('common')::by_ovip_filter());
 
                 $filter->column(1 / 2, function ($filter) {
                     $filter->where(function ($query) {
@@ -334,7 +319,7 @@ class UserFamilyController extends MainController
                 return $target;
             });
 
-            return new \App\Admin\Widgets\Table(
+            return new \family_admin('table')(
                 [
                     'ID',
                     __('month') . '/' . __('year'),
@@ -510,8 +495,8 @@ class UserFamilyController extends MainController
                         break;
                 }
                 $row->column(2, new InfoBox($user->salary, 'dollar', 'green', '?type=balance_details', __('Balance')));
-                $row->column(2, new InfoBox(Common::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
-                $row->column(2, new InfoBox(Common::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
+                $row->column(2, new InfoBox(family_helper('common')::level_center($user)['sender_level'], 'dollar', 'orange', '?type=balance_details', __('Level')));
+                $row->column(2, new InfoBox(family_helper('common')::level_center($user)['receiver_level'], 'dollar', 'blue', '?type=balance_details', __('worth')));
                 $row->column(2, new InfoBox($user->getTotalDiamond(), 'dollar', 'red', '?type=balance_details', __('diamonds')));
                 $row->column(2, new InfoBox($user->di, 'dollar', 'yellow', '?type=balance_details', __('coins')));
                 $row->column(2, new InfoBox($userType ?? '', '', 'green', '?type=balance_details', __('type')));
@@ -666,8 +651,8 @@ class UserFamilyController extends MainController
                     }
 
                     $row->column(2, new InfoBox(__('Balance'), 'dollar', 'green', '?type=balance_details', $user->salary));
-                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', Common::level_center($user)['sender_level']));
-                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', Common::level_center($user)['receiver_level']));
+                    $row->column(2, new InfoBox(__('Level'), 'dollar', 'orange', '?type=balance_details', family_helper('common')::level_center($user)['sender_level']));
+                    $row->column(2, new InfoBox(__('worth'), 'dollar', 'blue', '?type=balance_details', family_helper('common')::level_center($user)['receiver_level']));
                     $row->column(2, new InfoBox(__('diamonds'), 'dollar', 'red', '?type=balance_details', $user->getTotalDiamonds()));
                     $row->column(2, new InfoBox(__('coins'), 'dollar', 'red', '?type=balance_details', $user->di));
                     $row->column(2, new InfoBox(__('type'), 'dollar', 'red', '?type=balance_details', $userType));
@@ -797,7 +782,7 @@ class UserFamilyController extends MainController
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
         $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
-        $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
+        $form->switch('status', __('block status'))->options(family_helper('common')::getSwitchStates2());
 
         $form->select('type_user', trans('User Type'))->options([
             $form->model()->type_user => $form->model()->type_user,

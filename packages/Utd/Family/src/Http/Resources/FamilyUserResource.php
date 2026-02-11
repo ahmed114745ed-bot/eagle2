@@ -3,7 +3,6 @@
 namespace Utd\Family\Http\Resources;
 
 use Utd\Family\Entities\Family;
-use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class FamilyUserResource extends JsonResource

@@ -2,22 +2,17 @@
 
 namespace Utd\Family\Services;
 
-use App\Enums\UserCoinLogType;
-use App\Facades\CustomNotification;
-use App\Helpers\UserCoinLogHelper;
-use App\Models\User;
-use App\Helpers\Common;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
-use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Family\Repositories\FamilyRepository;
 use Utd\Family\Http\Resources\V2\FamilyResource;
 use Utd\Family\Repositories\FamilyRankRepository;
 use Utd\Family\Repositories\FamilyUserRepository;
 use Modules\Milestones\Helpers\MilestoneHelper;
+use App\Contracts\FamilyContract;
 
-class FamilyService
+class FamilyService implements FamilyContract
 {
 
     public function __construct(
@@ -40,13 +35,13 @@ class FamilyService
         return $this->familyRepository->findById($id);
     }
 
-    public function create(User $user, $request, $price)
+    public function create($user, $request, $price)
     {
         $family = $this->familyRepository->findByUserId($user->id);
         if ($family) throw new \Exception('already have family');
 
         $img = null;
-        if ($request->hasFile('image'))  $img = Common::upload('families', $request->file('image'));
+        if ($request->hasFile('image'))  $img = family_helper('common')::upload('families', $request->file('image'));
 
 
         // DB::beginTransaction();
@@ -72,11 +67,11 @@ class FamilyService
 
         $logAmount = -abs($price);
         $amountBefore =  $user->di;
-        UserCoinLogHelper::logByType(
+        family_helper('user_coin_log')::logByType(
             $user->id,
             $logAmount,
             $amountBefore,
-            UserCoinLogType::FAMILY,
+            family_enum('user_coin_log_type')::FAMILY,
             $request->name
         );
         $this->userRepository->decrementCoins($user->id, $price);
@@ -140,7 +135,7 @@ class FamilyService
             $family->notice = $request->notice;
         }
         if ($request->hasFile('image')) {
-            $family->image = Common::upload('families', $request->file('image'));
+            $family->image = family_helper('common')::upload('families', $request->file('image'));
         }
         $family->save();
         return $family;
@@ -184,7 +179,7 @@ class FamilyService
     {
         $family = $this->familyRepository->findById($familyId);
         if (!$family) throw new \Exception('not found');
-        if ($user->id != $family->user_id) return Common::apiResponse(0, 'not allowed', null, 403);
+        if ($user->id != $family->user_id) return family_helper('common')::apiResponse(0, 'not allowed', null, 403);
         $this->familyUserRepository->delete($familyId);
         $this->userRepository->updateFamilyId($user, null);
         $this->userRepository->updateUsersFamily($familyId, null);
@@ -249,7 +244,7 @@ class FamilyService
             $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
-            if ($user && ($request->status == 1))  CustomNotification::acceptUserFamily($family, $user);
+            if ($user && ($request->status == 1))  family_facade('custom_notification')::acceptUserFamily($family, $user);
         } elseif ($request->status == 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
@@ -302,7 +297,7 @@ class FamilyService
         return $rooms;
     }
 
-    public function exitMember(User $user)
+    public function exitMember($user)
     {
         $this->familyUserRepository->exitUser($user->id);
         $this->userRepository->updateFamilyId($user, 0);
@@ -329,5 +324,10 @@ class FamilyService
         $this->familyUserRepository->deleteByUserId($userId);
 
         return true;
+    }
+
+    public function isFamilyOwner($userId)
+    {
+        return (bool) $this->familyRepository->findByUserId($userId);
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf5f5d371b7568e07e2a2359ac5e8ea7",
+    "content-hash": "8a8de38f556b25a76b94cd87ba075e9a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -14376,11 +14376,11 @@
         },
         {
             "name": "utd/achievements",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Achievements",
-                "reference": "73e243a67837210559d41cbb0e72f4fd92d4cb5b"
+                "reference": "da7c70f33699cf57d0d8c957f6f51750035dd4b0"
             },
             "require": {
                 "encore/laravel-admin": "^1.8",
@@ -14418,11 +14418,11 @@
         },
         {
             "name": "utd/agency",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Agency",
-                "reference": "5b0789f587941fa91927066d5c81621ab954364d"
+                "reference": "e65b9e8cd9a4ca58ec570d5f255863c0fa04dc20"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14469,11 +14469,11 @@
         },
         {
             "name": "utd/charizma",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Charizma",
-                "reference": "63857da7d933becac8e343a369580e7269e59122"
+                "reference": "5f4496a4cef93f0f6192176ea12025bd915b3696"
             },
             "require": {
                 "php": "^8.1"
@@ -14507,12 +14507,58 @@
             }
         },
         {
+            "name": "utd/family",
+            "version": "dev-familiesPackage",
+            "dist": {
+                "type": "path",
+                "url": "packages/Utd/Family",
+                "reference": "4e8ac31461f173794d158683fc609d4abdd8a9b3"
+            },
+            "require": {
+                "illuminate/support": "^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Utd\\Family\\FamilyServiceProvider"
+                    ],
+                    "aliases": {
+                        "Family": "Utd\\Family\\Facades\\Family"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Utd\\Family\\": "src/",
+                    "Utd\\Family\\Database\\": "database/"
+                },
+                "files": [
+                    "src/Support/helpers.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "UTD Team",
+                    "email": "dev@utd.com"
+                }
+            ],
+            "description": "Family Management System for Utd Platform",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "utd/gifts",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "./packages/Utd/Gifts",
-                "reference": "c11d04b813e62ece46d59dd18674ce9a6cb7d76b"
+                "reference": "00ef9f9788b2950c92e34863f39a0a32ab78a0b6"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14554,11 +14600,11 @@
         },
         {
             "name": "utd/moments",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Moments",
-                "reference": "ed1a9236e70257dbf92528425e1a2cee0c8a37b4"
+                "reference": "361a5546167e3ccbafab4148dd58078e72d096e7"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14595,11 +14641,11 @@
         },
         {
             "name": "utd/pk",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Pk",
-                "reference": "d19cd4b293f466466c52c6b38df2409972acf2c0"
+                "reference": "9d1195161bdf835fa0e5fb477d89dca47f30cd43"
             },
             "require": {
                 "php": "^8.1"
@@ -14634,11 +14680,11 @@
         },
         {
             "name": "utd/reals",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Reals",
-                "reference": "62bf966f616bc3ac25632b5bcba722b717cf4751"
+                "reference": "0363f8fc7776cb235283c9e4d85b2049c5dc24f6"
             },
             "require": {
                 "illuminate/database": "^10.0|^11.0",
@@ -14686,11 +14732,11 @@
         },
         {
             "name": "utd/room",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/Room",
-                "reference": "3eb65d4cda3a4437481426894c3857d898f40de9"
+                "reference": "b2f088ad65c29ed4d2342c81c97b17f6b1e6193b"
             },
             "require": {
                 "illuminate/support": "^10.0|^11.0",
@@ -14727,11 +14773,11 @@
         },
         {
             "name": "utd/room-cup",
-            "version": "dev-achievmentPackage",
+            "version": "dev-familiesPackage",
             "dist": {
                 "type": "path",
                 "url": "packages/Utd/RoomCup",
-                "reference": "2a8bac652e7b32e2509612d3c4c57e4cd3fa682a"
+                "reference": "1d30f2e92696ee36b12ac1375dcae688f2527eb8"
             },
             "require": {
                 "php": "^8.1"

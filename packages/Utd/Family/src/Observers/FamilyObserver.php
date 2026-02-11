@@ -2,7 +2,6 @@
 
 namespace Utd\Family\Observers;
 
-use App\Models\User;
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
 use Modules\Milestones\Entities\Milestone;

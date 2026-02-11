@@ -2,8 +2,9 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
+use Utd\Family\Http\Controllers\Controller;
+
 use Carbon\Carbon;
-use App\Models\User;
 use Utd\Family\Entities\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -12,7 +13,6 @@ use Utd\Family\Admin\Extensions\FamilyExporter;
 use Utd\Family\Admin\Extensions\FamilyLevelExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyController extends MainController
@@ -23,7 +23,7 @@ class FamilyController extends MainController
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("families");
+        (new family_service('app_feature'))->validateStatusEnable("families");
     }
 
     public function familyLevelExcel()

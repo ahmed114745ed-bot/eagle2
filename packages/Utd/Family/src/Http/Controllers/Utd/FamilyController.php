@@ -2,12 +2,10 @@
 
 namespace Utd\Family\Http\Controllers\Utd;
 
-use App\Helpers\Common;
-use App\Http\Controllers\Controller;
+use Utd\Family\Http\Controllers\Controller;
+
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
-use App\Models\User;
-use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 use Utd\Family\Services\FamilyService;
 
@@ -29,7 +27,7 @@ class FamilyController extends Controller
         $families = Family::paginate($perPage);
 
 
-        return Common::apiResponse(true, '', $families, 200);
+        return family_helper('common')::apiResponse(true, '', $families, 200);
     }
 
     public function all()
@@ -43,7 +41,7 @@ class FamilyController extends Controller
         });
 
 
-        return Common::apiResponse(true, '', $families, 200);
+        return family_helper('common')::apiResponse(true, '', $families, 200);
     }
 
     public function store(Request $request)
@@ -52,7 +50,7 @@ class FamilyController extends Controller
         $image = null;
 
         if ($request->has('image')) {
-            $image = Common::upload('images', $request->image);
+            $image = family_helper('common')::upload('images', $request->image);
         }
 
         $family  = Family::create([
@@ -76,7 +74,7 @@ class FamilyController extends Controller
             'status'    => 1,
         ]);
 
-        return Common::apiResponse(true, '',  [], 200);
+        return family_helper('common')::apiResponse(true, '',  [], 200);
     }
 
     public function update(Request $request, $id)
@@ -84,7 +82,7 @@ class FamilyController extends Controller
 
 
         if ($request->has('image')) {
-            $image = Common::upload('images', $request->image);
+            $image = family_helper('common')::upload('images', $request->image);
             Family::findOrFail($id)->update([
                 'image' => $image
             ]);
@@ -117,14 +115,14 @@ class FamilyController extends Controller
             'num' => $request->num
         ]);
 
-        return Common::apiResponse(1, 'Family updated successfully');
+        return family_helper('common')::apiResponse(1, 'Family updated successfully');
     }
 
     public function show($id)
     {
         $family = Family::findOrFail($id);
 
-        return Common::apiResponse(true, '', $family, 200);
+        return family_helper('common')::apiResponse(true, '', $family, 200);
     }
 
     public function destroy($id)
@@ -132,7 +130,7 @@ class FamilyController extends Controller
 
         Family::findOrFail($id)->delete();
 
-        return Common::apiResponse(1, 'success', null, 200);
+        return family_helper('common')::apiResponse(1, 'success', null, 200);
     }
 
     public function delete_all(Request $request)
@@ -145,17 +143,17 @@ class FamilyController extends Controller
 
         Family::whereIn('id', $ids)->delete();
 
-        return Common::apiResponse(1, 'success');
+        return family_helper('common')::apiResponse(1, 'success');
     }
 
     public function kickFamily($id)
     {
         try {
             $this->familyService->kickFamily($id);
-            return Common::apiResponse(true, 'removed');
+            return family_helper('common')::apiResponse(true, 'removed');
         } catch (\Exception $exception) {
 
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
+            return family_helper('common')::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Utd\Family\Http\Controllers\Dashboard;
 
-use App\Http\Controllers\Controller;
+use Utd\Family\Http\Controllers\Controller;
+
 use Utd\Family\Entities\FamilyLevel;
-use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 
 class AdminFAmilyLevelsController extends Controller

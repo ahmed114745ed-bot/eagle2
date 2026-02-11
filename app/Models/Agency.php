@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use Utd\Agency\Helpers\AgencyModelsHelper;
-
-if ($agencyClass = AgencyModelsHelper::getAgencyClass()) {
+if (class_exists('Utd\Agency\Helpers\AgencyModelsHelper') && $agencyClass = \Utd\Agency\Helpers\AgencyModelsHelper::getAgencyClass()) {
     class_alias($agencyClass, __NAMESPACE__ . '\Agency');
 }

@@ -2,7 +2,6 @@
 
 namespace Utd\Family\Services;
 
-use App\Helpers\Common;
 use Illuminate\Support\Facades\DB;
 use Utd\Family\Repositories\FamilyLevelRepository;
 
@@ -32,7 +31,7 @@ class FamilyLevelService
     {
 
         if ($request->hasFile('img')) {
-            $image= Common::upload('FamilyLevels', $request->file('img'));
+            $image= family_helper('common')::upload('FamilyLevels', $request->file('img'));
         }
 
    
@@ -72,7 +71,7 @@ class FamilyLevelService
             $FamilyLevel->admins = $request->admins;
         }
         if ($request->hasFile('img')) {
-            $FamilyLevel->img = Common::upload('families', $request->file('img'));
+            $FamilyLevel->img = family_helper('common')::upload('families', $request->file('img'));
         }
         $FamilyLevel->save();
         return $FamilyLevel;
