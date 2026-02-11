@@ -239,6 +239,17 @@ class AchievementDedicateController extends MainController
         $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
         $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');
         $form->html('</div>');
+
+        Admin::style('
+
+        .rtl .fields-group .form-group {
+            display: block !important;
+        }
+
+        .form-horizontal .fields-group > .col-md-12 > .form-group .input-group {
+            width: 50% !important;
+        }
+    ');
         return $form;
     }
 }
