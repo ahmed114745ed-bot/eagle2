@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Utd\Gifts\Repositories\GiftRepository;
 use Utd\Gifts\Repositories\GiftLogRepository;
 use GuzzleHttp\Exception\BadResponseException;
+use Utd\RoomBoom\Services\NewRoomBoomGiftService;
 
 
 class GiftLogService
@@ -910,13 +911,13 @@ class GiftLogService
 
     private function hasRoomBoomService(): bool
     {
-        return class_exists('\\Modules\\RoomBoom\\Services\\NewRoomBoomGiftService');
+        return class_exists('\\Utd\\RoomBoom\\Services\\NewRoomBoomGiftService');
     }
 
     private function getRoomBoomService()
     {
         if ($this->hasRoomBoomService()) {
-            return ClassResolver::getService('room_boom_gift_service') ?? new \Modules\RoomBoom\Services\NewRoomBoomGiftService();
+            return ClassResolver::getService('room_boom_gift_service') ?? new NewRoomBoomGiftService();
         }
         return null;
     }
