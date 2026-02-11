@@ -87,6 +87,7 @@ class RoomServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 \Utd\Room\Console\Commands\RemoveBackgroundCron::class,
+                \Utd\Room\Console\Commands\UpdateRoomBanCommand::class,
             ]);
         }
     }
