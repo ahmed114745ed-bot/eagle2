@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Utd\Gifts\Repositories\GiftRepository;
 use Utd\Gifts\Repositories\GiftLogRepository;
 use GuzzleHttp\Exception\BadResponseException;
+use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomBoom\Services\NewRoomBoomGiftService;
 
 
@@ -267,8 +268,7 @@ class GiftLogService
                     $tz = getTimezone();
                     $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
 
-                    $roomBoomService = $this->getRoomBoomService();
-                    $totalRoomGift = $roomBoomService ? $roomBoomService->getOrCreateTotalRoomGift($room->id, $todayStart) : null;
+                    $totalRoomGift = $this->getOrCreateTotalRoomGift($room->id, $todayStart);
 
                     info($totalPrice);
                     $totalRoomGift->increment('current_total', $totalPrice);
@@ -338,6 +338,21 @@ class GiftLogService
         });
     }
 
+    public function getOrCreateTotalRoomGift($roomId, $todayStart){
+        $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
+            ->where('created_at', '>=', $todayStart)
+            ->lockForUpdate()
+            ->first();
+
+        if (!$totalRoomGift) {
+            $totalRoomGift = TotalRoomGift::create([
+                'room_id' => $roomId,
+                'current_total' => 0,
+            ]);
+        }
+
+        return $totalRoomGift;
+    }
 
     public function sendTestGift($request, $updateUserWhenSendGift = null)
     {
