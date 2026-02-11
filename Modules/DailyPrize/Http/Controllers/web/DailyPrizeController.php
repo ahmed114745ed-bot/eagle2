@@ -83,7 +83,7 @@ class DailyPrizeController extends MainController
     {
         $type = request('type');
         $grid = new Grid(new DailyGift());
-        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement'])->where('type', $type)->orderBy('order');
+        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement.images','customAchievement'])->where('type', $type)->orderBy('order');
         // $grid->column('order', __('Order'))->editable();
         $grid->column('order', __('days'))
             ->display(function ($order) {

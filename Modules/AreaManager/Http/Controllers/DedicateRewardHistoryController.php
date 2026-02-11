@@ -153,8 +153,7 @@ class DedicateRewardHistoryController extends AdminController
             } elseif ($this->reward->type == "coins") {
                 return @$this->reward->target;
             } elseif ($this->reward->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->reward->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->reward->customAchievement?->name ?? '';
             }
         });
 
@@ -168,7 +167,7 @@ class DedicateRewardHistoryController extends AdminController
             } elseif ($this->reward->type == 'badge') {
                 $path = @$this->reward->badge->image ?? '';
             } elseif ($this->reward->type == 'achievement') {
-                $path = $this->reward->target;
+                $path = $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } else {
                 $path = 'coin.png';
             }
@@ -231,8 +230,7 @@ class DedicateRewardHistoryController extends AdminController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
 
@@ -247,7 +245,7 @@ class DedicateRewardHistoryController extends AdminController
                 // $vips = Badge::find($this->target);
                 $path = @$this->badge->image ?? '';
             } elseif ($this->type == 'achievement') {
-                $path = $this->target;
+                $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } else {
                 $path = 'coin.png';
             }

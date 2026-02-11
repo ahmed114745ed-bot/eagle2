@@ -130,7 +130,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -205,7 +205,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -279,7 +279,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {

@@ -37,128 +37,7 @@ class WinnerRankingController extends  MainController
      *
      * @return Grid
      */
-    // protected function grid()
-    // {
-    //     $grid = new Grid(new WinnerRanking());
-    //     $grid->model()->with([
-    //         'reward',
-    //         'user',
-    //         "user.country",
-    //         'user.senderLevel',
-    //         'user.receiverLevel',
-    //         'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-    //         "reward.vip",
-    //         'reward.ware',
-    //         'reward.badge'
-    //     ]);
 
-    //     $grid->filter(function (Grid\Filter $filter) {
-    //         $filter->expand();
-    //         $filter->disableIdFilter();
-    //         $filter->column(1 / 2, function ($filter) {
-
-    //             $filter->where(function ($query) {
-    //                 $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-    //                 $query->whereDate('created_at', '>=', $datt);
-    //             }, __('from_date'), 'from_date')->date();
-    //         });
-    //         $filter->column(1 / 2, function ($filter) {
-    //             $filter->where(function ($query) {
-    //                 $datt = \App\Helpers\UserCommon::arabicToEnglishNumbers($this->input);
-
-    //                 $query->whereDate('created_at', '<=', $datt);
-    //             }, __('to_date'), 'to_date')->date();
-    //         });
-
-    //         $filter->column(1 / 2, function ($filter) {
-    //             $filter->where(function ($query) {
-    //                 $input = $this->input;
-
-    //                 // Search on the related user table
-    //                 $query->whereHas('user', function ($q) use ($input) {
-    //                     $q->where('id', $input)
-    //                         ->orWhere('uuid', $input);
-    //                 });
-    //             }, __('User'))->placeholder(__('Search by ID, UUID'));
-    //         });
-    //         $filter->column(1 / 2, function ($filter) {
-    //             $filter->equal('type', __('type'))->select([
-    //                 'sender' => __('wealth'),
-    //                 'receiver' => __('charm'),
-    //                 'game' => __('game'),
-    //                 'charge' => __('charge'),
-    //             ]);
-    //         });
-    //     });
-
-    //     $grid->column('id', __('Id'));
-    //     $grid->column('winner_id', __('Winner'))->display(function ($name) {
-
-    //         $user = $this->user;
-    //         if (! $user) {
-    //             return __('No User');
-    //         }
-    //         return app(UserService::class)->adminUserAvatar($user);
-    //     });
-
-    //     $grid->column('type', __('type'))->display(function ($type) {
-
-    //         return   $type == "sender" ? "wealth" : ($type == "receiver" ? "charm" : $type);
-    //     });
-    //     $grid->column('reward.target_type', trans('reward type'))->display(function ($type) {
-
-    //         return   $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
-    //     });
-
-    //     $grid->column('gift_id', __('gifts'))->display(function () {
-    //         if ($this->reward->target_type == "ware") {
-    //             return @$this->reward->ware->name ?? '';
-    //         } elseif ($this->reward->target_type == "vip") {
-    //             return @$this->reward->vip->name ?? '';
-    //         } elseif ($this->reward->target_type == "badge") {
-    //             return @$this->reward->badge->name ?? '';
-    //         } elseif ($this->reward->target_type == "coins") {
-    //             return @$this->reward->target;
-    //         } elseif ($this->reward->target_type == "achievement") {
-    //             $value = getDriverUrl() . '/' . @$this->reward->target;
-    //             return "<img src='$value' width='80' height='80'>";
-    //         }
-    //     });
-
-    //     $grid->column('image', __('image'))->display(function ($path) {
-    //         if (@$this->reward->target_type == 'ware') {
-    //             $ware = Ware::find($this->reward->target);
-    //             $path = $ware->img2 ?? ($ware->show_img ?? "");
-    //         } elseif (@$this->reward->target_type == 'vip') {
-    //             $vips = OVip::find($this->reward->target);
-    //             $path = $vips->img ?? '';
-    //         } elseif (@$this->reward->target_type == 'badge') {
-    //             // $vips = Badge::find($this->target);
-    //             $path = @$this->reward->badge->image ?? '';
-    //         } elseif (@$this->reward->target_type == 'achievement') {
-    //             $path = @$this->reward->target ?? '';
-    //         } else {
-    //             $path = 'coin.png';
-    //         }
-
-    //         /** @var Gift $this */
-    //         $url = getImagePath($path);
-    //         return handleShowImageWithTypes($this->id, $url, 50, 50);
-    //     });
-    //     $grid->column('created_at', __('Created at'));
-
-    //     $grid->disableCreateButton();
-    //     $grid->disableRowSelector();
-    //     $grid->disableActions();
-    //     $grid->disableExport();
-
-    //     Admin::script("
-    //     if (window.innerWidth >= 1024) { // Example threshold for desktop screens
-    //         $('.table-responsive').removeClass('table-responsive');
-    //         }
-    //     ");
-    //     return $grid;
-    // }
 
     protected function grid()
     {
@@ -175,6 +54,8 @@ class WinnerRankingController extends  MainController
             'reward.ware:id,name,img2,show_img',
             'reward.vip:id,name,img',
             'reward.badge:id,name,image',
+            "reward.customAchievement",
+            'reward.customAchievement.images',
         ]);
 
         /* ================= FILTERS ================= */
@@ -241,7 +122,7 @@ class WinnerRankingController extends  MainController
                 'vip'         => $this->reward->vip?->name,
                 'badge'       => $this->reward->badge?->name,
                 'coins'       => $this->reward->target,
-                'achievement' => "<img src='" . getDriverUrl() . "/{$this->reward->target}' width='80' height='80'>",
+                'achievement' =>  $path = $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ??  '',
                 default       => '',
             };
         });
@@ -251,7 +132,7 @@ class WinnerRankingController extends  MainController
                 'ware'        => $this->reward->ware->img2 ?? $this->reward->ware->show_img,
                 'vip'         => $this->reward->vip->img ?? '',
                 'badge'       => $this->reward->badge->image ?? '',
-                'achievement' => $this->reward->target,
+                'achievement' => $this->reward->customAchievement?->name ?? '',
                 default       => 'coin.png',
             };
 

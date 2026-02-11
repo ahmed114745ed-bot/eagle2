@@ -14,12 +14,17 @@ class UserBadgeResource extends JsonResource
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
     public function toArray($request)
-    {  $user = request()->user();
-        $badge = $this->badge->images->firstWhere('language', $user->lan ?? 'en');
+    {
+        $user = request()->user();
+        $userLang = $user->lan ?? 'en';
+        
+        // Get image for user's language with fallback
+        $badgeImage = $this->badge?->images?->firstWhere('language', $userLang)
+            ?? $this->badge?->images?->first();
+        
         return [
-            'image' => $badge->image ?? '',
-            'image_type' => $badge->image_type ?? '',
-
+            'image' => $badgeImage?->image ?? $this->badge?->image ?? '',
+            'image_type' => $badgeImage?->image_type ?? $this->badge?->image_type ?? '',
         ];
     }
 }
