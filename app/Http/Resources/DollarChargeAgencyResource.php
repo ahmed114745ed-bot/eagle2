@@ -32,7 +32,7 @@ class DollarChargeAgencyResource extends JsonResource
             'totalUsed'  => (int) ($this->usd ?? 0),
             'coins'      => $this->amount ?? 0,
             'is_sender'      => $is_sender ?? 0,
-            'colored_name' => $hasColor ? common::wareUserVip($receiver['id'], 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip($receiver['id'], 18, 'color') : null),
 
 
 

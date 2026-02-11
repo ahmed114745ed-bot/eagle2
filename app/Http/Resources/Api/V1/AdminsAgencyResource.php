@@ -29,7 +29,7 @@ class AdminsAgencyResource extends JsonResource
             'exp'   => '0',
             'image_color'          => @$this->user->color_image,
             'id_image'             => @$this->user->specialId?->ware?->show_img ?? '',
-            'colored_name' => $hasColor ? common::wareUserVip(@$this->user->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$this->user->id, 18, 'color') : null),
 
         ];
     }
