@@ -68,9 +68,10 @@ class RoomBoomReward extends Model
                 case 'achievement':
                     if (isset($model->achievement_target)) {
                         $model->target = $model->achievement_target;
+                        unset($model->achievement_target);
                     }
 
-                    unset($model->achievement_target);
+
                     break;
 
                 case 'coin':
@@ -80,47 +81,6 @@ class RoomBoomReward extends Model
                     }
                     break;
             }
-        });
-        self::creating(function ($model) {
-            if ($model->target_type == 'ware') {
-                $model->target = request('target1', $model->target);
-            } elseif ($model->target_type == 'achievement') {
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
-            } elseif ($model->target_type == 'gift') {
-                $model->target = request('target5', $model->target);
-            } elseif ($model->target_type == 'coin') {
-                $model->target = request('target6', $model->target);
-            }
-            unset($model->target1);
-            unset($model->target4);
-            unset($model->target5);
-            unset($model->target6);
-        });
-
-        self::updating(function ($model) {
-            if ($model->target_type == 'ware') {
-                $model->target = request('target1', $model->target);
-            } elseif ($model->target_type == 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
-            } elseif ($model->target_type == 'gift') {
-                $model->target = request('target5', $model->target);
-            } elseif ($model->target_type == 'coin') {
-                $model->target = request('target6', $model->target);
-            }
-            unset($model->target1);
-            unset($model->target4);
-            unset($model->target5);
-            unset($model->target6);
         });
     }
 }
