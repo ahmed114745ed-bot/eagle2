@@ -260,7 +260,7 @@ class PkEventGiftController extends MainController
             } elseif ($this->type == "coins") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+               
                return $this->customAchievement?->name ?? '';
             }
         });
