@@ -4,7 +4,7 @@ namespace Utd\Family\Http\Resources;
 
 use Carbon\Carbon;
 use App\Models\User;
-use Utd\Family\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Helpers\Common;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;

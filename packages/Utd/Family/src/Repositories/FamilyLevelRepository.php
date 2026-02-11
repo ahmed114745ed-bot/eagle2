@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Models\FamilyLevel;
+use Utd\Family\Entities\FamilyLevel;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
 

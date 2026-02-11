@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Family\Http\Controllers\Admin;
 
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
@@ -33,7 +33,7 @@ use App\Admin\Selectable\ImageColors;
 use App\Admin\Actions\DeletePackAction;
 use Illuminate\Support\Facades\Session;
 use App\Helpers\AgencyPackageHelper;
-use App\Admin\Actions\KickOfFamilyAction;
+use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
 use App\Admin\Widgets\Table as TableWidget;

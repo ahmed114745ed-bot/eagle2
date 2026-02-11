@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Admin\Extensions;
+namespace Utd\Family\Admin\Extensions;
 
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 

@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Models\Charge;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Models\Config;
 use App\Models\Follow;
 use App\Helpers\Common;

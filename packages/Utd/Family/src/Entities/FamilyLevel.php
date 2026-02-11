@@ -1,6 +1,6 @@
 <?php
 
-namespace Utd\Family\Models;
+namespace Utd\Family\Entities;
 use App\Models\User;
 
 use App\Traits\TimestampsWithTimezone;

@@ -53,8 +53,8 @@ use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
 use App\Http\Controllers\utd\EventPeriodController;
 use App\Http\Controllers\utd\ExchangeController;
-use App\Http\Controllers\utd\FamilyController;
-use App\Http\Controllers\utd\FamilyLevelController;
+use Utd\Family\Http\Controllers\Utd\FamilyController;
+use Utd\Family\Http\Controllers\Api\FamilyLevelController;
 use App\Http\Controllers\utd\GroupChatController;
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
@@ -662,7 +662,7 @@ Route::middleware([])->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', [UserController::class, 'allUsers']);
         Route::post('kick-agency/{id}', [UserController::class, 'kickAgency']);
-        Route::post('kick-family/{id}', [UserController::class, 'kickFamily']);
+        Route::post('kick-family/{id}', [FamilyController::class, 'kickFamily']);
         Route::post('change-agency', [UserController::class, 'changeAgency']);
         Route::post('update-switch', [UserController::class, 'updateSwitch']);
         Route::post('update-user-Setting', [UserController::class, 'updateUserSetting']);

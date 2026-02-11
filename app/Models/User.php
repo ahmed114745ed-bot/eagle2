@@ -40,6 +40,8 @@ use Modules\UsersWallet\Entities\UserWallet;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyUser;
 use Utd\Moments\Entities\Moment;
 use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Entities\Room;

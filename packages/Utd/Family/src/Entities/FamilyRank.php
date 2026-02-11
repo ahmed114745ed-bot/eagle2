@@ -1,22 +1,22 @@
 <?php
 
-namespace Utd\Family\Models;
+namespace Utd\Family\Entities;
 use App\Models\User;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FamilyUser extends Model
+class FamilyRank extends Model
 {
     use HasFactory, TimestampsWithTimezone;
 
-    protected $table = 'family_user';
-
     protected $guarded = [];
 
-    public function user()
+    protected $table = 'family_ranks';
+
+    public function family()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Family::class, 'family_id');
     }
 }

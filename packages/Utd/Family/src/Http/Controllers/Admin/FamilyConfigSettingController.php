@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Family\Http\Controllers\Admin;
 
 use App\Models\Config;
 use Encore\Admin\Layout\Content;
@@ -17,6 +17,6 @@ class FamilyConfigSettingController extends MainController
         $config = Config::where('name', 'family_price')->first();
         $configValue = $config->value ?? '';
         return  parent::index($content
-            ->view('familySetting', compact('config', 'configValue')));
+            ->view('family::familySetting', compact('config', 'configValue')));
     }
 }

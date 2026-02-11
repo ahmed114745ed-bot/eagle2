@@ -2,8 +2,8 @@
 
 namespace Utd\Family\Observers;
 
-use Utd\Family\Models\Family;
-use Utd\Family\Models\FamilyUser;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\User;
 
 class FamilyUserObserver

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Family\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

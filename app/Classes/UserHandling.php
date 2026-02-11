@@ -196,7 +196,7 @@ class UserHandling
 
     public function checkIfUserOwnerOfFamily(int $userId): bool
     {
-        return \App\Models\Family::query()->where('user_id', $userId)->exists();
+        return \Utd\Family\Entities\Family::query()->where('user_id', $userId)->exists();
     }
 
     public function removeMonthlyLiveTimes(int $userId): bool

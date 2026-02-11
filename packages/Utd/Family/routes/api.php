@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Utd\Family\Http\Controllers\FamilyController;
+use Utd\Family\Http\Controllers\Api\FamilyController;
+use Utd\Family\Http\Controllers\Api\FamilyLevelController;
+use Utd\Family\Http\Controllers\Utd\FamilyController as UtdFamilyController;
 
 Route::prefix('api/families')->group(function () {
     Route::get('all', [FamilyController::class, 'index']);
@@ -19,4 +21,23 @@ Route::prefix('api/families')->group(function () {
     Route::post('getMembersList', [FamilyController::class, 'getMembersList']);
     Route::post('getFamilyRooms', [FamilyController::class, 'getFamilyRooms']);
     Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
+});
+
+// Utd Custom Dashboard Routes
+Route::prefix('utd/families')->group(function () {
+    Route::get('/', [UtdFamilyController::class, 'index']);
+    Route::get('/all', [UtdFamilyController::class, 'all']);
+    Route::post('/', [UtdFamilyController::class, 'store']);
+    Route::post('/update/{id}', [UtdFamilyController::class, 'update']);
+    Route::post('/delete/{id}', [UtdFamilyController::class, 'destroy']);
+    Route::post('/delete-all', [UtdFamilyController::class, 'delete_all']);
+    Route::get('/{id}', [UtdFamilyController::class, 'show']);
+});
+
+Route::prefix('utd/family-levels')->group(function () {
+    Route::get('/all', [FamilyLevelController::class, 'index']);
+    Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
+    Route::post('/create', [FamilyLevelController::class, 'store']);
+    Route::post('/update/{id}', [FamilyLevelController::class, 'update']);
+    Route::post('/delete/{id}', [FamilyLevelController::class, 'destroy']);
 });

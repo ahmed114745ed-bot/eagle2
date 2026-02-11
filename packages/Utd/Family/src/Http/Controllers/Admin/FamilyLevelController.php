@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Family\Http\Controllers\Admin;
 
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Models\FamilyLevel;
+use Utd\Family\Entities\FamilyLevel;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use App\Services\AppFeatureService;

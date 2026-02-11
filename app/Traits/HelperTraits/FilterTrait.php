@@ -7,7 +7,7 @@ namespace App\Traits\HelperTraits;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 
 trait FilterTrait
 {

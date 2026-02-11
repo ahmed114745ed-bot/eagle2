@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Families;
+namespace Utd\Family\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\FamilyLevel;
+use Utd\Family\Entities\FamilyLevel;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace Utd\Family\Http\Controllers;
+namespace Utd\Family\Http\Controllers\Api;
 
 use Exception;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use Utd\Family\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Helpers\Common;
-use Utd\Family\Models\FamilyRank;
-use Utd\Family\Models\FamilyUser;
+use Utd\Family\Entities\FamilyRank;
+use Utd\Family\Entities\FamilyUser;
 use Utd\Family\Services\FamilyService;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
@@ -55,6 +55,16 @@ class FamilyController extends Controller
         ];
         return Common::apiResponse(true, 'success', $data);
     }
+
+    public function userFamily(Request $request)
+    {
+        $key = $request->q;
+        $page = $request->get('page', 1);
+        $users = $this->familyServices->searchUsersInFamily($key, $page);
+
+        return response()->json($users);
+    }
+
     public function ranking(Request $request)
     {
         $time = $request->time;

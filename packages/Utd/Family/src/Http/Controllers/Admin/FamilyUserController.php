@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Family\Http\Controllers\Admin;
 
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;

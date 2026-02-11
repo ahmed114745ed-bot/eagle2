@@ -1,10 +1,10 @@
 <?php
 
-namespace Utd\Family\Http\Controllers;
+namespace Utd\Family\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Family\Models\FamilyLevel;
+use Utd\Family\Entities\FamilyLevel;
 use Utd\Family\Services\FamilyLevelService;
 use Illuminate\Http\Request;
 use Exception;

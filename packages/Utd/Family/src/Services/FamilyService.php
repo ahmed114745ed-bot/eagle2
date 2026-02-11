@@ -307,4 +307,27 @@ class FamilyService
         $this->familyUserRepository->exitUser($user->id);
         $this->userRepository->updateFamilyId($user, 0);
     }
+
+    public function searchUsersInFamily($key, $page)
+    {
+        $perPage = 10;
+        return $this->familyRepository->searchUserFamily($key, $page, $perPage);
+    }
+
+    public function kickFamily($userId)
+    {
+        $user = $this->userRepository->findById($userId);
+        if (!$user) {
+            throw new \Exception('user not found');
+        }
+        $user->family_id = null;
+        $user->is_family_admin = 0;
+        $user->is_family_owner = 0;
+        $user->save();
+
+        // Remove from FamilyUser table
+        $this->familyUserRepository->deleteByUserId($userId);
+
+        return true;
+    }
 }

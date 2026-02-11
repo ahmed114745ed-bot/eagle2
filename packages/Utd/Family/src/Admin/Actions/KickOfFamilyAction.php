@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Admin\Actions;
+namespace Utd\Family\Admin\Actions;
 
 use App\Facades\UserHandling;
 use App\Helpers\Common;
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;

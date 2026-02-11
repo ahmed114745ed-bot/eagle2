@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Http\Resources;
 
-use Utd\Family\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 

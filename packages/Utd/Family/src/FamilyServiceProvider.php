@@ -33,12 +33,15 @@ class FamilyServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Observe Models
-        \Utd\Family\Models\Family::observe(\Utd\Family\Observers\FamilyObserver::class);
-        \Utd\Family\Models\FamilyUser::observe(\Utd\Family\Observers\FamilyUserObserver::class);
+        \Utd\Family\Entities\Family::observe(\Utd\Family\Observers\FamilyObserver::class);
+        \Utd\Family\Entities\FamilyUser::observe(\Utd\Family\Observers\FamilyUserObserver::class);
 
         // Load Routes
         $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
         $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        if (file_exists(__DIR__ . '/../routes/admin.php')) {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
+        }
 
         // Load Migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
@@ -46,8 +49,8 @@ class FamilyServiceProvider extends ServiceProvider
         // Load Translations (if any)
         // $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'family');
 
-        // Load Views (if any)
-        // $this->loadViewsFrom(__DIR__ . '/../resources/views', 'family');
+        // Load Views
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'family');
 
         // Publishing files
         if ($this->app->runningInConsole()) {

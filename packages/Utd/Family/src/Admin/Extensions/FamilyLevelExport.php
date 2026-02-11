@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Admin\Extensions;
+namespace Utd\Family\Admin\Extensions;
 
-use App\Models\FamilyLevel;
+use Utd\Family\Entities\FamilyLevel;
 
 use Maatwebsite\Excel\Concerns\WithHeadings;
 

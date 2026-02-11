@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Models\FamilyRank;
+use Utd\Family\Entities\FamilyRank;
 
 
 

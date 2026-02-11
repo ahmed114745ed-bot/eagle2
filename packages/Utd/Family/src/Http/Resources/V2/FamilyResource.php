@@ -4,8 +4,8 @@ namespace Utd\Family\Http\Resources\V2;
 
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\ShortFamilyUserResource;
-use Utd\Family\Models\Family;
-use Utd\Family\Models\FamilyUser;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 

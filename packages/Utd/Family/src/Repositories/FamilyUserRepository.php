@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 
 
 

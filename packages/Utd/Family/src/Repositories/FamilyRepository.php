@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,6 +50,18 @@ class FamilyRepository extends AbstractRepository
     public function findByUserId($userId)
     {
       return  $this->model->query()->where('user_id', $userId)->first();
+    }
+
+    public function searchUserFamily($key, $page, $perPage)
+    {
+        return \App\Models\User::whereHas('family')
+            ->where(function ($query) use ($key) {
+                $query->where('name', 'like', '%' . $key . '%')
+                    ->orWhere('id', 'like', '%' . $key . '%')
+                    ->orWhere('user_id', 'like', '%' . $key . '%');
+            })
+            ->select('id', 'name', 'user_id', 'avatar')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function delete($family)

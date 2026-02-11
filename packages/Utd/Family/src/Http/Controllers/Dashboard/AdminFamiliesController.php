@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Families;
+namespace Utd\Family\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Families\AdminFamiliesResource;
-use App\Models\Family;
+use Utd\Family\Http\Resources\Dashboard\AdminFamiliesResource;
+use Utd\Family\Entities\Family;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 

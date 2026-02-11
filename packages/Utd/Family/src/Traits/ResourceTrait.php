@@ -2,7 +2,7 @@
 
 namespace Utd\Family\Traits;
 
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\User;
 
 trait ResourceTrait
