@@ -24,7 +24,7 @@ class AchievementDetailResource extends JsonResource
             'id' => $this->id,
             'name' => 'قام ' . $this->user?->name . ' بشحن قيمه' . $achievementLevel?->target ?? '',
             'type' => $achievementLevel?->achievement?->type ?? 'no achievement',
-            'image' => $achievementLevel?->valid_image ?? ($this->custom_image ?? $this->file),
+            'image' => $achievementLevel?->valid_image ?? ($this->custom_image ?? $this->file) ??$this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '',
             'description' =>    $achievementLevel ?  $achievementLevel?->ar_description  : __('get it by admin'),
             'description_en' =>    $achievementLevel ?   $achievementLevel?->en_description : __('get it by admin'),
 
