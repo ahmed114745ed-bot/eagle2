@@ -23,7 +23,7 @@ class CustomAchievementController extends MainController
      */
     protected $title = 'CustomAchievement';
 
-    public $permission_name = 'achievement';
+    public $permission_name = 'custom-achievement';
 
     public function index(Content $content)
     {
