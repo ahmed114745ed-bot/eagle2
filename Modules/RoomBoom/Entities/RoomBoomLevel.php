@@ -11,7 +11,7 @@ class RoomBoomLevel extends Model
 {
     use TimestampsWithTimezone;
 
-    protected $fillable = ['level', 'min_target', 'target'];
+    protected $fillable = ['level', 'min_target', 'target','image_type'];
 
     public function roomBoomRewards(): HasMany
     {
