@@ -113,7 +113,7 @@ class CustomAchievementController extends MainController
     {
         $form = new Form(new CustomAchievement());
 
-        $form->text('name', __('Name'));
+        $form->text('name', __('Name'))->required();
 
         $form->html(function () use ($form) {
 
