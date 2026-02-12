@@ -10,12 +10,12 @@ abstract class AbstractRepository
 {
     public function __construct(protected Model $model) {}
 
-    final public function updateOrCreate(array $condition, array $data): mixed
+    public function updateOrCreate(array $condition, array $data): mixed
     {
         return $this->model->updateOrCreate($condition, $data);
     }
 
-    final public function update(array $data, $id): mixed
+    public function update(array $data, $id): mixed
     {
         if ($id instanceof Model) {
             return $id->update($data);
@@ -24,12 +24,12 @@ abstract class AbstractRepository
         return $this->model->findOrFail($id)->update($data);
     }
 
-    final public function create(array $data): mixed
+    public function create(array $data): mixed
     {
         return $this->model->create($data);
     }
 
-    final public function insert(array $data): mixed
+    public function insert(array $data): mixed
     {
         return $this->model->insert($data);
     }
@@ -47,7 +47,7 @@ abstract class AbstractRepository
      * @param  array  $data
      * @return Builder[]|Collection
      */
-    final public function getAll(): Collection|array
+    public function getAll(): Collection|array
     {
         return $this->model->all();
     }
@@ -55,7 +55,7 @@ abstract class AbstractRepository
     /**
      * @return Builder|Builder[]|Collection|Model|null
      */
-    final public function findById(int $userId)
+    public function findById(int $userId)
     {
         return $this->model->find($userId);
     }
@@ -63,7 +63,7 @@ abstract class AbstractRepository
     /**
      * @return Builder|Builder[]|Collection|Model
      */
-    final public function findOrFail($id)
+    public function findOrFail($id)
     {
         return $this->model->findOrFail($id);
     }
@@ -72,7 +72,7 @@ abstract class AbstractRepository
      * @param  int  $page
      * @param  int  $limit
      */
-    final public function paginate($page, $limit = null): mixed
+    public function paginate($page, $limit = null): mixed
     {
         $query = $this->model->query();
         if ($limit) {
@@ -82,7 +82,7 @@ abstract class AbstractRepository
         return $query->paginate($page);
     }
 
-    final public function paginateWhere(array $condition, int $per = 10): mixed
+    public function paginateWhere(array $condition, int $per = 10): mixed
     {
         return $this->model->query()->where($condition)->paginate($per);
     }
@@ -90,12 +90,12 @@ abstract class AbstractRepository
     /**
      * @return Builder|Model|object|null
      */
-    final public function findOrFailByWhere(array $where)
+    public function findOrFailByWhere(array $where)
     {
         return $this->model->query()->where($where)->firstOrFail();
     }
 
-    final public function exists(array $condition): bool
+    public function exists(array $condition): bool
     {
         return $this->model->query()->where($condition)->exists();
     }
@@ -103,7 +103,7 @@ abstract class AbstractRepository
     /**
      * @return Builder|Model|object|null
      */
-    final public function firstByWhere(array $where)
+    public function firstByWhere(array $where)
     {
         return $this->model->query()->where($where)->first();
     }
