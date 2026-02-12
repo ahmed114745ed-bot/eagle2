@@ -381,10 +381,8 @@ class LuckyGiftService
 
         while ($user->di >= $totalPrice && $index > 0) {
 
-            // $appWallet->coins   += $price * 8;
             $appWallet->coins   += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
-            //        $ownerWallet->save();
             $isWinner       = $this->is_winner($gift);
 
             $isPopular      = false;
@@ -414,12 +412,6 @@ class LuckyGiftService
                 $isPopular = $this->isPopular($cashback_percentage);
 
                 if ($isPopular) {
-
-                    //  \Log::info('🚀 Sending Popular To Zego...', [
-                    //         'user_id'  => $userId,
-                    //         'owner_id' => $ownerId,
-                    //         'room_id'  => $room->id ?? null,
-                    //     ]);
 
                     $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                 }
@@ -636,10 +628,8 @@ class LuckyGiftService
                 $gift?->name,
             );
 
-            // $appWallet->coins   += $price * 8;
             $appWallet->coins   += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
-            //        $ownerWallet->save();
 
             $iterationTotalWin = 0;
             $iterationPopular = false;
