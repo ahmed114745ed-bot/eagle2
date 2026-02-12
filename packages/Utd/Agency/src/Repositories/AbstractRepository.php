@@ -34,7 +34,7 @@ abstract class AbstractRepository
         return $this->model->insert($data);
     }
 
-    final public function delete($id): mixed
+    public function delete($id): mixed
     {
         if ($id instanceof Model) {
             return $id->delete();

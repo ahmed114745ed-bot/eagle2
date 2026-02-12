@@ -88,7 +88,7 @@ abstract class AbstractRepository
             ->get();
     }
 
-    final public function delete(int $id): bool
+    public function delete(int $id): bool
     {
         $data = $this->model->find($id);
         if (! $data) {

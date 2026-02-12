@@ -75,7 +75,6 @@
             "Database\\Seeders\\": "database/seeders/",
             "Utd\\CP\\Database\\Seeders\\": "vendor/utd/cp/Database/Seeders/",
             "Utd\\LuckyBox\\Database\\Seeders\\": "vendor/utd/lucky-box/Database/Seeders/"
-
         },
         "files": [
             "app/helpers.php",

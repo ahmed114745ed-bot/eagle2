@@ -342,11 +342,11 @@ class RoomBoomRewardJob implements ShouldQueue
             $achievementTitle = __('Achievement Reward');
             $achievementBody = __('You have received a new achievement.');
 
-            if (! empty($notification['user_ids'])) {
+            if (! empty($this->achievementNotifications['user_ids'])) {
                 Common::sendOfficialMessage($this->achievementNotifications['user_ids'], $achievementTitle, $achievementBody);
             }
 
-            if (! empty($notification['tokens'])) {
+            if (! empty($this->achievementNotifications['tokens'])) {
                 Common::send_firebase_notification($this->achievementNotifications['tokens'], $achievementTitle, $achievementBody);
             }
         }

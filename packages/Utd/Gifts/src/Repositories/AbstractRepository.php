@@ -69,7 +69,7 @@ abstract class AbstractRepository
         return $this->model->where($column, 'like', '%'.$search.'%')->select(['name as text', 'id'])->take(10)->get();
     }
 
-    final public function delete($id)
+    public function delete($id)
     {
         $data = $this->model->find($id);
         if (! $data) {
