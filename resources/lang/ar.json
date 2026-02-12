@@ -17,6 +17,14 @@
     "today_balance": " هدايا اليوم",
     "Zego Feature":"ميزة زيجو",
     "disable zego feature":"تعطيل ميزة زيجو",
+    "Custom Achievement":"الإنجازات المخصصة",
+    "Browse custom achievement": "تصفح الإنجازات المخصصة",
+"Create custom achievement": "إنشاء إنجاز مخصص",
+"Delete custom achievement": "حذف إنجاز مخصص",
+"Edit custom achievement": "تعديل إنجاز مخصص",
+"Show custom achievement": "عرض إنجاز مخصص",
+
+
    "convert diamonds to coins according": "تحويل الألماس إلى عملات وفقًا لـ",
 "convert diamonds": "تحويل الألماس",
     "Enter the lucky gift coins value": "أدخل قيمة عملات الهدية المحظوظة",
