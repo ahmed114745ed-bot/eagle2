@@ -3,6 +3,7 @@
 use Modules\RoomCup\Http\Controllers\web\RoomCupTargetController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupSettingsController;
 use Modules\RoomCup\Http\Controllers\web\RoomCupReportsController;
+use Modules\RoomCup\Http\Controllers\web\RoomCupDebugController;
 use  Modules\RoomCup\Console\CalculateRoomCupRewards;
 /*
 |--------------------------------------------------------------------------
@@ -35,8 +36,9 @@ Route::group(
 
         Route::resource('room-cup-reports', RoomCupReportsController::class);
         
- 
-        
+        // Debug Routes
+        Route::get('room-cup-debug', [RoomCupDebugController::class, 'index'])->name('room-cup-debug.index');
+        Route::get('room-cup-debug/compare', [RoomCupDebugController::class, 'compare'])->name('room-cup-debug.compare');
    
     }
 );
