@@ -623,7 +623,7 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
     //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
-
+ Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
 
 Route::get('/test-games', function () {
