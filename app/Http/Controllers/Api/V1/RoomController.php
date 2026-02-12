@@ -383,7 +383,13 @@ class RoomController extends Controller
     public function deleteOldRoomMic($user, $room)
     {
         RoomMicrophone::where('user_id', $user->id)->delete();
-        $json = $this->cpMapJson([]);
+        CpRoomHistory::where("user_one_id", $user->id)
+            ->orWhere("user_two_id", $user->id)->delete();
+        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
+        $json = $this->cpMapJson($indices);
 
         Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
     }

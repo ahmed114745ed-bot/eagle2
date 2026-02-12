@@ -546,7 +546,7 @@ class EnteranceRoomServices
             if ($room->room_pass != $room_pass) return Common::apiResponse(false, __('Password is incorrect, please re-enter'), null, 410);
         }
 
-      $this->deleteOldRoomMic($user, $room);
+        $this->deleteOldRoomMic($user, $room);
 
         if ($user->id == $owner_id) {
             $room->is_afk = 1;
@@ -584,9 +584,19 @@ class EnteranceRoomServices
     public function deleteOldRoomMic($user, $room)
     {
         RoomMicrophone::where('user_id', $user->id)->delete();
-        $json = $this->cpMapJson([]);
+        $cpHistory = CpRoomHistory::where("user_one_id", $user->id)->orWhere("user_two_id", $user->id)->first();
+        if (!$cpHistory) return;
+        $userIIId = $cpHistory->user_one_id == $user->id ? $cpHistory->user_two_id : $cpHistory->user_one_id;
+        $nowRoomId = User::where('id', $userIIId)->value('now_room_uid');
 
-        Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+        CpRoomHistory::where("user_one_id", $user->id)
+            ->orWhere("user_two_id", $user->id)->delete();
+        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
+        $indices = $cpRoomHistories->map(function ($history) {
+            return [$history->index1, $history->index2];
+        })->toArray();
+        $json = $this->cpMapJson($indices);
+        if ($nowRoomId) Common::sendToZego('SendCustomCommand', @$nowRoomId, $user->id, $json);
     }
 
 
