@@ -76,7 +76,7 @@ class RewardTargetController extends MainController
         $target = ChargeTargetEvent::query()->find($charge_event_id);
         $grid = new Grid(new RewardTarget());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("charge_event_id", $charge_event_id);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("charge_event_id", $charge_event_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
 
@@ -104,7 +104,7 @@ class RewardTargetController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {

@@ -165,7 +165,7 @@ class DedicateRewardHistoryController extends AdminController
                 $vips = $this->reward->vip;
                 $path = $vips->img ?? '';
             } elseif ($this->reward->type == 'badge') {
-                $path = @$this->reward->badge->image ?? '';
+                $path = @$this->reward->badge?->images?->firstWhere('language', app()->getLocale())?->image?? '';
             } elseif ($this->reward->type == 'achievement') {
                 $path = $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } else {
@@ -189,6 +189,9 @@ class DedicateRewardHistoryController extends AdminController
             'ware',
             'vip',
             'badge',
+            'badge.images',
+            'customAchievement',
+            'customAchievement.images',
             'subAreaManagerDedicate',
             'areaManagerDedicate',
             'superAdmin'
@@ -243,7 +246,7 @@ class DedicateRewardHistoryController extends AdminController
                 $path = $vips->img ?? '';
             } elseif ($this->type == 'badge') {
                 // $vips = Badge::find($this->target);
-                $path = @$this->badge->image ?? '';
+                $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } else {

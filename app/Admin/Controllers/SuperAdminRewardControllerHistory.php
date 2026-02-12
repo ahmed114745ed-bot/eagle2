@@ -191,7 +191,7 @@ class SuperAdminRewardControllerHistory extends MainController
                         $vips = $this->vip;
                         $path = $vips->img ?? '';
                     } elseif ($this->type == 'badge') {
-                        $path = @$this->badge->image ?? '';
+                        $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                     } elseif ($this->type == 'achievement') {
                         $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                     } else {
@@ -431,7 +431,7 @@ class SuperAdminRewardControllerHistory extends MainController
 
                     case 'badge':
                         $gifts = $memper->badge->name ?? '';
-                        $path  = $memper->badge->image ?? '';
+                        $path  = $memper->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
 
                     case 'coins':

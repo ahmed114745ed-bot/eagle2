@@ -130,7 +130,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -156,7 +156,7 @@ class WeeklyEventGiftNController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
@@ -204,7 +204,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -232,7 +232,7 @@ class WeeklyEventGiftNController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
@@ -278,7 +278,7 @@ class WeeklyEventGiftNController extends MainController
         $weekly_event_id = request('weekly_event_id');
         $grid = new Grid(new Reward());
         $grid->column('created_at')->hide();
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("weekly_star_id", $weekly_event_id)->where("level", $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
@@ -305,7 +305,7 @@ class WeeklyEventGiftNController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {

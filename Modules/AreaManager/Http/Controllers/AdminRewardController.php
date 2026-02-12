@@ -47,7 +47,7 @@ class AdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type)->with(['ware','vip','badge','customAchievement','customAchievement.images'])->whereRaw('no_reward - gave_reward_no != 0');
+        $grid->model()->where('type',  $type)->with(['ware','vip','badge','badge.images','customAchievement','customAchievement.images',])->whereRaw('no_reward - gave_reward_no != 0');
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'area-manager' ? auth()->user()->id : auth()->user()->parent_id;
@@ -58,7 +58,7 @@ class AdminRewardController extends MainController
             } elseif ($this->type == "vip") {
                 return @$this->vip->name ?? '';
             } elseif ($this->type == "badge") {
-                return @$this->badge->name ?? '';
+                return @$this->badge?->name ?? '';
             } elseif ($this->type == "coin") {
                 return @$this->target;
             } elseif ($this->type == "achievement") {
@@ -75,7 +75,7 @@ class AdminRewardController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } else {

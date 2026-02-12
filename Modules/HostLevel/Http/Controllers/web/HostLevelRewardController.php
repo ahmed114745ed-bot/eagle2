@@ -78,7 +78,7 @@ class HostLevelRewardController extends MainController
     {
         $host_level_id = request('host_level_id');
         $grid = new Grid(new HostLevelReward());
-        $grid->model()->with(['ware', 'vip', 'badge','customAchievement','customAchievement.images'])->where("host_level_id", $host_level_id);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where("host_level_id", $host_level_id);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         if (!request()->filled('_export_')) {
@@ -105,7 +105,7 @@ class HostLevelRewardController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
                 } else {
