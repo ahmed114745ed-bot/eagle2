@@ -54,7 +54,7 @@ class Cp extends Model
     public function getPartnerAttribute()
     {
         return $this->user_one_id == auth()->id()
-            ? $this->fromUser : $this->toUser;
+            ?  $this->toUser : $this->fromUser;
     }
 
     public function level()
