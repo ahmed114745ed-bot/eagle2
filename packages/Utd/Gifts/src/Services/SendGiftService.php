@@ -227,12 +227,10 @@ class SendGiftService
 
     public function updatePkScoresAndSendToZegoJob($pk, $userId, $roomId, $receivedIds, $giftPrice, $room)
     {
-        info('is installed');
         if (! PackageHelper::isInstalled('pk')) {
             return;
         }
 
-        info('is instance');
         if (! ($pk instanceof Pk)) {
             return;
         }
@@ -306,7 +304,6 @@ class SendGiftService
         ];
         $json = json_encode($ms);
 
-        info('send to zego test');
         Common::sendToZego('SendCustomCommand', $roomId, $userId, $json);
     }
 
