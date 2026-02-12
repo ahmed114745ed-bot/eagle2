@@ -3,6 +3,7 @@
 namespace Utd\Room\Services;
 
 use App\Contracts\GiftLogRepositoryContract;
+use App\Contracts\TaskStreamServiceContract;
 use App\Contracts\UserCharismaServiceContract;
 use App\Enums\UserCoinLogType;
 use App\Facades\UserHandling;
@@ -18,7 +19,6 @@ use App\Traits\MultiQueryPagination;
 use Exception;
 use GuzzleHttp\Promise\Utils;
 use Illuminate\Support\Facades\Schema;
-use Modules\TaskStream\Services\TaskStreamService;
 use Throwable;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Room\Entities\RequestBackgroundImage;
@@ -345,7 +345,7 @@ class RoomRepoService
 
         $taskStreamRoom = $room->taskStreamRoom()->first();
         if ($taskStreamRoom) {
-            app(TaskStreamService::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
+            app(TaskStreamServiceContract::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
         }
 
         if ($room->uid === $user->id && Schema::hasColumn('rooms', 'is_live') && $room->type !== 'audio') {

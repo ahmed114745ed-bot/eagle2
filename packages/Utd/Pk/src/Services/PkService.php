@@ -27,7 +27,7 @@ class PkService
         if ($userId !== $room->uid) {
             throw new Exception(__('you don not have permission'));
         }
-        if ($room->room_visitor == '') {
+        if ($room->room_visitor === '') {
             throw new Exception(__('room closed'));
         }
         $ex = $this->pkRepository->getPk($room->id);
@@ -53,7 +53,7 @@ class PkService
         if (! $pk) {
             throw new Exception(__('PK not found'));
         }
-        if ($pk->status == 0) {
+        if ($pk->status === 0) {
             throw new Exception(__('Already closed'));
         }
 

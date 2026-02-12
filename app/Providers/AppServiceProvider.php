@@ -42,7 +42,9 @@ use App\Repositories\User\UserRepoInterface;
 use App\Services\Gifts\LuckyGiftService;
 use App\Services\RedisService;
 use App\Contracts\UserCharismaServiceContract;
+use App\Contracts\TaskStreamServiceContract;
 use App\Services\Null\NullUserCharismaService;
+use App\Services\Null\NullTaskStreamService;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -95,6 +97,11 @@ class AppServiceProvider extends ServiceProvider
         // Charizma service fallback
         if (!$this->app->bound(UserCharismaServiceContract::class)) {
             $this->app->bind(UserCharismaServiceContract::class, NullUserCharismaService::class);
+        }
+
+        // TaskStream service fallback
+        if (!$this->app->bound(TaskStreamServiceContract::class)) {
+            $this->app->bind(TaskStreamServiceContract::class, NullTaskStreamService::class);
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

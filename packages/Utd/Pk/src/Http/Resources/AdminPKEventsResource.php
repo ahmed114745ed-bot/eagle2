@@ -27,7 +27,8 @@ class AdminPKEventsResource extends JsonResource
 
             return '';
 
-        } elseif ($type === 'vip') {
+        }
+        if ($type === 'vip') {
             $item = OVip::find($id);
             if ($item) {
                 return [

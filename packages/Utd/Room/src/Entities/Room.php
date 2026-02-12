@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
 use Modules\Chat\Entities\ChatMessage;
-use Modules\TaskStream\Entities\TaskStream;
-use Modules\TaskStream\Entities\TaskStreamRoom;
 use Modules\Vip\Entities\Vip;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Traits\RoomBoxes;
+use Utd\TaskStream\Entities\TaskStream;
+use Utd\TaskStream\Entities\TaskStreamRoom;
 
 /**
  * @method static withoutAppends()

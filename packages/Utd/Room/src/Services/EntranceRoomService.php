@@ -3,6 +3,7 @@
 namespace Utd\Room\Services;
 
 use App\Contracts\EnteranceRoomContract;
+use App\Contracts\TaskStreamServiceContract;
 use App\Contracts\UserCharismaServiceContract;
 use App\Facades\UserHandling;
 use App\Helpers\Common;
@@ -21,7 +22,6 @@ use Modules\Chat\Events\Conversation;
 use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
-use Modules\TaskStream\Services\TaskStreamService;
 use Throwable;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Charizma\Jobs\ResetCharisma;
@@ -137,7 +137,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         $taskStreamRoom = $room->taskStreamRoom()->first();
         if ($taskStreamRoom) {
-            app(TaskStreamService::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
+            app(TaskStreamServiceContract::class)->leave(['task_stream_id' => $taskStreamRoom->task_stream_id]);
         }
 
         $visitors = $this->updateRoomVisitorsBasedOnEvent2($event, $room, $user->id);

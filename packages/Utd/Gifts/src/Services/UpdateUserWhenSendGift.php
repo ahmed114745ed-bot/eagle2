@@ -7,6 +7,7 @@ use App\Exceptions\NotInfMoneyException;
 use App\Jobs\IncreaseDiamondJob;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -51,7 +52,7 @@ class UpdateUserWhenSendGift
                 dispatch(new SendCustomOfficialMessageToUser($user->id, NotificationType::RECEIVED_LEVEL))
                     ->onQueue('notification');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::build([
                 'driver' => 'single',
                 'path' => storage_path('logs/diamond_upgrade.log'),
@@ -186,7 +187,7 @@ class UpdateUserWhenSendGift
                     ->orWhereRaw('DATE_ADD(created_at, INTERVAL expire DAY) >= NOW()');
             })->first();
 
-        throw_if((! $userGift), \Exception::class, 'Receiver has reached maximum allowed gifts');
+        throw_if((! $userGift), Exception::class, 'Receiver has reached maximum allowed gifts');
 
         $userGift->quantity -= $number;
 

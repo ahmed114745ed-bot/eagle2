@@ -60,7 +60,8 @@
         "utd/reals": "*",
         "utd/room": "*",
         "utd/room-boom": "*",
-        "utd/room-cup": "*"
+        "utd/room-cup": "*",
+        "utd/task-stream": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -190,6 +191,10 @@
         {
             "type": "path",
             "url": "packages/Utd/RoomBoom"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/TaskStream"
         }
     ]
 }

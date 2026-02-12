@@ -27,6 +27,7 @@ use App\Tik\Repositories\TargetRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use Cache;
 use Carbon\Carbon;
+use DB;
 use Exception;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
@@ -140,7 +141,7 @@ class AgencyService implements AgencyServiceInterface
             ->where('uid', $user->id)
             ->whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
-            ->groupBy(\DB::raw('date(created_at)'))
+            ->groupBy(DB::raw('date(created_at)'))
             ->limit(31)->sum('hours');
         $minutes = $hours * 60;
         $hasColor = Common::hasInPack(@$user->id, 18, true);
@@ -872,7 +873,7 @@ class AgencyService implements AgencyServiceInterface
         $month_hosts = AgencyMonthlyHostResource::collection($monthlyHost);
         $totalSalary = $agency->salary;
         $last_salary = $agency->last_month_salary;
-        $current_salary = $agency->agencySalary ? $agency->agencySalary->sum(\DB::raw('sallary - cut_amount')) : 0;
+        $current_salary = $agency->agencySalary ? $agency->agencySalary->sum(DB::raw('sallary - cut_amount')) : 0;
 
         $total_hosts_achieve = $this->userSalaryRepository->sum($hosts->pluck('id')->toArray(), 'sallary');
 

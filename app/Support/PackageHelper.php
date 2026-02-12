@@ -3,8 +3,8 @@
 namespace App\Support;
 
 use Illuminate\Database\Eloquent\Model;
-use Modules\TaskStream\Entities\TaskStream;
 use Utd\Achievements\Entities\Achievement;
+use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\CP\Entities\Cp;
 use Utd\LuckyBox\Entities\Box;

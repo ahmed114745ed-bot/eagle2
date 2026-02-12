@@ -8,9 +8,9 @@ use App\Helpers\Common;
 use App\Models\Setting;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Facades\Cache;
-use Modules\TaskStream\Jobs\PkSessionJob;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Cache;
+use Utd\TaskStream\Jobs\PkSessionJob;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Utd\CP\Console\WeeklyCpWinnerConsole;
 
@@ -164,14 +164,16 @@ class Kernel extends ConsoleKernel
 
         // $schedule->command('roomcup:calculate-rewards')->dailyAt('23:59');
 
-        $schedule->call(function () {
-            dispatch(new PkSessionJob());
-        })
-            ->name('pk-session-job')
-            ->everyMinute()
-            ->timezone(getTimezone())
-            ->withoutOverlapping()
-            ->appendOutputTo(storage_path('logs/pk_session_job.log'));
+        if (PackageHelper::isInstalled('taskStream')) {
+            $schedule->call(function () {
+                dispatch(new PkSessionJob());
+            })
+                ->name('pk-session-job')
+                ->everyMinute()
+                ->timezone(getTimezone())
+                ->withoutOverlapping()
+                ->appendOutputTo(storage_path('logs/pk_session_job.log'));
+        }
 
         $schedule->command('remaining-diamonds')
             ->monthly()

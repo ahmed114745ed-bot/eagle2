@@ -10,12 +10,12 @@ abstract class AbstractRepository
 {
     public function __construct(protected Model $model) {}
 
-    final public function updateOrCreate(array $condition, array $data): mixed
+    public function updateOrCreate(array $condition, array $data): mixed
     {
         return $this->model->updateOrCreate($condition, $data);
     }
 
-    final public function update(array $data, $id): mixed
+    public function update(array $data, $id): mixed
     {
         if ($id instanceof Model) {
             return $id->update($data);
@@ -24,27 +24,27 @@ abstract class AbstractRepository
         return $this->model->findOrFail($id)->update($data);
     }
 
-    final public function create(array $data): mixed
+    public function create(array $data): mixed
     {
         return $this->model->create($data);
     }
 
-    final public function insert(array $data): mixed
+    public function insert(array $data): mixed
     {
         return $this->model->insert($data);
     }
 
-    final public function findOrFail(int $id, array $relations = []): Model|Collection|Builder|array|null
+    public function findOrFail(int $id, array $relations = []): Model|Collection|Builder|array|null
     {
         return $this->model->with($relations)->findOrFail($id);
     }
 
-    final public function find(int $id): ?Model
+    public function find(int $id): ?Model
     {
         return $this->model->find($id);
     }
 
-    final public function getPaginate(
+    public function getPaginate(
         array $conditions = [],
         array $with = [],
         array $select = ['*'],
@@ -60,7 +60,7 @@ abstract class AbstractRepository
             })->paginate(config('app.element_number_per_page', 15));
     }
 
-    final public function getAll(
+    public function getAll(
         array $conditions = [],
         array $with = [],
         array $select = ['*'],
@@ -74,12 +74,12 @@ abstract class AbstractRepository
             })->get();
     }
 
-    final public function prepareQuery(array $conditions = [], array $with = [], array $select = []): Builder
+    public function prepareQuery(array $conditions = [], array $with = [], array $select = []): Builder
     {
         return $this->model->with($with)->where($conditions)->select($select);
     }
 
-    final public function searchWith(string $search, $column = 'name'): mixed
+    public function searchWith(string $search, $column = 'name'): mixed
     {
         return $this->model
             ->where($column, 'like', '%'.$search.'%')
