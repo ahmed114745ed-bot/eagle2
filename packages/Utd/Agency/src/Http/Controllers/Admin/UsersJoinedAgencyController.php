@@ -2,26 +2,29 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
 use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Exception;
 use Utd\Agency\Entities\UsersJoinedAgency;
-use App\Admin\Controllers\MainController;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class UsersJoinedAgencyController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
+    public $permission_name = 'agency-join-logs';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'UsersJoinedAgency';
-    public $permission_name = 'agency-join-logs';
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -49,9 +52,9 @@ class UsersJoinedAgencyController extends MainController
                     if ($date) {
                         $converted = \App\Helpers\UserCommon::convertArabicNumbers($date);
                         try {
-                            $parsedDate = \Carbon\Carbon::parse($converted)->toDateString();
+                            $parsedDate = Carbon::parse($converted)->toDateString();
                             $query->whereDate('join_date', $parsedDate);
-                        } catch (\Exception $e) {
+                        } catch (Exception $e) {
                             // silently fail
                         }
                     }
@@ -64,7 +67,7 @@ class UsersJoinedAgencyController extends MainController
         $grid->column('id', __('Id'));
         $grid->column('user.name', __('User'))
             ->display(function ($name) {
-                if (!$this->user) {
+                if (! $this->user) {
                     return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
@@ -75,11 +78,11 @@ class UsersJoinedAgencyController extends MainController
                 }
                 $uid = @$this->user->uuid;
                 $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -96,7 +99,7 @@ class UsersJoinedAgencyController extends MainController
             });
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
-                if (!$this->agency) {
+                if (! $this->agency) {
                     return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
@@ -107,11 +110,11 @@ class UsersJoinedAgencyController extends MainController
                 }
                 $path = @$this->agency->img;
                 $id = $this->agency->id;
-                $defaultImage = asset("images/icon-agency.jpg");
+                $defaultImage = asset('images/icon-agency.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Fallback if image doesn't exist
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
@@ -125,6 +128,7 @@ class UsersJoinedAgencyController extends MainController
             });
         $grid->column('status', __('status'))->display(function ($name) {
             $name = __($name);
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
 
@@ -138,13 +142,14 @@ class UsersJoinedAgencyController extends MainController
 
         $grid->disableActions();
         $grid->disableCreateButton();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

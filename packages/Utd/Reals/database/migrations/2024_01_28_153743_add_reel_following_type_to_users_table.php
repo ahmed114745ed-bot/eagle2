@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('users', 'reel_following_type')) {
+        if (! Schema::hasColumn('users', 'reel_following_type')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->string("reel_following_type")->nullable()->default(0);
+                $table->string('reel_following_type')->nullable()->default(0);
             });
         }
     }

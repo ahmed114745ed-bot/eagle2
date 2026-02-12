@@ -2,12 +2,12 @@
 
 namespace Utd\Achievements\Http\Controllers\web;
 
-use Carbon\Carbon;
-use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use App\Models\AchievementValidImage;
 use App\Admin\Controllers\MainController;
+use App\Models\AchievementValidImage;
+use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Utd\Achievements\Entities\UserAchievementLevel;
 
 class AchievementDedicateController extends MainController
@@ -29,6 +29,7 @@ class AchievementDedicateController extends MainController
     public function create(Content $content)
     {
         $achievementValidImage = AchievementValidImage::get();
+
         return parent::create($content
             ->title(trans('user-achievement-levels'))
             ->body(view('admin.grid.users.UserAchievementLevelDedicate', compact('achievementValidImage'))));
@@ -67,10 +68,10 @@ class AchievementDedicateController extends MainController
         $grid->model()->with([
             'user.profile',
             'user',
-            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
-            'admin'
+            'user.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'admin',
         ])
-            ->when($countryID, fn($q) => $q->whereHas('user', fn($q) => $q->where('country_id', $countryID)))
+            ->when($countryID, fn ($q) => $q->whereHas('user', fn ($q) => $q->where('country_id', $countryID)))
             ->when(
                 request('from_date') && request('to_date'),
                 function ($q) {
@@ -97,18 +98,18 @@ class AchievementDedicateController extends MainController
         $grid->column('user.name', __('user'))
             ->display(function ($recever) {
 
-                $name =  $this->user?->name ?? '';
+                $name = $this->user?->name ?? '';
 
                 $uid = @$this->user?->uuid ?? 0;
                 if (request()->filled('_export_')) {
                     return "{$name} (UUID: {$uid})";
                 }
                 $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -124,7 +125,6 @@ class AchievementDedicateController extends MainController
          ";
             });
 
-
         $grid->column('admin.name', __('creator'))->display(function () {
 
             $name = $this->admin->name ?? '';
@@ -133,11 +133,11 @@ class AchievementDedicateController extends MainController
                 return "{$name} (ID: {$id})";
             }
             $path = @$this->admin->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = $path ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
@@ -158,11 +158,11 @@ class AchievementDedicateController extends MainController
              </div>
              ";
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('file', __('image'))->display(function ($img) {
-                $defaultImage = asset("images/background_room.jpg");
+                $defaultImage = asset('images/background_room.jpg');
                 $path = getImagePath($img ?? $this->custom_image);
-                if (!isImageExists($path)) {
+                if (! isImageExists($path)) {
                     $path = $defaultImage;
                 }
                 $parsedUrl = parse_url($path);
@@ -201,25 +201,22 @@ class AchievementDedicateController extends MainController
                 'off' => ['value' => 0, 'text' => 'no', 'color' => 'danger'],
                 'on' => ['value' => 1, 'text' => 'yes', 'color' => 'success'],
             ];
-            if (Admin::user()->can('edit-' . $this->permission_name) || Admin::user()->can('*')) {
+            if (Admin::user()->can('edit-'.$this->permission_name) || Admin::user()->can('*')) {
                 $grid->column('is_enable', __('is enabled'))->switch($states);
             }
         } else {
             $grid->column('is_enable', __('is enabled'))->display(function ($isEnable) {
-                return   $isEnable == 1 ? __('on') : __('off');
+                return $isEnable === 1 ? __('on') : __('off');
             });
         }
 
-
         $grid->column('created_at', trans('admin.created_at'));
-
 
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableView();
             $actions->disableEdit();
         });
         $this->extendGrid($grid);
-
 
         return $grid;
     }

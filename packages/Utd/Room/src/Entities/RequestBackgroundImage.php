@@ -2,11 +2,11 @@
 
 namespace Utd\Room\Entities;
 
-use App\Models\User;
 use App\Helpers\Common;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Auth;
 
 class RequestBackgroundImage extends Model
 {
@@ -20,9 +20,9 @@ class RequestBackgroundImage extends Model
 
         self::creating(function ($model) {
             $room = Room::where('uid', $model->owner_room_id)->first();
-            
+
             if ($model->status === 1) {
-                if (!empty($room)) {
+                if (! empty($room)) {
                     $data = [
                         'messageContent' => [
                             'message' => 'changeBackground',
@@ -34,7 +34,7 @@ class RequestBackgroundImage extends Model
                         ],
                     ];
                     $json = json_encode($data);
-                    
+
                     if (class_exists(Common::class)) {
                         Common::sendToZego('SendCustomCommand', $room?->id, $model->owner_room_id, $json);
                     }

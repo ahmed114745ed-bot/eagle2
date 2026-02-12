@@ -8,28 +8,31 @@ use App\Helpers\UserCoinLogHelper;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\PackageHelper;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Symfony\Component\Console\Command\Command as EnumCommand;
 use Utd\Room\Entities\Room;
 use Utd\Room\Entities\TotalRoomGift;
-use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\RoomCup\Entities\RoomCupReward;
+use Utd\RoomCup\Entities\RoomCupTarget;
 use Utd\RoomCup\Helpers\RoomCupHelper;
-use Symfony\Component\Console\Command\Command as EnumCommand;
 
 class CalculateRoomCupRewards extends Command
 {
     protected $signature = 'roomcup:calculate-rewards';
+
     protected $description = 'Calculate RoomCup rewards and distribute profits to the owner and admins if the target is achieved';
+
     protected string $type;
 
     public function handle(): int
     {
-        if (!PackageHelper::isInstalled('room')) {
-            $this->warn("⛔ Room package is not installed.");
+        if (! PackageHelper::isInstalled('room')) {
+            $this->warn('⛔ Room package is not installed.');
+
             return EnumCommand::SUCCESS;
         }
 
@@ -37,8 +40,9 @@ class CalculateRoomCupRewards extends Command
         $type = $settings['type'] ?? 'daily';
         $this->type = $type;
 
-        if (!$this->isEnabledRoomCup($settings)) {
-            $this->warn("⛔ Room Cup not enabled");
+        if (! $this->isEnabledRoomCup($settings)) {
+            $this->warn('⛔ Room Cup not enabled');
+
             return EnumCommand::SUCCESS;
         }
 
@@ -51,6 +55,27 @@ class CalculateRoomCupRewards extends Command
         $this->logEnd();
 
         return EnumCommand::SUCCESS;
+    }
+
+    public function adjustAdminsBasedOnTarget($room, $target): void
+    {
+        $currentTotal = $room->total_admins;
+        $targetTotal = (int) $target->number_of_admins;
+
+        $difference = $targetTotal - $currentTotal;
+
+        if ($difference === 0) {
+            return;
+        }
+
+        if ($difference > 0) {
+            $room->additional_admin += $difference;
+        } else {
+            $difference = abs($difference);
+            $room->additional_admin = max(0, $room->additional_admin - $difference);
+        }
+        $room->save();
+        $this->normalizeRoomAdmins($room);
     }
 
     private function isEnabledRoomCup(array $settings): bool
@@ -71,7 +96,7 @@ class CalculateRoomCupRewards extends Command
         $settings = [];
 
         foreach ($default as $key => $defaultValue) {
-            $cacheKey = 'roomcup_' . $key;
+            $cacheKey = 'roomcup_'.$key;
             $value = Cache::get($cacheKey);
 
             if ($value === null) {
@@ -134,7 +159,7 @@ class CalculateRoomCupRewards extends Command
 
     private function logEnd(): void
     {
-        $this->info("✅ Calculation finished");
+        $this->info('✅ Calculation finished');
     }
 
     private function processGift($gift): void
@@ -146,9 +171,10 @@ class CalculateRoomCupRewards extends Command
 
         $room = $roomClass::find($gift->room_id);
 
-        if (!$room) {
+        if (! $room) {
             $this->warn("⛔ Room not found (ID: {$gift->room_id})");
             $this->logRoomCup("Room not found (ID: {$gift->room_id})");
+
             return;
         }
 
@@ -159,9 +185,10 @@ class CalculateRoomCupRewards extends Command
         $this->logRoomCup("Room #{$room->id}: Admins=$adminsCount, Visitors=$visitorsCount, Total={$gift->current_total}");
 
         $target = $this->findTarget($gift->current_total, $visitorsCount, $adminsCount);
-        if (!$target) {
+        if (! $target) {
             $this->line("⛔ No target achieved for Room #{$room->id}");
             $this->logRoomCup("No target achieved for Room #{$room->id}");
+
             return;
         }
 
@@ -223,6 +250,7 @@ class CalculateRoomCupRewards extends Command
                 if ($exists) {
                     $this->line("⏭️ Skipping duplicate reward for user {$reward['user_id']} in room {$reward['room_id']} (gift {$reward['total_room_gift_id']})");
                     $this->logRoomCup("Skipping duplicate reward: Room={$reward['room_id']}, User={$reward['user_id']}, Gift={$reward['total_room_gift_id']}");
+
                     continue;
                 }
 
@@ -270,27 +298,6 @@ class CalculateRoomCupRewards extends Command
         ];
     }
 
-    public function adjustAdminsBasedOnTarget($room, $target): void
-    {
-        $currentTotal = $room->total_admins;
-        $targetTotal = (int) $target->number_of_admins;
-
-        $difference = $targetTotal - $currentTotal;
-
-        if ($difference === 0) {
-            return;
-        }
-
-        if ($difference > 0) {
-            $room->additional_admin += $difference;
-        } else {
-            $difference = abs($difference);
-            $room->additional_admin = max(0, $room->additional_admin - $difference);
-        }
-        $room->save();
-        $this->normalizeRoomAdmins($room);
-    }
-
     private function logRoomCup(string $message): void
     {
         Log::channel('roomCup')->info($message);
@@ -302,7 +309,7 @@ class CalculateRoomCupRewards extends Command
         $roomMax = $room->total_admins;
         $configMaxRoom = Common::getConfig('max_room_admin') ?? 4;
 
-        $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
+        $adm_arr = ($roomAdmin === '') ? [] : explode(',', trim($roomAdmin));
         $adm_arr = array_filter(array_unique($adm_arr));
 
         $allowedMax = ($roomMax >= $configMaxRoom) ? $roomMax : $configMaxRoom;
@@ -310,7 +317,7 @@ class CalculateRoomCupRewards extends Command
         if (count($adm_arr) > $allowedMax) {
             $adm_arr = array_slice($adm_arr, 0, $allowedMax);
         }
-        $str = implode(",", $adm_arr);
+        $str = implode(',', $adm_arr);
         $room->update(['room_admin' => $str]);
     }
 }

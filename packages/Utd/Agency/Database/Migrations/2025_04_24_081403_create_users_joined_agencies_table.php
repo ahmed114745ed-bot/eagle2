@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('users_joined_agencies')) return;
+        if (Schema::hasTable('users_joined_agencies')) {
+            return;
+        }
         Schema::create('users_joined_agencies', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('agency_id');

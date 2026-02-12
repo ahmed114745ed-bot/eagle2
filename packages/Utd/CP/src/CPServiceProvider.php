@@ -13,6 +13,7 @@ use Utd\CP\Services\CpService;
 class CPServiceProvider extends ServiceProvider
 {
     protected string $moduleName = 'CP';
+
     protected string $moduleNameLower = 'cp';
 
     /**
@@ -20,8 +21,8 @@ class CPServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'cp');
-        
+        $this->mergeConfigFrom(__DIR__.'/../Config/config.php', 'cp');
+
         $this->app->singleton(CpServiceContract::class, CpService::class);
         $this->app->singleton(CpRepositoryContract::class, CpRepository::class);
     }
@@ -46,11 +47,11 @@ class CPServiceProvider extends ServiceProvider
     {
         Route::middleware('api')
             ->prefix('api')
-            ->group(__DIR__ . '/../Routes/api.php');
-        
+            ->group(__DIR__.'/../Routes/api.php');
+
         // Register web/admin routes
-        if (file_exists(__DIR__ . '/../Routes/web.php')) {
-            $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
+        if (file_exists(__DIR__.'/../Routes/web.php')) {
+            $this->loadRoutesFrom(__DIR__.'/../Routes/web.php');
         }
     }
 
@@ -59,7 +60,7 @@ class CPServiceProvider extends ServiceProvider
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/migrations');
     }
 
     /**
@@ -67,12 +68,12 @@ class CPServiceProvider extends ServiceProvider
      */
     protected function registerViews(): void
     {
-        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
-        $sourcePath = __DIR__ . '/../Resources/views';
+        $viewPath = resource_path('views/modules/'.$this->moduleNameLower);
+        $sourcePath = __DIR__.'/../Resources/views';
 
         $this->publishes([
-            $sourcePath => $viewPath
-        ], ['views', $this->moduleNameLower . '-views']);
+            $sourcePath => $viewPath,
+        ], ['views', $this->moduleNameLower.'-views']);
 
         $this->loadViewsFrom($sourcePath, $this->moduleNameLower);
     }
@@ -82,8 +83,8 @@ class CPServiceProvider extends ServiceProvider
      */
     protected function registerTranslations(): void
     {
-        $langPath = resource_path('lang/modules/' . $this->moduleNameLower);
-        $sourcePath = __DIR__ . '/../Resources/lang';
+        $langPath = resource_path('lang/modules/'.$this->moduleNameLower);
+        $sourcePath = __DIR__.'/../Resources/lang';
 
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->moduleNameLower);
@@ -99,7 +100,7 @@ class CPServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Utd\CP\Console\WeeklyCpWinnerConsole::class,
+                Console\WeeklyCpWinnerConsole::class,
             ]);
         }
     }
@@ -111,13 +112,12 @@ class CPServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../Config/config.php' => config_path('cp.php'),
+                __DIR__.'/../Config/config.php' => config_path('cp.php'),
             ], 'cp-config');
 
             $this->publishes([
-                __DIR__ . '/../Database/migrations' => database_path('migrations'),
+                __DIR__.'/../Database/migrations' => database_path('migrations'),
             ], 'cp-migrations');
         }
     }
 }
-

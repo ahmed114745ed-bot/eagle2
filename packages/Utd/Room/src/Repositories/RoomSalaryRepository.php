@@ -27,6 +27,7 @@ class RoomSalaryRepository extends AbstractRepository implements RoomSalaryRepos
         if ($roomSalary) {
             $roomSalary->increment('cut_amount', $amount);
         }
+
         return true;
     }
 

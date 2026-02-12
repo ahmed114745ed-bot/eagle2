@@ -22,7 +22,7 @@ class AgencyInvitationResource extends JsonResource
             'invited_by' => $this->invited_by,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            
+
             // Relations
             'agency' => $this->whenLoaded('agency'),
             'user' => $this->whenLoaded('user'),

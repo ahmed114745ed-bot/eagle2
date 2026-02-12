@@ -2,8 +2,6 @@
 
 namespace Utd\Moments\Transformers;
 
-use Carbon\Carbon;
-use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MomentDashboardResource extends JsonResource
@@ -17,32 +15,32 @@ class MomentDashboardResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id'           => $this->id,
-            'user_id'      => $this->user_id,
-            'description'  => $this->description,
-            'comment_num'  => $this->comments->count(),
-            'like_num'     => $this->likes->count(),
-            'created_at'   => $this->created_at,
-            'updated_at'   => $this->updated_at,
-            'img'          => $this->img,
-            'comments'     => $this->comments->map(fn ($comment) => [
-                'id'          => $comment->id,
-                'moment_id'   => $comment->moment_id,
-                'user_id'     => $comment->user_id,
-                'comment'     => $comment->comment,
-                'created_at'  => $comment->created_at,
-                'updated_at'  => $comment->updated_at,
+            'id' => $this->id,
+            'user_id' => $this->user_id,
+            'description' => $this->description,
+            'comment_num' => $this->comments->count(),
+            'like_num' => $this->likes->count(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'img' => $this->img,
+            'comments' => $this->comments->map(fn ($comment) => [
+                'id' => $comment->id,
+                'moment_id' => $comment->moment_id,
+                'user_id' => $comment->user_id,
+                'comment' => $comment->comment,
+                'created_at' => $comment->created_at,
+                'updated_at' => $comment->updated_at,
             ]),
-            'likes'        => $this->likes->map(fn ($like) => [
-                'id'          => $like->id,
-                'moment_id'   => $like->moment_id,
-                'user_id'     => $like->user_id,
-                'created_at'  => $like->created_at,
-                'updated_at'  => $like->updated_at,
+            'likes' => $this->likes->map(fn ($like) => [
+                'id' => $like->id,
+                'moment_id' => $like->moment_id,
+                'user_id' => $like->user_id,
+                'created_at' => $like->created_at,
+                'updated_at' => $like->updated_at,
             ]),
 
             'gifts' => $this->gifts->map(fn ($gift) => [
-                'gifts_count'  => $gift->gifts_count,
+                'gifts_count' => $gift->gifts_count,
             ]),
             // 'gifts'        => $this->gifts->map(fn ($gift) => [
             //     'id'                 => $gift->id,
@@ -71,6 +69,4 @@ class MomentDashboardResource extends JsonResource
             // ]),
         ];
     }
-
-
 }

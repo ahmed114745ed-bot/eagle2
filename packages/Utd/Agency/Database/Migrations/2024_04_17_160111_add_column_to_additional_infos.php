@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('additional_infos') || !Schema::hasColumn('additional_infos', 'country_id') || Schema::hasColumn('additional_infos', 'country')) return;
+        if (! Schema::hasTable('additional_infos') || ! Schema::hasColumn('additional_infos', 'country_id') || Schema::hasColumn('additional_infos', 'country')) {
+            return;
+        }
         Schema::table('additional_infos', function (Blueprint $table) {
             $table->string('country_id')->change();
             $table->renameColumn('country_id', 'country');

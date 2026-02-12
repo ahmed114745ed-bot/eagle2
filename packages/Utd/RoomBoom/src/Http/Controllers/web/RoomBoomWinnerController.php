@@ -6,11 +6,8 @@ use App\Admin\Controllers\MainController;
 use App\Admin\Services\UserService;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
-use Utd\RoomBoom\Entities\RoomBoomLevel;
 use Utd\RoomBoom\Entities\RoomBoomWinner;
 
 class RoomBoomWinnerController extends MainController
@@ -33,11 +30,11 @@ class RoomBoomWinnerController extends MainController
             'reward.ware',
             'boom.roomBoomLevel',
             'boom.totalRoomGift.room',
-             'boom.totalRoomGift.room.owner.country',
+            'boom.totalRoomGift.room.owner.country',
             'user',
             'user.profile',
             'user.country',
-            'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+            'user.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
 
         ]);
 
@@ -51,14 +48,14 @@ class RoomBoomWinnerController extends MainController
             return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
         });
         $grid->column('room_info', __('Room'))->display(function () {
-            $room   = @$this->boom->totalRoomGift->room;
-            $name   = $room->room_name ?? 'Unknown Room';
-            $id     = $room->id ?? '-';
-            $path   = $room->cover ?? null;
-            $defaultImage = asset("images/room.jpg");
+            $room = @$this->boom->totalRoomGift->room;
+            $name = $room->room_name ?? 'Unknown Room';
+            $id = $room->id ?? '-';
+            $path = $room->cover ?? null;
+            $defaultImage = asset('images/room.jpg');
             $url = $path ? getImagePath($path) : $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
@@ -87,7 +84,9 @@ class RoomBoomWinnerController extends MainController
         $grid->column('reward.target', __('target'))->display(function () {
             $reward = $this->reward;
 
-            if (!$reward) return 'N/A';
+            if (! $reward) {
+                return 'N/A';
+            }
 
             switch ($reward->target_type) {
                 case 'ware':
@@ -97,31 +96,35 @@ class RoomBoomWinnerController extends MainController
                 case 'achievement':
                     return 'Achievement Badge';
                 case 'coin':
-                    return $reward->target . ' Coins';
+                    return $reward->target.' Coins';
                 default:
                     return 'N/A';
             }
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('image', __('Image'))->display(function () {
                 $reward = $this->reward;
-                if (!$reward) return '';
+                if (! $reward) {
+                    return '';
+                }
                 $path = null;
                 if ($reward->target_type === 'ware') {
                     $path = $reward->ware?->img2 ?? $reward->ware?->show_img;
                 } elseif ($reward->target_type === 'gift') {
                     $path = $reward->gift?->show_img ?? $reward->gift?->img;
                 } elseif ($reward->target_type === 'achievement') {
-                    $value = getDriverUrl() . '/' . $reward->target;
+                    $value = getDriverUrl().'/'.$reward->target;
+
                     return "<img src='$value' width='80' height='80'>";
                 } elseif ($reward->target_type === 'coin') {
                     $path = 'coin.png';
                 }
 
-                if (!$path) {
+                if (! $path) {
                     return '';
                 }
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }

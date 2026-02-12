@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('bd_agency_host_sallaries')) return;
-        
-        if (!Schema::hasColumn('bd_agency_host_sallaries', 'salary')) {
+        if (! Schema::hasTable('bd_agency_host_sallaries')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('bd_agency_host_sallaries', 'salary')) {
             Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
                 $table->decimal('salary', 12, 4)->nullable();
             });

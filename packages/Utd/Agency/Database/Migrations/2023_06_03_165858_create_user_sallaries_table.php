@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateUserSallariesTable extends Migration
 {
@@ -13,19 +13,21 @@ class CreateUserSallariesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('user_sallaries')) return;
+        if (Schema::hasTable('user_sallaries')) {
+            return;
+        }
         Schema::create('user_sallaries', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedBigInteger('user_id')->default (0);
-            $table->string  ('hours')->default ('0/0');
-            $table->string ('days')->default ('0/0');
-            $table->float('sallary',20,2)->default (0);
-            $table->float('agency_sallary',20,2)->default (0);
-            $table->float('cut_amount',20,2)->default (0);
-            $table->integer('month')->default (0);
-            $table->integer('year')->default (0);
-            $table->boolean('is_paid')->default (0);
-            $table->unsignedBigInteger('user_agency_id')->default (0);
+            $table->unsignedBigInteger('user_id')->default(0);
+            $table->string('hours')->default('0/0');
+            $table->string('days')->default('0/0');
+            $table->float('sallary', 20, 2)->default(0);
+            $table->float('agency_sallary', 20, 2)->default(0);
+            $table->float('cut_amount', 20, 2)->default(0);
+            $table->integer('month')->default(0);
+            $table->integer('year')->default(0);
+            $table->boolean('is_paid')->default(0);
+            $table->unsignedBigInteger('user_agency_id')->default(0);
             $table->timestamps();
         });
     }

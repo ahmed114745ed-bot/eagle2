@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\LuckyBox\Http\Controllers\Web\BoxUseController;
 use Utd\LuckyBox\Http\Controllers\Web\LuckyBoxController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
 
         'middleware' => [
             'web',
@@ -25,7 +25,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('lucky-boxes', LuckyBoxController::class);

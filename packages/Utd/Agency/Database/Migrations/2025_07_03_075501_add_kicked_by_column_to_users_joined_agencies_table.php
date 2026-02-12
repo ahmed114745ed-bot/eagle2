@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('users_joined_agencies')) return;
-        
-        if (!Schema::hasColumn('users_joined_agencies', 'kicked_by_app')) {
+        if (! Schema::hasTable('users_joined_agencies')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('users_joined_agencies', 'kicked_by_app')) {
             Schema::table('users_joined_agencies', function (Blueprint $table) {
                 $table->foreignId('kicked_by_app')->nullable();
             });
         }
 
-        if (!Schema::hasColumn('users_joined_agencies', 'kicked_by_admin')) {
+        if (! Schema::hasColumn('users_joined_agencies', 'kicked_by_admin')) {
             Schema::table('users_joined_agencies', function (Blueprint $table) {
                 $table->foreignId('kicked_by_admin')->nullable();
             });

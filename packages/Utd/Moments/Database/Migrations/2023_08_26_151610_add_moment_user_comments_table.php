@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddMomentUserCommentsTable extends Migration
 {
@@ -13,7 +13,7 @@ class AddMomentUserCommentsTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('moment_user_comments')) {
+        if (! Schema::hasTable('moment_user_comments')) {
             Schema::create('moment_user_comments', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateBdSallariesTable extends Migration
 {
@@ -13,16 +13,18 @@ class CreateBdSallariesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('bd_sallaries')) return;
+        if (Schema::hasTable('bd_sallaries')) {
+            return;
+        }
         Schema::create('bd_sallaries', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedBigInteger('bd_id')->default (0);
-            $table->unsignedBigInteger('agency_id')->default (0);
+            $table->unsignedBigInteger('bd_id')->default(0);
+            $table->unsignedBigInteger('agency_id')->default(0);
             $table->double('sallary', 15, 2)->default(0);
-            $table->float('cut_amount')->default (0);
-            $table->integer('month')->default (0);
-            $table->integer('year')->default (0);
-            $table->boolean('is_paid')->default (0);
+            $table->float('cut_amount')->default(0);
+            $table->integer('month')->default(0);
+            $table->integer('year')->default(0);
+            $table->boolean('is_paid')->default(0);
             $table->timestamps();
         });
     }

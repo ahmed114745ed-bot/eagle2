@@ -15,9 +15,9 @@ class RoomCountriesResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'   => $this->id,
-            'name' => app()->getLocale() == 'ar' ? $this->name : $this->e_name,
-            'flag' => $this->flag
+            'id' => $this->id,
+            'name' => app()->getLocale() === 'ar' ? $this->name : $this->e_name,
+            'flag' => $this->flag,
         ];
     }
 }

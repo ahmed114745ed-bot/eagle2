@@ -2,9 +2,10 @@
 
 namespace Utd\Reals\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use Throwable;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -22,7 +23,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // لا تسجل الـ routes إذا لم تكن الجداول موجودة
-        if (!$this->tablesExist()) {
+        if (! $this->tablesExist()) {
             return;
         }
 
@@ -37,7 +38,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         try {
             return Schema::hasTable('reals');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }
@@ -49,7 +50,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware(['api', 'auth:sanctum'])
-            ->group(__DIR__ . '/../../routes/api.php');
+            ->group(__DIR__.'/../../routes/api.php');
     }
 
     /**
@@ -58,6 +59,6 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')
-            ->group(__DIR__ . '/../../routes/web.php');
+            ->group(__DIR__.'/../../routes/web.php');
     }
 }

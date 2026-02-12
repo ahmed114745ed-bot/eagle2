@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('rooms', function (Blueprint $table) {
             $table->enum('type', ['audio', 'single_live', 'multi_live'])->default('audio');
-            $table->boolean('is_live')->default(false); 
+            $table->boolean('is_live')->default(false);
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rooms', function (Blueprint $table) {
-                $table->dropColumn('type','is_live');
+            $table->dropColumn('type', 'is_live');
         });
     }
 };

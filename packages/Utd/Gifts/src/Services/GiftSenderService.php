@@ -2,20 +2,21 @@
 
 namespace Utd\Gifts\Services;
 
+use App\Models\User;
 use DB;
+use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use Utd\Gifts\Contracts\GiftSenderInterface;
 use Utd\Gifts\DTOs\SendGiftDTO;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftLog;
 use Utd\Gifts\Events\GiftSending;
 use Utd\Gifts\Events\GiftSent;
-use Utd\Gifts\Contracts\GiftSenderInterface;
-use Utd\Gifts\Exceptions\InsufficientBalanceException;
 use Utd\Gifts\Exceptions\GiftNotFoundException;
+use Utd\Gifts\Exceptions\InsufficientBalanceException;
 use Utd\Gifts\Exceptions\VipLevelRequiredException;
 use Utd\Gifts\Repositories\GiftRepository;
-use App\Models\User;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class GiftSenderService implements GiftSenderInterface
 {
@@ -32,7 +33,7 @@ class GiftSenderService implements GiftSenderInterface
     {
         // 1. Get gift
         $gift = $this->giftRepository->findById($dto->giftId);
-        if (!$gift) {
+        if (! $gift) {
             throw new GiftNotFoundException("Gift not found: {$dto->giftId}");
         }
 
@@ -52,7 +53,7 @@ class GiftSenderService implements GiftSenderInterface
         // 5. Fire "Sending" event (قبل الإرسال)
         $event = new GiftSending($dto, $gift, $sender, $totalPrice);
         if (event($event) === false) {
-            throw new \Exception('Gift sending was cancelled');
+            throw new Exception('Gift sending was cancelled');
         }
 
         // 6. Execute in transaction
@@ -70,20 +71,56 @@ class GiftSenderService implements GiftSenderInterface
         });
     }
 
+    public function canSend(SendGiftDTO $dto): bool
+    {
+        try {
+            $gift = $this->giftRepository->findById($dto->giftId);
+            $sender = $this->getSender($dto->senderId);
+            $totalPrice = $this->calculateTotalPrice($gift, $dto->quantity, $dto->getTotalReceivers());
+
+            $this->validate($dto, $gift, $sender, $totalPrice);
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    public function calculateTotalPrice(Gift $gift, int $quantity, int $receiversCount): int
+    {
+        return $gift->price * $quantity * $receiversCount;
+    }
+
+    public function checkVipRequirement(Gift $gift, int $userId): bool
+    {
+        if ($gift->vip_level <= 0) {
+            return true;
+        }
+
+        $user = $this->getSender($userId);
+        if (! $user) {
+            return false;
+        }
+
+        $userVipLevel = $this->getUserVipLevel($user);
+
+        return $userVipLevel >= $gift->vip_level;
+    }
+
     /**
      * Validation
      */
     private function validate(SendGiftDTO $dto, Gift $gift, User $sender, int $totalPrice): void
     {
         // Check balance
-        if (!$this->balanceService->hasSufficientBalance($sender, $totalPrice)) {
+        if (! $this->balanceService->hasSufficientBalance($sender, $totalPrice)) {
             throw new InsufficientBalanceException(
                 "Insufficient balance. Required: {$totalPrice}, Available: {$sender->di}"
             );
         }
 
         // Check VIP level
-        if (!$this->checkVipRequirement($gift, $sender->id)) {
+        if (! $this->checkVipRequirement($gift, $sender->id)) {
             throw new VipLevelRequiredException(
                 "VIP level {$gift->vip_level} required to send this gift"
             );
@@ -125,51 +162,17 @@ class GiftSenderService implements GiftSenderInterface
         }
 
         GiftLog::insert($logs);
+
         return GiftLog::where('batch_uuid', $batchUuid)->get();
-    }
-
-    public function canSend(SendGiftDTO $dto): bool
-    {
-        try {
-            $gift = $this->giftRepository->findById($dto->giftId);
-            $sender = $this->getSender($dto->senderId);
-            $totalPrice = $this->calculateTotalPrice($gift, $dto->quantity, $dto->getTotalReceivers());
-
-            $this->validate($dto, $gift, $sender, $totalPrice);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    public function calculateTotalPrice(Gift $gift, int $quantity, int $receiversCount): int
-    {
-        return $gift->price * $quantity * $receiversCount;
-    }
-
-    public function checkVipRequirement(Gift $gift, int $userId): bool
-    {
-        if ($gift->vip_level <= 0) {
-            return true;
-        }
-
-        $user = $this->getSender($userId);
-        if (!$user) {
-            return false;
-        }
-        
-        $userVipLevel = $this->getUserVipLevel($user);
-
-        return $userVipLevel >= $gift->vip_level;
     }
 
     private function getSender(int $userId)
     {
         $userModel = ModelResolver::getUserModel();
-        if (!$userModel) {
+        if (! $userModel) {
             return null;
         }
-        
+
         return $userModel::find($userId);
     }
 
@@ -178,9 +181,10 @@ class GiftSenderService implements GiftSenderInterface
         // Check if Common helper exists
         if (class_exists('\App\Helpers\Common')) {
             $vipData = \App\Helpers\Common::ovip_center($user);
+
             return $vipData?->level ?? 0;
         }
-        
+
         // Fallback to user property if exists
         return $user->vip_level ?? 0;
     }

@@ -16,4 +16,3 @@ class CpRelation extends Model
         return $this->hasMany(CpLevel::class, 'cp_relation_id');
     }
 }
-

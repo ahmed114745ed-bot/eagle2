@@ -14,7 +14,7 @@ class AddModeToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('mode')->nullable ()->default (0);
+            $table->unsignedTinyInteger('mode')->nullable()->default(0);
         });
     }
 

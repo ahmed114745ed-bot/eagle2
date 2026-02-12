@@ -2,12 +2,12 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use Encore\Admin\Facades\Admin;
-use Utd\Agency\Facades\AgencyHelper;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use Illuminate\Support\Facades\Cache;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Layout\Content;
+use Illuminate\Support\Facades\Cache;
+use Utd\Agency\Facades\AgencyHelper;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencySettingsController extends MainController
@@ -15,6 +15,7 @@ class AgencySettingsController extends MainController
     use ResolvesExternalDependencies;
 
     public $permission_name = 'agency-settings';
+
     /**
      * Title for current resource.
      *
@@ -24,15 +25,15 @@ class AgencySettingsController extends MainController
 
     public function index(Content $content)
     {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-' . $this->permission_name);
+        if (! Admin::user()->can('*')) {
+            Permission::check('browse-'.$this->permission_name);
         }
 
         $tab = request('firsttab');
 
-        $hours =  AgencyHelper::getSettingValue('hours') ?? 0;
-        $days =  AgencyHelper::getSettingValue('days') ?? 0;
-        $moments =  AgencyHelper::getSettingValue('Moments') ?? 0;
+        $hours = AgencyHelper::getSettingValue('hours') ?? 0;
+        $days = AgencyHelper::getSettingValue('days') ?? 0;
+        $moments = AgencyHelper::getSettingValue('Moments') ?? 0;
         $reels = AgencyHelper::getSettingValue('reels') ?? 0;
         $diamonds = AgencyHelper::getSettingValue('diamonds');
         $hoursDays = AgencyHelper::getSettingValue('hours_days');
@@ -74,36 +75,9 @@ class AgencySettingsController extends MainController
         return parent::index(
             $content->title(__('Agency settings'))
                 ->view('agency_settings', array_merge($vars, [
-                    'targetGrid' => $targetGridHtml
+                    'targetGrid' => $targetGridHtml,
                 ]))
         );
-    }
-
-    private function getSettings()
-    {
-        $default = [
-            'remaining_diamonds'     => 'nothing',
-        ];
-
-        $settings = [];
-
-        foreach ($default as $key => $defaultValue) {
-            $cacheKey =   $key;
-            $value = Cache::get($cacheKey);
-
-            if ($value === null) {
-                $setting = Setting::where('key', $cacheKey)->first();
-                $value = $setting ? $setting->value : $defaultValue;
-
-                Cache::put($cacheKey, $value);
-            }
-
-
-
-            $settings[$key] = $value;
-        }
-
-        return $settings;
     }
 
     public function badges()
@@ -111,10 +85,10 @@ class AgencySettingsController extends MainController
         $lang = request()->header('X-localization', 'en');
 
         $types = [
-            'host'         => 1,
+            'host' => 1,
             'agency_owner' => 2,
-            'shipping'     => 3,
-            'bd'           => 4,
+            'shipping' => 3,
+            'bd' => 4,
         ];
 
         $suffixes = ['badge', 'intro', 'frame'];
@@ -123,7 +97,7 @@ class AgencySettingsController extends MainController
         foreach ($types as $type => $id) {
             foreach ($suffixes as $suffix) {
                 $localizedName = $suffix === 'badge' ? "{$lang}_{$type}" : "{$lang}_{$type}_{$suffix}";
-                $englishName   = $suffix === 'badge' ? "en_{$type}"   : "en_{$type}_{$suffix}";
+                $englishName = $suffix === 'badge' ? "en_{$type}" : "en_{$type}_{$suffix}";
 
                 $configNames[] = $localizedName;
                 $configNames[] = $englishName;
@@ -138,7 +112,7 @@ class AgencySettingsController extends MainController
 
             foreach ($suffixes as $suffix) {
                 $localizedName = $suffix === 'badge' ? "{$lang}_{$type}" : "{$lang}_{$type}_{$suffix}";
-                $englishName   = $suffix === 'badge' ? "en_{$type}"       : "en_{$type}_{$suffix}";
+                $englishName = $suffix === 'badge' ? "en_{$type}" : "en_{$type}_{$suffix}";
 
                 $images["image_{$suffix}"] = $configs[$localizedName] ?? $configs[$englishName] ?? null;
             }
@@ -150,5 +124,30 @@ class AgencySettingsController extends MainController
             'status' => 'success',
             'data' => $data,
         ]);
+    }
+
+    private function getSettings()
+    {
+        $default = [
+            'remaining_diamonds' => 'nothing',
+        ];
+
+        $settings = [];
+
+        foreach ($default as $key => $defaultValue) {
+            $cacheKey = $key;
+            $value = Cache::get($cacheKey);
+
+            if ($value === null) {
+                $setting = Setting::where('key', $cacheKey)->first();
+                $value = $setting ? $setting->value : $defaultValue;
+
+                Cache::put($cacheKey, $value);
+            }
+
+            $settings[$key] = $value;
+        }
+
+        return $settings;
     }
 }

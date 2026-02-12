@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('targets', 'created_by')) {
+        if (! Schema::hasColumn('targets', 'created_by')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->unsignedBigInteger('created_by')->nullable();
             });
         }
-        
-        if (!Schema::hasColumn('targets', 'updated_by')) {
+
+        if (! Schema::hasColumn('targets', 'updated_by')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->unsignedBigInteger('updated_by')->nullable();
             });

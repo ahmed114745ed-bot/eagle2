@@ -51,14 +51,15 @@ class RoomBoomLevelController extends MainController
         $grid->column('level', __('level'));
         $grid->column('min_target', __('min target'));
         $grid->column('target', __('target'));
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('video', __('video'))->display(function ($path) {
-                $defaultImage = asset("images/image.png");
+                $defaultImage = asset('images/image.png');
 
                 $url = getImagePath($path) ?? $defaultImage;
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
@@ -66,10 +67,11 @@ class RoomBoomLevelController extends MainController
             return Carbon::parse($value)->format('Y-m-d');
         });
         if (Admin::user()->can('browse-room-boom-rewards') || Admin::user()->can('*')) {
-            if (!request()->filled('_export_')) {
+            if (! request()->filled('_export_')) {
                 $grid->column(__('Procedures'))->display(function () {
-                    $url = url('admin/room_boom_rewards/' . $this->id);
+                    $url = url('admin/room_boom_rewards/'.$this->id);
                     $text = __('Room Boom Rewards');
+
                     return "<a href='{$url}' class='btn btn-sm btn-info'>{$text}</a>";
                 });
             }
@@ -110,16 +112,17 @@ class RoomBoomLevelController extends MainController
         $form->number('target', __('target'))->required()
             ->help(__('The full target that must be achieved to complete the Room Boom at this level.'));
         $form->file('video', trans('video'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         })->default('1.png')
             ->help(__('The special video for this level, displayed after completion. Each level has its own unique video.'));
 
         $form->saving(function (Form $form) {
-            if (!$form->model()->exists) {
+            if (! $form->model()->exists) {
                 $count = RoomBoomLevel::count();
                 if ($count >= 5) {
                     $error = __('You can only have a maximum of 5 Room Boom Levels.');
                     admin_error($error);
+
                     return back();
                 }
             }
@@ -127,5 +130,4 @@ class RoomBoomLevelController extends MainController
 
         return $form;
     }
-
 }

@@ -13,7 +13,9 @@ class AlterUserSallariesTableChingeDefoltValue extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('user_sallaries') || !Schema::hasColumn('user_sallaries', 'owner_pide')) return;
+        if (! Schema::hasTable('user_sallaries') || ! Schema::hasColumn('user_sallaries', 'owner_pide')) {
+            return;
+        }
         Schema::table('user_sallaries', function (Blueprint $table) {
             // Modify the existing column
             $table->decimal('owner_pide')->default(0)->change();

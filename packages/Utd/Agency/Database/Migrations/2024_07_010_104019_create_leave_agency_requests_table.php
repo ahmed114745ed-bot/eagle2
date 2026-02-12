@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('leave_agency_requests')) return;
+        if (Schema::hasTable('leave_agency_requests')) {
+            return;
+        }
         Schema::create('leave_agency_requests', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('agency_id');

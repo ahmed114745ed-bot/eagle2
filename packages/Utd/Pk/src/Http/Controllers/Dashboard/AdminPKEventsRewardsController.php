@@ -3,11 +3,11 @@
 namespace Utd\Pk\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
-use Utd\Pk\Http\Resources\AdminPKEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 use Utd\Pk\Entities\PkReward;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
+use Utd\Pk\Http\Resources\AdminPKEventsResource;
 
 class AdminPKEventsRewardsController extends Controller
 {
@@ -31,47 +31,49 @@ class AdminPKEventsRewardsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'event_id'    => 'required|exists:pk_events,id',
-            'expire'      => 'required|numeric',
-            'level'       => 'required|numeric',
-            'type'        => 'required',
-            'img'         => 'nullable',
-            'event_type'  => 'required',
+            'event_id' => 'required|exists:pk_events,id',
+            'expire' => 'required|numeric',
+            'level' => 'required|numeric',
+            'type' => 'required',
+            'img' => 'nullable',
+            'event_type' => 'required',
         ]);
         $img = null;
         if ($request->type !== 'achievement') {
             $request->validate([
-                'target'       => 'required|numeric',
+                'target' => 'required|numeric',
             ]);
         } else {
             $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'events') : null;
         }
         PkReward::insert([
-            'pk_event_id'  =>  $request->event_id,
-            'pk_type'      =>  $request->event_type,
-            'expire'       =>  $request->expire,
-            'level'        => $request->level ,
-            'type'         => $request->type ,
-            'target'       => $request->type !== 'achievement' ? $request->target : $img ?? '' ,
+            'pk_event_id' => $request->event_id,
+            'pk_type' => $request->event_type,
+            'expire' => $request->expire,
+            'level' => $request->level,
+            'type' => $request->type,
+            'target' => $request->type !== 'achievement' ? $request->target : $img ?? '',
         ]);
-        return $img ;
+
+        return $img;
     }
 
     public function show(string $id)
     {
         $data = PkReward::find($id);
+
         return new AdminPKEventsResource($data);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'event_id'    => 'required|exists:pk_events,id',
-            'expire'      => 'required|numeric',
-            'level'       => 'required|numeric',
-            'type'        => 'required',
-            'img'         => 'nullable',
-            'event_type'  => 'required',
+            'event_id' => 'required|exists:pk_events,id',
+            'expire' => 'required|numeric',
+            'level' => 'required|numeric',
+            'type' => 'required',
+            'img' => 'nullable',
+            'event_type' => 'required',
         ]);
 
         $pkReward = PkReward::findOrFail($id);
@@ -81,11 +83,9 @@ class AdminPKEventsRewardsController extends Controller
                 'target' => 'required|numeric',
             ]);
         } else {
-            if($request->hasFile('img'))
-            {
+            if ($request->hasFile('img')) {
                 $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'events') : null;
-            }
-            else{
+            } else {
                 $img = $pkReward->target;
             }
         }
@@ -105,11 +105,11 @@ class AdminPKEventsRewardsController extends Controller
     public function destroy(string $id)
     {
         $PkReward = PkReward::find($id);
-        if( $PkReward->type == 'achievement' && $PkReward->target)
-        {
+        if ($PkReward->type === 'achievement' && $PkReward->target) {
             $this->delete_img($PkReward->target);
         }
         $PkReward->delete();
+
         return 200;
     }
 }

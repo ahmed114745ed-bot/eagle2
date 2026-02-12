@@ -13,7 +13,7 @@ class AddFieldsToAgencies extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('agencies', 'app_owner_id')) {
+        if (! Schema::hasColumn('agencies', 'app_owner_id')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('app_owner_id')->nullable();
             });

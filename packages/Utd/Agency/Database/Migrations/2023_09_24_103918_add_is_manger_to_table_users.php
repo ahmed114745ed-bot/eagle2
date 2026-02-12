@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('users', 'is_manger')) {
+        if (! Schema::hasColumn('users', 'is_manger')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->boolean('is_manger')->default(false);
             });
         }
-        
-        if (!Schema::hasColumn('users', 'dashboard_manager_id')) {
+
+        if (! Schema::hasColumn('users', 'dashboard_manager_id')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->bigInteger('dashboard_manager_id')->default(0);
             });

@@ -40,7 +40,7 @@ trait AgencySalaryTrait
      */
     public function getSalaryAttribute()
     {
-        return $this->agencySalaries->sum(fn($row) => ($row->sallary - $row->cut_amount));
+        return $this->agencySalaries->sum(fn ($row) => ($row->sallary - $row->cut_amount));
     }
 
     /**
@@ -52,8 +52,9 @@ trait AgencySalaryTrait
             ->where('agency_id', $this->id)
             ->where('is_paid', 0)
             ->sum(DB::raw('sallary - cut_amount'));
-        
+
         $this->attributes['salary'] = $salary;
+
         return $salary;
     }
 
@@ -66,7 +67,7 @@ trait AgencySalaryTrait
         $year = $year ?? now()->year;
 
         $agencySalary = AgencySalary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -84,7 +85,7 @@ trait AgencySalaryTrait
         $year = $year ?? now()->year;
 
         $agencySalary = AgencySalary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -102,7 +103,7 @@ trait AgencySalaryTrait
         $year = $year ?? now()->year;
 
         $result = AgencySalary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->selectRaw('SUM(sallary) - SUM(cut_amount) as total')
@@ -120,7 +121,7 @@ trait AgencySalaryTrait
         $year = $year ?? now()->year;
 
         $agencySalary = AgencySalary::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -153,7 +154,7 @@ trait AgencySalaryTrait
     {
         $agencySalary = AgencySalary::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
             })
             ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary - cut_amount'));
@@ -168,7 +169,7 @@ trait AgencySalaryTrait
     {
         $agencySalary = AgencySalary::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
             })
             ->where('agency_id', $this->id)
             ->sum(DB::raw('cut_amount'));
@@ -183,7 +184,7 @@ trait AgencySalaryTrait
     {
         $agencySalary = AgencySalary::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
-                $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
             })
             ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary'));

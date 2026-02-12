@@ -7,14 +7,14 @@ use Utd\RoomBoom\Http\Controllers\web\SuperBoomRuleController;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . 'routes',
+        'as' => config('admin.route.prefix').'routes',
     ],
     function () {
         Route::resource('room_boom_levels', RoomBoomLevelController::class);

@@ -11,4 +11,3 @@ enum CpStatus: int
     case RESTORED = 4;
     case PENDING_RESTORED = 5;
 }
-

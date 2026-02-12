@@ -2,21 +2,19 @@
 
 namespace Utd\CP\Repositories;
 
-use Utd\CP\Entities\Cp;
-
 use App\Models\GiftLog;
 use Illuminate\Support\Facades\DB;
-use Utd\CP\Entities\WeeklyCpWinner;
-use Modules\Events\Entities\WeeklyStar;
 use Modules\Events\Entities\GeneralRole;
+use Modules\Events\Entities\WeeklyStar;
+use Utd\CP\Entities\Cp;
 
 class WeeklyCpRepository
 {
-
     public function currentWeeklyCp()
     {
         return WeeklyStar::currentEvent()->WeeklyCP()->with('gifts', 'weeklyCpGifts')->first();
     }
+
     public function perviousWeeklyCpTopWinner()
     {
         return $this->perviousWeeklyCp(['WeeklyCpWinners' => function ($query) {
@@ -36,8 +34,6 @@ class WeeklyCpRepository
         }])->limit($limit)->get();
     }
 
-
-
     public function role()
     {
         return GeneralRole::where('type', 'weekly_cp')->first();
@@ -46,26 +42,27 @@ class WeeklyCpRepository
     public function topUsers($giftIds, $weeklyCp, int $perPage = 10)
     {
         $timezone = getTimezone();
+
         return GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')
-           ->whereBetween('created_at', [
+            ->whereBetween('created_at', [
                 \Carbon\Carbon::parse($weeklyCp->start_date, $timezone)->startOfDay(),
-            \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
+                \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->paginate($perPage);
     }
 
-
     public function topUser($giftIds, $weeklyCp)
     {
-       $timezone = getTimezone();
+        $timezone = getTimezone();
+
         return GiftLog::whereIn('giftId', $giftIds)
             ->select(DB::raw('sum(gift_logs.giftNum * gift_logs.giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')
             ->whereBetween('created_at', [
                 \Carbon\Carbon::parse($weeklyCp->start_date, $timezone)->startOfDay(),
-            \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
+                \Carbon\Carbon::parse($weeklyCp->end_date, $timezone)->endOfDay(),
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->first();
@@ -74,9 +71,10 @@ class WeeklyCpRepository
     public function userDetails($giftIds, $weeklyCp, $userId)
     {
         $cp = $this->userCP($userId);
-        $priceGifts =  GiftLog::whereIn('giftId', $giftIds)
+        $priceGifts = GiftLog::whereIn('giftId', $giftIds)
             ->whereBetween('created_at', [$weeklyCp->start_date, $weeklyCp->end_date])
-            ->where('cp_id', @$cp?->id)->sum("giftPrice");
+            ->where('cp_id', @$cp?->id)->sum('giftPrice');
+
         return $priceGifts;
     }
 
@@ -88,4 +86,3 @@ class WeeklyCpRepository
         })->relation()->orderByDesc('di')->first();
     }
 }
-

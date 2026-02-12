@@ -2,24 +2,22 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
-use Modules\Vip\Entities\Vip;
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
+use Modules\Vip\Entities\Vip;
 
-
-class RoomVipController extends \App\Admin\Controllers\MainController
+class RoomVipController extends MainController
 {
     /**
      * Title for current resource.
      *
      * @var string
      */
-
-
     public $permission_name = 'room-vip';
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -30,8 +28,7 @@ class RoomVipController extends \App\Admin\Controllers\MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -44,8 +41,7 @@ class RoomVipController extends \App\Admin\Controllers\MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -78,6 +74,7 @@ class RoomVipController extends \App\Admin\Controllers\MainController
         $grid->column('level', __('Level'))->editable();
         $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
             $value = $value->getOriginal();
+
             return number_format($value);
         })->editable();
         //        $grid->column('di', __('Diamonds'));
@@ -85,13 +82,14 @@ class RoomVipController extends \App\Admin\Controllers\MainController
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -108,6 +106,7 @@ class RoomVipController extends \App\Admin\Controllers\MainController
         //        $show->field('created_at', __('Created at'));
         //        $show->field('updated_at', __('Updated at'));
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -121,7 +120,6 @@ class RoomVipController extends \App\Admin\Controllers\MainController
         $form = new Form(new Vip());
         $this->disableFormTools($form);
 
-
         $form->hidden('type')->value(4);
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
@@ -130,7 +128,7 @@ class RoomVipController extends \App\Admin\Controllers\MainController
         //        $form->number('di', __('Diamonds'));
         //        $form->number('co', __('Coins'));
         $form->image('img', __('Image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         });
 
         return $form;

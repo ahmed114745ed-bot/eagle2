@@ -1,4 +1,5 @@
 <?php
+
 namespace Utd\CP\Repositories;
 
 use App\Models\Pack;
@@ -14,10 +15,10 @@ class PackRepository
     public function findByUserIdAndTargetId($userId, $targetId)
     {
         return Pack::where('user_id', $userId)
-                    ->where('target_id', $targetId)
+            ->where('target_id', $targetId)
 /*                     ->where('expire', '<', Carbon::now()->timestamp)
                     ->where('expire', '!=', 0) */
-                    ->first();
+            ->first();
     }
 
     public function countUserVipPacks($userId)
@@ -30,4 +31,3 @@ class PackRepository
             ->count();
     }
 }
-

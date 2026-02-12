@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('charges')) return;
-        
+        if (! Schema::hasTable('charges')) {
+            return;
+        }
+
         if (Schema::hasColumn('charges', 'user_id')) {
             Schema::table('charges', function (Blueprint $table) {
                 $table->unsignedInteger('user_id')->nullable()->change();
             });
         }
-        
-        if (!Schema::hasColumn('charges', 'agency_id')) {
+
+        if (! Schema::hasColumn('charges', 'agency_id')) {
             Schema::table('charges', function (Blueprint $table) {
                 $table->integer('agency_id')->nullable();
             });
@@ -32,7 +34,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('charges', function (Blueprint $table) {
-           $table->dropColumn('agency_id');
+            $table->dropColumn('agency_id');
         });
     }
 };

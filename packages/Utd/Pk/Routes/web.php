@@ -16,14 +16,14 @@ use Utd\Pk\Http\Controllers\Web\PkEventGiftController;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('pk-events', PkEventController::class);

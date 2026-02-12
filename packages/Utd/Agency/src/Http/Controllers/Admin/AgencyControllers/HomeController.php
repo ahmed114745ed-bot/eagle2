@@ -4,7 +4,6 @@ namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
 use App\Admin\Customization\Dashboard\CustomDashboard;
 use App\Http\Controllers\Controller;
-use Encore\Admin\Auth\Database\Administrator;
 use Encore\Admin\Controllers\Dashboard;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
@@ -20,10 +19,8 @@ class HomeController extends Controller
 
     public $permission_name = 'agent-home';
 
-
     public function index(Content $content)
     {
-
 
         return $content
             ->title('Dashboard')
@@ -31,22 +28,22 @@ class HomeController extends Controller
             ->row(CustomDashboard::title())
             ->row(function (Row $row) {
                 $row->column(3, function (Column $column) {
-                    $labels = ["- 20", "20:30", "30:40", "40:50", "50:60", "+ 60"];
+                    $labels = ['- 20', '20:30', '30:40', '40:50', '50:60', '+ 60'];
                     $numbers = [12, 19, 3, 5, 2, 3];
                     $data = [
-                        'labels'=>$labels,
-                        'numbers'=>$numbers
+                        'labels' => $labels,
+                        'numbers' => $numbers,
                     ];
-                    $column->append(new Box('user age', view('admin.components.users-age-chart',['data'=>$data])));
+                    $column->append(new Box('user age', view('admin.components.users-age-chart', ['data' => $data])));
                 });
                 $row->column(3, function (Column $column) {
-                    $labels = ["male", "female"];
+                    $labels = ['male', 'female'];
                     $numbers = [12, 19];
                     $data = [
-                        'labels'=>$labels,
-                        'numbers'=>$numbers
+                        'labels' => $labels,
+                        'numbers' => $numbers,
                     ];
-                    $column->append(new Box('user gender', view('admin.components.users-gender-chart',['data'=>$data])));
+                    $column->append(new Box('user gender', view('admin.components.users-gender-chart', ['data' => $data])));
                 });
             });
     }
@@ -78,17 +75,17 @@ class HomeController extends Controller
         $content->title('Info box');
         $content->description('Description...');
         $content->row(function ($row) {
-            $agency = Agency::query ()->where ('owner_id',@Auth::user ()->id)->first();
-            $balance = @$agency->salary?:0;
-            $users = User::query ()->whereNotNull ('agency_id')->where ('agency_id',@Auth::user ()->agency_id)->count ();
-            $targets = UserTarget::query ()->whereNotNull ('agency_id')->where ('agency_id',@Auth::user ()->agency_id)->where ('agency_obtain','>',0)->count ();
+            $agency = Agency::query()->where('owner_id', @Auth::user()->id)->first();
+            $balance = @$agency->salary ?: 0;
+            $users = User::query()->whereNotNull('agency_id')->where('agency_id', @Auth::user()->agency_id)->count();
+            $targets = UserTarget::query()->whereNotNull('agency_id')->where('agency_id', @Auth::user()->agency_id)->where('agency_obtain', '>', 0)->count();
 
-            $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', route (config('admin.route.prefix').'.agency.users'), $users));
-            $row->column(3, new InfoBox(__('Targets'), 'wechat', 'green', route (config('admin.route.prefix').'.agency.userTarget'), $targets));
-            $row->column(3, new InfoBox(__('salary'), 'dollar', 'yellow', route (config('admin.route.prefix').'.home'), $balance));
-//            $row->column(3, new InfoBox(__('Store'), 'shopping-cart', 'red', route (config('admin.route.prefix').'.wares'), Ware::query ()->count ()));
+            $row->column(3, new InfoBox(__('Users'), 'users', 'aqua', route(config('admin.route.prefix').'.agency.users'), $users));
+            $row->column(3, new InfoBox(__('Targets'), 'wechat', 'green', route(config('admin.route.prefix').'.agency.userTarget'), $targets));
+            $row->column(3, new InfoBox(__('salary'), 'dollar', 'yellow', route(config('admin.route.prefix').'.home'), $balance));
+            //            $row->column(3, new InfoBox(__('Store'), 'shopping-cart', 'red', route (config('admin.route.prefix').'.wares'), Ware::query ()->count ()));
         });
+
         return $content;
     }
-
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('agencies', 'is_frozen')) {
+        if (! Schema::hasColumn('agencies', 'is_frozen')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->boolean('is_frozen')->default(false);
             });

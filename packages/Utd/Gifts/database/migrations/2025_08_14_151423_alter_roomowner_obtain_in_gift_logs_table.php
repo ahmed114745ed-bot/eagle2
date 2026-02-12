@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    { 
+    {
         Schema::table('gift_logs', function (Blueprint $table) {
             $table->unsignedBigInteger('roomowner_obtain')->change();
         });
@@ -21,6 +21,6 @@ return new class extends Migration
         Schema::table('gift_logs', function (Blueprint $table) {
             $table->unsignedInteger('roomowner_obtain')->change();
         });
-        
+
     }
 };

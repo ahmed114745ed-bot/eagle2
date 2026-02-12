@@ -2,14 +2,14 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Grid;
 use Utd\Agency\Entities\AgencySalary;
-use Utd\Agency\Services\TargetService;
 use Utd\Agency\Repositories\AgencySalaryRepository;
+use Utd\Agency\Services\TargetService;
 
 class SalaryController extends Controller
 {
@@ -29,6 +29,41 @@ class SalaryController extends Controller
             ->title(__('Agency Salaries'))
             ->description(__('Salary records'))
             ->body($this->grid());
+    }
+
+    /**
+     * Mark as paid
+     */
+    public function markAsPaid(Request $request, $id)
+    {
+        try {
+            $this->targetService->markSalaryAsPaid($id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Salary marked as paid',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * Get report
+     */
+    public function report(Request $request, Content $content)
+    {
+        $month = $request->month ?? now()->month;
+        $year = $request->year ?? now()->year;
+
+        $data = $this->salaryRepository->getSalaryReport($month, $year);
+
+        return $content
+            ->title(__('Salary Report'))
+            ->body(view('agency::admin.salary-report', compact('data', 'month', 'year')));
     }
 
     /**
@@ -72,40 +107,5 @@ class SalaryController extends Controller
         $grid->disableCreateButton();
 
         return $grid;
-    }
-
-    /**
-     * Mark as paid
-     */
-    public function markAsPaid(Request $request, $id)
-    {
-        try {
-            $this->targetService->markSalaryAsPaid($id);
-            
-            return response()->json([
-                'status' => true,
-                'message' => 'Salary marked as paid',
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
-    /**
-     * Get report
-     */
-    public function report(Request $request, Content $content)
-    {
-        $month = $request->month ?? now()->month;
-        $year = $request->year ?? now()->year;
-
-        $data = $this->salaryRepository->getSalaryReport($month, $year);
-
-        return $content
-            ->title(__('Salary Report'))
-            ->body(view('agency::admin.salary-report', compact('data', 'month', 'year')));
     }
 }

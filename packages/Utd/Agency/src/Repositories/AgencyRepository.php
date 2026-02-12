@@ -2,13 +2,12 @@
 
 namespace Utd\Agency\Repositories;
 
+use Utd\Agency\Contracts\AgencyRepositoryInterface;
 use Utd\Agency\Entities\Agency;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Entities\UsersJoinedAgency;
 use Utd\Agency\Scopes\HostAgencyScope;
-use Utd\Agency\Contracts\AgencyRepositoryInterface;
-use Illuminate\Support\Facades\DB;
 
 class AgencyRepository implements AgencyRepositoryInterface
 {
@@ -37,11 +36,11 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function findByOwner($ownerId, $status = null)
     {
         $query = $this->model->where('app_owner_id', $ownerId);
-        
+
         if ($status !== null) {
             $query->where('status', $status);
         }
-        
+
         return $query->first();
     }
 
@@ -51,11 +50,11 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function findAgencyByOwnerId($ownerId, $status = null)
     {
         $query = $this->model->where('app_owner_id', $ownerId);
-        
+
         if ($status !== null) {
             $query->where('status', $status);
         }
-        
+
         return $query->first();
     }
 
@@ -73,12 +72,13 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function update($id, array $data)
     {
         $agency = $this->findById($id);
-        
+
         if ($agency) {
             $agency->update($data);
+
             return $agency->fresh();
         }
-        
+
         return null;
     }
 
@@ -88,11 +88,11 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function delete($id)
     {
         $agency = $this->findById($id);
-        
+
         if ($agency) {
             return $agency->delete();
         }
-        
+
         return false;
     }
 
@@ -102,7 +102,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function filterAgency($id)
     {
         return $this->model
-            ->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])
+            ->whereRaw('CAST(id AS CHAR) LIKE ?', [$id.'%'])
             ->with('owner', 'AgencypaymentGateways')
             ->get();
     }
@@ -152,7 +152,7 @@ class AgencyRepository implements AgencyRepositoryInterface
      */
     public function userMembers($agency, $type = null, $userIds = null)
     {
-        return $agency?->mempers?->pluck("id")->toArray() ?? [];
+        return $agency?->mempers?->pluck('id')->toArray() ?? [];
     }
 
     /**
@@ -172,6 +172,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     public function updateAgency($agency)
     {
         $agency->save();
+
         return true;
     }
 
@@ -182,6 +183,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     {
         $agency->status = $status;
         $this->updateAgency($agency);
+
         return true;
     }
 
@@ -262,7 +264,7 @@ class AgencyRepository implements AgencyRepositoryInterface
      */
     public function getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status = null, $action = null)
     {
-        if ($action == null) {
+        if ($action === null) {
             $agencies = $this->model
                 ->withoutGlobalScope(HostAgencyScope::class)
                 ->where('status', 0)
@@ -291,7 +293,7 @@ class AgencyRepository implements AgencyRepositoryInterface
             ->when(isset($status), function ($query) use ($status) {
                 $query->where('status', $status);
             })
-            ->orderByDesc("id")
+            ->orderByDesc('id')
             ->paginate($perPage, ['*'], 'page', $page);
 
         return $agencies;
@@ -305,7 +307,7 @@ class AgencyRepository implements AgencyRepositoryInterface
         return $this->model
             ->with(['owner', 'owner.profile'])
             ->where(function ($q) use ($keyword) {
-                $q->where('id', 'like', '%' . $keyword . '%');
+                $q->where('id', 'like', '%'.$keyword.'%');
             })
             ->get();
     }
@@ -401,7 +403,7 @@ class AgencyRepository implements AgencyRepositoryInterface
     /**
      * Get report
      */
-    public function report($id, $month = null, $year = null, $perPage, $page)
+    public function report($id, $month, $year, $perPage, $page)
     {
         return $this->model
             ->when(isset($id), function ($query) use ($id) {
@@ -423,6 +425,7 @@ class AgencyRepository implements AgencyRepositoryInterface
                 $agency->target = $agency->getTotalSallaryAgency($month, $year);
                 $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
                 $agency->salary = $agency->getSalaryAgency($month, $year);
+
                 return $agency;
             });
     }

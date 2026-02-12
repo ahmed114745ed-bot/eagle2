@@ -14,6 +14,8 @@ use Utd\Moments\Entities\MomentGallery;
 
 class MomentController extends MainController
 {
+    public $permission_name = 'moment';
+
     /**
      * Title for current resource.
      *
@@ -21,7 +23,6 @@ class MomentController extends MainController
      */
     protected $title = 'Moment';
 
-    public $permission_name = 'moment';
     /**
      * Make a grid builder.
      *
@@ -35,6 +36,18 @@ class MomentController extends MainController
                 $row->column(12, $this->grid());
             }));
     }
+
+    public function momentGallery(Content $content, $id)
+    {
+        $galleries = MomentGallery::where('moment_id', $id)->get();
+
+        return $content
+            ->header(__('images'))
+            ->description('')
+
+            ->body(view('momentGallery', compact('galleries')));
+    }
+
     protected function grid2()
     {
         $form = new Box();
@@ -46,7 +59,7 @@ class MomentController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Moment());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         // 🔹 **إضافة الفلتر للبحث عن المستخدم بالاسم أو UUID**
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -73,20 +86,21 @@ class MomentController extends MainController
 
         // 🔹 **عرض الوصف في مودال عند النقر عليه**
         $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+            $limitedDescription = mb_substr($description, 0, 40).(mb_strlen($description) > 40 ? '...' : '');
+
+            return "<a href='#' class='view-description' data-description=\"".htmlentities($description)."\">$limitedDescription</a>";
         });
 
         // 🔹 **عرض معلومات المستخدم**
         $grid->column('user.name', __('User'))->display(function ($name) {
             $uid = @$this->user->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$this->user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-            $userUrl = admin_url('users/' . $this->user_id); // رابط صفحة المستخدم في لوحة التحكم
+            $userUrl = admin_url('users/'.$this->user_id); // رابط صفحة المستخدم في لوحة التحكم
 
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -97,11 +111,11 @@ class MomentController extends MainController
                 </div>";
         });
 
-
         // 🔹 **عرض إحصائيات (التعليقات + الإعجابات)**
         $grid->column('comment_num', __('status'))->display(function () {
             $likeCount = count(@$this->likes);
             $commentCount = count(@$this->comments);
+
             return "<span class=\"fa fa-comment\"> $commentCount</span>  <span class=\"fa fa-thumbs-up\"> $likeCount</span>";
         });
 
@@ -143,14 +157,14 @@ class MomentController extends MainController
                 return 'No Image';
             }
 
-            $html = '<div id="image-gallery-' . $id . '" style="display: none;">';
+            $html = '<div id="image-gallery-'.$id.'" style="display: none;">';
             $imgUrl = '';
             foreach ($galleries as $image) {
-                $imgUrl = getDriverUrl() . '/' . $image->image;
+                $imgUrl = getDriverUrl().'/'.$image->image;
 
-                $html .= '<img src="' . $imgUrl . '"
+                $html .= '<img src="'.$imgUrl.'"
                          style="width: 100%; height: 200px; object-fit: cover;"
-                         data-original="' . $imgUrl . '"
+                         data-original="'.$imgUrl.'"
                          loading="lazy"
                          class="gallery-image">';
             }
@@ -159,9 +173,9 @@ class MomentController extends MainController
 
             // Show only the first image
 
-            $html .= '<img src="' . $imgUrl . '"
+            $html .= '<img src="'.$imgUrl.'"
                       style="width: 80px; height: 80px; object-fit: cover; cursor: pointer; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"
-                      onclick="document.querySelector(`#image-gallery-' . $id . ' img`).click()">';
+                      onclick="document.querySelector(`#image-gallery-'.$id.' img`).click()">';
 
             Admin::script("
             new Viewer(document.getElementById('image-gallery-$id'));
@@ -172,6 +186,7 @@ class MomentController extends MainController
 
         $grid->disableCreateButton();
         $this->extendGrid($grid);
+
         return $grid;
     }
 
@@ -224,7 +239,7 @@ class MomentController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -264,15 +279,5 @@ class MomentController extends MainController
         $form->image('img', __('Img'));
 
         return $form;
-    }
-
-    public function momentGallery(Content $content, $id)
-    {
-        $galleries = MomentGallery::where('moment_id', $id)->get();
-        return $content
-            ->header(__('images'))
-            ->description('')
-
-            ->body(view('momentGallery', compact('galleries')));
     }
 }

@@ -8,14 +8,12 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Jobs\AllOpeningRoomsZegoRequest;
 use App\Jobs\SendCustomToZend;
-use Utd\Room\Entities\Room;
 use App\Models\User;
+use Utd\Room\Entities\Room;
 use Utd\Room\Repositories\RoomRepoInterface;
-use Illuminate\Validation\ValidationException;
 
 class RoomComments
 {
-
     private $roomRepo;
 
     public function __construct(RoomRepoInterface $roomRepo)
@@ -24,7 +22,6 @@ class RoomComments
     }
 
     /**
-     *
      * @throws NotInfCoins
      */
     public function sendComments(User $user, array $data)
@@ -41,7 +38,7 @@ class RoomComments
                     'uId' => $user->id,
                     'umsg' => $data['message'],
                     'oid' => @$room->uid,
-                    'ps' => @$room->room_pass != null || @$room->room_pass != '', // password_status
+                    'ps' => @$room->room_pass !== null || @$room->room_pass !== '', // password_status
                     'room' => [
                         'id' => @$room->id ?? 0,
                         'name' => @$room->room_name ?? '',
@@ -54,18 +51,18 @@ class RoomComments
                             'id' => @$room->owner->id ?? 0,
                             'uuid' => @$room->owner->uuid ?? 0,
                         ],
-                        'room_type' => $room->type
+                        'room_type' => $room->type,
                     ],
-                ]
+                ],
             ];
             $json = json_encode($ms);
 
-//            Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+            //            Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
             // AllOpeningRoomsZegoRequest::dispatch($json, $user->id, $data['room_id'])
             // ->onQueue('zegoRequests');
             dispatchJobToQueue(new AllOpeningRoomsZegoRequest($json, $user->id, $data['room_id']), 'heavyProcessing');
 
-            //send comment in queue
+            // send comment in queue
             //            dispatch(new SendCustomToZend($user->id, $data['room_id'], $data['message'], $rooms))->onQueue('sendComment');
             // minus coins for comments
 
@@ -84,7 +81,7 @@ class RoomComments
 
     private function minusUserCoins(User $user, int $numOfCoins)
     {
-        $amountBefore =  $user->di;
+        $amountBefore = $user->di;
         $logAmount = -abs($numOfCoins);
         UserCoinLogHelper::logByType(
             $user->id,
@@ -93,6 +90,7 @@ class RoomComments
             UserCoinLogType::ROOM_COMMENT,
         );
         $user->di -= $numOfCoins;
+
         return $user;
     }
 }

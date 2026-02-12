@@ -2,48 +2,45 @@
 
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
-use Session;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
-use Illuminate\Validation\Rule;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use App\Admin\Services\UserService;
-use Illuminate\Support\Facades\App;
-use App\Admin\Selectable\ImageColors;
-use App\Admin\Services\AgencyService;
-use Illuminate\Support\Facades\Cache;
+use App\Admin\Actions\CanPlaySwitchAction;
 use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
-use App\Admin\Actions\CanPlaySwitchAction;
+use App\Admin\Selectable\ImageColors;
+use App\Admin\Services\AgencyService;
+use App\Admin\Services\UserService;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Session;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class UserController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
+    public $permission_name = 'hosts';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title;
-    public $permission_name = 'hosts';
-
-
 
     public function __construct()
     {
         $this->title = 'Hosts';
     }
-
 
     public function index(Content $content)
     {
@@ -51,13 +48,13 @@ class UserController extends MainController
             ->title(__($this->title))
             ->row(function ($row) {
                 $row->column(12, $this->grid());
-                //$row->column(2, view('admin.grid.users.actions'));
+                // $row->column(2, view('admin.grid.users.actions'));
             })->row(view('admin.same_device_users_modal')));
     }
 
     public function indexProfessionals(Content $content)
     {
-        if (!session('preview_superadmin') && !session('filter_country_id') && !session('preview_area_manager')) {
+        if (! session('preview_superadmin') && ! session('filter_country_id') && ! session('preview_area_manager')) {
             abort(404, __('not found'));
         }
 
@@ -69,11 +66,11 @@ class UserController extends MainController
 
         return $content;
     }
+
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -86,8 +83,7 @@ class UserController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -107,8 +103,8 @@ class UserController extends MainController
     protected function gridProfessional()
     {
         $grid = new Grid(new User());
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
-        $haveCoins = (request()->have_coins == 1);
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
+        $haveCoins = (request()->have_coins === 1);
         $grid->model()
             ->ofAgency()
             ->with(['profile', 'packs', 'agency.country', 'country'])
@@ -119,10 +115,10 @@ class UserController extends MainController
                 $query->where(function ($q) use ($currentCountry) {
                     $q->whereIn('country_id', $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
-                            $a->whereNotIn('country_id',  $currentCountry);
+                            $a->whereNotIn('country_id', $currentCountry);
                         });
                 })->orWhere(function ($q) use ($currentCountry) {
-                    $q->whereNotIn('country_id',  $currentCountry)
+                    $q->whereNotIn('country_id', $currentCountry)
                         ->whereHas('agency', function ($a) use ($currentCountry) {
                             $a->whereIn('country_id', $currentCountry);
                         });
@@ -148,9 +144,10 @@ class UserController extends MainController
         if ($haveCoins) {
             $grid->column('di', __('coins'))->display(function ($coin) {
                 $icon = asset('images/coin.jpg'); // تأكد من وجود الصورة في هذا المسار
+
                 return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>".number_format($coin)."</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
@@ -165,7 +162,7 @@ class UserController extends MainController
                 }
                 $uid = @$this->uuid;
                 $path = @$this->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 $receiver_img = @$this->getImageReceiverOrSender('receiver_id', 1)?->img ?? '';
@@ -174,12 +171,12 @@ class UserController extends MainController
                 $sender_img = @$this->getImageReceiverOrSender('sender_id', 2)?->img ?? '';
                 $senderImg = getImagePath($sender_img) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 50, 50);
                 $showUrl = url("superadmin/users/profile/{$this->id}");
-                $country = app()->getLocale() == 'ar' ? $this->country?->name : $this->country?->e_name;
+                $country = app()->getLocale() === 'ar' ? $this->country?->name : $this->country?->e_name;
 
                 return "
                         <div style='display: flex; align-items: center; gap: 10px;'>
@@ -203,7 +200,7 @@ class UserController extends MainController
                 if (request()->filled('_export_')) {
                     return $this?->agency?->name ?: __('No agency');
                 }
-                if (!$this->agency) {
+                if (! $this->agency) {
                     return "<span style='color: #aaa;'>No agency</span>";
                 }
 
@@ -212,10 +209,10 @@ class UserController extends MainController
                 $cacheKey = "agency_image_{$this->agency_id}";
                 $image = Cache::remember($cacheKey, 3600, function () {
                     $path = $this->agency->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
+                    $defaultImage = asset('images/icon-agency.jpg');
                     $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
+                    if (! isImageExists($url)) {
                         $url = $defaultImage;
                     }
 
@@ -223,7 +220,7 @@ class UserController extends MainController
                 });
 
                 $profileUrl = route('superadmin.agency.profile', ['id' => $this->agency_id]);
-                $country = app()->getLocale() == 'ar' ? $this->agency->country?->name : $this->agency->country?->e_name;
+                $country = app()->getLocale() === 'ar' ? $this->agency->country?->name : $this->agency->country?->e_name;
 
                 return "
                     <a href='{$profileUrl}' style='text-decoration: none; color: inherit;'>
@@ -241,7 +238,7 @@ class UserController extends MainController
 
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::style("
+        Admin::style('
             .modal-dialog {
                 max-width: 90%;
             }
@@ -254,10 +251,11 @@ class UserController extends MainController
                 max-height: 70vh !important;
                 overflow-y: auto !important;
             }
-        ");
+        ');
 
         $grid->column('custom_button2', __('Number of Accounts'))->display(function () {
             $count = $this->same_device_users_count;
+
             return "<button class='btn btn-sm btn-primary show-same-device-modal' data-user-id='{$this->id}'>$count</button>";
         });
 
@@ -280,25 +278,24 @@ class UserController extends MainController
         return $grid;
     }
 
-
     protected function form()
     {
         $form = new Form(new User());
         $this->disableFormTools($form);
 
         if ($form->isEditing()) {
-            $userId           = request()->route('user');
-            $user             = User::findOrFail($userId);
-            $oldDiValue       = $user->getOriginal('di');
+            $userId = request()->route('user');
+            $user = User::findOrFail($userId);
+            $oldDiValue = $user->getOriginal('di');
             $oldDiamoundValue = $user->getOriginal('user_diamond');
         } else {
-            $oldDiValue       = null;
+            $oldDiValue = null;
             $oldDiamoundValue = null;
         }
 
         $loggedInUserId = Admin::user()->id;
         $form->display('id', __('id'));
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             // Add a hidden field for 'uuid' in the edit form
             $form->text('uuid', __('uuid'))->creationRules([
                 'required',
@@ -307,7 +304,7 @@ class UserController extends MainController
                     if (DB::table('wares')->where('value', $value)->exists()) {
                         return $fail(__('لا يمكنك استخدام معرف المميز هذا'));
                     }
-                }
+                },
             ])
                 ->updateRules([
                     'required',
@@ -317,23 +314,22 @@ class UserController extends MainController
                         if (DB::table('wares')->where('value', $value)->exists()) {
                             return $fail(__('القيمة موجودة بالفعل في جدول wares.'));
                         }
-                    }
+                    },
                 ]);
         }
 
         $form->belongsTo('image_color_id', ImageColors::class, __('Color'));
-
 
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
             $form->hidden('oldDiValue')->default($oldDiValue);
             $form->hidden('oldDiamoundValue')->default($oldDiamoundValue);
         }
-        $form->text('uuid', __('uuid'))->updateRules(['required', "unique:users,uuid,{{id}}"]);
+        $form->text('uuid', __('uuid'))->updateRules(['required', 'unique:users,uuid,{{id}}']);
 
         // $form->switch('is_gold_id', trans('	is_gold_id'))->states (Common::getSwitchStates());
         $form->image('profile.avatar', __('image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         });
 
         $form->image('profile.image_id', __('image Id'));
@@ -342,21 +338,22 @@ class UserController extends MainController
             'off' => ['value' => 0, 'text' => 'close', 'color' => 'default'],
         ];
 
-        $form->switch('charge_status', __("charge status"))->states($state);
-        $form->switch('transfer_salary', __("transfer_salary"))->states($state);
-        $form->switch('userSetting.show_invite_code', __("show invite code"))->states($state);
-        $form->switch('userSetting.hide_chat', __("hide_chat"))->states($state);
+        $form->switch('charge_status', __('charge status'))->states($state);
+        $form->switch('transfer_salary', __('transfer_salary'))->states($state);
+        $form->switch('userSetting.show_invite_code', __('show invite code'))->states($state);
+        $form->switch('userSetting.hide_chat', __('hide_chat'))->states($state);
         $form->select('country_id', trans('country'))->options(function () {
-            $ops       = [null => __('no country')];
+            $ops = [null => __('no country')];
             $countries = Country::all();
             foreach ($countries as $country) {
-                $ops[$country->id] = App::isLocale('en') ?  ($country->e_name ?? $country->name) : $country->name;
+                $ops[$country->id] = App::isLocale('en') ? ($country->e_name ?? $country->name) : $country->name;
             }
+
             return $ops;
         });
         $states = [
-            'default'  => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
-            'on'  => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
+            'default' => ['value' => 0, 'text' => 'yes', 'color' => 'success'],
+            'on' => ['value' => 2, 'text' => 'yes', 'color' => 'success'],
             'off' => ['value' => 3, 'text' => 'no', 'color' => 'danger'],
         ];
         if ($form->isCreating()) {
@@ -364,11 +361,12 @@ class UserController extends MainController
         } elseif ($form->isEditing()) {
             $form->switch('can_play', __('canPlay'))->value(function ($can_play) {
                 $can_play = UserHandling::chickLevelToPlay($this);
+
                 return $can_play ? 'on' : 'off';
             })->states($states);
         }
 
-        if ($loggedInUserId == 1 || $loggedInUserId == 2) {
+        if ($loggedInUserId === 1 || $loggedInUserId === 2) {
             if ($form->isEditing()) {
                 $form->number('di', __('Coins'))->default(0)
                     ->disable($form->isEditing());
@@ -384,16 +382,16 @@ class UserController extends MainController
         $form->select('profile.gender', __('gender'))->options([0 => __('female'), 1 => __('male')]);
         $form->email('email', __('Email'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly');
         $form->password('password', __('Password'))->attribute('onfocus', "this.removeAttribute('readonly');")->attribute('readonly')->creationRules('required');
-        $form->text('phone', __('phone'))->creationRules(['required', "unique:users,phone,{{id}}"])->updateRules(['required', "unique:users,phone,{{id}}"]);
+        $form->text('phone', __('phone'))->creationRules(['required', 'unique:users,phone,{{id}}'])->updateRules(['required', 'unique:users,phone,{{id}}']);
         $form->switch('status', __('block status'))->options(Common::getSwitchStates2());
         $form->select('type_user', trans('User Type'))->options([
             $form->model()->type_user => $form->model()->type_user,
-            0                         => 'مستخدم',
-            1                         => 'مضيف',
-            2                         => 'وكيل مضيفين',
-            3                         => 'وكيل شحن',
-            4                         => ' وكيل مصيفين ووكيل شحن',
-            5                         => 'اداري',
+            0 => 'مستخدم',
+            1 => 'مضيف',
+            2 => 'وكيل مضيفين',
+            3 => 'وكيل شحن',
+            4 => ' وكيل مصيفين ووكيل شحن',
+            5 => 'اداري',
 
         ])->default(0);
 
@@ -407,13 +405,13 @@ class UserController extends MainController
 
         $form->saving(function (Form $form) use ($oldDiValue, $oldDiamoundValue) {
             $type_user = request()->type_user;
-            $model     = $form->model();
-            $user_id   = $model->id;
-            if ($form->oldDiValue != $oldDiValue) {
+            $model = $form->model();
+            $user_id = $model->id;
+            if ($form->oldDiValue !== $oldDiValue) {
                 $form->di = $oldDiValue;
             }
 
-            if ($form->oldDiamoundValue != $oldDiamoundValue) {
+            if ($form->oldDiamoundValue !== $oldDiamoundValue) {
                 $form->user_diamond = $oldDiamoundValue;
             }
 
@@ -424,15 +422,13 @@ class UserController extends MainController
             }
             if ($agancy) {
 
-
-                if (in_array(intval($type_user), [0, 1, 5]) && $model->isDirty('type_user')) {
+                if (in_array((int) $type_user, [0, 1, 5]) && $model->isDirty('type_user')) {
                     session()->flash('show_alert', 'Your alert message');
+
                     return redirect()->back();
                 }
 
-
                 switch ($type_user) {
-
 
                     case 2:
                         User::where('id', $user_id)->update(['type_user' => 2]);
@@ -453,10 +449,8 @@ class UserController extends MainController
             }
         });
 
-
         return $form;
     }
-
 
     /**
      * Make a grid builder.
@@ -467,12 +461,14 @@ class UserController extends MainController
     {
         // $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
         $countryID = null;
-        if (!empty((array)session('filter_country_id')) || session('filter_country_id'))  $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        if (! empty((array) session('filter_country_id')) || session('filter_country_id')) {
+            $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
+        }
         $grid = new Grid(new User());
-        $haveCoins = (request()->have_coins == 1);
+        $haveCoins = (request()->have_coins === 1);
         $grid->model()->ofAgency()
-            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
-            ->select(['id', 'name', 'uuid', 'special_id','country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
+            ->when($countryID, fn ($q) => $q->whereIn('country_id', $countryID))
+            ->select(['id', 'name', 'uuid', 'special_id', 'country_id', 'sender_level', 'received_level', 'agency_id', 'family_id',  'can_play', 'is_host', 'transfer_salary', 'is_bd', 'device_token', 'di'])
             ->with([
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
@@ -480,7 +476,7 @@ class UserController extends MainController
                 'senderLevel:id,level,img',
                 'receiverLevel:id,level,img',
                 'country',
-                'packs' => fn($q) => $q->where('is_used', true)
+                'packs' => fn ($q) => $q->where('is_used', true)
                     ->whereIn('type', [25])
                     ->with('ware:id,value'),
             ])->where('is_host', 1)->withCount('sameDeviceUsers');
@@ -513,6 +509,7 @@ class UserController extends MainController
                 if (! $user) {
                     return __('No User');
                 }
+
                 return app(UserService::class)->adminUserAvatar($user);
             });
 
@@ -526,11 +523,9 @@ class UserController extends MainController
                 return app(AgencyService::class)->adminAgencyData($agency);
             });
 
-
-
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
         Admin::style('.btn-circle {width: 30px; height: 30px; font-size:15px; border-radius: 50%; text-align: center; }');
-        Admin::style("
+        Admin::style('
             .modal-dialog {
                 max-width: 90%;
             }
@@ -543,7 +538,7 @@ class UserController extends MainController
                 max-height: 70vh !important;
                 overflow-y: auto !important;
             }
-        ");
+        ');
 
         $grid->column('custom_button2', __('accounts number'))->display(function () {
             $count = $this->same_device_users_count;
@@ -563,38 +558,36 @@ class UserController extends MainController
                     });
         ");
 
-
         $permission = $this->permission_name;
 
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if (Admin::user()->can('charge-switch-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('charge-switch-'.$permission) || Admin::user()->can('*')) {
                 $actions->add(new ChargeSwitchAction());
             }
-            if (Admin::user()->can('invite-switch-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('invite-switch-'.$permission) || Admin::user()->can('*')) {
 
                 $actions->add(new InviteSwitchAction());
             }
-            if (Admin::user()->can('can-Play-switch-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('can-Play-switch-'.$permission) || Admin::user()->can('*')) {
 
                 $actions->add(new CanPlaySwitchAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('kick-agency-switch-'.$permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfAgencyAction());
             }
-            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ($model->family_id >= 1 && (Admin::user()->can('kick-family-switch-'.$permission) || Admin::user()->can('*'))) {
                 $actions->add(new KickOfFamilyAction());
             }
-            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-' . $permission) || Admin::user()->can('*'))) {
+            if ($model->agency_id >= 1 && (Admin::user()->can('chang-agency-switch-'.$permission) || Admin::user()->can('*'))) {
                 $actions->add(new ChangeAgencyAction($model->id));
             }
 
-            if (! Admin::user()->can('delete-' . $permission) || !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-'.$permission) || ! Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
         });
-
 
         $grid->disableCreateButton();
 
@@ -604,7 +597,7 @@ class UserController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -618,10 +611,6 @@ class UserController extends MainController
         $show->field('nickname', __('NickName'));
         $show->field('flag', __('country'))->image('', 50);
         $show->field('email', __('Email'));
-
-
-
-
 
         return $show;
     }

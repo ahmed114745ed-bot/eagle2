@@ -16,7 +16,7 @@ use Utd\Pk\Http\Controllers\Dashboard\AdminPKEventsRewardsController;
 
 Route::group([
     'middleware' => ['api', 'auth:sanctum'],
-    'prefix' => 'api/dashboard'
+    'prefix' => 'api/dashboard',
 ], function () {
     Route::resource('admin-event-pk', AdminPKEventsController::class);
     Route::resource('admin-event-pk-rewords', AdminPKEventsRewardsController::class);

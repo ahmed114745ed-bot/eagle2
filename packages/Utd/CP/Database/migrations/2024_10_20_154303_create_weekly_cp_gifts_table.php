@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -17,11 +17,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('weekly_cp_id')->nullable()->constrained('weekly_stars')->nullOnDelete();
             $table->integer('level');
-            $table->string("target");
-            $table->string("type");
-            $table->string("sub_type")->nullable();
-            $table->string("gender");
-            $table->string("expire");
+            $table->string('target');
+            $table->string('type');
+            $table->string('sub_type')->nullable();
+            $table->string('gender');
+            $table->string('expire');
             $table->timestamps();
         });
     }

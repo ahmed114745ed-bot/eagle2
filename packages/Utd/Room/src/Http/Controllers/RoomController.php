@@ -2,8 +2,9 @@
 
 namespace Utd\Room\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Utd\Room\Services\RoomService;
 use Utd\Room\Transformers\RoomResource;
@@ -12,8 +13,7 @@ class RoomController extends Controller
 {
     public function __construct(
         protected RoomService $roomService
-    ) {
-    }
+    ) {}
 
     /**
      * Get all rooms
@@ -42,7 +42,7 @@ class RoomController extends Controller
                 'message' => 'Success',
                 'data' => new RoomResource($room),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -58,7 +58,7 @@ class RoomController extends Controller
         $userId = $request->user()->id;
         $room = $this->roomService->findRoomByUser($userId);
 
-        if (!$room) {
+        if (! $room) {
             return response()->json([
                 'status' => false,
                 'message' => 'No room found',
@@ -93,7 +93,7 @@ class RoomController extends Controller
                 'message' => 'Room created successfully',
                 'data' => new RoomResource($room),
             ], 201);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -114,7 +114,7 @@ class RoomController extends Controller
                 'message' => 'Room updated successfully',
                 'data' => new RoomResource($room),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -135,7 +135,7 @@ class RoomController extends Controller
                 'message' => 'Success',
                 'data' => $admins,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -156,7 +156,7 @@ class RoomController extends Controller
                 'message' => 'Writing status toggled',
                 'data' => ['writing_disabled' => $room->writing_disabled],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),

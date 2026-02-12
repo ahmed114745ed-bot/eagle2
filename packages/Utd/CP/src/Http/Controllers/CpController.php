@@ -3,28 +3,23 @@
 namespace Utd\CP\Http\Controllers;
 
 use App\Helpers\Common;
-use App\Models\GiftLog;
-use App\Models\Pack;
-use App\Models\Ware;
 use Auth;
-use DB;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Utd\CP\Entities\CpRelation;
 use Illuminate\Support\Facades\Validator;
 use Utd\CP\Entities\Cp;
-use Utd\CP\Entities\UserRelationAvilable;
-use Utd\CP\Transformers\CpLevelResource;
+use Utd\CP\Entities\CpRelation;
 use Utd\CP\Services\CpProfileService;
 use Utd\CP\Services\CpserviceCo;
 use Utd\CP\Services\ExtendCardService;
-use Utd\CP\Transformers\CpListResource;
-use Utd\CP\Transformers\RankingResource;
-use Utd\CP\Transformers\RequestCpResource;
 
 class CpController extends Controller
 {
-    protected $cpService, $extendCardService, $cpProfileService;
+    protected $cpService;
+
+    protected $extendCardService;
+
+    protected $cpProfileService;
 
     public function __construct(CpserviceCo $cpService, ExtendCardService $extendCardService, CpProfileService $cpProfileService)
     {
@@ -32,6 +27,7 @@ class CpController extends Controller
         $this->extendCardService = $extendCardService;
         $this->cpProfileService = $cpProfileService;
     }
+
     public function cpLevels()
     {
         $type = request('type') ?? 'lovely';
@@ -50,7 +46,9 @@ class CpController extends Controller
             ->first();
 
         $result = [];
-        if (!$cp_relations) return Common::apiResponse(1, 'not found', $result);
+        if (! $cp_relations) {
+            return Common::apiResponse(1, 'not found', $result);
+        }
 
         foreach ($cp_relations->levels as $level) {
             $have = in_array($level->id, $levelsIds);
@@ -67,7 +65,7 @@ class CpController extends Controller
                         $image = $gift->vip->img;
                         break;
                     case 'coins':
-                        $image ='custom_image/gold_coin_icon.png';
+                        $image = 'custom_image/gold_coin_icon.png';
                         break;
                     case 'acheivment':
                         $image = $gift->item_id;
@@ -75,7 +73,7 @@ class CpController extends Controller
                 }
 
                 if ($image) {
-                    if (!isset($levelGifts[$gift->type])) {
+                    if (! isset($levelGifts[$gift->type])) {
                         $levelGifts[$gift->type] = [
                             'title' => $gift->type,
                             'images' => [],
@@ -100,8 +98,6 @@ class CpController extends Controller
         return Common::apiResponse(1, '', $result);
     }
 
-
-
     public function makeRequestCp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -111,16 +107,19 @@ class CpController extends Controller
 
         if ($validator->fails()) {
             $errors = implode(',', $validator->errors()->all());
+
             return Common::apiResponse(0, $errors);
         }
 
         $user = $request->user();
+
         return $this->cpService->makeRequestCp($request, $user);
     }
 
     public function getRequestCp()
     {
         $user = Auth::user();
+
         return $this->cpService->getRequestCp($user);
     }
 
@@ -137,28 +136,28 @@ class CpController extends Controller
     public function cpList()
     {
         $userId = Auth::id();
+
         return $this->cpService->getCpList($userId);
     }
-
 
     public function cpUserList()
     {
         $userId = request('user_id') ?? Auth::id();
+
         return $this->cpService->cpUserList($userId);
     }
 
     public function extendCard(Request $request)
     {
         $user = Auth::user();
+
         return $this->extendCardService->extendCard($user, $request->ware_id);
     }
-
 
     public function cpProfile()
     {
         $userId = request('user_id') ?? Auth::id();
+
         return $this->cpProfileService->getCpProfiles($userId);
     }
 }
-
-

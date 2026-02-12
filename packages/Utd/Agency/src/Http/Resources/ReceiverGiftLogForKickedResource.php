@@ -2,8 +2,8 @@
 
 namespace Utd\Agency\Http\Resources;
 
-use Utd\Agency\Facades\AgencyHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Agency\Facades\AgencyHelper;
 
 class ReceiverGiftLogForKickedResource extends JsonResource
 {
@@ -16,9 +16,9 @@ class ReceiverGiftLogForKickedResource extends JsonResource
             'uuid' => @$this->receiver->uuid ?? '',
             'name' => @$this->receiver->name ?: '',
             'image' => $this->receiver->profile->avatar ?: '',
-            'exp'   => $this->exp ?? '',
-            'image_color'          => @$this->receiver->color_image,
-            'id_image'             => @$this->receiver->specialId?->ware?->show_img ?? '',
+            'exp' => $this->exp ?? '',
+            'image_color' => @$this->receiver->color_image,
+            'id_image' => @$this->receiver->specialId?->ware?->show_img ?? '',
             'level' => AgencyHelper::level_center_min(@$this->receiver->id),
             'colored_name' => $hasColor ? AgencyHelper::wareUserVip(@$this->receiver->id, 18, 'color') ?? '' : '',
             'is_kicked' => (bool) $this->is_kicked,

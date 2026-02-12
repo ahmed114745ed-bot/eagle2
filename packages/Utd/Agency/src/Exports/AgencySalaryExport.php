@@ -2,15 +2,17 @@
 
 namespace Utd\Agency\Exports;
 
-use Utd\Agency\Entities\AgencySalary;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Utd\Agency\Entities\AgencySalary;
 
 class AgencySalaryExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $month;
+
     protected $year;
+
     protected $isPaid;
 
     public function __construct($month = null, $year = null, $isPaid = null)

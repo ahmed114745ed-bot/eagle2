@@ -3,19 +3,18 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Helpers\Common;
-use Utd\Room\Entities\RoomCategory;
-use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Utd\Room\Entities\RoomCategory;
 
 class RoomCategoryController extends \App\Admin\Controllers\MainController
 {
     use HasResourceActions;
-    public $permission_name = 'categories';
 
+    public $permission_name = 'categories';
 
     public function index(Content $content)
     {
@@ -27,8 +26,7 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -41,8 +39,7 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -59,7 +56,6 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
             ->body($this->form()));
     }
 
-
     /**
      * Make a grid builder.
      *
@@ -73,9 +69,9 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
         $grid->name(trans('name'));
         $grid->column('name_en', trans('name_en'));
         $grid->column('img', trans('img'))->display(function ($img) {
-            $defaultImage = asset("images/background_room.jpg");
+            $defaultImage = asset('images/background_room.jpg');
             $path = getImagePath($img);
-            if (!isImageExists(@$path)) {
+            if (! isImageExists(@$path)) {
                 $path = $defaultImage;
             }
             $parsedUrl = parse_url($path);
@@ -121,7 +117,7 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -149,7 +145,6 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
         $form = new Form(new RoomCategory);
         $this->disableFormTools($form);
 
-
         $form->display(__('ID'));
         $form->select('parent_id', trans('parent'))->options(function () {
             $options = [0 => trans('root')];
@@ -157,12 +152,13 @@ class RoomCategoryController extends \App\Admin\Controllers\MainController
             foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
+
             return $options;
         });
         $form->text('name', trans('name'))->rules('required');
         $form->text('name_en', trans('name_en'))->rules('required');
         $form->select('type', trans('type'))->options([
-            'party' => trans('party')
+            'party' => trans('party'),
         ]);
         $form->image('img', trans('img'));
         $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());

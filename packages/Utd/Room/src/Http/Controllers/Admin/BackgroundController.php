@@ -3,22 +3,22 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Helpers\Common;
-use Utd\Room\Entities\Background;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Utd\Room\Entities\Background;
 
 class BackgroundController extends \App\Admin\Controllers\MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'room-background';
 
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -31,8 +31,7 @@ class BackgroundController extends \App\Admin\Controllers\MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -45,8 +44,7 @@ class BackgroundController extends \App\Admin\Controllers\MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -59,7 +57,6 @@ class BackgroundController extends \App\Admin\Controllers\MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -80,9 +77,9 @@ class BackgroundController extends \App\Admin\Controllers\MainController
 
         $grid->id(__('ID'));
         $grid->column('img', trans('image'))->display(function ($img) {
-            $defaultImage = asset("images/background_room.jpg");
+            $defaultImage = asset('images/background_room.jpg');
             $path = getImagePath($img);
-            if (!isImageExists(@$path)) {
+            if (! isImageExists(@$path)) {
                 $path = $defaultImage;
             }
             $parsedUrl = parse_url($path);
@@ -127,7 +124,7 @@ class BackgroundController extends \App\Admin\Controllers\MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -152,7 +149,6 @@ class BackgroundController extends \App\Admin\Controllers\MainController
     {
         $form = new Form(new Background);
         $this->disableFormTools($form);
-
 
         $form->display(__('ID'));
         $form->image('img', trans('image'));

@@ -2,25 +2,27 @@
 
 namespace Utd\Moments\Http\Controllers\web;
 
-use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Content;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Log;
 use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentCommint;
 use Utd\Moments\Entities\MomentLikes;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class MomentViewerController extends MainController
 {
+    public $permission_name = 'moment';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'Moment Viewer';
-
-    public $permission_name = 'moment';
 
     /**
      * عرض صفحة Moment Viewer
@@ -52,8 +54,7 @@ class MomentViewerController extends MainController
     /**
      * جلب قائمة الـ Moments بناءً على الترتيب المحدد
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getMoments(Request $request)
     {
@@ -67,24 +68,24 @@ class MomentViewerController extends MainController
 
             $query = Moment::select(['id', 'user_id', 'description', 'img', 'created_at'])
                 ->with([
-                    'user' => fn($q) => $q->select(['id', 'uuid', 'name'])
+                    'user' => fn ($q) => $q->select(['id', 'uuid', 'name'])
                         ->with([
                             'profile:id,user_id,avatar',
                         ]),
-                    'images' => fn($q) => $q->select(['id', 'moment_id', 'image']),
+                    'images' => fn ($q) => $q->select(['id', 'moment_id', 'image']),
                 ])
                 ->withCount(['likes', 'comments', 'gifts']);
 
             // فلتر بالمعرف (ID)
-            if (!empty($userId)) {
+            if (! empty($userId)) {
                 $query->where('user_id', $userId);
             }
 
             // تطبيق فلتر البحث بالمستخدم
-            if (!empty($search)) {
+            if (! empty($search)) {
                 $query->whereHas('user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('uuid', 'like', "%{$search}%");
+                        ->orWhere('uuid', 'like', "%{$search}%");
                 });
             }
 
@@ -109,7 +110,7 @@ class MomentViewerController extends MainController
                         'last_page' => $moments->lastPage(),
                         'per_page' => $moments->perPage(),
                         'total' => $moments->total(),
-                    ]
+                    ],
                 ]);
             }
 
@@ -133,13 +134,14 @@ class MomentViewerController extends MainController
                     'last_page' => $moments->lastPage(),
                     'per_page' => $moments->perPage(),
                     'total' => $moments->total(),
-                ]
+                ],
             ]);
-        } catch (\Exception $e) {
-            \Log::error('Error loading Moments: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::error('Error loading Moments: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
-                'message' => 'Error loading Moments: ' . $e->getMessage()
+                'message' => 'Error loading Moments: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -147,25 +149,25 @@ class MomentViewerController extends MainController
     /**
      * جلب تفاصيل Moment محدد
      *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $id
+     * @return JsonResponse
      */
     public function getMoment($id)
     {
         $moment = Moment::with([
-            'user' => fn($q) => $q->select(['id', 'uuid', 'name', 'special_id', 'sender_level', 'received_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
+            'user' => fn ($q) => $q->select(['id', 'uuid', 'name', 'special_id', 'sender_level', 'received_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
                 ->with([
-                    'packs' => fn($q) => $q->whereIn('type', [4, 25, 18])
-                        ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+                    'packs' => fn ($q) => $q->whereIn('type', [4, 25, 18])
+                        ->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                         ->where('is_used', 1)
                         ->with(['ware:id,img1,img2,show_img,color,value']),
-                    'UserVip' => fn($q) => $q->with('OVip:id,img'),
+                    'UserVip' => fn ($q) => $q->with('OVip:id,img'),
                     'receiverLevel:id,img,level',
                     'senderLevel:id,img,level',
                     'chargeLevel:id,img,level',
                     'profile:id,user_id,avatar',
                     'room:id,uid,room_pass',
-                    'shippingAgency:id,app_owner_id,name,img'
+                    'shippingAgency:id,app_owner_id,name,img',
                 ]),
             'images:id,moment_id,image',
             'likes.user:id,uuid,name',
@@ -176,15 +178,15 @@ class MomentViewerController extends MainController
 
         return response()->json([
             'success' => true,
-            'data' => $moment
+            'data' => $moment,
         ]);
     }
 
     /**
      * جلب قائمة المستخدمين الذين قاموا بعمل Like
      *
-     * @param int $momentId
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $momentId
+     * @return JsonResponse
      */
     public function getLikes($momentId, Request $request)
     {
@@ -192,8 +194,8 @@ class MomentViewerController extends MainController
         $perPage = $request->get('per_page', 20);
 
         $likes = MomentLikes::where('moment_id', $momentId)
-            ->with(['user' => fn($q) => $q->select(['id', 'uuid', 'name'])
-                ->with(['profile:id,user_id,avatar'])
+            ->with(['user' => fn ($q) => $q->select(['id', 'uuid', 'name'])
+                ->with(['profile:id,user_id,avatar']),
             ])
             ->orderByDesc('created_at')
             ->paginate($perPage);
@@ -206,15 +208,15 @@ class MomentViewerController extends MainController
                 'last_page' => $likes->lastPage(),
                 'per_page' => $likes->perPage(),
                 'total' => $likes->total(),
-            ]
+            ],
         ]);
     }
 
     /**
      * جلب قائمة التعليقات
      *
-     * @param int $momentId
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $momentId
+     * @return JsonResponse
      */
     public function getComments($momentId, Request $request)
     {
@@ -222,8 +224,8 @@ class MomentViewerController extends MainController
         $perPage = $request->get('per_page', 20);
 
         $comments = MomentCommint::where('moment_id', $momentId)
-            ->with(['user' => fn($q) => $q->select(['id', 'uuid', 'name'])
-                ->with(['profile:id,user_id,avatar'])
+            ->with(['user' => fn ($q) => $q->select(['id', 'uuid', 'name'])
+                ->with(['profile:id,user_id,avatar']),
             ])
             ->orderBy('created_at')
             ->paginate($perPage);
@@ -236,15 +238,15 @@ class MomentViewerController extends MainController
                 'last_page' => $comments->lastPage(),
                 'per_page' => $comments->perPage(),
                 'total' => $comments->total(),
-            ]
+            ],
         ]);
     }
 
     /**
      * حذف تعليق
      *
-     * @param int $commentId
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $commentId
+     * @return JsonResponse
      */
     public function deleteComment($commentId)
     {
@@ -254,12 +256,12 @@ class MomentViewerController extends MainController
 
             return response()->json([
                 'success' => true,
-                'message' => __('Comment deleted successfully')
+                'message' => __('Comment deleted successfully'),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to delete comment')
+                'message' => __('Failed to delete comment'),
             ], 500);
         }
     }
@@ -267,9 +269,8 @@ class MomentViewerController extends MainController
     /**
      * جلب قائمة الهدايا
      *
-     * @param int $momentId
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $momentId
+     * @return JsonResponse
      */
     public function getGifts($momentId, Request $request)
     {
@@ -285,7 +286,7 @@ class MomentViewerController extends MainController
                 'users.uuid as user_uuid',
                 DB::raw('COALESCE(gifts.e_name, gifts.name) as gift_name'),
                 'gifts.img as gift_img',
-                'gifts.price as gift_value'
+                'gifts.price as gift_value',
             ]);
 
         // تطبيق الترتيب
@@ -304,16 +305,15 @@ class MomentViewerController extends MainController
         return response()->json([
             'success' => true,
             'data' => $gifts,
-            'total' => $gifts->count()
+            'total' => $gifts->count(),
         ]);
     }
 
     /**
      * تحديث وصف Moment
      *
-     * @param Request $request
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $id
+     * @return JsonResponse
      */
     public function updateDescription(Request $request, $id)
     {
@@ -321,7 +321,7 @@ class MomentViewerController extends MainController
             $moment = Moment::findOrFail($id);
 
             $request->validate([
-                'description' => 'nullable|string|max:5000'
+                'description' => 'nullable|string|max:5000',
             ]);
 
             $moment->description = $request->input('description');
@@ -330,12 +330,12 @@ class MomentViewerController extends MainController
             return response()->json([
                 'success' => true,
                 'message' => __('Description updated successfully'),
-                'description' => $moment->description
+                'description' => $moment->description,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to update description: ') . $e->getMessage()
+                'message' => __('Failed to update description: ').$e->getMessage(),
             ], 500);
         }
     }
@@ -343,8 +343,8 @@ class MomentViewerController extends MainController
     /**
      * حذف Moment
      *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param  int  $id
+     * @return JsonResponse
      */
     public function deleteMoment($id)
     {
@@ -362,12 +362,12 @@ class MomentViewerController extends MainController
 
             return response()->json([
                 'success' => true,
-                'message' => __('Moment deleted successfully')
+                'message' => __('Moment deleted successfully'),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('Failed to delete moment: ') . $e->getMessage()
+                'message' => __('Failed to delete moment: ').$e->getMessage(),
             ], 500);
         }
     }
@@ -375,8 +375,7 @@ class MomentViewerController extends MainController
     /**
      * إعادة تعيين seed للترتيب العشوائي
      *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function resetRandomSeed(Request $request)
     {
@@ -385,7 +384,7 @@ class MomentViewerController extends MainController
         // مسح جميع الـ random IDs المخزنة في الـ session
         $sessionKeys = $request->session()->all();
         foreach ($sessionKeys as $key => $value) {
-            if (strpos($key, 'moment_random_ids_') === 0) {
+            if (mb_strpos($key, 'moment_random_ids_') === 0) {
                 $request->session()->forget($key);
                 $keysDeleted++;
             }
@@ -397,7 +396,7 @@ class MomentViewerController extends MainController
         return response()->json([
             'success' => true,
             'message' => __('Random order reset successfully'),
-            'keys_deleted' => $keysDeleted
+            'keys_deleted' => $keysDeleted,
         ]);
     }
 
@@ -413,7 +412,7 @@ class MomentViewerController extends MainController
                 ->having('moments_count', '>', 0)
                 ->with(['profile:id,user_id,avatar']);
 
-            if (!empty($search)) {
+            if (! empty($search)) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                         ->orWhere('uuid', 'like', "%{$search}%")
@@ -435,9 +434,9 @@ class MomentViewerController extends MainController
                     'last_page' => $users->lastPage(),
                     'per_page' => $users->perPage(),
                     'total' => $users->total(),
-                ]
+                ],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

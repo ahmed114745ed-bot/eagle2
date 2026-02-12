@@ -15,7 +15,7 @@ return new class extends Migration
             $table->boolean('new_gift')->default(false);
 
         });
-        
+
     }
 
     /**

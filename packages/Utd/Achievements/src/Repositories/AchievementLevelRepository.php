@@ -5,7 +5,6 @@ namespace Utd\Achievements\Repositories;
 use App\Tik\Repositories\AbstractRepository;
 use Utd\Achievements\Entities\AchievementLevel;
 
-
 class AchievementLevelRepository extends AbstractRepository
 {
     public function __construct()

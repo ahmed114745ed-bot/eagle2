@@ -2,8 +2,8 @@
 
 namespace Utd\Reals\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 
 class RealDatabaseSeeder extends Seeder
 {
@@ -12,7 +12,7 @@ class RealDatabaseSeeder extends Seeder
         Model::unguard();
 
         $this->call([
-            MenuRealSeeder::class
+            MenuRealSeeder::class,
         ]);
     }
 }

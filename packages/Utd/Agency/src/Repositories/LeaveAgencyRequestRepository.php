@@ -35,12 +35,13 @@ class LeaveAgencyRequestRepository
     public function update($id, array $data)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->update($data);
+
             return $request->fresh();
         }
-        
+
         return null;
     }
 
@@ -50,11 +51,11 @@ class LeaveAgencyRequestRepository
     public function delete($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             return $request->delete();
         }
-        
+
         return false;
     }
 
@@ -113,12 +114,13 @@ class LeaveAgencyRequestRepository
     public function approve($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->status = 1;
+
             return $request->save();
         }
-        
+
         return false;
     }
 
@@ -128,12 +130,13 @@ class LeaveAgencyRequestRepository
     public function reject($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->status = 2;
+
             return $request->save();
         }
-        
+
         return false;
     }
 

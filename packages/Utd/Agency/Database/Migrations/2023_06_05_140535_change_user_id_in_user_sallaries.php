@@ -13,9 +13,11 @@ class ChangeUserIdInUserSallaries extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('user_sallaries')) return;
+        if (! Schema::hasTable('user_sallaries')) {
+            return;
+        }
         Schema::table('user_sallaries', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->default (0)->change ();
+            $table->unsignedBigInteger('user_id')->default(0)->change();
         });
     }
 

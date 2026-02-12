@@ -29,11 +29,11 @@ class Moment extends Model
     public function gifts()
     {
         $giftModel = config('moments.models.gift', 'Utd\Gifts\Entities\Gift');
-        
+
         if (class_exists($giftModel)) {
             return $this->belongsToMany($giftModel, 'moment_user_gifts');
         }
-        
+
         return $this->belongsToMany(get_class($this), 'moment_user_gifts', 'moment_id', 'gift_id')
             ->whereRaw('1 = 0');
     }
@@ -60,22 +60,21 @@ class Moment extends Model
         }]);
     }
 
-
     public function scopeWithUser($query)
     {
-        return $query->with(['user' => fn($q) => $q->select(['id', 'uuid','name', 'special_id', 'sender_level', 'received_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
+        return $query->with(['user' => fn ($q) => $q->select(['id', 'uuid', 'name', 'special_id', 'sender_level', 'received_level', 'charge_level', 'now_room_uid', 'type_user', 'manger_type_id', 'color_id', 'image_color_id', 'is_bd'])
             ->with([
-                'packs' => fn($q) => $q->whereIn('type', [4, 25, 18])
-                    ->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
+                'packs' => fn ($q) => $q->whereIn('type', [4, 25, 18])
+                    ->where(fn ($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp))
                     ->where('is_used', 1)
                     ->with(['ware:id,img1,img2,show_img,color,value']),
-                'UserVip' => fn($q) => $q->with('OVip:id,img'),
+                'UserVip' => fn ($q) => $q->with('OVip:id,img'),
                 'receiverLevel:id,img,level',
                 'senderLevel:id,img,level',
                 'chargeLevel:id,img,level',
                 'profile:id,user_id,avatar',
                 'room:id,uid,room_pass',
-                'shippingAgency:id,app_owner_id,name,img'
+                'shippingAgency:id,app_owner_id,name,img',
             ])]);
     }
 }

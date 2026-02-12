@@ -2,17 +2,15 @@
 
 namespace Utd\Reals\Services;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
-use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\JpegEncoder;
-
+use Intervention\Image\ImageManager;
 
 class InterventionImage
 {
-
     // public function combineImages(array $paths)
     // {
     //     $manager = new ImageManager(new Driver());
@@ -51,10 +49,8 @@ class InterventionImage
     //     // Get image content in memory
     //     $imageContent = (string) $canvas->toPng();
 
-
     //     // Upload to GCS (or other disk)
     //     Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, 'public');
-
 
     //     return 'merged/' . $fileName;
     // }
@@ -68,9 +64,10 @@ class InterventionImage
         foreach ($paths as $path) {
 
             $img = $this->readImage($path);
-            if (!$img) {
+            if (! $img) {
                 // Log missing file
                 Log::warning("Image not found: $path");
+
                 continue; // skip
             }
             if ($img) {
@@ -92,14 +89,13 @@ class InterventionImage
         $rows = ceil($count / $columns);
 
         // 2️⃣ Calculate canvas size based on resized images
-        $tileWidth = max(array_map(fn($img) => $img->width(), $images));
-        $tileHeight = max(array_map(fn($img) => $img->height(), $images));
+        $tileWidth = max(array_map(fn ($img) => $img->width(), $images));
+        $tileHeight = max(array_map(fn ($img) => $img->height(), $images));
 
         $canvasWidth = $columns * $tileWidth;
         $canvasHeight = $rows * $tileHeight;
 
         $canvas = $manager->create($canvasWidth, $canvasHeight);
-
 
         // 3️⃣ Place images
         foreach ($images as $i => $img) {
@@ -109,19 +105,14 @@ class InterventionImage
         }
 
         // 4️⃣ Generate filename and save
-        $fileName = 'merged_' . Str::random(16) . '.jpg';
+        $fileName = 'merged_'.Str::random(16).'.jpg';
         $imageContent = (string) $canvas->encode(new JpegEncoder(quality: 70));
         // smaller file
 
-        Storage::disk('gcs')->put('merged/' . $fileName, $imageContent, ['visibility' => 'public']);
+        Storage::disk('gcs')->put('merged/'.$fileName, $imageContent, ['visibility' => 'public']);
 
-        return 'merged/' . $fileName;
+        return 'merged/'.$fileName;
     }
-
-
-
-
-
 
     public function readImage(string $pathOrUrl)
     {
@@ -135,6 +126,7 @@ class InterventionImage
         // 2️⃣ asset() URL
         if (str_starts_with($pathOrUrl, asset(''))) {
             $local = public_path(parse_url($pathOrUrl, PHP_URL_PATH));
+
             return file_exists($local) ? $manager->read($local) : null;
         }
 
@@ -145,7 +137,7 @@ class InterventionImage
             $objectPath = ltrim(parse_url($pathOrUrl, PHP_URL_PATH), '/');
             $objectPath = preg_replace('#^[^/]+/#', '', $objectPath);
 
-            if (!Storage::disk('gcs')->exists($objectPath)) {
+            if (! Storage::disk('gcs')->exists($objectPath)) {
                 return null;
             }
 

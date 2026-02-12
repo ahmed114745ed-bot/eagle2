@@ -2,22 +2,22 @@
 
 namespace Utd\RoomCup\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
+use Illuminate\Http\Request;
 use Utd\RoomCup\Entities\RoomCupTarget;
 
 class RoomCupTargetController extends MainController
 {
-    protected $title = '';
-
     public $permission_name = 'room-cup-target';
+
+    protected $title = '';
 
     public function index(Content $content)
     {
@@ -30,14 +30,6 @@ class RoomCupTargetController extends MainController
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             }));
-    }
-
-    protected function grid2()
-    {
-        return (new Box(
-            title: __('admin.description'),
-            content: view('admin.grid.roomTarget'),
-        ));
     }
 
     public function show($id, Content $content)
@@ -61,6 +53,23 @@ class RoomCupTargetController extends MainController
             ->body($this->form()));
     }
 
+    public function cupTargetHtml(Request $request)
+    {
+        $lang = $request->get('lang', 'en');
+        app()->setLocale($lang);
+        $cupTargets = RoomCupTarget::get();
+
+        return view('roomcup::cup_target', compact('cupTargets'));
+    }
+
+    protected function grid2()
+    {
+        return new Box(
+            title: __('admin.description'),
+            content: view('admin.grid.roomTarget'),
+        );
+    }
+
     protected function grid()
     {
         $grid = new Grid(new RoomCupTarget());
@@ -68,6 +77,7 @@ class RoomCupTargetController extends MainController
         $grid->column('id', __('ID'))->sortable();
         $grid->column('total', __('Total'))->display(function ($coins) {
             $image = asset('images/coin.jpg');
+
             return "<div style='display: flex; align-items: center;'>
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
@@ -77,6 +87,7 @@ class RoomCupTargetController extends MainController
         $grid->column('number_of_admins', __('Number of Admins'))->sortable();
         $grid->column('owner_profit', __('Owner Profit'))->display(function ($coins) {
             $image = asset('images/coin.jpg');
+
             return "<div style='display: flex; align-items: center;'>
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
@@ -84,6 +95,7 @@ class RoomCupTargetController extends MainController
         });
         $grid->column('admin_profit', __('Admin Profit'))->display(function ($coins) {
             $image = asset('images/coin.jpg');
+
             return "<div style='display: flex; align-items: center;'>
                         <span>{$coins}</span>
                          <img src='{$image}' alt='Coins' width='20' height='20'>
@@ -97,6 +109,7 @@ class RoomCupTargetController extends MainController
         });
 
         $this->extendGrid($grid);
+
         return $grid;
     }
 
@@ -143,7 +156,7 @@ class RoomCupTargetController extends MainController
             $ownerPercentage = request('owner_percentage');
             $adminPercentage = request('admin_percentage');
             $total = $adminPercentage + $ownerPercentage;
-            if ($total != 100) {
+            if ($total !== 100) {
                 $error = new \Illuminate\Support\MessageBag([
                     'title' => 'Error',
                     'message' => trans('admin.percent_total_error', ['total' => $total]),
@@ -157,13 +170,5 @@ class RoomCupTargetController extends MainController
         });
 
         return $form;
-    }
-
-    public function cupTargetHtml(Request $request)
-    {
-        $lang = $request->get('lang', 'en');
-        app()->setLocale($lang);
-        $cupTargets = RoomCupTarget::get();
-        return view('roomcup::cup_target', compact("cupTargets"));
     }
 }

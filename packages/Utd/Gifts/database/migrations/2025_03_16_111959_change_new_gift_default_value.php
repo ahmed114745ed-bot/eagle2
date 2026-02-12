@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement("UPDATE users SET new_gift = false");
+        DB::statement('UPDATE users SET new_gift = false');
 
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('new_gift')->default(true)->change();

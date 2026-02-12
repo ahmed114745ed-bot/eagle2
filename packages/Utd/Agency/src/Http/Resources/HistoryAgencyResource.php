@@ -3,9 +3,9 @@
 namespace Utd\Agency\Http\Resources;
 
 use Carbon\Carbon;
-use Utd\Agency\Contracts\ExternalModuleInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Utd\Agency\Contracts\ExternalModuleInterface;
 
 class HistoryAgencyResource extends JsonResource
 {
@@ -16,26 +16,26 @@ class HistoryAgencyResource extends JsonResource
 
         $giftLog = $this->getTopReceivers($year, $month);
         $heroGiftLog = $this->getTopSenders($year, $month);
-    
-        $isOwner = Auth::user()->id == $this->app_owner_id;
+
+        $isOwner = Auth::user()->id === $this->app_owner_id;
         $salary = $isOwner ? $this->getSalary($year, $month) : 0;
         $target = $isOwner ? $this->calculateTarget($heroGiftLog) : 0;
-    
+
         return [
-            'star'   => ReceiverGiftLogForKickedResource::collection($giftLog),
+            'star' => ReceiverGiftLogForKickedResource::collection($giftLog),
             'heroes' => SenderGiftLogResource::collection($heroGiftLog),
             'salary' => $isOwner ? (string) $salary : '0',
             'target' => $target,
         ];
     }
-    
+
     private function getTopReceivers($year, $month)
     {
         $externalModule = app(ExternalModuleInterface::class);
         $giftLogModel = $externalModule->get('models.gift_log');
-        
+
         return $giftLogModel::where('agency_id', $this->id)
-            ->selectRaw("
+            ->selectRaw('
                 SUM(giftPrice) as exp, 
                 receiver_id,
                 EXISTS (
@@ -43,7 +43,7 @@ class HistoryAgencyResource extends JsonResource
                     WHERE gl.receiver_id = gift_logs.receiver_id 
                     AND gl.is_finished = 1
                 ) as is_kicked
-            ")
+            ')
             ->with('receiver')
             ->groupBy('receiver_id')
             ->whereHas('receiver')
@@ -54,14 +54,14 @@ class HistoryAgencyResource extends JsonResource
             ->take(3)
             ->get();
     }
-    
+
     private function getTopSenders($year, $month)
     {
         $externalModule = app(ExternalModuleInterface::class);
         $giftLogModel = $externalModule->get('models.gift_log');
-        
+
         return $giftLogModel::where('agency_id', $this->id)
-            ->selectRaw("SUM(giftPrice) as exp, sender_id, is_finished")
+            ->selectRaw('SUM(giftPrice) as exp, sender_id, is_finished')
             ->with('sender')
             ->whereHas('sender')
             ->whereYear('created_at', $year)
@@ -72,18 +72,18 @@ class HistoryAgencyResource extends JsonResource
             ->take(3)
             ->get();
     }
-    
+
     private function getSalary($year, $month)
     {
         $externalModule = app(ExternalModuleInterface::class);
         $agencySalaryModel = $externalModule->get('models.agency_salary');
-        
+
         return $agencySalaryModel::where('agency_id', $this->id)
             ->where('year', $year)
             ->where('month', $month)
             ->sum('sallary');
     }
-    
+
     private function calculateTarget($heroGiftLog)
     {
         return 0;

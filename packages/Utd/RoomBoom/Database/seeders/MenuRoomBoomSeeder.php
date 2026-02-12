@@ -13,12 +13,12 @@ class MenuRoomBoomSeeder extends Seeder
 
         $roomBoomParent = Menu::firstOrCreate(
             [
-                'title'     => 'Room Boom',
+                'title' => 'Room Boom',
                 'parent_id' => 0,
             ],
             [
                 'order' => $parentOrder + 1,
-                'icon'  => '💣',
+                'icon' => '💣',
             ]
         );
 

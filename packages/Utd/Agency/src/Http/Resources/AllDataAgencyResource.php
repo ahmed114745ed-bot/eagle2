@@ -3,19 +3,19 @@
 namespace Utd\Agency\Http\Resources;
 
 use Carbon\Carbon;
-use Utd\Agency\Contracts\ExternalModuleInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Utd\Agency\Contracts\ExternalModuleInterface;
 
 class AllDataAgencyResource extends JsonResource
 {
     public function toArray($request)
     {
         $externalModule = app(ExternalModuleInterface::class);
-        
+
         $userSalaryModel = $externalModule->get('models.user_salary');
         $targetModel = $externalModule->get('models.target');
-        
+
         $target = $userSalaryModel::where('user_agency_id', $this->agency_id)->sum('agency_sallary');
 
         $minValue = $targetModel::where('usd', '<', $target)
@@ -29,9 +29,9 @@ class AllDataAgencyResource extends JsonResource
         $admin = @$authUser->agencyUserJob;
         $type = '';
 
-         if ($this->type == 1) {
+        if ($this->type === 1) {
             $type = 'hosts ';
-        } elseif ($this->type == 2) {
+        } elseif ($this->type === 2) {
             $type = 'shipping';
         }
 
@@ -60,15 +60,15 @@ class AllDataAgencyResource extends JsonResource
             'phone' => $this->phone ?: 0,
             'img' => $this->img ?: '',
             'agency_type' => $type,
-            'num_of_hosts'      => $this->mempers->count(),
+            'num_of_hosts' => $this->mempers->count(),
             'owner' => $this->owner ? new MyDataForAgencyResource($this->owner) : [
-                "id" => 0,
-                "uuid" => '',
-                "target_usd" => 0,
+                'id' => 0,
+                'uuid' => '',
+                'target_usd' => 0,
                 'name' => '',
-                "profile" => [
-                    "image" => ''
-                ]
+                'profile' => [
+                    'image' => '',
+                ],
             ],
             'mempers_count' => $this->mempers_count,
             'admin' => AdminsAgencyResource::collection(@$this->admins),
@@ -77,13 +77,13 @@ class AllDataAgencyResource extends JsonResource
         ];
     }
 
-    public function getTopGiftLogsByUserType(int $year, int $month, string $userType, int $limit = null)
+    public function getTopGiftLogsByUserType(int $year, int $month, string $userType, ?int $limit = null)
     {
         $externalModule = app(ExternalModuleInterface::class);
         $giftLogModel = $externalModule->get('models.gift_log');
-        
+
         $userRelation = $userType; // 'receiver' or 'sender'
-        $userColumn   = $userType . '_id'; // receiver_id or sender_id
+        $userColumn = $userType.'_id'; // receiver_id or sender_id
 
         $query = $giftLogModel::where('agency_id', $this->id)
             ->selectRaw("SUM(giftPrice) as exp, {$userColumn}")

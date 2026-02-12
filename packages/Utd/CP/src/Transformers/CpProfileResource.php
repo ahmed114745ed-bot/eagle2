@@ -2,14 +2,8 @@
 
 namespace Utd\CP\Transformers;
 
-use App\Helpers\Common;
-use App\Models\User;
-use App\Models\Vip;
-use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Utd\CP\Entities\Cp;
 use Utd\CP\Entities\CpLevel;
 
 class CpProfileResource extends JsonResource
@@ -18,7 +12,7 @@ class CpProfileResource extends JsonResource
     {
         $loginUserId = request('user_id') ?? Auth::id();
 
-        if ($this->user_one_id == $loginUserId) {
+        if ($this->user_one_id === $loginUserId) {
             $user = $this->toUser;
         } else {
             $user = $this->fromUser;
@@ -29,14 +23,13 @@ class CpProfileResource extends JsonResource
         $frame = $dress_1_data ?: $dress_1_fallback;
 
         $currentLevel = CpLevel::find($this->level_id);
-        $nextLevel = CpLevel::where("cp_relation_id",  $this?->cp_relation_id)->where("id", ">", $this->level_id)->orderBy('id')->first();
+        $nextLevel = CpLevel::where('cp_relation_id', $this?->cp_relation_id)->where('id', '>', $this->level_id)->orderBy('id')->first();
         $currentExp = is_object($currentLevel) ? $currentLevel->exp : 0;
-
 
         $ratio = 0;
 
         if (
-            (!empty($currentLevel) || $this->level_id === 0) &&
+            (! empty($currentLevel) || $this->level_id === 0) &&
             $nextLevel &&
             $nextLevel->exp > $currentExp
         ) {
@@ -51,24 +44,25 @@ class CpProfileResource extends JsonResource
         }
 
         return [
-            'id'        => $this->id,
-            'level'     => $currentLevel?->level ?? 0,
-            'next_level'     =>  $nextLevel?->level ?? 0,
-            'di'        => $this->di,
+            'id' => $this->id,
+            'level' => $currentLevel?->level ?? 0,
+            'next_level' => $nextLevel?->level ?? 0,
+            'di' => $this->di,
             'ratio' => $ratio,
-            "user"      => [
-                "id"        => $user?->id,
-                "uid"       => $user?->uuid,
-                "name"      => $user?->name,
-                "image"     => $user?->avatar,
-                "gender"    => (string)($user?->gender == 'male' ? 1 : 0),
+            'user' => [
+                'id' => $user?->id,
+                'uid' => $user?->uuid,
+                'name' => $user?->name,
+                'image' => $user?->avatar,
+                'gender' => (string) ($user?->gender === 'male' ? 1 : 0),
                 'frame' => $frame,
             ],
-            "relation" => $this->relation,
+            'relation' => $this->relation,
             'frame' => $frame,
 
         ];
     }
+
     public function getUserDress($user, $type, $dress, $item = 'img1')
     {
         $pack = $user?->packs
@@ -79,4 +73,3 @@ class CpProfileResource extends JsonResource
         return $pack && $pack->ware ? $pack->ware->{$item} : '';
     }
 }
-

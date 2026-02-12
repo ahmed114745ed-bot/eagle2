@@ -7,16 +7,16 @@ use App\Contracts\AchievementLevelContract;
 use App\Contracts\UserAchievementContract;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Utd\Achievements\Services\AchievementService;
-use Utd\Achievements\Services\AchievementLevelsService;
-use Utd\Achievements\Services\UserAchievementService;
 use Utd\Achievements\Console\ResetUserAchievementMonthly;
+use Utd\Achievements\Services\AchievementLevelsService;
+use Utd\Achievements\Services\AchievementService;
+use Utd\Achievements\Services\UserAchievementService;
 
 class AchievementsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/achievements.php', 'achievements');
+        $this->mergeConfigFrom(__DIR__.'/../config/achievements.php', 'achievements');
 
         $this->app->singleton(AchievementContract::class, AchievementService::class);
         $this->app->singleton(AchievementLevelContract::class, AchievementLevelsService::class);
@@ -39,20 +39,20 @@ class AchievementsServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/achievements.php' => config_path('achievements.php'),
+                __DIR__.'/../config/achievements.php' => config_path('achievements.php'),
             ], 'achievements-config');
 
-//            $this->publishes([
-//                __DIR__ . '/../database/migrations' => database_path('migrations'),
-//            ], 'achievements-migrations');
-//
-//            $this->publishes([
-//                __DIR__ . '/../database/seeders' => database_path('seeders/Achievements'),
-//            ], 'achievements-seeders');
-//
-//            $this->publishes([
-//                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/achievements'),
-//            ], 'achievements-lang');
+            //            $this->publishes([
+            //                __DIR__ . '/../database/migrations' => database_path('migrations'),
+            //            ], 'achievements-migrations');
+            //
+            //            $this->publishes([
+            //                __DIR__ . '/../database/seeders' => database_path('seeders/Achievements'),
+            //            ], 'achievements-seeders');
+            //
+            //            $this->publishes([
+            //                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/achievements'),
+            //            ], 'achievements-lang');
         }
     }
 
@@ -61,7 +61,7 @@ class AchievementsServiceProvider extends ServiceProvider
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     /**
@@ -69,7 +69,7 @@ class AchievementsServiceProvider extends ServiceProvider
      */
     protected function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'achievements');
+        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'achievements');
     }
 
     /**
@@ -90,18 +90,18 @@ class AchievementsServiceProvider extends ServiceProvider
     protected function registerRoutes(): void
     {
         if (config('achievements.routes.api_enabled', true)) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+            $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         }
 
         if (config('achievements.routes.utd_enabled', true)) {
             Route::prefix('api/utd')
                 ->middleware(['api', 'localization'])
-                ->group(__DIR__ . '/../routes/utd.php');
+                ->group(__DIR__.'/../routes/utd.php');
         }
 
         if (config('achievements.routes.web_enabled', true) && $this->isLaravelAdminInstalled()) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-            $this->loadRoutesFrom(__DIR__ . '/../routes/preview.php');
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__.'/../routes/preview.php');
         }
     }
 

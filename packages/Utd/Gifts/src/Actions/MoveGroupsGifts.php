@@ -2,10 +2,10 @@
 
 namespace Utd\Gifts\Actions;
 
-use Utd\Gifts\Entities\GiftCategory;
-use Illuminate\Http\Request;
 use Encore\Admin\Actions\BatchAction;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Utd\Gifts\Entities\GiftCategory;
 
 class MoveGroupsGifts extends BatchAction
 {
@@ -29,8 +29,6 @@ class MoveGroupsGifts extends BatchAction
         return $this->response()->success(__('Gift moved successfully'))->refresh();
     }
 
-
-
     public function form()
     {
         $locale = app()->getLocale();
@@ -43,7 +41,7 @@ class MoveGroupsGifts extends BatchAction
                 foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
                     // Access title as object property or array
                     $titleValue = $category->title;
-                    
+
                     if (is_array($titleValue)) {
                         $title = $titleValue[$locale] ?? $titleValue['en'] ?? reset($titleValue);
                     } else {

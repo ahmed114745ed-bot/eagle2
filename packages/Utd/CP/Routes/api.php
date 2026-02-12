@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Utd\CP\Http\Controllers\CpController;
-use Utd\CP\Http\Controllers\WeeklyCpController;
 use Utd\CP\Http\Controllers\CpRelationController;
+use Utd\CP\Http\Controllers\WeeklyCpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -11,7 +11,7 @@ use Utd\CP\Http\Controllers\CpRelationController;
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:sanctum', 'localization' ,'update.last.seen'])->group(function () {
+Route::middleware(['auth:sanctum', 'localization', 'update.last.seen'])->group(function () {
     Route::get('/cp-relations', [CpRelationController::class, 'index']);
     Route::post('/make-cp-request', [CpController::class, 'makeRequestCp']);
     Route::get('/get-cp-request', [CpController::class, 'getRequestCp']);
@@ -20,7 +20,7 @@ Route::middleware(['auth:sanctum', 'localization' ,'update.last.seen'])->group(f
     Route::get('/cp-list', [CpController::class, 'cpList']);
     Route::post('/buy-sets', [CpController::class, 'extendCard']);
     Route::get('/cp-profile', [CpController::class, 'cpProfile']);
-    Route::get('/cp-levels-gifts', [CpController::class , 'cpLevels']);
+    Route::get('/cp-levels-gifts', [CpController::class, 'cpLevels']);
 
     Route::get('/cp-user-list', [CpController::class, 'cpUserList']);
 

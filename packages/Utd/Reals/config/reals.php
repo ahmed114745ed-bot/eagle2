@@ -23,8 +23,8 @@ return [
     ],
 
     'video' => [
-        'max_duration' => env('REALS_MAX_DURATION', 60), 
-        'max_size' => env('REALS_MAX_SIZE', 50 * 1024 * 1024), 
+        'max_duration' => env('REALS_MAX_DURATION', 60),
+        'max_size' => env('REALS_MAX_SIZE', 50 * 1024 * 1024),
         'allowed_extensions' => ['mp4', 'mov', 'avi', 'webm'],
         'thumbnail_width' => 300,
         'thumbnail_height' => 400,
@@ -39,7 +39,7 @@ return [
 
     'cache' => [
         'enabled' => env('REALS_CACHE_ENABLED', true),
-        'ttl' => 3600, 
+        'ttl' => 3600,
         'prefix' => 'reals_',
     ],
 

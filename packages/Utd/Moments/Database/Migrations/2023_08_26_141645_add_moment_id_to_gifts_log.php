@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('gift_logs', 'moent_id')) {
+        if (! Schema::hasColumn('gift_logs', 'moent_id')) {
             Schema::table('gift_logs', function (Blueprint $table) {
                 // $table->unsignedInteger('moent_id')->nullable();
                 $table->foreignId('moent_id')->nullable()->constrained('moment')->onDelete('cascade');

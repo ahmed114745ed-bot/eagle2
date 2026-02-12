@@ -2,10 +2,10 @@
 
 namespace Utd\Gifts\Services;
 
-use Utd\Gifts\Contracts\GiftsContract;
 use App\Contracts\GiftsContract as AppGiftsContract;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Utd\Gifts\Contracts\GiftsContract;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\GiftLog;
@@ -14,26 +14,24 @@ use Utd\Gifts\Support\ModelResolver;
 
 /**
  * GiftsService
- * 
  */
-class GiftsService implements GiftsContract, AppGiftsContract
+class GiftsService implements AppGiftsContract, GiftsContract
 {
     /**
-     * 
-     * @param int $userId
+     * @param  int  $userId
      * @return Collection
      */
     public function getUserGifts($userId)
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return collect();
         }
-        
+
         $user = $userModel::find($userId);
-        
-        if (!$user) {
+
+        if (! $user) {
             return collect();
         }
 
@@ -44,25 +42,22 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param int $senderId
-     * @param int $receiverId
-     * @param int $giftId
-     * @param int $quantity
-     * @param array $options
+     * @param  int  $senderId
+     * @param  int  $receiverId
+     * @param  int  $giftId
+     * @param  int  $quantity
      * @return mixed
      */
     public function sendGift($senderId, $receiverId, $giftId, $quantity = 1, array $options = [])
     {
-      
-        
+
         $gift = Gift::find($giftId);
-        
-        if (!$gift) {
+
+        if (! $gift) {
             return ['success' => false, 'message' => 'Gift not found'];
         }
 
-        if (!$this->canSendGift($senderId, $giftId, $quantity)) {
+        if (! $this->canSendGift($senderId, $giftId, $quantity)) {
             return ['success' => false, 'message' => 'Cannot send gift'];
         }
 
@@ -79,8 +74,7 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param int|null $categoryId
+     * @param  int|null  $categoryId
      * @return Collection
      */
     public function getGiftsByCategory($categoryId = null)
@@ -97,8 +91,6 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param array $filters
      * @return mixed
      */
     public function getGiftLogs(array $filters = [])
@@ -106,23 +98,23 @@ class GiftsService implements GiftsContract, AppGiftsContract
         $query = GiftLog::with(['gift', 'sender', 'receiver']);
 
         // Apply filters
-        if (!empty($filters['sender_id'])) {
+        if (! empty($filters['sender_id'])) {
             $query->where('sender_id', $filters['sender_id']);
         }
 
-        if (!empty($filters['receiver_id'])) {
+        if (! empty($filters['receiver_id'])) {
             $query->where('receiver_id', $filters['receiver_id']);
         }
 
-        if (!empty($filters['gift_id'])) {
+        if (! empty($filters['gift_id'])) {
             $query->where('giftId', $filters['gift_id']);
         }
 
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->where('created_at', '>=', $filters['date_from']);
         }
 
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->where('created_at', '<=', $filters['date_to']);
         }
 
@@ -130,8 +122,7 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param int $giftId
+     * @param  int  $giftId
      * @return mixed
      */
     public function getGift($giftId)
@@ -140,7 +131,6 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
      * @return Collection
      */
     public function getAllGifts()
@@ -154,7 +144,6 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
      * @return Collection
      */
     public function getGiftCategories()
@@ -167,30 +156,29 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param int $userId
-     * @param int $giftId
-     * @param int $quantity
+     * @param  int  $userId
+     * @param  int  $giftId
+     * @param  int  $quantity
      * @return bool
      */
     public function canSendGift($userId, $giftId, $quantity = 1)
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return false;
         }
-        
+
         $user = $userModel::find($userId);
         $gift = Gift::find($giftId);
 
-        if (!$user || !$gift) {
+        if (! $user || ! $gift) {
             return false;
         }
 
         $totalPrice = $gift->price * $quantity;
         // استخدام di بدلاً من coins
-        if (!isset($user->di) || $user->di < $totalPrice) {
+        if (! isset($user->di) || $user->di < $totalPrice) {
             return false;
         }
 
@@ -201,7 +189,7 @@ class GiftsService implements GiftsContract, AppGiftsContract
 
         if ($gift->vip_level > 0) {
             $vipTrait = ModelResolver::getTrait('vip_level');
-            
+
             if ($vipTrait && in_array($vipTrait, class_uses($user))) {
                 if ($user->vip_level < $gift->vip_level) {
                     return false;
@@ -215,16 +203,14 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param string $type
-     * @param array $filters
+     * @param  string  $type
      * @return mixed
      */
     public function getGiftRankings($type, array $filters = [])
     {
         $query = GiftRanking::with('ranker')->where('type', $type);
 
-        if (!empty($filters['role'])) {
+        if (! empty($filters['role'])) {
             $query->where('role', $filters['role']);
         }
 
@@ -234,8 +220,6 @@ class GiftsService implements GiftsContract, AppGiftsContract
     }
 
     /**
-     * 
-     * @param array $data
      * @return mixed
      */
     public function createGiftLog(array $data)

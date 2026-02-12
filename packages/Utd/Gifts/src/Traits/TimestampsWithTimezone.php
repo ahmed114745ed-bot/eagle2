@@ -6,48 +6,43 @@ use Illuminate\Support\Carbon;
 
 /**
  * TimestampsWithTimezone
- * 
  */
 trait TimestampsWithTimezone
 {
     /**
-     * 
-     * @param mixed $value
+     * @param  mixed  $value
      * @return string
      */
     public function getCreatedAtAttribute($value)
     {
         $tz = $this->getTimezone();
+
         return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
     /**
-     * 
-     * @param mixed $value
+     * @param  mixed  $value
      * @return string
      */
     public function getUpdatedAtAttribute($value)
     {
         $tz = $this->getTimezone();
+
         return Carbon::parse($value)->setTimezone($tz)->format('Y-m-d H:i:s');
     }
 
-    /**
-     * 
-     * @return string
-     */
     protected function getTimezone(): string
     {
         $tz = request()->header('tz', 'UTC');
-        
-        if (function_exists('isValidTimezone') && !isValidTimezone($tz)) {
+
+        if (function_exists('isValidTimezone') && ! isValidTimezone($tz)) {
             return 'UTC';
         }
-        
-        if (!in_array($tz, timezone_identifiers_list())) {
+
+        if (! in_array($tz, timezone_identifiers_list())) {
             return 'UTC';
         }
-        
+
         return $tz;
     }
 }

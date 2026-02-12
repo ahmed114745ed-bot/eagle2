@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Listeners;
 
-use Utd\Gifts\Events\GiftSent;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Helpers\CustomNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Utd\Gifts\Events\GiftSent;
 
 class SendGiftNotification implements ShouldQueue
 {
@@ -14,7 +14,7 @@ class SendGiftNotification implements ShouldQueue
     {
         foreach ($event->logs as $log) {
             // Send notification based on source type
-            match($event->dto->sourceType) {
+            match ($event->dto->sourceType) {
                 'room' => $this->notifyRoomGift($event, $log),
                 'moment' => $this->notifyMomentGift($event, $log),
                 'reel' => $this->notifyReelGift($event, $log),

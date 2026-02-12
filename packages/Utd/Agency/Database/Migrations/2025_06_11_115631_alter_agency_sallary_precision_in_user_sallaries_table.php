@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
     {
         $columns = ['agency_sallary', 'sallary', 'cut_amount', 'db', 'app_profit'];
-        
+
         foreach ($columns as $column) {
             if (Schema::hasColumn('user_sallaries', $column)) {
                 Schema::table('user_sallaries', function (Blueprint $table) use ($column) {

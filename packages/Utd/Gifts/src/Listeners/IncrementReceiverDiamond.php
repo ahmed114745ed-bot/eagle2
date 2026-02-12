@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Listeners;
 
-use Utd\Gifts\Events\GiftSent;
 use App\Jobs\IncreaseDiamondJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Utd\Gifts\Events\GiftSent;
 
 class IncrementReceiverDiamond implements ShouldQueue
 {

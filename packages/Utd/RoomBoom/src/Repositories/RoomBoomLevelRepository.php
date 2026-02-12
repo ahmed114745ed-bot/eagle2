@@ -15,19 +15,19 @@ class RoomBoomLevelRepository
 
         return RoomBoomLevel::with([
             'roomBoomRewards' => function ($query) {
-            $query->orderBy('priority');
-        },
+                $query->orderBy('priority');
+            },
             'roomBooms' => function ($query) use ($roomId, $today) {
                 $query->whereHas('totalRoomGift', function ($q) use ($roomId) {
                     $q->where('room_id', $roomId);
                 })
-                ->whereDate('started_at', $today);
-        },
+                    ->whereDate('started_at', $today);
+            },
         ])->orderBy('level')->get();
     }
 
     public function getVideos(): \Illuminate\Support\Collection
     {
-        return RoomBoomLevel::select(['id', 'level', 'video'])->with(['roomBoomRewards','roomBooms'])->orderBy('level')->get();
+        return RoomBoomLevel::select(['id', 'level', 'video'])->with(['roomBoomRewards', 'roomBooms'])->orderBy('level')->get();
     }
 }

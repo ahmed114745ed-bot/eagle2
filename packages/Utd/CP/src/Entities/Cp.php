@@ -51,13 +51,8 @@ class Cp extends Model
         });
     }
 
-
     protected static function booted()
     {
-        static::created(function ($cp) {
-
-        });
+        static::created(function ($cp) {});
     }
-
 }
-

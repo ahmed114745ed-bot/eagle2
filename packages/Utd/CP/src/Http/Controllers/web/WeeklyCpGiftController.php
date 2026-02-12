@@ -2,25 +2,27 @@
 
 namespace Utd\CP\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
+use App\Selectables\Badges;
+use App\Selectables\WaresByType;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
-use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
-use App\Services\AppFeatureService;
-use Utd\CP\Entities\WeeklyCpGift;
 use Modules\Events\Entities\WeeklyStar;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
+use Utd\CP\Entities\WeeklyCpGift;
 
 class WeeklyCpGiftController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'weekly_cp_gift';
+
     public function __construct()
     {
         $weekly_cp_id = request('weekly_cp_id');
@@ -30,6 +32,7 @@ class WeeklyCpGiftController extends MainController
         //     (new AppFeatureService)->validateStatusEnable("weekly_cp");
         // }
     }
+
     public function index(Content $content)
     {
         $url = url('/admin/weekly-cp'); // Define your button URL
@@ -39,6 +42,7 @@ class WeeklyCpGiftController extends MainController
         <i class="fa fa-arrow-left"></i> رجوع
     </a>
     HTML;
+
         return $content
             ->header(trans('admin.index'))
             ->description(trans('admin.description'))
@@ -50,8 +54,8 @@ class WeeklyCpGiftController extends MainController
             ->row($this->grid2()) // Second grid
             ->row($this->grid3()); // Third grid
 
-
     }
+
     public function create(Content $content)
     {
         return $content
@@ -63,12 +67,14 @@ class WeeklyCpGiftController extends MainController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
     }
 
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+
         return $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
@@ -82,6 +88,7 @@ class WeeklyCpGiftController extends MainController
             ->description(trans('admin.description'))
             ->body($this->detail($id));
     }
+
     protected function grid1()
     {
         $type = 1;
@@ -89,20 +96,25 @@ class WeeklyCpGiftController extends MainController
         $grid = new Grid(new WeeklyCpGift());
         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
+        $grid->model()->where('weekly_cp_id', $weekly_cp_id)->where('level', $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if (@$this->type == "ware") {
+            if (@$this->type === 'ware') {
                 return @$this->ware->name;
-            } elseif (@$this->type == "vip") {
+            }
+            if (@$this->type === 'vip') {
                 return @$this->vip->name;
-            } elseif (@$this->type == "coins") {
+            }
+            if (@$this->type === 'coins') {
                 return @$this->target;
-            }  elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif (@$this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if (@$this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
@@ -113,7 +125,7 @@ class WeeklyCpGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('weekly_cp_id') . "/1/create";
+            $url = request()->route('weekly_cp_id').'/1/create';
             $customButtonHTML = <<<HTML
 
                 <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
@@ -123,6 +135,7 @@ class WeeklyCpGiftController extends MainController
             HTML;
             $tools->append($customButtonHTML);
         });
+
         return $grid;
     }
 
@@ -133,20 +146,25 @@ class WeeklyCpGiftController extends MainController
         $grid = new Grid(new WeeklyCpGift());
         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
+        $grid->model()->where('weekly_cp_id', $weekly_cp_id)->where('level', $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name;
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name;
-             } elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
@@ -157,7 +175,7 @@ class WeeklyCpGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('weekly_cp_id') . "/2/create";
+            $url = request()->route('weekly_cp_id').'/2/create';
             $customButtonHTML = <<<HTML
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>ضيف
@@ -177,20 +195,25 @@ class WeeklyCpGiftController extends MainController
         $grid = new Grid(new WeeklyCpGift());
         $grid->disableRowSelector();
         $grid->column('created_at')->hide();
-        $grid->model()->where("weekly_cp_id", $weekly_cp_id)->where("level", $type);
+        $grid->model()->where('weekly_cp_id', $weekly_cp_id)->where('level', $type);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name;
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name;
-            }elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
@@ -201,7 +224,7 @@ class WeeklyCpGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('weekly_cp_id') . "/3/create";
+            $url = request()->route('weekly_cp_id').'/3/create';
             $customButtonHTML = <<<HTML
             <a href="{$url}" class="btn btn-sm btn-success" style="margin-right: 10px;">
                 <i class="fa fa-plus"></i>ضيف
@@ -242,17 +265,17 @@ class WeeklyCpGiftController extends MainController
     protected function addTypeField(Form $form)
     {
         $typeOptions = [
-            "ware" => __('ware'),
-            "vip" => __('vip'),
-            "badge" => __('badge'),
-            "coins" => __('coins'),
+            'ware' => __('ware'),
+            'vip' => __('vip'),
+            'badge' => __('badge'),
+            'coins' => __('coins'),
         ];
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
         $form->select('type', trans('type'))->options($typeOptions)->when('ware', function () use ($form) {
             $this->addWareField($form);
-        })->when("badge", function () use ($form) {
+        })->when('badge', function () use ($form) {
             $this->addBadgeField($form);
         })->when('vip', function () use ($form) {
             $this->addVipField($form);
@@ -267,16 +290,19 @@ class WeeklyCpGiftController extends MainController
     {
         $prefix = 'badges';
         $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
+            $form->setElementName($prefix.'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Badge::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -292,16 +318,19 @@ class WeeklyCpGiftController extends MainController
     {
         $prefix = 'wares';
         $form->belongsTo('target', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target')
+            $form->setElementName($prefix.'target')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Ware::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -322,6 +351,7 @@ class WeeklyCpGiftController extends MainController
             foreach ($vips as $vip) {
                 $ops[$vip->id] = $vip->name;
             }
+
             return $ops;
         });
     }
@@ -331,7 +361,7 @@ class WeeklyCpGiftController extends MainController
      */
     protected function addCoinsField(Form $form)
     {
-        $form->number("target3", __("coins"));
+        $form->number('target3', __('coins'));
     }
 
     /**
@@ -339,8 +369,8 @@ class WeeklyCpGiftController extends MainController
      */
     protected function addAchievementField(Form $form)
     {
-        $form->image("target4", __('image'))->name(function ($file) {
-            return now()->timestamp . '.' . $file->guessExtension();
+        $form->image('target4', __('image'))->name(function ($file) {
+            return now()->timestamp.'.'.$file->guessExtension();
         })->disk('gcs');
     }
 
@@ -360,7 +390,7 @@ class WeeklyCpGiftController extends MainController
         $form->select('gender', __('gender'))->options([
             'all' => __('all'),
             'male' => __('Male'),
-            'female' => __('Female')
+            'female' => __('Female'),
         ])->required();
     }
 
@@ -370,7 +400,8 @@ class WeeklyCpGiftController extends MainController
     protected function addSavedRedirect(Form $form)
     {
         $form->saved(function (Form $form) {
-            $route = url('admin/weekly-cp-gift/' . request('weekly_cp_id'));
+            $route = url('admin/weekly-cp-gift/'.request('weekly_cp_id'));
+
             return redirect($route);
         });
     }

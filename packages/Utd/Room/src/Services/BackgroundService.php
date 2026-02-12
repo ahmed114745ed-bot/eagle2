@@ -2,6 +2,7 @@
 
 namespace Utd\Room\Services;
 
+use Exception;
 use Utd\Room\Repositories\BackgroundRepository;
 use Utd\Room\Repositories\RoomRepository;
 
@@ -10,8 +11,7 @@ class BackgroundService
     public function __construct(
         protected BackgroundRepository $backgroundRepository,
         protected RoomRepository $roomRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get all enabled backgrounds
@@ -35,9 +35,9 @@ class BackgroundService
     public function setRoomBackground($roomId, $backgroundId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
-            throw new \Exception(__('Room not found'));
+
+        if (! $room) {
+            throw new Exception(__('Room not found'));
         }
 
         $room->room_background = $backgroundId;

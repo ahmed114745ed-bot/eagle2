@@ -2,6 +2,7 @@
 
 namespace Utd\Room\Repositories;
 
+use DB;
 use Utd\Room\Entities\RoomMicrophone;
 
 class RoomMicrophoneRepository extends AbstractRepository
@@ -54,7 +55,7 @@ class RoomMicrophoneRepository extends AbstractRepository
 
     public function getByRoomIds(array $roomIds, array $columns = ['room_id', 'user_id', 'position'])
     {
-        return \DB::table('room_microphones')
+        return DB::table('room_microphones')
             ->whereIn('room_id', $roomIds)
             ->orderBy('position')
             ->get($columns);

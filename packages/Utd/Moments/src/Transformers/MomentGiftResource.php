@@ -22,7 +22,7 @@ class MomentGiftResource extends JsonResource
         return [
             'name' => $this->user->name ?? '',
             'avatar' => $this->user->profile->avatar ?? '',
-            'description' => __('source:') . $sourceName . ' ' . __('gift:') . $giftName,
+            'description' => __('source:').$sourceName.' '.__('gift:').$giftName,
             'id_moment' => $this->moment_id,
             'created_at' => $formattedDate,
             'diamond' => $this->total ?? 0,

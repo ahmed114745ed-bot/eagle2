@@ -2,9 +2,10 @@
 
 namespace Utd\Agency\Console;
 
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class UninstallAgencyCommand extends Command
 {
@@ -37,7 +38,7 @@ class UninstallAgencyCommand extends Command
         $this->info('');
 
         // Confirm uninstallation
-        if (!$this->option('force')) {
+        if (! $this->option('force')) {
             if ($this->option('remove-data')) {
                 $this->warn('⚠️  WARNING: --remove-data option will delete all Agency data!');
                 $this->warn('   This action cannot be undone.');
@@ -47,8 +48,9 @@ class UninstallAgencyCommand extends Command
             }
             $this->info('');
 
-            if (!$this->confirm('Are you sure you want to uninstall the Agency package?')) {
+            if (! $this->confirm('Are you sure you want to uninstall the Agency package?')) {
                 $this->info('Uninstallation cancelled.');
+
                 return Command::SUCCESS;
             }
         }
@@ -83,14 +85,13 @@ class UninstallAgencyCommand extends Command
         $this->info('   ✅ Caches cleared.');
 
         // Step 5: Remove admin menu
-        if (!$this->option('keep-menu')) {
+        if (! $this->option('keep-menu')) {
             $this->info('🗑️  Step 5/5: Removing admin menu items...');
             $this->removeAdminMenu();
             $this->info('   ✅ Admin menu removed.');
         } else {
             $this->info('⏭️  Skipping admin menu removal (--keep-menu option)');
         }
-        ;
 
         $this->info('');
         $this->info('╔════════════════════════════════════════════════════════════╗');
@@ -120,8 +121,8 @@ class UninstallAgencyCommand extends Command
         foreach ($triggers as $trigger) {
             try {
                 DB::unprepared("DROP TRIGGER IF EXISTS {$trigger}");
-            } catch (\Exception $e) {
-                $this->warn("   ⚠️  Could not drop trigger {$trigger}: " . $e->getMessage());
+            } catch (Exception $e) {
+                $this->warn("   ⚠️  Could not drop trigger {$trigger}: ".$e->getMessage());
             }
         }
     }
@@ -146,8 +147,8 @@ class UninstallAgencyCommand extends Command
                             Schema::table($table, function ($t) use ($column) {
                                 $t->dropColumn($column);
                             });
-                        } catch (\Exception $e) {
-                            $this->warn("   ⚠️  Could not drop {$table}.{$column}: " . $e->getMessage());
+                        } catch (Exception $e) {
+                            $this->warn("   ⚠️  Could not drop {$table}.{$column}: ".$e->getMessage());
                         }
                     }
                 }
@@ -185,8 +186,8 @@ class UninstallAgencyCommand extends Command
             if (Schema::hasTable($table)) {
                 try {
                     Schema::drop($table);
-                } catch (\Exception $e) {
-                    $this->warn("   ⚠️  Could not drop table {$table}: " . $e->getMessage());
+                } catch (Exception $e) {
+                    $this->warn("   ⚠️  Could not drop table {$table}: ".$e->getMessage());
                 }
             }
         }
@@ -218,8 +219,9 @@ class UninstallAgencyCommand extends Command
             })
             ->first();
 
-        if (!$agencySystemMenu) {
+        if (! $agencySystemMenu) {
             $this->info('   ℹ️  No Agency menu found to remove.');
+
             return;
         }
 
@@ -253,19 +255,19 @@ class UninstallAgencyCommand extends Command
     protected function removeMigrationHistory(): void
     {
         $migrationPath = base_path('packages/Utd/Agency/Database/Migrations');
-        if (!is_dir($migrationPath)) {
+        if (! is_dir($migrationPath)) {
             return;
         }
 
-        $files = glob($migrationPath . '/*.php');
+        $files = glob($migrationPath.'/*.php');
         $migrationsToRemove = [];
 
         foreach ($files as $file) {
             $migrationsToRemove[] = basename($file, '.php');
         }
 
-        if (!empty($migrationsToRemove)) {
-            $affected = \Illuminate\Support\Facades\DB::table('migrations')
+        if (! empty($migrationsToRemove)) {
+            $affected = DB::table('migrations')
                 ->whereIn('migration', $migrationsToRemove)
                 ->delete();
 

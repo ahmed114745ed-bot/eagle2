@@ -14,7 +14,7 @@ class AddMicsToPks extends Migration
     public function up()
     {
         Schema::table('pks', function (Blueprint $table) {
-            $table->string ('mics')->nullable ()->default ('0,0,0,0,0,0,0,0');
+            $table->string('mics')->nullable()->default('0,0,0,0,0,0,0,0');
         });
     }
 

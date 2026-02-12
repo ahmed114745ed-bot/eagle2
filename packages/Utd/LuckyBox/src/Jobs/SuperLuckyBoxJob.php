@@ -5,9 +5,7 @@ namespace Utd\LuckyBox\Jobs;
 use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use App\Helpers\LogHelper;
 use App\Helpers\UserCoinLogHelper;
-use Utd\Room\Entities\RoomVisitor;
 use App\Models\User;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Promise\Utils;
@@ -17,11 +15,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\LuckyBox\Entities\PickBoxList;
 use Utd\LuckyBox\Entities\UserBoxGift;
 use Utd\LuckyBox\Services\LuckyBoxServices;
+use Utd\Room\Entities\RoomVisitor;
 
 class SuperLuckyBoxJob implements ShouldQueue
 {
@@ -105,13 +103,13 @@ class SuperLuckyBoxJob implements ShouldQueue
 
             $amountBefore = $box->user?->di;
             UserCoinLogHelper::logByType(
-                 $box?->user?->id,
-                 $box->unused_coins,
-                 $amountBefore,
+                $box?->user?->id,
+                $box->unused_coins,
+                $amountBefore,
                 UserCoinLogType::LUCK_BOX,
-                 null,
-                 0,
-                 now(),
+                null,
+                0,
+                now(),
                 now(),
             );
             // Refund remaining coins to box owner
@@ -127,7 +125,6 @@ class SuperLuckyBoxJob implements ShouldQueue
         $remainingBoxCount = BoxUse::where('room_uid', $box->room_uid)->where('not_used_num', '>', 0)->count();
 
         $roomId = $box->roomV2?->id ?? 0;
-
 
         $js[] = $this->hideLuckyBoxForAllUsers($box->user, $box, $remainingBoxCount);
         if ($winners) {
@@ -165,7 +162,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'winners' => $winners,
             ],
         ];
-     
+
         return json_encode($payload);
     }
 
@@ -182,7 +179,7 @@ class SuperLuckyBoxJob implements ShouldQueue
                 'numOfBoxes' => $remaining,
             ],
         ];
-     
+
         return json_encode($payload);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Utd\Agency\Repositories;
 
-use Utd\Agency\Entities\AgencySalary;
 use Illuminate\Support\Facades\DB;
+use Utd\Agency\Entities\AgencySalary;
 
 class AgencySalaryRepository
 {
@@ -36,12 +36,13 @@ class AgencySalaryRepository
     public function update($id, array $data)
     {
         $salary = $this->findById($id);
-        
+
         if ($salary) {
             $salary->update($data);
+
             return $salary->fresh();
         }
-        
+
         return null;
     }
 
@@ -109,12 +110,13 @@ class AgencySalaryRepository
     public function markAsPaid($id)
     {
         $salary = $this->findById($id);
-        
+
         if ($salary) {
             $salary->is_paid = 1;
+
             return $salary->save();
         }
-        
+
         return false;
     }
 

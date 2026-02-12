@@ -2,15 +2,15 @@
 
 namespace Utd\Agency\Traits;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Utd\Agency\Entities\AdditionalInfo;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Entities\UsersJoinedAgency;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 trait AgencyRelationsTrait
 {

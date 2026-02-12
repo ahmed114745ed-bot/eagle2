@@ -2,25 +2,27 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
-use App\Models\User;
 use App\Models\Gift;
+use App\Models\User;
 use App\Traits\Gifts\WinLuckyGift;
+use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Controllers\AdminController;
-use Utd\Room\Entities\CustomZegoMessage;
 use Utd\Room\Admin\Actions\ResendZegoMessageAction;
+use Utd\Room\Entities\CustomZegoMessage;
 
 class CustomZegoMessageController extends AdminController
 {
+    use WinLuckyGift;
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'CustomZegoMessage';
-    use WinLuckyGift;
+
     /**
      * Make a grid builder.
      *
@@ -37,13 +39,14 @@ class CustomZegoMessageController extends AdminController
         $grid->actions(function ($actions) {
             $actions->add(new ResendZegoMessageAction());
         });
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -73,8 +76,9 @@ class CustomZegoMessageController extends AdminController
         $form->select('gift_id', __('gifts'))->options(function ($value) {
             $ops = [];
             foreach (Gift::where('type', 6)->get() as $gift) {
-                $ops[$gift->id] = $gift->name . ' - ' . $gift->id . ' - ' . $gift->price;
+                $ops[$gift->id] = $gift->name.' - '.$gift->id.' - '.$gift->price;
             }
+
             return $ops;
         })->required();
         $form->number('percentage', __('Percentage'));
@@ -84,26 +88,27 @@ class CustomZegoMessageController extends AdminController
             $room = $user->ownerRoom;
 
             $zigoData = [
-                'user_id'      => $user->id,
-                'user_image'   => @$user->profile->avatar ?? '',
-                'gift_image'   => @$gift->img ?? '',
-                'owner_id'     => $user->id,
-                'user_name'    => $user->name ?? '',
-                'room_id'      => $room->id,
-                'percentage'   => $form->percentage,
-                'is_room_pass' => ($room->room_pass != null && $room->room_pass != ''),
-                'gift_price'   => @$gift->price,
-                'room_name'    => $room->room_name ?: '',
-                'room_cover'   => $room->room_cover ?? '',
-                'room_background'   => $room->final_room_image ?? '',
-                'room_mode'   =>  $room->mode,
-                'room_uuid'   => $room->owner?->uuid ?: 0,
-                'room_owner_id'   => $room->uid ?: 0,
-                'is_password'   =>  (bool)(@$room->room_pass),
+                'user_id' => $user->id,
+                'user_image' => @$user->profile->avatar ?? '',
+                'gift_image' => @$gift->img ?? '',
+                'owner_id' => $user->id,
+                'user_name' => $user->name ?? '',
+                'room_id' => $room->id,
+                'percentage' => $form->percentage,
+                'is_room_pass' => ($room->room_pass !== null && $room->room_pass !== ''),
+                'gift_price' => @$gift->price,
+                'room_name' => $room->room_name ?: '',
+                'room_cover' => $room->room_cover ?? '',
+                'room_background' => $room->final_room_image ?? '',
+                'room_mode' => $room->mode,
+                'room_uuid' => $room->owner?->uuid ?: 0,
+                'room_owner_id' => $room->uid ?: 0,
+                'is_password' => (bool) (@$room->room_pass),
 
             ];
             $this->sendToZegoLuckyGift($zigoData);
         });
+
         return $form;
     }
 }

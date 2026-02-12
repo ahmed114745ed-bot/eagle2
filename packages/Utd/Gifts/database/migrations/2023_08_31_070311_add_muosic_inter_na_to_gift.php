@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('gifts', function (Blueprint $table) {
             $table->boolean('music_gift')->default(false);
             $table->boolean('international_gift')->default(false);
-       
+
         });
     }
 
@@ -24,11 +24,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('gifts', function (Blueprint $table) {
-          
+
             $table->dropColumn('music_gift');
             $table->dropColumn('international_gift');
 
-       
         });
     }
 };

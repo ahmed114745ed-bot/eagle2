@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('real_categories')) {
+        if (! Schema::hasTable('real_categories')) {
             Schema::create('real_categories', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('real_id');
                 $table->unsignedBigInteger('category_id');
                 $table->timestamps();
-                
+
                 // Only add foreign keys if referenced tables exist
                 if (Schema::hasTable('reals')) {
                     $table->foreign('real_id')->references('id')->on('reals')->onDelete('cascade');

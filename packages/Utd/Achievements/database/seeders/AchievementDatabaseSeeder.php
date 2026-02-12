@@ -2,8 +2,8 @@
 
 namespace Utd\Achievements\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 
 class AchievementDatabaseSeeder extends Seeder
 {
@@ -17,9 +17,9 @@ class AchievementDatabaseSeeder extends Seeder
         Model::unguard();
 
         $this->call([
-            MenuAchievementSeeder::class
+            MenuAchievementSeeder::class,
         ]);
-//        $this->call(AchievementTableSeeder::class);
-//        $this->call(AchievementLevelTableSeeder::class);
+        //        $this->call(AchievementTableSeeder::class);
+        //        $this->call(AchievementLevelTableSeeder::class);
     }
 }

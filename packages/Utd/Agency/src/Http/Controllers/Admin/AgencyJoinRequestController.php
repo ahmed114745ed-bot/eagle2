@@ -3,36 +3,34 @@
 namespace Utd\Agency\Http\Controllers\Admin;
 
 use Carbon\Carbon;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
-use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\UsersJoinedAgency;
-use Encore\Admin\Actions\Response;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Agency\Entities\AgencyJoinRequest;
+use Utd\Agency\Entities\UsersJoinedAgency;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyJoinRequestController extends MainController
 {
     use HasResourceActions;
     use ResolvesExternalDependencies;
-    
+
     public $permission_name = 'agencies-join-requests';
 
     public function update($id)
     {
 
-        if (request('_edit_inline') == "true") {
+        if (request('_edit_inline') === 'true') {
             if (request('status')) {
                 request()->request->add(['change_status_admin_id' => Auth::id()]);
             }
         }
+
         return $this->form()->update($id);
     }
 
@@ -46,8 +44,7 @@ class AgencyJoinRequestController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -60,8 +57,7 @@ class AgencyJoinRequestController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -78,7 +74,6 @@ class AgencyJoinRequestController extends MainController
             ->body($this->form()));
     }
 
-
     /**
      * Make a grid builder.
      *
@@ -88,14 +83,12 @@ class AgencyJoinRequestController extends MainController
     {
 
         $grid = new Grid(new AgencyJoinRequest);
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
-
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
 
         $grid->model()
-            ->when($countryID, fn($q) =>
-            $q->where(function ($q) use ($countryID) {
-                $q->whereHas('user', fn($q) => $q->whereIn('country_id', $countryID))
-                    ->orWhereHas('agency', fn($q) => $q->whereIn('country_id', $countryID));
+            ->when($countryID, fn ($q) => $q->where(function ($q) use ($countryID) {
+                $q->whereHas('user', fn ($q) => $q->whereIn('country_id', $countryID))
+                    ->orWhereHas('agency', fn ($q) => $q->whereIn('country_id', $countryID));
             }))
             ->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
@@ -103,7 +96,7 @@ class AgencyJoinRequestController extends MainController
 
             $filter->where(function ($query) {
                 $query->whereHas('user', function ($q) {
-                    $q->where('uuid', 'like', '%' . $this->input . '%');
+                    $q->where('uuid', 'like', '%'.$this->input.'%');
                 });
             }, __('uuid'), 'text')->placeholder('ادخل UUID')->default('');
 
@@ -120,15 +113,15 @@ class AgencyJoinRequestController extends MainController
             ->display(function ($name) {
                 $uid = @$this->user->uuid;
                 $path = @$this->user?->profile?->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-                $showUrl = $this->user ? url("admin/users/{$this->user->id}") : "#";
+                $showUrl = $this->user ? url("admin/users/{$this->user->id}") : '#';
 
                 return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -144,11 +137,11 @@ class AgencyJoinRequestController extends MainController
         $grid->column('agency.name', __('Agency'))
             ->display(function ($name) {
                 $path = @$this->agency->img;
-                $defaultImage = asset("images/icon-agency.jpg");
+                $defaultImage = asset('images/icon-agency.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
                 $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -163,7 +156,9 @@ class AgencyJoinRequestController extends MainController
             ";
             });
         $grid->column('user.phone', __('whatsapp'))->display(function ($number) {
-            if (!$number) return '-';
+            if (! $number) {
+                return '-';
+            }
 
             $iconUrl = asset('images/whatsapp.png'); // Adjust the path based on your actual file location
 
@@ -193,18 +188,18 @@ class AgencyJoinRequestController extends MainController
             ->display(function () {
                 $admin = Admin::find($this->change_status_admin_id) ?? User::find($this->change_status_admin_id);
 
-                if (!$admin) {
+                if (! $admin) {
                     return '-';
                 }
 
                 $name = $admin->name ?? 'Unknown';
                 $uid = $admin->uuid ?? 'N/A';
                 $path = @$admin->profile?->avatar ?? @$admin->avatar;
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
                 // Check if the image exists
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
@@ -228,16 +223,16 @@ class AgencyJoinRequestController extends MainController
         // });
         $this->extendGrid($grid);
 
-
         $grid->disableCreateButton();
         $grid->disableExport();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -275,24 +270,24 @@ class AgencyJoinRequestController extends MainController
             [
                 0 => __('pending'),
                 1 => __('accepted'),
-                2 => __('denied')
+                2 => __('denied'),
             ]
-        );;
+        );
         $form->hidden('change_status_admin_id', 'change_status_admin_id');
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
 
-
-            if ($form->model()->status == 1) {
+            if ($form->model()->status === 1) {
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if (($user->agency_id)) {
                     $error = new MessageBag(
                         [
-                            'title'   => 'forbidden',
+                            'title' => 'forbidden',
                             'message' => 'user already in agency',
                         ]
                     );
+
                     return back()->with(compact('error'));
                 }
                 // UserCommon::userVip($user,'agency-join-dash');
@@ -303,13 +298,13 @@ class AgencyJoinRequestController extends MainController
                     'agency_id' => $form->model()->agency_id,
                     'type' => 2,
                 ])->where('leave_date', null)->exists();
-                if (!$checkAgencyUser) {
+                if (! $checkAgencyUser) {
                     UsersJoinedAgency::create([
                         'user_id' => $user_id,
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
-                        'status' => 'Joined'
+                        'status' => 'Joined',
                     ]);
                 }
 
@@ -317,8 +312,7 @@ class AgencyJoinRequestController extends MainController
                     ->where('id', $user_id)
                     ->update(['type_user' => 1]);
 
-
-                if (!$update) {
+                if (! $update) {
                     $error = new MessageBag([
                         'title' => 'Error',
                         'message' => 'Failed to update user',
@@ -328,7 +322,6 @@ class AgencyJoinRequestController extends MainController
                 uploadMonthlyDiamondReceive($user_id, 0);
             }
         });
-
 
         return $form;
     }

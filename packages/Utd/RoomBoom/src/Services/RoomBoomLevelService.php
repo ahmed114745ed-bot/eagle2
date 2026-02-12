@@ -7,9 +7,7 @@ use Utd\RoomBoom\Repositories\RoomBoomLevelRepository;
 
 class RoomBoomLevelService
 {
-    public function __construct(private readonly RoomBoomLevelRepository $roomBoomLevelRepository)
-    {
-    }
+    public function __construct(private readonly RoomBoomLevelRepository $roomBoomLevelRepository) {}
 
     public function index($id): Collection|array
     {

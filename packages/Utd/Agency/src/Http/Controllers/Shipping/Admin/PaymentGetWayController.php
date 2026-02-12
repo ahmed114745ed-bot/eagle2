@@ -2,7 +2,6 @@
 
 namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
-
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -13,6 +12,7 @@ use Utd\Agency\Traits\ResolvesExternalDependencies;
 class PaymentGetWayController extends MainController
 {
     use ResolvesExternalDependencies;
+
     /**
      * Title for current resource.
      *
@@ -30,13 +30,12 @@ class PaymentGetWayController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('payment-gateways'))
             ->body($this->detail($id)));
     }
@@ -44,13 +43,12 @@ class PaymentGetWayController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('payment-gateways'))
             ->body($this->form()->edit($id)));
     }
@@ -61,8 +59,6 @@ class PaymentGetWayController extends MainController
             ->title(trans('payment-gateways'))
             ->body($this->form()));
     }
-
-
 
     /**
      * Make a grid builder.
@@ -77,13 +73,14 @@ class PaymentGetWayController extends MainController
         $grid->column('title', __('title'));
         $grid->column('photo', __('Photo'))->image('', 50);
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

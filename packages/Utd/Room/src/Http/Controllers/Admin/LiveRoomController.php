@@ -3,35 +3,38 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\Admin as AdminModel;
 use App\Models\KickRecord;
-use App\Support\PackageHelper;
-use Utd\Pk\Entities\Pk;
-use Utd\Room\Entities\Room;
 use App\Models\User;
+use App\Support\PackageHelper;
+use DB;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use App\Helpers\Common;
-use Utd\Room\Entities\EnteredRoom;
-use Utd\Room\Entities\RoomCategory;
 use Encore\Admin\Widgets\Box;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Encore\Admin\Facades\Admin;
-use App\Models\Admin as AdminModel;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Support\Facades\Cache;
 use Utd\LuckyBox\Entities\BoxUse;
+use Utd\Pk\Entities\Pk;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomCategory;
 
 class LiveRoomController extends \App\Admin\Controllers\MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'rooms';
 
-    static $usersCache;
-    protected static $microphoneCache = [];
+    public static $usersCache;
 
+    protected static $microphoneCache = [];
 
     public function index(Content $content)
     {
@@ -52,11 +55,9 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
-
     public function show($id, Content $content)
     {
         $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
@@ -92,7 +93,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         // Mic positions
         $micPositions = [];
         $microphones = $room->microphones
-            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->filter(fn ($mic) => ! is_null($mic->user_id) && $mic->user_id > 0)
             ->sortBy('position')
             ->values();
         foreach ($microphones as $mic) {
@@ -106,15 +107,15 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             foreach ($blackListItems as $item) {
                 $parts = explode('#', $item);
                 if (count($parts) === 3) {
-                    $userId   = $parts[0];
+                    $userId = $parts[0];
                     $kickTime = $parts[1];
                     $duration = $parts[2];
                     $endTime = $kickTime + $duration;
                     if (time() < $endTime) {
                         $blackList[$userId] = [
                             'kick_time' => $kickTime,
-                            'duration'  => $duration / 60, // minutes
-                            'remaining' => ceil(($endTime - time()) / 60) // min remaining
+                            'duration' => $duration / 60, // minutes
+                            'remaining' => ceil(($endTime - time()) / 60), // min remaining
                         ];
                     }
                 }
@@ -128,6 +129,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             ->map(function ($visitor) use ($micPositions, $blackList) {
                 $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
                 $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
+
                 return $visitor;
             })
             ->sortBy(function ($visitor) {
@@ -195,22 +197,22 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
-                'room'          => $room,
-                'admins'        => $admins,
-                'gifts'         => $gifts,
+                'room' => $room,
+                'admins' => $admins,
+                'gifts' => $gifts,
                 'totalDiamonds' => $totalDiamonds,
-                'visitors'      => $visitors,
-                'pks'           => $pks,
-                'boxes'         => $boxes,
-                'roomTypes'     => $roomTypes,
-                'roomModes'     => $roomModes
+                'visitors' => $visitors,
+                'pks' => $pks,
+                'boxes' => $boxes,
+                'roomTypes' => $roomTypes,
+                'roomModes' => $roomModes,
             ]));
     }
+
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -223,7 +225,6 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -233,15 +234,241 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             ->body($this->form()));
     }
 
+    public function updatePinStatus($id, Request $request)
+    {
+        try {
+            $room = Room::findOrFail($id);
+            $room->pin = request('pin');
+            $room->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => request('pin')
+                    ? 'Room pinned successfully'
+                    : 'Room unpinned successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating pin status: '.$e->getMessage(),
+            ]);
+        }
+    }
+
+    public function removeAdmin(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+        $adminId = $request->admin_id;
+
+        $admin = AdminModel::find($adminId);
+
+        $admins = array_filter(explode(',', $room->room_admin));
+
+        $admins = array_diff($admins, [$adminId]);
+
+        $room->room_admin = implode(',', $admins);
+        $room->save();
+
+        $adminName = $admin?->name ?? __('Unknown');
+        $comment = __(':name has been removed from administrators.', ['name' => $adminName]);
+
+        $d = [
+            'messageContent' => [
+                'message' => 'banAdmin',
+                'roomId' => $room->id,
+                'adminId' => $adminId,
+                'comment' => $comment,
+            ],
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Administrator removed successfully'),
+        ]);
+    }
+
+    public function addVisitor(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+
+        if ($room->roomVisitors()->where('user_id', $request->user_id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('User is already a visitor in this room'),
+            ]);
+        }
+
+        $room->roomVisitors()->create([
+            'user_id' => $request->user_id,
+            'created_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor added successfully'),
+        ]);
+    }
+
+    public function kickVisitor(Request $request, $roomId): JsonResponse
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+        $duration = $request->minutes ?? 5;
+
+        if ($visitorId === $room->uid) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick the room owner'),
+            ]);
+        }
+
+        if (Common::pack_get(9, $visitorId)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick this user'),
+            ]);
+        }
+
+        $blackList = $room->room_black;
+
+        if (empty($blackList)) {
+            $blackList = $visitorId.'#'.time().'#'.($duration * 60);
+        } else {
+            $list = explode(',', $blackList);
+            $newList = [];
+
+            foreach ($list as &$item) {
+                $black = explode('#', $item);
+                if (isset($black[0]) && $black[0] !== $visitorId && $item !== '') {
+                    $newList[] = $item;
+                }
+            }
+
+            $newList = array_filter($newList);
+
+            $blackList = implode(',', $newList) ?: null;
+        }
+
+        $room->room_black = $blackList;
+        $room->save();
+
+        Common::quit_hand($room->uid, $visitorId);
+
+        $user = User::find($visitorId);
+        if ($user) {
+            $user->now_room_uid = 0;
+            $user->save();
+        }
+
+        KickRecord::create([
+            'kicked_user_id' => auth()->id(),
+            'user_id' => $visitorId,
+            'room_id' => $room->id,
+            'type' => 'admin',
+        ]);
+
+        $message = __('api.blockRoom', [
+            'name' => $user->name ?? 'Unknown',
+            'actionName' => auth()->user()->name,
+            'duration' => $duration,
+        ], 'ar');
+
+        $d = [
+            'messageContent' => [
+                'message' => 'kickVisitorOut',
+                'duration' => $duration,
+                'visitorId' => $visitorId,
+                'comment' => $message,
+            ],
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        Common::calcTime($visitorId);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor kicked successfully'),
+        ]);
+    }
+
+    public function unbanVisitor(Request $request, $roomId): JsonResponse
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+
+        if (! $room->room_black) {
+            return response()->json(['success' => false, 'message' => __('User is not banned')]);
+        }
+
+        $list = explode(',', $room->room_black);
+        $newList = [];
+
+        foreach ($list as $item) {
+            $black = explode('#', $item);
+            if ($black[0] !== $visitorId) {
+                $newList[] = $item;
+            }
+        }
+
+        $room->room_black = implode(',', $newList);
+        $room->save();
+
+        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $userIds = $request->user_ids;
+
+        $users = User::whereIn('id', array_filter($userIds))
+            ->with('profile:user_id,avatar')
+            ->get(['id', 'name', 'uuid']);
+
+        $users = $users->map(function ($user) {
+            $avatar = $user->profile?->avatar ?? null;
+            $user->avatar_url = getImagePath($avatar);
+
+            return $user;
+        });
+
+        return response()->json($users);
+    }
+
+    public function updateBasicInfo(Request $request, $id)
+    {
+        $room = Room::findOrFail($id);
+
+        $room->room_name = $request->room_name;
+        $room->room_type = $request->room_type;
+        $room->max_admin = $request->max_admin;
+        $room->is_popular = $request->has('is_popular');
+        $room->is_top = $request->has('is_top');
+        $room->is_recommended = $request->has('is_recommended');
+        $room->secret_chat = $request->has('secret_chat');
+
+        $room->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Room updated successfully!'),
+        ]);
+    }
+
     protected function grid2()
     {
         $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function () {
             return settings()->get('make_rooms_top');
         });
-        return (new Box(
+
+        return new Box(
             title: __('admin.Actions'),
             content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
-        ));
+        );
     }
 
     /**
@@ -249,7 +476,6 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
      *
      * @return Grid
      */
-
     protected function grid()
     {
         $grid = new Grid(new Room);
@@ -276,13 +502,13 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
     {
         return Cache::remember("tabs_header_$filterType", now()->addMinutes(10), function () use ($filterType) {
             $tabs = [
-                'all'         => __('All'),
-                'popular'     => __('Popular'),
+                'all' => __('All'),
+                'popular' => __('Popular'),
                 'last_create' => __('New'),
-                'pk'          => __('PK'),
-                'close_room'  => __('close room'),
-                'hide_room'   => __('hide room'),
-                'country'     => __('countries'),
+                'pk' => __('PK'),
+                'close_room' => __('close room'),
+                'hide_room' => __('hide room'),
+                'country' => __('countries'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -293,7 +519,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             }
             $html .= '</ul></div>';
 
-            $html .= <<<HTML
+            $html .= <<<'HTML'
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const tabLinks = document.querySelectorAll('.tab-link');
@@ -316,14 +542,13 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         });
     }
 
-
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
 
         $grid->model()
             ->where('is_live', 1)
-            ->select("id", 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', "room_name", "room_cover", "room_admin", \DB::raw("
+            ->select('id', 'uid', 'microphone', 'pin', 'max_admin', 'pin', 'is_top', 'top_room', 'room_name', 'room_cover', 'room_admin', DB::raw('
                 CASE room_status
                     WHEN 1 THEN 100
                     WHEN 2 THEN 10
@@ -332,17 +557,17 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
                 (SELECT GROUP_CONCAT(user_id)
                  FROM room_visitors
                  WHERE room_visitors.room_id = rooms.id) AS visitor_ids
-            "))
+            '))
             ->with([
-                'owner' => fn($q)  => $q->with([
-                    'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'owner' => fn ($q) => $q->with([
+                    'packs' => fn ($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
                 ])->select(['id', 'uuid', 'special_id', 'name', 'country_id']),
 
             ])
-            ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
-                $q->whereIn('id',  $countryID);
+            ->when($countryID, fn ($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
+                $q->whereIn('id', $countryID);
             }))
             ->withCount('roomVisitors');
 
@@ -351,28 +576,27 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         });
 
         $orderSql = [];
-        if ($makeRoomsTop == 1) {
+        if ($makeRoomsTop === 1) {
             $orderSql[] = 'is_top DESC';
         }
         $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
-        if (request()->online == 1) {
+        if (request()->online === 1) {
             $grid->model()->whereHas('roomVisitors');
         }
 
-        if (request()->is_live == 1) {
+        if (request()->is_live === 1) {
             $grid->model()->where('is_live', 1);
         }
 
-        if (request()->is_live == 0 && !is_null(request()->is_live)) {
+        if (request()->is_live === 0 && ! is_null(request()->is_live)) {
             $grid->model()->where('is_live', 0);
         }
 
         $grid->model()->orderByRaw(implode(', ', $orderSql));
     }
-
 
     protected function applyFilterType(Grid $grid, string $filterType, $user): void
     {
@@ -419,7 +643,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
 
             case 'party':
                 $grid->model()
-                    ->whereHas('roomCategory', fn($q) => $q->where('type', 'party'))
+                    ->whereHas('roomCategory', fn ($q) => $q->where('type', 'party'))
                     ->orderByDesc('pin');
                 break;
 
@@ -445,7 +669,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
                         ->toArray();
                 });
 
-                if (!empty($roomTypes)) {
+                if (! empty($roomTypes)) {
                     $grid->model()
                         ->whereIn('room_type', $roomTypes)
                         ->orderByDesc('pin')
@@ -514,30 +738,24 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-                    $query->whereHas('owner', fn($q) => $q->where('name', 'like', "%$input%")
+                    $query->whereHas('owner', fn ($q) => $q->where('name', 'like', "%$input%")
                         ->orWhere('special_id', 'like', "%$input%")
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
+                $locale = app()->getLocale(); // 'ar', 'en', etc.
+                $column = $locale === 'ar' ? 'name' : 'e_name';
 
-                    $locale = app()->getLocale(); // 'ar', 'en', etc.
-                    $column = $locale === 'ar' ? 'name' : 'e_name';
-
-                    $countries =\App\Models\Country::query()->pluck($column, 'id');
-
+                $countries = \App\Models\Country::query()->pluck($column, 'id');
 
                 $filter->where(function ($query) {
                     if ($this->input) {
-                        $query->whereHas('owner', fn($q) => $q->where('country_id', $this->input));
+                        $query->whereHas('owner', fn ($q) => $q->where('country_id', $this->input));
                     }
                 }, __('Country'))->select($countries);
             });
         });
     }
-
-
-
-
 
     protected function defineGridColumns($grid)
     {
@@ -571,7 +789,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         //        });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
-            return $pin == 1
+            return $pin === 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
         });
@@ -581,16 +799,17 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         $grid->column('room_name', __('live stream'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
-            $defaultImage = asset("images/room.jpg");
+            $defaultImage = asset('images/room.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50).' ...';
             }
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
@@ -612,43 +831,12 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         });
 
         $grid->column('session', __('Gifts'))->display(function () {
-            return $this->session  ?? 0;
+            return $this->session ?? 0;
         });
 
-
-        $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
+        $grid->column('id', __('Number of users'))->display(fn () => $this->room_visitors_count ?? 0);
     }
 
-
-
-
-
-
-
-
-
-
-
-    public function updatePinStatus($id, Request $request)
-    {
-        try {
-            $room = Room::findOrFail($id);
-            $room->pin = request('pin');
-            $room->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => request('pin')
-                    ? 'Room pinned successfully'
-                    : 'Room unpinned successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating pin status: ' . $e->getMessage()
-            ]);
-        }
-    }
     protected function setupPinModalScript()
     {
         $token = csrf_token();
@@ -656,7 +844,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         $confirm = __('Confirm Pin Room');
         $doyouwant = __('Do you want to pin this room to the top?');
         $confirm = __('Confirm');
-        $cancel  = __('admin.cancel');
+        $cancel = __('admin.cancel');
         Admin::html(<<<HTML
             <div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
@@ -740,55 +928,57 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             </script>
             HTML);
     }
+
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
     {
         $show = new Show(Room::findOrFail($id));
-        //$show->id('ID');
-        //$show->numid('numid');
-        //$show->uid('uid');
-        //$show->room_status('room_status');
-        //$show->room_name('room_name');
-        //$show->room_cover('room_cover');
-        //$show->room_intro('room_intro');
-        //$show->room_pass('room_pass');
-        //$show->room_class('room_class');
-        //$show->room_type('room_type');
-        //$show->room_welcome('room_welcome');
-        //$show->room_admin('room_admin');
-        //$show->room_visitor('room_visitor');
-        //$show->room_speak('room_speak');
-        //$show->room_sound('room_sound');
-        //$show->room_black('room_black');
-        //$show->week_star('week_star');
-        //$show->ranking('ranking');
-        //$show->is_popular('is_popular');
-        //$show->secret_chat('secret_chat');
-        //$show->is_top('is_top');
-        //$show->sort('sort');
-        //$show->room_background('room_background');
-        //$show->microphone('microphone');
-        //$show->super_uid('super_uid');
-        //$show->is_afk('is_afk');
-        //$show->hot('hot');
-        //$show->room_judge('room_judge');
-        //$show->is_prohibit_sound('is_prohibit_sound');
-        //$show->openid('openid');
-        //$show->commission_proportion('commission_proportion');
-        //$show->fresh_time('fresh_time');
-        //$show->start_hour('start_hour');
-        //$show->end_hour('end_hour');
-        //$show->is_recommended('is_recommended');
-        //$show->play_num('play_num');
-        //$show->free_mic('free_mic');
-        //$show->created_at(__('admin.created_at'));
-        //$show->updated_at(__('admin.updated_at'));
+        // $show->id('ID');
+        // $show->numid('numid');
+        // $show->uid('uid');
+        // $show->room_status('room_status');
+        // $show->room_name('room_name');
+        // $show->room_cover('room_cover');
+        // $show->room_intro('room_intro');
+        // $show->room_pass('room_pass');
+        // $show->room_class('room_class');
+        // $show->room_type('room_type');
+        // $show->room_welcome('room_welcome');
+        // $show->room_admin('room_admin');
+        // $show->room_visitor('room_visitor');
+        // $show->room_speak('room_speak');
+        // $show->room_sound('room_sound');
+        // $show->room_black('room_black');
+        // $show->week_star('week_star');
+        // $show->ranking('ranking');
+        // $show->is_popular('is_popular');
+        // $show->secret_chat('secret_chat');
+        // $show->is_top('is_top');
+        // $show->sort('sort');
+        // $show->room_background('room_background');
+        // $show->microphone('microphone');
+        // $show->super_uid('super_uid');
+        // $show->is_afk('is_afk');
+        // $show->hot('hot');
+        // $show->room_judge('room_judge');
+        // $show->is_prohibit_sound('is_prohibit_sound');
+        // $show->openid('openid');
+        // $show->commission_proportion('commission_proportion');
+        // $show->fresh_time('fresh_time');
+        // $show->start_hour('start_hour');
+        // $show->end_hour('end_hour');
+        // $show->is_recommended('is_recommended');
+        // $show->play_num('play_num');
+        // $show->free_mic('free_mic');
+        // $show->created_at(__('admin.created_at'));
+        // $show->updated_at(__('admin.updated_at'));
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -803,7 +993,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
         $this->disableFormTools($form);
 
         $form->display(__('ID'));
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
         } else {
             $form->text('numid', __('numid'));
@@ -825,6 +1015,7 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
+
             return $options;
         });
         $form->select('room_type', __('room type'))->options(function () {
@@ -833,226 +1024,24 @@ class LiveRoomController extends \App\Admin\Controllers\MainController
             foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
+
             return $options;
         });
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'))->default(0);
-
 
         return $form;
     }
 
     protected function ownerOptions($editing = false)
     {
-        return function ($value) use ($editing) {
+        return function ($value) {
             $ops = [];
             foreach (User::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+                $ops[$user->id] = $user->uuid ?? $user->id.'_'.$user->name;
             }
+
             return $ops;
         };
-    }
-
-    public function removeAdmin(Request $request, $roomId)
-    {
-        $room = Room::findOrFail($roomId);
-        $adminId = $request->admin_id;
-
-        $admin = AdminModel::find($adminId);
-
-        $admins = array_filter(explode(',', $room->room_admin));
-
-        $admins = array_diff($admins, [$adminId]);
-
-        $room->room_admin = implode(',', $admins);
-        $room->save();
-
-        $adminName = $admin?->name ?? __('Unknown');
-        $comment = __(':name has been removed from administrators.', ['name' => $adminName]);
-
-        $d = [
-            "messageContent" => [
-                "message" => "banAdmin",
-                "roomId" => $room->id,
-                "adminId" => $adminId,
-                "comment" => $comment
-            ]
-        ];
-        $json = json_encode($d);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Administrator removed successfully')
-        ]);
-    }
-
-    public function addVisitor(Request $request, $roomId)
-    {
-        $room = Room::findOrFail($roomId);
-
-        if ($room->roomVisitors()->where('user_id', $request->user_id)->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('User is already a visitor in this room')
-            ]);
-        }
-
-        $room->roomVisitors()->create([
-            'user_id' => $request->user_id,
-            'created_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Visitor added successfully')
-        ]);
-    }
-
-    public function kickVisitor(Request $request, $roomId): JsonResponse
-    {
-        $room = Room::findOrFail($roomId);
-        $visitorId = $request->user_id;
-        $duration = $request->minutes ?? 5;
-
-        if ($visitorId == $room->uid) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Cannot kick the room owner')
-            ]);
-        }
-
-        if (Common::pack_get(9, $visitorId)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Cannot kick this user')
-            ]);
-        }
-
-        $blackList = $room->room_black;
-
-        if (empty($blackList)) {
-            $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
-        } else {
-            $list = explode(',', $blackList);
-            $newList = [];
-
-            foreach ($list as &$item) {
-                $black = explode('#', $item);
-                if (isset($black[0]) && $black[0] != $visitorId && $item !== "") {
-                    $newList[] = $item;
-                }
-            }
-
-            $newList = array_filter($newList);
-
-            $blackList = implode(',', $newList) ?: null;
-        }
-
-        $room->room_black = $blackList;
-        $room->save();
-
-        Common::quit_hand($room->uid, $visitorId);
-
-        $user = User::find($visitorId);
-        if ($user) {
-            $user->now_room_uid = 0;
-            $user->save();
-        }
-
-        KickRecord::create([
-            "kicked_user_id" => auth()->id(),
-            "user_id" => $visitorId,
-            "room_id" => $room->id,
-            "type" => 'admin'
-        ]);
-
-        $message = __('api.blockRoom', [
-            'name' => $user->name ?? 'Unknown',
-            'actionName' => auth()->user()->name,
-            'duration' => $duration
-        ], 'ar');
-
-        $d = [
-            "messageContent" => [
-                "message" => "kickVisitorOut",
-                'duration' => $duration,
-                "visitorId" => $visitorId,
-                "comment" => $message
-            ]
-        ];
-        $json = json_encode($d);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
-
-        Common::calcTime($visitorId);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Visitor kicked successfully')
-        ]);
-    }
-
-    public function unbanVisitor(Request $request, $roomId): JsonResponse
-    {
-        $room = Room::findOrFail($roomId);
-        $visitorId = $request->user_id;
-
-        if (!$room->room_black) {
-            return response()->json(['success' => false, 'message' => __('User is not banned')]);
-        }
-
-        $list = explode(',', $room->room_black);
-        $newList = [];
-
-        foreach ($list as $item) {
-            $black = explode('#', $item);
-            if ($black[0] != $visitorId) {
-                $newList[] = $item;
-            }
-        }
-
-        $room->room_black = implode(',', $newList);
-        $room->save();
-
-        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
-    }
-
-    public function getUsers(Request $request)
-    {
-        $userIds = $request->user_ids;
-
-        $users = User::whereIn('id', array_filter($userIds))
-            ->with('profile:user_id,avatar')
-            ->get(['id', 'name', 'uuid']);
-
-        $users = $users->map(function ($user) {
-            $avatar = $user->profile?->avatar ?? null;
-            $user->avatar_url = getImagePath($avatar);
-            return $user;
-        });
-
-        return response()->json($users);
-    }
-
-    public function updateBasicInfo(Request $request, $id)
-    {
-        $room = Room::findOrFail($id);
-
-        $room->room_name = $request->room_name;
-        $room->room_type = $request->room_type;
-        $room->max_admin = $request->max_admin;
-        $room->is_popular = $request->has('is_popular');
-        $room->is_top = $request->has('is_top');
-        $room->is_recommended = $request->has('is_recommended');
-        $room->secret_chat = $request->has('secret_chat');
-
-        $room->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Room updated successfully!')
-        ]);
     }
 }

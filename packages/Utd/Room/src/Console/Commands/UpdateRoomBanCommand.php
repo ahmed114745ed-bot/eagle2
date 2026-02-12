@@ -31,9 +31,9 @@ class UpdateRoomBanCommand extends Command
         if ($rooms) {
             foreach ($rooms as $room) {
                 $ban = $room->bans()
-                    ->whereRaw("created_at + INTERVAL duration HOUR > ?", [now()])
+                    ->whereRaw('created_at + INTERVAL duration HOUR > ?', [now()])
                     ->first();
-                if (!$ban) {
+                if (! $ban) {
                     $room->room_status = 1;
                     $room->save();
                 }

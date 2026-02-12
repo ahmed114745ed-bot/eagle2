@@ -2,63 +2,61 @@
 
 namespace Utd\Moments\Http\Controllers;
 
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use Database\Seeders\config;
+use Exception;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
-use Utd\Moments\Entities\Moment;
 use Illuminate\Support\Facades\Auth;
+use Utd\Moments\Entities\Moment;
 use Utd\Moments\Entities\MomentLikes;
-use Illuminate\Contracts\Support\Renderable;
-use Utd\Moments\Services\MomentService;
 use Utd\Moments\Services\MomentLikesService;
+use Utd\Moments\Services\MomentService;
 use Utd\Moments\Transformers\MomentlikesResource;
 
 class MomentUserLikesController extends Controller
 {
-
     public $momentLikesService;
+
     public $momentsService;
 
-    public function __construct(MomentService $momentsService, MomentLikesService $momentLikesService) {
-        $this->momentsService        = $momentsService;
+    public function __construct(MomentService $momentsService, MomentLikesService $momentLikesService)
+    {
+        $this->momentsService = $momentsService;
         $this->momentLikesService = $momentLikesService;
     }
+
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index($moment_id)
     {
-        $moment = Moment::where('id',$moment_id)->first();
+        $moment = Moment::where('id', $moment_id)->first();
 
-        if (!$moment){
+        if (! $moment) {
             return Common::apiResponse(0, 'Moment not founded', [], 402);
         }
 
         $paginateLikes = $this->momentLikesService->showLikes($moment);
-        $data =  MomentlikesResource::collection($paginateLikes);
+        $data = MomentlikesResource::collection($paginateLikes);
 
         return Common::apiResponse(1, 'successful', $data, 200);
-
-
 
     }
 
     /**
      * Show the form for creating a new resource.
+     *
      * @return Renderable
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
     public function store($moment_id, Request $request)
@@ -87,31 +85,32 @@ class MomentUserLikesController extends Controller
         // return Common::apiResponse(1, 'success');
         $user = Auth::user();
         try {
-            $moment =  Moment::findOrFail($moment_id);
-        } catch (\Exception $e) {
+            $moment = Moment::findOrFail($moment_id);
+        } catch (Exception $e) {
             $moment = null;
         }
-        if ($moment == null){
+        if ($moment === null) {
             return Common::apiResponse(0, 'Moment not founded', [], 402);
         }
 
-        $add =  $this->momentLikesService->likeOrUnLike( $moment, $user);
-        if ($add == 'un Like'){
+        $add = $this->momentLikesService->likeOrUnLike($moment, $user);
+        if ($add === 'un Like') {
             return Common::apiResponse(1, 'success', [], 200);
         }
-        if ($add == 'Like'){
+        if ($add === 'Like') {
 
             CustomNotification::likeMoment($moment, $user);
+
             return Common::apiResponse(1, 'success', [], 200);
         }
-
 
         return Common::apiResponse(1, 'success', [], 200);
     }
 
     /**
      * Show the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function show($id)
@@ -121,7 +120,8 @@ class MomentUserLikesController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function edit($id)
@@ -131,8 +131,8 @@ class MomentUserLikesController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function update(Request $request, $id)
@@ -142,7 +142,8 @@ class MomentUserLikesController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function destroy($id)

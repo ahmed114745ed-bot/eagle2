@@ -1,18 +1,18 @@
 <?php
 
-
 namespace Utd\Moments\Transformers;
 
 use App\Helpers\Common;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class MomentGiftUserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray($request)
     {
@@ -23,9 +23,10 @@ class MomentGiftUserResource extends JsonResource
             'name' => @$this->user->name ?: '',
             'image' => @$this->user->profile->avatar ?? '',
             'level' => Common::level_center(@$this->user),
-            'total_num_gift' => (int)$this->num,
+            'total_num_gift' => (int) $this->num,
 
         ];
+
         return $data;
     }
 }

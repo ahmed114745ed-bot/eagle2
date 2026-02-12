@@ -2,8 +2,8 @@
 
 namespace Utd\Achievements\Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Seeder;
 use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Enums\TargetType;
 
@@ -23,7 +23,7 @@ class AchievementLevelTableSeeder extends Seeder
             'invalid_image' => '/test',
             'valid_image' => '/test',
             'target' => 10000000,
-            'target_type' => TargetType::MONTHLY
+            'target_type' => TargetType::MONTHLY,
         ]);
 
         AchievementLevel::query()->create([
@@ -31,7 +31,7 @@ class AchievementLevelTableSeeder extends Seeder
             'invalid_image' => '/test',
             'valid_image' => '/test',
             'target' => 20000000,
-            'target_type' => TargetType::MONTHLY
+            'target_type' => TargetType::MONTHLY,
         ]);
 
         AchievementLevel::query()->create([
@@ -39,7 +39,7 @@ class AchievementLevelTableSeeder extends Seeder
             'invalid_image' => '/test',
             'valid_image' => '/test',
             'target' => 50000000,
-            'target_type' => TargetType::DEFAULT
+            'target_type' => TargetType::DEFAULT,
         ]);
 
         AchievementLevel::query()->create([
@@ -47,7 +47,7 @@ class AchievementLevelTableSeeder extends Seeder
             'invalid_image' => '/test',
             'valid_image' => '/test',
             'target' => 100000000,
-            'target_type' => TargetType::DEFAULT
+            'target_type' => TargetType::DEFAULT,
         ]);
     }
 }

@@ -14,7 +14,7 @@ class AddCountUserSocketToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->integer('count_room_socket')->nullable()->default (0);
+            $table->integer('count_room_socket')->nullable()->default(0);
         });
     }
 

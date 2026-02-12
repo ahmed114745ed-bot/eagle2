@@ -5,16 +5,16 @@ namespace Utd\Pk\Console;
 use App\Enums\UserCoinLogType;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
-use App\Models\Ware;
-use App\Models\GiftLog;
 use App\Helpers\UserCommon;
+use App\Models\GiftLog;
+use App\Models\Ware;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Modules\Vip\Entities\OVip;
+use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkWinner;
-use Utd\Achievements\Entities\UserAchievementLevel;
 
 class PKEventWinnerCommand extends Command
 {
@@ -25,7 +25,7 @@ class PKEventWinnerCommand extends Command
     public function handle()
     {
         $pkEvent = $this->getCurrentPkEvent();
-        if (!$pkEvent) {
+        if (! $pkEvent) {
             return '';
         }
 
@@ -44,18 +44,19 @@ class PKEventWinnerCommand extends Command
     {
         $participants = $this->getEventParticipants($pkEvent, $participantType);
         foreach ($participants as $index => $participant) {
-            if ($this->isAlreadyWinner($pkEvent->id, $participant->{$participantType . '_id'})) {
+            if ($this->isAlreadyWinner($pkEvent->id, $participant->{$participantType.'_id'})) {
                 continue;
             }
-            $winner = $this->createWinner($pkEvent->id, $participant->{$participantType . '_id'}, $index + 1, $pkType);
+            $winner = $this->createWinner($pkEvent->id, $participant->{$participantType.'_id'}, $index + 1, $pkType);
             $this->assignRewards($winner, $pkEvent->rewards->where('level', $index + 1), $participant->{$participantType});
         }
     }
 
     protected function getEventParticipants($pkEvent, $participantType)
     {
-        $column = $participantType === 'roomowner' ? 'roomowner_id' : $participantType . '_id';
+        $column = $participantType === 'roomowner' ? 'roomowner_id' : $participantType.'_id';
         $notZero = $participantType === 'roomowner' ? '!=' : '=';
+
         return GiftLog::whereBetween('created_at', [$pkEvent->start_date, $pkEvent->end_date])
             ->with([$participantType])
             ->where('pk', 1)
@@ -95,7 +96,7 @@ class PKEventWinnerCommand extends Command
             ]);
 
             switch ($reward->type) {
-                case "coins":
+                case 'coins':
                     $amountBefore = $user->di;
                     $user->di += $reward->target;
                     $user->save();
@@ -107,22 +108,22 @@ class PKEventWinnerCommand extends Command
                         UserCoinLogType::PK,
                     );
                     break;
-                case "vip":
+                case 'vip':
                     $vip = OVip::find($reward->target);
                     UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'pk-event');
                     break;
-                case "ware":
+                case 'ware':
                     $ware = Ware::find($reward->target);
                     UserCommon::addWareToUser($user, $ware, $reward->expire, null, 'pk-event');
                     break;
-                case "badge":
+                case 'badge':
                     Common::userBadge($user->id, $reward->target, $reward->expire, 'pk-event');
                     break;
-                case "achievement":
+                case 'achievement':
                     if (class_exists(UserAchievementLevel::class)) {
-                        $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
+                        $dateTimestamp = Carbon::parse($reward->expire)->format('Y-m-d H:i:s');
                         $attributes = [
-                            'user_id'       => $user->id,
+                            'user_id' => $user->id,
                             'custom_image' => $reward->target,
                             'end_at' => $dateTimestamp,
                         ];

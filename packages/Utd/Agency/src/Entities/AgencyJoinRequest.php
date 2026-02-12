@@ -4,12 +4,20 @@ namespace Utd\Agency\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 
 class AgencyJoinRequest extends Model
 {
     use ConfigurableModelsTrait;
+
+    /**
+     * Status constants
+     */
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_ACCEPTED = 1;
+
+    public const STATUS_REJECTED = 2;
 
     protected $table = 'agency_join_requests';
 
@@ -20,13 +28,6 @@ class AgencyJoinRequest extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Status constants
-     */
-    const STATUS_PENDING = 0;
-    const STATUS_ACCEPTED = 1;
-    const STATUS_REJECTED = 2;
 
     /**
      * Relationship with Agency
@@ -42,6 +43,7 @@ class AgencyJoinRequest extends Model
     public function user(): BelongsTo
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'user_id');
     }
 
@@ -51,6 +53,7 @@ class AgencyJoinRequest extends Model
     public function admin(): BelongsTo
     {
         $agentClass = config('agency-package.models.agent', \App\Models\Agent::class);
+
         return $this->belongsTo($agentClass, 'change_status_admin_id');
     }
 
@@ -60,6 +63,7 @@ class AgencyJoinRequest extends Model
     public function userOperator(): BelongsTo
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'change_status_admin_id');
     }
 
@@ -92,7 +96,7 @@ class AgencyJoinRequest extends Model
      */
     public function isPending(): bool
     {
-        return $this->status == self::STATUS_PENDING;
+        return $this->status === self::STATUS_PENDING;
     }
 
     /**
@@ -101,6 +105,7 @@ class AgencyJoinRequest extends Model
     public function accept(): bool
     {
         $this->status = self::STATUS_ACCEPTED;
+
         return $this->save();
     }
 
@@ -110,6 +115,7 @@ class AgencyJoinRequest extends Model
     public function reject(): bool
     {
         $this->status = self::STATUS_REJECTED;
+
         return $this->save();
     }
 
@@ -119,6 +125,7 @@ class AgencyJoinRequest extends Model
     public function requsers()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'user_id', 'id');
     }
 

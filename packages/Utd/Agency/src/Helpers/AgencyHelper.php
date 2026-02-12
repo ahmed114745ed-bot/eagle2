@@ -70,7 +70,7 @@ class AgencyHelper
         if (function_exists('appFeatureEnabled')) {
             return appFeatureEnabled('agencies');
         }
-        
+
         return true;
     }
 
@@ -91,10 +91,10 @@ class AgencyHelper
      */
     public static function calculatePercentage($value, $total): float
     {
-        if ($total == 0) {
+        if ($total === 0) {
             return 0;
         }
-        
+
         return round(($value / $total) * 100, 2);
     }
 
@@ -117,19 +117,19 @@ class AgencyHelper
             11 => 'November',
             12 => 'December',
         ];
-        
+
         return $months[$month] ?? '';
     }
-    
+
     /**
      * API Response helper
      *
-     * @param mixed $status
-     * @param string $message
-     * @param mixed $data
-     * @param int $statusCode
-     * @param mixed $pagination
-     * @param string $dataKey
+     * @param  mixed  $status
+     * @param  string  $message
+     * @param  mixed  $data
+     * @param  int  $statusCode
+     * @param  mixed  $pagination
+     * @param  string  $dataKey
      * @return \Illuminate\Http\JsonResponse
      */
     public static function apiResponse($status, $message = '', $data = [], $statusCode = 200, $pagination = '', $dataKey = 'data')
@@ -138,15 +138,15 @@ class AgencyHelper
             'status' => $status ? 1 : 0,
             'message' => $message,
         ];
-        
-        if (!empty($data)) {
+
+        if (! empty($data)) {
             $response[$dataKey] = $data;
         }
-        
-        if (!empty($pagination)) {
+
+        if (! empty($pagination)) {
             $response['pagination'] = $pagination;
         }
-        
+
         return response()->json($response, $statusCode);
     }
 }

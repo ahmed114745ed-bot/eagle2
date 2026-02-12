@@ -4,7 +4,6 @@ namespace Utd\Agency\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 use Utd\Agency\Traits\TimestampsWithTimezone;
 
@@ -86,6 +85,7 @@ class UsersJoinedAgency extends Model
     public function endMembership(): bool
     {
         $this->leave_date = now();
+
         return $this->save();
     }
 }

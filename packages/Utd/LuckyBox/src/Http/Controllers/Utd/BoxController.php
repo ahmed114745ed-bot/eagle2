@@ -17,7 +17,7 @@ class BoxController extends Controller
         $result = Box::when($search, function ($q) use ($search) {
             $q->where('id', $search);
         })
-        ->paginate($perPage);
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }
@@ -33,13 +33,14 @@ class BoxController extends Controller
     {
         $result = Box::findOrFail($id);
         $result->delete();
+
         return Common::apiResponse(true, 'Success');
     }
 
     public function delete_all(Request $request)
     {
         $request->validate([
-            'ids' => 'required'
+            'ids' => 'required',
         ]);
 
         $ids = explode(',', $request->ids);
@@ -51,13 +52,13 @@ class BoxController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'type'          => 'required|integer|in:0,1',
-            'coins'         => 'required|integer|min:0',
-            'users'         => 'required|integer|min:0',
-            'image'         => 'nullable|image|mimes:jpeg,png,gif,svg,webp|max:2048',
-            'has_label'     => 'boolean',
+            'type' => 'required|integer|in:0,1',
+            'coins' => 'required|integer|min:0',
+            'users' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,gif,svg,webp|max:2048',
+            'has_label' => 'boolean',
             'default_label' => 'nullable|string|max:255',
-            'duration'      => 'required|integer|min:0',
+            'duration' => 'required|integer|min:0',
         ]);
 
         if ($request->hasFile('image')) {
@@ -72,13 +73,13 @@ class BoxController extends Controller
     public function update($id, Request $request)
     {
         $validatedData = $request->validate([
-            'type'          => 'required|integer|in:0,1',
-            'coins'         => 'required|integer|min:0',
-            'users'         => 'required|integer|min:0',
-            'image'         => 'nullable|image|mimes:jpeg,png,gif,svg,webp|max:2048',
-            'has_label'     => 'boolean',
+            'type' => 'required|integer|in:0,1',
+            'coins' => 'required|integer|min:0',
+            'users' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,gif,svg,webp|max:2048',
+            'has_label' => 'boolean',
             'default_label' => 'nullable|string|max:255',
-            'duration'      => 'required|integer|min:0',
+            'duration' => 'required|integer|min:0',
         ]);
 
         $result = Box::findOrFail($id);

@@ -2,21 +2,16 @@
 
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\UsersJoinedAgency;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Actions\Response;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Agency\Entities\AgencyJoinRequest;
+use Utd\Agency\Entities\UsersJoinedAgency;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyJoinRequestController extends MainController
@@ -25,24 +20,23 @@ class AgencyJoinRequestController extends MainController
 
     public $permission_name = 'agent-request';
 
-
     public function __construct()
     {
         $appFeatureService = $this->getAppFeatureService();
         if ($appFeatureService) {
-            $appFeatureService->validateStatusEnable("agencies");
+            $appFeatureService->validateStatusEnable('agencies');
         }
     }
-
 
     public function update($id)
     {
 
-        if (request('_edit_inline') == "true") {
+        if (request('_edit_inline') === 'true') {
             if (request('status')) {
                 request()->request->add(['change_status_admin_id' => Auth::id()]);
             }
         }
+
         return $this->form()->update($id);
     }
 
@@ -56,8 +50,7 @@ class AgencyJoinRequestController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -70,8 +63,7 @@ class AgencyJoinRequestController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -87,7 +79,6 @@ class AgencyJoinRequestController extends MainController
             ->title(trans('Join To Agency Requests'))
             ->body($this->form());
     }
-
 
     /**
      * Make a grid builder.
@@ -111,12 +102,14 @@ class AgencyJoinRequestController extends MainController
             if ($model->user_id) {
                 return Common::getUserShow($model->user_id);
             }
+
             return null;
         });
         $grid->column('agency_id', __('agency id'))->modal('agency info', function ($model) {
             if ($model->agency_id) {
                 return Common::getAgencyShow($model->agency_id);
             }
+
             return null;
         });
         $grid->column('whatsapp', __('whatsapp'));
@@ -124,13 +117,14 @@ class AgencyJoinRequestController extends MainController
             [
                 0 => __('pending'),
                 1 => __('accepted'),
-                2 => __('denied')
+                2 => __('denied'),
             ]
         );
         $grid->column('change_status_admin_id', __('change status admin id'))->modal('admin info', function ($model) {
             if ($model->change_status_admin_id) {
                 return Common::getAdminShow($model->change_status_admin_id);
             }
+
             return null;
         });
         $grid->column('created_at', trans('time'))->diffForHumans();
@@ -145,7 +139,7 @@ class AgencyJoinRequestController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -159,8 +153,6 @@ class AgencyJoinRequestController extends MainController
         $show->change_status_admin_id('change_status_admin_id');
         $show->created_at(trans('admin.created_at'));
         $show->updated_at(trans('admin.updated_at'));
-
-
 
         return $show;
     }
@@ -181,30 +173,31 @@ class AgencyJoinRequestController extends MainController
             [
                 0 => __('pending'),
                 1 => __('accepted'),
-                2 => __('denied')
+                2 => __('denied'),
             ]
-        );;
+        );
         $form->hidden('change_status_admin_id', 'change_status_admin_id');
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
         $form->saving(function (Form $form) {
-            if ($form->model()->status == 1) {
+            if ($form->model()->status === 1) {
                 $user_id = $form->model()->user_id;
                 $update = DB::table('users')
                     ->where('id', $user_id)
                     ->update(['type_user' => 1]);
-                
-                 uploadMonthlyDiamondReceive($user_id, 0);
-              
+
+                uploadMonthlyDiamondReceive($user_id, 0);
+
                 $user = User::query()->where('id', $form->model()->user_id)->first();
                 if ($user->agency_id) {
                     $error = new MessageBag(
                         [
-                            'title'   => 'forbidden',
+                            'title' => 'forbidden',
                             'message' => 'user already in agency',
                         ]
                     );
                 }
+
                 return back()->with(compact('error'));
 
                 // UserCommon::userVip($user,'agency-join-form-dash');
@@ -213,19 +206,17 @@ class AgencyJoinRequestController extends MainController
                     'agency_id' => $form->model()->agency_id,
                     'type' => 2,
                 ])->where('leave_date', null)->exists();
-                if (!$checkAgencyUser) {
+                if (! $checkAgencyUser) {
                     UsersJoinedAgency::create([
                         'user_id' => $user_id,
                         'agency_id' => $form->model()->agency_id,
                         'type' => 2,
                         'join_date' => now(),
-                        'status' => 'Joined'
+                        'status' => 'Joined',
                     ]);
                 }
             }
         });
-
-
 
         //        $form->deleting (function (Form $form) {
         //            $user = User::query ()->where ('id',$form->model ()->user_id)->first ();
@@ -234,7 +225,6 @@ class AgencyJoinRequestController extends MainController
         //                $user->save();
         //            }
         //        });
-
 
         return $form;
     }

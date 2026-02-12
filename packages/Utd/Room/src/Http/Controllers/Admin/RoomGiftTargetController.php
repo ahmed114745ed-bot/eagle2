@@ -2,11 +2,11 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
-use Utd\Room\Entities\RoomGiftTarget;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+use Utd\Room\Entities\RoomGiftTarget;
 
 class RoomGiftTargetController extends AdminController
 {
@@ -30,7 +30,6 @@ class RoomGiftTargetController extends AdminController
         $grid->column('target', __('Target'));
         $grid->column('image', __('Image'))->image('', 50);
         $grid->column('coins', __('coins'));
-        
 
         return $grid;
     }
@@ -38,7 +37,7 @@ class RoomGiftTargetController extends AdminController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -63,11 +62,10 @@ class RoomGiftTargetController extends AdminController
     protected function form()
     {
         $form = new Form(new RoomGiftTarget());
-        
+
         $form->number('target', __('Target'))->required();
         $form->number('coins', __('Coins'))->required();
         $form->image('image', __('Image'));
-        
 
         return $form;
     }

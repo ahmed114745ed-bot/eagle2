@@ -2,18 +2,17 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
-
 
 class ChangeAgencyMangerController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
     /**
      * Title for current resource.
      *
@@ -21,19 +20,18 @@ class ChangeAgencyMangerController extends MainController
      */
     protected $title = 'Agency';
 
-    public function index ( Content $content )
+    public function index(Content $content)
     {
-       
-            return $content
+
+        return $content
             ->title(trans('change agency Manger'))
-            ->description(__(request ('desc')?:'الرئيسيه'))
-            ->row(function($row) {
+            ->description(__(request('desc') ?: 'الرئيسيه'))
+            ->row(function ($row) {
                 // $row->column(2, view('admin.grid.common.allStatistics'));
                 $row->column(15, view('agency.changeManger'));
-                $row->column(20,$this->grid());
+                $row->column(20, $this->grid());
             });
     }
-
 
     /**
      * Make a grid builder.
@@ -43,15 +41,15 @@ class ChangeAgencyMangerController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency);
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
         });
 
-        $grid->model ()->orderByDesc('id');
+        $grid->model()->orderByDesc('id');
         $grid->id(__('ID'));
-       
-        $grid->column('name',trans ('name'));
-        $grid->column('agencyManger.name',__('Agency manger id'))->display(function ($name) {
+
+        $grid->column('name', trans('name'));
+        $grid->column('agencyManger.name', __('Agency manger id'))->display(function ($name) {
             $uid = @$this->agencyManger->uuid;
 
             return "$name <br>
@@ -65,16 +63,13 @@ class ChangeAgencyMangerController extends MainController
         $grid->disableExport();
         $grid->disableCreateButton();
 
-
         return $grid;
     }
-
-   
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -117,14 +112,15 @@ class ChangeAgencyMangerController extends MainController
         $form = new Form(new Agency());
         $form->text('name', __('Name'));
         if ($form->isEditing()) {
-            $form->select('agency_manger_id', __('Agency Manger app Id'))->options(function ($value){
+            $form->select('agency_manger_id', __('Agency Manger app Id'))->options(function ($value) {
                 $ops2 = [];
-                foreach (User::where('is_manger',1)->orWhere('id', $value)->get() as $user){
+                foreach (User::where('is_manger', 1)->orWhere('id', $value)->get() as $user) {
                     $ops2[$user->id] = $user->uuid.'_'.$user->name;
                 }
+
                 return $ops2;
             });
-    
+
         }
 
         return $form;

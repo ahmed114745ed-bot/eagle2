@@ -3,25 +3,19 @@
 namespace Utd\Moments\Http\Controllers;
 
 use App\Helpers\Common;
-use App\Models\Follow;
-use App\Models\User;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Facades\Admin;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Utd\Moments\Entities\Moment;
-use Utd\Moments\Entities\MomentLikes;
-use Utd\Moments\Entities\ReportMoment;
-use Utd\Moments\Transformers\MomentResource;
-use DB;
-use Illuminate\Support\Facades\Log;
 use Utd\Moments\Services\MomentService;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Auth\Permission;
+use Utd\Moments\Transformers\MomentResource;
 
 class MomentController extends Controller
 {
     public $permission_name = 'report-moment';
+
     public function __construct(public MomentService $momentService) {}
 
     public function index(Request $request)
@@ -31,7 +25,7 @@ class MomentController extends Controller
         $userId = $request->user_id;
         $currentUser = Auth::id();
 
-        if (!$page || $page == 1) {
+        if (! $page || $page === 1) {
             $user = Auth::user();
             //            $user->moment_type = $user->id . random_int(1000, 9999);
             //            $user->save();
@@ -39,7 +33,7 @@ class MomentController extends Controller
 
         $data = $this->momentService->getMomentsByType($type, $userId, $page, $currentUser);
 
-        if (!$data) {
+        if (! $data) {
             return Common::apiResponse(1, 'Please select a valid type', '', 200);
         }
 
@@ -48,6 +42,7 @@ class MomentController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -62,21 +57,21 @@ class MomentController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
      * @return Renderable
      */
-
 
     /**
      * Show the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
 
-
     /**
      * Show the form for editing the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function show(Request $request, $id)
@@ -87,7 +82,7 @@ class MomentController extends Controller
         $result = $this->momentService->getMoment($id, $userId);
 
         // Format and return response
-        if (!$result['success']) {
+        if (! $result['success']) {
             return Common::apiResponse(0, $result['message'], $result['status']);
         }
 
@@ -96,8 +91,9 @@ class MomentController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
+     *
+     * @param  Request  $request
+     * @param  int  $id
      * @return Renderable
      */
     // public function update(Request $request, $id)
@@ -107,7 +103,8 @@ class MomentController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function destroy($id)
@@ -120,13 +117,13 @@ class MomentController extends Controller
 
     public function destroy_dash($moment_id, $id)
     {
-        if (!Admin::user()->can('*')){
+        if (! Admin::user()->can('*')) {
             Permission::check('delete-'.$this->permission_name);
         }
         $result = $this->momentService->deleteMomentAndReport($moment_id, $id);
 
         // Check result and return the appropriate response
-        if (!$result['success']) {
+        if (! $result['success']) {
             return redirect()->back()->with('error', $result['message']);
         }
 

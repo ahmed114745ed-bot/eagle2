@@ -2,21 +2,17 @@
 
 namespace Utd\Agency\Http\Controllers\Admin\AgencyControllers;
 
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class UserTargetController extends MainController
 {
     use HasResourceActions;
     use ResolvesExternalDependencies;
-    
+
     public $permission_name = 'achieved-Target';
 
     public function index(Content $content)
@@ -25,6 +21,7 @@ class UserTargetController extends MainController
             ->title(trans('Achieved Target'))
             ->body($this->grid()));
     }
+
     /**
      * Make a grid builder.
      *
@@ -33,7 +30,7 @@ class UserTargetController extends MainController
     protected function grid()
     {
         $grid = new Grid(new UserTarget);
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -53,11 +50,10 @@ class UserTargetController extends MainController
             });
         });
         $grid->model()
-            ->when($countryID, fn($q) =>
-                $q->where(function ($q) use ($countryID) {
-                    $q->whereHas('user', fn($q) => $q->where('country_id', $countryID))
-                        ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
-                }))
+            ->when($countryID, fn ($q) => $q->where(function ($q) use ($countryID) {
+                $q->whereHas('user', fn ($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn ($q) => $q->where('country_id', $countryID));
+            }))
             ->ofAgency()->where('agency_obtain', '>', 0);
         $grid->id('ID');
         $grid->column('user_id', __('user'))->display(function ($name) {
@@ -67,16 +63,17 @@ class UserTargetController extends MainController
                 return "{$name} (UUID: {$uid})";
             }
             $path = @$this->user?->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->user) ? url("admin/users/{$this->user->id}") : 0;
+            $showUrl = ($this->user) ? url("admin/users/{$this->user->id}") : 0;
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -93,7 +90,7 @@ class UserTargetController extends MainController
             if (request()->filled('_export_')) {
                 return $name ?? '';
             }
-            if (!@$this->agency) {
+            if (! @$this->agency) {
                 return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                          <span style='text-decoration: underline; cursor: pointer;'>unknown agency</span>
@@ -105,15 +102,16 @@ class UserTargetController extends MainController
                 return $name ?? '';
             }
             $path = @$this->agency->img;
-            $defaultImage = asset("images/icon-agency.jpg");
+            $defaultImage = asset('images/icon-agency.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
             $showUrl = url("admin/agencies/profile/{$this->agency->id}");
+
             return "
             <div style='display: flex; align-items: center; gap: 10px;'>
                 $image
@@ -124,20 +122,20 @@ class UserTargetController extends MainController
         ";
         });
         $grid->column('add_month', __('date'))->display(function ($month) {
-            return $month . '/' . $this->add_year;
+            return $month.'/'.$this->add_year;
         });
         $grid->column('target_id', __('target id'));
         $grid->column('target_diamonds', __('target diamonds'));
 
-        $grid->column('target_usd', __('usd') . ' ' . __('deserved') . '(%)');
+        $grid->column('target_usd', __('usd').' '.__('deserved').'(%)');
         $grid->column('target_hours', __('target hours'))->display(function ($usd) {
-            return $usd . '/' . $this->target_hours;
+            return $usd.'/'.$this->target_hours;
         });
         $grid->column('target_days', __('target days'))->display(function ($usd) {
 
-            return $usd . '/' . $this->target_days;
+            return $usd.'/'.$this->target_days;
         });
-        $grid->column('target_agency_share', __('agency share') . '(%)');
+        $grid->column('target_agency_share', __('agency share').'(%)');
         $grid->column('user_diamonds', __('user diamonds'));
         $grid->column('user_hours', __('user hours'));
         $grid->column('user_days', __('user days'));
@@ -162,9 +160,10 @@ class UserTargetController extends MainController
             $labelLikes = __('Likes:');
             $labelComments = __('Comments:');
             if (request()->filled('_export_')) {
-                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n" .
+                return "Moments:\nUploads: $momentUpload, Likes: $momentLikes, Comments: $momentComments\n".
                     "Reels:\nUploads: $reelUpload, Likes: $reelLikes, Comments: $reelComments";
             }
+
             return <<<HTML
                 <div style="line-height: 1.6;">
                     <div><b>{$labelMoments}</b></div>
@@ -183,11 +182,12 @@ class UserTargetController extends MainController
             HTML;
         });
         $grid->column('user_obtain', __('salary'))->display(function ($usd) {
-            $usd =  truncateAndTrim($usd);
+            $usd = truncateAndTrim($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
@@ -203,12 +203,13 @@ class UserTargetController extends MainController
                 ->where('target_id', $this->target_id)
                 ->where('user_agency_id', $this->agency_id)
                 ->value('cut_amount') ?? 0;
-            $userSalary =  truncateAndTrim($userSalary);
+            $userSalary = truncateAndTrim($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
 
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$userSalary}</span>
@@ -226,10 +227,11 @@ class UserTargetController extends MainController
                 ->where('user_agency_id', $this->agency_id)
                 ->selectRaw('sallary - cut_amount AS net_salary')
                 ->value('net_salary') ?? 0;
-            $userSalary =  truncateAndTrim($userSalary);
+            $userSalary = truncateAndTrim($userSalary);
             if (request()->filled('_export_')) {
                 return $userSalary;
             }
+
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$userSalary}</span>
@@ -237,11 +239,12 @@ class UserTargetController extends MainController
                     </div>";
         });
         $grid->column('agency_obtain', __('agency salary'))->display(function ($usd) {
-            $usd =truncateAndTrim($usd);
+            $usd = truncateAndTrim($usd);
             if (request()->filled('_export_')) {
                 return $usd ?? 0;
             }
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$usd}</span>
@@ -250,6 +253,7 @@ class UserTargetController extends MainController
         });
         $grid->disableActions();
         $grid->disableCreateButton();
+
         return $grid;
     }
 }

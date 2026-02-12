@@ -19,30 +19,29 @@ class CpsUserResourceV2 extends JsonResource
         // Find CP directly from eager-loaded relations
         $cp = $this->cpsAsOne
             ->merge($this->cpsAsTwo)
-            ->first(fn($cp) =>
-                in_array($cp->status, [1,4]) &&
+            ->first(fn ($cp) => in_array($cp->status, [1, 4]) &&
                 $cp->cpRelation?->type === $this->relationType
             );
 
         $otherUser = null;
         if ($cp) {
-            $otherUser = $cp->user_one_id == $this->id
+            $otherUser = $cp->user_one_id === $this->id
                 ? $cp->toUser
                 : $cp->fromUser;
         }
 
         return [
-            'id'   => $this->id,
+            'id' => $this->id,
             'name' => $this->name ?? '',
             'uuid' => $this->uuid,
-            'image'=> $this->profile?->avatar ?? '',
-            'exp'  => $cp?->di ?? 0,
+            'image' => $this->profile?->avatar ?? '',
+            'exp' => $cp?->di ?? 0,
             'reciver_level_img' => @$this->receiverLevel?->img ?? '',
-            'sender_level_img'  => @$this->senderLevel?->img ?? '',
+            'sender_level_img' => @$this->senderLevel?->img ?? '',
             'other' => [
-                'id'    => $otherUser?->id ?? 0,
-                'name'  => $otherUser?->name ?? '',
-                'uuid'  => $otherUser?->uuid ?? 0,
+                'id' => $otherUser?->id ?? 0,
+                'name' => $otherUser?->name ?? '',
+                'uuid' => $otherUser?->uuid ?? 0,
                 'image' => $otherUser?->profile?->avatar ?? '',
             ],
         ];

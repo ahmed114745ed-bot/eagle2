@@ -9,19 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-        public function up(): void
-        {
-            Schema::table('chat_messages', function (Blueprint $table) {
-                $table->bigInteger('room_id')->nullable();
-          
-            });
-        }
-    
-        public function down(): void
-        {
-            Schema::table('chat_messages', function (Blueprint $table) {
-              
-                $table->dropColumn('room_id');
-            });
-        }
+    public function up(): void
+    {
+        Schema::table('chat_messages', function (Blueprint $table) {
+            $table->bigInteger('room_id')->nullable();
+
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('chat_messages', function (Blueprint $table) {
+
+            $table->dropColumn('room_id');
+        });
+    }
 };

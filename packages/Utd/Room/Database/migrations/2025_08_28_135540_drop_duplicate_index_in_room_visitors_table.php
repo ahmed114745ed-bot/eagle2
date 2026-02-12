@@ -16,16 +16,16 @@ return new class extends Migration
             Schema::table('room_visitors', function (Blueprint $table) {
                 $table->dropForeign(['room_id']);
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Foreign key may not exist
         }
-        
+
         // Then drop the index if it exists
         try {
             Schema::table('room_visitors', function (Blueprint $table) {
                 $table->dropIndex('room_visitors_room_id_index');
             });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Index may not exist
         }
     }

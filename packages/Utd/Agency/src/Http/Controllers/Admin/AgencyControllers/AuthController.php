@@ -36,7 +36,6 @@ class AuthController extends Controller
     /**
      * Handle a login request.
      *
-     * @param Request $request
      *
      * @return mixed
      */
@@ -52,22 +51,7 @@ class AuthController extends Controller
         }
 
         return back()->withInput()->withErrors([
-                                                   $this->username() => $this->getFailedLoginMessage(),
-                                               ]);
-    }
-
-    /**
-     * Get a validator for an incoming login request.
-     *
-     * @param array $data
-     *
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function loginValidator(array $data)
-    {
-        return Validator::make($data, [
-            $this->username()   => 'required',
-            'password'          => 'required',
+            $this->username() => $this->getFailedLoginMessage(),
         ]);
     }
 
@@ -88,7 +72,6 @@ class AuthController extends Controller
     /**
      * User setting page.
      *
-     * @param Content $content
      *
      * @return Content
      */
@@ -119,6 +102,20 @@ class AuthController extends Controller
     }
 
     /**
+     * Get a validator for an incoming login request.
+     *
+     *
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function loginValidator(array $data)
+    {
+        return Validator::make($data, [
+            $this->username() => 'required',
+            'password' => 'required',
+        ]);
+    }
+
+    /**
      * Model-form for user setting.
      *
      * @return Form
@@ -144,7 +141,7 @@ class AuthController extends Controller
         $form->ignore(['password_confirmation']);
 
         $form->saving(function (Form $form) {
-            if ($form->password && $form->model()->password != $form->password) {
+            if ($form->password && $form->model()->password !== $form->password) {
                 $form->password = Hash::make($form->password);
             }
         });
@@ -185,7 +182,6 @@ class AuthController extends Controller
     /**
      * Send the response after the user was authenticated.
      *
-     * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\Response
      */

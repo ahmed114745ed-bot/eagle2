@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('users_joined_agencies')) return;
-        
+        if (! Schema::hasTable('users_joined_agencies')) {
+            return;
+        }
+
         if (Schema::hasColumn('users_joined_agencies', 'status')) {
             Schema::table('users_joined_agencies', function (Blueprint $table) {
                 // Check if column exists and change it to text if it's not already
@@ -26,8 +28,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (!Schema::hasTable('users_joined_agencies')) return;
-        
+        if (! Schema::hasTable('users_joined_agencies')) {
+            return;
+        }
+
         Schema::table('users_joined_agencies', function (Blueprint $table) {
             $table->string('status')->nullable()->change();
         });

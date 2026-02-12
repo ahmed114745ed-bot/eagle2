@@ -2,22 +2,24 @@
 
 namespace Utd\CP\Console;
 
-use App\Models\Ware;
+use App\Helpers\UserRewardsWeeklyCp;
 use App\Models\GiftLog;
+use App\Models\Ware;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use App\Helpers\UserRewardsWeeklyCp;
+use Modules\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\CpWinnerReward;
 use Utd\CP\Entities\WeeklyCpWinner;
 use Utd\CP\Services\CpService;
-use Modules\Events\Entities\WeeklyStar;
 
 class WeeklyCpWinnerConsole extends Command
 {
     protected $signature = 'weekly-cp-winner';
 
     protected $description = 'Command description';
+
     protected $cpService;
+
     public function __construct(CpService $cpService)
     {
         parent::__construct();
@@ -32,7 +34,7 @@ class WeeklyCpWinnerConsole extends Command
             ->latest()
             ->first();
 
-        if (!$weeklyCp) {
+        if (! $weeklyCp) {
             return '';
         }
 
@@ -40,7 +42,7 @@ class WeeklyCpWinnerConsole extends Command
         $leaderBoard = GiftLog::whereIn('giftId', $giftIds)->select(DB::raw('sum(giftPrice) as totalGiftNum'), 'cp_id')
             ->groupBy('cp_id')->whereBetween('created_at', [
                 $weeklyCp->start_date,
-                $weeklyCp->end_date
+                $weeklyCp->end_date,
             ])->whereHas('cps', function ($q) {
                 $q->relation();
             })->with('cp')->orderByDesc('totalGiftNum')->take(3)->get();
@@ -48,7 +50,7 @@ class WeeklyCpWinnerConsole extends Command
         foreach ($leaderBoard as $index => $entry) {
             $alreadyWinner = WeeklyCpWinner::where(['weekly_cp_id' => $weeklyCp->id, 'user_one_id' => $entry->cp->user_one_id, 'user_two_id' => $entry->cp->user_two_id, 'type_relation' => $entry->cp->relation->type])->exists();
 
-            if (!$alreadyWinner) {
+            if (! $alreadyWinner) {
                 WeeklyCpWinner::create([
                     'weekly_cp_id' => $weeklyCp->id,
                     'user_one_id' => $entry->cp->user_one_id,
@@ -57,7 +59,7 @@ class WeeklyCpWinnerConsole extends Command
                     'level' => $index + 1,
                     'total_price' => $entry->totalGiftNum,
                 ]);
-                $userOne =  UserRewardsWeeklyCp::getUserById($entry->cp->user_one_id);
+                $userOne = UserRewardsWeeklyCp::getUserById($entry->cp->user_one_id);
                 $userTwo = UserRewardsWeeklyCp::getUserById($entry->cp->user_two_id);
                 $rewards = $weeklyCp->weeklyCpGifts->where('level', $index + 1);
 
@@ -91,10 +93,9 @@ class WeeklyCpWinnerConsole extends Command
 
         $newWeeklyCp = $weeklyCp->replicate();
         $newWeeklyCp->start_date = now(getTimezone())->toDateString();
-        $newWeeklyCp->end_date   = now(getTimezone())->addWeek()->toDateString();
+        $newWeeklyCp->end_date = now(getTimezone())->addWeek()->toDateString();
         $newWeeklyCp->save();
 
         $newWeeklyCp->gifts()->sync($weeklyCp->gifts->pluck('id')->toArray());
     }
 }
-

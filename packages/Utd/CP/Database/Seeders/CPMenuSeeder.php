@@ -14,14 +14,14 @@ class CPMenuSeeder extends Seeder
             ->whereNull('uri')
             ->first();
 
-        if (!$cpParent) {
+        if (! $cpParent) {
             $parentOrder = Menu::where('parent_id', 0)->max('order') ?? 0;
             $cpParent = Menu::create([
-                'title'     => 'CP',
+                'title' => 'CP',
                 'parent_id' => 0,
-                'order'     => $parentOrder + 1,
-                'icon'      => '🧑‍❤️‍👩',
-                'uri'       => null,
+                'order' => $parentOrder + 1,
+                'icon' => '🧑‍❤️‍👩',
+                'uri' => null,
             ]);
         }
 
@@ -42,14 +42,14 @@ class CPMenuSeeder extends Seeder
 
         Menu::firstOrCreate(
             [
-                'title'     => $title,
+                'title' => $title,
                 'parent_id' => $parentId,
             ],
             [
-                'order'      => $order + 1,
-                'uri'        => $uri,
+                'order' => $order + 1,
+                'uri' => $uri,
                 'permission' => $permission,
-                'icon'       => $icon,
+                'icon' => $icon,
             ]
         );
     }

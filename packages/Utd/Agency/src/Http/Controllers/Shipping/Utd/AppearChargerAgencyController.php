@@ -4,9 +4,9 @@ namespace Utd\Agency\Http\Controllers\Shipping\Utd;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Utd\Agency\Helpers\AgencyHelper;
 use Utd\Agency\Http\Resources\AppearChargerAgencyResource;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
-use Utd\Agency\Helpers\AgencyHelper;
 
 class AppearChargerAgencyController extends Controller
 {
@@ -41,7 +41,7 @@ class AppearChargerAgencyController extends Controller
         $user = $userClass::findOrFail($id);
 
         $user->update([
-            'appear_charger_agency' => $request->appear_charger_agency
+            'appear_charger_agency' => $request->appear_charger_agency,
         ]);
 
         return AgencyHelper::apiResponse(true, 'Success');

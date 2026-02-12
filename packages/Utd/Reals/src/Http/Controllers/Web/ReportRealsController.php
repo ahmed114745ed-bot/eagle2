@@ -2,19 +2,21 @@
 
 namespace Utd\Reals\Http\Controllers\Web;
 
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Utd\Reals\Entities\Real;
-use Utd\Reals\Entities\ReportReals;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Utd\Reals\Entities\Real;
+use Utd\Reals\Entities\ReportReals;
 
 class ReportRealsController extends MainController
 {
     use HasResourceActions;
+
+    public $permission_name = 'report-real';
 
     /**
      * Title for current resource.
@@ -22,21 +24,46 @@ class ReportRealsController extends MainController
      * @var string
      */
     protected $title = 'ReportReals';
-    public $permission_name = 'report-real';
+
+    public static function getRoomsShow(Real $reel)
+    {
+        $show = new Show($reel);
+
+        $show->field('url', __('Video'))->unescape()->as(function ($path) {
+            $url = getImagePath($path);
+
+            return "<video width='100%' controls>
+                    <source src='$url' type='video/mp4'>
+                    Your browser does not support the video tag.
+                </video>";
+        });
+
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
+
+        Admin::script("
+        if (window.innerWidth >= 1024) {
+            $('.table-responsive').removeClass('table-responsive');
+        }
+    ");
+
+        return $show;
+    }
 
     /**
      * Make a grid builder.
      *
      * @return Grid
      */
-
     public function index(Content $content)
     {
         return parent::index($content
             ->title(trans('Report Reel'))
             ->body($this->grid()));
     }
-
 
     protected function grid()
     {
@@ -47,17 +74,19 @@ class ReportRealsController extends MainController
 
         $grid->column('reporter.name', __('Reporter'))->display(function () {
             $reporter = $this->reporter;
-            if (!$reporter) return '-';
+            if (! $reporter) {
+                return '-';
+            }
 
             $name = $reporter->name;
             $uuid = $reporter->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$reporter->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-            $userUrl = admin_url('users/' . $reporter->id);
+            $userUrl = admin_url('users/'.$reporter->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -70,19 +99,21 @@ class ReportRealsController extends MainController
 
         $grid->column('reportedUser.name', __('Reported User'))->display(function () {
             $reportedUser = $this->reportedUser;
-            if (!$reportedUser) return '-';
+            if (! $reportedUser) {
+                return '-';
+            }
 
             $name = $reportedUser->name;
             $uuid = $reportedUser->uuid;
 
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$reportedUser->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-            $userUrl = admin_url('users/' . $reportedUser->id);
+            $userUrl = admin_url('users/'.$reportedUser->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                 <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -94,8 +125,9 @@ class ReportRealsController extends MainController
         });
 
         $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+            $limitedDescription = mb_substr($description, 0, 40).(mb_strlen($description) > 40 ? '...' : '');
+
+            return "<a href='#' class='view-description' data-description=\"".htmlentities($description)."\">$limitedDescription</a>";
         });
 
         Admin::script("
@@ -119,11 +151,11 @@ class ReportRealsController extends MainController
         });
     }); ");
 
-
-        if (Admin::user()->can('delete-' . 'Real') || Admin::user()->can('*')) {
+        if (Admin::user()->can('delete-'.'Real') || Admin::user()->can('*')) {
             $grid->column(__('redirect_button'))->display(function () {
                 $redirectRoute = 'delete-reel';
-                return '<a href="' . route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]) . '" class="btn btn-xs btn-danger">' . __('admin.delete_video') . '</a>';
+
+                return '<a href="'.route($redirectRoute, ['real_id' => $this->real_id, 'id' => $this->id]).'" class="btn btn-xs btn-danger">'.__('admin.delete_video').'</a>';
             });
         }
 
@@ -137,51 +169,18 @@ class ReportRealsController extends MainController
 
         $permission_name = $this->permission_name;
 
-        $grid->actions(function ($actions)  use ($permission_name) {
+        $grid->actions(function ($actions) use ($permission_name) {
             $actions->disableEdit();
-            if (! Admin::user()->can('delete-' . $permission_name) && !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-'.$permission_name) && ! Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
-            if (!Admin::user()->can('show-' . $permission_name) && !Admin::user()->can('*')) {
+            if (! Admin::user()->can('show-'.$permission_name) && ! Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
 
         return $grid;
     }
-
-    public static function getRoomsShow(Real $reel)
-    {
-        $show = new Show($reel);
-
-        $show->field('url', __('Video'))->unescape()->as(function ($path) {
-            $url = getImagePath($path);
-            return "<video width='100%' controls>
-                    <source src='$url' type='video/mp4'>
-                    Your browser does not support the video tag.
-                </video>";
-        });
-
-
-
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableList();
-            $tools->disableDelete();
-        });
-
-        Admin::script("
-        if (window.innerWidth >= 1024) {
-            $('.table-responsive').removeClass('table-responsive');
-        }
-    ");
-
-        return $show;
-    }
-
-
-
-
 
     // protected function grid()
     // {
@@ -221,7 +220,6 @@ class ReportRealsController extends MainController
     //     });
     //     $show->field('description', __('description'));
 
-
     //     $show->panel()
     //          ->tools(function ($tools) {
     //              $tools->disableEdit();
@@ -239,7 +237,7 @@ class ReportRealsController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

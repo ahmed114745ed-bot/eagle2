@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,7 +15,7 @@ return new class extends Migration
         // Only change if column exists and is not already string type
         if (Schema::hasColumn('targets', 'reel')) {
             $columnType = DB::select("SHOW COLUMNS FROM targets WHERE Field = 'reel'");
-            if (!empty($columnType) && strpos($columnType[0]->Type, 'varchar') === false) {
+            if (! empty($columnType) && mb_strpos($columnType[0]->Type, 'varchar') === false) {
                 Schema::table('targets', function (Blueprint $table) {
                     $table->string('reel')->nullable()->change();
                 });

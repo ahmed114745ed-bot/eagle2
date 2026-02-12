@@ -4,12 +4,10 @@ namespace Utd\Agency\Repositories;
 
 use App\Models\Admin;
 
-
 class AdminRepository extends AbstractRepository
 {
-
     /**
-     * @param Model $model
+     * @param  Model  $model
      */
     public function __construct()
     {

@@ -4,13 +4,13 @@ namespace Utd\Reals\Services;
 
 use FFMpeg\FFProbe;
 use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
+use Storage;
 
 class FfmpegService
 {
-
     public function extract($videoPath, $id)
     {
-        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $id . '.jpg';
+        $imagePath = (config('app.env') !== 'production' ? '' : 'test-').'frames/'.$id.'.jpg';
         FFMpeg::openUrl($videoPath)
             ->getFrameFromSeconds(1)
             ->export()
@@ -20,8 +20,8 @@ class FfmpegService
 
     public function extractByDuration($videoPath, $id): void
     {
-        $imagePath = (config('app.env') != 'production' ? '' : 'test-') . "frames/" . $id . '.jpg';
-        $media    = FFMpeg::openUrl($videoPath);
+        $imagePath = (config('app.env') !== 'production' ? '' : 'test-').'frames/'.$id.'.jpg';
+        $media = FFMpeg::openUrl($videoPath);
         $duration = $media->getDurationInSeconds();
         $timestamp = max(0, (int) floor($duration / 2));
 
@@ -35,7 +35,7 @@ class FfmpegService
     {
         $tempDir = storage_path('app/temp_frames');
 
-        if (!file_exists($tempDir)) {
+        if (! file_exists($tempDir)) {
             mkdir($tempDir, 0777, true);
         }
 
@@ -46,12 +46,12 @@ class FfmpegService
         $videoStream = $ffprobe->streams($videoPath)->videos()->first();
         $frameCount = $videoStream->get('nb_frames');
 
-        if (!$frameCount || !is_numeric($frameCount)) {
+        if (! $frameCount || ! is_numeric($frameCount)) {
             // Estimate frame count
             $duration = $ffprobe->format($videoPath)->get('duration');
             $frameRate = $videoStream->get('avg_frame_rate'); // e.g. "25/1"
             [$num, $den] = explode('/', $frameRate);
-            $fps = $den != 0 ? $num / $den : 0;
+            $fps = $den !== 0 ? $num / $den : 0;
             $frameCount = (int) floor($duration * $fps);
         }
 
@@ -70,9 +70,7 @@ class FfmpegService
 
         $prefix = config('app.env') !== 'production' ? '' : 'test-';
         // Upload image to GCS
-        \Storage::disk('gcs')->put("{$prefix}frames/{$id}.jpg", file_get_contents($imagePath));
+        Storage::disk('gcs')->put("{$prefix}frames/{$id}.jpg", file_get_contents($imagePath));
         unlink($imagePath); // optional: clean up
     }
-
-
 }

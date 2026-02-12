@@ -5,22 +5,21 @@ namespace Utd\Gifts\Http\Controllers\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
 use Utd\Gifts\Entities\GiftCategory;
-use Utd\Gifts\Entities\Gift;
-
 
 class GiftCategoryController
 {
     use HasResourceActions;
 
-    protected $title = 'Gift Categories';
     public $permission_name = 'gift-categories';
 
+    protected $title = 'Gift Categories';
 
     public function index(Content $content)
     {
@@ -57,6 +56,61 @@ class GiftCategoryController
         return $content
             ->title(trans('Gift Categories'))
             ->body($this->form());
+    }
+
+    /**
+     * Clear cache
+     */
+    public function clearCache(Request $request)
+    {
+        try {
+            Cache::tags(['gift_categories', 'admin_data'])->flush();
+
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => __('Cache cleared successfully'),
+            ]);
+        } catch (Exception $e) {
+            Log::error('Failed to clear cache: '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => __('Failed to clear cache'),
+            ], 500);
+        }
+    }
+
+    /**
+     * Sort update
+     */
+    public function sortUpdate(Request $request)
+    {
+        try {
+            $orders = $request->input('orders', []);
+
+            foreach ($orders as $order) {
+                GiftCategory::where('id', $order['id'])
+                    ->update(['sort' => $order['sort']]);
+            }
+
+            $this->clearCache($request);
+
+            return response()->json([
+                'status' => true,
+                'message' => __('Sort updated successfully'),
+            ]);
+        } catch (Exception $e) {
+            Log::error('Failed to update sort: '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => __('Failed to update sort'),
+            ], 500);
+        }
     }
 
     /**
@@ -110,7 +164,7 @@ class GiftCategoryController
     protected function form()
     {
         $form = new Form(new GiftCategory);
-        
+
         // Disable default form tools
         $form->tools(function ($tools) {
             $tools->disableDelete();
@@ -120,7 +174,7 @@ class GiftCategoryController
         $form->display('id', trans('ID'));
         $form->text('title.ar', __('Title (Arabic)'))->required();
         $form->text('title.en', __('Title (English)'))->required();
-        
+
         $form->select('type', __('Type'))->options([
             'normal' => __('Normal'),
             'hot' => __('Hot'),
@@ -131,64 +185,9 @@ class GiftCategoryController
             'cp' => __('CP'),
             'vip' => __('VIP'),
         ])->required();
-        
+
         $form->number('sort', __('Sort'))->default(1);
 
         return $form;
-    }
-
-    /**
-     * Clear cache
-     */
-    public function clearCache(Request $request)
-    {
-        try {
-            Cache::tags(['gift_categories', 'admin_data'])->flush();
-            
-            if (function_exists('opcache_reset')) {
-                opcache_reset();
-            }
-            
-            return response()->json([
-                'status' => true,
-                'message' => __('Cache cleared successfully')
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to clear cache: ' . $e->getMessage());
-            
-            return response()->json([
-                'status' => false,
-                'message' => __('Failed to clear cache')
-            ], 500);
-        }
-    }
-
-    /**
-     * Sort update
-     */
-    public function sortUpdate(Request $request)
-    {
-        try {
-            $orders = $request->input('orders', []);
-            
-            foreach ($orders as $order) {
-                GiftCategory::where('id', $order['id'])
-                    ->update(['sort' => $order['sort']]);
-            }
-            
-            $this->clearCache($request);
-            
-            return response()->json([
-                'status' => true,
-                'message' => __('Sort updated successfully')
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to update sort: ' . $e->getMessage());
-            
-            return response()->json([
-                'status' => false,
-                'message' => __('Failed to update sort')
-            ], 500);
-        }
     }
 }

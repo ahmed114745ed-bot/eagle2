@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('request_background_images', function (Blueprint $table) {
-            if (!Schema::hasColumn('request_background_images', 'created_by')) {
+            if (! Schema::hasColumn('request_background_images', 'created_by')) {
                 $table->unsignedBigInteger('created_by')->nullable()->after('id');
             }
 
-            if (!Schema::hasColumn('request_background_images', 'created_by_type')) {
+            if (! Schema::hasColumn('request_background_images', 'created_by_type')) {
                 $table->string('created_by_type')->nullable()->after('created_by');
             }
 
-            if (!Schema::hasColumn('request_background_images', 'room_id')) {
+            if (! Schema::hasColumn('request_background_images', 'room_id')) {
                 $table->unsignedInteger('room_id')->nullable()->after('owner_room_id');
 
                 $table->foreign('room_id')

@@ -17,10 +17,7 @@ class ResetCharisma implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private int $roomId)
-    {
-
-    }
+    public function __construct(private int $roomId) {}
 
     /**
      * Execute the job.
@@ -31,8 +28,8 @@ class ResetCharisma implements ShouldQueue
 
         $ms = [
             'messageContent' => [
-                "message" =>  'closeCharisma',
-            ]
+                'message' => 'closeCharisma',
+            ],
         ];
         $json = json_encode($ms);
 

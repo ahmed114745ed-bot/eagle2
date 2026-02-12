@@ -35,12 +35,13 @@ class AgencyJoinRequestRepository
     public function update($id, array $data)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->update($data);
+
             return $request->fresh();
         }
-        
+
         return null;
     }
 
@@ -50,11 +51,11 @@ class AgencyJoinRequestRepository
     public function delete($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             return $request->delete();
         }
-        
+
         return false;
     }
 
@@ -157,12 +158,13 @@ class AgencyJoinRequestRepository
     public function accept($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->status = 1;
+
             return $request->save();
         }
-        
+
         return false;
     }
 
@@ -172,12 +174,13 @@ class AgencyJoinRequestRepository
     public function reject($id)
     {
         $request = $this->findById($id);
-        
+
         if ($request) {
             $request->status = 2;
+
             return $request->save();
         }
-        
+
         return false;
     }
 }

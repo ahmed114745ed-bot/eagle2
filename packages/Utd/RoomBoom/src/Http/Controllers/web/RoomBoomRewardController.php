@@ -7,20 +7,18 @@ use App\Helpers\Common;
 use App\Models\Gift;
 use App\Models\Ware;
 use App\Selectables\Gifts;
-use App\Selectables\Wares;
 use App\Selectables\WaresByType;
 use Carbon\Carbon;
+use Encore\Admin\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
-use Utd\RoomBoom\Entities\RoomBoomLevel;
-use Utd\RoomBoom\Entities\RoomBoomReward;
-use Encore\Admin\Admin;
-use Illuminate\Http\Request;
 use Utd\Achievements\Entities\Achievement;
+use Utd\RoomBoom\Entities\RoomBoomReward;
 
 class RoomBoomRewardController extends MainController
 {
@@ -43,6 +41,7 @@ class RoomBoomRewardController extends MainController
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+
         return parent::edit($id, $content
             ->title(__('Edit Room Boom Reward'))
             ->body($this->form()->edit($id)));
@@ -53,6 +52,50 @@ class RoomBoomRewardController extends MainController
         return parent::create($content
             ->title(__('Create Room Boom Reward'))
             ->body($this->form()));
+    }
+
+    public function store()
+    {
+        $form = $this->form();
+
+        $form->saved(function (Form $form) {
+            $roomBoomLevelId = $form->model()->room_boom_level_id;
+            admin_toastr(__('Created successfully'));
+
+            return redirect()->to('admin/room_boom_rewards/'.$roomBoomLevelId);
+        });
+
+        return $form->store();
+    }
+
+    public function update($id)
+    {
+        $id = request()->route('id');
+        $form = $this->form()->edit($id);
+
+        $form->saved(function (Form $form) {
+            $roomBoomLevelId = $form->model()->room_boom_level_id;
+            admin_toastr(__('Updated successfully'));
+
+            return redirect()->to('admin/room_boom_rewards/'.$roomBoomLevelId);
+        });
+
+        return $form->update($id);
+    }
+
+    public function destroy($id)
+    {
+        $reward = RoomBoomReward::findOrFail($id);
+        $roomBoomLevelId = $reward->room_boom_level_id;
+        $reward->delete();
+
+        admin_toastr(__('Deleted successfully'));
+
+        return [
+            'status' => true,
+            'message' => __('Deleted successfully'),
+            'redirect' => admin_url('room_boom_rewards?room_boom_level_id='.$roomBoomLevelId),
+        ];
     }
 
     // protected function grid()
@@ -127,99 +170,100 @@ class RoomBoomRewardController extends MainController
 
     //     return $grid;
     // }
-    
+
     protected function grid()
-{
-    $grid = new Grid(new RoomBoomReward());
+    {
+        $grid = new Grid(new RoomBoomReward());
 
-    $roomBoomLevelId = request('room_boom_level_id');
+        $roomBoomLevelId = request('room_boom_level_id');
 
-    $grid->model()
-        ->where('room_boom_level_id', $roomBoomLevelId)
-        ->with([
-            'ware:id,name,img2,show_img',
-            'gift:id,name,show_img,img'
-        ])
-        ->select([
-            'id',
-            'target_type',
-            'target',
-            'priority',
-            'quantity',
-            'expire_days',
-            'created_at',
-            'room_boom_level_id'
-        ]);
+        $grid->model()
+            ->where('room_boom_level_id', $roomBoomLevelId)
+            ->with([
+                'ware:id,name,img2,show_img',
+                'gift:id,name,show_img,img',
+            ])
+            ->select([
+                'id',
+                'target_type',
+                'target',
+                'priority',
+                'quantity',
+                'expire_days',
+                'created_at',
+                'room_boom_level_id',
+            ]);
 
-    $grid->column('id', __('ID'))->sortable();
-    $grid->column('target_type', __('Target Type'));
+        $grid->column('id', __('ID'))->sortable();
+        $grid->column('target_type', __('Target Type'));
 
-    // ✅ Target name / value
-    $grid->column('target', __('Target'))->display(function () {
-        return match ($this->target_type) {
-            'ware'        => $this->ware?->name,
-            'gift'        => $this->gift?->name,
-            'coin'        => $this->target,
-            'achievement' => sprintf(
-                "<img src='%s/%s' width='80' height='80'>",
-                getDriverUrl(),
-                $this->target
-            ),
-            default => '-'
-        };
-    });
-
-    // ✅ Image (skip during export)
-    if (!request()->filled('_export_')) {
-        $grid->column('image', __('Image'))->display(function () {
-
-            $path = match ($this->target_type) {
-                'ware'  => $this->ware?->img2 ?? $this->ware?->show_img,
-                'gift'  => $this->gift?->show_img ?? $this->gift?->img,
-                'coin'  => 'coin.png',
-                default => null
+        // ✅ Target name / value
+        $grid->column('target', __('Target'))->display(function () {
+            return match ($this->target_type) {
+                'ware' => $this->ware?->name,
+                'gift' => $this->gift?->name,
+                'coin' => $this->target,
+                'achievement' => sprintf(
+                    "<img src='%s/%s' width='80' height='80'>",
+                    getDriverUrl(),
+                    $this->target
+                ),
+                default => '-'
             };
-
-            if (!$path) {
-                return '-';
-            }
-
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-    }
 
-    $grid->column('priority', __('Priority'));
-    $grid->column('quantity', __('Quantity'));
-    $grid->column('expire_days', __('Expire'));
+        // ✅ Image (skip during export)
+        if (! request()->filled('_export_')) {
+            $grid->column('image', __('Image'))->display(function () {
 
-    // ✅ No Carbon parse per row
-    $grid->column('created_at', __('Created At'))
-        ->display(fn ($v) => substr($v, 0, 10));
+                $path = match ($this->target_type) {
+                    'ware' => $this->ware?->img2 ?? $this->ware?->show_img,
+                    'gift' => $this->gift?->show_img ?? $this->gift?->img,
+                    'coin' => 'coin.png',
+                    default => null
+                };
 
-    // Extend grid if exists
-    if (method_exists($this, 'extendGrid')) {
-        $this->extendGrid($grid);
-    }
+                if (! $path) {
+                    return '-';
+                }
 
-    // Back button
-    $grid->tools(function (Grid\Tools $tools) {
-        $tools->append(
-            '<a href="'.admin_url('room_boom_levels').'" class="btn btn-sm btn-info">
+                $url = getImagePath($path);
+
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
+            });
+        }
+
+        $grid->column('priority', __('Priority'));
+        $grid->column('quantity', __('Quantity'));
+        $grid->column('expire_days', __('Expire'));
+
+        // ✅ No Carbon parse per row
+        $grid->column('created_at', __('Created At'))
+            ->display(fn ($v) => mb_substr($v, 0, 10));
+
+        // Extend grid if exists
+        if (method_exists($this, 'extendGrid')) {
+            $this->extendGrid($grid);
+        }
+
+        // Back button
+        $grid->tools(function (Grid\Tools $tools) {
+            $tools->append(
+                '<a href="'.admin_url('room_boom_levels').'" class="btn btn-sm btn-info">
                 <i class="fa fa-arrow-left"></i> '.__('Back').'
             </a>'
-        );
-    });
+            );
+        });
 
-    // Desktop optimization
-    \Encore\Admin\Facades\Admin::script("
+        // Desktop optimization
+        \Encore\Admin\Facades\Admin::script("
         if (window.innerWidth >= 1024) {
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
 
-    return $grid;
-}
+        return $grid;
+    }
 
     protected function detail($id)
     {
@@ -250,39 +294,42 @@ class RoomBoomRewardController extends MainController
         $form->hidden('room_boom_level_id')->default($roomBoomLevelId);
 
         $form->saving(function (Form $form) use ($roomBoomLevelId) {
-            if (!$form->model()->exists) {
+            if (! $form->model()->exists) {
                 $count = RoomBoomReward::where('room_boom_level_id', $roomBoomLevelId)->count();
                 if ($count >= 7) {
                     admin_error(__('You can only have a maximum of 7 gifts for this Room Boom Level.'));
+
                     return back();
                 }
             }
         });
 
         $targetTypeOptions = [
-            "ware" => __('ware'),
-            "gift" => __('gift'),
-            "coin" => __('coin'),
+            'ware' => __('ware'),
+            'gift' => __('gift'),
+            'coin' => __('coin'),
         ];
         if (class_exists(Achievement::class)) {
             $targetTypeOptions['achievement'] = __('achievement');
         }
 
         $form->select('target_type', trans('Target Type'))->options($targetTypeOptions)
-            ->when("ware", function (Form $form) {
+            ->when('ware', function (Form $form) {
                 $this->addWareFields($form);
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
             })
-            ->when("gift", function (Form $form) {
+            ->when('gift', function (Form $form) {
                 $this->addGiftFields($form);
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
             })
-            ->when("achievement", function (Form $form) {
-                if (!class_exists(Achievement::class)) return;
+            ->when('achievement', function (Form $form) {
+                if (! class_exists(Achievement::class)) {
+                    return;
+                }
                 $this->addAchievementFields($form);
                 $form->number('expire_days', __('expire'))->rules('nullable|integer|min:0');
             })
-            ->when("coin", fn(Form $form) => $this->addcoinField($form));
+            ->when('coin', fn (Form $form) => $this->addcoinField($form));
 
         $form->number('priority', __('priority'))
             ->rules(function () use ($roomBoomLevelId, $form) {
@@ -292,7 +339,7 @@ class RoomBoomRewardController extends MainController
                     'min:1',
                     Rule::unique('room_boom_rewards', 'priority')
                         ->where('room_boom_level_id', $roomBoomLevelId)
-                        ->ignore($form->model()->id)
+                        ->ignore($form->model()->id),
                 ];
             });
         $form->number('quantity', __('Quantity'))->rules('required|integer|min:1');
@@ -330,13 +377,16 @@ class RoomBoomRewardController extends MainController
         $form->belongsTo('ware_target_id', WaresByType::class, __('Ware'), function ($form) {
             $form->select('id', __('Wares'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Ware::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
         })->default(function ($form) {
             return $form->model()->target_type === 'ware'
@@ -352,13 +402,16 @@ class RoomBoomRewardController extends MainController
         $form->belongsTo('gift_target_id', Gifts::class, __('Gift'), function ($form) {
             $form->select('id', __('Gifts'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $gift = Gift::find($id);
+
                     return $gift ? [$gift->id => "{$gift->name}_{$gift->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url'     => admin_url('gifts-by-id')
+                    'data-load-url' => admin_url('gifts-by-id'),
                 ]);
         })->default(function ($form) {
             return $form->model()->target_type === 'gift'
@@ -369,31 +422,30 @@ class RoomBoomRewardController extends MainController
         $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
     }
 
-//    protected function addGiftFields($form, $prefix = 'gift_'): void
-//    {
-//        $fieldName = $prefix . 'id';
-//
-//        $form->select('target', __('Gift'))
-//            ->options(function ($id) {
-//                $query = Gift::query()->pluck('name', 'id');
-//
-//                if ($id) {
-//                    $gift = Gift::find($id);
-//                    if ($gift && !$query->has($gift->id)) {
-//                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
-//                    }
-//                }
-//                return Gift::pluck('name', 'id');
-//            })
-//            ->attribute([
-//                'data-image-select' => 1,
-//                'data-load-url'     => admin_url('gifts-by-id'),
-//            ]);
-//        $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
-//
-//        $this->addGiftJs($fieldName, 'gift-image-preview');
-//    }
-
+    //    protected function addGiftFields($form, $prefix = 'gift_'): void
+    //    {
+    //        $fieldName = $prefix . 'id';
+    //
+    //        $form->select('target', __('Gift'))
+    //            ->options(function ($id) {
+    //                $query = Gift::query()->pluck('name', 'id');
+    //
+    //                if ($id) {
+    //                    $gift = Gift::find($id);
+    //                    if ($gift && !$query->has($gift->id)) {
+    //                        $query[$gift->id] = "{$gift->name}_{$gift->id}";
+    //                    }
+    //                }
+    //                return Gift::pluck('name', 'id');
+    //            })
+    //            ->attribute([
+    //                'data-image-select' => 1,
+    //                'data-load-url'     => admin_url('gifts-by-id'),
+    //            ]);
+    //        $form->html('<div id="gift-image-preview" style="margin-top:10px;"></div>');
+    //
+    //        $this->addGiftJs($fieldName, 'gift-image-preview');
+    //    }
 
     protected function addGiftJs(string $fieldName = 'gift_id', string $previewId = 'gift-image-preview'): void
     {
@@ -432,14 +484,12 @@ class RoomBoomRewardController extends MainController
         Admin::script($script);
     }
 
-
-
     protected function addAchievementFields($form): void
     {
-        $form->image("achievement_target", __('image'))
+        $form->image('achievement_target', __('image'))
             ->name(function ($file) {
                 if ($file instanceof UploadedFile) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+                    return now()->timestamp.'.'.$file->guessExtension();
                 }
 
                 return $file;
@@ -456,48 +506,4 @@ class RoomBoomRewardController extends MainController
                     : null;
             });
     }
-
-    public function store()
-    {
-        $form = $this->form();
-
-        $form->saved(function (Form $form) {
-            $roomBoomLevelId = $form->model()->room_boom_level_id;
-            admin_toastr(__('Created successfully'));
-            return redirect()->to('admin/room_boom_rewards/' . $roomBoomLevelId);
-        });
-
-        return $form->store();
-    }
-
-    public function update($id)
-    {
-        $id = request()->route('id');
-        $form = $this->form()->edit($id);
-
-        $form->saved(function (Form $form) {
-            $roomBoomLevelId = $form->model()->room_boom_level_id;
-            admin_toastr(__('Updated successfully'));
-            return redirect()->to('admin/room_boom_rewards/' . $roomBoomLevelId);
-        });
-
-        return $form->update($id);
-    }
-
-    public function destroy($id)
-    {
-        $reward = RoomBoomReward::findOrFail($id);
-        $roomBoomLevelId = $reward->room_boom_level_id;
-        $reward->delete();
-
-        admin_toastr(__('Deleted successfully'));
-
-        return [
-            'status' => true,
-            'message' => __('Deleted successfully'),
-            'redirect' => admin_url('room_boom_rewards?room_boom_level_id=' . $roomBoomLevelId),
-        ];
-    }
-
-
 }

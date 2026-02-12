@@ -8,18 +8,13 @@ return [
 
         'api_enabled' => true,
 
-
         'utd_enabled' => true,
-
 
         'web_enabled' => true,
 
-
         'shipping_api_enabled' => true,
 
-
         'shipping_utd_enabled' => true,
-
 
         'shipping_web_enabled' => true,
     ],
@@ -81,58 +76,58 @@ return [
     'feature_key' => 'agencies',
 
     'models' => [
-        'user' => \App\Models\User::class,
-        'admin' => \App\Models\Admin::class,
-        'admin_user' => \App\Models\AdminUser::class,
-        'agent' => \App\Models\Agent::class,
-        'country' => \App\Models\Country::class,
-        'charge' => \App\Models\Charge::class,
-        'coin_log' => \App\Models\CoinLog::class,
-        'gift_log' => \App\Models\GiftLog::class,
-        'user_salary' => \App\Models\UserSallary::class,
-        'user_target' => \App\Models\UserTarget::class,
-        'bd' => \App\Models\Bd::class,
-        'payment_gateway' => \App\Models\PaymentGateway::class,
-        'config' => \App\Models\Config::class,
-        'language' => \App\Models\Language::class,
-        'setting' => \App\Models\Setting::class,
-        'country_rate' => \App\Models\CountryRate::class,
-        'gift' => \App\Models\Gift::class,
-        'room' => \App\Models\Room::class,
-        'chat' => \App\Models\Chat::class,
-        'notification' => \App\Models\Notification::class,
-        'user_gift' => \App\Models\UserGift::class,
-        
+        'user' => App\Models\User::class,
+        'admin' => App\Models\Admin::class,
+        'admin_user' => App\Models\AdminUser::class,
+        'agent' => App\Models\Agent::class,
+        'country' => App\Models\Country::class,
+        'charge' => App\Models\Charge::class,
+        'coin_log' => App\Models\CoinLog::class,
+        'gift_log' => App\Models\GiftLog::class,
+        'user_salary' => App\Models\UserSallary::class,
+        'user_target' => App\Models\UserTarget::class,
+        'bd' => App\Models\Bd::class,
+        'payment_gateway' => App\Models\PaymentGateway::class,
+        'config' => App\Models\Config::class,
+        'language' => App\Models\Language::class,
+        'setting' => App\Models\Setting::class,
+        'country_rate' => App\Models\CountryRate::class,
+        'gift' => App\Models\Gift::class,
+        'room' => App\Models\Room::class,
+        'chat' => App\Models\Chat::class,
+        'notification' => App\Models\Notification::class,
+        'user_gift' => App\Models\UserGift::class,
+
         // Agency Package Models
-        'agency' => \Utd\Agency\Entities\Agency::class,
-        'agency_salary' => \Utd\Agency\Entities\AgencySalary::class,
-        'agency_join_request' => \Utd\Agency\Entities\AgencyJoinRequest::class,
-        'agency_user_job' => \Utd\Agency\Entities\AgencyUserJob::class,
+        'agency' => Utd\Agency\Entities\Agency::class,
+        'agency_salary' => Utd\Agency\Entities\AgencySalary::class,
+        'agency_join_request' => Utd\Agency\Entities\AgencyJoinRequest::class,
+        'agency_user_job' => Utd\Agency\Entities\AgencyUserJob::class,
     ],
 
     'helpers' => [
-        'common' => \App\Helpers\Common::class,
+        'common' => App\Helpers\Common::class,
     ],
 
     'controllers' => [
-        'main_controller' => \App\Admin\Controllers\MainController::class,
+        'main_controller' => App\Admin\Controllers\MainController::class,
     ],
 
     'required_traits' => [
-        \App\Traits\CreatedByTrait::class,
-        \App\Traits\PaymentGetWayTrait::class,
-        \App\Traits\TimestampsWithTimezone::class,
+        App\Traits\CreatedByTrait::class,
+        App\Traits\PaymentGetWayTrait::class,
+        App\Traits\TimestampsWithTimezone::class,
     ],
 
     'modules' => [
         'salary_transaction' => [
             'enabled' => true,
-            'charge_agency' => \Modules\SalaryTransaction\Entities\ChargeAgency::class,
-            'salary_request' => \Modules\SalaryTransaction\Entities\SalaryRequest::class,
+            'charge_agency' => Modules\SalaryTransaction\Entities\ChargeAgency::class,
+            'salary_request' => Modules\SalaryTransaction\Entities\SalaryRequest::class,
         ],
         'milestones' => [
             'enabled' => true,
-            'helper' => \Modules\Milestones\Helpers\MilestoneHelper::class,
+            'helper' => Modules\Milestones\Helpers\MilestoneHelper::class,
         ],
         'agency_app' => [
             'enabled' => true,

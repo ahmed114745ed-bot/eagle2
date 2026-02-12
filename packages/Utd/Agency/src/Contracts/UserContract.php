@@ -1,4 +1,5 @@
 <?php
+
 namespace Utd\Agency\Contracts;
 
 interface UserContract

@@ -88,25 +88,25 @@ class LuckyGift extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         self::creating(function ($model) {
             if ($model->win_probability === null) {
                 return false;
             }
 
-            $model->min_percentage = $model->min_percentag . ',' . $model->mid_percentag . ',' . $model->max_percentag;
+            $model->min_percentage = $model->min_percentag.','.$model->mid_percentag.','.$model->max_percentag;
 
             unset($model->min_percentag);
             unset($model->mid_percentag);
             unset($model->max_percentag);
         });
-        
+
         self::updating(function ($model) {
             if ($model->win_probability === null) {
                 return false;
             }
-            
-            $model->min_percentage = $model->min_percentag . ',' . $model->mid_percentag . ',' . $model->max_percentag;
+
+            $model->min_percentage = $model->min_percentag.','.$model->mid_percentag.','.$model->max_percentag;
 
             unset($model->min_percentag);
             unset($model->mid_percentag);

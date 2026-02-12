@@ -2,14 +2,14 @@
 
 namespace Utd\CP\Entities;
 
-use App\Models\Ware;
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
-use Illuminate\Http\UploadedFile;
-use Modules\Badge\Entities\Badge;
+use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Modules\Badge\Entities\Badge;
+use Modules\Vip\Entities\OVip;
 
 class WeeklyCpGift extends Model
 {
@@ -130,4 +130,3 @@ class WeeklyCpGift extends Model
         });
     }
 }
-

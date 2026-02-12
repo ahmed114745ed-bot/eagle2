@@ -14,11 +14,11 @@ class AddFieldsToGiftLogs extends Migration
     public function up()
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            $table->dropColumn (['family_id']);
+            $table->dropColumn(['family_id']);
         });
         Schema::table('gift_logs', function (Blueprint $table) {
-            $table->unsignedInteger ('sender_family_id')->nullable ();
-            $table->unsignedInteger ('receiver_family_id')->nullable ();
+            $table->unsignedInteger('sender_family_id')->nullable();
+            $table->unsignedInteger('receiver_family_id')->nullable();
         });
     }
 

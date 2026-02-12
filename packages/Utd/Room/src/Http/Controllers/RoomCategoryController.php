@@ -2,7 +2,6 @@
 
 namespace Utd\Room\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 use Utd\Room\Services\RoomCategoryService;
@@ -12,8 +11,7 @@ class RoomCategoryController extends Controller
 {
     public function __construct(
         protected RoomCategoryService $categoryService
-    ) {
-    }
+    ) {}
 
     /**
      * Get all categories
@@ -50,7 +48,7 @@ class RoomCategoryController extends Controller
     {
         $category = $this->categoryService->findById($id);
 
-        if (!$category) {
+        if (! $category) {
             return response()->json([
                 'status' => false,
                 'message' => 'Category not found',

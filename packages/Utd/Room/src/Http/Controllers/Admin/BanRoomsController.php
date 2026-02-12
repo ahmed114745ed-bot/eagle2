@@ -3,23 +3,22 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Controllers\MainController;
-use Encore\Admin\Grid;
-use Utd\Room\Entities\BanRoom;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Utd\Room\Admin\Actions\BanRoomAction;
-use Encore\Admin\Controllers\HasResourceActions;
-
+use Utd\Room\Entities\BanRoom;
 
 class BanRoomsController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'close-room';
 
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -33,11 +32,9 @@ class BanRoomsController extends MainController
         // });
     }
 
-
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -46,7 +43,6 @@ class BanRoomsController extends MainController
             ->title(trans('bans'))
             ->body($this->form()));
     }
-
 
     /**
      * Make a grid builder.
@@ -64,13 +60,13 @@ class BanRoomsController extends MainController
                 'room.owner',
                 'room.owner.agency',
                 'room.owner.profile:user_id,avatar',
-                'room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'room.owner.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
 
-                'staff'
+                'staff',
             ])
             ->whereHas('room')
-            ->when($countryID, fn($q) => $q->whereHas('room', fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID))))
-            ->whereRaw("DATE_ADD(created_at, INTERVAL duration HOUR) > ?", [now()])
+            ->when($countryID, fn ($q) => $q->whereHas('room', fn ($q) => $q->whereHas('owner', fn ($q) => $q->where('country_id', $countryID))))
+            ->whereRaw('DATE_ADD(created_at, INTERVAL duration HOUR) > ?', [now()])
             // ->select('id','room_id', 'duration', 'staff_id',
             //     DB::raw('(SELECT MAX(created_at) FROM bans_rooms WHERE bans_rooms.room_id = bans_rooms.room_id) AS created_at')
             // )
@@ -81,18 +77,20 @@ class BanRoomsController extends MainController
         $grid->column('room_id', __('Room'))->display(function () {
             $room = $this->room;
 
-            if (!$room) return '-';
+            if (! $room) {
+                return '-';
+            }
             $name = $room->room_name;
             $room_id = $room->id;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$room->room_cover;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-            $userUrl = admin_url('rooms/' . $room->id);
+            $userUrl = admin_url('rooms/'.$room->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -108,20 +106,22 @@ class BanRoomsController extends MainController
 
         $grid->column('user_id', __('owner'))->display(function () {
             $user = $this->room->owner; // العلاقة مع المستخدم
-            if (!$user) return '-';
+            if (! $user) {
+                return '-';
+            }
 
             $name = $user->name;
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-'; // عرض "-" إذا لم يكن هناك رقم
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = $user->profile->avatar ?? '';
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-            $userUrl = admin_url('users/' . $user->id);
+            $userUrl = admin_url('users/'.$user->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -134,15 +134,17 @@ class BanRoomsController extends MainController
         });
 
         $grid->column('staff_id', __('staff'))->display(function () {
-            if (!$this->staff) return '-';
+            if (! $this->staff) {
+                return '-';
+            }
 
             $name = $this->staff->name ?? '-';
             $email = $this->staff->email ?? '-';
-            $defaultImage = asset("images/admin-icon.png");
+            $defaultImage = asset('images/admin-icon.png');
             $avatarPath = $this->staff->avatar ?? null;
             $avatar = $avatarPath ? asset($avatarPath) : $defaultImage;
 
-            $adminUrl = admin_url('admin/auth/users/' . $this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
+            $adminUrl = admin_url('admin/auth/users/'.$this->staff->id); // تعديل الرابط حسب صفحة الأدمن لديك
 
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$avatar' alt='Admin Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -177,16 +179,16 @@ class BanRoomsController extends MainController
 
             if ($hours >= 1) {
                 return "{$hours}h:{$minutes}m";
-            } else {
-                return "{$minutes}" . ' ' . __('minute');
             }
+
+            return "{$minutes}".' '.__('minute');
+
         });
-        if (Admin::user()->can('delete-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('delete-'.$this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('Delete'))->display(function () {
                 return (new \Utd\Room\Admin\Actions\DeleteBansRoom($this->id))->render();
             });
         }
-
 
         $grid->disableExport();
         $grid->disableRowSelector();
@@ -209,7 +211,7 @@ class BanRoomsController extends MainController
 
         $permission = $this->permission_name;
         $grid->tools(function (Grid\Tools $tools) use ($permission) {
-            if (Admin::user()->can('create-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('create-'.$permission) || Admin::user()->can('*')) {
                 $tools->append((new BanRoomAction())->render());
             }
         });

@@ -15,7 +15,7 @@ class AdminHelper
     public static function getSwitchStatesv2($field = null)
     {
         return [
-            'on'  => ['value' => 1, 'text' => __('On'),  'color' => 'success'],
+            'on' => ['value' => 1, 'text' => __('On'),  'color' => 'success'],
             'off' => ['value' => 0, 'text' => __('Off'), 'color' => 'danger'],
         ];
     }

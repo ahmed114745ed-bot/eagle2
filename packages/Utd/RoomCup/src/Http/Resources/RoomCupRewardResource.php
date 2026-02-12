@@ -17,7 +17,7 @@ class RoomCupRewardResource extends JsonResource
         return [
             'id' => $this->id,
             'amount' => $this->amount,
-            'date' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s')
+            'date' => Carbon::parse($this->created_at)->format('Y-m-d H:i:s'),
         ];
     }
 }

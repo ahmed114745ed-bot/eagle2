@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('user_achievement_levels', 'receive_type')) {
+        if (! Schema::hasColumn('user_achievement_levels', 'receive_type')) {
             Schema::table('user_achievement_levels', function (Blueprint $table) {
                 $table->string('receive_type')->nullable();
             });

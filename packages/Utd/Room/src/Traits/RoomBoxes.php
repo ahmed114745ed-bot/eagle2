@@ -8,7 +8,7 @@ trait RoomBoxes
 {
     public function scopeWithLuckyBoxFlag($query, $userId)
     {
-        if (!PackageHelper::isInstalled('luckyBox')) {
+        if (! PackageHelper::isInstalled('luckyBox')) {
             return $query;
         }
 
@@ -23,7 +23,7 @@ trait RoomBoxes
                         $q->where('user_id', $userId);
                     })
                     ->limit(1);
-            }
+            },
         ]);
     }
 }

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('room_categories', function (Blueprint $table) {
-              $table->integer('sort')->default(0);
-              $table->string('name_ar')->nullable();
+            $table->integer('sort')->default(0);
+            $table->string('name_ar')->nullable();
         });
     }
 

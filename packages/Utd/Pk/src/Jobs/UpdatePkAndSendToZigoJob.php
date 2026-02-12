@@ -2,38 +2,38 @@
 
 namespace Utd\Pk\Jobs;
 
-use Utd\Gifts\Services\SendGiftService;
-use Utd\Pk\Entities\Pk;
-use Utd\Room\Entities\Room;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Utd\Gifts\Services\SendGiftService;
+use Utd\Room\Entities\Room;
 
 class UpdatePkAndSendToZigoJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $userId;
+
     private $receivedIds;
+
     private $totalPrice;
+
     private $roomId;
+
     private $room;
 
     /**
-     * @param array $receivedIds
-     * @param float $totalPrice
-     * @param string $room
-     * @param $userId
+     * @param  string  $room
      */
     public function __construct($userId, $roomId, array $receivedIds, float $totalPrice, $room)
     {
         $this->receivedIds = $receivedIds;
-        $this->totalPrice  = $totalPrice;
-        $this->room        = $room;
-        $this->userId      = $userId;
-        $this->roomId      = $roomId;
+        $this->totalPrice = $totalPrice;
+        $this->room = $room;
+        $this->userId = $userId;
+        $this->roomId = $roomId;
     }
 
     /**

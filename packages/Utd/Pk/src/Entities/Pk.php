@@ -3,10 +3,10 @@
 namespace Utd\Pk\Entities;
 
 use App\Models\User;
-use Utd\Room\Entities\Room;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Utd\Room\Entities\Room;
 
 class Pk extends Model
 {

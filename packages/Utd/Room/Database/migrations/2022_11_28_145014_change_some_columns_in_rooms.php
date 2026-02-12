@@ -15,12 +15,12 @@ class ChangeSomeColumnsInRooms extends Migration
     {
 
         Schema::table('rooms', function (Blueprint $table) {
-            $table->dropColumn (['play_num','free_mic']);
+            $table->dropColumn(['play_num', 'free_mic']);
         });
 
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedTinyInteger('play_num')->comment('مفتاح اللعبة الرقمي 1 على 0 إيقاف')->nullable()->default (0)->after ('is_recommended');
-            $table->unsignedTinyInteger('free_mic')->nullable()->default (0)->comment('بت مجاني للميكروفون 1 عند 0 إيقاف')->after ('play_num');
+            $table->unsignedTinyInteger('play_num')->comment('مفتاح اللعبة الرقمي 1 على 0 إيقاف')->nullable()->default(0)->after('is_recommended');
+            $table->unsignedTinyInteger('free_mic')->nullable()->default(0)->comment('بت مجاني للميكروفون 1 عند 0 إيقاف')->after('play_num');
         });
     }
 

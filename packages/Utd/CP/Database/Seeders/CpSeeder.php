@@ -2,12 +2,11 @@
 
 namespace Utd\CP\Database\Seeders;
 
-use App\Models\User;
-use App\Models\Follow;
 use App\Models\GiftLog;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Utd\CP\Entities\Cp;
 use Modules\Events\Entities\WeeklyStar;
+use Utd\CP\Entities\Cp;
 
 class CpSeeder extends Seeder
 {
@@ -20,7 +19,7 @@ class CpSeeder extends Seeder
         $giftLogsLast = GiftLog::take(50)->orderByDesc('id')->get();
         Cp::query()->update([
             'status' => 1,
-            'cp_relation_id' => 12
+            'cp_relation_id' => 12,
         ]);
         $weeklyCp = WeeklyStar::find(22);
 
@@ -33,9 +32,9 @@ class CpSeeder extends Seeder
             $userTwo = $userIds[$i * 2 + 1];
 
             Cp::create([
-                'user_one_id'    => $userOne,
-                'user_two_id'    => $userTwo,
-                'status'         => 1,
+                'user_one_id' => $userOne,
+                'user_two_id' => $userTwo,
+                'status' => 1,
                 'cp_relation_id' => 12,
             ]);
         }

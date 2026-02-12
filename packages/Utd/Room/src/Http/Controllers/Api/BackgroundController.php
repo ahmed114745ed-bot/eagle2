@@ -4,62 +4,64 @@ namespace Utd\Room\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Room\Entities\Background;
 use Illuminate\Http\Request;
+use Utd\Room\Entities\Background;
 
 class BackgroundController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
-        $perPage = request('per_page')?? 10;
+        $perPage = request('per_page') ?? 10;
         $search = request('search');
-        $backgrounds = Background::when($search,function($q)use($search){
+        $backgrounds = Background::when($search, function ($q) use ($search) {
             $q->where('id', $search);
         })->paginate($perPage);
-
 
         return Common::apiResponse(true, '', $backgrounds, 200);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        if($request->hasFile('img')){
+        if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->img);
         }
 
-        $background  = Background::create([
+        $background = Background::create([
             'img' => $image ?? '',
-            'enable' => $request->enable
+            'enable' => $request->enable,
         ]);
 
-        return Common::apiResponse(true, '',  $background, 200);
+        return Common::apiResponse(true, '', $background, 200);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
 
-
-        if($request->hasFile('img')){
+        if ($request->hasFile('img')) {
             $image = Common::upload('images', $request->img);
             Background::findOrFail($id)->update([
-                'img' => $image
+                'img' => $image,
             ]);
         }
         Background::findOrFail($id)->update([
-            'enable' => $request->enable
+            'enable' => $request->enable,
         ]);
 
         return Common::apiResponse(1, 'Background updated successfully');
 
-
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $background = Background::findOrFail($id);
 
         return Common::apiResponse(true, '', $background, 200);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
 
         Background::findOrFail($id)->delete();
 

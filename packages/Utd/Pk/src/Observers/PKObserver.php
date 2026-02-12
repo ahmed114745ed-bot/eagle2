@@ -6,7 +6,7 @@ use Utd\Pk\Entities\Pk;
 
 class PKObserver
 {
-    public function creating(PK $pK)
+    public function creating(Pk $pK)
     {
         $mics = $pK->mics;
         $m = is_string($mics) ? explode(',', $mics) : $mics;
@@ -26,7 +26,7 @@ class PKObserver
         $pK->team_2 = $t2;
     }
 
-    public function updating(PK $pK)
+    public function updating(Pk $pK)
     {
         $mics = $pK->mics;
         $m = is_string($mics) ? explode(',', $mics) : $mics;

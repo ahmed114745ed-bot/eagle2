@@ -14,8 +14,8 @@ class AdditionalInfoResource extends JsonResource
         return [
             'id' => $this->id,
             'agency_id' => $this->agency_id,
-            'face_image' => $this->face_image ? asset('storage/' . $this->face_image) : null,
-            'back_image' => $this->back_image ? asset('storage/' . $this->back_image) : null,
+            'face_image' => $this->face_image ? asset('storage/'.$this->face_image) : null,
+            'back_image' => $this->back_image ? asset('storage/'.$this->back_image) : null,
             'email' => $this->email,
             'status' => $this->status,
             'status_text' => $this->getStatusText(),

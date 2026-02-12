@@ -23,9 +23,6 @@ class HostDailyDataExport implements FromCollection, WithHeadings, WithMapping
         return collect($this->data);
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -44,14 +41,13 @@ class HostDailyDataExport implements FromCollection, WithHeadings, WithMapping
     }
 
     /**
-     * @param mixed $row
-     * @return array
+     * @param  mixed  $row
      */
     public function map($row): array
     {
         // If $row is a resource instance, get the resource array
-        $data = is_object($row) && method_exists($row, 'toArray') 
-            ? $row->toArray(request()) 
+        $data = is_object($row) && method_exists($row, 'toArray')
+            ? $row->toArray(request())
             : (array) $row;
 
         return [

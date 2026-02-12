@@ -2,21 +2,20 @@
 
 namespace Utd\Gifts\Http\Controllers\Admin;
 
+use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Auth\Permission;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Str;
 use Utd\Gifts\Entities\Gift;
 use Utd\Gifts\Entities\GiftCategory;
 use Utd\Gifts\Entities\LuckyGift;
 use Utd\Gifts\Support\ClassResolver;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\App;
 
 /**
  * GiftController
@@ -26,6 +25,7 @@ class GiftController
     use HasResourceActions;
 
     public $permission_name = 'gift';
+
     protected $title = 'Gifts';
 
     public function index(Content $content)
@@ -35,15 +35,6 @@ class GiftController
             ->row(function ($row) {
                 $row->column(12, $this->grid());
             });
-    }
-
-    protected function grid2()
-    {
-        $make_rooms_top = settings()->get('close_open_gifts');
-        return (new Box(
-            title: __('admin.Actions'),
-            content: view('admin.grid.users.closeOpenGifts', compact(['make_rooms_top'])),
-        ));
     }
 
     /**
@@ -61,7 +52,7 @@ class GiftController
      */
     public function edit($id, Content $content)
     {
-        if (url()->previous() != url()) {
+        if (url()->previous() !== url()) {
             session(['return_url' => url()->previous()]);
         }
 
@@ -80,23 +71,44 @@ class GiftController
             ->body($this->form());
     }
 
+    public function luckyGiftSettings(Content $content)
+    {
+        if (! Admin::user()->can('*')) {
+            Permission::check('browse-lucky-gift-setting');
+        }
+        $SettingModel = ClassResolver::model('setting');
+        $config = $SettingModel::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins', 'host_lucky_gift'])->pluck('value', 'key')->toArray();
+
+        return $content->view('lucky_gift', compact('config'));
+    }
+
+    protected function grid2()
+    {
+        $make_rooms_top = settings()->get('close_open_gifts');
+
+        return new Box(
+            title: __('admin.Actions'),
+            content: view('admin.grid.users.closeOpenGifts', compact(['make_rooms_top'])),
+        );
+    }
+
     /**
      * Make a grid builder
      */
     protected function grid()
     {
         $grid = new Grid(new Gift);
-       
+
         $filterType = request('filter', 'all');
-        $category  = [];
-        if (request('filter') != 'all') {
+        $category = [];
+        if (request('filter') !== 'all') {
             $category = GiftCategory::find(request('filter'));
         }
 
         $grid->model()
             ->with('vip')
             ->where('type', '!=', 8)
-            ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
+            ->when($filterType !== 'all', fn ($q) => $q->where('gift_category_id', $filterType))
             ->orderBy('use_count', 'desc')
             ->orderBy('type')
             ->orderByRaw('ISNULL(`sort`), `sort`')
@@ -120,7 +132,7 @@ class GiftController
             // بناء HTML
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
             foreach ($tabs as $key => $label) {
-                $active = $filterType === (string)$key ? 'active' : '';
+                $active = $filterType === (string) $key ? 'active' : '';
                 $url = request()->fullUrlWithQuery(['filter' => $key]);
                 $html .= "<li class='{$active}'><a href='{$url}'>{$label}</a></li>";
             }
@@ -132,11 +144,12 @@ class GiftController
         $grid->id(__('ID'));
         $grid->name(__('Name'));
 
-        if ($category && $category->type == 'vip') {
+        if ($category && $category->type === 'vip') {
             $grid->column('level', trans('vip'))->display(function () {
-                $defaultImage = asset("images/image.png");
+                $defaultImage = asset('images/image.png');
                 $path = getImagePath($this?->vip?->img);
                 $url = $path ?: $defaultImage;
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
             $grid->column('vip_level', __('level_num'));
@@ -151,18 +164,19 @@ class GiftController
 
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.jpg');
+
             return "
             <div style='display: flex; align-items: center; gap: 5px;'>
-                <span>" . number_format($coin) . "</span>
+                <span>".number_format($coin)."</span>
                 <img src='{$icon}' alt='Coin' width='20' height='20'>
             </div>
         ";
         });
 
         $grid->column('img', trans('image'))->display(function ($path) {
-            $imgPath = getImagePath($path) ?: asset("images/image.png");
-            $musicIcon = $this->music_gift == 1
-                ? "<img src='" . asset('images/music.jpg') . "'
+            $imgPath = getImagePath($path) ?: asset('images/image.png');
+            $musicIcon = $this->music_gift === 1
+                ? "<img src='".asset('images/music.jpg')."'
                 style='position: absolute; top: 5px; right: 5px; width: 20px; height: 20px;
                 background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; padding: 2px;'>"
                 : '';
@@ -175,10 +189,11 @@ class GiftController
 
         $grid->column('show_img', trans('show_img'))->display(function ($path) {
             $url = getImagePath($path) ?: asset('images/image.png');
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
-        $grid->column("use_count", __('use count'));
+        $grid->column('use_count', __('use count'));
 
         $grid->disableExport();
 
@@ -187,12 +202,12 @@ class GiftController
             $('.table-responsive').removeClass('table-responsive');
         }
     ");
-        $permission    = $this->permission_name;
+        $permission = $this->permission_name;
         $grid->actions(function ($actions) use ($permission) {
             $model = $actions->row;
 
-            if ((Admin::user()->can('move-switch-' . $permission) || Admin::user()->can('*'))
-                && $model->category?->type != null
+            if ((Admin::user()->can('move-switch-'.$permission) || Admin::user()->can('*'))
+                && $model->category?->type !== null
             ) {
                 $MoveGiftCategoryAction = ClassResolver::action('move_gift_category');
                 if ($MoveGiftCategoryAction && class_exists($MoveGiftCategoryAction)) {
@@ -207,6 +222,7 @@ class GiftController
                 $batch->add(new $MoveGroupsGiftsAction());
             }
         });
+
         return $grid;
     }
 
@@ -216,6 +232,7 @@ class GiftController
     protected function detail($id)
     {
         $show = new Show(Gift::findOrFail($id));
+
         // Extended show fields can be added here
         return $show;
     }
@@ -227,13 +244,13 @@ class GiftController
     {
         $TabsFromClass = ClassResolver::form('tabs_from');
         $form = new $TabsFromClass(new Gift);
-        
+
         // Disable default form tools
         $form->tools(function ($tools) {
             $tools->disableDelete();
             $tools->disableView();
         });
-        
+
         $type = old('type', $form->model()->type ?? null);
 
         $form->display(__('ID'));
@@ -257,7 +274,7 @@ class GiftController
 
         $form->file('img', __('img'));
         $form->file('show_img', __('show_img'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
         })->required();
         $form->select('image_type', __('image_type'))->options(
             [
@@ -272,10 +289,12 @@ class GiftController
         if ($CommonHelperClass) {
             $form->switch('music_gift', trans('music_gift'))->states($CommonHelperClass::getSwitchStatesGiftMucic());
         }
-        
+
         // Before saving, handle validations and model fields
         $form->saving(function (Form $form) {
-            if (request()->has('_edit_inline')) return;
+            if (request()->has('_edit_inline')) {
+                return;
+            }
 
             $categoryId = $form->input('gift_category_id');
             $category = GiftCategory::find($categoryId);
@@ -289,11 +308,12 @@ class GiftController
                 $maxPercentag = (float) ($form->input('luckyGift.max_percentag') ?? 0);
                 $total = $minPercentag + $midPercentag + $maxPercentag;
 
-                if ($total != 100) {
+                if ($total !== 100) {
                     $error = new \Illuminate\Support\MessageBag([
                         'title' => 'Error',
                         'message' => trans('admin.percent_total_error', ['total' => $total]),
                     ]);
+
                     return back()->with(compact('error'))->withInput();
                 }
 
@@ -325,15 +345,5 @@ class GiftController
         });
 
         return $form;
-    }
-
-    public function luckyGiftSettings(Content $content)
-    {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-lucky-gift-setting');
-        }
-        $SettingModel = ClassResolver::model('setting');
-        $config = $SettingModel::whereIn('key', ['app_wallet_lucky_gift', 'owner_lucky_gift', 'lucky_gift_coins','host_lucky_gift'])->pluck('value', 'key')->toArray();
-        return $content->view('lucky_gift', compact('config'));
     }
 }

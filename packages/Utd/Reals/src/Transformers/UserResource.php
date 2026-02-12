@@ -3,9 +3,9 @@
 namespace Utd\Reals\Transformers;
 
 use App\Helpers\Common;
-use Utd\Room\Entities\Room;
-use Illuminate\Http\Resources\Json\JsonResource;
 use App\Http\Resources\Api\V1\MangerTypeResource;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Room\Entities\Room;
 
 class UserResource extends JsonResource
 {
@@ -36,13 +36,13 @@ class UserResource extends JsonResource
             'vip_level' => (int) (@$this->UserVip->level ?? 0),
             'sender_level' => (int) (@$this->total_sender_level ?? 0),
             'now_room' => [
-                'is_in_room' => @$this->now_room_uid != 0,
+                'is_in_room' => @$this->now_room_uid !== 0,
                 'uid' => @(int) $this->now_room_uid,
-                'is_mine' => @$this->id == $this->now_room_uid,
-                'password_status' => $pass_status
+                'is_mine' => @$this->id === $this->now_room_uid,
+                'password_status' => $pass_status,
             ],
-            'type_user' => intval(@$this->type_user) ?: 0,
-            "manger_type" => new MangerTypeResource(@$this->mangerType)
+            'type_user' => (int) (@$this->type_user) ?: 0,
+            'manger_type' => new MangerTypeResource(@$this->mangerType),
         ];
     }
 }

@@ -52,23 +52,22 @@ class HostDiamondController extends MainController
         $countryID = session('filter_country_id');
 
         $grid->model()
-            ->when($countryID, fn($q) =>
-            $q->where(function ($q) use ($countryID) {
-                $q->whereHas('receiver', fn($q) => $q->where('country_id', $countryID))
-                    ->orWhereHas('agency', fn($q) => $q->where('country_id', $countryID));
+            ->when($countryID, fn ($q) => $q->where(function ($q) use ($countryID) {
+                $q->whereHas('receiver', fn ($q) => $q->where('country_id', $countryID))
+                    ->orWhereHas('agency', fn ($q) => $q->where('country_id', $countryID));
             }))
             ->selectRaw('receiver_id, agency_id, SUM(giftPrice) as total_gift_price')
             ->with([
                 'receiver:id,uuid,original_uuid,name,country_id',
                 'receiver.profile:id,user_id,avatar',
                 'receiver.country:id,name,e_name,flag',
-                'agency:id,name,img'
+                'agency:id,name,img',
             ])
             ->where('agency_id', '!=', 0)
             ->groupBy('receiver_id', 'agency_id')
-            ->when(! request('from_date'), fn($q) => $q->where('created_at', '>=', now()->startOfMonth()))
-            ->when(! request('to_date'), fn($q) => $q->where('created_at', '<=', now()->endOfMonth()))
-            ->when(request('total_gift_price'), fn($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
+            ->when(! request('from_date'), fn ($q) => $q->where('created_at', '>=', now()->startOfMonth()))
+            ->when(! request('to_date'), fn ($q) => $q->where('created_at', '<=', now()->endOfMonth()))
+            ->when(request('total_gift_price'), fn ($q) => $q->havingRaw('total_gift_price >= ?', [(int) request('total_gift_price')]))
             ->orderByDesc('total_gift_price');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -130,8 +129,9 @@ class HostDiamondController extends MainController
 
         $grid->column('total_gift_price', __('Total Diamond received'))->display(function ($val) {
             if (request()->filled('_export_')) {
-                return "\t" . number_format($val);
+                return "\t".number_format($val);
             }
+
             return number_format($val);
         });
         $grid->disableActions();

@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('agency_user_jobs')) return;
+        if (Schema::hasTable('agency_user_jobs')) {
+            return;
+        }
         Schema::create('agency_user_jobs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('agency_id')->constrained('agencies')->onDelete ('cascade');
-            $table->foreignId ('user_id')->constrained('users')->onDelete ('cascade');
-            $table->char('type',100)->nullable();
+            $table->unsignedInteger('agency_id')->constrained('agencies')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->char('type', 100)->nullable();
             $table->timestamps();
         });
     }

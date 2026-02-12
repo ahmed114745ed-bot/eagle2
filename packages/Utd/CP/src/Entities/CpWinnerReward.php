@@ -11,4 +11,3 @@ class CpWinnerReward extends Model
 
     protected $guarded = [];
 }
-

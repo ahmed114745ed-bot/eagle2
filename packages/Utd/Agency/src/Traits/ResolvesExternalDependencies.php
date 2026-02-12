@@ -8,8 +8,8 @@ namespace Utd\Agency\Traits;
  */
 trait ResolvesExternalDependencies
 {
-    use ResolvesModels;
-    use ResolvesServices;
     use ResolvesHelpers;
+    use ResolvesModels;
     use ResolvesModules;
+    use ResolvesServices;
 }

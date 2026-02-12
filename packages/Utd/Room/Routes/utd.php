@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Utd\Room\Http\Controllers\RoomController;
+use Utd\Room\Http\Controllers\Api\RoomVipsController;
 use Utd\Room\Http\Controllers\BackgroundController;
 use Utd\Room\Http\Controllers\MicrophoneController;
 use Utd\Room\Http\Controllers\RoomCategoryController;
-use Utd\Room\Http\Controllers\Api\RoomVipsController;
+use Utd\Room\Http\Controllers\RoomController;
 
 /*
 |--------------------------------------------------------------------------

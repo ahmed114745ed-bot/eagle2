@@ -13,7 +13,9 @@ class OwnerPidAgan extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('OwnerAgancyBide')) return;
+        if (Schema::hasTable('OwnerAgancyBide')) {
+            return;
+        }
         Schema::create('OwnerAgancyBide', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');

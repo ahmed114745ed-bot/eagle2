@@ -2,25 +2,17 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
+use App\Models\User;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Modules\Vip\Entities\OVip;
 use Utd\Room\Entities\Room;
-use App\Models\User;
-use App\Models\Ware;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use App\Helpers\Common;
-use Illuminate\Support\Str;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\Session;
-use Encore\Admin\Controllers\HasResourceActions;
-use Modules\Public\Http\Services\UserCounterServices;
 
 class RoomMicController extends \App\Admin\Controllers\MainController
 {
-
     use HasResourceActions;
-   // public $permission_name = 'ovip-gift';
+    // public $permission_name = 'ovip-gift';
 
     public function index(Content $content)
     {
@@ -31,27 +23,22 @@ class RoomMicController extends \App\Admin\Controllers\MainController
         <i class="fa fa-arrow-left"></i> {$back}
     </a>
     HTML;
-     
-            $room = Room::find(request('room_id'));
-            $ids = explode(',', $room->microphone);
-      
 
+        $room = Room::find(request('room_id'));
+        $ids = explode(',', $room->microphone);
 
         // Add the back button
 
-
         // Dynamically add rows for each level
-       
-            $content = $content
-                ->header(trans('admin.index'))
 
-                ->row($buttonHTML);
-            $content->row($this->gridDynamic($ids));
-        
+        $content = $content
+            ->header(trans('admin.index'))
+
+            ->row($buttonHTML);
+        $content->row($this->gridDynamic($ids));
 
         return $content;
     }
-  
 
     protected function gridDynamic($ids)
     {
@@ -64,16 +51,14 @@ class RoomMicController extends \App\Admin\Controllers\MainController
         $grid->column('uuid', __('uuid'));
 
         $grid->column('profile.avatar', __('image'))->display(function ($path) {
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
-       
-
-       
 
         $grid->actions(function ($actions) {
             $actions->disableView();
@@ -81,13 +66,7 @@ class RoomMicController extends \App\Admin\Controllers\MainController
             $actions->disableEdit();
         });
         $grid->disableCreateButton();
-       
-       
 
-    
         return $grid;
     }
-
-
-    
 }

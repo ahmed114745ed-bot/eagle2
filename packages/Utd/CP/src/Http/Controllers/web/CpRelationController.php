@@ -2,19 +2,18 @@
 
 namespace Utd\CP\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Admin\Controllers\MainController;
-use Utd\Achievements\Entities\Achievement;
-use Utd\Achievements\Enums\AchievementType;
-use Utd\CP\Entities\CpRelation;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Utd\CP\Entities\CpRelation;
 
 class CpRelationController extends MainController
 {
-     public $permission_name = 'cp-relation';
+    public $permission_name = 'cp-relation';
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -25,8 +24,7 @@ class CpRelationController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -39,8 +37,7 @@ class CpRelationController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -53,7 +50,6 @@ class CpRelationController extends MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -78,40 +74,39 @@ class CpRelationController extends MainController
             ]);
         });
         $grid->column('id', __('Id'));
-        $grid->column("title", __("title"));
-        $grid->column("description", __("description"));
-        if (!request()->filled('_export_')) {
+        $grid->column('title', __('title'));
+        $grid->column('description', __('description'));
+        if (! request()->filled('_export_')) {
             $grid->column('image', __('Img'))->image('', 30, 30);
         }
-        $grid->column("price", __("price"));
-        $grid->column("type", __("type"))->display(function () {
+        $grid->column('price', __('price'));
+        $grid->column('type', __('type'))->display(function () {
             return $this->type;
         });
-        $grid->column("relations_number", __("relations number"));
-        if (!request()->filled('_export_')) {
+        $grid->column('relations_number', __('relations number'));
+        if (! request()->filled('_export_')) {
             $grid->column('الاجرائات')->display(function () {
                 if ($this->type === 'solution') {
                     return '';
-                } else {
-
-                    $url = url('admin/cp-levels/' . $this->id);
-                    $button = "<a href='{$url}' class='btn btn-sm btn-info'>المستويات (levels)</a>";
-                    return $button;
                 }
+
+                $url = url('admin/cp-levels/'.$this->id);
+                $button = "<a href='{$url}' class='btn btn-sm btn-info'>المستويات (levels)</a>";
+
+                return $button;
+
             });
         }
-        
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
-
-
     protected function detail($id)
     {
         $show = new Show(CpRelation::findOrFail($id));
@@ -143,12 +138,12 @@ class CpRelationController extends MainController
             'friend' => __('friend'),
             'lovely' => __('lovely'),
             'solution' => __('solution'),
-        ])->default(0)->rules('required')->when('!=', 'solution', function ($form){
-            $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__("admin.relations_help"));
+        ])->default(0)->rules('required')->when('!=', 'solution', function ($form) {
+            $form->switch('relations_number', __('relations number'))->default(0)->rules('required')->help(__('admin.relations_help'));
         });
 
         $form->saving(function (Form $form) {
-            if ($form->type == 'solution') {
+            if ($form->type === 'solution') {
                 $form->relations_number = 1;
             }
         });

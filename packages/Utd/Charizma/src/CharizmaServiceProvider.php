@@ -11,6 +11,7 @@ use Utd\Charizma\Services\UserCharismaService;
 class CharizmaServiceProvider extends ServiceProvider
 {
     protected string $moduleName = 'Charizma';
+
     protected string $moduleNameLower = 'charizma';
 
     /**
@@ -18,8 +19,8 @@ class CharizmaServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../Config/charizma.php', 'charizma');
-        
+        $this->mergeConfigFrom(__DIR__.'/../Config/charizma.php', 'charizma');
+
         $this->app->singleton(UserCharismaServiceContract::class, UserCharismaService::class);
     }
 
@@ -40,7 +41,7 @@ class CharizmaServiceProvider extends ServiceProvider
     protected function registerRoutes(): void
     {
         Route::middleware('api')
-            ->group(__DIR__ . '/../Routes/api.php');
+            ->group(__DIR__.'/../Routes/api.php');
     }
 
     /**
@@ -48,7 +49,7 @@ class CharizmaServiceProvider extends ServiceProvider
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/migrations');
     }
 
     /**
@@ -56,12 +57,12 @@ class CharizmaServiceProvider extends ServiceProvider
      */
     protected function registerViews(): void
     {
-        $viewPath = resource_path('views/modules/' . $this->moduleNameLower);
-        $sourcePath = __DIR__ . '/../Resources/views';
+        $viewPath = resource_path('views/modules/'.$this->moduleNameLower);
+        $sourcePath = __DIR__.'/../Resources/views';
 
         $this->publishes([
-            $sourcePath => $viewPath
-        ], ['views', $this->moduleNameLower . '-views']);
+            $sourcePath => $viewPath,
+        ], ['views', $this->moduleNameLower.'-views']);
 
         $this->loadViewsFrom($sourcePath, $this->moduleNameLower);
     }
@@ -73,11 +74,11 @@ class CharizmaServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../Config/charizma.php' => config_path('charizma.php'),
+                __DIR__.'/../Config/charizma.php' => config_path('charizma.php'),
             ], 'charizma-config');
 
             $this->publishes([
-                __DIR__ . '/../Database/migrations' => database_path('migrations'),
+                __DIR__.'/../Database/migrations' => database_path('migrations'),
             ], 'charizma-migrations');
         }
     }

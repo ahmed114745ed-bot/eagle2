@@ -29,12 +29,10 @@ class RoomServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../Config/room.php', 'room');
+        $this->mergeConfigFrom(__DIR__.'/../Config/room.php', 'room');
 
         // Bind the repository interface to the implementation (RoomRepository now implements both)
         $this->app->bind(RoomRepoInterface::class, RoomRepository::class);
@@ -63,8 +61,6 @@ class RoomServiceProvider extends ServiceProvider
 
     /**
      * Boot the application events.
-     *
-     * @return void
      */
     public function boot(Router $router): void
     {
@@ -79,100 +75,88 @@ class RoomServiceProvider extends ServiceProvider
 
     /**
      * Register the package commands.
-     *
-     * @return void
      */
     protected function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Utd\Room\Console\Commands\RemoveBackgroundCron::class,
-                \Utd\Room\Console\Commands\UpdateRoomBanCommand::class,
+                Console\Commands\RemoveBackgroundCron::class,
+                Console\Commands\UpdateRoomBanCommand::class,
             ]);
         }
     }
 
     /**
      * Register the package routes.
-     *
-     * @return void
      */
     protected function registerRoutes(): void
     {
         Route::middleware('api')
-            ->group(__DIR__ . '/../Routes/api.php');
+            ->group(__DIR__.'/../Routes/api.php');
 
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/web.php');
+            ->group(__DIR__.'/../Routes/web.php');
 
         Route::prefix('api/utd')
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/utd.php');
+            ->group(__DIR__.'/../Routes/utd.php');
 
         Route::prefix('api/dashboard')
             ->middleware(['api'])
-            ->group(__DIR__ . '/../Routes/dashboard.php');
+            ->group(__DIR__.'/../Routes/dashboard.php');
     }
 
     /**
      * Register the package views.
-     *
-     * @return void
      */
     protected function registerViews(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'room');
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'room');
     }
 
     /**
      * Register the package translations.
-     *
-     * @return void
      */
     protected function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'room');
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'room');
     }
 
     /**
      * Register the package migrations.
-     *
-     * @return void
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/migrations');
     }
 
     /**
      * Register the package's publishable resources.
-     *
-     * @return void
      */
     protected function registerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             // Config
             $this->publishes([
-                __DIR__ . '/../Config/room.php' => config_path('room.php'),
+                __DIR__.'/../Config/room.php' => config_path('room.php'),
             ], 'room-config');
-//
-//            // Views
-//            $this->publishes([
-//                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
-//            ], 'room-views');
-//
-//            // Translations
-//            $this->publishes([
-//                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
-//            ], 'room-lang');
-//
-//            // Migrations
-//            $this->publishes([
-//                __DIR__ . '/../Database/migrations' => database_path('migrations'),
-//            ], 'room-migrations');
+            //
+            //            // Views
+            //            $this->publishes([
+            //                __DIR__ . '/../Resources/views' => resource_path('views/vendor/room'),
+            //            ], 'room-views');
+            //
+            //            // Translations
+            //            $this->publishes([
+            //                __DIR__ . '/../Resources/lang' => resource_path('lang/vendor/room'),
+            //            ], 'room-lang');
+            //
+            //            // Migrations
+            //            $this->publishes([
+            //                __DIR__ . '/../Database/migrations' => database_path('migrations'),
+            //            ], 'room-migrations');
         }
     }
 

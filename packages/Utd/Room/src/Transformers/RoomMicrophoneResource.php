@@ -9,7 +9,7 @@ class RoomMicrophoneResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
@@ -20,7 +20,7 @@ class RoomMicrophoneResource extends JsonResource
             'position' => $this->position,
             'user_id' => $this->user_id,
             'status' => $this->status,
-            'user' => $this->whenLoaded('user', fn() => [
+            'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'uuid' => $this->user->uuid ?? '',
                 'name' => $this->user->name ?? '',

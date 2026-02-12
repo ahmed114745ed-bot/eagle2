@@ -3,9 +3,7 @@
 namespace Utd\Achievements\Repositories;
 
 use App\Tik\Repositories\AbstractRepository;
-use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Entities\UserAchievementLevel;
-
 
 class UserAchievementLevelRepository extends AbstractRepository
 {

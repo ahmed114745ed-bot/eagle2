@@ -13,14 +13,14 @@ class PkMenuSeeder extends Seeder
             ->whereNull('uri')
             ->first();
 
-        if (!$eventsParent) {
+        if (! $eventsParent) {
             $parentOrder = Menu::where('parent_id', 0)->max('order') ?? 0;
             $eventsParent = Menu::create([
-                'title'     => 'events',
+                'title' => 'events',
                 'parent_id' => 0,
-                'order'     => $parentOrder + 1,
-                'icon'      => '📅',
-                'uri'       => null,
+                'order' => $parentOrder + 1,
+                'icon' => '📅',
+                'uri' => null,
             ]);
         }
 

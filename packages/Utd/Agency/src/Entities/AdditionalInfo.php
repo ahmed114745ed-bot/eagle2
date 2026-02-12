@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AdditionalInfo extends Model
 {
+    /**
+     * Status Constants
+     */
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_APPROVED = 1;
+
+    public const STATUS_REJECTED = 2;
+
     protected $table = 'additional_infos';
 
     protected $guarded = [];
@@ -16,13 +25,6 @@ class AdditionalInfo extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Status Constants
-     */
-    const STATUS_PENDING = 0;
-    const STATUS_APPROVED = 1;
-    const STATUS_REJECTED = 2;
 
     /**
      * Relationship with Agency
@@ -53,7 +55,7 @@ class AdditionalInfo extends Model
      */
     public function isApproved(): bool
     {
-        return $this->status == self::STATUS_APPROVED;
+        return $this->status === self::STATUS_APPROVED;
     }
 
     /**
@@ -62,6 +64,7 @@ class AdditionalInfo extends Model
     public function approve(): bool
     {
         $this->status = self::STATUS_APPROVED;
+
         return $this->save();
     }
 
@@ -71,6 +74,7 @@ class AdditionalInfo extends Model
     public function reject(): bool
     {
         $this->status = self::STATUS_REJECTED;
+
         return $this->save();
     }
 }

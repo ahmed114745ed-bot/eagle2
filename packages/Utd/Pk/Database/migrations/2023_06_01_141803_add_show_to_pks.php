@@ -14,7 +14,7 @@ class AddShowToPks extends Migration
     public function up()
     {
         Schema::table('pks', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('show_status')->default (0);
+            $table->unsignedTinyInteger('show_status')->default(0);
         });
     }
 

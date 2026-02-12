@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cp_relations', function (Blueprint $table) {
-            $table->enum('type',[0,1,2,3])->default(0)->comment('الاخوة و صديق حميم و حبايب و حلال العلاقة');
+            $table->enum('type', [0, 1, 2, 3])->default(0)->comment('الاخوة و صديق حميم و حبايب و حلال العلاقة');
         });
     }
 

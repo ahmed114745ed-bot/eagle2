@@ -9,13 +9,14 @@ class AgencyJoinReqResource extends JsonResource
     public function toArray($request)
     {
         $statuses = [
-            0=>'pending',
-            1=>'accepted',
-            2=>'denied',
+            0 => 'pending',
+            1 => 'accepted',
+            2 => 'denied',
         ];
+
         return [
-            'agency'=>$this->agency,
-            'status'=>$statuses[$this->status?:0],
+            'agency' => $this->agency,
+            'status' => $statuses[$this->status ?: 0],
         ];
     }
 }

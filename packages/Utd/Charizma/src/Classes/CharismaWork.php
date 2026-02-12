@@ -2,48 +2,50 @@
 
 namespace Utd\Charizma\Classes;
 
-use App\Helpers\Common;
 use App\Interfaces\RoomJobInterface;
-use Utd\Room\Entities\Room;
+use Exception;
 use Utd\Charizma\Services\UserCharismaService;
+use Utd\Room\Entities\Room;
 
 class CharismaWork implements RoomJobInterface
 {
-
-    public function work($roomJob) : array
+    public function work($roomJob): array
     {
         $room = Room::query()->find($roomJob->room_id);
-        if(!$room) throw new \Exception('Room not found');
+        if (! $room) {
+            throw new Exception('Room not found');
+        }
         $userIds = unserialize($roomJob->data);
         $earnedCoinsPerUser = $roomJob->coins;
 
         $data = (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $userIds, $earnedCoinsPerUser);
-        return ['room_id'=> $room->id, ...$data];
+
+        return ['room_id' => $room->id, ...$data];
     }
 
-    public function sendToZego($data, int $roomId,int $user_id):  string
+    public function sendToZego($data, int $roomId, int $user_id): string
     {
-        $ms   = [
+        $ms = [
             'messageContent' => [
-                "message" => "updateCharisma",
-                "data"    => $data,
-            ]
+                'message' => 'updateCharisma',
+                'data' => $data,
+            ],
         ];
         $json = json_encode($ms);
 
         return $json;
     }
 
-    public function prepareDataToZego($data) : array
+    public function prepareDataToZego($data): array
     {
         $result = [];
 
         foreach ($data['charisma'] as $item) {
-            $room_id = $item["room_id"]; // Assuming the first entry of each item contains the room_id and user data
+            $room_id = $item['room_id']; // Assuming the first entry of each item contains the room_id and user data
             foreach ($item as $userData) {
                 if (is_array($userData)) { // Ensure we're working with the user data arrays
                     $user_id = $userData['user_id'];
-                    if (!isset($result[$room_id])) {
+                    if (! isset($result[$room_id])) {
                         $result[$room_id] = [
                             'room_id' => $room_id,
                             'data' => [],

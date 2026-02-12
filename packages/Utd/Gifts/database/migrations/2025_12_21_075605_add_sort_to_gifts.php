@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gifts', function (Blueprint $table) {
-           $table->bigInteger('sort')->nullable()->change();
+            $table->bigInteger('sort')->nullable()->change();
         });
     }
 

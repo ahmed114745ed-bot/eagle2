@@ -13,9 +13,11 @@ class AddAgencyIdToUsers extends Migration
      */
     public function up()
     {
-        if (Schema::hasColumn('users', 'agency_id')) return;
+        if (Schema::hasColumn('users', 'agency_id')) {
+            return;
+        }
         Schema::table('users', function (Blueprint $table) {
-            $table->unsignedInteger ('agency_id')->nullable ()->default (0);
+            $table->unsignedInteger('agency_id')->nullable()->default(0);
         });
     }
 

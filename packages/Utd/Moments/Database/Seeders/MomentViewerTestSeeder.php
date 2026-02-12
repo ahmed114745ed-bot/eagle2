@@ -3,6 +3,7 @@
 namespace Utd\Moments\Database\Seeders;
 
 use App\Models\User;
+use Exception;
 use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -27,12 +28,13 @@ class MomentViewerTestSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->error('No users found! Please create users first.');
+
             return;
         }
 
         // جلب الهدايا الموجودة (إذا كانت موجودة)
         $gifts = DB::table('gifts')->pluck('id')->toArray();
-        $hasGifts = !empty($gifts);
+        $hasGifts = ! empty($gifts);
 
         $this->command->info('Creating test Moments...');
 
@@ -53,7 +55,7 @@ class MomentViewerTestSeeder extends Seeder
             for ($j = 0; $j < $imageCount; $j++) {
                 MomentGallery::create([
                     'moment_id' => $moment->id,
-                    'image' => 'storage/Moments/test_' . rand(1, 10) . '.jpg', // مسار تجريبي
+                    'image' => 'storage/Moments/test_'.rand(1, 10).'.jpg', // مسار تجريبي
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -98,7 +100,7 @@ class MomentViewerTestSeeder extends Seeder
                             'created_at' => now()->subSeconds(rand(1, 86400)),
                             'updated_at' => now(),
                         ]);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         // تجاهل الأخطاء في الهدايا
                     }
                 }

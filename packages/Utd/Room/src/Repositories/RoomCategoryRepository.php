@@ -2,6 +2,7 @@
 
 namespace Utd\Room\Repositories;
 
+use DB;
 use Utd\Room\Entities\RoomCategory;
 
 class RoomCategoryRepository extends AbstractRepository
@@ -37,6 +38,6 @@ class RoomCategoryRepository extends AbstractRepository
      */
     public function getEnabledParentCategories()
     {
-        return \DB::table('room_categories')->where(['pid' => 0, 'enable' => 1])->selectRaw("id,name")->get();
+        return DB::table('room_categories')->where(['pid' => 0, 'enable' => 1])->selectRaw('id,name')->get();
     }
 }

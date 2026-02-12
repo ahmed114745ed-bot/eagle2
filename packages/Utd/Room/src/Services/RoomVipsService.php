@@ -6,9 +6,7 @@ use Utd\Room\Repositories\RoomVipsRepository;
 
 class RoomVipsService
 {
-    public function __construct(protected RoomVipsRepository $repository)
-    {
-    }
+    public function __construct(protected RoomVipsRepository $repository) {}
 
     public function index($perPage = 15, $page = 1)
     {

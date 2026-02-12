@@ -35,12 +35,13 @@ class UsersJoinedAgencyRepository
     public function update($id, array $data)
     {
         $record = $this->findById($id);
-        
+
         if ($record) {
             $record->update($data);
+
             return $record->fresh();
         }
-        
+
         return null;
     }
 
@@ -112,12 +113,13 @@ class UsersJoinedAgencyRepository
     public function recordLeave($userId, $agencyId)
     {
         $membership = $this->getActiveMembership($userId, $agencyId);
-        
+
         if ($membership) {
             $membership->leave_date = now();
+
             return $membership->save();
         }
-        
+
         return false;
     }
 

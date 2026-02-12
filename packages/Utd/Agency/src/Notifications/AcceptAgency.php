@@ -3,9 +3,8 @@
 namespace Utd\Agency\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class AcceptAgency extends Notification
 {
@@ -36,16 +35,16 @@ class AcceptAgency extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Agency Request Accepted')
-                    ->line('Congratulations! Your agency request has been accepted.')
-                    ->line('You can now start using your agency features.')
-                    ->action('Go to Dashboard', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Agency Request Accepted')
+            ->line('Congratulations! Your agency request has been accepted.')
+            ->line('You can now start using your agency features.')
+            ->action('Go to Dashboard', url('/'))
+            ->line('Thank you for using our application!');
     }
 
     /**

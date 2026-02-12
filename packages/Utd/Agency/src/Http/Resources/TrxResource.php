@@ -23,7 +23,7 @@ class TrxResource extends JsonResource
             'method' => $this->method,
             'status' => $statuses[$this->status],
             'trx_num' => $this->trx,
-            'date' => Carbon::parse($this->created_at)->format('Y/m/d H:i:s')
+            'date' => Carbon::parse($this->created_at)->format('Y/m/d H:i:s'),
         ];
     }
 }

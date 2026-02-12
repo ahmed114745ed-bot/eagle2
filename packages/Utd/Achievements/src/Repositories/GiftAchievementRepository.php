@@ -4,7 +4,6 @@ namespace Utd\Achievements\Repositories;
 
 use App\Tik\Repositories\AbstractRepository;
 use Utd\Achievements\Entities\GiftAchievement;
-use Request;
 
 class GiftAchievementRepository extends AbstractRepository
 {
@@ -18,12 +17,13 @@ class GiftAchievementRepository extends AbstractRepository
         return $this->model->where('achievement_id', $achievementId)->with('user', 'gift', 'Achievement')->paginate($perPage, ['*'], 'page', $Page);
     }
 
-    public function all( $perPage, $Page)
+    public function all($perPage, $Page)
     {
-        return $this->model->with( 'gift')->paginate($perPage, ['*'], 'page', $Page);
+        return $this->model->with('gift')->paginate($perPage, ['*'], 'page', $Page);
     }
 
-    public function store($request){
+    public function store($request)
+    {
         $this->model->create($request->all());
     }
 }

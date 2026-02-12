@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('gift_id')->nullable();
             $table->boolean('type')->default(0);
-            $table->double("value")->default(0);
-            $table->integer("number")->default(0);
-            $table->double("gift_price")->default(0);
+            $table->double('value')->default(0);
+            $table->integer('number')->default(0);
+            $table->double('gift_price')->default(0);
             $table->timestamps();
         });
     }

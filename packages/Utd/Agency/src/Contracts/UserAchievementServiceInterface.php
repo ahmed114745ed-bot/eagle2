@@ -7,8 +7,8 @@ interface UserAchievementServiceInterface
     /**
      * Insert charging achievement for user
      *
-     * @param mixed $user
-     * @param float|int $amount
+     * @param  mixed  $user
+     * @param  float|int  $amount
      * @return mixed
      */
     public function insertCharging($user, $amount);
@@ -16,9 +16,7 @@ interface UserAchievementServiceInterface
     /**
      * Update user achievement progress
      *
-     * @param int $userId
-     * @param string $achievementType
-     * @param mixed $value
+     * @param  mixed  $value
      * @return mixed
      */
     public function updateAchievement(int $userId, string $achievementType, $value);
@@ -26,17 +24,12 @@ interface UserAchievementServiceInterface
     /**
      * Get user achievements
      *
-     * @param int $userId
      * @return mixed
      */
     public function getUserAchievements(int $userId);
 
     /**
      * Check if user has completed achievement
-     *
-     * @param int $userId
-     * @param int $achievementId
-     * @return bool
      */
     public function hasCompletedAchievement(int $userId, int $achievementId): bool;
 }

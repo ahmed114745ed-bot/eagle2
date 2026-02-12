@@ -15,33 +15,33 @@ return new class extends Migration
     public function up(): void
     {
         // 1. جدول دول الوكالات
-        if (!Schema::hasTable('agency_countries')) {
+        if (! Schema::hasTable('agency_countries')) {
             Schema::create('agency_countries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedInteger('agency_id');
                 $table->unsignedInteger('country_id')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
                 $table->index('country_id');
             });
         }
-        
+
         // 2. جدول مديري الوكالة من التطبيق
-        if (!Schema::hasTable('agency_manger_app_dash')) {
+        if (! Schema::hasTable('agency_manger_app_dash')) {
             Schema::create('agency_manger_app_dash', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
                 $table->unsignedBigInteger('user_id');
                 $table->string('permission')->nullable();
                 $table->timestamps();
-                
+
                 $table->index(['agency_id', 'user_id']);
             });
         }
-        
+
         // 3. جدول باقات الوكالة
-        if (!Schema::hasTable('agency_packs')) {
+        if (! Schema::hasTable('agency_packs')) {
             Schema::create('agency_packs', function (Blueprint $table) {
                 $table->id();
                 $table->bigInteger('agency_id');
@@ -49,14 +49,14 @@ return new class extends Migration
                 $table->bigInteger('ware_id');
                 $table->integer('count')->default(1);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
                 $table->index('user_id');
             });
         }
-        
+
         // 4. جدول مكافآت الوكالة
-        if (!Schema::hasTable('agency_rewards')) {
+        if (! Schema::hasTable('agency_rewards')) {
             Schema::create('agency_rewards', function (Blueprint $table) {
                 $table->id();
                 $table->bigInteger('agency_id');
@@ -68,12 +68,12 @@ return new class extends Migration
                 $table->integer('expire_days');
                 $table->datetime('expire_at')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
-        
-        if (!Schema::hasTable('agency_transfer_salaries')) {
+
+        if (! Schema::hasTable('agency_transfer_salaries')) {
             Schema::create('agency_transfer_salaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id')->default(0);
@@ -83,13 +83,13 @@ return new class extends Migration
                 $table->integer('year')->default(0);
                 $table->integer('pending_usd')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
-        
+
         // 6. جدول تغييرات مديري الوكالة
-        if (!Schema::hasTable('change_agency_mangers')) {
+        if (! Schema::hasTable('change_agency_mangers')) {
             Schema::create('change_agency_mangers', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
@@ -98,24 +98,24 @@ return new class extends Migration
                 $table->unsignedBigInteger('changed_by_admin_id')->nullable();
                 $table->text('reason')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
-        
+
         // 7. جدول شحن الوكالات
-        if (!Schema::hasTable('charge_agencies')) {
+        if (! Schema::hasTable('charge_agencies')) {
             Schema::create('charge_agencies', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedInteger('agency_id')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
-        
+
         // 8. جدول أهداف المستخدمين (user_target)
-        if (!Schema::hasTable('user_target')) {
+        if (! Schema::hasTable('user_target')) {
             Schema::create('user_target', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -133,7 +133,7 @@ return new class extends Migration
                 $table->decimal('agency_obtain', 15, 2)->default(0);
                 $table->decimal('next_diamond', 15, 2)->default(0);
                 $table->timestamps();
-                
+
                 $table->index('user_id');
                 $table->index('agency_id');
                 $table->index(['add_month', 'add_year']);

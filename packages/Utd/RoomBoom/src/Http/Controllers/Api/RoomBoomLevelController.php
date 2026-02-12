@@ -10,9 +10,7 @@ use Utd\RoomBoom\Transformers\RoomBoomLevelResource;
 
 class RoomBoomLevelController extends Controller
 {
-    public function __construct(private readonly RoomBoomLevelService $roomBoomLevelService)
-    {
-    }
+    public function __construct(private readonly RoomBoomLevelService $roomBoomLevelService) {}
 
     public function index($id): JsonResponse
     {

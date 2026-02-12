@@ -17,16 +17,16 @@ class ExternalModuleService
             'salary_transaction' => SalaryTransactionModuleWrapper::class,
             'milestones' => MilestonesModuleWrapper::class,
         ];
-        
+
         $wrapperClass = $modules[$moduleName] ?? null;
-        
-        if (!$wrapperClass) {
+
+        if (! $wrapperClass) {
             return new NullModuleWrapper();
         }
-        
+
         return app($wrapperClass);
     }
-    
+
     /**
      * Check if module is enabled in config
      */
@@ -42,7 +42,7 @@ class NullModuleWrapper implements ExternalModuleInterface
     {
         return false;
     }
-    
+
     public function get($identifier = null)
     {
         return null;
@@ -55,12 +55,13 @@ class RealsModuleWrapper implements ExternalModuleInterface
     {
         return class_exists(\Modules\Reals\Http\Services\RealsService::class);
     }
-    
+
     public function get($identifier = null)
     {
         if ($this->isAvailable()) {
             return app(\Modules\Reals\Http\Services\RealsService::class);
         }
+
         return null;
     }
 }
@@ -71,12 +72,13 @@ class FixedTargetModuleWrapper implements ExternalModuleInterface
     {
         return class_exists(\Modules\FixedTarget\Services\FixedTargetService::class);
     }
-    
+
     public function get($identifier = null)
     {
         if ($this->isAvailable()) {
             return app(\Modules\FixedTarget\Services\FixedTargetService::class);
         }
+
         return null;
     }
 }
@@ -87,12 +89,13 @@ class SalaryTransactionModuleWrapper implements ExternalModuleInterface
     {
         return class_exists(\Modules\SalaryTransaction\Entities\ChargeAgency::class);
     }
-    
+
     public function get($identifier = null)
     {
         if ($this->isAvailable()) {
             return \Modules\SalaryTransaction\Entities\ChargeAgency::class;
         }
+
         return null;
     }
 }
@@ -103,12 +106,13 @@ class MilestonesModuleWrapper implements ExternalModuleInterface
     {
         return class_exists(\Modules\Milestones\Helpers\MilestoneHelper::class);
     }
-    
+
     public function get($identifier = null)
     {
         if ($this->isAvailable()) {
             return \Modules\Milestones\Helpers\MilestoneHelper::class;
         }
+
         return null;
     }
 }

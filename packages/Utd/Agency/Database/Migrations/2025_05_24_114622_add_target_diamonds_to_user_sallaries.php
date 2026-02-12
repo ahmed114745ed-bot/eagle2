@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('user_sallaries', 'target_diamonds')) {
+        if (! Schema::hasColumn('user_sallaries', 'target_diamonds')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
                 $table->double('target_diamonds')->default(0);
             });

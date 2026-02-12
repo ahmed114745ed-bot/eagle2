@@ -5,10 +5,10 @@ namespace Utd\Gifts\Http\Controllers\Admin;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use Utd\Gifts\Entities\GiftLog;
+use Encore\Admin\Show;
 use Illuminate\Http\Request;
+use Utd\Gifts\Entities\GiftLog;
 
 /**
  * GiftLogController
@@ -19,6 +19,7 @@ class GiftLogController extends MainController
     use HasResourceActions;
 
     public $permission_name = 'giftlog';
+
     protected $title = 'Gift Logs';
 
     /**
@@ -42,6 +43,29 @@ class GiftLogController extends MainController
     }
 
     /**
+     * Statistics page
+     */
+    public function statistics(Content $content)
+    {
+        // يمكن إضافة صفحة إحصائيات متقدمة هنا
+        return $content
+            ->title(__('Gift Statistics'))
+            ->description(__('View detailed gift statistics'));
+    }
+
+    /**
+     * Export gifts logs
+     */
+    public function export(Request $request)
+    {
+        // يمكن إضافة تصدير متقدم هنا
+        return response()->json([
+            'status' => true,
+            'message' => __('Export started'),
+        ]);
+    }
+
+    /**
      * Make a grid builder
      */
     protected function grid()
@@ -54,22 +78,22 @@ class GiftLogController extends MainController
         $grid->column('giftName', __('Gift Name'));
         $grid->column('giftNum', __('Quantity'));
         $grid->column('giftPrice', __('Price'));
-        
+
         $grid->column('sender.name', __('Sender'))
             ->display(function () {
                 return $this->sender ? $this->sender->name : '-';
             });
-        
+
         $grid->column('receiver.name', __('Receiver'))
             ->display(function () {
                 return $this->receiver ? $this->receiver->name : '-';
             });
-        
+
         $grid->column('roomOwner.name', __('Room Owner'))
             ->display(function () {
                 return $this->roomOwner ? $this->roomOwner->name : '-';
             });
-        
+
         $grid->column('created_at', __('Sent At'))->sortable();
 
         $grid->disableCreateButton();
@@ -84,7 +108,7 @@ class GiftLogController extends MainController
         });
 
         $grid->export(function ($export) {
-            $export->filename('Gift_Logs_' . date('Y-m-d'));
+            $export->filename('Gift_Logs_'.date('Y-m-d'));
             $export->column('id', 'ID');
             $export->column('giftName', 'Gift Name');
             $export->column('giftNum', 'Quantity');
@@ -114,28 +138,5 @@ class GiftLogController extends MainController
         $show->field('created_at', __('Sent At'));
 
         return $show;
-    }
-
-    /**
-     * Statistics page
-     */
-    public function statistics(Content $content)
-    {
-        // يمكن إضافة صفحة إحصائيات متقدمة هنا
-        return $content
-            ->title(__('Gift Statistics'))
-            ->description(__('View detailed gift statistics'));
-    }
-
-    /**
-     * Export gifts logs
-     */
-    public function export(Request $request)
-    {
-        // يمكن إضافة تصدير متقدم هنا
-        return response()->json([
-            'status' => true,
-            'message' => __('Export started')
-        ]);
     }
 }

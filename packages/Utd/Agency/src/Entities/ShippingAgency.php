@@ -3,25 +3,19 @@
 namespace Utd\Agency\Entities;
 
 use App\Traits\AgencyAdditionalInfoTrait;
-use Utd\Agency\Entities\Agency;
-use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\AgencySalary;
-use Utd\Agency\Entities\AgencyUserJob;
-use Utd\Agency\Traits\ConfigurableModelsTrait;
-use Utd\Agency\Traits\CreatedByTrait;
-use Utd\Agency\Traits\PaymentGetWayTrait;
-use Utd\Agency\Traits\TimestampsWithTimezone;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Utd\Agency\Scopes\ShippingAgencyScope;
-
+use Utd\Agency\Traits\ConfigurableModelsTrait;
+use Utd\Agency\Traits\CreatedByTrait;
+use Utd\Agency\Traits\PaymentGetWayTrait;
+use Utd\Agency\Traits\TimestampsWithTimezone;
 
 class ShippingAgency extends Model
 {
-    use AgencyAdditionalInfoTrait, PaymentGetWayTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
+    use AgencyAdditionalInfoTrait, ConfigurableModelsTrait, CreatedByTrait, PaymentGetWayTrait, SoftDeletes, TimestampsWithTimezone;
 
     protected $table = 'agencies';
 
@@ -31,44 +25,10 @@ class ShippingAgency extends Model
         'password',
     ];
 
-    protected function userModel()
-    {
-        return config('agency-package.models.user');
-    }
-
-    protected function adminModel()
-    {
-        return config('agency-package.models.admin');
-    }
-
-    protected function countryModel()
-    {
-        return config('agency-package.models.country');
-    }
-
-    protected function chargeModel()
-    {
-        return config('agency-package.models.charge');
-    }
-
-    protected function salaryModel()
-    {
-        return config('agency-package.models.user_salary');
-    }
-
-    protected function userTargetModel()
-    {
-        return config('agency-package.models.user_target');
-    }
-
-    protected function agencyUserJobModel()
-    {
-        return \Utd\Agency\Entities\AgencyUserJob::class;
-    }
-
     public function chargeAgency()
     {
         $class = $this->getModuleClass('salary_transaction', 'charge_agency');
+
         return $class ? $this->hasOne($class, 'agency_id') : null;
     }
 
@@ -108,6 +68,7 @@ class ShippingAgency extends Model
     public function salaryRequests()
     {
         $class = $this->getModuleClass('salary_transaction', 'salary_request');
+
         return $class ? $this->hasMany($class, 'agency_id') : null;
     }
 
@@ -115,18 +76,20 @@ class ShippingAgency extends Model
     public function getTransferSalaryAttribute()
     {
         $class = $this->getModuleClass('salary_transaction', 'agency_transfer_salary');
-        if (!$class) {
+        if (! $class) {
             return 0;
         }
+
         return $class::query()->where('agency_id', $this->id)->sum(DB::raw('salary - cut_amount - pending_usd'));
     }
 
     public function getPendingSalaryAttribute()
     {
         $class = $this->getModuleClass('salary_transaction', 'agency_transfer_salary');
-        if (!$class) {
+        if (! $class) {
             return 0;
         }
+
         return $class::query()->where('agency_id', $this->id)->sum('pending_usd');
     }
 
@@ -161,7 +124,6 @@ class ShippingAgency extends Model
         return $this->belongsTo($this->getModelClass('admin'), 'owner_id', 'id');
     }
 
-
     public function getSalaryAttribute()
     {
         return AgencySalary::query()
@@ -177,8 +139,6 @@ class ShippingAgency extends Model
             ->where('add_year', date('Y'))
             ->first();
     }
-
-
 
     public function setSalaryAttribute()
     {
@@ -238,7 +198,7 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySalary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -257,7 +217,7 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySalary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -290,7 +250,7 @@ class ShippingAgency extends Model
             $year = now()->year;
         }
         $agencySallary = AgencySalary::query()->where(function ($query) use ($year, $month) {
-            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month);
+            $query->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month);
         })->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -328,6 +288,16 @@ class ShippingAgency extends Model
         return $value ?? 0;
     }
 
+    public function coinLogs()
+    {
+        return $this->morphMany($this->getModelClass('coin_log'), 'owner', 'user_type', 'user_id');
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo($this->getModelClass('admin_user'), 'created_by');
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -338,7 +308,7 @@ class ShippingAgency extends Model
             if (request()->has('charge_agency')) {
                 $chargeAgencyClass = $model->getModuleClass('salary_transaction', 'charge_agency');
                 if ($chargeAgencyClass) {
-                    if (request('charge_agency') == 1) {
+                    if (request('charge_agency') === 1) {
                         $chargeAgencyClass::firstOrCreate([
                             'agency_id' => $model->id,
                         ]);
@@ -352,7 +322,7 @@ class ShippingAgency extends Model
                 $user = $model->getModelClass('user')::find($model->app_owner_id);
 
                 if ($user) {
-                    if (request('appear_charger_agency') == 1) {
+                    if (request('appear_charger_agency') === 1) {
                         $user->update(['appear_charger_agency' => 1]);
                     } else {
                         $user->update(['appear_charger_agency' => 0]);
@@ -395,13 +365,38 @@ class ShippingAgency extends Model
         });
     }
 
-    public function coinLogs()
+    protected function userModel()
     {
-        return $this->morphMany($this->getModelClass('coin_log'), 'owner', 'user_type', 'user_id');
+        return config('agency-package.models.user');
     }
 
-    public function creator()
+    protected function adminModel()
     {
-        return $this->belongsTo($this->getModelClass('admin_user'), 'created_by');
+        return config('agency-package.models.admin');
+    }
+
+    protected function countryModel()
+    {
+        return config('agency-package.models.country');
+    }
+
+    protected function chargeModel()
+    {
+        return config('agency-package.models.charge');
+    }
+
+    protected function salaryModel()
+    {
+        return config('agency-package.models.user_salary');
+    }
+
+    protected function userTargetModel()
+    {
+        return config('agency-package.models.user_target');
+    }
+
+    protected function agencyUserJobModel()
+    {
+        return AgencyUserJob::class;
     }
 }

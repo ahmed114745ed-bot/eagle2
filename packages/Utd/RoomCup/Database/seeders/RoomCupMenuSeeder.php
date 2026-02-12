@@ -15,18 +15,18 @@ class RoomCupMenuSeeder extends Seeder
 
         if ($currentParent) {
             $existingParent = Menu::whereId($currentParent->parent_id)->exists();
-            if ($currentParent->parent_id != 0 && !$existingParent) {
+            if ($currentParent->parent_id !== 0 && ! $existingParent) {
                 $currentParent->update(['parent_id' => 0]);
             }
             $roomCupParent = $currentParent;
         } else {
             $parentOrder = Menu::where('parent_id', 0)->max('order') ?? 0;
             $roomCupParent = Menu::create([
-                'title'     => 'room-cup-target',
+                'title' => 'room-cup-target',
                 'parent_id' => 0,
-                'order'     => $parentOrder + 1,
-                'icon'      => '🏆',
-                'uri'       => null,
+                'order' => $parentOrder + 1,
+                'icon' => '🏆',
+                'uri' => null,
             ]);
         }
 

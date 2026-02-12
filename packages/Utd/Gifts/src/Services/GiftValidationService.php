@@ -4,13 +4,8 @@ namespace Utd\Gifts\Services;
 
 use Utd\Gifts\DTOs\SendGiftDTO;
 use Utd\Gifts\Entities\Gift;
-use Utd\Gifts\Support\ModelResolver;
 
 class GiftValidationService
 {
-    /**
-     */
-    public function validate(SendGiftDTO $dto, Gift $gift, $sender): void
-    {
-    }
+    public function validate(SendGiftDTO $dto, Gift $gift, $sender): void {}
 }

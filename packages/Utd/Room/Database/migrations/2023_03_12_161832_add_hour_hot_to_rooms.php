@@ -14,7 +14,7 @@ class AddHourHotToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedBigInteger ('hour_hot')->nullable ()->default (0);
+            $table->unsignedBigInteger('hour_hot')->nullable()->default(0);
         });
     }
 

@@ -13,14 +13,14 @@ class AddSalaryToUsers extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('users', 'salary')) {
+        if (! Schema::hasColumn('users', 'salary')) {
             Schema::table('users', function (Blueprint $table) {
-                $table->float ('salary',20,2)->default (0);
+                $table->float('salary', 20, 2)->default(0);
             });
         }
-        if (Schema::hasTable('agencies') && !Schema::hasColumn('agencies', 'salary')) {
+        if (Schema::hasTable('agencies') && ! Schema::hasColumn('agencies', 'salary')) {
             Schema::table('agencies', function (Blueprint $table) {
-                $table->float ('salary',20,2)->default (0);
+                $table->float('salary', 20, 2)->default(0);
             });
         }
     }

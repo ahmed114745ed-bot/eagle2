@@ -2,14 +2,15 @@
 
 namespace Utd\Agency\Exports;
 
-use Utd\Agency\Entities\Agency;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Utd\Agency\Entities\Agency;
 
 class AgencyExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $month;
+
     protected $year;
 
     public function __construct($month = null, $year = null)
@@ -26,8 +27,8 @@ class AgencyExport implements FromCollection, WithHeadings, WithMapping
         return Agency::with(['owner', 'agencySalaries' => function ($query) {
             $query->where('month', $this->month)->where('year', $this->year);
         }])
-        ->withCount('users')
-        ->get();
+            ->withCount('users')
+            ->get();
     }
 
     /**
@@ -56,7 +57,7 @@ class AgencyExport implements FromCollection, WithHeadings, WithMapping
     public function map($agency): array
     {
         $salary = $agency->agencySalaries->first();
-        
+
         return [
             $agency->id,
             $agency->name,
@@ -64,7 +65,7 @@ class AgencyExport implements FromCollection, WithHeadings, WithMapping
             $agency->owner?->uuid,
             $agency->phone,
             $agency->users_count,
-            $agency->status == 1 ? 'Active' : 'Inactive',
+            $agency->status === 1 ? 'Active' : 'Inactive',
             $salary?->sallary ?? 0,
             $salary?->cut_amount ?? 0,
             ($salary?->sallary ?? 0) - ($salary?->cut_amount ?? 0),

@@ -4,12 +4,20 @@ namespace Utd\Agency\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 
 class LeaveAgencyRequest extends Model
 {
     use ConfigurableModelsTrait;
+
+    /**
+     * Status Constants
+     */
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_APPROVED = 1;
+
+    public const STATUS_REJECTED = 2;
 
     protected $table = 'leave_agency_requests';
 
@@ -20,13 +28,6 @@ class LeaveAgencyRequest extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Status Constants
-     */
-    const STATUS_PENDING = 0;
-    const STATUS_APPROVED = 1;
-    const STATUS_REJECTED = 2;
 
     /**
      * Relationship with Agency
@@ -57,7 +58,7 @@ class LeaveAgencyRequest extends Model
      */
     public function isPending(): bool
     {
-        return $this->status == self::STATUS_PENDING;
+        return $this->status === self::STATUS_PENDING;
     }
 
     /**
@@ -66,6 +67,7 @@ class LeaveAgencyRequest extends Model
     public function approve(): bool
     {
         $this->status = self::STATUS_APPROVED;
+
         return $this->save();
     }
 
@@ -75,6 +77,7 @@ class LeaveAgencyRequest extends Model
     public function reject(): bool
     {
         $this->status = self::STATUS_REJECTED;
+
         return $this->save();
     }
 }

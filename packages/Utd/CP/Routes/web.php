@@ -1,13 +1,13 @@
 <?php
 
-use Utd\CP\Http\Controllers\web\LevelController;
-use Utd\CP\Http\Controllers\web\WeeklyCpController;
-use Utd\CP\Http\Controllers\web\LevelGiftController;
+use Illuminate\Support\Facades\Route;
 use Utd\CP\Http\Controllers\web\CpRelationController;
-use Utd\CP\Http\Controllers\web\WeeklyCpGiftController;
 use Utd\CP\Http\Controllers\web\CpReportRelationController;
 use Utd\CP\Http\Controllers\web\CpSettingsController;
-use Illuminate\Support\Facades\Route;
+use Utd\CP\Http\Controllers\web\LevelController;
+use Utd\CP\Http\Controllers\web\LevelGiftController;
+use Utd\CP\Http\Controllers\web\WeeklyCpController;
+use Utd\CP\Http\Controllers\web\WeeklyCpGiftController;
 
 Route::group(
     [
@@ -18,9 +18,9 @@ Route::group(
             'adminIp',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
-    function (\Illuminate\Routing\Router $router) {
+    function (Illuminate\Routing\Router $router) {
         $router->resource('cp-relations', CpRelationController::class);
         $router->resource('weekly-cp', WeeklyCpController::class);
         $router->resource('cp-reports', CpReportRelationController::class);

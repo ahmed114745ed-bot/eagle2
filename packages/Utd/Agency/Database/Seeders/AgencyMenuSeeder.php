@@ -24,13 +24,14 @@ class AgencyMenuSeeder extends Seeder
             // Menu exists, just ensure it's linked to roles
             $this->linkMenusToRoles($existingParent->id);
             $this->command->info('   ℹ️  Agency menu already exists, linked to roles.');
+
             return;
         }
 
         // Get the maximum order
         $maxOrder = DB::table('admin_menu')->max('order') ?? 0;
         $baseOrder = $maxOrder + 1;
-        
+
         // Store all created menu IDs
         $createdMenuIds = [];
 
@@ -336,7 +337,7 @@ class AgencyMenuSeeder extends Seeder
                     ->where('menu_id', $menuId)
                     ->exists();
 
-                if (!$exists) {
+                if (! $exists) {
                     DB::table('admin_role_menu')->insert([
                         'role_id' => $roleId,
                         'menu_id' => $menuId,

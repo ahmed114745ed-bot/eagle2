@@ -2,15 +2,15 @@
 
 namespace Utd\Agency\Http\Resources;
 
-use Utd\Agency\Facades\AgencyHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Agency\Facades\AgencyHelper;
 
 class MyDataForAgencyResource extends JsonResource
 {
     public function toArray($request)
     {
         // التأكد من وجود بيانات
-        if (!$this->resource) {
+        if (! $this->resource) {
             return [
                 'id' => 0,
                 'uuid' => '',
@@ -21,7 +21,7 @@ class MyDataForAgencyResource extends JsonResource
                 'vip' => null,
                 'level' => 0,
                 'profile' => [
-                    'image' => ''
+                    'image' => '',
                 ],
                 'has_color_name' => false,
                 'gender' => null,

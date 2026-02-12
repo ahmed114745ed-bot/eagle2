@@ -15,7 +15,7 @@ class AgencyOwnerResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'img' => $this->img ? asset('storage/' . $this->img) : null,
+            'img' => $this->img ? asset('storage/'.$this->img) : null,
             'country' => $this->country?->name,
             'phone' => $this->phone,
         ];

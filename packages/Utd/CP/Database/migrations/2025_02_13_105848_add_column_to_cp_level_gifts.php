@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cp_level_gifts', function (Blueprint $table) {
-            $table->string("item_id")->change();
+            $table->string('item_id')->change();
         });
     }
 

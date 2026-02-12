@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('targets', 'under_edit')) {
+        if (! Schema::hasColumn('targets', 'under_edit')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->boolean('under_edit')->default(false);
             });
         }
-        
-        if (!Schema::hasColumn('targets', 'edit_id')) {
+
+        if (! Schema::hasColumn('targets', 'edit_id')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->unsignedBigInteger('edit_id')->nullable();
             });
@@ -34,7 +34,7 @@ return new class extends Migration
                 $table->dropColumn('under_edit');
             });
         }
-        
+
         if (Schema::hasColumn('targets', 'edit_id')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->dropColumn('edit_id');

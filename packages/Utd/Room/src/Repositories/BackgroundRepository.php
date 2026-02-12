@@ -2,6 +2,7 @@
 
 namespace Utd\Room\Repositories;
 
+use DB;
 use Utd\Room\Entities\Background;
 
 class BackgroundRepository extends AbstractRepository
@@ -31,6 +32,6 @@ class BackgroundRepository extends AbstractRepository
      */
     public function getDefaultImage()
     {
-        return \DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img ?? null;
+        return DB::table('backgrounds')->where('enable', 1)->orderBy('id', 'asc')->limit(1)->first()->img ?? null;
     }
 }

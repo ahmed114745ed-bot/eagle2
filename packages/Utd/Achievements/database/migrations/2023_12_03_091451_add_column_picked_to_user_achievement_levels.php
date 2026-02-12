@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('user_achievement_levels', 'picked')) {
+        if (! Schema::hasColumn('user_achievement_levels', 'picked')) {
             Schema::table('user_achievement_levels', function (Blueprint $table) {
                 $table->boolean('picked')->nullable()->default(false);
             });

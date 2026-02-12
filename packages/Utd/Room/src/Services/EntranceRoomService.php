@@ -2,23 +2,18 @@
 
 namespace Utd\Room\Services;
 
-use App\Support\PackageHelper;
-use Utd\CP\Entities\CpRoomHistory;
-use Utd\Room\Entities\Room;
-use App\Models\User;
+use App\Contracts\EnteranceRoomContract;
+use App\Contracts\UserCharismaServiceContract;
+use App\Facades\UserHandling;
 use App\Helpers\Common;
-use Utd\Charizma\Jobs\ResetCharisma;
-use Utd\Room\Entities\EnteredRoom;
-use Utd\Room\Entities\RoomVisitor;
+use App\Jobs\SendNotificationToAllFollowers;
+use App\Models\User;
+use App\Support\PackageHelper;
+use Carbon\Carbon;
+use DB;
 use Exception;
 use Illuminate\Http\Request;
-use App\Facades\UserHandling;
-use Utd\Room\Repositories\RoomRepository;
-use Utd\Agency\Repositories\UserRepository;
-use App\Jobs\SendNotificationToAllFollowers;
-use Utd\Room\Http\Resources\EnterRoomCollection;
 use Illuminate\Support\Facades\Schema;
-use App\Contracts\UserCharismaServiceContract;
 use Modules\Chat\Entities\ChatMessage;
 use Modules\Chat\Entities\ChatRoom;
 use Modules\Chat\Events\Chat;
@@ -27,21 +22,30 @@ use Modules\Chat\Events\OpenChat;
 use Modules\Chat\Http\Resources\ChatMessageResource;
 use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
 use Modules\TaskStream\Services\TaskStreamService;
+use Throwable;
+use Utd\Agency\Repositories\UserRepository;
+use Utd\Charizma\Jobs\ResetCharisma;
+use Utd\CP\Entities\CpRoomHistory;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomVisitor;
 use Utd\Room\Entities\TotalRoomGift;
-use Carbon\Carbon;
-use App\Contracts\EnteranceRoomContract;
+use Utd\Room\Http\Resources\EnterRoomCollection;
+use Utd\Room\Repositories\RoomRepository;
 
 class EntranceRoomService implements EnteranceRoomContract
 {
     protected $roomRepository;
+
     protected $userRepository;
+
     public function __construct(RoomRepository $roomRepository, UserRepository $userRepository)
     {
         $this->roomRepository = $roomRepository;
         $this->userRepository = $userRepository;
     }
 
-    ///////////////////////////////////////pusher////////////////////////////////////
+    // /////////////////////////////////////pusher////////////////////////////////////
     public function updateRoomCountFromPusher(Request $request)
     {
         if ($request->header('X-Pusher-Key') !== env('PUSHER_APP_KEY')) {
@@ -65,9 +69,9 @@ class EntranceRoomService implements EnteranceRoomContract
             return response()->json(['status' => 'Webhook received']);
         }
 
-        if ($name == 'channel_occupied' || $name == 'member_added') {
+        if ($name === 'channel_occupied' || $name === 'member_added') {
             $this->handleMemberAdded($room, $userId);
-        } elseif ($name == 'channel_vacated' || $name == 'member_removed') {
+        } elseif ($name === 'channel_vacated' || $name === 'member_removed') {
             $this->handleMemberRemoved($room, $user, $request->owner_id);
         }
 
@@ -77,53 +81,7 @@ class EntranceRoomService implements EnteranceRoomContract
         return response()->json(['status' => 'Webhook received']);
     }
 
-    private function handleMemberAdded($room, $userId)
-    {
-        $visitors = explode(',', $room->room_visitor);
-        if ($visitors[0] == '') $visitors = [];
-        if (!in_array($userId, $visitors)) {
-            $visitors[] = $userId;
-            $visitors = array_unique($visitors);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
-        }
-    }
-
-    private function handleMemberRemoved($room, $user, $ownerId)
-    {
-        $userId = $user->id;
-        if (@$room->charizma_status) {
-            $userCharismaService = app(UserCharismaServiceContract::class);
-            $userCharismaService->resetUserCharisma($userId, $room->id);
-            $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$userId]);
-
-            $ms = [
-                'messageContent' => [
-                    "message" => "updateCharisma",
-                    'data' => $userDataWithCharisma
-                ]
-            ];
-            $json = json_encode($ms);
-
-            Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
-        }
-
-        $visitors = explode(',', $room->room_visitor);
-        if (in_array($userId, $visitors)) {
-            $index = array_search($userId, $visitors);
-            unset($visitors[$index]);
-            $room->count_room_socket = count($visitors);
-            $room->room_visitor = trim(implode(",", $visitors), ",");
-        }
-
-        if ($room->uid == $userId->now_room_uid) {
-            $user->now_room_uid = 0;
-        }
-
-        UserHandling::calcTime($userId);
-    }
-
-    //////////////////////////////////////////////////////room visitors//////////////////////////////////////////
+    // ////////////////////////////////////////////////////room visitors//////////////////////////////////////////
     public function updateRoomCountFromZego(Request $request)
     {
         $event = $request->event;
@@ -134,19 +92,19 @@ class EntranceRoomService implements EnteranceRoomContract
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
-        if (!$room || !$user) {
+        if (! $room || ! $user) {
             return response()->json(['status' => 'Webhook received but room or user not found']);
         }
 
         $visitors = $this->updateRoomVisitorsBasedOnEvent($event, $room, $user->id);
 
-        if ($event == 'room_login') {
+        if ($event === 'room_login') {
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->id;
-        } elseif ($event == 'room_logout' && $room->uid == $user->now_room_uid) {
+        } elseif ($event === 'room_logout' && $room->uid === $user->now_room_uid) {
             $user->now_room_uid = 0;
         }
-        if ($event == 'room_logout') {
+        if ($event === 'room_logout') {
             if ($user->id === $room->uid) {
                 $room->is_afk = 0;
             }
@@ -154,7 +112,7 @@ class EntranceRoomService implements EnteranceRoomContract
             $this->handleLeaveCp($user, $room);
         }
 
-        if ($event == 'room_logout' && $room->charizma_status) {
+        if ($event === 'room_logout' && $room->charizma_status) {
             $this->handleCharismaStatusOnLogout($room, $user, $request->owner_id);
         }
         $user->save();
@@ -173,7 +131,7 @@ class EntranceRoomService implements EnteranceRoomContract
         $room = Room::select(['id', 'uid', 'count_room_socket', 'room_visitor', 'charizma_status', 'microphone'])->find($roomId);
         $user = User::find($userId);
 
-        if (!$room || !$user) {
+        if (! $room || ! $user) {
             return response()->json(['status' => 'Webhook received but room or user not found']);
         }
 
@@ -184,13 +142,13 @@ class EntranceRoomService implements EnteranceRoomContract
 
         $visitors = $this->updateRoomVisitorsBasedOnEvent2($event, $room, $user->id);
 
-        if ($event == 'room_login') {
+        if ($event === 'room_login') {
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->id;
-        } elseif ($event == 'room_logout' && $room->uid == $user->now_room_uid) {
+        } elseif ($event === 'room_logout' && $room->uid === $user->now_room_uid) {
             $user->now_room_uid = 0;
         }
-        if ($event == 'room_logout') {
+        if ($event === 'room_logout') {
             if ($user->id === $room->uid) {
                 $room->is_afk = 0;
             }
@@ -198,7 +156,7 @@ class EntranceRoomService implements EnteranceRoomContract
             $this->handleLeaveCp($user, $room);
         }
 
-        if ($event == 'room_logout' && $room->charizma_status) {
+        if ($event === 'room_logout' && $room->charizma_status) {
             $this->handleCharismaStatusOnLogout2($room, $user, $request->owner_id);
         }
         $user->save();
@@ -210,7 +168,7 @@ class EntranceRoomService implements EnteranceRoomContract
     public function updateRoomCountFromAgora(Request $request)
     {
         $data = $request->all();
-        if (!isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
+        if (! isset($data[0]['eventType'], $data[0]['payload']['channelName'], $data[0]['payload']['lastUid'])) {
             return response()->json(['status' => 'Invalid Webhook Data'], 400);
         }
 
@@ -223,7 +181,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         $user = User::find($userId);
 
-        if (!$room || !$user) {
+        if (! $room || ! $user) {
             return response()->json(['status' => 'Room or user not found'], 404);
         }
 
@@ -233,7 +191,7 @@ class EntranceRoomService implements EnteranceRoomContract
             $this->addUserToVisitors($room->id, $user->id);
             $user->now_room_uid = $room->id;
 
-            if ($room->uid == $user->id && Schema::hasColumn('rooms', 'is_live')) {
+            if ($room->uid === $user->id && Schema::hasColumn('rooms', 'is_live')) {
                 $room->update(['is_live' => true]);
             }
         } elseif (in_array($eventType, [102, 104])) {
@@ -242,14 +200,14 @@ class EntranceRoomService implements EnteranceRoomContract
 
             if (
                 Schema::hasColumn('rooms', 'is_live') &&
-                $room->uid == $user->id &&
+                $room->uid === $user->id &&
                 $room->type !== 'audio'
             ) {
                 $room->update(['is_live' => false]);
             }
         }
 
-        if ($eventType == 'room_logout' && $room->charizma_status) {
+        if ($eventType === 'room_logout' && $room->charizma_status) {
             $ownerId = $data[0]['payload']['owner_id'] ?? null;
             $this->handleCharismaStatusOnLogout($room, $user, $ownerId);
         }
@@ -263,14 +221,15 @@ class EntranceRoomService implements EnteranceRoomContract
     {
         $userId = $user->id;
         $this->removeUserCpInRoom($userId);
+
         return $this->sendCpLovelyMessage($room, $user);
     }
 
     public function removeUserCpInRoom(mixed $userId): void
     {
         if (PackageHelper::isInstalled('cp')) {
-            CpRoomHistory::where("user_one_id", $userId)
-                ->orWhere("user_two_id", $userId)->delete();
+            CpRoomHistory::where('user_one_id', $userId)
+                ->orWhere('user_two_id', $userId)->delete();
         }
     }
 
@@ -278,7 +237,7 @@ class EntranceRoomService implements EnteranceRoomContract
     {
         $indices = [];
         if (PackageHelper::isInstalled('cp')) {
-            $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
+            $cpRoomHistories = CpRoomHistory::where('room_id', $room->id)->get(['index1', 'index2']);
             $indices = $cpRoomHistories->map(function ($history) {
                 return [$history->index1, $history->index2];
             })->toArray();
@@ -293,168 +252,76 @@ class EntranceRoomService implements EnteranceRoomContract
     {
         $ms = [
             'messageContent' => [
-                "message" => "cpLovelyZego",
-                "data" => $indices,
-            ]
+                'message' => 'cpLovelyZego',
+                'data' => $indices,
+            ],
         ];
+
         return json_encode($ms);
     }
 
-    private function addUserToVisitors(int $roomId, int $userId)
-    {
-        RoomVisitor::query()->where(['user_id' => $userId])->delete();
-        RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $roomId]);
-    }
-
-    private function removeUserToVisitors(int $roomId, int $userId)
-    {
-        RoomVisitor::query()->where(['user_id' => $userId, 'room_id' => $roomId])->delete();
-    }
-
-    private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
-    {
-        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
-
-        if ($event == 'room_login' && !in_array($userId, $visitors)) {
-            $visitors[] = $userId;
-        } elseif ($event == 'room_logout') {
-            UserHandling::calcTime($userId);
-            $this->updateMicrophone($room->uid, $userId);
-            $visitors = array_diff($visitors, [$userId]);
-        }
-
-        return array_values(array_unique($visitors));
-    }
-
-    private function updateRoomVisitorsBasedOnEvent2($event, $room, $userId)
-    {
-        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
-
-        if ($event == 'room_login' && !in_array($userId, $visitors)) {
-            $visitors[] = $userId;
-        } elseif ($event == 'room_logout') {
-            UserHandling::calcTime($userId);
-            $this->updateMicrophone2($room->uid, $userId);
-            $visitors = array_diff($visitors, [$userId]);
-        }
-
-        return array_values(array_unique($visitors));
-    }
-
-    private function handleCharismaStatusOnLogout($room, $user, $ownerId)
-    {
-        $userCharismaService = app(UserCharismaServiceContract::class);
-        $userCharismaService->resetUserCharisma($user->id, $room->id);
-        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
-
-        $ms = [
-            'messageContent' => [
-                "message" => "updateCharisma",
-                'data' => $userDataWithCharisma
-            ]
-        ];
-        $json = json_encode($ms);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
-    }
-
-    private function handleCharismaStatusOnLogout2($room, $user, $ownerId)
-    {
-        $userCharismaService = app(UserCharismaServiceContract::class);
-        $userCharismaService->resetUserCharisma($user->id, $room->id);
-        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
-
-        $ms = [
-            'messageContent' => [
-                "message" => "updateCharisma",
-                'data' => $userDataWithCharisma
-            ]
-        ];
-        $json = json_encode($ms);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
-    }
-
-    private function updateMicrophone($room_uid, $user_id)
-    {
-        $user = User::query()->find($user_id);
-        if (!$user) return;
-        $result = Common::go_microphone_hand($room_uid, $user_id);
-
-        $room = Room::query()->where('uid', $room_uid)->first();
-
-        if (!$room) return;
-        if ($result) {
-            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
-        }
-    }
-
-    private function updateMicrophone2($room_uid, $user_id)
-    {
-        $user = User::query()->find($user_id);
-        if (!$user) return;
-        $result = Common::go_microphone_hand_2($room_uid, $user_id);
-
-        $room = Room::query()->where('uid', $room_uid)->first();
-
-        if (!$room) return;
-        if ($result) {
-            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
-        }
-    }
-
-    ///////////////////////////////
+    // /////////////////////////////
 
     public function enterRoom($user, $request, $room_pass, $room)
     {
         $owner_id = $room->uid;
-        if ($request->sub_type == 'random') {
+        if ($request->sub_type === 'random') {
             $owner_id = $this->roomRepository->randomOwner();
         }
 
-        if (!$owner_id) return Common::apiResponse(0, 'not found', null, 404);
+        if (! $owner_id) {
+            return Common::apiResponse(0, 'not found', null, 404);
+        }
 
         $black_list = Common::getUserBlackListInRoom($owner_id, $user->id);
-        if ($black_list) return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
+        if ($black_list) {
+            return Common::apiResponse(false, __('You have been blocked by the other party'), null, 422);
+        }
 
-        if (!$room) return Common::apiResponse(false, 'No room yet, please create first', null, 404);
+        if (! $room) {
+            return Common::apiResponse(false, 'No room yet, please create first', null, 404);
+        }
 
-        if ($room->room_status == 2) {
+        if ($room->room_status === 2) {
             return Common::apiResponse(0, __('room_closed'));
         }
 
         $roomBlack = $room->room_black;
-        if (!empty($roomBlack)) {
+        if (! empty($roomBlack)) {
             $is_black = explode(',', $roomBlack);
             foreach ($is_black as $k => &$v) {
-                $arr = explode("#", $v);
+                $arr = explode('#', $v);
                 $sjc = time() - $arr[1];
                 $rt = $arr[2] - $sjc;
                 $h = floor($rt / 3600);
                 $r = $rt % 3600;
                 $m = floor($r / 60);
                 $s = $r % 60;
-                if ($sjc < $arr[2] && $arr[0] == $user->id) {
-                    return Common::apiResponse(false, __('No entry for ') . $arr[2] / 60 . __(' minutes after being kicked out of the room'));
+                if ($sjc < $arr[2] && $arr[0] === $user->id) {
+                    return Common::apiResponse(false, __('No entry for ').$arr[2] / 60 .__(' minutes after being kicked out of the room'));
                 }
 
                 if ($sjc >= $arr[2]) {
                     unset($is_black[$k]);
                 }
             }
-            $roomBlack = implode(",", $is_black);
+            $roomBlack = implode(',', $is_black);
             $this->roomRepository->updateRoomBlack($room, $roomBlack);
         }
 
-        if ($room->room_pass && $owner_id != $user->id) {
-            if (!$room_pass) return Common::apiResponse(false, __('The room is locked, please enter the password'), null, 409);
-            if ($room->room_pass != $room_pass) return Common::apiResponse(false, __('Password is incorrect, please re-enter'), null, 410);
+        if ($room->room_pass && $owner_id !== $user->id) {
+            if (! $room_pass) {
+                return Common::apiResponse(false, __('The room is locked, please enter the password'), null, 409);
+            }
+            if ($room->room_pass !== $room_pass) {
+                return Common::apiResponse(false, __('Password is incorrect, please re-enter'), null, 410);
+            }
         }
 
-        if ($user->id == $owner_id) {
+        if ($user->id === $owner_id) {
             $room->is_afk = 1;
             $room->save();
-            if ($room->count_room_socket == 0) {
+            if ($room->count_room_socket === 0) {
                 dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
             }
         }
@@ -466,10 +333,10 @@ class EntranceRoomService implements EnteranceRoomContract
         $this->enterTheRoomCreateOrUpdate($user->id, $owner_id, $room->id);
 
         $user->enableSaving = false;
-        $user->now_room_uid = (int)$room->id;
+        $user->now_room_uid = (int) $room->id;
         $user->save();
 
-        if (config('app.env') != "production") {
+        if (config('app.env') !== 'production') {
             RoomVisitor::firstOrCreate([
                 'user_id' => $user->id,
                 'room_id' => $room->id,
@@ -479,80 +346,21 @@ class EntranceRoomService implements EnteranceRoomContract
         return Common::apiResponse(true, '', $room_info);
     }
 
-    private function updateRoom($user_id, $owner_id, Room &$room)
-    {
-        if (PackageHelper::isInstalled('charisma')){
-            if ($room->charizma_status && ($room->charizma_timestamp + 86400) < now()->timestamp) {
-                $room->charizma_timestamp = null;
-                $room->charizma_status = false;
-                dispatch(new ResetCharisma($room->id));
-            }
-        }
-
-        if ($room->uid == $user_id) {
-            $room->is_live = true;
-        }
-
-        $room->save();
-    }
-
-    private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
-    {
-        $timezone = Common::timeZone();
-
-        EnteredRoom::query()->updateOrCreate(
-            [
-                'uid' => $user_id,
-                'ruid' => $owner_id,
-                'rid' => $room_id
-            ],
-            [
-                'entered_at' => now($timezone)
-            ]
-        );
-        $this->updateRoomVisitors($room_id);
-    }
-
-    private function updateRoomVisitors(int $roomId): void
-    {
-        $timezone = Common::timeZone();
-        $today    = Carbon::now($timezone)->startOfDay();
-        $tomorrow = (clone $today)->endOfDay();
-
-        $uniqueVisitors = EnteredRoom::query()
-            ->where('rid', $roomId)
-            ->whereBetween('entered_at', [$today, $tomorrow])
-            ->distinct('uid')
-            ->count('uid');
-
-        $gift = TotalRoomGift::where('room_id', $roomId)
-            ->whereBetween('created_at', [$today, $tomorrow])
-            ->first();
-
-        if ($gift) {
-            $gift->update(['number_of_visitors' => $uniqueVisitors]);
-        } else {
-            TotalRoomGift::create([
-                'room_id'            => $roomId,
-                'current_total'      => 0,
-                'number_of_visitors' => $uniqueVisitors,
-            ]);
-        }
-    }
-
     public function makeRequestInviteRoom($user, $request)
     {
         $tokens_notfacion = [];
 
         $room = Room::where('uid', '=', $request->owner_id)->first();
-        if (!$room) throw new Exception('room not found');
+        if (! $room) {
+            throw new Exception('room not found');
+        }
 
         $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
 
-        if (!$chatRoom) {
+        if (! $chatRoom) {
             $chatRoom = ChatRoom::create([
                 'user_id' => $user->id,
-                'user_id2' => $request->user_id
+                'user_id2' => $request->user_id,
             ]);
 
             $user->current_room_chat = $chatRoom->id;
@@ -560,13 +368,15 @@ class EntranceRoomService implements EnteranceRoomContract
         }
 
         $user2 = User::find($request->user_id);
-        if (!$user2) throw new Exception('user not found');
+        if (! $user2) {
+            throw new Exception('user not found');
+        }
 
         $data = [
             'title' => __('I invite you to enter my room'),
-            'room_owner_id' => intval($request->owner_id),
-            'room_id' => intval($room->id),
-            'status' => 0
+            'room_owner_id' => (int) ($request->owner_id),
+            'room_id' => (int) ($room->id),
+            'status' => 0,
         ];
 
         $message = json_encode($data);
@@ -574,21 +384,21 @@ class EntranceRoomService implements EnteranceRoomContract
         $chatMessageData = [
             'chat_room_id' => $chatRoom->id,
             'user_id' => $user->id,
-            'room_owner_id' => intval($request->owner_id),
-            'room_id' => intval($room->id),
+            'room_owner_id' => (int) ($request->owner_id),
+            'room_id' => (int) ($room->id),
             'message' => __('I invite you to enter my room'),
-            'type' => 'invite_room'
+            'type' => 'invite_room',
         ];
 
-        if ($user2->online == 1 && $user2->current_room_chat == $chatRoom->id) {
+        if ($user2->online === 1 && $user2->current_room_chat === $chatRoom->id) {
             $chatMessageData['status'] = 'seen';
-        } elseif ($user2->online == 1) {
+        } elseif ($user2->online === 1) {
             $chatMessageData['status'] = 'received';
         }
         $chatMessage = ChatMessage::create($chatMessageData);
 
-        if ($user2->is_logout != 1) {
-            $tokens_notfacion[] = \DB::table('users')->where('id', $user2->id)->value('notification_id');
+        if ($user2->is_logout !== 1) {
+            $tokens_notfacion[] = DB::table('users')->where('id', $user2->id)->value('notification_id');
             $title = $user->name;
             $body = $message;
             $type = $message->type ?? 'text';
@@ -597,7 +407,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         $message_resource = new ChatMessageResource($chatMessage);
         $room_resource = new ChatRoomResourcePusher($chatRoom);
-        if ($chatRoom->user_id == $user->id) {
+        if ($chatRoom->user_id === $user->id) {
             $chatuser = User::find($chatRoom->user_id2);
         } else {
             $chatuser = User::find($chatRoom->user_id);
@@ -605,7 +415,7 @@ class EntranceRoomService implements EnteranceRoomContract
 
         try {
             event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             return $th->getMessage();
         }
 
@@ -618,7 +428,7 @@ class EntranceRoomService implements EnteranceRoomContract
     public function enterLiveRoom($user, Request $request, $roomPass, $room)
     {
         $ownerId = $this->getOwnerId($request, $room);
-        if (!$ownerId) {
+        if (! $ownerId) {
             return Common::apiResponse(0, 'not found', null, 404);
         }
 
@@ -643,6 +453,226 @@ class EntranceRoomService implements EnteranceRoomContract
         return Common::apiResponse(true, '', $roomInfo);
     }
 
+    private function handleMemberAdded($room, $userId)
+    {
+        $visitors = explode(',', $room->room_visitor);
+        if ($visitors[0] === '') {
+            $visitors = [];
+        }
+        if (! in_array($userId, $visitors)) {
+            $visitors[] = $userId;
+            $visitors = array_unique($visitors);
+            $room->count_room_socket = count($visitors);
+            $room->room_visitor = trim(implode(',', $visitors), ',');
+        }
+    }
+
+    private function handleMemberRemoved($room, $user, $ownerId)
+    {
+        $userId = $user->id;
+        if (@$room->charizma_status) {
+            $userCharismaService = app(UserCharismaServiceContract::class);
+            $userCharismaService->resetUserCharisma($userId, $room->id);
+            $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$userId]);
+
+            $ms = [
+                'messageContent' => [
+                    'message' => 'updateCharisma',
+                    'data' => $userDataWithCharisma,
+                ],
+            ];
+            $json = json_encode($ms);
+
+            Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+        }
+
+        $visitors = explode(',', $room->room_visitor);
+        if (in_array($userId, $visitors)) {
+            $index = array_search($userId, $visitors);
+            unset($visitors[$index]);
+            $room->count_room_socket = count($visitors);
+            $room->room_visitor = trim(implode(',', $visitors), ',');
+        }
+
+        if ($room->uid === $userId->now_room_uid) {
+            $user->now_room_uid = 0;
+        }
+
+        UserHandling::calcTime($userId);
+    }
+
+    private function addUserToVisitors(int $roomId, int $userId)
+    {
+        RoomVisitor::query()->where(['user_id' => $userId])->delete();
+        RoomVisitor::query()->create(['user_id' => $userId, 'room_id' => $roomId]);
+    }
+
+    private function removeUserToVisitors(int $roomId, int $userId)
+    {
+        RoomVisitor::query()->where(['user_id' => $userId, 'room_id' => $roomId])->delete();
+    }
+
+    private function updateRoomVisitorsBasedOnEvent($event, $room, $userId)
+    {
+        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
+
+        if ($event === 'room_login' && ! in_array($userId, $visitors)) {
+            $visitors[] = $userId;
+        } elseif ($event === 'room_logout') {
+            UserHandling::calcTime($userId);
+            $this->updateMicrophone($room->uid, $userId);
+            $visitors = array_diff($visitors, [$userId]);
+        }
+
+        return array_values(array_unique($visitors));
+    }
+
+    private function updateRoomVisitorsBasedOnEvent2($event, $room, $userId)
+    {
+        $visitors = $room->room_visitor ? explode(',', $room->room_visitor) : [];
+
+        if ($event === 'room_login' && ! in_array($userId, $visitors)) {
+            $visitors[] = $userId;
+        } elseif ($event === 'room_logout') {
+            UserHandling::calcTime($userId);
+            $this->updateMicrophone2($room->uid, $userId);
+            $visitors = array_diff($visitors, [$userId]);
+        }
+
+        return array_values(array_unique($visitors));
+    }
+
+    private function handleCharismaStatusOnLogout($room, $user, $ownerId)
+    {
+        $userCharismaService = app(UserCharismaServiceContract::class);
+        $userCharismaService->resetUserCharisma($user->id, $room->id);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
+
+        $ms = [
+            'messageContent' => [
+                'message' => 'updateCharisma',
+                'data' => $userDataWithCharisma,
+            ],
+        ];
+        $json = json_encode($ms);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+    }
+
+    private function handleCharismaStatusOnLogout2($room, $user, $ownerId)
+    {
+        $userCharismaService = app(UserCharismaServiceContract::class);
+        $userCharismaService->resetUserCharisma($user->id, $room->id);
+        $userDataWithCharisma = $userCharismaService->getUserResetData2($room, [$user->id]);
+
+        $ms = [
+            'messageContent' => [
+                'message' => 'updateCharisma',
+                'data' => $userDataWithCharisma,
+            ],
+        ];
+        $json = json_encode($ms);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $ownerId, $json);
+    }
+
+    private function updateMicrophone($room_uid, $user_id)
+    {
+        $user = User::query()->find($user_id);
+        if (! $user) {
+            return;
+        }
+        $result = Common::go_microphone_hand($room_uid, $user_id);
+
+        $room = Room::query()->where('uid', $room_uid)->first();
+
+        if (! $room) {
+            return;
+        }
+        if ($result) {
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+        }
+    }
+
+    private function updateMicrophone2($room_uid, $user_id)
+    {
+        $user = User::query()->find($user_id);
+        if (! $user) {
+            return;
+        }
+        $result = Common::go_microphone_hand_2($room_uid, $user_id);
+
+        $room = Room::query()->where('uid', $room_uid)->first();
+
+        if (! $room) {
+            return;
+        }
+        if ($result) {
+            app(UserCharismaServiceContract::class)->RemoveUserRoomWhenLeaveMic($user_id, $room->id);
+        }
+    }
+
+    private function updateRoom($user_id, $owner_id, Room &$room)
+    {
+        if (PackageHelper::isInstalled('charisma')) {
+            if ($room->charizma_status && ($room->charizma_timestamp + 86400) < now()->timestamp) {
+                $room->charizma_timestamp = null;
+                $room->charizma_status = false;
+                dispatch(new ResetCharisma($room->id));
+            }
+        }
+
+        if ($room->uid === $user_id) {
+            $room->is_live = true;
+        }
+
+        $room->save();
+    }
+
+    private function enterTheRoomCreateOrUpdate($user_id, $owner_id, $room_id)
+    {
+        $timezone = Common::timeZone();
+
+        EnteredRoom::query()->updateOrCreate(
+            [
+                'uid' => $user_id,
+                'ruid' => $owner_id,
+                'rid' => $room_id,
+            ],
+            [
+                'entered_at' => now($timezone),
+            ]
+        );
+        $this->updateRoomVisitors($room_id);
+    }
+
+    private function updateRoomVisitors(int $roomId): void
+    {
+        $timezone = Common::timeZone();
+        $today = Carbon::now($timezone)->startOfDay();
+        $tomorrow = (clone $today)->endOfDay();
+
+        $uniqueVisitors = EnteredRoom::query()
+            ->where('rid', $roomId)
+            ->whereBetween('entered_at', [$today, $tomorrow])
+            ->distinct('uid')
+            ->count('uid');
+
+        $gift = TotalRoomGift::where('room_id', $roomId)
+            ->whereBetween('created_at', [$today, $tomorrow])
+            ->first();
+
+        if ($gift) {
+            $gift->update(['number_of_visitors' => $uniqueVisitors]);
+        } else {
+            TotalRoomGift::create([
+                'room_id' => $roomId,
+                'current_total' => 0,
+                'number_of_visitors' => $uniqueVisitors,
+            ]);
+        }
+    }
+
     private function getOwnerId(Request $request, Room $room): ?int
     {
         return $request->type === 'random'
@@ -657,11 +687,11 @@ class EntranceRoomService implements EnteranceRoomContract
 
     private function validateRoomStatus(Room $room, $user)
     {
-        if (!$room) {
+        if (! $room) {
             return Common::apiResponse(false, 'No room yet, please create first', null, 404);
         }
 
-        if ($room->room_status == 2) {
+        if ($room->room_status === 2) {
             return Common::apiResponse(0, __('room_closed'));
         }
 
@@ -676,9 +706,9 @@ class EntranceRoomService implements EnteranceRoomContract
 
         $isBlack = explode(',', $room->room_black);
         foreach ($isBlack as $k => &$v) {
-            $arr = explode("#", $v);
+            $arr = explode('#', $v);
             $sjc = time() - $arr[1];
-            if ($sjc < $arr[2] && $arr[0] == $userId) {
+            if ($sjc < $arr[2] && $arr[0] === $userId) {
                 return true;
             }
             if ($sjc >= $arr[2]) {
@@ -686,7 +716,7 @@ class EntranceRoomService implements EnteranceRoomContract
             }
         }
 
-        $room->room_black = implode(",", $isBlack);
+        $room->room_black = implode(',', $isBlack);
         $this->roomRepository->updateRoomBlack($room, $room->room_black);
 
         return false;
@@ -695,13 +725,14 @@ class EntranceRoomService implements EnteranceRoomContract
     private function checkRoomPassword(Room $room, ?string $roomPass, int $ownerId, int $userId)
     {
         if ($room->room_pass && $ownerId !== $userId) {
-            if (!$roomPass) {
+            if (! $roomPass) {
                 return Common::apiResponse(false, __('The room is locked, please enter the password'), null, 409);
             }
             if ($room->room_pass !== $roomPass) {
                 return Common::apiResponse(false, __('Password is incorrect, please re-enter'), null, 410);
             }
         }
+
         return null;
     }
 
@@ -711,7 +742,7 @@ class EntranceRoomService implements EnteranceRoomContract
             $room->is_afk = 1;
             $room->save();
 
-            if ($room->count_room_socket == 0) {
+            if ($room->count_room_socket === 0) {
                 dispatch(new SendNotificationToAllFollowers($room->uid))->onQueue('notification_heavy');
             }
         }
@@ -731,7 +762,7 @@ class EntranceRoomService implements EnteranceRoomContract
         $user->now_room_uid = $ownerId;
         $user->save();
 
-        if (config('app.env') !== "production") {
+        if (config('app.env') !== 'production') {
             RoomVisitor::firstOrCreate([
                 'user_id' => $user->id,
                 'room_id' => $room->id,

@@ -3,19 +3,20 @@
 namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
 use App\Admin\Controllers\MainController;
-use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Illuminate\Support\Facades\Cache;
+use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class ChargeAgencyController extends MainController
 {
     use HasResourceActions;
     use ResolvesExternalDependencies;
+
     public $permission_name = 'charge-agency';
 
     public function index(Content $content)
@@ -28,13 +29,12 @@ class ChargeAgencyController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('agency-country'))
             ->body($this->detail($id)));
     }
@@ -42,13 +42,12 @@ class ChargeAgencyController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('agency-country'))
             ->body($this->form()->edit($id)));
     }
@@ -63,24 +62,24 @@ class ChargeAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new EntitiesChargeAgency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()
-            ->when($countryID, fn($q) => $q->whereHas('agency', fn($q) => $q->where('country_id', $countryID)))
+            ->when($countryID, fn ($q) => $q->whereHas('agency', fn ($q) => $q->where('country_id', $countryID)))
             ->whereHas('agency');
 
         $grid->id(__('ID'));
         $grid->column('agency.name', __('Agency'))->display(function ($name) {
-            if (! $this->agency){
-                return ;
+            if (! $this->agency) {
+                return;
             }
             $cacheKey = "agency_image_{$this->agency->id}";
             $image = Cache::remember($cacheKey, 3600, function () {
                 $path = @$this->agency->img;
-                $defaultImage = asset("images/icon-agency.jpg");
+                $defaultImage = asset('images/icon-agency.jpg');
                 $url = getImagePath($path) ?? $defaultImage;
 
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
@@ -101,13 +100,14 @@ class ChargeAgencyController extends MainController
         });
 
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -138,6 +138,7 @@ class ChargeAgencyController extends MainController
             if ($agency) {
                 return [$agency->id => $agency->name];
             }
+
             return [];
         })->ajax('/api/search/shipping-agencies', 'id', 'name');
 

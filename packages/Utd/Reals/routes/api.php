@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Utd\Reals\Http\Controllers\RealsController;
-use Utd\Reals\Http\Controllers\RealsUserLikesController;
 use Utd\Reals\Http\Controllers\RealsUserCommentController;
+use Utd\Reals\Http\Controllers\RealsUserLikesController;
 use Utd\Reals\Http\Controllers\ReportController;
 
 /*

@@ -2,17 +2,16 @@
 
 namespace Utd\CP\Http\Controllers;
 
-use Exception;
 use App\Helpers\Common;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Utd\CP\Transformers\TopWeeklyCpResource;
 use Utd\CP\Services\WeeklyCpService;
-use Utd\CP\Transformers\WeeklyCpResource;
-use Utd\CP\Transformers\UserWeeklyCpResource;
-use Utd\CP\Transformers\PerviousWeeklyCpResource;
 use Utd\CP\Transformers\PerviousOneWeeklyCpResource;
-
+use Utd\CP\Transformers\PerviousWeeklyCpResource;
+use Utd\CP\Transformers\TopWeeklyCpResource;
+use Utd\CP\Transformers\UserWeeklyCpResource;
+use Utd\CP\Transformers\WeeklyCpResource;
 
 class WeeklyCpController extends Controller
 {
@@ -25,6 +24,7 @@ class WeeklyCpController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
+
         return Common::apiResponse(1, '', PerviousWeeklyCpResource::collection($data));
     }
 
@@ -36,6 +36,7 @@ class WeeklyCpController extends Controller
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
         $data = new WeeklyCpResource($weeklyCp, $rule);
+
         return Common::apiResponse(1, '', $data);
     }
 
@@ -58,6 +59,7 @@ class WeeklyCpController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
+
         return Common::apiResponse(1, '', new PerviousOneWeeklyCpResource($data));
     }
 
@@ -69,8 +71,7 @@ class WeeklyCpController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
+
         return Common::apiResponse(1, '', new UserWeeklyCpResource($user, $data));
     }
 }
-
-

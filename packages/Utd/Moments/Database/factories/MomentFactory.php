@@ -22,10 +22,10 @@ class MomentFactory extends Factory
         $createdAt = $this->faker->dateTimeBetween('2020-01-01', 'now');
 
         return [
-            'user_id' => rand(1,2),
+            'user_id' => rand(1, 2),
             'description' => fake()->text(),
             'created_at' => $createdAt,
-            'updated_at' => $this->faker->dateTimeBetween($createdAt, 'now')
+            'updated_at' => $this->faker->dateTimeBetween($createdAt, 'now'),
         ];
     }
 }

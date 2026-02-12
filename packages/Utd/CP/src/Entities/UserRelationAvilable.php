@@ -11,4 +11,3 @@ class UserRelationAvilable extends Model
 
     protected $guarded = [];
 }
-

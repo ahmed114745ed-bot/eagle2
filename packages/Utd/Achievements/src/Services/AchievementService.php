@@ -3,27 +3,25 @@
 namespace Utd\Achievements\Services;
 
 use App\Contracts\AchievementContract;
-use App\Models\User;
+use App\Contracts\GiftRepositoryContract;
 use App\Helpers\Common;
-use Utd\Achievements\Enums\TargetType;
+use App\Models\User;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Achievements\Enums\TargetType;
+use Utd\Achievements\Repositories\AchievementLevelRepository;
 use Utd\Achievements\Repositories\AchievementRepository;
 use Utd\Achievements\Repositories\GiftAchievementRepository;
-use Utd\Achievements\Repositories\AchievementLevelRepository;
 use Utd\Achievements\Repositories\UserAchievementLevelRepository;
-use App\Contracts\GiftRepositoryContract;
 
 class AchievementService implements AchievementContract
 {
     public function __construct(
-        private readonly AchievementRepository          $achievementRepository,
-        private readonly AchievementLevelRepository     $achievementLevelRepository,
-        private readonly GiftAchievementRepository      $giftAchievementRepository,
-        private readonly ?GiftRepositoryContract        $giftRepository,
+        private readonly AchievementRepository $achievementRepository,
+        private readonly AchievementLevelRepository $achievementLevelRepository,
+        private readonly GiftAchievementRepository $giftAchievementRepository,
+        private readonly ?GiftRepositoryContract $giftRepository,
         private readonly UserAchievementLevelRepository $userAchievementLevelRepository,
-    )
-    {
-    }
+    ) {}
 
     public function show(User $user, int $page = 1)
     {
@@ -58,9 +56,10 @@ class AchievementService implements AchievementContract
             'target' => $request->target,
             'target_type' => $request->target_type,
             'ar_description' => $request->ar_description,
-            'en_description' => $request->en_description
+            'en_description' => $request->en_description,
         ];
         $this->achievementLevelRepository->create($data);
+
         return true;
     }
 
@@ -72,7 +71,7 @@ class AchievementService implements AchievementContract
             'target' => $request->target,
             'target_type' => $request->target_type,
             'ar_description' => $request->ar_description,
-            'en_description' => $request->en_description
+            'en_description' => $request->en_description,
         ];
         if ($request->hasFile('valid_image')) {
             $data['valid_image'] = Common::upload('images', $request->file('valid_image'));
@@ -81,6 +80,7 @@ class AchievementService implements AchievementContract
             $data['invalid_image'] = Common::upload('images', $request->file('invalid_image'));
         }
         $this->achievementLevelRepository->update($data, $id);
+
         return true;
     }
 
@@ -88,6 +88,7 @@ class AchievementService implements AchievementContract
     {
         $data = $this->achievementLevelRepository->findOrFail($id);
         $data->delete();
+
         return true;
     }
 
@@ -109,6 +110,7 @@ class AchievementService implements AchievementContract
     public function achievementGift($request)
     {
         $this->giftAchievementRepository->store($request);
+
         return true;
     }
 
@@ -125,6 +127,7 @@ class AchievementService implements AchievementContract
     public function isEnable($id, $isEnable)
     {
         $this->userAchievementLevelRepository->update(['is_enable' => $isEnable], $id);
+
         return true;
     }
 
@@ -132,6 +135,7 @@ class AchievementService implements AchievementContract
     {
         $data = $this->userAchievementLevelRepository->findOrFail($id);
         $data->delete();
+
         return true;
     }
 
@@ -158,6 +162,7 @@ class AchievementService implements AchievementContract
             'gift_achievement_id' => $request->gift_achievement_id,
         ];
         $this->userAchievementLevelRepository->create($data);
+
         return true;
     }
 }

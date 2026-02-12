@@ -14,22 +14,22 @@ class MomentCommentsService
         $userId = $user->id;
         $moment->comments()->create([
             'user_id' => $userId,
-            'comment' => $comment
+            'comment' => $comment,
         ]);
+
         return true;
     }
 
     public function delete($comment_id, Moment $moment)
     {
         $commint = MomentCommint::findOrFail($comment_id);
-        if (!$commint) {
-            return "false";
+        if (! $commint) {
+            return 'false';
         }
         $moment->comments()->where('moment_user_comments.id', $comment_id)->delete();
     }
 
     /**
-     * @param $moment
      * @return mixed
      */
     public function showComments($moment)
@@ -39,7 +39,7 @@ class MomentCommentsService
             ->with([
                 'user' => function ($query) {
                     $query->withoutAppends()->with('profile')->select(['id', 'uuid', 'name']);
-                }
+                },
             ])->orderByDesc('id')->paginate(10);
     }
 }

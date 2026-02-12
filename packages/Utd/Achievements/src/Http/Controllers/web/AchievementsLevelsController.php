@@ -2,17 +2,17 @@
 
 namespace Utd\Achievements\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\AchievementValidImage;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Support\Str;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
-use Utd\Achievements\Enums\TargetType;
 use Utd\Achievements\Entities\AchievementLevel;
-use Encore\Admin\Facades\Admin;
+use Utd\Achievements\Enums\TargetType;
 
 class AchievementsLevelsController extends MainController
 {
@@ -23,7 +23,6 @@ class AchievementsLevelsController extends MainController
      *
      * @return Grid
      */
-
     public function create(Content $content)
     {
         return parent::create($content
@@ -35,12 +34,14 @@ class AchievementsLevelsController extends MainController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
     }
 
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+
         return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
@@ -54,7 +55,6 @@ class AchievementsLevelsController extends MainController
             ->description(trans('admin.description'))
             ->body($this->grid()));
     }
-
 
     protected function grid()
     {
@@ -97,7 +97,7 @@ class AchievementsLevelsController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -122,8 +122,6 @@ class AchievementsLevelsController extends MainController
      * Make a form builder.
      *
      * @return Form
-     *
-     *
      */
     protected function form()
     {
@@ -136,10 +134,10 @@ class AchievementsLevelsController extends MainController
             return TargetType::getTranslatedOptions();
         })->rules('required');
         $form->file('valid_image', trans('Valid image'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
         })->rules('required');
         $form->file('invalid_image', trans('Invalid image'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
         })->rules('required');
         $form->textarea('ar_description', __('ar_description'));
         $form->textarea('en_description', __('en_description'));
@@ -158,13 +156,14 @@ class AchievementsLevelsController extends MainController
             if ($form->model()->valid_image) {
                 $existingImage = AchievementValidImage::where('image', $form->model()->valid_image)->first();
 
-                if (!$existingImage) {
+                if (! $existingImage) {
                     AchievementValidImage::create([
                         'image' => $form->model()->valid_image,
                     ]);
                 }
             }
         });
+
         return $form;
     }
 }

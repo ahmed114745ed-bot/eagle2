@@ -3,8 +3,8 @@
 namespace Utd\CP\Services;
 
 use Exception;
-use Utd\CP\Repositories\WeeklyCpRepository;
 use Modules\Events\Entities\WeeklyStar;
+use Utd\CP\Repositories\WeeklyCpRepository;
 
 class WeeklyCpService
 {
@@ -52,7 +52,7 @@ class WeeklyCpService
         }
 
         $giftIds = $weeklyCp->gifts->pluck('id')->toArray();
-       
+
         return $this->weeklyCpRepository->topUser($giftIds, $weeklyCp);
     }
 
@@ -99,5 +99,3 @@ class WeeklyCpService
         return $this->weeklyCpRepository->currentWeeklyCp();
     }
 }
-
-

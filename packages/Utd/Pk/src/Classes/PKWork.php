@@ -2,54 +2,58 @@
 
 namespace Utd\Pk\Classes;
 
-use Utd\Gifts\Services\SendGiftService;
 use App\Interfaces\RoomJobInterface;
 use App\Support\PackageHelper;
+use Carbon\Carbon;
+use Exception;
+use Utd\Gifts\Services\SendGiftService;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
-use Carbon\Carbon;
 
 class PKWork implements RoomJobInterface
 {
-
-    public function work($roomJob) : array
+    public function work($roomJob): array
     {
         $room = PackageHelper::isInstalled('room') ? Room::query()->find($roomJob->room_id) : null;
-        if(!$room) throw new \Exception('Room not found');
+        if (! $room) {
+            throw new Exception('Room not found');
+        }
         $userIds = unserialize($roomJob->data);
         $earnedCoinsPerUser = $roomJob->coins;
         $lastPk = Pk::query()->where('room_id', $room->id)->where('status', 1)
-            ->whereDate('end_at', "<=", now())->orderByDesc('id')->first();
-        $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk,$userIds, $earnedCoinsPerUser, $room);
-        return ['room_id'=> $room->id, ...$data];
+            ->whereDate('end_at', '<=', now())->orderByDesc('id')->first();
+        $data = (new SendGiftService())->updatePkScoresAndSendToZegoJob2($lastPk, $userIds, $earnedCoinsPerUser, $room);
+
+        return ['room_id' => $room->id, ...$data];
     }
 
-    public function sendToZego($data, int $roomId,int $user_id):  string
+    public function sendToZego($data, int $roomId, int $user_id): string
     {
         $ms = [
             'messageContent' => [
-                "message" => "updatePk",
-                "PkTime" => Carbon ::parse ( $data['end_at']  ) -> diffInMinutes ( now () ),
-                "scoreTeam1" => $data['t1_score'],
-                "scoreTeam2" => $data['t2_score'],
-                "percentagepk_team1" => (string)$data['t1_per'] ,
-                "percentagepk_team2" => (string)$data['t2_per']
-            ]
+                'message' => 'updatePk',
+                'PkTime' => Carbon::parse($data['end_at'])->diffInMinutes(now()),
+                'scoreTeam1' => $data['t1_score'],
+                'scoreTeam2' => $data['t2_score'],
+                'percentagepk_team1' => (string) $data['t1_per'],
+                'percentagepk_team2' => (string) $data['t2_per'],
+            ],
         ];
-        $json = json_encode ($ms);
+        $json = json_encode($ms);
+
         return $json;
     }
 
-    public function getVariables($data) : array
+    public function getVariables($data): array
     {
         return [$data, $data['room_id'], 2013];
     }
 
-    public function prepareDataToZego($data) : array
+    public function prepareDataToZego($data): array
     {
         $grouped = [];
         foreach ($data['pk'] as $pk) {
-            if (!isset($grouped[$pk['room_id']])) {
+            if (! isset($grouped[$pk['room_id']])) {
                 $grouped[$pk['room_id']] = [
                     'room_id' => $pk['room_id'],
                     't1_score' => 0.0,
@@ -62,30 +66,33 @@ class PKWork implements RoomJobInterface
             $grouped[$pk['room_id']]['end_at'] = $pk['end_at'] ?? null;
             $grouped[$pk['room_id']]['t1_score'] += $pk['t1_score'];
             $grouped[$pk['room_id']]['t2_score'] += $pk['t2_score'];
-            $grouped[$pk['room_id']]['t1_per'] = $this->per_1($grouped[$pk['room_id']]['t1_score'],$grouped[$pk['room_id']]['t2_score']);
-            $grouped[$pk['room_id']]['t2_per'] = $this->per_2($grouped[$pk['room_id']]['t1_score'],$grouped[$pk['room_id']]['t2_score']);
+            $grouped[$pk['room_id']]['t1_per'] = $this->per_1($grouped[$pk['room_id']]['t1_score'], $grouped[$pk['room_id']]['t2_score']);
+            $grouped[$pk['room_id']]['t2_per'] = $this->per_2($grouped[$pk['room_id']]['t1_score'], $grouped[$pk['room_id']]['t2_score']);
         }
         $finalResult = array_values($grouped);
+
         return $finalResult;
     }
 
-    public function per_2($t1_score,$t2_score) :float
+    public function per_2($t1_score, $t2_score): float
     {
-        if (($t1_score + $t2_score) > 0){
-            $res = $t2_score/($t1_score + $t2_score);
-        }else{
+        if (($t1_score + $t2_score) > 0) {
+            $res = $t2_score / ($t1_score + $t2_score);
+        } else {
             $res = 0.5;
         }
-        return number_format ($res,2);
+
+        return number_format($res, 2);
     }
 
-    public function per_1($t1_score,$t2_score) :float
+    public function per_1($t1_score, $t2_score): float
     {
-        if (($t1_score + $t2_score) > 0){
-            $res = $t1_score/($t1_score + $t2_score);
-        }else{
+        if (($t1_score + $t2_score) > 0) {
+            $res = $t1_score / ($t1_score + $t2_score);
+        } else {
             $res = 0.5;
         }
-        return number_format ($res,2);
+
+        return number_format($res, 2);
     }
 }

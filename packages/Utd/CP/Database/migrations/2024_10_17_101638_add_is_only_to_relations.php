@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cp_relations', function (Blueprint $table) {
-           $table->integer('cp_one')->default(0);
+            $table->integer('cp_one')->default(0);
         });
     }
 

@@ -2,21 +2,22 @@
 
 namespace Utd\Room\Repositories;
 
-use Carbon\Carbon;
-use App\Models\Pack;
-use App\Models\User;
-use Utd\Room\Entities\Room;
-use Utd\Room\Entities\EnteredRoom;
-use Utd\Room\Entities\RoomPrivateMessages;
-use App\Http\Resources\Api\V1\NowRoomResource;
-use App\Http\Resources\Api\V1\RoomResource;
 use App\Contracts\RoomRepositoryContract;
 use App\Helpers\CacheHelper;
+use App\Http\Resources\Api\V1\NowRoomResource;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Models\Pack;
+use App\Models\User;
+use Carbon\Carbon;
+use DB;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomPrivateMessages;
 
 /**
  * @property Room $model
  */
-class RoomRepository extends AbstractRepository implements RoomRepositoryContract, RoomRepoInterface
+class RoomRepository extends AbstractRepository implements RoomRepoInterface, RoomRepositoryContract
 {
     public function __construct()
     {
@@ -29,6 +30,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         if ($withoutAppends) {
             $model = $model->withoutAppends();
         }
+
         return $model->where('uid', $userId)
             ->with(['owner', 'roomCategory', 'family'])
             ->first();
@@ -45,6 +47,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         if ($withoutAppends) {
             $model = $model->withoutAppends();
         }
+
         return $model->where('type', $type)
             ->where('uid', $userId)
             ->with(['owner', 'roomCategory', 'family'])
@@ -57,6 +60,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         if ($withoutAppends) {
             $model = $model->withoutAppends();
         }
+
         return $model->where('type', 'audio')
             ->where('uid', $userId)
             ->with(['owner', 'roomCategory', 'family'])
@@ -71,6 +75,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             $query = $query->withoutAppends();
         }
         $query = $query->select(['id', 'uid', 'room_admin']);
+
         return $query->where('id', $id)->first();
     }
 
@@ -107,6 +112,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             $query = $query->withoutAppends();
         }
         $query = $query->select(['id', 'uid', 'room_admin']);
+
         return $query->where('uid', $userId)->first();
     }
 
@@ -127,7 +133,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             ->first();
     }
 
-    public function findUserRoom($ownerId, $selectRow = "*")
+    public function findUserRoom($ownerId, $selectRow = '*')
     {
         return $this->model->withoutAppends()
             ->where(['uid' => $ownerId])
@@ -135,7 +141,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             ->first();
     }
 
-    public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = "*")
+    public function findTypeUserRoom($ownerId, $type = 'audio', $selectRow = '*')
     {
         return $this->model->withoutAppends()
             ->where(['uid' => $ownerId])
@@ -144,7 +150,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             ->first();
     }
 
-    public function findUserRoomById($ownerId, $selectRow = "*")
+    public function findUserRoomById($ownerId, $selectRow = '*')
     {
         return $this->model
             ->withoutAppends()
@@ -176,6 +182,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     public function updateMicRoom($room, $mic)
     {
         $room->microphone = $mic;
+
         return $room->save();
     }
 
@@ -189,6 +196,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     public function updateRoomUser($room)
     {
         $room->save();
+
         return true;
     }
 
@@ -197,7 +205,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         return $this->model->with($with)
             ->where('game_id', '!=', null)
             ->where('mode', 4)
-            ->when(isset($gameId) && $gameId != 'null', function ($query) use ($gameId) {
+            ->when(isset($gameId) && $gameId !== 'null', function ($query) use ($gameId) {
                 $query->where('game_id', $gameId);
             })->get();
     }
@@ -236,26 +244,13 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         return $query->where('type', 'live');
     }
 
-    protected function getBlockedUserIds()
-    {
-        return Pack::query()
-            ->select('user_id')
-            ->where('type', 16)
-            ->where('is_used', 1)
-            ->where(function ($q) {
-                $q->where('expire', 0)
-                    ->orWhere('expire', '>=', now()->timestamp);
-            })
-            ->pluck('user_id');
-    }
-
     public function createPrivetMessage($fromUserId, $toUserId, $message, $price)
     {
         return RoomPrivateMessages::query()->create([
             'from_user_id' => $fromUserId,
             'to_user_id' => $toUserId,
             'message' => $message,
-            'price' => $price
+            'price' => $price,
         ]);
     }
 
@@ -263,7 +258,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
     {
         $roomType = $req->room_type ?? 'audio';
         $user = $req?->user();
-        $topRooms = (settings()->get('make_rooms_top') == 1) ?? false;
+        $topRooms = (settings()->get('make_rooms_top') === 1) ?? false;
 
         $blockedUserIds = $this->getBlockedUserIds();
 
@@ -274,7 +269,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                 'defaultBackground:id,img',
                 'lastPk:id,room_id',
                 'background:id,img',
-                'roomVisitorUsers' => fn($q) => $q->with('profile')->limit(5),
+                'roomVisitorUsers' => fn ($q) => $q->with('profile')->limit(5),
                 'myClass',
                 'roomCategory:id,type',
                 'myType',
@@ -289,7 +284,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                     'specialId.ware',
                     'eligiblePacks.ware',
                     'profile',
-                    'medals.achievementLevel.achievement'
+                    'medals.achievementLevel.achievement',
                 ],
             ])
             ->withCount('roomVisitors')
@@ -299,7 +294,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
 
         $result->orderByDesc('pin');
 
-        if ($topRooms && $roomType != 'live') {
+        if ($topRooms && $roomType !== 'live') {
             $result->orderByRaw('is_top = 1 DESC');
         } else {
             $result->where(function ($query) {
@@ -309,7 +304,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         $result->orderByDesc('room_visitors_count');
         $result->orderByDesc('hour_hot');
 
-        if (!is_null($req->country_id)) {
+        if (! is_null($req->country_id)) {
             $result->whereHas('owner', function ($q) use ($req) {
                 $q->where('country_id', $req->country_id);
             });
@@ -364,7 +359,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                     ->pluck('room.room_type')
                     ->unique();
 
-                $result->whereIn("room_type", $roomTypes)
+                $result->whereIn('room_type', $roomTypes)
                     ->orderByDesc('top_room')
                     ->orderByDesc('session');
                 break;
@@ -399,9 +394,9 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
             $result = $result->whereIn('uid', $ids);
         }
 
-        return $result->when($roomType != 'live', function ($q) use ($roomType) {
+        return $result->when($roomType !== 'live', function ($q) use ($roomType) {
             $q->where('type', $roomType);
-        })->when($roomType == 'live', function ($q) use ($roomType) {
+        })->when($roomType === 'live', function ($q) {
             $q->whereIn('type', ['single_live', 'multi_live']);
         })->paginate(10);
     }
@@ -417,11 +412,11 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         return [
             'audio' => $audio
                 ? new RoomResource($audio)
-                : (object)[],
+                : (object) [],
 
             'live' => $live
                 ? new RoomResource($live)
-                : (object)[],
+                : (object) [],
         ];
     }
 
@@ -437,30 +432,200 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
         return [
             'audio' => $audio
                 ? new RoomResource($audio)
-                : (object)[],
+                : (object) [],
 
             'live' => $live
                 ? new RoomResource($live)
-                : (object)[],
+                : (object) [],
             'now_room' => $nowRooms
                 ? $nowRooms
-                : (object)[],
+                : (object) [],
         ];
+    }
+
+    public function liveRooms($req, $ids = [])
+    {
+        $user = $req?->user();
+        $topRooms = false;
+
+        $blockedUserIds = $this->getBlockedUserIds();
+
+        $query = $this->baseRoomQuery($user, $blockedUserIds);
+
+        $this->applyTopRoomsOrder($query, $topRooms);
+
+        if (! is_null($req->country_id)) {
+            $this->applyCountryFilter($query, $req->country_id);
+        }
+
+        if (! empty($ids)) {
+            $query->whereIn('uid', $ids);
+        }
+
+        return RoomResource::collection(
+            $query->where('type', 'live')->where('is_afk', 1)->paginate()
+        );
+    }
+
+    // ========================================
+    // Methods from RoomRepoInterface
+    // ========================================
+
+    /**
+     * Find room by owner user ID
+     */
+    public function findByUid($id)
+    {
+        return $this->model->where('uid', $id)->first();
+    }
+
+    /**
+     * Find room by owner ID and type
+     */
+    public function findByType($id, $type)
+    {
+        return $this->model->where('uid', $id)->where('type', $type)->first();
+    }
+
+    /**
+     * Save model and clear cache
+     */
+    public function save($model)
+    {
+        CacheHelper::forget('rooms');
+        $model->save();
+
+        return $model;
+    }
+
+    /**
+     * Delete room by ID
+     */
+    public function delete(int $id): bool
+    {
+        return (bool) $this->model->where('id', $id)->delete();
+    }
+
+    /**
+     * Get all opening rooms
+     */
+    public function getAllOpening()
+    {
+        return $this->model
+            ->orderBy('top_room', 'DESC')
+            ->where('room_status', 1)
+            ->get();
+    }
+
+    /**
+     * Get all opening room IDs
+     */
+    public function getAllOpeningIds()
+    {
+        return $this->model
+            ->where('room_status', 1)
+            ->pluck('id')
+            ->toArray();
+    }
+
+    // ========================================
+    // DB Query Helper Methods (Issue #10)
+    // ========================================
+
+    /**
+     * Get single column value by uid
+     */
+    public function getValueByUid($uid, $column)
+    {
+        return DB::table('rooms')->where('uid', $uid)->value($column);
+    }
+
+    /**
+     * Get room data with specific columns by uid
+     */
+    public function getColumnsByUid($uid, $columns)
+    {
+        return DB::table('rooms')->where('uid', $uid)->select($columns)->first();
+    }
+
+    /**
+     * Update room by uid
+     */
+    public function updateByUid($uid, $data)
+    {
+        return DB::table('rooms')->where('uid', $uid)->update($data);
+    }
+
+    /**
+     * Get microphone status data
+     */
+    public function getMicrophoneStatusByUid($uid)
+    {
+        return (array) DB::table('rooms')
+            ->selectRaw('uid,microphone,is_prohibit_sound,room_sound,play_num')
+            ->where('uid', $uid)
+            ->first();
+    }
+
+    /**
+     * Get room mic info
+     */
+    public function getMicInfoByUid($uid)
+    {
+        return (array) DB::table('rooms')
+            ->where(['uid' => $uid])
+            ->selectRaw('id,room_visitor,room_admin,microphone,free_mic,mode')
+            ->first();
+    }
+
+    /**
+     * Get room user info (admin, speak, judge, sound, room_black, id)
+     */
+    public function getRoomUserInfoByUid($uid)
+    {
+        return DB::table('rooms')->where('uid', $uid)->first();
+    }
+
+    /**
+     * Get room black and id by uid
+     */
+    public function getRoomBlackByUid($uid)
+    {
+        return DB::table('rooms')->where('uid', $uid)->first();
+    }
+
+    protected function getBlockedUserIds()
+    {
+        return Pack::query()
+            ->select('user_id')
+            ->where('type', 16)
+            ->where('is_used', 1)
+            ->where(function ($q) {
+                $q->where('expire', 0)
+                    ->orWhere('expire', '>=', now()->timestamp);
+            })
+            ->pluck('user_id');
     }
 
     private function getNowRooms($user)
     {
-        if (!$user->now_room_uid) return (object)[];
+        if (! $user->now_room_uid) {
+            return (object) [];
+        }
 
         $nowRoomOwner = $user->nowRoomOwner;
 
-        if (!$nowRoomOwner) return (object)[];
+        if (! $nowRoomOwner) {
+            return (object) [];
+        }
 
-        if ($nowRoomOwner->getPackWithTypeV3(16)) return (object)[];
+        if ($nowRoomOwner->getPackWithTypeV3(16)) {
+            return (object) [];
+        }
 
         $resource = (new NowRoomResource($this))->toArray(request());
 
-        return empty($resource) ? (object)[] : $resource;
+        return empty($resource) ? (object) [] : $resource;
     }
 
     private function baseRoomQuery($user, $blockedUserIds)
@@ -493,13 +658,13 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                 'hour_hot',
                 'type',
                 'mode',
-                'created_at'
+                'created_at',
             ])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
                 'background:id',
-                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'roomVisitorUsers' => fn ($q) => $q->limit(5),
                 'myClass',
                 'roomCategory:id,type',
                 'myType',
@@ -553,13 +718,13 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                 'room_background',
                 'type',
                 'mode',
-                'created_at'
+                'created_at',
             ])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
                 'background:id,img',
-                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'roomVisitorUsers' => fn ($q) => $q->limit(5),
                 'myClass',
                 'roomCategory:id,type',
                 'myType',
@@ -571,7 +736,7 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                 'owner.medals.achievementLevel.achievement',
                 'boxUse',
                 'taskStream',
-                'taskStreamRoom'
+                'taskStreamRoom',
             ])
             ->withCount('roomVisitors')
             ->orderByDesc('pin')
@@ -611,13 +776,13 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
                 'room_background',
                 'type',
                 'mode',
-                'created_at'
+                'created_at',
             ])
             ->with([
                 'backgroundImage:request_background_images.id,owner_room_id,img',
                 'lastPk:id,room_id',
                 'background:id,img',
-                'roomVisitorUsers' => fn($q) => $q->limit(5),
+                'roomVisitorUsers' => fn ($q) => $q->limit(5),
                 'myClass',
                 'roomCategory:id,type',
                 'myType',
@@ -663,155 +828,6 @@ class RoomRepository extends AbstractRepository implements RoomRepositoryContrac
 
     private function applyCountryFilter($query, $countryId)
     {
-        $query->whereHas('owner', fn($q) => $q->where('country_id', $countryId));
-    }
-
-    public function liveRooms($req, $ids = [])
-    {
-        $user = $req?->user();
-        $topRooms = false;
-
-        $blockedUserIds = $this->getBlockedUserIds();
-
-        $query = $this->baseRoomQuery($user, $blockedUserIds);
-
-        $this->applyTopRoomsOrder($query, $topRooms);
-
-        if (!is_null($req->country_id)) {
-            $this->applyCountryFilter($query, $req->country_id);
-        }
-
-        if (!empty($ids)) {
-            $query->whereIn('uid', $ids);
-        }
-        return RoomResource::collection(
-            $query->where('type', 'live')->where('is_afk', 1)->paginate()
-        );
-    }
-
-    // ========================================
-    // Methods from RoomRepoInterface
-    // ========================================
-
-    /**
-     * Find room by owner user ID
-     */
-    public function findByUid($id)
-    {
-        return $this->model->where('uid', $id)->first();
-    }
-
-    /**
-     * Find room by owner ID and type
-     */
-    public function findByType($id, $type)
-    {
-        return $this->model->where('uid', $id)->where('type', $type)->first();
-    }
-
-    /**
-     * Save model and clear cache
-     */
-    public function save($model)
-    {
-        CacheHelper::forget('rooms');
-        $model->save();
-        return $model;
-    }
-
-    /**
-     * Delete room by ID
-     */
-    public function delete(int $id): bool
-    {
-        return (bool)$this->model->where('id', $id)->delete();
-    }
-
-    /**
-     * Get all opening rooms
-     */
-    public function getAllOpening()
-    {
-        return $this->model
-            ->orderBy('top_room', 'DESC')
-            ->where('room_status', 1)
-            ->get();
-    }
-
-    /**
-     * Get all opening room IDs
-     */
-    public function getAllOpeningIds()
-    {
-        return $this->model
-            ->where('room_status', 1)
-            ->pluck('id')
-            ->toArray();
-    }
-
-    // ========================================
-    // DB Query Helper Methods (Issue #10)
-    // ========================================
-
-    /**
-     * Get single column value by uid
-     */
-    public function getValueByUid($uid, $column)
-    {
-        return \DB::table('rooms')->where('uid', $uid)->value($column);
-    }
-
-    /**
-     * Get room data with specific columns by uid
-     */
-    public function getColumnsByUid($uid, $columns)
-    {
-        return \DB::table('rooms')->where('uid', $uid)->select($columns)->first();
-    }
-
-    /**
-     * Update room by uid
-     */
-    public function updateByUid($uid, $data)
-    {
-        return \DB::table('rooms')->where('uid', $uid)->update($data);
-    }
-
-    /**
-     * Get microphone status data
-     */
-    public function getMicrophoneStatusByUid($uid)
-    {
-        return (array)\DB::table('rooms')
-            ->selectRaw("uid,microphone,is_prohibit_sound,room_sound,play_num")
-            ->where('uid', $uid)
-            ->first();
-    }
-
-    /**
-     * Get room mic info
-     */
-    public function getMicInfoByUid($uid)
-    {
-        return (array)\DB::table('rooms')
-            ->where(['uid' => $uid])
-            ->selectRaw('id,room_visitor,room_admin,microphone,free_mic,mode')
-            ->first();
-    }
-
-    /**
-     * Get room user info (admin, speak, judge, sound, room_black, id)
-     */
-    public function getRoomUserInfoByUid($uid)
-    {
-        return \DB::table('rooms')->where('uid', $uid)->first();
-    }
-
-    /**
-     * Get room black and id by uid
-     */
-    public function getRoomBlackByUid($uid)
-    {
-        return \DB::table('rooms')->where('uid', $uid)->first();
+        $query->whereHas('owner', fn ($q) => $q->where('country_id', $countryId));
     }
 }

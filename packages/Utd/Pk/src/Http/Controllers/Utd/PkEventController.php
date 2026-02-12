@@ -2,18 +2,17 @@
 
 namespace Utd\Pk\Http\Controllers\Utd;
 
-use Exception;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
 use Utd\Pk\Http\Resources\PkEventResource;
-use Illuminate\Support\Facades\Validator;
 
 class PkEventController extends Controller
 {
-
     public function index(Request $request)
     {
         $id = $request->id;
@@ -22,6 +21,7 @@ class PkEventController extends Controller
         $data = PkEvent::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -38,11 +38,12 @@ class PkEventController extends Controller
         try {
             $lastStartDate = PkEvent::max('start_date');
             $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-            if ($minStartDate == $request->start_date) {
-                return Common::apiResponse(0, __('date must be after ' . $minStartDate),);
+            if ($minStartDate === $request->start_date) {
+                return Common::apiResponse(0, __('date must be after '.$minStartDate));
             }
 
             PkEvent::create($request->all());
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -55,6 +56,7 @@ class PkEventController extends Controller
         $lastStartDate = PkEvent::max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
+
         return Common::apiResponse(true, 'done', $minStartDate);
     }
 
@@ -62,7 +64,8 @@ class PkEventController extends Controller
     {
         try {
             $data = PkEvent::findOrFail($id);
-            return Common::apiResponse(true, ' successfully',  $data);
+
+            return Common::apiResponse(true, ' successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -83,6 +86,7 @@ class PkEventController extends Controller
         try {
             $data = PkEvent::findOrFail($id);
             $data->update($request->all());
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -95,7 +99,8 @@ class PkEventController extends Controller
         try {
             $data = PkEvent::findOrFail($id);
             $data->delete();
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -116,9 +121,10 @@ class PkEventController extends Controller
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = PkReward::where('pk_event_id', $request->pk_event_id)->where("pk_type", $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
+        $data = PkReward::where('pk_event_id', $request->pk_event_id)->where('pk_type', $request->pk_type)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', PkEventResource::collection($data));
     }
 
@@ -132,7 +138,7 @@ class PkEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -148,9 +154,10 @@ class PkEventController extends Controller
                 'pk_type' => $request->pk_type,
                 'level' => $request->level,
                 'type' => $request->type,
-                'expire'  => $request->expire,
+                'expire' => $request->expire,
             ];
             PkReward::create($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -168,7 +175,7 @@ class PkEventController extends Controller
             'target1' => 'nullable',
             'target2' => 'nullable',
             'target3' => 'nullable',
-            'expire'  => 'required',
+            'expire' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -184,20 +191,21 @@ class PkEventController extends Controller
                 'pk_type' => $request->pk_type,
                 'level' => $request->level,
                 'type' => $request->type,
-                'expire'  => $request->expire,
+                'expire' => $request->expire,
             ];
-            $reward =  PkReward::findOrFail($id);
-            if ($request->type == 'ware') {
+            $reward = PkReward::findOrFail($id);
+            if ($request->type === 'ware') {
                 $reward->target = $request->target1;
-            } elseif ($request->type == 'vip') {
+            } elseif ($request->type === 'vip') {
                 $reward->target = $request->target2;
-            } elseif ($request->type == 'coins') {
+            } elseif ($request->type === 'coins') {
                 $reward->target = $request->target3;
-            } elseif ($request->type == 'achievement' && $request->hasFile('target4')) {
+            } elseif ($request->type === 'achievement' && $request->hasFile('target4')) {
                 $file = $request->file('target4');
                 $reward->target = Common::upload('images', $file);
             }
             $reward->update($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -208,9 +216,10 @@ class PkEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  PkReward::findOrFail($id);
+            $data = PkReward::findOrFail($id);
             $data->delete();
-            return Common::apiResponse(true, 'deleted successfully',  $data);
+
+            return Common::apiResponse(true, 'deleted successfully', $data);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -220,7 +229,8 @@ class PkEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  PkReward::with('ware', 'vip')->findOrFail($id);
+            $data = PkReward::with('ware', 'vip')->findOrFail($id);
+
             return Common::apiResponse(true, 'done', new PkEventResource($data));
         } catch (Exception $exception) {
 

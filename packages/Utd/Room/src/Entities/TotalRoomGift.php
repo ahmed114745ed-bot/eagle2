@@ -6,8 +6,8 @@ use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Utd\RoomCup\Entities\RoomCupReward;
 use Utd\RoomBoom\Entities\RoomBoom;
+use Utd\RoomCup\Entities\RoomCupReward;
 
 class TotalRoomGift extends Model
 {

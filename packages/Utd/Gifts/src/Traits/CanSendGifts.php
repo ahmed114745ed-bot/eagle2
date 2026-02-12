@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Traits;
 
-use Utd\Gifts\DTOs\SendGiftDTO;
-use Utd\Gifts\Contracts\GiftSenderInterface;
 use Illuminate\Support\Collection;
+use Utd\Gifts\Contracts\GiftSenderInterface;
+use Utd\Gifts\DTOs\SendGiftDTO;
 
 trait CanSendGifts
 {
@@ -29,6 +29,7 @@ trait CanSendGifts
         ?int $cpId = null
     ): Collection {
         $dto = SendGiftDTO::forRoom($giftId, $senderId, $receiverIds, $quantity, $roomId, $pkId, $cpId);
+
         return $this->giftSender()->send($dto);
     }
 
@@ -43,6 +44,7 @@ trait CanSendGifts
         int $momentId
     ): Collection {
         $dto = SendGiftDTO::forMoment($giftId, $senderId, $receiverId, $quantity, $momentId);
+
         return $this->giftSender()->send($dto);
     }
 
@@ -57,6 +59,7 @@ trait CanSendGifts
         int $reelId
     ): Collection {
         $dto = SendGiftDTO::forReel($giftId, $senderId, $receiverId, $quantity, $reelId);
+
         return $this->giftSender()->send($dto);
     }
 
@@ -70,6 +73,7 @@ trait CanSendGifts
         int $quantity
     ): Collection {
         $dto = SendGiftDTO::forProfile($giftId, $senderId, $receiverId, $quantity);
+
         return $this->giftSender()->send($dto);
     }
 

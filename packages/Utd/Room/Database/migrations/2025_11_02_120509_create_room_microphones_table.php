@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('room_microphones')) {
+        if (! Schema::hasTable('room_microphones')) {
             Schema::create('room_microphones', function (Blueprint $table) {
                 $table->id();
                 $table->bigInteger('room_id');

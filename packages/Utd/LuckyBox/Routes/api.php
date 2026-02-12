@@ -1,10 +1,10 @@
 <?php
 
 use App\Helpers\Common;
-use Utd\Room\Entities\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Utd\LuckyBox\Http\Controllers\BoxController;
+use Utd\Room\Entities\Room;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
     }
 );
 
-//Route::get('/test-room-zego', function (Request $request) {
+// Route::get('/test-room-zego', function (Request $request) {
 //    $roomId = $request->query('room_id');
 //
 //    if (!$roomId) {
@@ -85,4 +85,4 @@ Route::middleware(['auth:sanctum', 'checkLatestToken', 'generalBan', 'userBan', 
 //            'error' => $th->getMessage(),
 //        ], 500);
 //    }
-//});
+// });

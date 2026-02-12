@@ -128,4 +128,3 @@ return [
         'paid_at' => 'Paid At',
     ],
 ];
-

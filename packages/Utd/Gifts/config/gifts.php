@@ -70,8 +70,8 @@ return [
             'daily' => 'يومي',
             'weekly' => 'أسبوعي',
             'monthly' => 'شهري',
-            'all_time' => 'كل الأوقات'
-        ]
+            'all_time' => 'كل الأوقات',
+        ],
     ],
 
     /*
@@ -131,31 +131,31 @@ return [
     */
     'models' => [
         'user' => env('GIFTS_USER_MODEL', 'App\Models\User'),
-        
+
         'vip' => env('GIFTS_VIP_MODEL', 'Modules\Vip\Entities\OVip'),
-        
+
         'moment' => env('GIFTS_MOMENT_MODEL', 'Utd\Moments\Entities\Moment'),
-        
+
         'room' => env('GIFTS_ROOM_MODEL', 'Utd\Room\Entities\Room'),
-        
-        'agency' => env('GIFTS_AGENCY_MODEL', 'App\Models\Agency'), 
-        
+
+        'agency' => env('GIFTS_AGENCY_MODEL', 'App\Models\Agency'),
+
         'null_agency' => env('GIFTS_NULL_AGENCY_MODEL', 'App\Models\NullAgency'),
-        
+
         'cp' => env('GIFTS_CP_MODEL', 'Utd\\CP\\Entities\\Cp'),
-        
+
         'pk' => env('GIFTS_PK_MODEL', 'Utd\Pk\Entities\Pk'),
-        
+
         'app_feature' => env('GIFTS_APP_FEATURE_MODEL', 'App\Models\AppFeature'),
-        
+
         'core_wallet' => env('GIFTS_CORE_WALLET_MODEL', 'App\Models\CoreWallet'),
-        
+
         'user_salary' => env('GIFTS_USER_SALARY_MODEL', 'App\Models\UserSallary'),
-        
+
         'remaining_diamond' => env('GIFTS_REMAINING_DIAMOND_MODEL', 'App\Models\RemainingDiamond'),
-        
+
         'monthly_diamond_receive' => env('GIFTS_MONTHLY_DIAMOND_RECEIVE_MODEL', 'App\Models\MonthlyDiamondReceive'),
-        
+
         'setting' => env('GIFTS_SETTING_MODEL', 'App\Models\Setting'),
     ],
 

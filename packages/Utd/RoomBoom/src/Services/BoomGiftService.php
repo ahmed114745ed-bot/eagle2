@@ -8,13 +8,13 @@ use Cache;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
+use Throwable;
+use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomBoom\Entities\RoomBoomLevel;
-use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomBoom\Jobs\EndBoomPusherJob;
 use Utd\RoomBoom\Jobs\EndBoomZegoJob;
 use Utd\RoomBoom\Jobs\RoomBoomRewardJob;
-use Throwable;
 
 class BoomGiftService
 {
@@ -170,9 +170,10 @@ class BoomGiftService
      */
     private function incrementTodayRoomGift($roomId, $todayStart, $totalPrice)
     {
-        if (!PackageHelper::isInstalled('room')) {
+        if (! PackageHelper::isInstalled('room')) {
             return 0;
         }
+
         return DB::transaction(function () use ($roomId, $todayStart, $totalPrice) {
             $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
                 ->where('created_at', '>=', $todayStart)

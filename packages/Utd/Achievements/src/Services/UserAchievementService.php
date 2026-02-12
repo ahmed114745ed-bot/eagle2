@@ -9,7 +9,6 @@ use Utd\Achievements\Entities\Achievement;
 use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Achievements\Enums\AchievementType;
-use Utd\Achievements\Services\AchievementLevelsService;
 
 class UserAchievementService implements UserAchievementContract
 {
@@ -18,7 +17,9 @@ class UserAchievementService implements UserAchievementContract
         $timezone = getTimezone();
         $userId = $user->id;
         $achievement = Achievement::query()->where('type', AchievementType::RECHARGE_TARGET)->first();
-        if (!$achievement) return;
+        if (! $achievement) {
+            return;
+        }
 
         $userAchievement = UserAchievement::query()
             ->where('user_id', $userId)
@@ -27,7 +28,7 @@ class UserAchievementService implements UserAchievementContract
             ->where('year', now($timezone)->year)
             ->first();
 
-        if ($userAchievement == null) {
+        if ($userAchievement === null) {
             $totalTarget = UserAchievement::query()
                 ->where('gift_achievement_id', null)
                 ->where('user_id', $userId)
@@ -36,14 +37,14 @@ class UserAchievementService implements UserAchievementContract
             $userAchievement = UserAchievement::query()->create([
                 'user_id' => $userId,
                 'achievement_id' => $achievement->id,
-                'target' => (int)$totalCoins,
-                'total_target' => (int)$totalTarget + (int)$totalCoins,
+                'target' => (int) $totalCoins,
+                'total_target' => (int) $totalTarget + (int) $totalCoins,
                 'month' => now($timezone)->month,
                 'year' => now($timezone)->year,
             ]);
         } else {
-            $userAchievement->target += (int)$totalCoins;
-            $userAchievement->total_target += (int)$totalCoins;
+            $userAchievement->target += (int) $totalCoins;
+            $userAchievement->total_target += (int) $totalCoins;
             $userAchievement->save();
         }
         (new AchievementLevelsService())->assignAchievementToUser($userAchievement);
@@ -55,7 +56,9 @@ class UserAchievementService implements UserAchievementContract
         $timezone = getTimezone();
         $userId = $user->id;
         $achievement = Achievement::query()->where('type', AchievementType::ROOM_TARGET)->first();
-        if (!$achievement) return;
+        if (! $achievement) {
+            return;
+        }
 
         $userAchievement = UserAchievement::query()
             ->where('user_id', $userId)
@@ -65,7 +68,7 @@ class UserAchievementService implements UserAchievementContract
             ->where('year', now($timezone)->year)
             ->first();
 
-        if ($userAchievement == null) {
+        if ($userAchievement === null) {
             $totalTarget = UserAchievement::query()
                 ->where('gift_achievement_id', null)
                 ->where('user_id', $userId)
@@ -74,14 +77,14 @@ class UserAchievementService implements UserAchievementContract
             $userAchievement = UserAchievement::query()->create([
                 'user_id' => $userId,
                 'achievement_id' => $achievement->id,
-                'target' => (int)$totalCoins,
-                'total_target' => (int)$totalTarget + (int)$totalCoins,
+                'target' => (int) $totalCoins,
+                'total_target' => (int) $totalTarget + (int) $totalCoins,
                 'month' => now($timezone)->month,
                 'year' => now($timezone)->year,
             ]);
         } else {
-            $userAchievement->target += (int)$totalCoins;
-            $userAchievement->total_target += (int)$totalCoins;
+            $userAchievement->target += (int) $totalCoins;
+            $userAchievement->total_target += (int) $totalCoins;
             $userAchievement->save();
         }
         (new AchievementLevelsService())->assignAchievementToUser($userAchievement);
@@ -91,10 +94,14 @@ class UserAchievementService implements UserAchievementContract
     {
         $timezone = getTimezone();
         $achievement = Achievement::query()->where('type', AchievementType::GIFT_TARGET)->first();
-        if (!$achievement) return;
+        if (! $achievement) {
+            return;
+        }
 
         $giftAchievement = $gift->achievement;
-        if (!$giftAchievement) return;
+        if (! $giftAchievement) {
+            return;
+        }
 
         $userId = $giftAchievement->user?->id;
         $userAchievement = UserAchievement::query()
@@ -105,7 +112,7 @@ class UserAchievementService implements UserAchievementContract
             ->where('year', now($timezone)->year)
             ->first();
 
-        if ($userAchievement == null) {
+        if ($userAchievement === null) {
             $totalTarget = UserAchievement::query()
                 ->where('gift_achievement_id', $giftAchievement->id)
                 ->where('user_id', $userId)
@@ -115,14 +122,14 @@ class UserAchievementService implements UserAchievementContract
                 'user_id' => $userId,
                 'achievement_id' => $achievement->id,
                 'gift_achievement_id' => $giftAchievement->id,
-                'target' => (int)$total,
-                'total_target' => (int)$totalTarget + (int)$total,
+                'target' => (int) $total,
+                'total_target' => (int) $totalTarget + (int) $total,
                 'month' => now($timezone)->month,
                 'year' => now($timezone)->year,
             ]);
         } else {
-            $userAchievement->target += (int)$total;
-            $userAchievement->total_target += (int)$total;
+            $userAchievement->target += (int) $total;
+            $userAchievement->total_target += (int) $total;
             $userAchievement->save();
         }
         (new AchievementLevelsService())->assignAchievementToUser($userAchievement);
@@ -148,28 +155,29 @@ class UserAchievementService implements UserAchievementContract
                     'user_achievement_levels.custom_image',
                     'achievement_levels.ar_description',
                     'achievement_levels.en_description',
-                    'achievements.type as type'
+                    'achievements.type as type',
                 ])->
                 with('achievementLevel')->get();
 
         return $usersAchievementLevels;
     }
 
-
     public function roomAchievement(int $ownerId)
     {
         $roomAchievement = Achievement::query()->where('type', AchievementType::ROOM_TARGET)
             ->with('levels:id,achievement_id,valid_image')->first();
-        if (!$roomAchievement) return collect();
+        if (! $roomAchievement) {
+            return collect();
+        }
 
         $levels = $roomAchievement->levels->flatten();
         $levelsIds = $levels->pluck('id')->toArray();
         $usersAchievements = UserAchievementLevel::query()
             ->where('user_id', $ownerId)
             ->where('is_enable', true)
-            ->where("picked", 1)
+            ->where('picked', 1)
             ->whereNotNull('achievement_level_id')
-            ->where(fn($query) => $query->whereIn('achievement_level_id', $levelsIds)->orWhere(fn($q) => $q->where('achievement_id', '=', null)->where('custom_image', '!=', null)))
+            ->where(fn ($query) => $query->whereIn('achievement_level_id', $levelsIds)->orWhere(fn ($q) => $q->where('achievement_id', '=', null)->where('custom_image', '!=', null)))
             ->get();
         $usersAchievements = $usersAchievements->map(function ($item) use ($levels) {
             return ['image' => $levels->where('id', $item->achievement_level_id)?->value('valid_image') ?? $item->custom_image];

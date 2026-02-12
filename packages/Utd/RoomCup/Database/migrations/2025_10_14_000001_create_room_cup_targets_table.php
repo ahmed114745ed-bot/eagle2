@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('room_cup_targets')) {
+        if (! Schema::hasTable('room_cup_targets')) {
             Schema::create('room_cup_targets', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('total')->default(0);

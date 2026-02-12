@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('bd_salaries')) return;
+        if (Schema::hasTable('bd_salaries')) {
+            return;
+        }
         Schema::create('bd_salaries', function (Blueprint $table) {
             $table->id();
 
             $table->unsignedBigInteger('bd_id');
             $table->decimal('salary', 12, 2)->default(0);
             $table->decimal('cut_amount', 12, 2)->default(0);
-            $table->bigInteger('month'); 
-            $table->bigInteger('year'); 
+            $table->bigInteger('month');
+            $table->bigInteger('year');
             $table->timestamps();
         });
     }

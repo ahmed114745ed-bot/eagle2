@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // First check if column exists, if not create it
-        if (!Schema::hasColumn('agencies', 'coins')) {
+        if (! Schema::hasColumn('agencies', 'coins')) {
             Schema::table('agencies', function (Blueprint $table) {
                 // Add after pending_dollar if it exists, otherwise just add it
                 if (Schema::hasColumn('agencies', 'pending_dollar')) {

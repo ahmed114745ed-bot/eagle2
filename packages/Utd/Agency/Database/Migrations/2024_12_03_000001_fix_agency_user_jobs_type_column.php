@@ -17,9 +17,9 @@ return new class extends Migration
                 $table->renameColumn('job_type', 'type');
             });
         }
-        
+
         // Add type column if not exists
-        if (Schema::hasTable('agency_user_jobs') && !Schema::hasColumn('agency_user_jobs', 'type')) {
+        if (Schema::hasTable('agency_user_jobs') && ! Schema::hasColumn('agency_user_jobs', 'type')) {
             Schema::table('agency_user_jobs', function (Blueprint $table) {
                 $table->string('type', 100)->nullable()->comment('owner, admin, requestManger, operator')->after('user_id');
             });

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('agencies', 'deleted_at')) {
+        if (! Schema::hasColumn('agencies', 'deleted_at')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->softDeletes(); // This adds the soft delete columns to the table
             });
@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropSoftDeletes(); 
+            $table->dropSoftDeletes();
         });
     }
 };

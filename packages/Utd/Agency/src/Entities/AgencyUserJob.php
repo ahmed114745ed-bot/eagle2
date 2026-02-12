@@ -4,12 +4,22 @@ namespace Utd\Agency\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 
 class AgencyUserJob extends Model
 {
     use ConfigurableModelsTrait;
+
+    /**
+     * Job Type Constants
+     */
+    public const TYPE_OWNER = 'owner';
+
+    public const TYPE_ADMIN = 'admin';
+
+    public const TYPE_REQUEST_MANAGER = 'requestManger';
+
+    public const TYPE_OPERATOR = 'operator';
 
     protected $table = 'agency_user_jobs';
 
@@ -21,19 +31,12 @@ class AgencyUserJob extends Model
     ];
 
     /**
-     * Job Type Constants
-     */
-    const TYPE_OWNER = 'owner';
-    const TYPE_ADMIN = 'admin';
-    const TYPE_REQUEST_MANAGER = 'requestManger';
-    const TYPE_OPERATOR = 'operator';
-
-    /**
      * Relationship with Agency
      */
     public function agency(): BelongsTo
     {
         $agencyClass = $this->getModelClass('agency', Agency::class);
+
         return $this->belongsTo($agencyClass, 'agency_id');
     }
 
@@ -43,6 +46,7 @@ class AgencyUserJob extends Model
     public function user(): BelongsTo
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'user_id');
     }
 
@@ -109,7 +113,6 @@ class AgencyUserJob extends Model
     {
         return $this->type === self::TYPE_OPERATOR;
     }
- 
 
     /**
      * Scope by type
@@ -118,5 +121,4 @@ class AgencyUserJob extends Model
     {
         return $query->where('type', $type);
     }
-
 }

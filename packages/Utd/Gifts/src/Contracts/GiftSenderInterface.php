@@ -2,17 +2,17 @@
 
 namespace Utd\Gifts\Contracts;
 
+use Illuminate\Support\Collection;
 use Utd\Gifts\DTOs\SendGiftDTO;
 use Utd\Gifts\Entities\Gift;
-use Illuminate\Support\Collection;
 
 interface GiftSenderInterface
 {
     /**
      * إرسال هدية
      *
-     * @param SendGiftDTO $dto
      * @return Collection<GiftLog>
+     *
      * @throws \Utd\Gifts\Exceptions\InsufficientBalanceException
      * @throws \Utd\Gifts\Exceptions\GiftNotFoundException
      * @throws \Utd\Gifts\Exceptions\VipLevelRequiredException

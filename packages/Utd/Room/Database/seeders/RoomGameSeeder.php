@@ -2,8 +2,8 @@
 
 namespace Utd\Room\Database\Seeders;
 
-use Utd\Room\Entities\RoomGame;
 use Illuminate\Database\Seeder;
+use Utd\Room\Entities\RoomGame;
 
 class RoomGameSeeder extends Seeder
 {
@@ -16,15 +16,15 @@ class RoomGameSeeder extends Seeder
     {
         RoomGame::create([
             'name' => 'RPS',
-            'type' => 'two_player'
+            'type' => 'two_player',
         ]);
         RoomGame::create([
             'name' => 'dice',
-            'type' => 'two_player'
+            'type' => 'two_player',
         ]);
         RoomGame::create([
             'name' => 'spin',
-            'type' => 'multi_player'
+            'type' => 'multi_player',
         ]);
     }
 }

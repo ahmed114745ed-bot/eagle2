@@ -28,4 +28,3 @@ class WeeklyCpWinner extends Model
         return $this->belongsTo(WeeklyStar::class, 'weekly_cp_id');
     }
 }
-

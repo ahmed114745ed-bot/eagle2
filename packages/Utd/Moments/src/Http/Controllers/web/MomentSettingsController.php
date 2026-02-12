@@ -2,26 +2,24 @@
 
 namespace Utd\Moments\Http\Controllers\web;
 
-
-use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
-
+use Encore\Admin\Layout\Content;
 
 class MomentSettingsController extends MainController
 {
+    public $permission_name = 'moment-settings';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
     protected $title = 'Moment Settings';
-    public $permission_name = 'moment-settings';
 
     public function index(Content $content)
     {
         return parent::index($content
-        ->title(__('Moment settings'))
-        ->view('moment_settings'));
+            ->title(__('Moment settings'))
+            ->view('moment_settings'));
     }
-
 }

@@ -3,46 +3,46 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Services\UserService;
+use App\Helpers\Common;
+use App\Models\Admin as AdminModel;
 use App\Models\KickRecord;
-use App\Support\PackageHelper;
-use Utd\Pk\Entities\Pk;
-use Utd\Room\Entities\Room;
 use App\Models\User;
+use App\Support\PackageHelper;
+use DB;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Utd\Room\Entities\EnteredRoom;
-use Utd\Room\Entities\RoomCategory;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-
-use Encore\Admin\Facades\Admin;
-use App\Models\Admin as AdminModel;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Log;
 use Utd\LuckyBox\Entities\BoxUse;
+use Utd\Pk\Entities\Pk;
+use Utd\Room\Entities\EnteredRoom;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomCategory;
 
 class RoomController extends \App\Admin\Controllers\MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'rooms';
 
-    static $usersCache;
-    protected static $microphoneCache = [];
+    public static $usersCache;
 
+    protected static $microphoneCache = [];
 
     public function index(Content $content)
     {
         $content = $content->title(trans('Rooms'));
 
-        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch'.$this->permission_name) || Admin::user()->can('*')) {
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
@@ -57,11 +57,9 @@ class RoomController extends \App\Admin\Controllers\MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
-
     public function show($id, Content $content)
     {
         $room = Room::with(['owner.profile', 'roomCategory', 'microphones.user.profile'])
@@ -97,13 +95,12 @@ class RoomController extends \App\Admin\Controllers\MainController
         // Mic positions
         $micPositions = [];
         $microphones = $room->microphones
-            ->filter(fn($mic) => !is_null($mic->user_id) && $mic->user_id > 0)
+            ->filter(fn ($mic) => ! is_null($mic->user_id) && $mic->user_id > 0)
             ->sortBy('position')
             ->values();
         foreach ($microphones as $mic) {
             $micPositions[$mic->user_id] = $mic->position + 1;
         }
-
 
         // Blacklist
         $blackList = [];
@@ -112,15 +109,15 @@ class RoomController extends \App\Admin\Controllers\MainController
             foreach ($blackListItems as $item) {
                 $parts = explode('#', $item);
                 if (count($parts) === 3) {
-                    $userId   = $parts[0];
+                    $userId = $parts[0];
                     $kickTime = $parts[1];
                     $duration = $parts[2];
                     $endTime = $kickTime + $duration;
                     if (time() < $endTime) {
                         $blackList[$userId] = [
                             'kick_time' => $kickTime,
-                            'duration'  => $duration / 60, // minutes
-                            'remaining' => ceil(($endTime - time()) / 60) // min remaining
+                            'duration' => $duration / 60, // minutes
+                            'remaining' => ceil(($endTime - time()) / 60), // min remaining
                         ];
                     }
                 }
@@ -134,6 +131,7 @@ class RoomController extends \App\Admin\Controllers\MainController
             ->map(function ($visitor) use ($micPositions, $blackList) {
                 $visitor->mic_position = $micPositions[$visitor->user_id] ?? null;
                 $visitor->kick_info = $blackList[$visitor->user_id] ?? null;
+
                 return $visitor;
             })
             ->sortBy(function ($visitor) {
@@ -201,22 +199,22 @@ class RoomController extends \App\Admin\Controllers\MainController
             ->title(__('Room Profile'))
             ->description(__('Room Details'))
             ->body(view('room_profile', [
-                'room'          => $room,
-                'admins'        => $admins,
-                'gifts'         => $gifts,
+                'room' => $room,
+                'admins' => $admins,
+                'gifts' => $gifts,
                 'totalDiamonds' => $totalDiamonds,
-                'visitors'      => $visitors,
-                'pks'           => $pks,
-                'boxes'         => $boxes,
-                'roomTypes'     => $roomTypes,
-                'roomModes'     => $roomModes
+                'visitors' => $visitors,
+                'pks' => $pks,
+                'boxes' => $boxes,
+                'roomTypes' => $roomTypes,
+                'roomModes' => $roomModes,
             ])));
     }
+
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -229,7 +227,6 @@ class RoomController extends \App\Admin\Controllers\MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -239,15 +236,324 @@ class RoomController extends \App\Admin\Controllers\MainController
             ->body($this->form()));
     }
 
+    public function getRoomMicrophones($roomId)
+    {
+        $room = Room::find($roomId);
+        if (! $room) {
+            return response()->json([]);
+        }
+
+        $users = collect(explode(',', $room->microphone))
+            ->filter()
+            ->map(function ($id) {
+                return (int) $id;
+            })
+            ->filter()
+            ->values()
+            ->all();
+
+        if (empty($users)) {
+            return response()->json([]);
+        }
+
+        $profiles = User::with('profile:id,user_id,avatar')
+            ->whereIn('id', $users)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'avatar' => $user->profile?->avatar ? getImagePath($user->profile->avatar) : null,
+                ];
+            })
+            ->values();
+
+        return response()->json($profiles);
+    }
+
+    // New batched endpoint to fetch microphones for multiple rooms at once
+    public function getRoomsMicrophones(Request $request)
+    {
+        $roomsParam = $request->get('rooms');
+        if (! $roomsParam) {
+            return response()->json([]);
+        }
+
+        $roomIds = is_array($roomsParam) ? $roomsParam : explode(',', $roomsParam);
+        $roomIds = array_filter(array_map('intval', $roomIds));
+        if (empty($roomIds)) {
+            return response()->json([]);
+        }
+
+        // fetch microphone rows for all requested rooms in one query
+        $micRepo = app(\Utd\Room\Repositories\RoomMicrophoneRepository::class);
+        $micRows = $micRepo->getByRoomIds($roomIds);
+
+        $userIds = collect($micRows)->pluck('user_id')->filter()->unique()->values()->all();
+
+        $users = [];
+        if (! empty($userIds)) {
+            $users = User::with('profile:id,user_id,avatar')
+                ->whereIn('id', $userIds)
+                ->get()
+                ->keyBy('id');
+        }
+
+        $result = [];
+        foreach ($micRows as $row) {
+            if (! $row->user_id) {
+                continue;
+            }
+            $u = $users->get($row->user_id);
+            if (! $u) {
+                continue;
+            }
+            $result[$row->room_id][] = [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->profile?->avatar ? getImagePath($u->profile->avatar) : null,
+                'position' => $row->position,
+            ];
+        }
+
+        return response()->json($result);
+    }
+
+    public function updatePinStatus($id, Request $request)
+    {
+        try {
+            $room = Room::findOrFail($id);
+            $room->pin = request('pin');
+            $room->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => request('pin')
+                    ? 'Room pinned successfully'
+                    : 'Room unpinned successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating pin status: '.$e->getMessage(),
+            ]);
+        }
+    }
+
+    public function removeAdmin(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+        $adminId = $request->admin_id;
+
+        $admin = AdminModel::find($adminId);
+
+        $admins = array_filter(explode(',', $room->room_admin));
+
+        $admins = array_diff($admins, [$adminId]);
+
+        $room->room_admin = implode(',', $admins);
+        $room->save();
+
+        $adminName = $admin?->name ?? __('Unknown');
+        $comment = __(':name has been removed from administrators.', ['name' => $adminName]);
+
+        $d = [
+            'messageContent' => [
+                'message' => 'banAdmin',
+                'roomId' => $room->id,
+                'adminId' => $adminId,
+                'comment' => $comment,
+            ],
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Administrator removed successfully'),
+        ]);
+    }
+
+    public function addVisitor(Request $request, $roomId)
+    {
+        $room = Room::findOrFail($roomId);
+
+        if ($room->roomVisitors()->where('user_id', $request->user_id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => __('User is already a visitor in this room'),
+            ]);
+        }
+
+        $room->roomVisitors()->create([
+            'user_id' => $request->user_id,
+            'created_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor added successfully'),
+        ]);
+    }
+
+    public function kickVisitor(Request $request, $roomId): JsonResponse
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+        $duration = $request->minutes ?? 5;
+
+        if ($visitorId === $room->uid) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick the room owner'),
+            ]);
+        }
+
+        if (Common::pack_get(9, $visitorId)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Cannot kick this user'),
+            ]);
+        }
+
+        $blackList = $room->room_black;
+
+        if (empty($blackList)) {
+            $blackList = $visitorId.'#'.time().'#'.($duration * 60);
+        } else {
+            $list = explode(',', $blackList);
+            $newList = [];
+
+            foreach ($list as &$item) {
+                $black = explode('#', $item);
+                if (isset($black[0]) && $black[0] !== $visitorId && $item !== '') {
+                    $newList[] = $item;
+                }
+            }
+
+            $newList = array_filter($newList);
+
+            $blackList = implode(',', $newList) ?: null;
+        }
+
+        $room->room_black = $blackList;
+        $room->save();
+
+        Common::quit_hand($room->uid, $visitorId);
+
+        $user = User::find($visitorId);
+        if ($user) {
+            $user->now_room_uid = 0;
+            $user->save();
+        }
+
+        KickRecord::create([
+            'kicked_user_id' => auth()->id(),
+            'user_id' => $visitorId,
+            'room_id' => $room->id,
+            'type' => 'admin',
+        ]);
+
+        $message = __('api.blockRoom', [
+            'name' => $user->name ?? 'Unknown',
+            'actionName' => auth()->user()->name,
+            'duration' => $duration,
+        ], 'ar');
+
+        $d = [
+            'messageContent' => [
+                'message' => 'kickVisitorOut',
+                'duration' => $duration,
+                'visitorId' => $visitorId,
+                'comment' => $message,
+            ],
+        ];
+        $json = json_encode($d);
+
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
+
+        Common::calcTime($visitorId);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Visitor kicked successfully'),
+        ]);
+    }
+
+    public function unbanVisitor(Request $request, $roomId): JsonResponse
+    {
+        $room = Room::findOrFail($roomId);
+        $visitorId = $request->user_id;
+
+        if (! $room->room_black) {
+            return response()->json(['success' => false, 'message' => __('User is not banned')]);
+        }
+
+        $list = explode(',', $room->room_black);
+        $newList = [];
+
+        foreach ($list as $item) {
+            $black = explode('#', $item);
+            if ($black[0] !== $visitorId) {
+                $newList[] = $item;
+            }
+        }
+
+        $room->room_black = implode(',', $newList);
+        $room->save();
+
+        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $userIds = $request->user_ids;
+
+        $users = User::whereIn('id', array_filter($userIds))
+            ->with('profile:user_id,avatar')
+            ->get(['id', 'name', 'uuid']);
+
+        $users = $users->map(function ($user) {
+            $avatar = $user->profile->avatar ?? null;
+            $user->avatar_url = getImagePath($avatar);
+
+            return $user;
+        });
+
+        return response()->json($users);
+    }
+
+    public function updateBasicInfo(Request $request, $id)
+    {
+        $room = Room::findOrFail($id);
+
+        $room->room_name = $request->room_name;
+        $room->room_type = $request->room_type;
+        $room->max_admin = $request->max_admin;
+        $room->is_popular = $request->has('is_popular');
+        $room->is_top = $request->has('is_top');
+        $room->is_recommended = $request->has('is_recommended');
+        $room->secret_chat = $request->has('secret_chat');
+
+        $room->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Room updated successfully!'),
+        ]);
+    }
+
     protected function grid2()
     {
         $make_rooms_top = Cache::rememberForever('rooms_make_rooms_top', function () {
             return settings()->get('make_rooms_top');
         });
-        return (new Box(
+
+        return new Box(
             title: __('admin.Actions'),
             content: view('admin.grid.users.RoomsChange', compact(['make_rooms_top'])),
-        ));
+        );
     }
 
     /**
@@ -255,7 +561,6 @@ class RoomController extends \App\Admin\Controllers\MainController
      *
      * @return Grid
      */
-
     protected function grid()
     {
         $grid = new Grid(new Room);
@@ -263,7 +568,7 @@ class RoomController extends \App\Admin\Controllers\MainController
         $filterType = request('filter', 'all');
         $user = auth()->user();
 
-            $grid->header(fn() => $this->buildTabsHeader($filterType));
+        $grid->header(fn () => $this->buildTabsHeader($filterType));
 
         $this->setupBaseModel($grid, $user);
         $this->applyFilterType($grid, $filterType, $user);
@@ -281,13 +586,13 @@ class RoomController extends \App\Admin\Controllers\MainController
     {
         return Cache::remember("tabs_header_$filterType", now()->addMinutes(10), function () use ($filterType) {
             $tabs = [
-                'all'         => __('All'),
-                'popular'     => __('Popular'),
+                'all' => __('All'),
+                'popular' => __('Popular'),
                 'last_create' => __('New'),
-                'pk'          => __('PK'),
-                'close_room'  => __('close room'),
-                'hide_room'   => __('hide room'),
-                'country'     => __('countries'),
+                'pk' => __('PK'),
+                'close_room' => __('close room'),
+                'hide_room' => __('hide room'),
+                'country' => __('countries'),
             ];
 
             $html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">';
@@ -298,7 +603,7 @@ class RoomController extends \App\Admin\Controllers\MainController
             }
             $html .= '</ul></div>';
 
-            $html .= <<<HTML
+            $html .= <<<'HTML'
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const tabLinks = document.querySelectorAll('.tab-link');
@@ -321,10 +626,9 @@ class RoomController extends \App\Admin\Controllers\MainController
         });
     }
 
-
     protected function setupBaseModel(Grid $grid, $user): void
     {
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
 
         $grid->model()
             ->audio()
@@ -339,7 +643,7 @@ class RoomController extends \App\Admin\Controllers\MainController
                 'rooms.room_name',
                 'rooms.room_cover',
                 'rooms.room_admin',
-                \DB::raw("
+                DB::raw('
         CASE rooms.room_status
             WHEN 1 THEN 100
             WHEN 2 THEN 10
@@ -348,12 +652,12 @@ class RoomController extends \App\Admin\Controllers\MainController
         (SELECT GROUP_CONCAT(user_id)
          FROM room_visitors
          WHERE room_visitors.room_id = rooms.id) AS visitor_ids
-     ")
+     ')
             )
 
             ->with([
-                'owner' => fn($q)  => $q->with([
-                    'packs' => fn($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'owner' => fn ($q) => $q->with([
+                    'packs' => fn ($q2) => $q2->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                     'profile:id,user_id,avatar',
                     'country:id,flag,name,e_name',
 
@@ -365,8 +669,8 @@ class RoomController extends \App\Admin\Controllers\MainController
                 'microphones.user.profile:id,user_id,avatar',
 
             ])
-            ->when($countryID, fn($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
-                $q->whereIn('id',  $countryID);
+            ->when($countryID, fn ($q) => $q->whereHas('owner.country', function ($q) use ($countryID) {
+                $q->whereIn('id', $countryID);
             }))
             ->withCount('roomVisitors');
 
@@ -377,20 +681,19 @@ class RoomController extends \App\Admin\Controllers\MainController
 
         // ✅ ترتيب الغرف
         $orderSql = [];
-        if ($makeRoomsTop == 1) {
+        if ($makeRoomsTop === 1) {
             $orderSql[] = 'is_top DESC';
         }
         $orderSql[] = 'status_priority DESC';
         $orderSql[] = 'pin DESC';
         $orderSql[] = 'room_visitors_count DESC';
 
-        if (request()->online == 1) {
+        if (request()->online === 1) {
             $grid->model()->whereHas('roomVisitors');
         }
 
         $grid->model()->orderByRaw(implode(', ', $orderSql));
     }
-
 
     protected function applyFilterType(Grid $grid, string $filterType, $user): void
     {
@@ -437,7 +740,7 @@ class RoomController extends \App\Admin\Controllers\MainController
 
             case 'party':
                 $grid->model()
-                    ->whereHas('roomCategory', fn($q) => $q->where('type', 'party'))
+                    ->whereHas('roomCategory', fn ($q) => $q->where('type', 'party'))
                     ->orderByDesc('pin');
                 break;
 
@@ -463,7 +766,7 @@ class RoomController extends \App\Admin\Controllers\MainController
                         ->toArray();
                 });
 
-                if (!empty($roomTypes)) {
+                if (! empty($roomTypes)) {
                     $grid->model()
                         ->whereIn('room_type', $roomTypes)
                         ->orderByDesc('pin')
@@ -532,7 +835,7 @@ class RoomController extends \App\Admin\Controllers\MainController
             $filter->column(1 / 2, function ($filter) {
                 $filter->where(function ($query) {
                     $input = $this->input;
-                    $query->whereHas('owner', fn($q) => $q->where('name', 'like', "%$input%")
+                    $query->whereHas('owner', fn ($q) => $q->where('name', 'like', "%$input%")
                         ->orWhere('special_id', 'like', "%$input%")
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
@@ -546,19 +849,14 @@ class RoomController extends \App\Admin\Controllers\MainController
 
                 $countries = \App\Models\Country::query()->pluck($column, 'id');
 
-
                 $filter->where(function ($query) {
                     if ($this->input) {
-                        $query->whereHas('owner', fn($q) => $q->where('country_id', $this->input));
+                        $query->whereHas('owner', fn ($q) => $q->where('country_id', $this->input));
                     }
                 }, __('Country'))->select($countries);
             });
         });
     }
-
-
-
-
 
     protected function defineGridColumns($grid)
     {
@@ -573,9 +871,9 @@ class RoomController extends \App\Admin\Controllers\MainController
 
             // fetch all needed users once
             $users = collect();
-            if (!empty($allIds)) {
+            if (! empty($allIds)) {
                 $users = User::select(['id', 'name'])
-                    //->with('profile:id,user_id,avatar')
+                    // ->with('profile:id,user_id,avatar')
                     ->whereIn('id', $allIds)
                     ->get()
                     ->keyBy('id');
@@ -585,7 +883,7 @@ class RoomController extends \App\Admin\Controllers\MainController
             $collection->each(function ($row) use ($users) {
                 $ids = array_filter(explode(',', (string) $row->microphone));
                 $row->microphone_users = collect($ids)
-                    ->map(fn($id) => $users->get($id))
+                    ->map(fn ($id) => $users->get($id))
                     ->filter()
                     ->values();
             });
@@ -594,7 +892,7 @@ class RoomController extends \App\Admin\Controllers\MainController
         });
 
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
-            return $pin == 1
+            return $pin === 1
                 ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
                 : '<span class="text-muted"> </span>';
         });
@@ -604,16 +902,17 @@ class RoomController extends \App\Admin\Controllers\MainController
         $grid->column('room_name', __('room'))->display(function ($name) {
             $path = @$this->room_cover;
             $id = @$this->id;
-            $defaultImage = asset("images/room.jpg");
+            $defaultImage = asset('images/room.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50).' ...';
             }
+
             return "
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
@@ -636,17 +935,15 @@ class RoomController extends \App\Admin\Controllers\MainController
 
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
-            return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
+
+            return $adminsCount.'/'.($maxAdmin ?? $maxRoomAdmin);
         });
 
-
-        $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
-
+        $grid->column('id', __('Number of users'))->display(fn () => $this->room_visitors_count ?? 0);
 
         $grid->column(__('microphone'))->display(function () {
 
             $microphones = $this->microphones->sortBy('position');
-
 
             if ($microphones->isEmpty()) {
                 return '';
@@ -657,14 +954,16 @@ class RoomController extends \App\Admin\Controllers\MainController
             foreach ($microphones as $mic) {
                 $user = $mic->user;
 
-                if (!$user) continue;
+                if (! $user) {
+                    continue;
+                }
 
                 $url = $user->profile?->avatar
                     ? getImagePath($user->profile->avatar)
-                    : asset("images/businessman-icon.jpg");
+                    : asset('images/businessman-icon.jpg');
 
                 $name = e($user->name);
-                $id   = e($user->id);
+                $id = e($user->id);
 
                 $html .= <<<HTML
                 <div class="image-wrapper" onclick="window.location.href='{$id}'">
@@ -681,7 +980,7 @@ class RoomController extends \App\Admin\Controllers\MainController
 
             // Add the same CSS block only once
             static $appended = false;
-            if (!$appended) {
+            if (! $appended) {
                 $html .= '
               <style>
 
@@ -723,10 +1022,6 @@ class RoomController extends \App\Admin\Controllers\MainController
             return $html;
         });
 
-
-
-
-
         Admin::style('
         .dropdown-backdrop {
             position: absolute !important;
@@ -740,113 +1035,6 @@ class RoomController extends \App\Admin\Controllers\MainController
     ');
     }
 
-
-
-
-
-
-
-
-    public function getRoomMicrophones($roomId)
-    {
-        $room = Room::find($roomId);
-        if (!$room) return response()->json([]);
-
-        $users = collect(explode(',', $room->microphone))
-            ->filter()
-            ->map(function ($id) {
-                return (int) $id;
-            })
-            ->filter()
-            ->values()
-            ->all();
-
-        if (empty($users)) return response()->json([]);
-
-        $profiles = User::with('profile:id,user_id,avatar')
-            ->whereIn('id', $users)
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'avatar' => $user->profile?->avatar ? getImagePath($user->profile->avatar) : null,
-                ];
-            })
-            ->values();
-
-        return response()->json($profiles);
-    }
-
-    // New batched endpoint to fetch microphones for multiple rooms at once
-    public function getRoomsMicrophones(Request $request)
-    {
-        $roomsParam = $request->get('rooms');
-        if (!$roomsParam) return response()->json([]);
-
-        $roomIds = is_array($roomsParam) ? $roomsParam : explode(',', $roomsParam);
-        $roomIds = array_filter(array_map('intval', $roomIds));
-        if (empty($roomIds)) return response()->json([]);
-
-        // fetch microphone rows for all requested rooms in one query
-        $micRepo = app(\Utd\Room\Repositories\RoomMicrophoneRepository::class);
-        $micRows = $micRepo->getByRoomIds($roomIds);
-
-        $userIds = collect($micRows)->pluck('user_id')->filter()->unique()->values()->all();
-
-        $users = [];
-        if (!empty($userIds)) {
-            $users = User::with('profile:id,user_id,avatar')
-                ->whereIn('id', $userIds)
-                ->get()
-                ->keyBy('id');
-        }
-
-        $result = [];
-        foreach ($micRows as $row) {
-            if (!$row->user_id) continue;
-            $u = $users->get($row->user_id);
-            if (!$u) continue;
-            $result[$row->room_id][] = [
-                'id' => $u->id,
-                'name' => $u->name,
-                'avatar' => $u->profile?->avatar ? getImagePath($u->profile->avatar) : null,
-                'position' => $row->position,
-            ];
-        }
-
-        return response()->json($result);
-    }
-
-
-
-
-
-
-
-
-
-
-    public function updatePinStatus($id, Request $request)
-    {
-        try {
-            $room = Room::findOrFail($id);
-            $room->pin = request('pin');
-            $room->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => request('pin')
-                    ? 'Room pinned successfully'
-                    : 'Room unpinned successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Error updating pin status: ' . $e->getMessage()
-            ]);
-        }
-    }
     protected function setupPinModalScript()
     {
         $token = csrf_token();
@@ -854,7 +1042,7 @@ class RoomController extends \App\Admin\Controllers\MainController
         $confirm = __('Confirm Pin Room');
         $doyouwant = __('Do you want to pin this room to the top?');
         $confirm = __('Confirm');
-        $cancel  = __('admin.cancel');
+        $cancel = __('admin.cancel');
         Admin::html(<<<HTML
             <div class="modal fade" id="pinRoomModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
@@ -938,55 +1126,57 @@ class RoomController extends \App\Admin\Controllers\MainController
             </script>
             HTML);
     }
+
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
     {
         $show = new Show(Room::findOrFail($id));
-        //$show->id('ID');
-        //$show->numid('numid');
-        //$show->uid('uid');
-        //$show->room_status('room_status');
-        //$show->room_name('room_name');
-        //$show->room_cover('room_cover');
-        //$show->room_intro('room_intro');
-        //$show->room_pass('room_pass');
-        //$show->room_class('room_class');
-        //$show->room_type('room_type');
-        //$show->room_welcome('room_welcome');
-        //$show->room_admin('room_admin');
-        //$show->room_visitor('room_visitor');
-        //$show->room_speak('room_speak');
-        //$show->room_sound('room_sound');
-        //$show->room_black('room_black');
-        //$show->week_star('week_star');
-        //$show->ranking('ranking');
-        //$show->is_popular('is_popular');
-        //$show->secret_chat('secret_chat');
-        //$show->is_top('is_top');
-        //$show->sort('sort');
-        //$show->room_background('room_background');
-        //$show->microphone('microphone');
-        //$show->super_uid('super_uid');
-        //$show->is_afk('is_afk');
-        //$show->hot('hot');
-        //$show->room_judge('room_judge');
-        //$show->is_prohibit_sound('is_prohibit_sound');
-        //$show->openid('openid');
-        //$show->commission_proportion('commission_proportion');
-        //$show->fresh_time('fresh_time');
-        //$show->start_hour('start_hour');
-        //$show->end_hour('end_hour');
-        //$show->is_recommended('is_recommended');
-        //$show->play_num('play_num');
-        //$show->free_mic('free_mic');
-        //$show->created_at(__('admin.created_at'));
-        //$show->updated_at(__('admin.updated_at'));
+        // $show->id('ID');
+        // $show->numid('numid');
+        // $show->uid('uid');
+        // $show->room_status('room_status');
+        // $show->room_name('room_name');
+        // $show->room_cover('room_cover');
+        // $show->room_intro('room_intro');
+        // $show->room_pass('room_pass');
+        // $show->room_class('room_class');
+        // $show->room_type('room_type');
+        // $show->room_welcome('room_welcome');
+        // $show->room_admin('room_admin');
+        // $show->room_visitor('room_visitor');
+        // $show->room_speak('room_speak');
+        // $show->room_sound('room_sound');
+        // $show->room_black('room_black');
+        // $show->week_star('week_star');
+        // $show->ranking('ranking');
+        // $show->is_popular('is_popular');
+        // $show->secret_chat('secret_chat');
+        // $show->is_top('is_top');
+        // $show->sort('sort');
+        // $show->room_background('room_background');
+        // $show->microphone('microphone');
+        // $show->super_uid('super_uid');
+        // $show->is_afk('is_afk');
+        // $show->hot('hot');
+        // $show->room_judge('room_judge');
+        // $show->is_prohibit_sound('is_prohibit_sound');
+        // $show->openid('openid');
+        // $show->commission_proportion('commission_proportion');
+        // $show->fresh_time('fresh_time');
+        // $show->start_hour('start_hour');
+        // $show->end_hour('end_hour');
+        // $show->is_recommended('is_recommended');
+        // $show->play_num('play_num');
+        // $show->free_mic('free_mic');
+        // $show->created_at(__('admin.created_at'));
+        // $show->updated_at(__('admin.updated_at'));
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -999,7 +1189,7 @@ class RoomController extends \App\Admin\Controllers\MainController
     {
         $form = new Form(new Room);
         $this->disableFormTools($form);
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             $form->hidden('numid', __('numid'))->default(rand(111111, 999999));
         } else {
             $form->text('numid', __('numid'));
@@ -1020,6 +1210,7 @@ class RoomController extends \App\Admin\Controllers\MainController
             foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
+
             return $options;
         });
         $form->select('room_type', __('room type'))->options(function () {
@@ -1028,226 +1219,24 @@ class RoomController extends \App\Admin\Controllers\MainController
             foreach ($cats as $cat) {
                 $options[$cat->id] = $cat->name;
             }
+
             return $options;
         });
         $form->text('room_welcome', __('room welcome'));
         $form->number('sort_num', __('Sort Num'))->default(0);
-
 
         return $form;
     }
 
     protected function ownerOptions($editing = false)
     {
-        return function ($value) use ($editing) {
+        return function ($value) {
             $ops = [];
             foreach (User::where('id', $value)->get() as $user) {
-                $ops[$user->id] = $user->uuid ?? $user->id . '_' . $user->name;
+                $ops[$user->id] = $user->uuid ?? $user->id.'_'.$user->name;
             }
+
             return $ops;
         };
-    }
-
-    public function removeAdmin(Request $request, $roomId)
-    {
-        $room = Room::findOrFail($roomId);
-        $adminId = $request->admin_id;
-
-        $admin = AdminModel::find($adminId);
-
-        $admins = array_filter(explode(',', $room->room_admin));
-
-        $admins = array_diff($admins, [$adminId]);
-
-        $room->room_admin = implode(',', $admins);
-        $room->save();
-
-        $adminName = $admin?->name ?? __('Unknown');
-        $comment = __(':name has been removed from administrators.', ['name' => $adminName]);
-
-        $d = [
-            "messageContent" => [
-                "message" => "banAdmin",
-                "roomId" => $room->id,
-                "adminId" => $adminId,
-                "comment" => $comment
-            ]
-        ];
-        $json = json_encode($d);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Administrator removed successfully')
-        ]);
-    }
-
-    public function addVisitor(Request $request, $roomId)
-    {
-        $room = Room::findOrFail($roomId);
-
-        if ($room->roomVisitors()->where('user_id', $request->user_id)->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => __('User is already a visitor in this room')
-            ]);
-        }
-
-        $room->roomVisitors()->create([
-            'user_id' => $request->user_id,
-            'created_at' => now()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Visitor added successfully')
-        ]);
-    }
-
-    public function kickVisitor(Request $request, $roomId): JsonResponse
-    {
-        $room = Room::findOrFail($roomId);
-        $visitorId = $request->user_id;
-        $duration = $request->minutes ?? 5;
-
-        if ($visitorId == $room->uid) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Cannot kick the room owner')
-            ]);
-        }
-
-        if (Common::pack_get(9, $visitorId)) {
-            return response()->json([
-                'success' => false,
-                'message' => __('Cannot kick this user')
-            ]);
-        }
-
-        $blackList = $room->room_black;
-
-        if (empty($blackList)) {
-            $blackList = $visitorId . '#' . time() . '#' . ($duration * 60);
-        } else {
-            $list = explode(',', $blackList);
-            $newList = [];
-
-            foreach ($list as &$item) {
-                $black = explode('#', $item);
-                if (isset($black[0]) && $black[0] != $visitorId && $item !== "") {
-                    $newList[] = $item;
-                }
-            }
-
-            $newList = array_filter($newList);
-
-            $blackList = implode(',', $newList) ?: null;
-        }
-
-        $room->room_black = $blackList;
-        $room->save();
-
-        Common::quit_hand($room->uid, $visitorId);
-
-        $user = User::find($visitorId);
-        if ($user) {
-            $user->now_room_uid = 0;
-            $user->save();
-        }
-
-        KickRecord::create([
-            "kicked_user_id" => auth()->id(),
-            "user_id" => $visitorId,
-            "room_id" => $room->id,
-            "type" => 'admin'
-        ]);
-
-        $message = __('api.blockRoom', [
-            'name' => $user->name ?? 'Unknown',
-            'actionName' => auth()->user()->name,
-            'duration' => $duration
-        ], 'ar');
-
-        $d = [
-            "messageContent" => [
-                "message" => "kickVisitorOut",
-                'duration' => $duration,
-                "visitorId" => $visitorId,
-                "comment" => $message
-            ]
-        ];
-        $json = json_encode($d);
-
-        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
-
-        Common::calcTime($visitorId);
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Visitor kicked successfully')
-        ]);
-    }
-
-    public function unbanVisitor(Request $request, $roomId): JsonResponse
-    {
-        $room = Room::findOrFail($roomId);
-        $visitorId = $request->user_id;
-
-        if (!$room->room_black) {
-            return response()->json(['success' => false, 'message' => __('User is not banned')]);
-        }
-
-        $list = explode(',', $room->room_black);
-        $newList = [];
-
-        foreach ($list as $item) {
-            $black = explode('#', $item);
-            if ($black[0] != $visitorId) {
-                $newList[] = $item;
-            }
-        }
-
-        $room->room_black = implode(',', $newList);
-        $room->save();
-
-        return response()->json(['success' => true, 'message' => __('User has been unbanned')]);
-    }
-
-    public function getUsers(Request $request)
-    {
-        $userIds = $request->user_ids;
-
-        $users = User::whereIn('id', array_filter($userIds))
-            ->with('profile:user_id,avatar')
-            ->get(['id', 'name', 'uuid']);
-
-        $users = $users->map(function ($user) {
-            $avatar = $user->profile->avatar ?? null;
-            $user->avatar_url = getImagePath($avatar);
-            return $user;
-        });
-
-        return response()->json($users);
-    }
-
-    public function updateBasicInfo(Request $request, $id)
-    {
-        $room = Room::findOrFail($id);
-
-        $room->room_name = $request->room_name;
-        $room->room_type = $request->room_type;
-        $room->max_admin = $request->max_admin;
-        $room->is_popular = $request->has('is_popular');
-        $room->is_top = $request->has('is_top');
-        $room->is_recommended = $request->has('is_recommended');
-        $room->secret_chat = $request->has('secret_chat');
-
-        $room->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => __('Room updated successfully!')
-        ]);
     }
 }

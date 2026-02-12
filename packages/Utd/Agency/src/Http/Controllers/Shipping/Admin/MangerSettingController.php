@@ -4,8 +4,6 @@ namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Auth\Permission;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\HtmlString;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
@@ -13,19 +11,18 @@ use Utd\Agency\Traits\ResolvesExternalDependencies;
 class MangerSettingController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
     public $permission_name = 'updates_group_chat';
+
     public $permission_setting = 'agency-manger-setting';
-
-
 
     public function index1(Content $content)
     {
         $route = 'admin.update-config-group-chat';
 
         $config = Config::where('name', 'system_default_manger')->first();
-        $configValue =  $config->value;
-        $form = '<form method="POST" action="' . route($route) . '"  >';
+        $configValue = $config->value;
+        $form = '<form method="POST" action="'.route($route).'"  >';
         $form .= csrf_field();
         $form .= '<style>
         .switch {
@@ -88,14 +85,14 @@ class MangerSettingController extends MainController
           border-radius: 50%;
         }
         </style>';
-        $form .= '<input type="hidden" name="id" value="' . ($config->id ?? '') . '">';
-        $form .= '<label for="android_min_version" class="control-label">' . __('admin.value') . ' :</label>';
-        $form .= '<input type="text" id="android_min_version" name="value" placeholder="android_min_version" value="' . $configValue . '" min="1"  class="inputs_cus_form">';
+        $form .= '<input type="hidden" name="id" value="'.($config->id ?? '').'">';
+        $form .= '<label for="android_min_version" class="control-label">'.__('admin.value').' :</label>';
+        $form .= '<input type="text" id="android_min_version" name="value" placeholder="android_min_version" value="'.$configValue.'" min="1"  class="inputs_cus_form">';
 
         $form .= '<div style="display: flex; flex-direction: row;">';
 
         $form .= '<div style="display: flex; justify-content: flex-end; width: 70%;">
-        <button type="submit" class="button_form_cus">' . __('admin.submit') . '</button>
+        <button type="submit" class="button_form_cus">'.__('admin.submit').'</button>
       </div>';
 
         $form .= '</div>';
@@ -115,49 +112,6 @@ class MangerSettingController extends MainController
             ->body(new HtmlString($form));
     }
 
-    protected function buildForm(): string
-    {
-        $languages = Language::all();
-        $gateways = PaymentGateway::all();
-
-        $form = '<form method="POST" action="' . route('admin.agency-manger-setting.save') . '">';
-        $form .= csrf_field();
-        $form .= $this->buildLanguageSection($languages);
-        $form .= $this->buildGatewaySection($gateways);
-        $form .= '<button type="submit" class="btn btn-primary">' . __('admin.submit') . '</button>';
-        $form .= '</form>';
-
-        return $form;
-    }
-
-    protected function buildLanguageSection($languages): string
-    {
-        $html = '<div class="form-group"><label>' . __('Languages') . '</label><div class="row">';
-
-        foreach ($languages as $lang) {
-            $checked = $lang->status ? 'checked' : '';
-            $html .= '<div class="col-md-3"><label><input type="checkbox" name="languages[]" value="' . $lang->id . '" ' . $checked . '> ' . $lang->name . '</label></div>';
-        }
-
-        $html .= '</div></div>';
-
-        return $html;
-    }
-
-    protected function buildGatewaySection($gateways): string
-    {
-        $html = '<div class="form-group"><label>' . __('Payment Gateways') . '</label><div class="row">';
-
-        foreach ($gateways as $gateway) {
-            $checked = $gateway->status ? 'checked' : '';
-            $html .= '<div class="col-md-3"><label><input type="checkbox" name="gateways[]" value="' . $gateway->id . '" ' . $checked . '> ' . $gateway->title . '</label></div>';
-        }
-
-        $html .= '</div></div>';
-
-        return $html;
-    }
-
     public function save()
     {
         $languages = request('languages', []);
@@ -171,5 +125,48 @@ class MangerSettingController extends MainController
         admin_toastr(__('admin.save_succeeded'));
 
         return redirect()->back();
+    }
+
+    protected function buildForm(): string
+    {
+        $languages = Language::all();
+        $gateways = PaymentGateway::all();
+
+        $form = '<form method="POST" action="'.route('admin.agency-manger-setting.save').'">';
+        $form .= csrf_field();
+        $form .= $this->buildLanguageSection($languages);
+        $form .= $this->buildGatewaySection($gateways);
+        $form .= '<button type="submit" class="btn btn-primary">'.__('admin.submit').'</button>';
+        $form .= '</form>';
+
+        return $form;
+    }
+
+    protected function buildLanguageSection($languages): string
+    {
+        $html = '<div class="form-group"><label>'.__('Languages').'</label><div class="row">';
+
+        foreach ($languages as $lang) {
+            $checked = $lang->status ? 'checked' : '';
+            $html .= '<div class="col-md-3"><label><input type="checkbox" name="languages[]" value="'.$lang->id.'" '.$checked.'> '.$lang->name.'</label></div>';
+        }
+
+        $html .= '</div></div>';
+
+        return $html;
+    }
+
+    protected function buildGatewaySection($gateways): string
+    {
+        $html = '<div class="form-group"><label>'.__('Payment Gateways').'</label><div class="row">';
+
+        foreach ($gateways as $gateway) {
+            $checked = $gateway->status ? 'checked' : '';
+            $html .= '<div class="col-md-3"><label><input type="checkbox" name="gateways[]" value="'.$gateway->id.'" '.$checked.'> '.$gateway->title.'</label></div>';
+        }
+
+        $html .= '</div></div>';
+
+        return $html;
     }
 }

@@ -22,6 +22,7 @@ class ReportMomentController extends Controller
         $data = ReportMoment::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('moment')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, 'done', $data);
     }
 
@@ -29,7 +30,8 @@ class ReportMomentController extends Controller
     {
         try {
             $data = ReportMoment::findOrFail($id);
-            return Common::apiResponse(1, 'done',  $data, 200);
+
+            return Common::apiResponse(1, 'done', $data, 200);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
         }
@@ -49,9 +51,9 @@ class ReportMomentController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-
         try {
             ReportMoment::create($request->all());
+
             return Common::apiResponse(1, 'done', 'created successfully', 200);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
@@ -74,6 +76,7 @@ class ReportMomentController extends Controller
 
         try {
             ReportMoment::where('id', $id)->update($request->all());
+
             return Common::apiResponse(1, 'done', 'updated successfully', 200);
         } catch (Exception $e) {
             return Common::apiResponse(0, $e->getMessage(), 422);
@@ -84,6 +87,7 @@ class ReportMomentController extends Controller
     {
         try {
             ReportMoment::where('id', $id)->delete();
+
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 
@@ -93,6 +97,6 @@ class ReportMomentController extends Controller
 
     public function destroyDash($moment_id, $id)
     {
-     return  $this->momentService->deleteMomentAndReport($moment_id, $id);
+        return $this->momentService->deleteMomentAndReport($moment_id, $id);
     }
 }

@@ -2,18 +2,17 @@
 
 namespace Utd\Room\Http\Controllers\Utd;
 
-use App\Helpers\WebPHelper;
-use Exception;
-use Utd\Room\Entities\Room;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
+use App\Helpers\WebPHelper;
 use App\Http\Controllers\Controller;
-use Utd\Room\Http\Resources\RoomResource;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Utd\Room\Entities\Room;
+use Utd\Room\Http\Resources\RoomResource;
 
 class RoomController extends Controller
 {
-
     public function all(Request $request)
     {
         $input = $request->search;
@@ -31,13 +30,14 @@ class RoomController extends Controller
             ->orderByDesc('rooms.top_room')
             ->orderByDesc('session')
             ->orderByDesc('count_room_socket')->paginate($perPage, ['*'], 'page', $page);
+
         return Common::apiResponse(true, '', RoomResource::collection($data), 200);
     }
 
     public function updateSwitches(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'room_id'         => 'required|integer|exists:rooms,id',
+            'room_id' => 'required|integer|exists:rooms,id',
             'key' => 'required|string|in:room_status,top_room,pin,is_afk',
             'value' => 'required|boolean',
         ]);
@@ -48,7 +48,7 @@ class RoomController extends Controller
         try {
 
             $room = Room::findOrFail($request->room_id);
-            $room->update([$request['key'] => $request['value'],]);
+            $room->update([$request['key'] => $request['value']]);
 
             return Common::apiResponse(true, 'changed');
         } catch (Exception $exception) {
@@ -80,7 +80,7 @@ class RoomController extends Controller
         }
 
         $data = [
-            'numid'  => $request->numid,
+            'numid' => $request->numid,
             'room_status' => $request->room_status,
             'top_room' => $request->top_room,
             'pin' => $request->pin,
@@ -96,15 +96,16 @@ class RoomController extends Controller
         ];
         if ($request->hasFile('room_cover')) {
 
-              $data['room_cover'] = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'images',
-                        'room_cover'
-                 );
+            $data['room_cover'] = WebPHelper::uploadWebp(
+                $request->file('room_cover'),
+                'images',
+                'room_cover'
+            );
         }
 
         try {
             Room::create($data);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -135,7 +136,7 @@ class RoomController extends Controller
         }
 
         $data = [
-            'numid'  => $request->numid,
+            'numid' => $request->numid,
             'room_status' => $request->room_status,
             'top_room' => $request->top_room,
             'pin' => $request->pin,
@@ -152,15 +153,16 @@ class RoomController extends Controller
         if ($request->hasFile('room_cover')) {
 
             $data['room_cover'] = WebPHelper::uploadWebp(
-                        $request->file('room_cover'),
-                        'images',
-                        'room_cover'
-                 );
+                $request->file('room_cover'),
+                'images',
+                'room_cover'
+            );
         }
 
         try {
             $room = Room::findOrFail($id);
             $room->update($data);
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -172,6 +174,7 @@ class RoomController extends Controller
     {
         try {
             $room = Room::findOrFail($id);
+
             return Common::apiResponse(true, '', $room, 200);
         } catch (Exception $exception) {
 
@@ -194,6 +197,7 @@ class RoomController extends Controller
         try {
             $room = Room::findOrFail($id);
             $room->delete();
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 

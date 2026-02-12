@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('targets', 'reel')) {
+        if (! Schema::hasColumn('targets', 'reel')) {
             Schema::table('targets', function (Blueprint $table) {
                 $table->string('reel')->nullable()->default('0,0,0');
             });

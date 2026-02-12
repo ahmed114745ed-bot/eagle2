@@ -35,12 +35,13 @@ class AgencyUserJobRepository
     public function update($id, array $data)
     {
         $job = $this->findById($id);
-        
+
         if ($job) {
             $job->update($data);
+
             return $job->fresh();
         }
-        
+
         return null;
     }
 
@@ -50,11 +51,11 @@ class AgencyUserJobRepository
     public function delete($id)
     {
         $job = $this->findById($id);
-        
+
         if ($job) {
             return $job->delete();
         }
-        
+
         return false;
     }
 

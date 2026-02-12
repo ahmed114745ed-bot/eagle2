@@ -2,32 +2,32 @@
 
 namespace Utd\Room\Entities;
 
-use App\Models\User;
-use App\Models\Family;
 use App\Models\AllGame;
+use App\Models\Family;
 use App\Models\GiftLog;
+use App\Models\User;
 use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Utd\Room\Traits\RoomBoxes;
-use Modules\Vip\Entities\Vip;
+use Illuminate\Support\Facades\DB;
+use Modules\Chat\Entities\ChatMessage;
 use Modules\TaskStream\Entities\TaskStream;
 use Modules\TaskStream\Entities\TaskStreamRoom;
-use Modules\Chat\Entities\ChatMessage;
+use Modules\Vip\Entities\Vip;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
+use Utd\Room\Traits\RoomBoxes;
 
 /**
  * @method static withoutAppends()
  */
 class Room extends Model
 {
-    use TimestampsWithTimezone;
     use RoomBoxes;
+    use TimestampsWithTimezone;
 
     /*
  * To enable and disable observer saving and updating methods
@@ -45,6 +45,30 @@ class Room extends Model
         'is_comment_closed' => 'boolean',
         'is_live' => 'boolean',
     ];
+
+    protected static $microphoneCache = [];
+
+    public static function cacheMicrophoneUsers($ids)
+    {
+        if (empty($ids)) {
+            return collect();
+        }
+
+        $missingIds = array_diff($ids, array_keys(self::$microphoneCache));
+
+        if (! empty($missingIds)) {
+            $users = User::whereIn('id', $missingIds)
+                ->with('profile:id,user_id,avatar')
+                ->get()
+                ->keyBy('id');
+
+            foreach ($users as $id => $user) {
+                self::$microphoneCache[$id] = $user;
+            }
+        }
+
+        return collect(self::$microphoneCache)->only($ids);
+    }
 
     public function user()
     {
@@ -171,7 +195,6 @@ class Room extends Model
         return $owner->country;
     }
 
-
     public function myClass()
     {
         return $this->belongsTo(RoomCategory::class, 'room_class')->select('name', 'img');
@@ -187,7 +210,6 @@ class Room extends Model
         return PackageHelper::checkRelation($this, 'pk', 'hasMany') ??
             $this->hasMany(Pk::class, 'room_id', 'id');
     }
-
 
     public function gifts()
     {
@@ -276,11 +298,12 @@ class Room extends Model
 
     public function getMicrophoneOnlyUsersAttribute()
     {
-        return  $this->attributes['microphone'] ?? '';
+        return $this->attributes['microphone'] ?? '';
     }
+
     public function getAllMicrophoneAttribute()
     {
-        return  $this->attributes['microphone'] ?? '';
+        return $this->attributes['microphone'] ?? '';
     }
 
     public function getMainMicrophoneAttribute()
@@ -381,8 +404,6 @@ class Room extends Model
         })->orderByDesc('id');
     }
 
-
-
     public function getVisitorsImages()
     {
         $visitors = $this->roomVisitorUsers;
@@ -400,7 +421,6 @@ class Room extends Model
         return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
     }
 
-
     public function getFinalRoomImageAttribute()
     {
         if ($this->is_pk_custom && $this->mode === 3) {
@@ -409,6 +429,7 @@ class Room extends Model
         if ($this->mode === 8) {
             return BaCKGROUND_IMAGE_MODE_8;
         }
+
         // dd($this->background?->img);
         return $this->backgroundImage?->img
             ?? $this->background?->img
@@ -437,11 +458,6 @@ class Room extends Model
         return $this->hasMany(BanRoom::class);
     }
 
-    protected function getAdminsAttribute()
-    {
-        return explode(',', $this->room_admin);
-    }
-
     public function totalRoomGifts(): HasMany
     {
         return $this->hasMany(TotalRoomGift::class, 'room_id');
@@ -450,29 +466,6 @@ class Room extends Model
     public function admins()
     {
         return $this->hasMany(User::class, 'id', 'room_admin');
-    }
-
-
-    protected static $microphoneCache = [];
-
-    public static function cacheMicrophoneUsers($ids)
-    {
-        if (empty($ids)) return collect();
-
-        $missingIds = array_diff($ids, array_keys(self::$microphoneCache));
-
-        if (!empty($missingIds)) {
-            $users = User::whereIn('id', $missingIds)
-                ->with('profile:id,user_id,avatar')
-                ->get()
-                ->keyBy('id');
-
-            foreach ($users as $id => $user) {
-                self::$microphoneCache[$id] = $user;
-            }
-        }
-
-        return collect(self::$microphoneCache)->only($ids);
     }
 
     public function scopeAudio(Builder $query)
@@ -489,5 +482,10 @@ class Room extends Model
     public function getTotalAdminsAttribute(): int
     {
         return (int) $this->max_admin + (int) $this->additional_admin;
+    }
+
+    protected function getAdminsAttribute()
+    {
+        return explode(',', $this->room_admin);
     }
 }

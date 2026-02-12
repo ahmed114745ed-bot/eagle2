@@ -8,9 +8,10 @@ use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
+use Throwable;
+use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomBoom\Entities\RoomBoomLevel;
-use Utd\Room\Entities\TotalRoomGift;
 use Utd\RoomBoom\Jobs\EndBoomPusherJob;
 use Utd\RoomBoom\Jobs\EndBoomZegoJob;
 use Utd\RoomBoom\Jobs\RoomBoomRewardJob;
@@ -18,7 +19,7 @@ use Utd\RoomBoom\Jobs\RoomBoomRewardJob;
 class RoomBoomGiftService
 {
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sendGift($room, $totalPrice, $roomBoomUuid): void
     {
@@ -47,12 +48,12 @@ class RoomBoomGiftService
                 ->orderBy('level', 'asc')
                 ->get();
 
-            foreach ($levelsToActivate as $level){
+            foreach ($levelsToActivate as $level) {
                 $existingNotActiveBoom = RoomBoom::where('room_boom_level_id', $level->id)
                     ->where('total_room_gift_id', $totalRoomGift->id)
                     ->first();
 
-                if (!$existingNotActiveBoom) {
+                if (! $existingNotActiveBoom) {
                     $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->latest()->value('id');
                     try {
                         RoomBoom::create([
@@ -60,10 +61,10 @@ class RoomBoomGiftService
                             'room_boom_level_id' => $level->id,
                             'started_at' => Carbon::now(),
                             'total_gifts_value' => $newTotal,
-                            'trigger_gift_id' => $giftLogId
+                            'trigger_gift_id' => $giftLogId,
                         ]);
                     } catch (QueryException $e) {
-                        if ($e->errorInfo[1] != 1062) {
+                        if ($e->errorInfo[1] !== 1062) {
                             throw $e;
                         }
                     }
@@ -76,7 +77,7 @@ class RoomBoomGiftService
                     ->lockForUpdate()
                     ->first();
 
-                if (!$existingBoom) {
+                if (! $existingBoom) {
                     $giftLogId = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->value('id');
 
                     try {
@@ -85,10 +86,10 @@ class RoomBoomGiftService
                             'room_boom_level_id' => $currentLevel->id,
                             'started_at' => Carbon::now(),
                             'total_gifts_value' => $newTotal,
-                            'trigger_gift_id' => $giftLogId
+                            'trigger_gift_id' => $giftLogId,
                         ]);
                     } catch (QueryException $e) {
-                        if ($e->errorInfo[1] == 1062) {
+                        if ($e->errorInfo[1] === 1062) {
                             $existingBoom = RoomBoom::where('total_room_gift_id', $totalRoomGift->id)
                                 ->where('room_boom_level_id', $currentLevel->id)
                                 ->first();
@@ -98,10 +99,10 @@ class RoomBoomGiftService
                     }
 
                     $d = [
-                        "messageContent" => [
-                            "message" => "roomBoomStarted",
+                        'messageContent' => [
+                            'message' => 'roomBoomStarted',
                             'roomBoomLevel' => $currentLevel->id,
-                        ]
+                        ],
                     ];
                     $json = json_encode($d);
 
@@ -117,7 +118,7 @@ class RoomBoomGiftService
 
                 GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
                     'room_boom_level' => $currentLevel->level,
-                    'start_boom_ranking' => $startBoomRanking
+                    'start_boom_ranking' => $startBoomRanking,
                 ]);
                 $existingBoom->total_gifts_value = $newTotal;
                 $existingBoom->save();
@@ -129,7 +130,7 @@ class RoomBoomGiftService
                 if ($nextLevel) {
                     GiftLog::where('room_boom_uuid', $roomBoomUuid)->update([
                         'room_boom_level' => $nextLevel->level,
-                        'start_boom_ranking' => 0
+                        'start_boom_ranking' => 0,
                     ]);
                 }
             }
@@ -145,11 +146,13 @@ class RoomBoomGiftService
     private function getTimezone(): string
     {
         $tz = request()->header('tz', Common::timeZone());
+
         return in_array($tz, timezone_identifiers_list()) ? $tz : 'UTC';
     }
 
-    private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice){
-        if (!PackageHelper::isInstalled('room')) {
+    private function getOrCreateTotalRoomGift($roomId, $todayStart, $totalPrice)
+    {
+        if (! PackageHelper::isInstalled('room')) {
             return null;
         }
         $totalRoomGift = TotalRoomGift::where('room_id', $roomId)
@@ -157,7 +160,7 @@ class RoomBoomGiftService
             ->lockForUpdate()
             ->first();
 
-        if (!$totalRoomGift) {
+        if (! $totalRoomGift) {
             $totalRoomGift = TotalRoomGift::create([
                 'room_id' => $roomId,
                 'current_total' => 0,
@@ -174,7 +177,7 @@ class RoomBoomGiftService
             ->latest()
             ->get();
 
-        foreach ($openBooms as $openBoom){
+        foreach ($openBooms as $openBoom) {
             $boomLevel = RoomBoomLevel::find($openBoom->room_boom_level_id);
             $giftLog = GiftLog::where('room_boom_uuid', $roomBoomUuid)->orderByDesc('id')->first(['id', 'sender_id']);
 
@@ -195,7 +198,7 @@ class RoomBoomGiftService
 
     private function mayStartNextBoom($totalRoomGift, $giftLog, $newTotal, $room, $boomLevel): void
     {
-        if ($newTotal == $boomLevel->target) {
+        if ($newTotal === $boomLevel->target) {
             $nextLevel = RoomBoomLevel::where('min_target', $newTotal)->first();
 
             if ($nextLevel) {
@@ -203,21 +206,20 @@ class RoomBoomGiftService
                     'total_room_gift_id' => $totalRoomGift->id,
                     'room_boom_level_id' => $nextLevel->id,
                 ], [
-                    'started_at'        => now(),
+                    'started_at' => now(),
                     'total_gifts_value' => $newTotal,
-                    'trigger_gift_id'   => $giftLog->id
+                    'trigger_gift_id' => $giftLog->id,
                 ]);
 
                 $d = [
-                    "messageContent" => [
-                        "message" => "roomBoomStarted",
-                        "roomBoomLevel" => $nextLevel->id,
-                    ]
+                    'messageContent' => [
+                        'message' => 'roomBoomStarted',
+                        'roomBoomLevel' => $nextLevel->id,
+                    ],
                 ];
 
                 Common::sendToZego('SendCustomCommand', $room->id, $room->uid, json_encode($d));
             }
         }
     }
-
 }

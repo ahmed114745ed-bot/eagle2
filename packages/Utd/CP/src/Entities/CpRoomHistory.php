@@ -15,4 +15,3 @@ class CpRoomHistory extends Model
      */
     protected $guarded = [];
 }
-

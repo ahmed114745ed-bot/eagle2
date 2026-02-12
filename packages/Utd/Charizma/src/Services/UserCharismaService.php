@@ -3,12 +3,12 @@
 namespace Utd\Charizma\Services;
 
 use App\Contracts\UserCharismaServiceContract;
+use App\Helpers\Common;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\Charizma\Transformers\CharismaResource;
 use Utd\Room\Entities\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use Illuminate\Database\Eloquent\Collection;
 
 class UserCharismaService implements UserCharismaServiceContract
 {
@@ -19,7 +19,7 @@ class UserCharismaService implements UserCharismaServiceContract
     public function roomCharisma($room_id)
     {
         $room = Room::withoutAppends()->where('charizma_status', true)->where('id', $room_id)->first();
-        if (!$room) {
+        if (! $room) {
             return [];
         }
 
@@ -28,6 +28,7 @@ class UserCharismaService implements UserCharismaServiceContract
 
         $charisma = ExtraDataInRoom::whereIn('user_id', $user_ids)->where('room_id', $room->id)->get()->map(function ($item) use ($users) {
             $item->position = $users->where('user_id', $item->user_id)->value('position');
+
             return $item;
         });
 
@@ -39,7 +40,7 @@ class UserCharismaService implements UserCharismaServiceContract
         $user = User::find($userId);
         $room = Room::find($roomId);
 
-        if (!$user || !$room) {
+        if (! $user || ! $room) {
             return Common::apiResponse(0, 'User Or Room does not exist', null, 404);
         }
 
@@ -47,24 +48,25 @@ class UserCharismaService implements UserCharismaServiceContract
 
         if ($deleted) {
             return Common::apiResponse(1, 'User removed from the room', null, 200);
-        } else {
-            return Common::apiResponse(0, 'No records found for the user', null, 404);
         }
+
+        return Common::apiResponse(0, 'No records found for the user', null, 404);
+
     }
 
     public function addTotalEarnedCoinsInUserRoom($room, array $userIds, $earnedCoins = null): false|array
     {
         $roomId = $room->id;
 
-        if (!$room) {
+        if (! $room) {
             return false;
         }
 
         $users = $room->microphones()
             ->get(['user_id', 'position'])
-            ->map(fn($m) => [
-                'user_id' => (int)$m->user_id,
-                'position' => (int)$m->position,
+            ->map(fn ($m) => [
+                'user_id' => (int) $m->user_id,
+                'position' => (int) $m->position,
             ])
             ->values();
 
@@ -73,7 +75,7 @@ class UserCharismaService implements UserCharismaServiceContract
         foreach ($userIds as $userId) {
             if ($earnedCoins) {
                 $extraDataInRoom = ExtraDataInRoom::firstOrNew([
-                    'user_id' => $userId, 'room_id' => $roomId
+                    'user_id' => $userId, 'room_id' => $roomId,
                 ]);
                 $extraDataInRoom->total += $earnedCoins;
                 $extraDataInRoom->room_id = $roomId;
@@ -94,7 +96,7 @@ class UserCharismaService implements UserCharismaServiceContract
     {
         $roomId = $room->id;
 
-        if (!$room) {
+        if (! $room) {
             return false;
         }
 
@@ -105,7 +107,7 @@ class UserCharismaService implements UserCharismaServiceContract
         foreach ($userIds as $userId) {
             if ($earnedCoins) {
                 $extraDataInRoom = ExtraDataInRoom::firstOrNew([
-                    'user_id' => $userId, 'room_id' => $roomId
+                    'user_id' => $userId, 'room_id' => $roomId,
                 ]);
                 $extraDataInRoom->total += $earnedCoins;
                 $extraDataInRoom->room_id = $roomId;
@@ -122,10 +124,6 @@ class UserCharismaService implements UserCharismaServiceContract
         return $allDataChanges;
     }
 
-    /**
-     * @param $microphones
-     * @return \Illuminate\Support\Collection
-     */
     public function getUserIdWithPosition($microphones): \Illuminate\Support\Collection
     {
         $arrMicrophones = explode(',', $microphones) ?: [];
@@ -165,6 +163,7 @@ class UserCharismaService implements UserCharismaServiceContract
                 $allDataChanges[] = $user;
             }
         }
+
         return $allDataChanges;
     }
 
@@ -179,6 +178,7 @@ class UserCharismaService implements UserCharismaServiceContract
                 $allDataChanges[] = $user;
             }
         }
+
         return $allDataChanges;
     }
 }

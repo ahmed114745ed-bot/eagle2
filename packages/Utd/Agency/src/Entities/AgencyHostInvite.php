@@ -10,6 +10,17 @@ class AgencyHostInvite extends Model
 {
     use ConfigurableModelsTrait;
 
+    /**
+     * Status constants
+     */
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_ACCEPTED = 1;
+
+    public const STATUS_REJECTED = 2;
+
+    public const STATUS_CANCELLED = 3;
+
     protected $table = 'agency_host_invites';
 
     protected $guarded = [];
@@ -19,14 +30,6 @@ class AgencyHostInvite extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Status constants
-     */
-    const STATUS_PENDING = 0;
-    const STATUS_ACCEPTED = 1;
-    const STATUS_REJECTED = 2;
-    const STATUS_CANCELLED = 3;
 
     /**
      * Relationship with Agency

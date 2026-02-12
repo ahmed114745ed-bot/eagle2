@@ -2,29 +2,28 @@
 
 namespace Utd\Room\Http\Controllers\Admin;
 
-use Utd\Room\Entities\Room;
-use Carbon\Carbon;
+use App\Admin\Controllers\MainController;
+use App\Facades\CustomNotification;
+use App\Helpers\Common;
 use App\Models\User;
+use Carbon\Carbon;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Facades\CustomNotification;
+use Encore\Admin\Show;
 use Utd\Room\Entities\RequestBackgroundImage;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
-class RequestBackgroundImageController extends \App\Admin\Controllers\MainController
+class RequestBackgroundImageController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'request-backgrounds-image';
 
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -37,8 +36,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -51,8 +49,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -65,7 +62,6 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -90,9 +86,9 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
                 'owner.ownerRoom',
                 'owner.profile',
                 'owner.country',
-                'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+                'owner.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
             ])
-            ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
+            ->when($countryID, fn ($q) => $q->whereHas('owner', fn ($q) => $q->where('country_id', $countryID)))
             ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
@@ -114,10 +110,10 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             $name = $ownerRoom->room_name ?? '';
             $uuid = $owner->uuid ?? '';
             $path = $ownerRoom->room_cover ?? null;
-            $defaultImage = asset("images/room.jpg");
+            $defaultImage = asset('images/room.jpg');
             $url = $path ? getImagePath($path) : $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
@@ -125,7 +121,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             $showUrl = $ownerRoom ? url("admin/rooms/{$ownerRoom->id}") : '#';
 
             $escapedName = json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS);
-            $escapedName = substr($escapedName, 1, -1); // remove surrounding quotes
+            $escapedName = mb_substr($escapedName, 1, -1); // remove surrounding quotes
 
             return <<<EOT
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -147,17 +143,17 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
                 $ownerId = $owner->id ?? null;
                 $path = $owner->profile->avatar ?? null;
 
-                $defaultImage = asset("images/businessman-icon.jpg");
+                $defaultImage = asset('images/businessman-icon.jpg');
                 $url = $path ? getImagePath($path) : $defaultImage;
 
-                if (!isImageExists($url)) {
+                if (! isImageExists($url)) {
                     $url = $defaultImage;
                 }
 
                 $image = $ownerId ? handleShowImageWithTypes($ownerId, $url, 40, 40) : "<img src='{$url}' width='40' height='40' style='border-radius: 50%; object-fit: cover;'>";
 
                 $escapedName = $name ? json_encode($name, JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_APOS) : '';
-                $escapedName = substr($escapedName, 1, -1); // remove quotes
+                $escapedName = mb_substr($escapedName, 1, -1); // remove quotes
 
                 $showUrl = $ownerId ? url("admin/users/{$ownerId}") : '#';
 
@@ -174,11 +170,10 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
         EOT;
             });
 
-
         $grid->img(__('image'))->display(function ($img) {
-            $defaultImage = asset("images/background_room.jpg");
+            $defaultImage = asset('images/background_room.jpg');
             $path = getImagePath($img) ?? $defaultImage;
-            if (!isImageExists($path)) {
+            if (! isImageExists($path)) {
                 $path = $defaultImage;
             }
             $parsedUrl = parse_url($path);
@@ -231,7 +226,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
         });
 
         $grid->column('expair', __('Expire'))->display(function ($value) {
-            if (!$value) {
+            if (! $value) {
                 return '—';
             }
 
@@ -240,13 +235,14 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
 
             if ($diffInDays > 0) {
                 return "$diffInDays";
-            } elseif ($diffInDays === 0) {
-                return __("today");
-            } else {
-                return abs($diffInDays) . " " . __("days ago");
             }
-        });
+            if ($diffInDays === 0) {
+                return __('today');
+            }
 
+            return abs($diffInDays).' '.__('days ago');
+
+        });
 
         $grid->column('updated_at', __('admin.updated_at'))->display(function ($date) {
             return Carbon::parse($date)->format('Y-m-d H:i:s');
@@ -258,13 +254,14 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             }
         ");
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -278,7 +275,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             [
                 0 => __('pending'),
                 1 => __('accepted'),
-                2 => __('denied')
+                2 => __('denied'),
             ]
         );
         $show->created_at(trans('admin.created_at'));
@@ -302,8 +299,9 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             $options = [];
             $users = User::query()->where('id', $this->owner_room_id)->get();
             foreach ($users as $cat) {
-                $options[$cat->id] = $cat->uuid . '-' . $cat->name;
+                $options[$cat->id] = $cat->uuid.'-'.$cat->name;
             }
+
             return $options;
         })->ajax('/api/search/users2', 'id', 'name')->default(2)->creationRules('required');
         // $form->select('owner_id', __('owner'))->options('/api/search/users2')->ajax('/api/search/users2', 'id', 'name');
@@ -314,15 +312,14 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             [
                 0 => __('pending'),
                 1 => __('accepted'),
-                2 => __('denied')
+                2 => __('denied'),
             ]
         )->default(1);
-
 
         if ($form->isCreating()) {
             $form->number('expair', __('expair'))->default(30);
         }
-        $form->hidden('type')->default("admin");
+        $form->hidden('type')->default('admin');
         $form->display(trans('admin.created_at'));
         $form->display(trans('admin.updated_at'));
 
@@ -344,7 +341,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             $status = $model->status;
 
             if ($form->isCreating() && $form->expair) {
-                $form->expair = \Carbon\Carbon::now()->addDays($form->expair)->timestamp;
+                $form->expair = Carbon::now()->addDays($form->expair)->timestamp;
             }
 
             if (! $user) {
@@ -352,7 +349,7 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             }
 
             // If denied and editing, refund if not created by admin
-            if ($form->isEditing() && $model->getOriginal('status') == 1 && $status == 2) {
+            if ($form->isEditing() && $model->getOriginal('status') === 1 && $status === 2) {
                 if ($model->created_by_type !== \App\Models\Admin::class) {
                     $cost = Common::getConfig('cost_request_background') ?: 2000;
                     $user->di += $cost;
@@ -362,12 +359,10 @@ class RequestBackgroundImageController extends \App\Admin\Controllers\MainContro
             }
 
             // If accepted, notify
-            if ($status == 1) {
+            if ($status === 1) {
                 CustomNotification::BackgroudRequest($user, 0); // Notify accepted
             }
         });
-
-
 
         return $form;
     }

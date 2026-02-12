@@ -2,14 +2,12 @@
 
 namespace Utd\RoomCup\Http\Controllers\Admin;
 
-use App\Support\PackageHelper;
-use App\Models\User;
+use App\Admin\Services\UserService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Utd\RoomCup\Entities\RoomCupReward;
-use Encore\Admin\Layout\Content;
-use App\Admin\Services\UserService;
 
 class RoomCupReportsController extends AdminController
 {
@@ -35,18 +33,18 @@ class RoomCupReportsController extends AdminController
                 'user.packs:id,user_id,type,is_used,target_id,expire',
                 'user.packs.ware:id',
                 'user.profile:id,user_id,avatar',
-                'user.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'user.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner:id,id,name,uuid,special_id',
                 'gift.room.owner.packs:id,user_id,type,is_used,target_id,expire',
                 'gift.room.owner.packs.ware:id',
-                'gift.room.owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
+                'gift.room.owner.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
                 'gift.room.owner.profile:id,user_id,avatar',
             ])
             ->orderBy('created_at', 'desc');
 
         $grid->column('user_id', __('user'))->display(function ($name) {
             $user = $this->user;
-            if (!$user) {
+            if (! $user) {
                 return __('No User');
             }
 
@@ -56,17 +54,18 @@ class RoomCupReportsController extends AdminController
         $grid->column('room_id', __('room'))->display(function ($name) {
             $path = @$this->gift->room->room_cover;
             $id = @$this->gift->room->id;
-            $defaultImage = asset("images/room.jpg");
+            $defaultImage = asset('images/room.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50).' ...';
             }
             $showUrl = $this ? url("admin/rooms/{$id}") : 0;
+
             return "<div style='display: flex; align-items: center; gap: 10px;'>
                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                     <div>

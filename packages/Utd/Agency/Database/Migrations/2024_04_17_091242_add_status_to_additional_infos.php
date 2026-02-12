@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('additional_infos')) return;
-        if (!Schema::hasColumn('additional_infos', 'status')) {
+        if (! Schema::hasTable('additional_infos')) {
+            return;
+        }
+        if (! Schema::hasColumn('additional_infos', 'status')) {
             Schema::table('additional_infos', function (Blueprint $table) {
                 $table->boolean('status');
             });

@@ -2,9 +2,10 @@
 
 namespace Utd\Gifts\Observers;
 
-use Utd\Gifts\Entities\GiftCategory;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Utd\Gifts\Entities\GiftCategory;
 
 /**
  * GiftCategoryObserver
@@ -54,7 +55,7 @@ class GiftCategoryObserver
     {
         $this->clearCache();
     }
-    
+
     /**
      * Clear all related caches
      */
@@ -62,13 +63,13 @@ class GiftCategoryObserver
     {
         try {
             Cache::tags(['gift_categories', 'admin_data'])->flush();
-            
+
             // Force opcache clear if available (for Octane)
             if (function_exists('opcache_reset')) {
                 opcache_reset();
             }
-        } catch (\Exception $e) {
-            Log::warning('Failed to clear cache in GiftCategoryObserver: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Failed to clear cache in GiftCategoryObserver: '.$e->getMessage());
         }
     }
 }

@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('additional_infos')) return;
-        if (!Schema::hasColumn('additional_infos', 'owner_id')) {
+        if (! Schema::hasTable('additional_infos')) {
+            return;
+        }
+        if (! Schema::hasColumn('additional_infos', 'owner_id')) {
             Schema::table('additional_infos', function (Blueprint $table) {
                 $table->foreignId('owner_id')->nullable()->constrained('users')->onDelete('cascade');
             });

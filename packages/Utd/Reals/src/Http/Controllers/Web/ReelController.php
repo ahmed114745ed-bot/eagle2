@@ -2,14 +2,14 @@
 
 namespace Utd\Reals\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
 use Utd\Reals\Entities\Real;
-use App\Admin\Controllers\MainController;
 
 class ReelController extends MainController
 {
@@ -18,9 +18,8 @@ class ReelController extends MainController
      *
      * @var string
      */
-
-
     public $permission_name = 'Real';
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -43,12 +42,14 @@ class ReelController extends MainController
             ->title(trans('reels'))
             ->body($this->form()));
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
             ->title(trans('reels'))
             ->body($this->detail($id)));
     }
+
     protected function grid2()
     {
         $form = new Box();
@@ -56,10 +57,11 @@ class ReelController extends MainController
 
         return $form;
     }
+
     protected function grid()
     {
         $grid = new Grid(new Real());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->disableIdFilter();
@@ -69,7 +71,7 @@ class ReelController extends MainController
 
                     $query->whereHas('user', function ($query) use ($input) {
                         //                        $query->where('name', 'like', "%$input%")
-                        $query->where('uuid',  trim($input));
+                        $query->where('uuid', trim($input));
                     });
                 }, __('User'))->placeholder(__('Search by name or UUID'));
             });
@@ -88,21 +90,17 @@ class ReelController extends MainController
         //     return $limitedDescription;
         // });
 
-
-
         $grid->column('user.name', __('user'))->display(function ($name) {
-            $defaultImage = asset("images/businessman-icon.jpg"); // الصورة الافتراضية
+            $defaultImage = asset('images/businessman-icon.jpg'); // الصورة الافتراضية
             $avatarPath = @$this->user->avatar;
             $userId = @$this->user->id;
             $uid = @$this->user->uuid;
 
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
-
-
 
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='/admin/users/$userId'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%; object-fit: cover;'>
@@ -113,25 +111,25 @@ class ReelController extends MainController
                     </div>";
         });
 
-
         $grid->column('comment_num', __('status'))->display(function ($commentNum) {
             $like = count(@$this->likes);
             $commentNum = count(@$this->comments);
+
             return "<span class=\"fa fa-comment\"> $commentNum</span>  <span class=\"fa fa-thumbs-up\"> $like</span> ";
         });
         $grid->column('created_at', __('Created at'))->sortable()->diffForHumans();
         $grid->column('video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath = getDriverUrl() . '/' . $this->url;
+            $videoPath = getDriverUrl().'/'.$this->url;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
         });
 
         $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 20) . (strlen($description) > 30 ? '...' : '');
+            $limitedDescription = mb_substr($description, 0, 20).(mb_strlen($description) > 30 ? '...' : '');
 
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+            return "<a href='#' class='view-description' data-description=\"".htmlentities($description)."\">$limitedDescription</a>";
         });
 
         Admin::script("
@@ -159,10 +157,10 @@ class ReelController extends MainController
         $permission_name = $this->permission_name;
         $grid->actions(function ($actions) use ($permission_name) {
             $actions->disableEdit();
-            if (!Admin::user()->can('delete-' . $permission_name) && !Admin::user()->can('*')) {
+            if (! Admin::user()->can('delete-'.$permission_name) && ! Admin::user()->can('*')) {
                 $actions->disableDelete();
             }
-            if (!Admin::user()->can('show-' . $permission_name) && !Admin::user()->can('*')) {
+            if (! Admin::user()->can('show-'.$permission_name) && ! Admin::user()->can('*')) {
                 $actions->disableView();
             }
         });
@@ -174,7 +172,7 @@ class ReelController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -194,7 +192,7 @@ class ReelController extends MainController
         $show->field('updated_at', __('Updated at'));
         $show->field('video', __('Video'))->as(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath = getDriverUrl() . '/' . $this->url;
+            $videoPath = getDriverUrl().'/'.$this->url;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";

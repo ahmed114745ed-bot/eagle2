@@ -2,27 +2,25 @@
 
 namespace Utd\CP\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\UserCommon;
+use App\Selectables\Gifts;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Gifts;
-use App\Helpers\UserCommon;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
 use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
-use Utd\CP\Entities\CpRelation;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Modules\Events\Entities\WeeklyStar;
-use App\Admin\Controllers\MainController;
-use Utd\Achievements\Entities\Achievement;
-use Utd\Achievements\Enums\AchievementType;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class WeeklyCpController extends MainController
 {
     use HasResourceActions;
 
     public $permission_name = 'weekly-cp';
+
     // public function __construct()
     // {
     //     (new AppFeatureService)->validateStatusEnable("weekly_cp");
@@ -39,12 +37,10 @@ class WeeklyCpController extends MainController
             });
     }
 
-
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -57,8 +53,7 @@ class WeeklyCpController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -71,7 +66,6 @@ class WeeklyCpController extends MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -80,6 +74,16 @@ class WeeklyCpController extends MainController
             ->title(trans('weekly-cp'))
             ->body($this->form()));
     }
+
+    public function store()
+    {
+        $data = request()->all();
+        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
+        request()->merge($data);
+
+        return parent::store();
+    }
+
     protected function grid2()
     {
         $form = new Box();
@@ -91,15 +95,15 @@ class WeeklyCpController extends MainController
     protected function grid()
     {
         $grid = new Grid(new WeeklyStar());
-        $grid->model()->whereType("weekly_cp");
-         $grid->disableRowSelector();
+        $grid->model()->whereType('weekly_cp');
+        $grid->disableRowSelector();
         $grid->column('id', __('Id'));
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
         $grid->column('Actions')->display(function () {
             // توليد الروابط
-            $url1 = url('admin/weekly-cp-gift/' . $this->id);
+            $url1 = url('admin/weekly-cp-gift/'.$this->id);
 
             // إنشاء أزرار HTML
             $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية الفائز </a>";
@@ -108,16 +112,7 @@ class WeeklyCpController extends MainController
             return $button1;
         });
 
-
         return $grid;
-    }
-
-    public function store()
-    {
-        $data = request()->all();
-        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
-        request()->merge($data);
-        return parent::store();
     }
 
     protected function form()
@@ -128,24 +123,26 @@ class WeeklyCpController extends MainController
         $this->disableFormTools($form);
 
         $form->hidden('type', 'Type')->default('weekly_cp');
-        $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_cp')->max('start_date');
+        $lastStartDate = WeeklyStar::where('type', 'weekly_cp')->max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date('Y-m-d'))
             ->rules(function ($form) {
 
-                $lastStartDate = \Modules\Events\Entities\WeeklyStar::where("type", 'weekly_cp')->max('start_date');
+                $lastStartDate = WeeklyStar::where('type', 'weekly_cp')->max('start_date');
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
                 if ($minStartDate) {
-                    if (!$id = $form->model()->id) {
-                        return 'required|after:' . $minStartDate;
-                    } else {
-                        return 'required';
+                    if (! $id = $form->model()->id) {
+                        return 'required|after:'.$minStartDate;
                     }
-                } else {
-                    return 'required|date';
+
+                    return 'required';
+
                 }
+
+                return 'required|date';
+
             });
         $form->belongsToMany('gifts', Gifts::class)
             ->rules('required|array|size:3', [

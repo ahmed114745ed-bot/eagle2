@@ -3,6 +3,7 @@
 namespace Utd\Agency\Actions;
 
 use Encore\Admin\Actions\RowAction;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class RejectJoinRequestAction extends RowAction
             $model->save();
 
             return $this->response()->success('Request rejected successfully.')->refresh();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->response()->error($e->getMessage());
         }
     }

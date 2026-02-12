@@ -2,18 +2,18 @@
 
 namespace Utd\Gifts\Actions;
 
-use Utd\Gifts\Entities\GiftCategory;
-use Illuminate\Http\Request;
 use Encore\Admin\Actions\RowAction;
-use Illuminate\Database\Eloquent\Model;
 use Encore\Admin\Form;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Utd\Gifts\Entities\GiftCategory;
 
 class MoveGiftCategory extends RowAction
 {
     public function name()
     {
         // الاسم ديناميكي بحسب الحالة الحالية
-        return  __('move');
+        return __('move');
     }
 
     public function handle(Model $model, Request $request)
@@ -21,10 +21,10 @@ class MoveGiftCategory extends RowAction
         $gift = $this->row;
         $newCategory = $request->get('category_id');
 
-        if (!$newCategory) {
+        if (! $newCategory) {
             return $this->response()->error('Please select category')->refresh();
         }
-    
+
         $gift->gift_category_id = $newCategory;
         $gift->save();
 
@@ -43,7 +43,7 @@ class MoveGiftCategory extends RowAction
                 $categories = [];
                 foreach (GiftCategory::whereNotIn('type', ['lucky_gift', 'vip'])->get() as $category) {
                     $titleValue = $category->title;
-                    
+
                     if (is_array($titleValue)) {
                         $title = $titleValue[$locale] ?? $titleValue['en'] ?? reset($titleValue);
                     } else {

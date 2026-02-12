@@ -3,9 +3,8 @@
 namespace Utd\Agency\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class RefuseAgency extends Notification
 {
@@ -36,16 +35,16 @@ class RefuseAgency extends Notification
      * Get the mail representation of the notification.
      *
      * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
+     * @return MailMessage
      */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Agency Request Declined')
-                    ->line('We regret to inform you that your agency request has been declined.')
-                    ->line('If you have any questions, please contact our support team.')
-                    ->action('Contact Support', url('/support'))
-                    ->line('Thank you for your understanding.');
+            ->subject('Agency Request Declined')
+            ->line('We regret to inform you that your agency request has been declined.')
+            ->line('If you have any questions, please contact our support team.')
+            ->action('Contact Support', url('/support'))
+            ->line('Thank you for your understanding.');
     }
 
     /**

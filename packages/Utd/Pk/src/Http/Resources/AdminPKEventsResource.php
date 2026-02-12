@@ -2,10 +2,10 @@
 
 namespace Utd\Pk\Http\Resources;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Vip\Entities\OVip;
 
 class AdminPKEventsResource extends JsonResource
 {
@@ -14,38 +14,34 @@ class AdminPKEventsResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    function get_name($id , $type) {
-        if($type == 'ware')
-        {
+    public function get_name($id, $type)
+    {
+        if ($type === 'ware') {
             $item = Ware::find($id);
-            if($item)
-            {
+            if ($item) {
                 return [
                     'name' => $item->name,
-                    'id' => $item->id
+                    'id' => $item->id,
                 ];
             }
-            else{
-                return '';
-            }
-        }
-        else if($type == 'vip')
-        {
+
+            return '';
+
+        } elseif ($type === 'vip') {
             $item = OVip::find($id);
-            if($item)
-            {
+            if ($item) {
                 return [
                     'name' => $item->name,
-                    'id' => $item->id
+                    'id' => $item->id,
                 ];
             }
-            else{
-                return '';
-            }
+
+            return '';
+
         }
-        else{
-            return null;
-        }
+
+        return null;
+
     }
 
     public function toArray(Request $request): array
@@ -53,13 +49,13 @@ class AdminPKEventsResource extends JsonResource
         return [
             'id' => $this->id,
             'event_type' => $this->pk_type,
-            'event_id'   => $this->pk_event_id,
-            'type'       => $this->type,
-            'level'      => $this->level,
-            'expire'     => $this->expire,
-            'target'     => $this->target,
-            'vip'        => $this->get_name($this->target ,$this->type ),
-            'ware'       => $this->get_name($this->target ,$this->type ) ,
+            'event_id' => $this->pk_event_id,
+            'type' => $this->type,
+            'level' => $this->level,
+            'expire' => $this->expire,
+            'target' => $this->target,
+            'vip' => $this->get_name($this->target, $this->type),
+            'ware' => $this->get_name($this->target, $this->type),
         ];
     }
 }

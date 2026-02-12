@@ -2,72 +2,60 @@
 
 namespace Utd\Agency\Http\Controllers\Shipping\Admin;
 
+use App\Admin\Controllers\MainController;
 use Carbon\Carbon;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Utd\Agency\Entities\ShippingAgency;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
 use Utd\Agency\Actions\DeleteShippingAgencyAction;
+use Utd\Agency\Entities\ShippingAgency;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AppearChargerAgencyController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
     public $permission_name = 'appear-charger-agency';
 
     public function index(Content $content)
     {
         $content = $content->title(trans('appear-charger-agency'));
 
-
-        if (Admin::user()->can('actions-switch' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('actions-switch'.$this->permission_name) || Admin::user()->can('*')) {
 
             $content = $content->row(function (Row $row) {
                 $row->column(12, $this->grid2());
             });
         }
 
-
         // Add the second row unconditionally
         $content = $content->row(function ($row) {
             $row->column(12, $this->grid());
         });
+
         return parent::index($content);
-    }
-
-    protected function grid2()
-    {
-        $transfer_salary = settings()->get('transfer_salary_reliable_shipping_agency');
-
-        return (new Box(
-            title: __('admin.Actions'),
-            content: view('agency::shipping.admin.grid.reliable_shipping_agency', compact(['transfer_salary'])),
-        ));
     }
 
     public function transferSalary(Request $request)
     {
-        if ($request->transfer_salary_reliable_shipping_agency === "true") {
-            settings()->set("transfer_salary_reliable_shipping_agency", "1");
+        if ($request->transfer_salary_reliable_shipping_agency === 'true') {
+            settings()->set('transfer_salary_reliable_shipping_agency', '1');
         } else {
-            settings()->set("transfer_salary_reliable_shipping_agency", "0");
+            settings()->set('transfer_salary_reliable_shipping_agency', '0');
         }
     }
 
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -80,8 +68,7 @@ class AppearChargerAgencyController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -104,18 +91,16 @@ class AppearChargerAgencyController extends MainController
         $month = $request->month ?? Carbon::now()->month;
         $tab = request('tab') ?? 'members';
 
-
         $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
             return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
                 ->select('id', 'name', 'app_owner_id', 'phone', 'salary', 'coins', 'img')
                 ->findOrFail($id);
         });
 
-
         $path = $agency->img;
-        $defaultImage = asset("images/icon-agency.jpg");
+        $defaultImage = asset('images/icon-agency.jpg');
         $imageUrl = getImagePath($path) ?? $defaultImage;
-        if (!isImageExists($imageUrl)) {
+        if (! isImageExists($imageUrl)) {
             $imageUrl = $defaultImage;
         }
         $agency->display_image = $imageUrl;
@@ -126,7 +111,7 @@ class AppearChargerAgencyController extends MainController
 
         switch ($tab) {
             case 'members':
-                $members = Cache::remember("agency_{$id}_members_page_" . request('members_page', 1), 600, function () use ($agency) {
+                $members = Cache::remember("agency_{$id}_members_page_".request('members_page', 1), 600, function () use ($agency) {
                     return $agency->mempers()
                         ->select('id', 'name', 'uuid', 'total_days', 'agency_id', 'country_id')
                         ->with('country', 'agencyUserJob')
@@ -135,7 +120,7 @@ class AppearChargerAgencyController extends MainController
                 break;
 
             case 'charges':
-                $charges = Cache::remember("agency_{$id}_charges_page_" . request('charges_page', 1), 600, function () use ($agency) {
+                $charges = Cache::remember("agency_{$id}_charges_page_".request('charges_page', 1), 600, function () use ($agency) {
                     return $agency->charges()
                         ->select('id', 'amount', 'created_at')
                         ->latest()
@@ -144,7 +129,7 @@ class AppearChargerAgencyController extends MainController
                 break;
 
             case 'salary':
-                $salaries = Cache::remember("agency_{$id}_salaries_page_" . request('salary_page', 1), 600, function () use ($id) {
+                $salaries = Cache::remember("agency_{$id}_salaries_page_".request('salary_page', 1), 600, function () use ($id) {
                     return AgencySallary::where('agency_id', $id)
                         ->select('id', 'sallary', 'cut_amount', 'month', 'year', 'created_at')
                         ->orderByDesc('id')
@@ -153,7 +138,7 @@ class AppearChargerAgencyController extends MainController
                 break;
 
             case 'requests':
-                $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_" . request('join_page', 1), 600, function () use ($id) {
+                $agencyJoinRequests = Cache::remember("agency_{$id}_requests_page_".request('join_page', 1), 600, function () use ($id) {
                     return AgencyJoinRequest::where(['agency_id' => $id, 'status' => 0])
                         ->with('user')
                         ->whereHas('user')
@@ -163,7 +148,7 @@ class AppearChargerAgencyController extends MainController
                 break;
 
             case 'targets':
-                $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_" . request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
+                $memberTargets = Cache::remember("agency_{$id}_targets_{$month}_{$year}_page_".request('target_page', 1), 600, function () use ($agency, $agencyId, $month, $year) {
                     return $agency->mempers()->with(['targets' => function ($query) use ($agencyId, $month, $year) {
                         $query->where('agency_id', $agencyId)
                             ->whereMonth('created_at', $month)
@@ -171,16 +156,16 @@ class AppearChargerAgencyController extends MainController
                     }])->paginate(10, ['*'], 'target_page');
                 });
 
-                [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn() => $this->rateAgency($agencyId, $month, $year));
-                $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
-                $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn() => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
+                [$agencyTarget, $rate] = Cache::remember("agency_{$id}_rate_{$month}_{$year}", 600, fn () => $this->rateAgency($agencyId, $month, $year));
+                $stars = Cache::remember("agency_{$id}_stars_{$month}_{$year}", 600, fn () => $this->giftLogByAgency('receiver', $month, $year, $agencyId, 'receiver_id'));
+                $heroes = Cache::remember("agency_{$id}_heroes_{$month}_{$year}", 600, fn () => $this->giftLogByAgency('sender', $month, $year, $agencyId, 'sender_id'));
 
                 break;
         }
 
         $giftLog = Cache::remember("agency_{$id}_giftlog", 600, function () use ($id) {
             return GiftLog::where('agency_id', $id)
-                ->selectRaw("SUM(giftPrice) as exp, receiver_id")
+                ->selectRaw('SUM(giftPrice) as exp, receiver_id')
                 ->with('receiver')
                 ->groupBy('receiver_id')
                 ->whereHas('receiver')
@@ -207,6 +192,97 @@ class AppearChargerAgencyController extends MainController
             ->view('agency::shipping.admin.agency_profile', $data);
     }
 
+    public function shippingProfile($id, Request $request, Content $content)
+    {
+        $tab = $request->input('tab', 'charges');
+
+        $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
+            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
+                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
+                ->findOrFail($id);
+        });
+
+        $agencyId = $agency->id;
+        $charges = null;
+        $resiveds = null;
+        $coinLogs = null;
+
+        switch ($tab) {
+            case 'charges':
+                $charges = Charge::where('charger_type', 'agency')
+                    ->where('charger_id', $agencyId);
+
+                $relations = [];
+
+                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
+                    $charges->where('user_type', $request->filter_by);
+                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
+                }
+                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
+                    $charges->where('user_id', $request->filter_id);
+                }
+
+                if (! empty($relations)) {
+                    $charges->with($relations);
+                }
+
+                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
+                break;
+
+            case 'resived':
+                $resiveds = Charge::where('user_id', $agencyId)
+                    ->where('user_type', 'agency');
+
+                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
+                    $resiveds->where('charger_type', $request->sender_type);
+                }
+                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
+                    $resiveds->where('charger_id', $request->sender_id);
+                }
+
+                $resiveds = $resiveds->with(['sender'])
+                    ->latest()
+                    ->paginate(10, ['*'], 'resived_page');
+                break;
+
+            case 'coinsLog':
+                $coinLogs = CoinLog::where('user_id', $agencyId)
+                    ->where('user_type', 'shipping_agency')
+                    ->latest()
+                    ->paginate(10, ['*'], 'resived_page');
+                break;
+        }
+
+        $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
+        $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
+
+        return $content->title(__('agency profile'))
+            ->view('agency::shipping.admin.shippingAgencyProfile', compact(
+                'agency',
+                'resiveds',
+                'coinLogs',
+                'charges',
+                'tab',
+                'totalReceive',
+                'totalSend'
+            ));
+    }
+
+    public function filterCharges($id, Request $request, Content $content)
+    {
+        return $this->shippingProfile($id, $request, $content);
+    }
+
+    protected function grid2()
+    {
+        $transfer_salary = settings()->get('transfer_salary_reliable_shipping_agency');
+
+        return new Box(
+            title: __('admin.Actions'),
+            content: view('agency::shipping.admin.grid.reliable_shipping_agency', compact(['transfer_salary'])),
+        );
+    }
+
     /**
      * Make a grid builder.
      *
@@ -216,18 +292,16 @@ class AppearChargerAgencyController extends MainController
     {
 
         $grid = new Grid(new ShippingAgency());
-        $countryID = empty((array)session('filter_country_id')) ? Common::areaCountries() : (array)session('filter_country_id');
-
+        $countryID = empty((array) session('filter_country_id')) ? Common::areaCountries() : (array) session('filter_country_id');
 
         $grid->model()->with(['owner:id,name,uuid,img,country_id', 'owner.profile', 'owner.country', 'creator', 'country'])
-            ->when($countryID, fn($q) => $q->whereIn('country_id', $countryID))
+            ->when($countryID, fn ($q) => $q->whereIn('country_id', $countryID))
             ->orderByDesc('id');
 
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->like('owner.uuid', __('UUID'))->placeholder(__('Search by UUID'));
         });
-
 
         $grid->column('id', __('Id'))->sortable();
 
@@ -236,10 +310,10 @@ class AppearChargerAgencyController extends MainController
                 $cacheKey = "agency_image_{$this->id}";
                 $image = Cache::remember($cacheKey, 3600, function () {
                     $path = @$this->img;
-                    $defaultImage = asset("images/icon-agency.jpg");
+                    $defaultImage = asset('images/icon-agency.jpg');
                     $url = getImagePath($path) ?? $defaultImage;
 
-                    if (!isImageExists($url)) {
+                    if (! isImageExists($url)) {
                         $url = $defaultImage;
                     }
 
@@ -247,7 +321,7 @@ class AppearChargerAgencyController extends MainController
                 });
 
                 $flagHtml = '';
-                if (!empty($this->country?->flag)) {
+                if (! empty($this->country?->flag)) {
                     $flagPath = getImagePath($this->country->flag);
                     $flagTitle = app()->getLocale() === 'ar'
                         ? e($this->country->name)
@@ -280,10 +354,10 @@ class AppearChargerAgencyController extends MainController
             $uid = $this->owner ? $this->owner->uuid ?? 'N/A' : 'N/A';
             $phone = $this->owner ? $this->owner->phone ?? '-' : '-';
             $path = $this->owner && $this->owner->profile ? $this->owner->profile->avatar : '';
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
@@ -291,7 +365,7 @@ class AppearChargerAgencyController extends MainController
 
             $showUrl = $this->owner ? url("admin/users/{$this->owner->id}") : 0;
             $flagHtml = '';
-            if (!empty($this->owner?->country?->flag)) {
+            if (! empty($this->owner?->country?->flag)) {
                 $flagPath = getImagePath($this->owner->country->flag);
                 $flagTitle = app()->getLocale() === 'ar'
                     ? e($this->owner->country->name)
@@ -303,6 +377,7 @@ class AppearChargerAgencyController extends MainController
                          title='{$flagTitle}' 
                          style='width:20px;height:auto;vertical-align:middle;margin-left:5px;'>";
             }
+
             return "
                 <a href='{$showUrl}' style='text-decoration: none; color: inherit;'>
                 <div style='display: flex; align-items: center; gap: 10px;'>
@@ -316,19 +391,19 @@ class AppearChargerAgencyController extends MainController
             ";
         });
 
-        $grid->column('charge_agency', __("Charge-agency"))
+        $grid->column('charge_agency', __('Charge-agency'))
             ->display(function () {
                 return $this->chargeAgency ? 1 : 0;
             })
-            ->switch(Common::getSwitchStates())->sortable();;
+            ->switch(Common::getSwitchStates())->sortable();
 
-        $grid->column('appear_charger_agency', __("Appear charger agency"))
+        $grid->column('appear_charger_agency', __('Appear charger agency'))
             ->display(function () {
                 return $this->owner && $this->owner->appear_charger_agency ? 1 : 0;
             })
             ->switch(Common::getSwitchStates())->sortable();
 
-        $grid->column('is_frozen', __("frozen"))
+        $grid->column('is_frozen', __('frozen'))
             ->display(function () {
                 return $this->is_frozen ? 1 : 0;
             })
@@ -336,11 +411,12 @@ class AppearChargerAgencyController extends MainController
         $permission = $this->permission_name;
         $grid->column('created_by', __('Creator'))->display(function ($creatorId) {
             $id = $creatorId;
+
             return app(\App\Admin\Services\CreatorService::class)->show($creatorId);
         });
         $grid->actions(function ($actions) use ($permission) {
             $actions->disableView();
-            if (Admin::user()->can('delete-switch-' . $permission) || Admin::user()->can('*')) {
+            if (Admin::user()->can('delete-switch-'.$permission) || Admin::user()->can('*')) {
 
                 $actions->add(new DeleteShippingAgencyAction());
             }
@@ -350,9 +426,9 @@ class AppearChargerAgencyController extends MainController
         $grid->tools(function (Grid\Tools $tools) {
             $query = request()->query();
 
-            $exportUrl = route('charge-agency-export-report') . '?' . http_build_query($query);
+            $exportUrl = route('charge-agency-export-report').'?'.http_build_query($query);
 
-            $tools->append('<a href="' . $exportUrl . '" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> ' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="'.$exportUrl.'" target="_blank" class="btn btn-sm btn-success"><i class="fa fa-download"></i> '.__('admin.exportExcel').'</a>');
         });
 
         return $grid;
@@ -361,7 +437,7 @@ class AppearChargerAgencyController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -387,8 +463,9 @@ class AppearChargerAgencyController extends MainController
             ->options(function ($value) {
                 $ops2 = [];
                 foreach (User::where('id', $value)->get() as $user) {
-                    $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                    $ops2[$user->id] = $user->uuid.'_'.$user->name;
                 }
+
                 return $ops2;
             })
             ->ajax('/api/search/users5', 'id', 'name')->rules('required');
@@ -471,14 +548,13 @@ class AppearChargerAgencyController extends MainController
             $originalOwnerId = $form->model()->getOriginal('app_owner_id');
             $newOwnerId = $form->model()->app_owner_id;
 
-            if (!$form->model()->exists) {
+            if (! $form->model()->exists) {
             }
 
-            if ($form->model()->exists && $newOwnerId != $originalOwnerId) {
+            if ($form->model()->exists && $newOwnerId !== $originalOwnerId) {
 
                 $user = User::find($originalOwnerId);
                 $agencyId = $form->model()->id;
-
 
                 Admin::where('username', $user->uuid)->delete();
             }
@@ -486,94 +562,12 @@ class AppearChargerAgencyController extends MainController
 
         $form->saved(function (Form $form) {
 
-            $appOwnerId = intval($form->model()->app_owner_id);
+            $appOwnerId = (int) ($form->model()->app_owner_id);
 
             $user = User::find($appOwnerId);
             MilestoneHelper::grantMilestoneToUser($user, 'charge-agency-owner');
         });
 
         return $form;
-    }
-
-    public function shippingProfile($id, Request $request, Content $content)
-    {
-        $tab = $request->input('tab', 'charges');
-
-        $agency = Cache::remember("agency_{$id}", 600, function () use ($id) {
-            return ShippingAgency::with(['admins', 'owner:id,name,uuid,country_id,phone', 'owner.profile', 'owner.country'])
-                ->select('id', 'name', 'app_owner_id', 'phone', 'coins', 'img')
-                ->findOrFail($id);
-        });
-
-        $agencyId = $agency->id;
-        $charges = null;
-        $resiveds = null;
-        $coinLogs = null;
-
-        switch ($tab) {
-            case 'charges':
-                $charges = Charge::where('charger_type', 'agency')
-                    ->where('charger_id', $agencyId);
-
-                $relations = [];
-
-                if ($request->has('filter_by') && $request->filter_by !== null && $request->filter_by !== '') {
-                    $charges->where('user_type', $request->filter_by);
-                    $relations[] = $request->filter_by === 'user' ? 'receiverUser' : 'receiverAgency';
-                }
-                if ($request->has('filter_id') && $request->filter_id !== null && $request->filter_id !== '') {
-                    $charges->where('user_id', $request->filter_id);
-                }
-
-                if (!empty($relations)) {
-                    $charges->with($relations);
-                }
-
-                $charges = $charges->latest()->paginate(10, ['*'], 'charges_page');
-                break;
-
-            case 'resived':
-                $resiveds = Charge::where('user_id', $agencyId)
-                    ->where('user_type', 'agency');
-
-                if ($request->has('sender_type') && $request->sender_type !== null && $request->sender_type !== '') {
-                    $resiveds->where('charger_type', $request->sender_type);
-                }
-                if ($request->has('sender_id') && $request->sender_id !== null && $request->sender_id !== '') {
-                    $resiveds->where('charger_id', $request->sender_id);
-                }
-
-                $resiveds = $resiveds->with(['sender'])
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
-
-
-            case 'coinsLog':
-                $coinLogs = CoinLog::where('user_id', $agencyId)
-                    ->where('user_type', 'shipping_agency')
-                    ->latest()
-                    ->paginate(10, ['*'], 'resived_page');
-                break;
-        }
-
-        $totalReceive = Charge::where('user_id', $agencyId)->where('user_type', 'agency')->sum('amount');
-        $totalSend = Charge::where('charger_type', 'agency')->where('charger_id', $agencyId)->sum('amount');
-
-        return $content->title(__('agency profile'))
-            ->view('agency::shipping.admin.shippingAgencyProfile', compact(
-                'agency',
-                'resiveds',
-                'coinLogs',
-                'charges',
-                'tab',
-                'totalReceive',
-                'totalSend'
-            ));
-    }
-
-    public function filterCharges($id, Request $request, Content $content)
-    {
-        return $this->shippingProfile($id, $request, $content);
     }
 }

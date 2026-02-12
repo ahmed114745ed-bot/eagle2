@@ -15,7 +15,7 @@ class AgencyMemberResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'name' => $this->name,
-            'img' => $this->img ? asset('storage/' . $this->img) : null,
+            'img' => $this->img ? asset('storage/'.$this->img) : null,
             'type_user' => $this->type_user,
             'is_admin' => $this->agencyAdmins()->exists(),
             'monthly_diamond_received' => $this->monthly_diamond_received_sum ?? 0,

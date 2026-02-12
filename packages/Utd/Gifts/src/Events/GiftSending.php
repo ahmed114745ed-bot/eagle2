@@ -2,10 +2,10 @@
 
 namespace Utd\Gifts\Events;
 
-use Utd\Gifts\DTOs\SendGiftDTO;
-use Utd\Gifts\Entities\Gift;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Utd\Gifts\DTOs\SendGiftDTO;
+use Utd\Gifts\Entities\Gift;
 
 /**
  * يُطلق قبل إرسال الهدية

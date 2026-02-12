@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateBoxUsesTable extends Migration
 {
@@ -26,7 +26,7 @@ class CreateBoxUsesTable extends Migration
             $table->string('label')->nullable();
             $table->integer('used_num')->nullable();
             $table->integer('not_used_num')->nullable();
-            $table->string ('image')->nullable ();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

@@ -19,8 +19,9 @@ class AchievementOneLevelsResource extends JsonResource
             'recharge_target' => 'recharge-target',
             'room_target' => 'room-target',
         ];
-        
+
         $target = $targets[$this->type->value] ?? 'gift-target';
+
         return [
             'id' => $this->id,
             'type' => $this->type,
@@ -34,11 +35,12 @@ class AchievementOneLevelsResource extends JsonResource
                     $valid = $level->valid_image;
                     $description_en = $level->en_description;
                     $description = $level->ar_description;
+
                     return [
                         'id' => $level->id,
                         'achievement_id' => $level->achievement_id,
                         'gift_id' => $level->gift_id,
-                        'name' => $target . '-' . $level->target,
+                        'name' => $target.'-'.$level->target,
                         'target' => $level->target,
                         'target_type' => $level->target_type,
                         'image' => $img,

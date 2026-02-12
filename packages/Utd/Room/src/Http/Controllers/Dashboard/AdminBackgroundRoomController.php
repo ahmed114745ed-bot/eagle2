@@ -3,9 +3,9 @@
 namespace Utd\Room\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use Utd\Room\Entities\Background;
-use Illuminate\Http\Request;
 use App\Traits\Dashboard\DashBoardTrait;
+use Illuminate\Http\Request;
+use Utd\Room\Entities\Background;
 
 class AdminBackgroundRoomController extends Controller
 {
@@ -13,56 +13,57 @@ class AdminBackgroundRoomController extends Controller
 
     public function index()
     {
-        $data = Background::orderBy('sort','asc')->get();
+        $data = Background::orderBy('sort', 'asc')->get();
+
         return $data;
     }
 
     public function sort($main_type)
     {
 
-        $items = Background::orderBy('id','desc')->get();
-        $index = 0 ;
+        $items = Background::orderBy('id', 'desc')->get();
+        $index = 0;
         foreach ($items as $item) {
-            $index ++;
+            $index++;
             $item->sort = $index;
             $item->save();
         }
+
         return 200;
     }
 
-    function change_sort(Request $request) {
+    public function change_sort(Request $request)
+    {
         $Background = Background::find($request->id);
-        if($Background)
-        {
-            if($Background->sort  > $request->new_num)
-            {
-                $items = Background::where('id','not Like',$request->id)->where('sort','>=',$request->new_num)->orderBy('sort','asc')->get();
+        if ($Background) {
+            if ($Background->sort > $request->new_num) {
+                $items = Background::where('id', 'not Like', $request->id)->where('sort', '>=', $request->new_num)->orderBy('sort', 'asc')->get();
                 foreach ($items as $item) {
-                    $item->sort +=1;
+                    $item->sort += 1;
+                    $item->update();
+                }
+            } else {
+                $items = Background::where('id', 'not Like', $request->id)->where('sort', '<=', $request->new_num)->orderBy('sort', 'asc')->get();
+                foreach ($items as $item) {
+                    $item->sort -= 1;
                     $item->update();
                 }
             }
-            else{
-                $items = Background::where('id','not Like',$request->id)->where('sort','<=',$request->new_num)->orderBy('sort','asc')->get();
-                foreach ($items as $item) {
-                    $item->sort -=1;
-                    $item->update();
-                }
-            }
-            $Background->sort  =$request->new_num;
+            $Background->sort = $request->new_num;
             $Background->update();
         }
+
         return 200;
     }
 
-    public function enable_Background(Request $request, $id , $status)
+    public function enable_Background(Request $request, $id, $status)
     {
         $Background = Background::find($id);
-        if($Background)
-        {
-            $Background->enable = $status  == 'true' ? 1 : 0;
-            $Background->update() ;
+        if ($Background) {
+            $Background->enable = $status === 'true' ? 1 : 0;
+            $Background->update();
         }
+
         return response()->json([
             'status' => 200,
         ]);
@@ -71,28 +72,29 @@ class AdminBackgroundRoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'img'    => 'required|image|mimes:jpeg,png,jpg',
-            'enable'      => 'required|max:255',
+            'img' => 'required|image|mimes:jpeg,png,jpg',
+            'enable' => 'required|max:255',
         ]);
         $last_num = Background::first()->sort;
 
-
         $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'images') : null;
         Background::insert([
-            'img'        => $img,
-            'enable'      => $request->enable ,
+            'img' => $img,
+            'enable' => $request->enable,
         ]);
-        $Background_last =  Background::orderBy('id','desc')->first();
-        $Background_last->sort = $last_num+1;
+        $Background_last = Background::orderBy('id', 'desc')->first();
+        $Background_last->sort = $last_num + 1;
         $Background_last->save();
+
         return response()->json([
-            'status' => 200 ,
+            'status' => 200,
         ]);
     }
 
     public function show(string $id)
     {
         $data = Background::find($id);
+
         return $data;
     }
 
@@ -100,15 +102,14 @@ class AdminBackgroundRoomController extends Controller
     {
         $Background = Background::find($id);
         $request->validate([
-            'enable'      => 'required|max:255',
+            'enable' => 'required|max:255',
         ]);
-        if( $request->hasFile('img'))
-        {
+        if ($request->hasFile('img')) {
             $this->delete_img($Background->img);
-            $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'images') : null;;
-            $Background->img   = $img ;
+            $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'images') : null;
+            $Background->img = $img;
         }
-        $Background->enable     = $request->enable ;
+        $Background->enable = $request->enable;
         $Background->update();
     }
 
@@ -117,6 +118,7 @@ class AdminBackgroundRoomController extends Controller
         $Background = Background::find($id);
         $this->delete_img($Background->img);
         $Background->delete();
+
         return 200;
     }
 }

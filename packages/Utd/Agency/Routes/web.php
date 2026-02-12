@@ -2,24 +2,24 @@
 
 use Illuminate\Support\Facades\Route;
 use Utd\Agency\Http\Controllers\Admin\AgencyController;
-use Utd\Agency\Http\Controllers\Admin\PackageController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyJoinRequestController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyTargetController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\ChargeController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\HomeController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\HostDiamondController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\UserController;
+use Utd\Agency\Http\Controllers\Admin\AgencyControllers\UserTargetController;
+use Utd\Agency\Http\Controllers\Admin\AgencyMangerAgencyesController;
+use Utd\Agency\Http\Controllers\Admin\AgencyMangerTaregetController;
+use Utd\Agency\Http\Controllers\Admin\AgencyMangerUsers;
+use Utd\Agency\Http\Controllers\Admin\ChangeAgencyMangerController;
 use Utd\Agency\Http\Controllers\Admin\JoinRequestController;
+use Utd\Agency\Http\Controllers\Admin\PackageController;
 use Utd\Agency\Http\Controllers\Admin\RecommendationAgencyController;
 use Utd\Agency\Http\Controllers\Admin\RequestAgencyController;
 use Utd\Agency\Http\Controllers\Admin\RequestAgencyFilterationController;
 use Utd\Agency\Http\Controllers\Admin\SalaryController;
-use Utd\Agency\Http\Controllers\Admin\AgencyMangerAgencyesController;
-use Utd\Agency\Http\Controllers\Admin\AgencyMangerUsers;
-use Utd\Agency\Http\Controllers\Admin\ChangeAgencyMangerController;
 use Utd\Agency\Http\Controllers\Admin\UsersJoinedAgencyController;
-use Utd\Agency\Http\Controllers\Admin\AgencyMangerTaregetController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\HomeController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\UserController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\HostDiamondController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\UserTargetController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyTargetController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\ChargeController;
-use Utd\Agency\Http\Controllers\Admin\AgencyControllers\AgencyJoinRequestController;
 
 Route::group([
     'prefix' => config('admin.route.prefix'),
@@ -29,7 +29,7 @@ Route::group([
         'adminIp',
         'multiLanguage',
     ],
-    'as' => config('admin.route.prefix') . '.',
+    'as' => config('admin.route.prefix').'.',
 ], function () {
 
     Route::group([
@@ -83,11 +83,8 @@ Route::group([
             Route::resource('/ag-req', AgencyJoinRequestController::class);
         });
 
-            Route::resource('request-agencies', RequestAgencyController::class);
-            Route::resource('request-agencies-filteration', RequestAgencyFilterationController::class);
-            Route::resource('recommendation-agencies', RecommendationAgencyController::class);
+        Route::resource('request-agencies', RequestAgencyController::class);
+        Route::resource('request-agencies-filteration', RequestAgencyFilterationController::class);
+        Route::resource('recommendation-agencies', RecommendationAgencyController::class);
     }); // End of web-agency-feature group
 });
-
-
-

@@ -3,6 +3,7 @@
 namespace Utd\Agency\Actions;
 
 use Encore\Admin\Actions\RowAction;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,7 @@ class AcceptJoinRequestAction extends RowAction
             }
 
             return $this->response()->success('Request accepted successfully.')->refresh();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->response()->error($e->getMessage());
         }
     }

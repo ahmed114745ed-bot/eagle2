@@ -3,18 +3,17 @@
 namespace Utd\Charizma\Jobs;
 
 use App\Helpers\Common;
-use Utd\Room\Entities\Room;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Utd\Charizma\Services\UserCharismaService;
+use Utd\Room\Entities\Room;
 
 class UpdateUsersAndSendCharismaToZigo implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
 
     /**
      * Create a new job instance.
@@ -39,9 +38,9 @@ class UpdateUsersAndSendCharismaToZigo implements ShouldQueue
 
         $ms = [
             'messageContent' => [
-                "message" => "updateCharisma",
-                "data" => $data,
-            ]
+                'message' => 'updateCharisma',
+                'data' => $data,
+            ],
         ];
         $json = json_encode($ms);
 

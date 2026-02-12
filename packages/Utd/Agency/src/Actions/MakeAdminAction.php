@@ -3,6 +3,7 @@
 namespace Utd\Agency\Actions;
 
 use Encore\Admin\Actions\RowAction;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Utd\Agency\Entities\AgencyUserJob;
@@ -32,7 +33,7 @@ class MakeAdminAction extends RowAction
             ]);
 
             return $this->response()->success('User is now an admin.')->refresh();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->response()->error($e->getMessage());
         }
     }

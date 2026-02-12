@@ -2,6 +2,7 @@
 
 namespace Utd\Agency\Traits;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -12,53 +13,54 @@ trait ResolvesModels
 {
     /**
      * Resolve any model from config
-     * 
-     * @param string $modelKey The config key (e.g., 'user', 'agency')
-     * @param string|null $default Default class if not configured
-     * @return string|null
+     *
+     * @param  string  $modelKey  The config key (e.g., 'user', 'agency')
+     * @param  string|null  $default  Default class if not configured
      */
     protected function resolveModel(string $modelKey, ?string $default = null): ?string
     {
-        $modelClass = config("agency-dependencies.dependencies.models.{$modelKey}") 
+        $modelClass = config("agency-dependencies.dependencies.models.{$modelKey}")
                    ?? config("agency-package.models.{$modelKey}")
                    ?? $default;
-        
-        if (!$modelClass) {
+
+        if (! $modelClass) {
             Log::warning("Agency Package: Model '{$modelKey}' not configured");
+
             return null;
         }
-        
-        if (!class_exists($modelClass)) {
-            Log::warning("Agency Package: Model class does not exist", [
+
+        if (! class_exists($modelClass)) {
+            Log::warning('Agency Package: Model class does not exist', [
                 'key' => $modelKey,
-                'class' => $modelClass
+                'class' => $modelClass,
             ]);
+
             return null;
         }
-        
+
         return $modelClass;
     }
-    
+
     /**
      * Get a query builder for a model safely
-     * 
-     * @param string $modelKey
+     *
      * @return \Illuminate\Database\Eloquent\Builder|null
      */
     protected function queryModel(string $modelKey)
     {
         $modelClass = $this->resolveModel($modelKey);
-        
-        if (!$modelClass) {
+
+        if (! $modelClass) {
             return null;
         }
-        
+
         try {
             return $modelClass::query();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Agency Package: Failed to create query for model '{$modelKey}'", [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return null;
         }
     }
@@ -198,7 +200,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('user_gift', \App\Models\UserGift::class);
     }
-    
+
     /**
      * Get Charge model class
      */
@@ -206,7 +208,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('charge', \App\Models\Charge::class);
     }
-    
+
     /**
      * Get CoinLog model class
      */
@@ -214,7 +216,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('coin_log', \App\Models\CoinLog::class);
     }
-    
+
     /**
      * Get Bd model class
      */
@@ -222,7 +224,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('bd', \App\Models\Bd::class);
     }
-    
+
     /**
      * Get UserTarget model class
      */
@@ -230,7 +232,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('user_target', \App\Models\UserTarget::class);
     }
-    
+
     /**
      * Get PaymentGateway model class
      */
@@ -238,7 +240,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('payment_gateway', \App\Models\PaymentGateway::class);
     }
-    
+
     /**
      * Get Language model class
      */
@@ -246,7 +248,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('language', \App\Models\Language::class);
     }
-    
+
     /**
      * Get Ware model class
      */
@@ -254,7 +256,7 @@ trait ResolvesModels
     {
         return $this->resolveModel('ware', \App\Models\Ware::class);
     }
-    
+
     /**
      * Get SalaryTrx model class
      */

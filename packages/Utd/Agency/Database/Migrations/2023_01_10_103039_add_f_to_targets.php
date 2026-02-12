@@ -13,7 +13,9 @@ class AddFToTargets extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('targets') || Schema::hasColumn('targets', 'agency_share')) return;
+        if (! Schema::hasTable('targets') || Schema::hasColumn('targets', 'agency_share')) {
+            return;
+        }
         Schema::table('targets', function (Blueprint $table) {
             $table->double('agency_share')->nullable()->default(0);
         });

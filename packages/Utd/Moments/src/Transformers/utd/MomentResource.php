@@ -23,7 +23,7 @@ class MomentResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'img' => $this->img,
-            'user'=> $this->user,
+            'user' => $this->user,
         ];
     }
 }

@@ -14,7 +14,7 @@ class AddSessionToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedBigInteger ('session')->nullable ()->default (0);
+            $table->unsignedBigInteger('session')->nullable()->default(0);
         });
     }
 

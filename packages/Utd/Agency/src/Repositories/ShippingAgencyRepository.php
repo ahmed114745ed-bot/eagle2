@@ -23,13 +23,14 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
         if ($status) {
             $data->where('status', $status);
         }
+
         return $data->first();
     }
 
     public function filterAgency($id)
     {
         return $this->model
-            ->whereRaw('CAST(id AS CHAR) LIKE ?', [$id . '%'])
+            ->whereRaw('CAST(id AS CHAR) LIKE ?', [$id.'%'])
             ->with(['owner', 'AgencypaymentGateways'])
             ->get();
     }
@@ -52,6 +53,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
         if ($shipping) {
             return $shipping;
         }
+
         return Agency::find($id);
     }
 
@@ -65,6 +67,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
         if ($shipping) {
             return $shipping;
         }
+
         return Agency::with('additionalInfo')
             ->where('id', $id)
             ->where('status', 1)
@@ -81,7 +84,8 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
 
     public function userMembers($agency, $type = null, $userIds = null)
     {
-        $members = $agency?->mempers?->pluck("id")->toArray();
+        $members = $agency?->mempers?->pluck('id')->toArray();
+
         return $members;
     }
 
@@ -93,6 +97,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
     public function updateAgency($agency)
     {
         $agency->save();
+
         return true;
     }
 
@@ -100,6 +105,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
     {
         $agency->status = $status;
         $this->updateAgency($agency);
+
         return true;
     }
 
@@ -152,7 +158,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
 
     public function getByAdditionalInfoPaginate($id, $uuid, $perPage, $page, $status = null, $action = null)
     {
-        if ($action == null) {
+        if ($action === null) {
             $agencies = $this->model->where('status', 0)->whereHas('additionalInfo', function ($query) {
                 $query->where('status', 0);
             });
@@ -169,7 +175,8 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
             $query->where('id', $id);
         })->when(isset($status), function ($query) use ($status) {
             $query->where('status', $status);
-        })->orderByDesc("id")->paginate($perPage, ['*'], 'page', $page);
+        })->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+
         return $agencies;
     }
 
@@ -178,9 +185,9 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
         return $this->model
             ->with('owner')
             ->where(function ($q) use ($keyword) {
-                $q->where('id', 'like', '%' . $keyword . '%')
+                $q->where('id', 'like', '%'.$keyword.'%')
                     ->orWhereHas('owner', function ($query) use ($keyword) {
-                        $query->where('uuid', 'like', '%' . $keyword . '%');
+                        $query->where('uuid', 'like', '%'.$keyword.'%');
                     });
             })->take(10)->get();
     }
@@ -237,7 +244,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
         })->with('owner')->paginate($perPage, ['*'], 'page', $page);
     }
 
-    public function report($id, $month = null, $year = null, $perPage, $page)
+    public function report($id, $month, $year, $perPage, $page)
     {
         return $this->model->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
@@ -254,6 +261,7 @@ class ShippingAgencyRepository implements ShippingAgencyRepositoryInterface
                 $agency->target = $agency->getTotalSallaryAgency($month, $year);
                 $agency->expenses = $agency->getTotalCutAmountAgency($month, $year);
                 $agency->salary = $agency->getSalaryAgency($month, $year);
+
                 return $agency;
             });
     }

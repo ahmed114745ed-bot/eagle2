@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('gift_logs', function (Blueprint $table) {
-            $table->unsignedDecimal('giftPrice',65,2)->change();
+            $table->unsignedDecimal('giftPrice', 65, 2)->change();
         });
     }
 

@@ -3,9 +3,9 @@
 namespace Utd\Room\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use Utd\Room\Entities\RoomCategory;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
+use Utd\Room\Entities\RoomCategory;
 
 class AdminRoomCategoriesController extends Controller
 {
@@ -14,6 +14,7 @@ class AdminRoomCategoriesController extends Controller
     public function index()
     {
         $data = RoomCategory::orderBy('sort', 'asc')->get();
+
         return $data;
     }
 
@@ -26,10 +27,11 @@ class AdminRoomCategoriesController extends Controller
             $item->sort = $index;
             $item->save();
         }
+
         return 200;
     }
 
-    function change_sort(Request $request)
+    public function change_sort(Request $request)
     {
         $RoomCategory = RoomCategory::find($request->id);
         if ($RoomCategory) {
@@ -51,6 +53,7 @@ class AdminRoomCategoriesController extends Controller
             $RoomCategory->sort = $request->new_num;
             $RoomCategory->update();
         }
+
         return 200;
     }
 
@@ -58,9 +61,10 @@ class AdminRoomCategoriesController extends Controller
     {
         $RoomCategory = RoomCategory::find($id);
         if ($RoomCategory) {
-            $RoomCategory->enable = $status == 'true' ? 1 : 0;
+            $RoomCategory->enable = $status === 'true' ? 1 : 0;
             $RoomCategory->update();
         }
+
         return response()->json([
             'status' => 200,
         ]);
@@ -86,6 +90,7 @@ class AdminRoomCategoriesController extends Controller
         $Background_last = RoomCategory::orderBy('id', 'desc')->first();
         $Background_last->sort = $last_num + 1;
         $Background_last->save();
+
         return response()->json([
             'status' => 200,
         ]);
@@ -94,6 +99,7 @@ class AdminRoomCategoriesController extends Controller
     public function show(string $id)
     {
         $data = RoomCategory::find($id);
+
         return $data;
     }
 
@@ -108,7 +114,7 @@ class AdminRoomCategoriesController extends Controller
 
         if ($request->hasFile('img')) {
             $this->delete_img($RoomCategory->img);
-            $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'images') : null;;
+            $img = $request->hasFile('img') ? $this->store_img($request->file('img'), 'images') : null;
             $RoomCategory->img = $img;
         }
         $RoomCategory->name = $request->name;
@@ -124,6 +130,7 @@ class AdminRoomCategoriesController extends Controller
             $this->delete_img($RoomCategory->img);
         }
         $RoomCategory->delete();
+
         return 200;
     }
 }

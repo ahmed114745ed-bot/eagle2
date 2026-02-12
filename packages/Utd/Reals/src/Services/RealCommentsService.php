@@ -7,18 +7,17 @@ use Utd\Reals\Entities\Real;
 
 class RealCommentsService
 {
-
     public function add($data, Real $real, User $user)
     {
         $comment = $data['comment'];
         $userId = $user->id;
         $real->comments()->create([
             'user_id' => $userId,
-            'comment' => $comment
+            'comment' => $comment,
         ]);
+
         return true;
     }
-
 
     public function delete($comment_id, Real $real)
     {
@@ -26,7 +25,6 @@ class RealCommentsService
     }
 
     /**
-     * @param $real
      * @return mixed
      */
     public function showComments($real)
@@ -34,7 +32,7 @@ class RealCommentsService
         return $real->comments()->with([
             'user' => function ($query) {
                 $query->withoutAppends()->with('profile')->select(['id', 'name']);
-            }
+            },
         ])->orderByDesc('id')->paginate(10);
     }
 }

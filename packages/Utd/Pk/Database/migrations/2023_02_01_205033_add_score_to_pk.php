@@ -14,8 +14,8 @@ class AddScoreToPk extends Migration
     public function up()
     {
         Schema::table('pks', function (Blueprint $table) {
-            $table->double ('t1_score')->nullable ()->default (0);
-            $table->double ('t2_score')->nullable ()->default (0);
+            $table->double('t1_score')->nullable()->default(0);
+            $table->double('t2_score')->nullable()->default(0);
         });
     }
 

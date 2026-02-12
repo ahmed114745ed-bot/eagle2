@@ -4,12 +4,20 @@ namespace Utd\Agency\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Utd\Agency\Traits\ConfigurableModelsTrait;
 
 class HostAgencyInvite extends Model
 {
     use ConfigurableModelsTrait;
+
+    /**
+     * Status Constants
+     */
+    public const STATUS_PENDING = 0;
+
+    public const STATUS_ACCEPTED = 1;
+
+    public const STATUS_REJECTED = 2;
 
     protected $table = 'host_agency_invites';
 
@@ -20,13 +28,6 @@ class HostAgencyInvite extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    /**
-     * Status Constants
-     */
-    const STATUS_PENDING = 0;
-    const STATUS_ACCEPTED = 1;
-    const STATUS_REJECTED = 2;
 
     /**
      * Relationship with Agency
@@ -65,7 +66,7 @@ class HostAgencyInvite extends Model
      */
     public function isPending(): bool
     {
-        return $this->status == self::STATUS_PENDING;
+        return $this->status === self::STATUS_PENDING;
     }
 
     /**
@@ -74,6 +75,7 @@ class HostAgencyInvite extends Model
     public function accept(): bool
     {
         $this->status = self::STATUS_ACCEPTED;
+
         return $this->save();
     }
 
@@ -83,6 +85,7 @@ class HostAgencyInvite extends Model
     public function reject(): bool
     {
         $this->status = self::STATUS_REJECTED;
+
         return $this->save();
     }
 }

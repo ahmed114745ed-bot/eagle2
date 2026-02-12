@@ -3,6 +3,7 @@
 namespace Utd\Agency\Actions;
 
 use Encore\Admin\Actions\RowAction;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Utd\Agency\Entities\AgencyUserJob;
@@ -21,7 +22,7 @@ class RemoveAdminAction extends RowAction
                 ->delete();
 
             return $this->response()->success('Admin role removed.')->refresh();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->response()->error($e->getMessage());
         }
     }

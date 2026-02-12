@@ -18,14 +18,14 @@ class UpdateDefaultValuesForAgenciesColumns extends Migration
                 $table->unsignedBigInteger('owner_id')->default(0)->change();
             });
         }
-        
-        if (!Schema::hasColumn('agencies', 'Shipping_agency')) {
+
+        if (! Schema::hasColumn('agencies', 'Shipping_agency')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('Shipping_agency')->default(false);
             });
         }
-        
-        if (!Schema::hasColumn('agencies', 'Host_agency')) {
+
+        if (! Schema::hasColumn('agencies', 'Host_agency')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('Host_agency')->default(false);
             });
@@ -40,7 +40,7 @@ class UpdateDefaultValuesForAgenciesColumns extends Migration
     public function down()
     {
         Schema::table('agencies', function (Blueprint $table) {
-            $table->dropColumn(['Shipping_agency', 'Host_agency','owner_id']);
+            $table->dropColumn(['Shipping_agency', 'Host_agency', 'owner_id']);
         });
     }
 }

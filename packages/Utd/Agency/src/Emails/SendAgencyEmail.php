@@ -11,12 +11,13 @@ class SendAgencyEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $agency;
+
     public $additionalInfo;
 
     /**
      * Create a new message instance.
      *
-     * @param mixed $agencyWithAdditionalInfo
+     * @param  mixed  $agencyWithAdditionalInfo
      */
     public function __construct($agencyWithAdditionalInfo)
     {
@@ -37,10 +38,10 @@ class SendAgencyEmail extends Mailable
     public function build()
     {
         return $this->subject('New Agency Registration')
-                    ->view('agency::emails.agency-registration')
-                    ->with([
-                        'agency' => $this->agency,
-                        'additionalInfo' => $this->additionalInfo,
-                    ]);
+            ->view('agency::emails.agency-registration')
+            ->with([
+                'agency' => $this->agency,
+                'additionalInfo' => $this->additionalInfo,
+            ]);
     }
 }

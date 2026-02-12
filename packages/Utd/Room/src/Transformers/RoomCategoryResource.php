@@ -9,7 +9,7 @@ class RoomCategoryResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
@@ -20,7 +20,7 @@ class RoomCategoryResource extends JsonResource
             'name_en' => $this->name_en ?? $this->name,
             'img' => $this->img,
             'parent_id' => $this->parent_id,
-            'children' => RoomCategoryResource::collection($this->whenLoaded('children')),
+            'children' => self::collection($this->whenLoaded('children')),
         ];
     }
 }

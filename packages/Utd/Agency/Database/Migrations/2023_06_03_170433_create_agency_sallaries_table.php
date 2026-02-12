@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateAgencySallariesTable extends Migration
 {
@@ -13,7 +13,9 @@ class CreateAgencySallariesTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasTable('agency_sallaries')) return;
+        if (Schema::hasTable('agency_sallaries')) {
+            return;
+        }
         Schema::create('agency_sallaries', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('agency_id')->default(0);

@@ -35,12 +35,13 @@ class AdditionalInfoRepository
     public function update($id, array $data)
     {
         $info = $this->findById($id);
-        
+
         if ($info) {
             $info->update($data);
+
             return $info->fresh();
         }
-        
+
         return null;
     }
 
@@ -50,11 +51,11 @@ class AdditionalInfoRepository
     public function delete($id)
     {
         $info = $this->findById($id);
-        
+
         if ($info) {
             return $info->delete();
         }
-        
+
         return false;
     }
 
@@ -86,12 +87,13 @@ class AdditionalInfoRepository
     public function approve($id)
     {
         $info = $this->findById($id);
-        
+
         if ($info) {
             $info->status = 1;
+
             return $info->save();
         }
-        
+
         return false;
     }
 
@@ -101,12 +103,13 @@ class AdditionalInfoRepository
     public function reject($id)
     {
         $info = $this->findById($id);
-        
+
         if ($info) {
             $info->status = 2;
+
             return $info->save();
         }
-        
+
         return false;
     }
 
@@ -116,13 +119,15 @@ class AdditionalInfoRepository
     public function createOrUpdate($agencyId, array $data)
     {
         $info = $this->getByAgency($agencyId);
-        
+
         if ($info) {
             $info->update($data);
+
             return $info->fresh();
         }
-        
+
         $data['agency_id'] = $agencyId;
+
         return $this->create($data);
     }
 }

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->dropColumn('total_diamond');
             $table->dropColumn('level');
             $table->dropColumn('exp');
-            
+
         });
     }
 };

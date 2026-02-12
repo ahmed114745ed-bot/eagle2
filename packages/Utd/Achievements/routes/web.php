@@ -11,15 +11,15 @@
 |
 */
 
-use Utd\Achievements\Http\Controllers\web\AchievementDedicateController;
-use Utd\Achievements\Http\Controllers\web\AchievementsController;
-use Utd\Achievements\Http\Controllers\web\GiftAchievemntController;
-use Utd\Achievements\Http\Controllers\web\AchievementsLevelsController;
-use Utd\Achievements\Http\Controllers\web\UserAchievementLevelController;
-use Utd\Achievements\Http\Controllers\web\AchievementLevelsModuleController;
-use Utd\Achievements\Http\Controllers\web\UserGiftAchController;
-use Utd\Achievements\Http\Controllers\web\GiftAchiementController;
 use Illuminate\Support\Facades\Route;
+use Utd\Achievements\Http\Controllers\web\AchievementDedicateController;
+use Utd\Achievements\Http\Controllers\web\AchievementLevelsModuleController;
+use Utd\Achievements\Http\Controllers\web\AchievementsController;
+use Utd\Achievements\Http\Controllers\web\AchievementsLevelsController;
+use Utd\Achievements\Http\Controllers\web\GiftAchiementController;
+use Utd\Achievements\Http\Controllers\web\GiftAchievemntController;
+use Utd\Achievements\Http\Controllers\web\UserAchievementLevelController;
+use Utd\Achievements\Http\Controllers\web\UserGiftAchController;
 
 Route::group(
     [
@@ -31,7 +31,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('achievements', AchievementsController::class);

@@ -2,8 +2,9 @@
 
 namespace Utd\Room\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Utd\Room\Services\BackgroundService;
 use Utd\Room\Transformers\BackgroundResource;
@@ -12,8 +13,7 @@ class BackgroundController extends Controller
 {
     public function __construct(
         protected BackgroundService $backgroundService
-    ) {
-    }
+    ) {}
 
     /**
      * Get all enabled backgrounds
@@ -49,7 +49,7 @@ class BackgroundController extends Controller
                 'message' => 'Background updated',
                 'data' => ['room_background' => $room->room_background],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),

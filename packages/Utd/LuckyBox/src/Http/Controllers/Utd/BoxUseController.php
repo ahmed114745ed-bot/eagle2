@@ -17,7 +17,7 @@ class BoxUseController extends Controller
         $result = BoxUse::when($search, function ($q) use ($search) {
             $q->where('id', $search);
         })
-        ->paginate($perPage);
+            ->paginate($perPage);
 
         return Common::apiResponse(true, 'Success', $result);
     }
@@ -41,7 +41,7 @@ class BoxUseController extends Controller
     public function delete_all(Request $request)
     {
         $request->validate([
-            'ids' => 'required'
+            'ids' => 'required',
         ]);
 
         $ids = explode(',', $request->ids);
@@ -54,16 +54,16 @@ class BoxUseController extends Controller
     public function update($id, Request $request)
     {
         $validatedData = $request->validate([
-            'box_id'       => 'required|integer|exists:boxs,id',
-            'user_id'      => 'required|integer|exists:users,id',
-            'coins'        => 'required|integer|min:0',
-            'end_at'       => 'nullable',
-            'room_uid'     => 'nullable',
-            'room_id'      => 'nullable',
-            'users_num'    => 'required|integer|min:0',
-            'type'         => 'nullable|string|max:255',
-            'label'        => 'nullable|string|max:255',
-            'used_num'     => 'required|integer|min:0',
+            'box_id' => 'required|integer|exists:boxs,id',
+            'user_id' => 'required|integer|exists:users,id',
+            'coins' => 'required|integer|min:0',
+            'end_at' => 'nullable',
+            'room_uid' => 'nullable',
+            'room_id' => 'nullable',
+            'users_num' => 'required|integer|min:0',
+            'type' => 'nullable|string|max:255',
+            'label' => 'nullable|string|max:255',
+            'used_num' => 'required|integer|min:0',
             'not_used_num' => 'required|integer|min:0',
         ]);
 

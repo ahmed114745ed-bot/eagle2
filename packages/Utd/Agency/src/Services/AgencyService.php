@@ -2,62 +2,50 @@
 
 namespace Utd\Agency\Services;
 
-use Exception;
-use Carbon\Carbon;
-use App\Models\Role;
-use App\Models\User;
-use App\Models\Admin;
-use App\Models\Agency;
-use App\Helpers\Common;
-use App\Models\LiveTime;
-use App\Helpers\UserCommon;
-use Illuminate\Support\Str;
-use App\Facades\UserHandling;
-use App\Models\AgencyJoinRequest;
-use App\Models\UsersJoinedAgency;
-use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
-use App\Notifications\AcceptAgency;
-use App\Notifications\RefuseAgency;
-use http\Exception\RuntimeException;
-use Illuminate\Support\Facades\Hash;
-use App\Models\MonthlyDiamondReceive;
-use App\Notifications\AgencyOwnerRole;
-use Illuminate\Support\Facades\Storage;
 use App\Exceptions\CValidationException;
-use Utd\Agency\Repositories\UserRepository;
-use Utd\Agency\Repositories\AdminRepository;
-use Utd\Agency\Repositories\AgencyRepository;
-use App\Tik\Repositories\FollowRepository;
-use App\Tik\Repositories\TargetRepository;
-use Modules\Milestones\Entities\Milestone;
-use App\Tik\Repositories\GiftLogRepository;
-use App\Tik\Repositories\HistoryRepository;
-use App\Tik\Repositories\LiveTimeRepository;
-use Illuminate\Support\Facades\Notification;
-use Modules\Reals\Http\Services\RealsService;
-use App\Tik\Repositories\UserSalaryRepository;
-use Illuminate\Validation\ValidationException;
-use Modules\Milestones\Helpers\MilestoneHelper;
-use Utd\Agency\Repositories\AgencySalaryRepository;
-use Utd\Agency\Repositories\ChargeAgencyRepository;
-use Utd\Agency\Repositories\AgencyUserJobRepository;
-use Utd\Agency\Repositories\AdditionalInfoRepository;
-use App\Tik\Repositories\ProfileVisitorRepository;
-use Utd\Agency\Repositories\ShippingAgencyRepository;
-use App\Http\Resources\Api\V1\SenderGiftLogResource;
-use Utd\Agency\Repositories\AgencyJoinRequestRepository;
-use Utd\Agency\Repositories\UsersJoinedAgencyRepository;
-use App\Http\Resources\Api\V1\ReceiverGiftLogResource;
-use Utd\Agency\Repositories\LeaveAgencyRequestRepository;
-use Utd\Agency\Transformers\AgencyHostResource;
+use App\Facades\CustomNotification;
+use App\Facades\UserHandling;
+use App\Helpers\Common;
+use App\Helpers\UserCommon;
 use App\Http\Resources\Api\V1\AgancyCurantMonthResource;
 use App\Http\Resources\Api\V1\AgencyUsersTargetResource;
 use App\Http\Resources\Api\V1\MyDataForAgencyNewResource;
-use Utd\Agency\Transformers\AgencyMonthlyHostResource;
+use App\Models\Admin;
+use App\Models\Agency;
+use App\Models\LiveTime;
+use App\Models\MonthlyDiamondReceive;
+use App\Models\User;
+use App\Models\UsersJoinedAgency;
+use App\Notifications\AcceptAgency;
+use App\Notifications\RefuseAgency;
+use App\Tik\Repositories\FollowRepository;
+use App\Tik\Repositories\GiftLogRepository;
+use App\Tik\Repositories\HistoryRepository;
+use App\Tik\Repositories\LiveTimeRepository;
+use App\Tik\Repositories\ProfileVisitorRepository;
+use App\Tik\Repositories\TargetRepository;
+use App\Tik\Repositories\UserSalaryRepository;
+use Cache;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
+use Log;
+use Modules\Milestones\Helpers\MilestoneHelper;
+use Modules\Reals\Http\Services\RealsService;
 use Utd\Agency\Contracts\AgencyServiceInterface;
-
-
+use Utd\Agency\Repositories\AdditionalInfoRepository;
+use Utd\Agency\Repositories\AdminRepository;
+use Utd\Agency\Repositories\AgencyJoinRequestRepository;
+use Utd\Agency\Repositories\AgencyRepository;
+use Utd\Agency\Repositories\AgencySalaryRepository;
+use Utd\Agency\Repositories\AgencyUserJobRepository;
+use Utd\Agency\Repositories\LeaveAgencyRequestRepository;
+use Utd\Agency\Repositories\ShippingAgencyRepository;
+use Utd\Agency\Repositories\UserRepository;
+use Utd\Agency\Repositories\UsersJoinedAgencyRepository;
+use Utd\Agency\Transformers\AgencyHostResource;
+use Utd\Agency\Transformers\AgencyMonthlyHostResource;
 
 class AgencyService implements AgencyServiceInterface
 {
@@ -80,24 +68,32 @@ class AgencyService implements AgencyServiceInterface
         private readonly AdminRepository $adminRepository,
         private readonly UsersJoinedAgencyRepository $usersJoinedAgencyRepository,
 
-
     ) {}
-
 
     public function joinAgency($user, $request)
     {
         $agencyId = $request->agency_id;
         $agency = $this->agencyRepository->findById($agencyId);
-        if (!$agency) throw new Exception(__('api_responses.agency'));
-        if ($agency->status == 0) throw new \Exception(__('api_responses.agencyDown'));
-        if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
+        if (! $agency) {
+            throw new Exception(__('api_responses.agency'));
+        }
+        if ($agency->status === 0) {
+            throw new Exception(__('api_responses.agencyDown'));
+        }
+        if ($agency->type === 2) {
+            throw new Exception(__('api_responses.shippingAgency'));
+        }
 
         $joined = $user->agency_id;
-        if ($joined) throw new \Exception(__('api_responses.you_are_already_under_agency'));
+        if ($joined) {
+            throw new Exception(__('api_responses.you_are_already_under_agency'));
+        }
         $countRequest = $this->agencyJoinRequestRepository->countByMonth($user->id);
         // if ($countRequest > 5)   throw new \Exception(__('api_responses.you_have_+5_requests_not_allowed_to_request_other_more'));
         $agency_request = $this->agencyJoinRequestRepository->countByAgency($user->id, $agencyId);
-        if ($agency_request > 0)  throw new \Exception(__('api_responses.you_already_send_request_to_this_agency'));
+        if ($agency_request > 0) {
+            throw new Exception(__('api_responses.you_already_send_request_to_this_agency'));
+        }
 
         $data = [
             'user_id' => $user->id,
@@ -116,17 +112,19 @@ class AgencyService implements AgencyServiceInterface
     public function find($agencyId)
     {
         $agency = $this->agencyRepository->findById($agencyId);
-        if (!$agency) throw new Exception(__('api_responses.agency'));
+        if (! $agency) {
+            throw new Exception(__('api_responses.agency'));
+        }
+
         return $agency;
     }
 
     public function gitOldAgencies($userId)
     {
         $user = $this->agencyRepository->gitOldAgencies($userId);
+
         return $user;
     }
-
-
 
     public function agencyTarget($userId, $user, $request)
     {
@@ -147,17 +145,16 @@ class AgencyService implements AgencyServiceInterface
         $minutes = $hours * 60;
         $hasColor = Common::hasInPack(@$user->id, 18, true);
 
-
         return [
             'success' => true,
             'message' => 'successfully',
             'data' => [
                 'user' => [
-                    'days'    => $user->getTotalDays(),
-                    'type'    => $user->type_user,
+                    'days' => $user->getTotalDays(),
+                    'type' => $user->type_user,
                     'minutes' => $minutes,
-                    'image_color'          => @$user->color_image,
-                    'id_image'             => @$user->specialId?->ware?->show_img ?? '',
+                    'image_color' => @$user->color_image,
+                    'id_image' => @$user->specialId?->ware?->show_img ?? '',
                     'colored_name' => $hasColor ? Common::wareUserVip(@$user->id, 18, 'color') ?? '' : '',
                 ],
 
@@ -168,7 +165,6 @@ class AgencyService implements AgencyServiceInterface
             'status' => 200,
         ];
     }
-
 
     public function stars($agencyId, $request)
     {
@@ -197,7 +193,10 @@ class AgencyService implements AgencyServiceInterface
     public function agencyMembers($agencyId)
     {
         $agency = $this->agencyRepository->findById($agencyId);
-        if (!$agency) throw new Exception(__('api_responses.agency'));
+        if (! $agency) {
+            throw new Exception(__('api_responses.agency'));
+        }
+
         return $this->agencyRepository->members($agency);
     }
 
@@ -209,7 +208,9 @@ class AgencyService implements AgencyServiceInterface
         } else {
             $agency = $this->agencyRepository->findAgencyByOwnerId($userId);
         }
-        if (!$agency) throw new Exception('u_not_have_agncy');
+        if (! $agency) {
+            throw new Exception('u_not_have_agncy');
+        }
         $requestList = $this->agencyJoinRequestRepository->getByAgencyId($agency->id);
 
         return $requestList;
@@ -217,9 +218,11 @@ class AgencyService implements AgencyServiceInterface
 
     public function requestAction($owner, $request)
     {
-        $accept    = $request->accept;
+        $accept = $request->accept;
         $user = $this->userRepository->findById($request->user_id);
-        if (!$user) throw new Exception('user not found');
+        if (! $user) {
+            throw new Exception('user not found');
+        }
 
         $admin = $this->agencyUserJobRepository->findByUserId($owner->id);
         if ($admin) {
@@ -227,15 +230,22 @@ class AgencyService implements AgencyServiceInterface
         } else {
             $agency = $this->agencyRepository->findByOwner($owner->id);
         }
-        if (!$agency) throw new Exception('u_not_owner_agncy');
-        if ($agency->type == 2) throw new \Exception(__('api_responses.shippingAgency'));
+        if (! $agency) {
+            throw new Exception('u_not_owner_agncy');
+        }
+        if ($agency->type === 2) {
+            throw new Exception(__('api_responses.shippingAgency'));
+        }
 
-        if ($user->agency_id) throw new Exception(__('user joined agency before'));
+        if ($user->agency_id) {
+            throw new Exception(__('user joined agency before'));
+        }
 
         $action = $this->agencyJoinRequestRepository->findRequest($user->id, $agency->id);
 
-
-        if (!$action) throw new Exception('Request not found');
+        if (! $action) {
+            throw new Exception('Request not found');
+        }
 
         if ($accept === 0 || $accept === false) {
             $action->status = 2;
@@ -245,17 +255,19 @@ class AgencyService implements AgencyServiceInterface
             $action->status = 1;
             $action->save();
             $this->userRepository->update(['agency_id' => $agency->id], $user->id);
-            $userMonthlyDiamond =  MonthlyDiamondReceive::where('user_id', $user->id)->where('month', now()->month)->where('year', now()->year)->first();
-            if ($userMonthlyDiamond) $userMonthlyDiamond->update(['monthly_diamond_received' => 0]);
+            $userMonthlyDiamond = MonthlyDiamondReceive::where('user_id', $user->id)->where('month', now()->month)->where('year', now()->year)->first();
+            if ($userMonthlyDiamond) {
+                $userMonthlyDiamond->update(['monthly_diamond_received' => 0]);
+            }
             $this->userRepository->updateTypeUser($user);
             // $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
             // if (!$checkAgencyUser) {
             $joinAgencyData = [
-                'user_id' =>  $user->id,
+                'user_id' => $user->id,
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
-                'status' => 'Joined'
+                'status' => 'Joined',
             ];
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
             // }
@@ -264,6 +276,7 @@ class AgencyService implements AgencyServiceInterface
             CustomNotification::acceptAgencyApp($agency, $user);
             MilestoneHelper::grantMilestoneToUser($user, 'host');
         }
+
         return true;
     }
 
@@ -271,13 +284,13 @@ class AgencyService implements AgencyServiceInterface
     {
         $agency = $this->agencyRepository->getWithSelectMonthAndYear($agencyId);
 
-        $createdAt   = $agency->created_at;
+        $createdAt = $agency->created_at;
         $currentDate = now();
 
         $monthsToInclude = [];
         while ($createdAt <= $currentDate) {
             $month = $createdAt->format('m');
-            $year  = $createdAt->format('Y');
+            $year = $createdAt->format('Y');
 
             // Only add if the month and year are not the same as the current date
             if ($month !== $currentDate->format('m') || $year !== $currentDate->format('Y')) {
@@ -300,46 +313,45 @@ class AgencyService implements AgencyServiceInterface
         return $monthsToInclude;
     }
 
-
     public function historySearch($agencyId, $request)
     {
-        $month        = $request->month;
-        $year         = $request->year;
+        $month = $request->month;
+        $year = $request->year;
         $CurrentMonth = date('m'); // Get the current month as a two-digit number (e.g., 08 for August)
-        $CurrentYear  = date('Y');
-        if ($CurrentYear == $year && $CurrentMonth == $month) {
+        $CurrentYear = date('Y');
+        if ($CurrentYear === $year && $CurrentMonth === $month) {
             $perPage = 15;                 // Number of items per page
-            $page    = request('page', 1); // Get the current page number from the request, default to 1
+            $page = request('page', 1); // Get the current page number from the request, default to 1
             $dataQuery = $this->userRepository->findUsersByAgencyIdI($agencyId);
             $paginatedData = $dataQuery->paginate($perPage, ['*'], 'page', $page);
-            $data =  $dataQuery->with('userSallary')->get();
+            $data = $dataQuery->with('userSallary')->get();
             $totalDiamond = $data->sum('monthly_diamond_received');
         } else {
             $data = $this->historyRepository->getByMonthAndYear($agencyId, $month, $year);
             $totalDiamond = $data->sum('diamond');
             $perPage = 15;                 // Number of items per page
-            $page    = request('page', 1); // Get the current page number from the request, default to 1
-            $paginatedData   = $data->paginate($perPage, ['*'], 'page', $page);
+            $page = request('page', 1); // Get the current page number from the request, default to 1
+            $paginatedData = $data->paginate($perPage, ['*'], 'page', $page);
         }
         $transformedData = AgancyCurantMonthResource::collection($paginatedData);
 
-        $target   = $this->userSalaryRepository->getSumByMonthAndYear($agencyId, $month, $year, 'agency_sallary');
+        $target = $this->userSalaryRepository->getSumByMonthAndYear($agencyId, $month, $year, 'agency_sallary');
 
         $minValue = $this->targetRepository->getByUsd($target);
 
-
         $totalusd = $this->userSalaryRepository->getSumByMonthAndYear($agencyId, $month, $year, 'sallary');
-        $total    = (@$minValue->agency_share / 100) * $totalusd;
+        $total = (@$minValue->agency_share / 100) * $totalusd;
 
         $agencySalary = $this->agencySalaryRepository->findByMonthAndYear($agencyId, $month, $year);
         $total = $agencySalary?->sallary ?? 0;
         $responseData = [
-            'sum'             => $totalDiamond ?: 0,
+            'sum' => $totalDiamond ?: 0,
             'sum_usd' => $totalusd ?: 0, // 'owner_usd' => $curant?:0,
             'Total_owner_usd' => $total ?: 0,
             'users' => $transformedData ?: 0,
 
         ];
+
         return $responseData;
     }
 
@@ -347,20 +359,23 @@ class AgencyService implements AgencyServiceInterface
     {
 
         $agency = $this->agencyRepository->findById($agencyId);
-        if (!$agency) throw new Exception(__('api_responses.agency'));
+        if (! $agency) {
+            throw new Exception(__('api_responses.agency'));
+        }
 
-        if ($agency->app_owner_id != $userId)  throw new Exception(__('api_responses.agency_app_owner'));
+        if ($agency->app_owner_id !== $userId) {
+            throw new Exception(__('api_responses.agency_app_owner'));
+        }
 
-
-        if ($request->name != null) {
+        if ($request->name !== null) {
             $agency->name = $request->name;
         }
 
-        if ($request->contents != null) {
+        if ($request->contents !== null) {
             $agency->contents = $request->contents;
         }
 
-        if ($request->get('content') != null) {
+        if ($request->get('content') !== null) {
             $agency->notice = $request->get('content');
         }
 
@@ -382,18 +397,19 @@ class AgencyService implements AgencyServiceInterface
     public function userHandlingRequest($userId, $agencyId, $type = null)
     {
         $operator = $this->userRepository->findById($userId);
-        if (!$operator) {
+        if (! $operator) {
             throw new CValidationException(__('User not found'));
         }
         // if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
 
-        if (!empty($type) && $type == 'remove') {
+        if (! empty($type) && $type === 'remove') {
             $this->agencyUserJobRepository->deleteAdmin($operator->id, $agencyId);
             $tokens_notfacion[] = $operator->notification_id;
             $title = $operator->name;
             $body = 'تم ازالتك من مشرفين الوكالة';
             $type = $message->type ?? 'text';
             CustomNotification::agencyRemoveAdmin($agencyId, $operator);
+
             return 'تم ازالة  المستخدم بنجاح';
         }
 
@@ -404,7 +420,7 @@ class AgencyService implements AgencyServiceInterface
         $data = [
             'agency_id' => $agencyId,
             'user_id' => $operator->id,
-            'type' => "requestManger",
+            'type' => 'requestManger',
         ];
         $this->agencyUserJobRepository->create($data);
         CustomNotification::agencyAddAdmin($agencyId, $operator);
@@ -416,7 +432,9 @@ class AgencyService implements AgencyServiceInterface
     {
         $operator = $this->userRepository->findById($userId);
 
-        if ($agencyId != $operator->agency_id) throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
+        if ($agencyId !== $operator->agency_id) {
+            throw new CValidationException('يجب ان يكون المستخدم في الوكاله!');
+        }
 
         if ($this->agencyUserJobRepository->exists($userId, $agencyId)) {
             throw new CValidationException(__('This user already has an agency job requested!'));
@@ -425,21 +443,25 @@ class AgencyService implements AgencyServiceInterface
         $data = [
             'agency_id' => $agencyId,
             'user_id' => $operator->id,
-            'type' => "requestManger",
+            'type' => 'requestManger',
         ];
         $this->agencyUserJobRepository->create($data);
+
         return true;
     }
-
 
     public function create($userId, $request)
     {
         $checkAgency = $this->agencyRepository->findAgencyByOwnerId($userId, 0);
-        if ($checkAgency)   throw new Exception('لقد قمت بتقديم طلب من قبل ولم يتم اتخاذ اي اجراء فيه!');
+        if ($checkAgency) {
+            throw new Exception('لقد قمت بتقديم طلب من قبل ولم يتم اتخاذ اي اجراء فيه!');
+        }
 
-        $checkUserAgency =  $this->agencyRepository->findAgencyByOwnerId($userId, 1);
+        $checkUserAgency = $this->agencyRepository->findAgencyByOwnerId($userId, 1);
 
-        if ($checkUserAgency) throw new Exception('انت تملك وكاله بالفعل');
+        if ($checkUserAgency) {
+            throw new Exception('انت تملك وكاله بالفعل');
+        }
 
         if ($request->hasFile('img')) {
             $img = $request->file('img');
@@ -468,14 +490,14 @@ class AgencyService implements AgencyServiceInterface
         $user = $this->userRepository->searchUser($request->user_id);
 
         if ($request->hasFile('video')) {
-            $data        = $request->file('video');
+            $data = $request->file('video');
             $video = RealsService::upload($data);
         }
         $dataInfo = [
             'agency_id' => $agency->id,
             'gmail' => $request->input('email'),
             'status' => 0,
-            'face_image_nationalId' =>  $face_image_nationalId ?? '',
+            'face_image_nationalId' => $face_image_nationalId ?? '',
             'back_image_nationalId' => $back_image_nationalId ?? '',
             'country' => $request->input('country'),
             'history_app_info' => $request->input('apps'),
@@ -483,27 +505,31 @@ class AgencyService implements AgencyServiceInterface
             'host' => $request->input('host'),
             'user_id' => $user->id ?? null,
             'video' => $video ?? null,
-            'owner_id' =>  $request->user()->id,
+            'owner_id' => $request->user()->id,
         ];
         $this->additionalInfoRepository->create($dataInfo);
         $agencyWithAdditionalInfo = $this->agencyRepository->findById($agency->id);
+
         return $agencyWithAdditionalInfo;
     }
 
     public function actionRequestAgency($request)
     {
         $agency = $this->agencyRepository->findById($request->agency_id);
-        if (!$agency)  throw new Exception('agency not found');
+        if (! $agency) {
+            throw new Exception('agency not found');
+        }
         $user = $this->userRepository->findById($agency->app_owner_id);
 
-        if ($request->status != 1) {
+        if ($request->status !== 1) {
 
             if ($agency->additionalInfo->gmail) {
-                Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new RefuseAgency());
+                Notification::route('mail', $agency->additionalInfo->gmail)->notify(new RefuseAgency());
             }
             $agency->delete();
 
             CustomNotification::refuseRequestAgency($user);
+
             return true;
         }
         $this->agencyRepository->updateStatus($agency, $request->status);
@@ -513,7 +539,7 @@ class AgencyService implements AgencyServiceInterface
         $additionalInfo->save();
 
         // type = 1 means host agency, type = 2 means shipping agency
-        if ($agency->type == 1) {
+        if ($agency->type === 1) {
             $user->type_user = 2;
             $user->agency_id = $agency->id;
             $user->is_host = 1;
@@ -521,13 +547,13 @@ class AgencyService implements AgencyServiceInterface
             uploadMonthlyDiamondReceive($user->id, 0);
         }
         if ($agency->additionalInfo->gmail) {
-            Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
+            Notification::route('mail', $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
-        ///  Common::createUserAdmin($agency->app_owner_id);
+        // /  Common::createUserAdmin($agency->app_owner_id);
         $checkAgencyUser = $this->usersJoinedAgencyRepository->exist($user->id, $agency->id);
-        if (!$checkAgencyUser) {
+        if (! $checkAgencyUser) {
             $joinAgencyData = [
-                'user_id' =>  $user->id,
+                'user_id' => $user->id,
                 'agency_id' => $agency->id,
                 'type' => 1,
                 'join_date' => now(),
@@ -535,6 +561,7 @@ class AgencyService implements AgencyServiceInterface
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
         }
         CustomNotification::acceptRequestAgency($user);
+
         return true;
     }
 
@@ -554,25 +581,24 @@ class AgencyService implements AgencyServiceInterface
         $total_hours = 0;
         $total_diamonds = 0;
         for ($date = $startDate; $date->lessThanOrEqualTo($endDate); $date->addDay()) {
-            $day        = $this->liveTimeRepository->sumDays($user->id, $startDate, $endDate, $date->toDateString());
-            $hour       = $this->liveTimeRepository->SumHours($user->id, $startDate, $endDate, $date->toDateString());
+            $day = $this->liveTimeRepository->sumDays($user->id, $startDate, $endDate, $date->toDateString());
+            $hour = $this->liveTimeRepository->SumHours($user->id, $startDate, $endDate, $date->toDateString());
 
-            $diamond    = $this->giftLogRepository->sumGiftPriceByReceiver($user->id, $startDate, $endDate, $date->toDateString());
-
+            $diamond = $this->giftLogRepository->sumGiftPriceByReceiver($user->id, $startDate, $endDate, $date->toDateString());
 
             $total_days += $day;
             $total_hours += $hour;
             $total_diamonds += $diamond;
             $data[] = [
-                'date'      =>  $day,
-                'days'      =>  $day,
-                'hours'     =>  $hour,
-                'diamonds'  =>  $diamond,
+                'date' => $day,
+                'days' => $day,
+                'hours' => $hour,
+                'diamonds' => $diamond,
             ];
         }
         $data[] = [
-            'total_days'    => $total_days,
-            'total_hours'   => $total_hours,
+            'total_days' => $total_days,
+            'total_hours' => $total_hours,
             'total_diamonds' => $total_diamonds,
         ];
 
@@ -581,41 +607,44 @@ class AgencyService implements AgencyServiceInterface
 
     public function agencyReport($agencyId)
     {
-        $userIds      = $this->userRepository->getIdsByAgencyId($agencyId);
+        $userIds = $this->userRepository->getIdsByAgencyId($agencyId);
 
         [$diamonds, $days, $hours, $visitors, $follows, $friends] = $this->details($userIds);
 
-        return  $data = [
-            'diamonds'    =>  $diamonds,
-            'hours'       =>  $hours,
-            'days'        =>  $days,
-            'visitors'    =>  $visitors,
-            'friends'     =>  $friends,
-            'follows'     =>  $follows,
+        return $data = [
+            'diamonds' => $diamonds,
+            'hours' => $hours,
+            'days' => $days,
+            'visitors' => $visitors,
+            'friends' => $friends,
+            'follows' => $follows,
         ];
     }
 
     public function details($userIds)
     {
-        $diamonds   = $this->giftLogRepository->totalUsersGiftPrice($userIds);
-        $days       = $this->liveTimeRepository->totalUsersHoursDays($userIds, 'days');
+        $diamonds = $this->giftLogRepository->totalUsersGiftPrice($userIds);
+        $days = $this->liveTimeRepository->totalUsersHoursDays($userIds, 'days');
 
-        $hours       = $this->liveTimeRepository->totalUsersHoursDays($userIds, 'hours');
-        $visitors   = $this->profileVisitorRepository->countUsersByYearAbdMonth($userIds);
-        $follows    = $this->followRepository->countFollows($userIds);
-        $friends    =  $this->followRepository->countFriends($userIds);
+        $hours = $this->liveTimeRepository->totalUsersHoursDays($userIds, 'hours');
+        $visitors = $this->profileVisitorRepository->countUsersByYearAbdMonth($userIds);
+        $follows = $this->followRepository->countFollows($userIds);
+        $friends = $this->followRepository->countFriends($userIds);
+
         return [$diamonds, $days, $hours, $visitors, $follows, $friends];
     }
 
     public function leaveAgency($userId, $agency)
     {
         $check = $this->leaveAgencyRequestRepository->getOldRequest($agency->id, $userId);
-        if ($check) throw new Exception("هناك طلب من قبل !");
+        if ($check) {
+            throw new Exception('هناك طلب من قبل !');
+        }
         $data = [
-            'agency_id' =>  $agency->id,
-            'user_id'   =>  $userId,
-            'admin_id'  =>  $agency->owner_id,
-            'status'    =>  0,
+            'agency_id' => $agency->id,
+            'user_id' => $userId,
+            'admin_id' => $agency->owner_id,
+            'status' => 0,
         ];
         $this->leaveAgencyRequestRepository->create($data);
         $userJoin = $this->usersJoinedAgencyRepository->findByUser($userId, $agency->id);
@@ -625,7 +654,7 @@ class AgencyService implements AgencyServiceInterface
             $userJoin->save();
         } else {
             $joinAgencyData = [
-                'user_id' =>  $userId,
+                'user_id' => $userId,
                 'agency_id' => $agency->id,
                 'type' => 2,
                 'join_date' => now(),
@@ -634,6 +663,7 @@ class AgencyService implements AgencyServiceInterface
             ];
             $this->usersJoinedAgencyRepository->create($joinAgencyData);
         }
+
         return true;
     }
 
@@ -641,25 +671,35 @@ class AgencyService implements AgencyServiceInterface
     {
         $operator = $this->userRepository->findById($userId);
 
-        if ($agencyId != $operator->agency_id) throw new Exception('يجب ان يكون المستخدم في الوكاله!');
+        if ($agencyId !== $operator->agency_id) {
+            throw new Exception('يجب ان يكون المستخدم في الوكاله!');
+        }
         $data = [
             'agency_id' => $agencyId,
             'user_id' => $operator->id,
-            'type' => "requestManger",
+            'type' => 'requestManger',
         ];
         $this->agencyUserJobRepository->create($data);
+
         return true;
     }
 
     public function kickAgency($auth, $userId)
     {
         $user_kicked = $this->userRepository->searchUserById($userId);
-        if (!$user_kicked) throw new Exception('user not found');
-        if ($user_kicked->agency_id != $auth->ownAgency->id || $user_kicked->id == $auth->ownAgency->app_owner_id) throw new Exception('لا يمكنك ازاله هذا المستخدم!');
+        if (! $user_kicked) {
+            throw new Exception('user not found');
+        }
+        if ($user_kicked->agency_id !== $auth->ownAgency->id || $user_kicked->id === $auth->ownAgency->app_owner_id) {
+            throw new Exception('لا يمكنك ازاله هذا المستخدم!');
+        }
         UserHandling::kickUserFromAgency($user_kicked, 1);
-        $joinedAgency = UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
-        if ($joinedAgency) UsersJoinedAgency::where(['agency_id' =>   $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
+        $joinedAgency = UsersJoinedAgency::where(['agency_id' => $user_kicked->agency_id, 'user_id' => $user_kicked->id])->first();
+        if ($joinedAgency) {
+            UsersJoinedAgency::where(['agency_id' => $user_kicked->agency_id, 'user_id' => $user_kicked->id])->update(['leave_date' => now(), 'status' => 'kicked off']);
+        }
         MilestoneHelper::removeReward($user_kicked, 'host');
+
         return true;
     }
 
@@ -668,53 +708,53 @@ class AgencyService implements AgencyServiceInterface
         $agencies = $this->agencyRepository->getAgencyByFilter($keyword);
 
         $agencyManger = $this->userRepository->getAgencyMangerByFilter($keyword);
+
         return [$agencies, $agencyManger];
     }
 
     public function dailyReport($user, $month, $year, $agencyId = null)
     {
-        \Log::info('[AgencyService::dailyReport] START', [
+        Log::info('[AgencyService::dailyReport] START', [
             'user_id' => $user->id,
             'month' => $month,
             'year' => $year,
             'agencyId_param' => $agencyId,
             'user_agency_id' => $user->agency_id,
         ]);
-        
+
         $timezone = Common::timeZone();
-        
+
         // Check if user is owner of an agency
         $owner = Agency::where('app_owner_id', $user->id)->where('status', 1)->first();
-        \Log::info('[AgencyService::dailyReport] Owner check', [
+        Log::info('[AgencyService::dailyReport] Owner check', [
             'owner_found' => $owner ? true : false,
             'owner_id' => $owner?->id,
         ]);
-        
+
         // Check if user is member (joined) of an agency
         $member = UsersJoinedAgency::where('user_id', $user->id)
             ->where('agency_id', $agencyId ?? $user->agency_id)
             ->first();
-        \Log::info('[AgencyService::dailyReport] Member check', [
+        Log::info('[AgencyService::dailyReport] Member check', [
             'member_found' => $member ? true : false,
             'member_agency_id' => $member?->agency_id,
             'searched_agency_id' => $agencyId ?? $user->agency_id,
         ]);
-        
+
         $joinedAgency = $owner ?? $member;
         if (! $joinedAgency) {
-            \Log::warning('[AgencyService::dailyReport] No joined agency found - returning empty array');
+            Log::warning('[AgencyService::dailyReport] No joined agency found - returning empty array');
+
             return [];
         }
-        
-        \Log::info('[AgencyService::dailyReport] Joined agency found, continuing...');
-        
-        
+
+        Log::info('[AgencyService::dailyReport] Joined agency found, continuing...');
+
         $joinRecord = $member;
 
         $timezone = getTimezone();
         //        $firstDay = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
         $nowInTimezone = Carbon::now($timezone);
-
 
         [$startOfMonth, $endOfMonth] = Carbon::startAndEndOfMonthUTC($year, $month, $timezone);
 
@@ -725,14 +765,10 @@ class AgencyService implements AgencyServiceInterface
             $joinRecord
         );
 
-
-
         $reportStart = 1;
-
 
         $isThisMonth = $month === $nowInTimezone->month && $year === $nowInTimezone->year;
         $endDay = $isThisMonth ? $nowInTimezone->day : $endOfMonth->day;
-
 
         // $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth)) ? $joinedDate : $startOfMonth;
         // $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth)) ? $leaveDate : $endOfMonth;
@@ -740,20 +776,22 @@ class AgencyService implements AgencyServiceInterface
         $dailyTimes = $this->liveTimeRepository->getByDaily($user->id, $startDate, $endDate);
 
         $dailyDiamonds = $dailyDiamonds->map(function ($data) use ($timezone) {
-            //$data->day = Carbon::parse($data->date)->day;
+            // $data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+
             return $data;
         });
         $dailyTimes = $dailyTimes->map(function ($data) use ($timezone) {
             // $data->day = Carbon::parse($data->date)->day;
             $data->day = Carbon::parse($data->date, 'UTC')->setTimezone($timezone)->day;
+
             return $data;
         });
 
         $totalDays = $user->getTotalDaysJoinedAgency($startDate);
 
         $saMonth = ltrim($month, '0');
-        $userInfoArray =  $user->getSallaryInfoByMonth2($saMonth, $year, $agencyId);
+        $userInfoArray = $user->getSallaryInfoByMonth2($saMonth, $year, $agencyId);
 
         $totalSalary = @$userInfoArray['total_salary'] ?? 0;
         $totalCutAmount = @$userInfoArray['total_cut_amount'] ?? 0;
@@ -770,20 +808,18 @@ class AgencyService implements AgencyServiceInterface
 
         $formatted = sprintf('%02d:%02d:%02d', $hours, $minutesPart, $secondsPart);
 
-
-
         $data = [
             'user_salary' => [
-                'cut_amount' => (int)$totalCutAmount,
-                'salary' => doubleval($totalSalary),
+                'cut_amount' => (int) $totalCutAmount,
+                'salary' => (float) $totalSalary,
             ],
             'request_leave_agency' => $this->leaveAgencyRequestRepository->getRequest($user->id, $agencyId),
             'diamonds' => numToStringNew($dailyDiamonds->sum('diamonds')),
-            'live_minutes' => (string)$formatted,
-            'active_days' => (string)$totalDays,
-            'daly_reports' => []
+            'live_minutes' => (string) $formatted,
+            'active_days' => (string) $totalDays,
+            'daly_reports' => [],
         ];
-        $hours_days = \Cache::get('hours_days') ?? 2;
+        $hours_days = Cache::get('hours_days') ?? 2;
 
         for ($startDay = $reportStart; $startDay <= $endDay; $startDay++) {
 
@@ -797,17 +833,13 @@ class AgencyService implements AgencyServiceInterface
 
             $dailyFormatted = sprintf('%02d:%02d:%02d', $dailyHoursPart, $dailyMinutesPart, $dailySecondsPart);
 
-
             $diamonds = $dailyDiamonds->where('day', $startDay)->first()?->diamonds ?? 0;
-
-
-
 
             $data['daly_reports'][] = [
                 'day' => sprintf('%02d-%02d', $startDay, $month),
-                'live_minutes' => (int)$dailyMinutes,
-                'live_minutes_formatted' => (string)$dailyFormatted,
-                'diamonds' => numToString((int)$diamonds),
+                'live_minutes' => (int) $dailyMinutes,
+                'live_minutes_formatted' => (string) $dailyFormatted,
+                'diamonds' => numToString((int) $diamonds),
                 'is_active_day' => $dailyHours >= $hours_days,
 
             ];
@@ -816,47 +848,22 @@ class AgencyService implements AgencyServiceInterface
         return $data;
     }
 
-
-    protected function getReportDateRange($year, $month, $timezone, $joinRecord)
-    {
-        $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
-        $startOfMonth  = $firstDayLocal->copy()->startOfDay();
-        $endOfMonth    = $firstDayLocal->copy()->endOfMonth()->endOfDay();
-
-        if ($joinRecord) {
-            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
-
-            $leaveDate  = $joinRecord->leave_date
-                ? Carbon::parse($joinRecord->leave_date, $timezone)
-                : $endOfMonth;
-        } else {
-            $joinedDate = null;
-            $leaveDate  = $endOfMonth;
-        }
-
-        $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
-            ? $joinedDate
-            : $startOfMonth;
-
-        $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
-            ? $leaveDate
-            : $endOfMonth;
-
-        return [$startDate, $endDate, $joinedDate, $leaveDate];
-    }
-
     public function dataAgency()
     {
         $user = $this->get_user(request());
-        if (!$user)  throw new Exception('لا يوجد مستخدم!');
+        if (! $user) {
+            throw new Exception('لا يوجد مستخدم!');
+        }
 
-        if (!$user->ownAgency)  throw new Exception('هذا المستخدم لا يمتلك وكاله!');
+        if (! $user->ownAgency) {
+            throw new Exception('هذا المستخدم لا يمتلك وكاله!');
+        }
         $agency = $this->agencyRepository->findById($user->agency_id);
-        $userIds    = $this->agencyRepository->userMembers($agency);
+        $userIds = $this->agencyRepository->userMembers($agency);
 
         [$diamonds, $days, $hours, $visitors, $follows, $friends] = $this->details($userIds);
 
-        $hosts = $agency->mempers->where("type_user", '!=', 0);
+        $hosts = $agency->mempers->where('type_user', '!=', 0);
         if (request('host_id')) {
             $hosts = $hosts->where('id', request('host_id'));
         }
@@ -867,44 +874,49 @@ class AgencyService implements AgencyServiceInterface
         $last_salary = $agency->last_month_salary;
         $current_salary = $agency->agencySalary ? $agency->agencySalary->sum(\DB::raw('sallary - cut_amount')) : 0;
 
-        $total_hosts_achieve = $this->userSalaryRepository->sum($hosts->pluck("id")->toArray(), 'sallary');
+        $total_hosts_achieve = $this->userSalaryRepository->sum($hosts->pluck('id')->toArray(), 'sallary');
 
-        $total_hosts_percentages = $this->userSalaryRepository->sum($hosts->pluck("id")->toArray(), 'agency_sallary');
+        $total_hosts_percentages = $this->userSalaryRepository->sum($hosts->pluck('id')->toArray(), 'agency_sallary');
 
         return [
-            'id'                =>  $agency->id,
-            'name'              =>  $agency->name,
-            'notice'            =>  $agency->notice,
-            'status'            =>  $agency->status,
-            'phone'             =>  $agency->phone,
-            'url'               =>  $agency->url,
-            'img'               =>  $agency->img,
-            'contents'          =>  $agency->contents,
-            'diamonds'          =>  $diamonds,
-            'hours'             =>  $hours,
-            'days'              =>  $days,
-            'visitors'          =>  $visitors,
-            'friends'           =>  $friends,
-            'follows'           =>  $follows,
-            'total_profit'      =>  $agency->getTotalSallaryAgency(),
-            'total_salary'      =>  $totalSalary,
-            'last_salary'       =>  $last_salary,
-            'current_salary'    =>  $current_salary,
-            'host_sallary'    =>  $total_hosts_achieve,
-            'host_percentage'    =>  $total_hosts_percentages,
-            'hosts'             =>  $AllHosts,
-            'monthly_hosts'     =>  $month_hosts,
+            'id' => $agency->id,
+            'name' => $agency->name,
+            'notice' => $agency->notice,
+            'status' => $agency->status,
+            'phone' => $agency->phone,
+            'url' => $agency->url,
+            'img' => $agency->img,
+            'contents' => $agency->contents,
+            'diamonds' => $diamonds,
+            'hours' => $hours,
+            'days' => $days,
+            'visitors' => $visitors,
+            'friends' => $friends,
+            'follows' => $follows,
+            'total_profit' => $agency->getTotalSallaryAgency(),
+            'total_salary' => $totalSalary,
+            'last_salary' => $last_salary,
+            'current_salary' => $current_salary,
+            'host_sallary' => $total_hosts_achieve,
+            'host_percentage' => $total_hosts_percentages,
+            'hosts' => $AllHosts,
+            'monthly_hosts' => $month_hosts,
         ];
     }
 
     public function hostReport($id)
     {
         $user = $this->get_user(request());
-        if (!$user)  throw new Exception('لا يوجد مستخدم!');
+        if (! $user) {
+            throw new Exception('لا يوجد مستخدم!');
+        }
         $host = $this->userRepository->findById($id);
-        if (!$host)  throw new Exception('لا يوجد هذا المضيف!');
-        if ($host->agency_id != $user->agency_id)  throw new Exception('هذا المستخدم ليس في وكالتك!');
-
+        if (! $host) {
+            throw new Exception('لا يوجد هذا المضيف!');
+        }
+        if ($host->agency_id !== $user->agency_id) {
+            throw new Exception('هذا المستخدم ليس في وكالتك!');
+        }
 
         $today = Carbon::today();
         $previousMonth = $today->subMonth();
@@ -915,7 +927,7 @@ class AgencyService implements AgencyServiceInterface
         if ($userSalary) {
             $stringWithoutSpaces = str_replace(' ', '', $userSalary->diamond);
             $parts = explode('/', $stringWithoutSpaces);
-            $last_month_di = intval($parts[0]);
+            $last_month_di = (int) ($parts[0]);
         }
 
         $start_date = now()->startOfMonth();
@@ -935,40 +947,43 @@ class AgencyService implements AgencyServiceInterface
                 $total_total_hours += $hours;
             }
             $diamonds = $this->giftLogRepository->getByDate($host->id, $date);
-            $total_diamonds +=  $diamonds?->total ?? 0;
+            $total_diamonds += $diamonds?->total ?? 0;
             $dAilyReport[] = [
-                'date'          => $date->toDateString(),
-                'total_hours'   => $hours,
-                'total_days'    => $days,
-                'diamond'    => $diamonds?->total ?? 0,
+                'date' => $date->toDateString(),
+                'total_hours' => $hours,
+                'total_days' => $days,
+                'diamond' => $diamonds?->total ?? 0,
             ];
         }
-
 
         return [
             'monthly_diamond' => $host->monthly_diamond_received,
             'last_month_diamond' => $last_month_di,
             'date_of_join' => $joinDate,
-            'last_active' =>  Carbon::parse($host->online_time)->toDateTimeString(),
-            'days' =>  $days,
-            'total_hours' =>  $total_total_hours,
-            'total_diamonds' =>  $total_diamonds,
-            'dailyReport' =>  $dAilyReport,
+            'last_active' => Carbon::parse($host->online_time)->toDateTimeString(),
+            'days' => $days,
+            'total_hours' => $total_total_hours,
+            'total_diamonds' => $total_diamonds,
+            'dailyReport' => $dAilyReport,
             'host' => [
                 'id' => $host->id,
                 'uuid' => $host->uuid,
                 'name' => $host->name,
                 'img' => $host->profile->avatar,
-            ]
+            ],
         ];
     }
 
     public function hostDailyReport($request)
     {
         $user = $this->get_user($request);
-        if (!$user)  throw new Exception('لا يوجد مستخدم!');
+        if (! $user) {
+            throw new Exception('لا يوجد مستخدم!');
+        }
 
-        if (!$user->agency)  throw new Exception('لا تملك وكاله!');
+        if (! $user->agency) {
+            throw new Exception('لا تملك وكاله!');
+        }
 
         $hosts = $this->userRepository->getByHost($user->agency_id, $request->host_id);
 
@@ -978,8 +993,12 @@ class AgencyService implements AgencyServiceInterface
     public function editAgency($request)
     {
         $user = $this->get_user(request());
-        if (!$user)  throw new Exception('لا يوجد مستخدم!');
-        if (!$user->ownAgency)  throw new Exception('هذا المستخدم لا يمتلك وكاله!');
+        if (! $user) {
+            throw new Exception('لا يوجد مستخدم!');
+        }
+        if (! $user->ownAgency) {
+            throw new Exception('هذا المستخدم لا يمتلك وكاله!');
+        }
         $agency = $this->agencyRepository->findById($user->agency_id);
         $data = [
             'name' => $request->name,
@@ -987,16 +1006,15 @@ class AgencyService implements AgencyServiceInterface
             'phone' => $request->phone,
         ];
         $this->agencyRepository->update($data, $agency->id);
+
         return $agency;
     }
-
-
 
     public function get_user($request)
     {
         if ($request->user_id) {
             $admin = $this->adminRepository->findById($request->user()->id);
-            if (isset($admin) && $admin->isRole("admin")) {
+            if (isset($admin) && $admin->isRole('admin')) {
                 $user = $this->userRepository->findById($request->user_id);
             } else {
                 $user = null;
@@ -1004,6 +1022,7 @@ class AgencyService implements AgencyServiceInterface
         } else {
             $user = $this->userRepository->findById($request->user()->id);
         }
+
         return $user;
     }
 
@@ -1017,17 +1036,17 @@ class AgencyService implements AgencyServiceInterface
             $agency = $this->agencyRepository->getAgencyByOwnerId($user->id);
         }
 
-        if (!$agency) {
+        if (! $agency) {
             return Common::apiResponse(0, __('api_responses.notAdmin'));
         }
 
         $agency_id = $agency->id;
         $list_req = $this->agencyRepository->getJoinRequests($agency_id);
 
-        if ($type == "application") {
+        if ($type === 'application') {
             $list_req1 = $list_req->where('status', 0)->with('user')->get();
             $list_req = MyDataForAgencyNewResource::collection($list_req1, 'application');
-        } elseif ($type == "record") {
+        } elseif ($type === 'record') {
             $list_req = $list_req->where('status', '!=', 0)->with('user', 'admin')->get();
             $list_req = MyDataForAgencyNewResource::collection($list_req, 'record');
         }
@@ -1068,6 +1087,7 @@ class AgencyService implements AgencyServiceInterface
         ];
         $this->userRepository->update($data, $agency->app_owner_id);
         $agency->delete();
+
         return true;
     }
 
@@ -1075,6 +1095,7 @@ class AgencyService implements AgencyServiceInterface
     {
         $this->userRepository->changeAgencyForHost($oldAgencyId, $newAgencyId);
         $this->userSalaryRepository->changeAgencyId($oldAgencyId, $newAgencyId);
+
         return true;
     }
 
@@ -1101,22 +1122,23 @@ class AgencyService implements AgencyServiceInterface
             // 'Shipping_agency' => $request->Shipping_agency,
         ];
 
-        $agency =  $this->agencyRepository->create($data);
-        //Common::createUserAdmin($request->app_owner_id);
+        $agency = $this->agencyRepository->create($data);
+        // Common::createUserAdmin($request->app_owner_id);
 
-        if ($request->type == 1) {
+        if ($request->type === 1) {
 
             $userType = 2;
-        } elseif ($request->type == 2) {
+        } elseif ($request->type === 2) {
             $userType = 3;
         }
 
         $data = [
-            'agency_id' =>  $agency->id,
+            'agency_id' => $agency->id,
             'type_user' => $userType,
             'monthly_diamond_received' => 0,
         ];
         $this->userRepository->update($data, $request->app_owner_id);
+
         return true;
     }
 
@@ -1125,7 +1147,7 @@ class AgencyService implements AgencyServiceInterface
 
         $agency = $this->agencyRepository->findOrFail($id);
 
-        if ($agency->app_owner_id != $request->app_owner_id) {
+        if ($agency->app_owner_id !== $request->app_owner_id) {
             $data = [
                 'agency_id' => 0,
                 'type_user' => 0,
@@ -1134,18 +1156,18 @@ class AgencyService implements AgencyServiceInterface
             $this->userRepository->update($data, $agency->app_owner_id);
             $user = User::find($agency->app_owner_id);
             Admin::where('username', $user->uuid)->delete();
-            //Common::createUserAdmin($request->app_owner_id);
+            // Common::createUserAdmin($request->app_owner_id);
         }
 
-        if ($request->type == 1) {
+        if ($request->type === 1) {
 
             $userType = 2;
-        } elseif ($request->type == 2) {
+        } elseif ($request->type === 2) {
             $userType = 3;
         }
 
         $data = [
-            'agency_id' =>  $agency->id,
+            'agency_id' => $agency->id,
             'type_user' => $userType,
             'monthly_diamond_received' => 0,
         ];
@@ -1164,6 +1186,7 @@ class AgencyService implements AgencyServiceInterface
             $dataAgency['img'] = Common::upload('agency', $request->file('img'));
         }
         $this->agencyRepository->update($dataAgency, $id);
+
         return true;
     }
 
@@ -1176,12 +1199,13 @@ class AgencyService implements AgencyServiceInterface
     {
         $data = $this->agencyRepository->findOrFail($id);
         $data->delete();
+
         return true;
     }
 
     public function getAllRequestUtd($status, $agencyId, $id, $perPage, $page)
     {
-        return  $this->agencyJoinRequestRepository->allRequests($status, $agencyId, $id, $perPage, $page);
+        return $this->agencyJoinRequestRepository->allRequests($status, $agencyId, $id, $perPage, $page);
     }
 
     public function showAgencyJoinRequest($id)
@@ -1192,25 +1216,60 @@ class AgencyService implements AgencyServiceInterface
     public function updateAgencyJoinRequest($id, $request)
     {
         $user = $this->userRepository->findOrFail($request->user_id);
-        if (!$user) throw new \Exception(' user not found');
-        if (($user->agency_id != 0) || ($user->agency_id != null)) throw new \Exception('user already in agency');
+        if (! $user) {
+            throw new Exception(' user not found');
+        }
+        if (($user->agency_id !== 0) || ($user->agency_id !== null)) {
+            throw new Exception('user already in agency');
+        }
         $agency = $this->agencyRepository->findById($request->agency_id);
-        if (!$agency) throw new \Exception(' agency not found');
+        if (! $agency) {
+            throw new Exception(' agency not found');
+        }
         $data = [
             'user_id' => $request->user_id,
             'agency_id' => $request->agency_id,
             'status' => $request->status,
         ];
         $this->agencyJoinRequestRepository->update($data, $id);
-        if ($request->status == 1) {
+        if ($request->status === 1) {
             // UserCommon::userVip($user , 'updatea-gency-join-request');
             $this->userRepository->update(['type_user' => 1, 'monthly_diamond_received' => 0], $user->id);
         }
+
         return true;
     }
 
     public function allAgencyCharged($id)
     {
         return $this->shippingAgencyRepository->getChargeAgency($id);
+    }
+
+    protected function getReportDateRange($year, $month, $timezone, $joinRecord)
+    {
+        $firstDayLocal = Carbon::create($year, $month, 1, 0, 0, 0, $timezone);
+        $startOfMonth = $firstDayLocal->copy()->startOfDay();
+        $endOfMonth = $firstDayLocal->copy()->endOfMonth()->endOfDay();
+
+        if ($joinRecord) {
+            $joinedDate = Carbon::parse($joinRecord->join_date, $timezone);
+
+            $leaveDate = $joinRecord->leave_date
+                ? Carbon::parse($joinRecord->leave_date, $timezone)
+                : $endOfMonth;
+        } else {
+            $joinedDate = null;
+            $leaveDate = $endOfMonth;
+        }
+
+        $startDate = ($joinedDate && $joinedDate->greaterThan($startOfMonth))
+            ? $joinedDate
+            : $startOfMonth;
+
+        $endDate = ($leaveDate && $leaveDate->lessThan($endOfMonth))
+            ? $leaveDate
+            : $endOfMonth;
+
+        return [$startDate, $endDate, $joinedDate, $leaveDate];
     }
 }

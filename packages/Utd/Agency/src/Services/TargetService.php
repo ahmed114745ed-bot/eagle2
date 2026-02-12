@@ -3,10 +3,8 @@
 namespace Utd\Agency\Services;
 
 use Carbon\Carbon;
-use Utd\Agency\Entities\AgencySalary;
 use Utd\Agency\Repositories\AgencyRepository;
 use Utd\Agency\Repositories\AgencySalaryRepository;
-use Illuminate\Support\Facades\DB;
 
 class TargetService
 {
@@ -24,8 +22,8 @@ class TargetService
         $year = $year ?? Carbon::now()->year;
 
         $agency = $this->agencyRepository->findById($agencyId);
-        
-        if (!$agency) {
+
+        if (! $agency) {
             return 0;
         }
 
@@ -53,8 +51,8 @@ class TargetService
         $year = $year ?? Carbon::now()->year;
 
         $agency = $this->agencyRepository->findById($agencyId);
-        
-        if (!$agency) {
+
+        if (! $agency) {
             return null;
         }
 
@@ -77,8 +75,8 @@ class TargetService
         $year = $year ?? Carbon::now()->year;
 
         $agency = $this->agencyRepository->findById($agencyId);
-        
-        if (!$agency) {
+
+        if (! $agency) {
             return [];
         }
 
@@ -87,9 +85,9 @@ class TargetService
                 $query->where('month', $month)->where('year', $year);
             }])
             ->get()
-            ->map(function ($user) use ($month, $year) {
+            ->map(function ($user) {
                 $salary = $user->userSalaries->first();
-                
+
                 return [
                     'user_id' => $user->id,
                     'name' => $user->name,
@@ -105,7 +103,7 @@ class TargetService
     public function updateAgencySalary($agencyId, $month, $year, $salary, $cutAmount = 0)
     {
         $existing = $this->agencySalaryRepository->getByAgencyAndPeriod($agencyId, $month, $year);
-        
+
         if ($existing) {
             return $this->agencySalaryRepository->update($existing->id, [
                 'sallary' => $salary,

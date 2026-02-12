@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('user_achievement_levels', 'admin_id')) {
+        if (! Schema::hasColumn('user_achievement_levels', 'admin_id')) {
             Schema::table('user_achievement_levels', function (Blueprint $table) {
                 $table->unsignedBigInteger('admin_id')->nullable();
             });

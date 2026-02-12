@@ -11,9 +11,9 @@ trait RequestTrait
     {
         throw new HttpResponseException(response()->json(
             [
-                'success'   => false,
-                'message'   => implode(',', $validator->errors()->all()),
-                'data'      => $validator->errors()
+                'success' => false,
+                'message' => implode(',', $validator->errors()->all()),
+                'data' => $validator->errors(),
             ],
             400
         ));
@@ -23,7 +23,7 @@ trait RequestTrait
     {
         return [
             'required' => __('required'),
-            'unique' => __('exists')
+            'unique' => __('exists'),
         ];
     }
 }

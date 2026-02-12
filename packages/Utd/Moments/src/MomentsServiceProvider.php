@@ -14,24 +14,20 @@ class MomentsServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register(): void
     {
-//        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
+        //        $this->mergeConfigFrom(__DIR__ . '/../Config/moments.php', 'moments');
 
         $this->app->singleton(MomentContract::class, MomentService::class);
     }
 
     /**
      * Boot the application events.
-     *
-     * @return void
      */
     public function boot(Router $router): void
     {
-//        $router->aliasMiddleware('moment.allowed', CheckAllowedMoment::class);
+        //        $router->aliasMiddleware('moment.allowed', CheckAllowedMoment::class);
 
         $this->registerRoutes();
         $this->registerViews();
@@ -42,83 +38,73 @@ class MomentsServiceProvider extends ServiceProvider
 
     /**
      * Register the package routes.
-     *
-     * @return void
      */
     protected function registerRoutes(): void
     {
         Route::prefix('api')
             ->middleware('api')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/api.php');
+            ->group(__DIR__.'/../Routes/api.php');
 
         Route::middleware('web')
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/web.php');
+            ->group(__DIR__.'/../Routes/web.php');
 
         Route::prefix('api/utd')
             ->middleware(['api', 'localization'])
             ->namespace($this->namespace)
-            ->group(__DIR__ . '/../Routes/utd.php');
+            ->group(__DIR__.'/../Routes/utd.php');
     }
 
     /**
      * Register the package views.
-     *
-     * @return void
      */
     protected function registerViews(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'moments');
+        $this->loadViewsFrom(__DIR__.'/../Resources/views', 'moments');
     }
 
     /**
      * Register the package translations.
-     *
-     * @return void
      */
     protected function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'moments');
+        $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'moments');
     }
 
     /**
      * Register the package migrations.
-     *
-     * @return void
      */
     protected function registerMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
     }
 
     /**
      * Register the package's publishable resources.
-     *
-     * @return void
      */
     protected function registerPublishing(): void
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../Config/moments.php' => config_path('moments.php'),
+                __DIR__.'/../Config/moments.php' => config_path('moments.php'),
             ], 'moments');
 
-//            $this->publishes([
-//                __DIR__ . '/../database/migrations' => database_path('migrations'),
-//            ], 'moments');
-//
-//            $this->publishes([
-//                __DIR__ . '/../database/seeders' => database_path('seeders/Moments'),
-//            ], 'moments');
-//
-//            $this->publishes([
-//                __DIR__ . '/../resources/views' => resource_path('views/vendor/moments'),
-//            ], 'moments');
-//
-//            $this->publishes([
-//                __DIR__ . '/../resources/lang' => lang_path('vendor/moments'),
-//            ], 'moments');
+            //            $this->publishes([
+            //                __DIR__ . '/../database/migrations' => database_path('migrations'),
+            //            ], 'moments');
+            //
+            //            $this->publishes([
+            //                __DIR__ . '/../database/seeders' => database_path('seeders/Moments'),
+            //            ], 'moments');
+            //
+            //            $this->publishes([
+            //                __DIR__ . '/../resources/views' => resource_path('views/vendor/moments'),
+            //            ], 'moments');
+            //
+            //            $this->publishes([
+            //                __DIR__ . '/../resources/lang' => lang_path('vendor/moments'),
+            //            ], 'moments');
         }
     }
 }

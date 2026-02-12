@@ -11,4 +11,3 @@ class CpLevelTakeGift extends Model
 
     protected $guarded = [];
 }
-

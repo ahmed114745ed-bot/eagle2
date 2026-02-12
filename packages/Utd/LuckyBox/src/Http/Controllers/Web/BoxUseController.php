@@ -2,23 +2,23 @@
 
 namespace Utd\LuckyBox\Http\Controllers\Web;
 
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
-use App\Http\Controllers\Controller;
-use Utd\LuckyBox\Entities\BoxUse;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Utd\LuckyBox\Entities\BoxUse;
 
 class BoxUseController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'box-use';
+
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -32,8 +32,7 @@ class BoxUseController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -47,8 +46,7 @@ class BoxUseController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -62,7 +60,6 @@ class BoxUseController extends MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -86,20 +83,22 @@ class BoxUseController extends MainController
 
         $grid->column('user_id', __('User'))->display(function () {
             $user = $this->user;
-            if (!$user) return '-';
+            if (! $user) {
+                return '-';
+            }
 
             $name = $user->name;
             $uuid = $user->uuid;
             $phone = $user->phone ?: '-';
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$user->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
 
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
-            $userUrl = admin_url('users/' . $user->id);
+            $userUrl = admin_url('users/'.$user->id);
 
             return "<div style='display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: var(--bg-color);'>
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
@@ -113,16 +112,18 @@ class BoxUseController extends MainController
 
         $grid->column('box_id', __('Box'))->display(function () {
             $box = $this->box;
-            if (!$box) return '-';
+            if (! $box) {
+                return '-';
+            }
 
             $name = $box->name ?? 'Unknown Box';
-            $boxUrl = admin_url('boxes/' . $box->id);
+            $boxUrl = admin_url('boxes/'.$box->id);
 
-            $defaultImage = asset("images/box-icon.jpg");
+            $defaultImage = asset('images/box-icon.jpg');
             $avatarPath = $box->image ?? null;
             $avatar = $avatarPath ? getImagePath($avatarPath) : $defaultImage;
 
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
 
@@ -136,16 +137,18 @@ class BoxUseController extends MainController
 
         $grid->column('room_id', __('Room'))->display(function () {
             $room = $this->room;
-            if (!$room) return '-';
+            if (! $room) {
+                return '-';
+            }
 
             $name = $room->room_name ?? 'Unknown Room';
-            $roomUrl = admin_url('rooms/' . $room->id);
+            $roomUrl = admin_url('rooms/'.$room->id);
 
-            $defaultImage = asset("images/default-room.jpg");
+            $defaultImage = asset('images/default-room.jpg');
             $roomImagePath = $room->room_cover ?? null;
             $roomImage = $roomImagePath ? getImagePath($roomImagePath) : $defaultImage;
 
-            if (!isImageExists($roomImage)) {
+            if (! isImageExists($roomImage)) {
                 $roomImage = $defaultImage;
             }
 
@@ -156,8 +159,6 @@ class BoxUseController extends MainController
                         </div>
                     </a>";
         });
-
-
 
         $grid->column('coins', __('coins'))->display(function ($coins) {
 
@@ -171,7 +172,7 @@ class BoxUseController extends MainController
         $grid->end_at(__('end_at'));
         $grid->users_num(__('users_num'));
         $grid->column('type', __('Type'))->display(function ($value) {
-            return $value == 1 ? __('type_global') : __('type_local');
+            return $value === 1 ? __('type_global') : __('type_local');
         });
         $grid->label(__('label'));
         $grid->used_num(__('used_num'));
@@ -180,14 +181,14 @@ class BoxUseController extends MainController
         $grid->disableCreateButton();
         $grid->disableExport();
         $this->extendGrid($grid);
+
         return $grid;
     }
-
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -221,7 +222,6 @@ class BoxUseController extends MainController
     {
         $form = new Form(new BoxUse);
         $this->disableFormTools($form);
-
 
         $form->display('ID');
         $form->text('box_id', 'box_id');

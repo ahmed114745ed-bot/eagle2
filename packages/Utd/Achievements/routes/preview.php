@@ -10,17 +10,17 @@
 */
 
 use Illuminate\Support\Facades\Route;
+use Utd\Achievements\Http\Controllers\web\AchievementLevelsModuleController;
 use Utd\Achievements\Http\Controllers\web\AchievementsController;
 use Utd\Achievements\Http\Controllers\web\AchievementsLevelsController;
-use Utd\Achievements\Http\Controllers\web\AchievementLevelsModuleController;
-use Utd\Achievements\Http\Controllers\web\UserAchievementLevelController;
-use Utd\Achievements\Http\Controllers\web\GiftAchievemntController;
 use Utd\Achievements\Http\Controllers\web\GiftAchiementController;
+use Utd\Achievements\Http\Controllers\web\GiftAchievemntController;
+use Utd\Achievements\Http\Controllers\web\UserAchievementLevelController;
 use Utd\Achievements\Http\Controllers\web\UserGiftAchController;
 
 Route::group(
     [
-        'prefix'     => 'preview/' . config('admin.route.prefix'),
+        'prefix' => 'preview/'.config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
@@ -28,7 +28,7 @@ Route::group(
             'multiLanguage',
             'prevent-delete',
         ],
-        'as' => 'preview.' . config('admin.route.prefix') . '.',
+        'as' => 'preview.'.config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('achievements', AchievementsController::class);

@@ -2,11 +2,11 @@
 
 namespace Utd\CP\Database\Seeders;
 
-use Utd\CP\Entities\Cp;
 use App\Models\Gift;
 use App\Models\GiftLog;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Utd\CP\Entities\Cp;
 
 class GiftLogSeeder extends Seeder
 {
@@ -15,7 +15,7 @@ class GiftLogSeeder extends Seeder
      */
     public function run(): void
     {
-        for($i = 0; $i < 10; $i++){
+        for ($i = 0; $i < 10; $i++) {
             $cp = Cp::inRandomOrder()->first();
             GiftLog::create([
                 'giftId' => Gift::inRandomOrder()->first()->id,
@@ -26,7 +26,7 @@ class GiftLogSeeder extends Seeder
                 'cp_id' => $cp->id,
                 'giftNum' => 2,
                 'giftPrice' => 100,
-                'app_profit_coins' => 100
+                'app_profit_coins' => 100,
             ]);
         }
     }

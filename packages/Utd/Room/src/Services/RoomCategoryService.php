@@ -8,8 +8,7 @@ class RoomCategoryService
 {
     public function __construct(
         protected RoomCategoryRepository $roomCategoryRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get all room categories (parent categories)

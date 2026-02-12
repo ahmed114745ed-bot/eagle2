@@ -2,28 +2,22 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
-// use Encore\Admin\Actions\Response;
-use Illuminate\Support\Facades\DB;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+// use Encore\Admin\Actions\Response;
+use Encore\Admin\Grid;
+use Encore\Admin\Show;
+use Illuminate\Support\Facades\DB;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
-
 
 class AgencyMangerUsers extends MainController
 {
     use ResolvesExternalDependencies;
-    
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
-    protected $title = 'User';
+
     public $permission_name = 'users';
+
     public $hiddenColumns = [
         'is_host',
         'status',
@@ -34,8 +28,68 @@ class AgencyMangerUsers extends MainController
         'di',
         'gold',
         'coins',
-        'actions'
+        'actions',
     ];
+
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'User';
+
+    public function extendGrid($grid)
+    {
+        $permission_name = $this->permission_name;
+
+        if (! Admin::user()->can('*')) {
+            if (! Admin::user()->can('edit-'.$permission_name)) {
+                $grid->hiddenColumns = $this->hiddenColumns;
+            }
+            if (! Admin::user()->can('delete-'.$permission_name)) {
+                $grid->disableRowSelector();
+            }
+            if (! Admin::user()->can('create-'.$permission_name)) {
+                $grid->disableCreateButton();
+            }
+            $grid->actions(
+                function ($actions) use ($permission_name) {
+
+                    // The roles with this permission will not able to see the delete button in actions column.
+                    if (! Admin::user()->can('delete-'.$permission_name)) {
+                        $actions->disableDelete();
+                    }
+                    if (! Admin::user()->can('edit-'.$permission_name)) {
+                        $actions->disableEdit();
+                    }
+                    if (! Admin::user()->can('show-'.$permission_name)) {
+                        $actions->disableView();
+                    }
+
+                }
+            );
+            if (! Admin::user()->can('edit-'.$permission_name) && ! Admin::user()->can('delete-'.$permission_name) && ! Admin::user()->can('create-'.$permission_name)) {
+                $grid->disableActions();
+            }
+        }
+
+        $grid->export(function ($export) use ($grid) {
+
+            $export->filename($this->permission_name.'.csv');
+
+            $export->except($this->hiddenColumns);
+
+            //            $export->only(['column3', 'column4' ...]);
+            //
+            $export->originalValue($grid->columnNames);
+            //
+            //            $export->column('column_5', function ($value, $original) {
+            //                return $value;
+            //            });
+        });
+
+    }
+
     /**
      * Make a grid builder.
      *
@@ -44,17 +98,17 @@ class AgencyMangerUsers extends MainController
     protected function grid()
     {
         $userClass = $this->getUserModel();
-        if (!$userClass) {
+        if (! $userClass) {
             abort(500, 'User model not available');
         }
-        
+
         $grid = new Grid(new $userClass());
-        $grid->model ()->ofAgency();
-        $grid->quickSearch ();
-        $grid->filter (function (Grid\Filter $filter){
-            $filter->expand ();
-            $filter->column(1/2, function ($filter) {
-                $filter->equal('uuid',__ ('uuid'));
+        $grid->model()->ofAgency();
+        $grid->quickSearch();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('uuid', __('uuid'));
                 // $filter->equal('is_host',__('is host'))->select([0=>'normal',1=>'host']);
             });
             // $filter->column(1/2, function ($filter) {
@@ -63,18 +117,18 @@ class AgencyMangerUsers extends MainController
             // });
         });
         $grid->column('id', __('Id'));
-        $grid->column ('uuid',__('uuid'));
+        $grid->column('uuid', __('uuid'));
 
-//        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
+        //        $grid->column ('is_gold_id',__ ('use Gold id'))->switch (Common::getSwitchStates ());
         $grid->column('name', __('Name'));
         $grid->column('nickname', __('NickName'));
-        $grid->column('profile.avatar', __('image'))->image ('',50);
-        $grid->column('profile.image_id', __('image Id'))->image ('',50);
-        $grid->column('phone', __ ('Phone'));
-//        $grid->column('di', __('coins'));
-//        $grid->column('gold', __('silver coins'));
-//        $grid->column('coins', __('diamonds'));
-//        $grid->column('status', __('block status'))->switch (Common::getSwitchStates2 () );
+        $grid->column('profile.avatar', __('image'))->image('', 50);
+        $grid->column('profile.image_id', __('image Id'))->image('', 50);
+        $grid->column('phone', __('Phone'));
+        //        $grid->column('di', __('coins'));
+        //        $grid->column('gold', __('silver coins'));
+        //        $grid->column('coins', __('diamonds'));
+        //        $grid->column('status', __('block status'))->switch (Common::getSwitchStates2 () );
         // $grid->column ('agency_id',__ ('agency id'))->modal ('agency info',function ($model){
         //     if ($model->agency_id){
         //         $a = Agency::query ()->find ($model->agency_id);
@@ -109,7 +163,6 @@ class AgencyMangerUsers extends MainController
         //             ]
         //         );
 
-
         //         return $target;
         //     });
 
@@ -133,33 +186,31 @@ class AgencyMangerUsers extends MainController
         //         , $targets->toArray());
         // });
 
+        $grid->disableExport();
 
-       $grid->disableExport();
+        $this->extendGrid($grid);
 
-        $this->extendGrid ($grid);
-
-        $grid->actions (function ($actions){
+        $grid->actions(function ($actions) {
             if (AgencyPackageHelper::isAgencyInstalled()) {
                 $actions->add(new \Utd\Agency\Actions\KickFromAgencyAction());
             }
             $actions->add(new KickOfFamilyAction());
         });
 
-
-
         $grid->model()->where('is_manger', 1);
-            $grid->actions(function ($actions){
-               $actions->disableEdit();
-               $actions->disableView();
-            });
-            $grid->disableCreateButton();
+        $grid->actions(function ($actions) {
+            $actions->disableEdit();
+            $actions->disableView();
+        });
+        $grid->disableCreateButton();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -332,13 +383,13 @@ class AgencyMangerUsers extends MainController
         // $form->number('type_user', __('Type user'));
         // $form->text('apple_id', __('Apple id'));
         $opsAgencyManger = [];
-        foreach (DB::table('admin_users')->get() as $user){
+        foreach (DB::table('admin_users')->get() as $user) {
             $opsAgencyManger[$user->id] = $user->name;
         }
         $form->select('agency_manger_id', __('Agency Manger Id'))->options($opsAgencyManger);
 
         $opsAgencyMangerUser = [];
-        foreach (User::where('is_manger',0)->get() as $user){
+        foreach (User::where('is_manger', 0)->get() as $user) {
             $opsAgencyMangerUser[$user->id] = $user->uuid.'_'.$user->name;
         }
         $form->select('agency_manger_id', __('Agency Manger Id'))->options($opsAgencyMangerUser);
@@ -351,60 +402,7 @@ class AgencyMangerUsers extends MainController
         }
 
         );
+
         return $form;
-    }
-
-
-    public function extendGrid($grid){
-        $permission_name = $this->permission_name;
-
-        if (!Admin::user()->can('*')) {
-            if ( ! Admin ::user () -> can ( 'edit-' . $permission_name ) ) {
-                $grid -> hiddenColumns = $this -> hiddenColumns;
-            }
-            if ( ! Admin ::user () -> can ( 'delete-' . $permission_name ) ) {
-                $grid -> disableRowSelector ();
-            }
-            if ( ! Admin ::user () -> can ( 'create-' . $permission_name ) ) {
-                $grid -> disableCreateButton ();
-            }
-            $grid -> actions (
-                function ( $actions ) use ( $permission_name ) {
-
-                    // The roles with this permission will not able to see the delete button in actions column.
-                    if ( ! Admin ::user () -> can ( 'delete-' . $permission_name ) ) {
-                        $actions -> disableDelete ();
-                    }
-                    if ( ! Admin ::user () -> can ( 'edit-' . $permission_name ) ) {
-                        $actions -> disableEdit ();
-                    }
-                    if ( ! Admin ::user () -> can ( 'show-' . $permission_name ) ) {
-                        $actions -> disableView ();
-                    }
-
-                }
-            );
-            if (! Admin ::user () -> can ( 'edit-' . $permission_name ) && ! Admin ::user () -> can ( 'delete-' . $permission_name ) && ! Admin ::user () -> can ( 'create-' . $permission_name )){
-                $grid->disableActions ();
-            }
-        }
-
-
-
-        $grid->export(function ($export) use ($grid){
-
-            $export->filename($this->permission_name.'.csv');
-
-            $export->except($this->hiddenColumns);
-
-//            $export->only(['column3', 'column4' ...]);
-//
-            $export->originalValue($grid->columnNames);
-//
-//            $export->column('column_5', function ($value, $original) {
-//                return $value;
-//            });
-        });
-
     }
 }

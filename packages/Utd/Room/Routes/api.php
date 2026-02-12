@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Utd\Room\Http\Controllers\Api\RoomController;
-use Utd\Room\Http\Controllers\Api\EnteranceController;
-use Utd\Room\Http\Controllers\Api\MicrophoneController;
-use Utd\Room\Http\Controllers\Api\RoomCategoryController;
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\ChargeController;
 use App\Http\Controllers\Api\V1\RequestBackgroundImageController;
+use Illuminate\Support\Facades\Route;
+use Utd\Room\Http\Controllers\Api\EnteranceController;
+use Utd\Room\Http\Controllers\Api\MicrophoneController;
+use Utd\Room\Http\Controllers\Api\RoomCategoryController;
+use Utd\Room\Http\Controllers\Api\RoomController;
 
 /*
 |--------------------------------------------------------------------------

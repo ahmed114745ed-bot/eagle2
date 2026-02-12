@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('lucky_gifts', function (Blueprint $table) {
-            $table->dropColumn("min_percentage");
+            $table->dropColumn('min_percentage');
         });
     }
 };

@@ -32,7 +32,7 @@ class CpRepository implements CpRepositoryContract
             ->whereHas('cpRelation', function ($q) use ($type) {
                 $q->where('type', $type);
             })
-            ->where("status", CpStatus::STOPED)
+            ->where('status', CpStatus::STOPED)
             ->first();
     }
 
@@ -61,129 +61,129 @@ class CpRepository implements CpRepositoryContract
     public function getCpCount($userId)
     {
         return Cp::where(function ($query) use ($userId) {
-            $query->where("user_one_id", $userId)
-                ->orWhere("user_two_id", $userId);
+            $query->where('user_one_id', $userId)
+                ->orWhere('user_two_id', $userId);
         })
-            ->whereHas("cpRelation", function ($q) {
+            ->whereHas('cpRelation', function ($q) {
                 $q->where('type', '!=', 'solution');
             })
-            ->whereIn("status", [0, 1, 4])
+            ->whereIn('status', [0, 1, 4])
             ->count();
     }
 
     public function checkExistingCp($userId, $otherUserId)
     {
         return Cp::where(function ($query) use ($userId, $otherUserId) {
-            $query->where("user_one_id", $userId)
-                ->where("user_two_id", $otherUserId)
+            $query->where('user_one_id', $userId)
+                ->where('user_two_id', $otherUserId)
                 ->orWhere(function ($query) use ($userId, $otherUserId) {
-                    $query->where("user_two_id", $userId)
-                        ->where("user_one_id", $otherUserId);
+                    $query->where('user_two_id', $userId)
+                        ->where('user_one_id', $otherUserId);
                 });
-        })->whereHas("cpRelation", function ($q) {
+        })->whereHas('cpRelation', function ($q) {
             $q->where('type', '!=', 'solution');
         })
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
     public function checkExistingSecondUserCp($otherUserId, $relationId)
     {
         return Cp::where(function ($query) use ($otherUserId) {
-            $query->where("user_two_id", $otherUserId)->orWhere("user_one_id", $otherUserId);
-        })->where('cp_relation_id', $relationId)->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            $query->where('user_two_id', $otherUserId)->orWhere('user_one_id', $otherUserId);
+        })->where('cp_relation_id', $relationId)->whereIn('status', [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
     public function checkExistingFirstUserCp($otherUserId)
     {
         return Cp::where(function ($query) use ($otherUserId) {
-            $query->where("user_two_id", $otherUserId)->orWhere("user_one_id", $otherUserId);
-        })->whereHas("cpRelation", function ($q) {
+            $query->where('user_two_id', $otherUserId)->orWhere('user_one_id', $otherUserId);
+        })->whereHas('cpRelation', function ($q) {
             $q->where('type', '!=', 'solution');
-        })->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+        })->whereIn('status', [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
     public function checkExistingCpLovlyForUser($userId)
     {
         return Cp::where(function ($query) use ($userId) {
-            $query->where("user_one_id", $userId)
-                ->orWhere("user_two_id", $userId);
+            $query->where('user_one_id', $userId)
+                ->orWhere('user_two_id', $userId);
         })
             ->whereHas('relation', function ($q) {
                 $q->where('relations_number', 1);
             })
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->first();
     }
 
     public function checkExistingCpLovly($userId, $otherUserId)
     {
         return Cp::where(function ($query) use ($userId, $otherUserId) {
-            $query->where("user_one_id", $userId)
-                ->where("user_two_id", $otherUserId)
+            $query->where('user_one_id', $userId)
+                ->where('user_two_id', $otherUserId)
                 ->orWhere(function ($query) use ($userId, $otherUserId) {
-                    $query->where("user_two_id", $userId)
-                        ->where("user_one_id", $otherUserId);
+                    $query->where('user_two_id', $userId)
+                        ->where('user_one_id', $otherUserId);
                 });
         })->relation()
-            /// TODO convert these status to enum
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // / TODO convert these status to enum
+            ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             // ->where("cp_relation_id",5)
             ->first();
     }
 
     public function countExistingCpSameRelation($userId, $relationId)
     {
-        return Cp::where(function ($query) use ($userId,) {
-            $query->where(function ($query) use ($userId,) {
-                $query->where("user_two_id", $userId)->orWhere("user_one_id", $userId);
+        return Cp::where(function ($query) use ($userId) {
+            $query->where(function ($query) use ($userId) {
+                $query->where('user_two_id', $userId)->orWhere('user_one_id', $userId);
             });
         })->where('cp_relation_id', $relationId)
-            /// TODO convert these status to enum
-            ->whereIn("status", [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // / TODO convert these status to enum
+            ->whereIn('status', [CpStatus::PENDING->value, CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->count();
     }
 
     public function countExistingCpSameRelationActive($userId, $relationId)
     {
-        return Cp::where(function ($query) use ($userId,) {
-            $query->where(function ($query) use ($userId,) {
-                $query->where("user_two_id", $userId)->orWhere("user_one_id", $userId);
+        return Cp::where(function ($query) use ($userId) {
+            $query->where(function ($query) use ($userId) {
+                $query->where('user_two_id', $userId)->orWhere('user_one_id', $userId);
             });
         })->where('cp_relation_id', $relationId)
-            /// TODO convert these status to enum
-            ->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
+            // / TODO convert these status to enum
+            ->whereIn('status', [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])
             ->count();
     }
 
     public function checkExistingCpOne($userId, $cpId)
     {
-        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+        return Cp::where('cp_relation_id', $cpId)->where(function ($query) use ($userId) {
             $query->where('user_one_id', $userId)
                 ->orWhere('user_two_id', $userId);
-        })->whereIn("status", [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])->first();
+        })->whereIn('status', [CpStatus::ACTIVE->value, CpStatus::RESTORED->value])->first();
     }
+
     public function checkExistingCpSendingOne($userId, $cpId)
     {
-        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+        return Cp::where('cp_relation_id', $cpId)->where(function ($query) use ($userId) {
             $query->where('user_one_id', $userId)->orWhere('user_two_id', $userId);
-        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
+        })->whereIn('status', [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
 
     public function checkExistingCpSendingTwo($userId, $cpId)
     {
-        return Cp::where("cp_relation_id", $cpId)->where(function ($query) use ($userId) {
+        return Cp::where('cp_relation_id', $cpId)->where(function ($query) use ($userId) {
             $query->where('user_two_id', $userId)->orWhere('user_one_id', $userId);
-        })->whereIn("status", [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
+        })->whereIn('status', [CpStatus::PENDING->value, CpStatus::RESTORED->value])->first();
     }
-
 
     public function getUserRelationAvailable($userId, $cpRelationId)
     {
-        return UserRelationAvilable::where(["user_id" => $userId, "cp_relation_id" => $cpRelationId])
-            ->where("count", ">", 0)
+        return UserRelationAvilable::where(['user_id' => $userId, 'cp_relation_id' => $cpRelationId])
+            ->where('count', '>', 0)
             ->first();
     }
 
@@ -200,8 +200,8 @@ class CpRepository implements CpRepositoryContract
 
     public function getRequestsForUser($userId)
     {
-        return Cp::where("user_two_id", $userId)
-            ->where("status", 0)
+        return Cp::where('user_two_id', $userId)
+            ->where('status', 0)
             ->get();
     }
 
@@ -213,6 +213,7 @@ class CpRepository implements CpRepositoryContract
     public function updateCpStatus(Cp $cp, $status)
     {
         $cp->status = $status;
+
         return $cp->save();
     }
 
@@ -220,11 +221,11 @@ class CpRepository implements CpRepositoryContract
     {
         return UserRelationAvilable::updateOrCreate(
             [
-                "user_id" => $userId,
-                "cp_relation_id" => $cpRelationId,
+                'user_id' => $userId,
+                'cp_relation_id' => $cpRelationId,
             ],
             [
-                "count" => DB::raw('count + 1'),
+                'count' => DB::raw('count + 1'),
             ]
         );
     }
@@ -232,7 +233,7 @@ class CpRepository implements CpRepositoryContract
     public function getCpRanking0($relationType, $type)
     {
         return GiftLog::selectRaw('cp_id, SUM(giftNum * giftPrice) as total_gifts')
-            ->whereNotNull("cp_id")
+            ->whereNotNull('cp_id')
             ->whereHas('cp.relation', function ($q) use ($relationType) {
                 $q->where('type', $relationType);
             })
@@ -240,7 +241,7 @@ class CpRepository implements CpRepositoryContract
                 'cp' => function ($query) {
                     $query->select('id', 'di', 'level_id', 'user_one_id', 'user_two_id', 'cp_relation_id');
                 },
-                'cp.relation'
+                'cp.relation',
             ])
             ->when($type, function ($query) use ($type) {
                 switch ($type) {
@@ -258,10 +259,6 @@ class CpRepository implements CpRepositoryContract
             ->take(20)
             ->get();
     }
-
-
-
-
 
     // public function getCpRanking($relationType, $type)
     // {
@@ -340,7 +337,7 @@ class CpRepository implements CpRepositoryContract
     {
         $t = is_numeric($type) ? (int) $type : null;
         $timezone = getTimezone();
-        $now = \Carbon\Carbon::now($timezone);
+        $now = Carbon::now($timezone);
 
         $query = GiftLog::query()
             ->selectRaw('
@@ -361,8 +358,7 @@ class CpRepository implements CpRepositoryContract
         // Apply date filter
         $query->when(
             $t === 1,
-            fn($q) =>
-            $q->whereBetween('gift_logs.created_at', [
+            fn ($q) => $q->whereBetween('gift_logs.created_at', [
                 $now->copy()->startOfDay()->toDateTimeString(),
                 $now->copy()->endOfDay()->toDateTimeString(),
             ])
@@ -370,8 +366,7 @@ class CpRepository implements CpRepositoryContract
 
         $query->when(
             $t === 2,
-            fn($q) =>
-            $q->whereBetween('gift_logs.created_at', [
+            fn ($q) => $q->whereBetween('gift_logs.created_at', [
                 $now->copy()->startOfWeek(),
                 $now->copy()->startOfWeek()->addDays(6)->endOfDay(),
             ])
@@ -379,8 +374,7 @@ class CpRepository implements CpRepositoryContract
 
         $query->when(
             $t === 3,
-            fn($q) =>
-            $q->whereBetween('gift_logs.created_at', [
+            fn ($q) => $q->whereBetween('gift_logs.created_at', [
                 $now->copy()->startOfMonth(),
                 $now->copy()->endOfMonth(),
             ])
@@ -402,7 +396,7 @@ class CpRepository implements CpRepositoryContract
 
         // preload CPs with relations in one query
         $cpIds = $rows->pluck('id');
-        $cps = Cp::with(['level:id,img', 'fromUser.profile:id,user_id,avatar,gender', 'toUser.profile:id,user_id,avatar,gender', 'fromUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'), 'toUser.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])
+        $cps = Cp::with(['level:id,img', 'fromUser.profile:id,user_id,avatar,gender', 'toUser.profile:id,user_id,avatar,gender', 'fromUser.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'), 'toUser.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')])
             ->whereIn('id', $cpIds)
             ->get()
             ->keyBy('id');
@@ -412,13 +406,13 @@ class CpRepository implements CpRepositoryContract
             if ($cps->has($row->id)) {
                 $cp = $cps[$row->id];
                 $cp->total_gifts = (int) $row->total_gifts;
+
                 return $cp;
             }
+
             return null;
         })->filter();
     }
-
-
 
     public function getCpRankingWithOutRelation(int $type)
     {
@@ -458,36 +452,33 @@ class CpRepository implements CpRepositoryContract
         return $result;
     }
 
-
     public function getCpList($userId, $activeOnly = false)
     {
         $var = $activeOnly ? [1, 4] : [0, 1, 4];
 
         return Cp::where(function ($query) use ($userId) {
-            $query->where("user_one_id", $userId)
+            $query->where('user_one_id', $userId)
                 ->orWhere(function ($query) use ($userId) {
-                    $query->where("user_two_id", $userId);
+                    $query->where('user_two_id', $userId);
                 });
         })
-            ->whereIn("status", $var)
+            ->whereIn('status', $var)
             ->get();
     }
 
     public function cpUserList($userId, $activeOnly = false)
     {
-        $var =  [1, 4];
+        $var = [1, 4];
 
         return Cp::where(function ($query) use ($userId) {
-            $query->where("user_one_id", $userId)
+            $query->where('user_one_id', $userId)
                 ->orWhere(function ($query) use ($userId) {
-                    $query->where("user_two_id", $userId);
+                    $query->where('user_two_id', $userId);
                 });
         })
-            ->whereIn("status", $var)
+            ->whereIn('status', $var)
             ->get();
     }
-
-
 
     public function findWare($wareId)
     {
@@ -501,8 +492,8 @@ class CpRepository implements CpRepositoryContract
             'toUser:id,name,dress_1,dress_2,dress_3',
             'fromUser:id,name,dress_1,dress_2,dress_3',
         ])
-            ->whereHas("cpRelation", function ($q) {
-                $q->where('type', "!=", 'solution');
+            ->whereHas('cpRelation', function ($q) {
+                $q->where('type', '!=', 'solution');
             })
             ->where(function ($query) use ($userId) {
                 $query->where('user_one_id', $userId)
@@ -514,14 +505,13 @@ class CpRepository implements CpRepositoryContract
             ->get();
     }
 
-
     public function getByUser($userId)
     {
         return Cp::where(function ($query) use ($userId) {
             $query->where(function ($q) use ($userId) {
-                $q->where("user_one_id", $userId)->whereHas('toUser');
+                $q->where('user_one_id', $userId)->whereHas('toUser');
             })->orWhere(function ($q) use ($userId) {
-                $q->where("user_two_id", $userId)->whereHas('fromUser');
+                $q->where('user_two_id', $userId)->whereHas('fromUser');
             });
         })->with('relation:id,title,type', 'toUser', 'fromUser')->get();
     }
@@ -536,4 +526,3 @@ class CpRepository implements CpRepositoryContract
             ->get();
     }
 }
-

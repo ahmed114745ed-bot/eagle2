@@ -2,8 +2,8 @@
 
 namespace Utd\Agency\Http\Resources;
 
-use Utd\Agency\Facades\AgencyHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Agency\Facades\AgencyHelper;
 
 class MyDataForAgencyNewResource extends JsonResource
 {
@@ -26,9 +26,10 @@ class MyDataForAgencyNewResource extends JsonResource
             $items = collect($resource->items())->map(function ($item) use ($type) {
                 return new static($item, $type);
             });
+
             return $items;
         }
-        
+
         // Otherwise treat as regular collection
         return collect($resource)->map(function ($item) use ($type) {
             return new static($item, $type);
@@ -44,18 +45,18 @@ class MyDataForAgencyNewResource extends JsonResource
             'phone' => @$this->user->phone ?? '',
             'country' => $this->user->country ?? null,
             'name' => @$this->user->name ?: '',
-            'vip'=>@AgencyHelper::ovip_center ($this->user->id),
-            'level'=>AgencyHelper::level_center_min ($this->user->id),
+            'vip' => @AgencyHelper::ovip_center($this->user->id),
+            'level' => AgencyHelper::level_center_min($this->user->id),
             'profile' => new ProfileForAgencyResource(@$this->user->profile),
             'status' => $this->status,
             'type' => $this->type,
         ];
-        
-        if ($this->status !=0){
-            $operator_name='';
-            if ($this->change_status_type == "app") {
+
+        if ($this->status !== 0) {
+            $operator_name = '';
+            if ($this->change_status_type === 'app') {
                 $operator_name = $this->userOperator?->name;
-            }else{
+            } else {
                 $operator_name = $this->admin?->name;
             }
             $data['operator'] = $operator_name;

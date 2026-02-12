@@ -13,9 +13,9 @@ use Utd\Gifts\Support\ModelResolver;
 class UserGift extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'user_gifts';
-    
+
     protected $fillable = ['gift_id', 'user_id', 'quantity', 'expire'];
 
     /**
@@ -32,11 +32,11 @@ class UserGift extends Model
     public function user()
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($userModel, 'user_id');
     }
 }

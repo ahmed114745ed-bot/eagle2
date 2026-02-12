@@ -2,8 +2,6 @@
 
 namespace Utd\Gifts\DTOs;
 
-use Illuminate\Support\Collection;
-
 class SendGiftDTO
 {
     public function __construct(
@@ -17,7 +15,7 @@ class SendGiftDTO
     ) {}
 
     // ============ Factory Methods ============
-    
+
     /**
      * إرسال هدية في روم
      */
@@ -108,7 +106,7 @@ class SendGiftDTO
     }
 
     // ============ Helper Methods ============
-    
+
     public function getTotalReceivers(): int
     {
         return count($this->receiverIds);

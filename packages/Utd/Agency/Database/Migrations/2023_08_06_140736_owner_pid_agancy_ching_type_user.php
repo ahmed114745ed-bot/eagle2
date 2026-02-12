@@ -13,10 +13,12 @@ class OwnerPidAgancyChingTypeUser extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('users', 'type_user')) return;
+        if (! Schema::hasColumn('users', 'type_user')) {
+            return;
+        }
         Schema::table('users', function (Blueprint $table) {
             $table->integer('type_user')->default(0)->change();
-    });
+        });
     }
 
     /**
@@ -27,7 +29,7 @@ class OwnerPidAgancyChingTypeUser extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-        //   $table->integer('type_user')->default(0)->change();
-    });
+            //   $table->integer('type_user')->default(0)->change();
+        });
     }
 }

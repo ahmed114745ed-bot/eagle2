@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('user_gifts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('gift_id');  
-            $table->unsignedBigInteger('user_id');  
+            $table->unsignedInteger('gift_id');
+            $table->unsignedBigInteger('user_id');
             $table->integer('quantity')->default(1);
             $table->bigInteger('expire')->default(0);
             $table->timestamps();

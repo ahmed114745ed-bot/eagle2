@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('agencies')) return;
-        if (!Schema::hasColumn('agencies', 'type')) {
+        if (! Schema::hasTable('agencies')) {
+            return;
+        }
+        if (! Schema::hasColumn('agencies', 'type')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->integer('type')->comment('1 = Host Agency, 2 = Shipping');
             });

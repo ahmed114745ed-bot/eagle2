@@ -20,7 +20,7 @@ class MomentsController extends Controller
     {
         $data = $this->momentService->all($request->id, $request->per_page, $request->page);
 
-        return Common::apiResponse(true, 'done', MomentResource::collection($data) );
+        return Common::apiResponse(true, 'done', MomentResource::collection($data));
     }
 
     public function create(Request $request)
@@ -36,9 +36,9 @@ class MomentsController extends Controller
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-
         try {
             $this->momentService->createFromRequest($request);
+
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -60,6 +60,7 @@ class MomentsController extends Controller
 
         try {
             $this->momentService->updateFromRequest($id, $request);
+
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -71,13 +72,14 @@ class MomentsController extends Controller
     {
         $data = $this->momentService->find($id);
 
-        return Common::apiResponse(true, 'done', new MomentResource($data) );
+        return Common::apiResponse(true, 'done', new MomentResource($data));
     }
 
     public function destroy($id)
     {
         try {
             $this->momentService->deleteById($id);
+
             return Common::apiResponse(true, 'deleted successfully');
         } catch (Exception $exception) {
 
@@ -90,7 +92,8 @@ class MomentsController extends Controller
 
         try {
             $moment = $this->momentService->search($uuid);
-            return Common::apiResponse(true, 'success', MomentResource::collection($moment) );
+
+            return Common::apiResponse(true, 'success', MomentResource::collection($moment));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -102,6 +105,7 @@ class MomentsController extends Controller
 
         try {
             $reels = $this->momentService->getUserMomentsForDashboard($user_id);
+
             // return $reels;
             return Common::apiResponse(true, 'success', MomentDashboardResource::collection($reels));
         } catch (Exception $exception) {
@@ -113,15 +117,16 @@ class MomentsController extends Controller
     public function config(Request $request)
     {
         $conf = Config::where('name', 'upload_moment')->first();
-        if (!$conf) {
-            config::create([
-                'name'  => 'upload_moment',
+        if (! $conf) {
+            Config::create([
+                'name' => 'upload_moment',
                 'value' => $request->num,
             ]);
         } else {
             $conf->value = $request->num;
             $conf->save();
         }
+
         return Common::apiResponse(true, __('dashboard.update'), null);
     }
 }

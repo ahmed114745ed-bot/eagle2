@@ -2,19 +2,26 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Table;
-use Encore\Admin\Controllers\AdminController;
+use Exception;
+use Log;
 use Utd\Agency\Entities\AdditionalInfo;
 use Utd\Agency\Traits\ResolvesModels;
-use Utd\Agency\Facades\ExternalHelper;
-
 
 class RecommendationAgencyController extends AdminController
 {
     use ResolvesModels;
+
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'RecommendationAgencies';
 
     public function __construct()
     {
@@ -22,18 +29,12 @@ class RecommendationAgencyController extends AdminController
         $featureServiceClass = config('agency-dependencies.dependencies.services.app_feature_service');
         if ($featureServiceClass && class_exists($featureServiceClass)) {
             try {
-                app($featureServiceClass)->validateStatusEnable("agencies");
-            } catch (\Exception $e) {
-                \Log::warning("Agency Package: AppFeatureService validation failed", ['error' => $e->getMessage()]);
+                app($featureServiceClass)->validateStatusEnable('agencies');
+            } catch (Exception $e) {
+                Log::warning('Agency Package: AppFeatureService validation failed', ['error' => $e->getMessage()]);
             }
         }
     }
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
-    protected $title = 'RecommendationAgencies';
 
     /**
      * Make a grid builder.
@@ -44,14 +45,13 @@ class RecommendationAgencyController extends AdminController
     {
         $userClass = $this->getUserModel();
         $agencyClass = $this->getAgencyModel();
-        
+
         $grid = new Grid(new $userClass());
-        $grid->model()->whereHas('additionalInfo',function($q) 
-        {
+        $grid->model()->whereHas('additionalInfo', function ($q) {
             $q->where('status', 1);
 
         });
-        
+
         $grid->quickSearch();
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
@@ -62,21 +62,22 @@ class RecommendationAgencyController extends AdminController
         $grid->column('uuid', __('uuid'));
         $grid->column('name', __('name'));
         $grid->column('additional', __('agencies'))->modal('الوكالات', function ($model) use ($agencyClass) {
-            $agenciesIds = AdditionalInfo::where('user_id',$this->id)->pluck('agency_id');
-            $agencies = $agencyClass::whereIn('id',$agenciesIds)->select("name", 'id',)->get();
+            $agenciesIds = AdditionalInfo::where('user_id', $this->id)->pluck('agency_id');
+            $agencies = $agencyClass::whereIn('id', $agenciesIds)->select('name', 'id')->get();
             $filteredAgencies = $agencies->map(function ($agency) {
-                return $agency->only(["id", "name", ]);
+                return $agency->only(['id', 'name']);
             });
-            return new Table([ __('ID'),__('Name')], $filteredAgencies->toArray());
+
+            return new Table([__('ID'), __('Name')], $filteredAgencies->toArray());
         });
         $grid->column('count', __('count'))->display(function () {
-            return AdditionalInfo::where('user_id',$this->id)->count();
+            return AdditionalInfo::where('user_id', $this->id)->count();
         });
         $grid->actions(function (Grid\Displayers\Actions $actions) {
             $actions->disableEdit();
             $actions->disableView();
         });
-       
+
         $grid->disableCreateButton();
 
         return $grid;
@@ -85,7 +86,7 @@ class RecommendationAgencyController extends AdminController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

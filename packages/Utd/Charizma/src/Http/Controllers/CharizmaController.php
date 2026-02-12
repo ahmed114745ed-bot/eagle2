@@ -2,15 +2,15 @@
 
 namespace Utd\Charizma\Http\Controllers;
 
-use Utd\Charizma\Services\UserCharismaService;
-use Utd\Room\Entities\Room;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\Support\Renderable;
 use Utd\Charizma\Entities\ExtraDataInRoom;
+use Utd\Charizma\Services\UserCharismaService;
+use Utd\Room\Entities\Room;
 
 class CharizmaController extends Controller
 {
@@ -25,7 +25,6 @@ class CharizmaController extends Controller
     }
 
     /**
-     * @param int $room_id
      * @return mixed
      */
     public function roomCharisma(int $room_id)
@@ -42,19 +41,19 @@ class CharizmaController extends Controller
         $roomId = $request->room_id;
         $room = Room::where('id', $roomId)->where('uid', auth()->id())->first();
 
-        if (!$room) {
+        if (! $room) {
             return Common::apiResponse(0, __('api_responses.room_not_found'), null, 4043);
         }
 
-        $room->charizma_status = !$room->charizma_status;
-        $isFalse = $room->charizma_status == 0;
+        $room->charizma_status = ! $room->charizma_status;
+        $isFalse = $room->charizma_status === 0;
         $room->charizma_timestamp = $isFalse ? null : now()->timestamp;
         $room->save();
 
         $ms = [
             'messageContent' => [
-                "message" => $room->charizma_status ? 'startCharisma' : 'closeCharisma',
-            ]
+                'message' => $room->charizma_status ? 'startCharisma' : 'closeCharisma',
+            ],
         ];
         $json = json_encode($ms);
         Common::sendToZego('SendCustomCommand', $roomId, Auth::id(), $json);
@@ -68,8 +67,8 @@ class CharizmaController extends Controller
             1,
             'charisma status is changed',
             [
-                "room_id" => $room->id,
-                "charisma_status" => $room->charizma_status
+                'room_id' => $room->id,
+                'charisma_status' => $room->charizma_status,
             ],
             200
         );
@@ -87,7 +86,7 @@ class CharizmaController extends Controller
             ? Room::find($roomId)
             : Room::where('uid', $request->owner_id)->where('type', 'audio')->first();
 
-        if (!$room) {
+        if (! $room) {
             return Common::apiResponse(false, 'No Room Founded');
         }
 
@@ -99,9 +98,9 @@ class CharizmaController extends Controller
 
         $ms = [
             'messageContent' => [
-                "message" => "updateCharisma",
-                "data" => $this->roomCharisma($room->id),
-            ]
+                'message' => 'updateCharisma',
+                'data' => $this->roomCharisma($room->id),
+            ],
         ];
         $json = json_encode($ms);
 

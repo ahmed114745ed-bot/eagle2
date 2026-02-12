@@ -30,7 +30,7 @@ class GiftObserver
         $isEnableOld = $gift->getOriginal('enable');
         $svgOld = $gift->getOriginal('show_img');
 
-        if ((!$isEnableOld && $gift->enable) || ($isEnableOld && !$gift->enable) || $gift->show_img != $svgOld) {
+        if ((! $isEnableOld && $gift->enable) || ($isEnableOld && ! $gift->enable) || $gift->show_img !== $svgOld) {
             if (function_exists('settings')) {
                 settings()->set('gifts_update_at', time());
             }

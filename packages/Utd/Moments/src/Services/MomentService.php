@@ -39,7 +39,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     public function deleteMomentAndReport($momentId, $reportId)
     {
         $moment = $this->momentRepository->findMomentById($momentId);
-        if (!$moment) {
+        if (! $moment) {
             return [
                 'success' => false,
                 'message' => 'Moment not found',
@@ -65,7 +65,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $moment = $this->momentRepository->findMomentById($id);
 
-        if (!$moment) {
+        if (! $moment) {
             return [
                 'success' => false,
                 'message' => 'Item not found',
@@ -86,7 +86,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $userId = Auth::id();
 
-        if (empty($contacts) && !$request->hasFile('multi_image')) {
+        if (empty($contacts) && ! $request->hasFile('multi_image')) {
             return [
                 'success' => false,
                 'message' => 'Not allowed to post empty content',
@@ -98,7 +98,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
             'description' => $contacts,
         ]);
 
-        if (!$moment) {
+        if (! $moment) {
             return [
                 'success' => false,
                 'message' => 'Try again',
@@ -126,7 +126,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $moment = $this->momentRepository->getMomentById($id, $userId);
 
-        if (!$moment) {
+        if (! $moment) {
             return [
                 'success' => false,
                 'message' => __('Moment not found'),
@@ -149,7 +149,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
 
     public function delete(int|Moment $moment)
     {
-        if (gettype($moment) == 'integer') {
+        if (gettype($moment) === 'integer') {
             $moment = Moment::query()->find($moment);
         }
 
@@ -159,7 +159,6 @@ class MomentService extends MomentBaseModelService implements MomentContract
     /**
      * Methods merged from MomentsService
      */
-
     public function all($id, $perPage, $page)
     {
         return $this->momentRepository->all($id, $perPage, $page);
@@ -173,9 +172,10 @@ class MomentService extends MomentBaseModelService implements MomentContract
         $data = [
             'user_id' => $request->user_id,
             'description' => $request->user_id,
-            'img' => $img ?? ''
+            'img' => $img ?? '',
         ];
         $this->momentRepository->create($data);
+
         return true;
     }
 
@@ -188,6 +188,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
             $data['img'] = Common::upload('images', $request->file('img'));
         }
         $this->momentRepository->update($data, $id);
+
         return true;
     }
 
@@ -195,6 +196,7 @@ class MomentService extends MomentBaseModelService implements MomentContract
     {
         $data = $this->momentRepository->findOrFail($id);
         $data->delete();
+
         return true;
     }
 

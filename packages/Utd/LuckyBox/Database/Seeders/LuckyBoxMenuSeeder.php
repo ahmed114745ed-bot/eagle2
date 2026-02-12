@@ -47,7 +47,7 @@ class LuckyBoxMenuSeeder extends Seeder
                 ->where('parent_id', $parentId)
                 ->exists();
 
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('admin_menu')->insert([
                     'parent_id' => $parentId,
                     'order' => $item['order'],

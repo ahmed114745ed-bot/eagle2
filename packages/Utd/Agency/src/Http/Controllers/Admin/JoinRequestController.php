@@ -2,12 +2,11 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Grid;
-use Encore\Admin\Form;
 use Utd\Agency\Entities\AgencyJoinRequest;
 use Utd\Agency\Repositories\AgencyJoinRequestRepository;
 use Utd\Agency\Services\AgencyService;
@@ -33,6 +32,56 @@ class JoinRequestController extends Controller
     }
 
     /**
+     * Accept request
+     */
+    public function accept(Request $request, $id)
+    {
+        try {
+            $joinRequest = $this->joinRequestRepository->findById($id);
+
+            if (! $joinRequest) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Request not found',
+                ], 404);
+            }
+
+            $this->agencyService->acceptRequest($joinRequest->agency_id, $joinRequest->user_id);
+            $this->joinRequestRepository->accept($id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Request accepted successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
+     * Reject request
+     */
+    public function reject(Request $request, $id)
+    {
+        try {
+            $this->joinRequestRepository->reject($id);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Request rejected successfully',
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+    /**
      * Make a grid builder
      */
     protected function grid()
@@ -52,6 +101,7 @@ class JoinRequestController extends Controller
                 1 => '<span class="label label-success">Accepted</span>',
                 2 => '<span class="label label-danger">Rejected</span>',
             ];
+
             return $labels[$status] ?? $status;
         });
         $grid->column('created_at', __('Created At'))->sortable();
@@ -79,55 +129,5 @@ class JoinRequestController extends Controller
         });
 
         return $grid;
-    }
-
-    /**
-     * Accept request
-     */
-    public function accept(Request $request, $id)
-    {
-        try {
-            $joinRequest = $this->joinRequestRepository->findById($id);
-            
-            if (!$joinRequest) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Request not found',
-                ], 404);
-            }
-
-            $this->agencyService->acceptRequest($joinRequest->agency_id, $joinRequest->user_id);
-            $this->joinRequestRepository->accept($id);
-            
-            return response()->json([
-                'status' => true,
-                'message' => 'Request accepted successfully',
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage(),
-            ], 400);
-        }
-    }
-
-    /**
-     * Reject request
-     */
-    public function reject(Request $request, $id)
-    {
-        try {
-            $this->joinRequestRepository->reject($id);
-            
-            return response()->json([
-                'status' => true,
-                'message' => 'Request rejected successfully',
-            ]);
-        } catch (Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => $e->getMessage(),
-            ], 400);
-        }
     }
 }

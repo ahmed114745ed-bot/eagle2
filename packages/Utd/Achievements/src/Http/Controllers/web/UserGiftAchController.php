@@ -2,36 +2,29 @@
 
 namespace Utd\Achievements\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-
-
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Utd\Achievements\Entities\GiftAchievement;
-
-
 
 class UserGiftAchController extends MainController
 {
+    public $permission_name = 'user_achievement_level';
+
     /**
      * Title for current resource.
      *
      * @var string
      */
-
-
     protected $title = 'giftAchievement';
-    public $permission_name = 'user_achievement_level';
 
     /**
      * Make a grid builder.
      *
      * @return Content
      */
-
-
     public function index(Content $content)
     {
         return parent::index($content
@@ -40,13 +33,14 @@ class UserGiftAchController extends MainController
             ->body($this->grid()));
     }
 
-
     public function create(Content $content)
     {
 
         $achievement_id = session()->get('achievement_id');
+
         return parent::create($content->header(trans('admin.create'))->description(trans('admin.description'))->body(view('admin.grid.users.UserGiftAchivement', compact('achievement_id'))))->render();
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -60,7 +54,6 @@ class UserGiftAchController extends MainController
             ->title(trans('gift achievements'))
             ->body($this->form()->edit($id)));
     }
-
 
     protected function grid()
     {
@@ -88,7 +81,7 @@ class UserGiftAchController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

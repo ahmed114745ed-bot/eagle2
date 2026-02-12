@@ -2,34 +2,33 @@
 
 namespace Utd\Pk\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\UserCommon;
 use App\Models\Ware;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\UserCommon;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
 use Modules\Badge\Entities\Badge;
-use App\Services\AppFeatureService;
+use Modules\Vip\Entities\OVip;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class PkEventController extends MainController
 {
-
     use HasResourceActions;
 
     public $permission_name = 'pk-event';
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("pk_event");
+        (new AppFeatureService)->validateStatusEnable('pk_event');
     }
 
     public function index(Content $content)
@@ -49,8 +48,7 @@ class PkEventController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -65,6 +63,27 @@ class PkEventController extends MainController
         return $content
             ->title(trans('pk-events'))
             ->body($this->form());
+    }
+
+    public function store()
+    {
+        $data = request()->all();
+        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
+        request()->merge($data);
+
+        return parent::store();
+    }
+
+    public function show($id, Content $content)
+    {
+        return $content
+            ->title(trans('pk-events'))
+            ->row('<h3>'.__('PK Event').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->PkEvent($id));
+            })
+            ->row('<h3>'.__('Rewards').'</h3>')->row(function ($row) use ($id) {
+                $row->column(12, $this->rewardList($id));
+            });
     }
 
     protected function grid2()
@@ -83,7 +102,7 @@ class PkEventController extends MainController
     protected function grid()
     {
         $grid = new Grid(new PkEvent());
-        $grid->model()->orderByDesc("id");
+        $grid->model()->orderByDesc('id');
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
 
@@ -113,28 +132,28 @@ class PkEventController extends MainController
         $grid->column('start_date_local', __('Start Date'));
         $grid->column('end_date_local', __('End Date'));
         $grid->column('created_at', __('Created at'));
-        if (!request()->filled('_export_') && (Admin::user()->can('browse-' . 'pk-event-rewards') || Admin::user()->can('*'))) {
+        if (! request()->filled('_export_') && (Admin::user()->can('browse-'.'pk-event-rewards') || Admin::user()->can('*'))) {
             $grid->column('الاجرائات')->display(function () {
                 // توليد الروابط
-                $url1 = url('admin/pk-events-gift/pk-star/' . $this->id);
-                $url2 = url('admin/pk-events-gift/pk-king/' . $this->id);
-                $url3 = url('admin/pk-events-gift/pk-room/' . $this->id);
+                $url1 = url('admin/pk-events-gift/pk-star/'.$this->id);
+                $url2 = url('admin/pk-events-gift/pk-king/'.$this->id);
+                $url3 = url('admin/pk-events-gift/pk-room/'.$this->id);
 
                 $pk_star = 'النجم PK  هداية ';
                 $pk_king = 'الملك PK  هداية ';
                 $pk_owner = 'الغرفة pk هداية ';
-                if (app()->getLocale() == 'en') {
+                if (app()->getLocale() === 'en') {
                     $pk_star = 'star PK gift';
                     $pk_king = 'king PK gift';
                     $pk_owner = 'room PK gift';
                 }
                 // إنشاء أزرار HTML
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . $pk_star . "  </a>";
-                $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'>" . $pk_king . " </a>";
-                $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'>" . $pk_owner . " </a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".$pk_star.'  </a>';
+                $button2 = "<a href='{$url2}' class='btn btn-sm btn-danger'>".$pk_king.' </a>';
+                $button3 = "<a href='{$url3}' class='btn btn-sm btn-primary'>".$pk_owner.' </a>';
 
                 // دمج الأزرار في سلسلة واحدة وإرجاعها
-                return $button1 . ' ' . $button2 . ' ' . $button3;
+                return $button1.' '.$button2.' '.$button3;
             });
         }
         $this->extendGrid($grid);
@@ -145,7 +164,7 @@ class PkEventController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -156,15 +175,8 @@ class PkEventController extends MainController
         $show->field('start_date', __('Start Date'));
         $show->field('end_date', __('End Date'));
         $this->extendShow($show);
-        return $show;
-    }
 
-    public function store()
-    {
-        $data = request()->all();
-        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
-        request()->merge($data);
-        return parent::store();
+        return $show;
     }
 
     /**
@@ -182,36 +194,26 @@ class PkEventController extends MainController
         $lastStartDate = PkEvent::max('start_date');
 
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date_local', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+        $form->date('start_date_local', __('Start Date'))->default($minStartDate ?? date('Y-m-d'))
             ->rules(function ($form) {
 
                 $lastStartDate = PkEvent::max('start_date');
 
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
                 if ($minStartDate) {
-                    if (!$id = $form->model()->id) {
-                        return 'required|after:' . $minStartDate;
-                    } else {
-                        return 'required';
+                    if (! $id = $form->model()->id) {
+                        return 'required|after:'.$minStartDate;
                     }
-                } else {
-                    return 'required|date';
+
+                    return 'required';
+
                 }
+
+                return 'required|date';
+
             });
 
         return $form;
-    }
-
-    public function show($id, Content $content)
-    {
-        return $content
-            ->title(trans('pk-events'))
-            ->row("<h3>" . __('PK Event') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->PkEvent($id));
-            })
-            ->row("<h3>" . __('Rewards') . "</h3>")->row(function ($row) use ($id) {
-                $row->column(12, $this->rewardList($id));
-            });
     }
 
     protected function PkEvent($id)
@@ -237,24 +239,31 @@ class PkEventController extends MainController
 
         $grid->column('level', trans('level'));
         $grid->column('type', trans('type'))->display(function ($type) {
-            return $type == "coins" ? "coins" : ($type == "ware" ? "ware" : ($type == "vip" ? "vip" : 'achievement'));
+            return $type === 'coins' ? 'coins' : ($type === 'ware' ? 'ware' : ($type === 'vip' ? 'vip' : 'achievement'));
         });
         $grid->column('target', trans('target'))->display(function ($target) {
-            if ($this->type == "coins") {
+            if ($this->type === 'coins') {
                 return $target;
-            } elseif ($this->type == "ware") {
-                $ware = Ware::find($target);
-                return $ware ? ($ware->name ?? "") : "";
-            } elseif ($this->type == "vip") {
-                $vip = OVip::find($target);
-                return $vip ? ($vip->name ?? "") : "";
-            } elseif ($this->type == "badge") {
-                $vip = Badge::find($target);
-                return $vip ? (@$vip->name ?? '') : "";
-            } else {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
             }
+            if ($this->type === 'ware') {
+                $ware = Ware::find($target);
+
+                return $ware ? ($ware->name ?? '') : '';
+            }
+            if ($this->type === 'vip') {
+                $vip = OVip::find($target);
+
+                return $vip ? ($vip->name ?? '') : '';
+            }
+            if ($this->type === 'badge') {
+                $vip = Badge::find($target);
+
+                return $vip ? (@$vip->name ?? '') : '';
+            }
+            $value = getDriverUrl().'/'.@$this->target;
+
+            return "<img src='$value' width='80' height='80'>";
+
         });
 
         $grid->disableActions();

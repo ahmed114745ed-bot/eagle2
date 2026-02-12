@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('percentage_agency_manger')) return;
+        if (Schema::hasTable('percentage_agency_manger')) {
+            return;
+        }
         Schema::create('percentage_agency_manger', function (Blueprint $table) {
             $table->id();
             $table->integer('agency_manger_id')->unsigned()->index()->nullable();

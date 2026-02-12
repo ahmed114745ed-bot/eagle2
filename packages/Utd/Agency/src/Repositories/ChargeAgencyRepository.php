@@ -6,9 +6,8 @@ use Modules\SalaryTransaction\Entities\ChargeAgency;
 
 class ChargeAgencyRepository extends AbstractRepository
 {
-
     /**
-     * @param Model $model
+     * @param  Model  $model
      */
     public function __construct()
     {

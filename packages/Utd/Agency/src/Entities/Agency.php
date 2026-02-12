@@ -8,42 +8,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Utd\Agency\Scopes\HostAgencyScope;
 use Utd\Agency\Traits\ConfigurableModelsTrait;
-use Utd\Agency\Traits\PaymentGetWayTrait;
-use Utd\Agency\Traits\TimestampsWithTimezone;
 use Utd\Agency\Traits\CreatedByTrait;
 use Utd\Agency\Traits\DefaultBdAssignmentTrait;
+use Utd\Agency\Traits\PaymentGetWayTrait;
+use Utd\Agency\Traits\TimestampsWithTimezone;
 
 class Agency extends Model
 {
-    use DefaultBdAssignmentTrait, PaymentGetWayTrait, SoftDeletes, TimestampsWithTimezone, CreatedByTrait, ConfigurableModelsTrait;
-    
-    // Dynamically use SalaryTransferTrait if available
-    public function __construct(array $attributes = [])
-    {
-        if (trait_exists('Modules\\SalaryTransaction\\Traits\\SalaryTransferTrait')) {
-            $this->initializeSalaryTransferTrait();
-        }
-        parent::__construct($attributes);
-    }
-    
-    protected function initializeSalaryTransferTrait()
-    {
-        if (method_exists($this, 'bootSalaryTransferTrait')) {
-            $this->bootSalaryTransferTrait();
-        }
-    }
-    
-    /**
-     * Additional Info relationship (from AgencyAdditionalInfoTrait)
-     */
-    public function additionalInfo()
-    {
-        if (class_exists('Utd\\Agency\\Entities\\AdditionalInfo')) {
-            $additionalInfoClass = \Utd\Agency\Entities\AdditionalInfo::class;
-            return $this->hasOne($additionalInfoClass, 'agency_id');
-        }
-        return $this->hasOne(self::class, 'agency_id')->whereRaw('1 = 0');
-    }
+    use ConfigurableModelsTrait, CreatedByTrait, DefaultBdAssignmentTrait, PaymentGetWayTrait, SoftDeletes, TimestampsWithTimezone;
 
     protected $guarded = [];
 
@@ -52,64 +24,95 @@ class Agency extends Model
         'salary',
     ];
 
+    // Dynamically use SalaryTransferTrait if available
+    public function __construct(array $attributes = [])
+    {
+        if (trait_exists('Modules\\SalaryTransaction\\Traits\\SalaryTransferTrait')) {
+            $this->initializeSalaryTransferTrait();
+        }
+        parent::__construct($attributes);
+    }
+
+    /**
+     * Additional Info relationship (from AgencyAdditionalInfoTrait)
+     */
+    public function additionalInfo()
+    {
+        if (class_exists('Utd\\Agency\\Entities\\AdditionalInfo')) {
+            $additionalInfoClass = AdditionalInfo::class;
+
+            return $this->hasOne($additionalInfoClass, 'agency_id');
+        }
+
+        return $this->hasOne(self::class, 'agency_id')->whereRaw('1 = 0');
+    }
+
     public function chargeAgency()
     {
-        if (!class_exists('Modules\\SalaryTransaction\\Entities\\ChargeAgency')) {
+        if (! class_exists('Modules\\SalaryTransaction\\Entities\\ChargeAgency')) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         $chargeAgencyClass = 'Modules\\SalaryTransaction\\Entities\\ChargeAgency';
+
         return $this->hasMany($chargeAgencyClass, 'agency_id');
     }
-    
+
     public function salaryRequests()
     {
-        if (!class_exists('Modules\\SalaryTransaction\\Entities\\SalaryRequest')) {
+        if (! class_exists('Modules\\SalaryTransaction\\Entities\\SalaryRequest')) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
         $salaryRequestClass = 'Modules\\SalaryTransaction\\Entities\\SalaryRequest';
+
         return $this->hasMany($salaryRequestClass, 'agency_id');
     }
 
     public function charges()
     {
         $chargeClass = config('agency-package.models.charge', \App\Models\Charge::class);
+
         return $this->hasMany($chargeClass, 'user_id', 'id')->where('charger_type', 'host_agency');
     }
+
     public function senderCharges()
     {
         $chargeClass = config('agency-package.models.charge', \App\Models\Charge::class);
+
         return $this->hasMany($chargeClass, 'charger_id', 'id')->where('charger_type', 'host_agency');
     }
-
 
     public function Countries()
     {
         $countryClass = config('agency-package.models.country', \App\Models\Country::class);
+
         return $this->belongsToMany($countryClass, 'agency_countries', 'agency_id', 'country_id')->withTimestamps();
     }
 
     public function country(): BelongsTo
     {
         $countryClass = config('agency-package.models.country', \App\Models\Country::class);
+
         return $this->belongsTo($countryClass);
     }
 
     public function mempers()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->hasMany($userClass, 'agency_id');
     }
 
     public function members()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->hasMany($userClass, 'agency_id');
     }
-
 
     public function users()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->hasMany($userClass, 'agency_id');
     }
 
@@ -126,6 +129,7 @@ class Agency extends Model
     public function owner()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'app_owner_id', 'id')
             ->withoutGlobalScopes();
     }
@@ -133,6 +137,7 @@ class Agency extends Model
     public function agencyManger()
     {
         $userClass = config('agency-package.models.user', \App\Models\User::class);
+
         return $this->belongsTo($userClass, 'agency_manger_id', 'id');
     }
 
@@ -146,6 +151,7 @@ class Agency extends Model
     public function dashOwner()
     {
         $adminClass = config('agency-package.models.admin', \App\Models\Admin::class);
+
         return $this->belongsTo($adminClass, 'owner_id', 'id');
     }
 
@@ -173,7 +179,8 @@ class Agency extends Model
             $year = date('Y');
         }
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $this->hasMany($agencySalaryClass)->where('month', $month)->where('year', $year)->first();
     }
 
@@ -186,7 +193,8 @@ class Agency extends Model
             $year = date('Y');
         }
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $this->hasMany($agencySalaryClass)
             ->where('month', $month)
             ->where('year', $year)
@@ -203,6 +211,7 @@ class Agency extends Model
         }
 
         $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
+
         return $this->hasMany($userTargetClass)
             ->where('add_month', $month)
             ->where('add_year', $year)
@@ -211,7 +220,7 @@ class Agency extends Model
 
     public function getSalaryAttribute()
     {
-        return $this->agencySalaries->sum(fn($row) => ($row->sallary - $row->cut_amount));
+        return $this->agencySalaries->sum(fn ($row) => ($row->sallary - $row->cut_amount));
 
         //        $salary = AgencySallary::query()->where('agency_id', $this->id)
         //            ->sum(DB::raw('sallary - cut_amount'));
@@ -221,7 +230,7 @@ class Agency extends Model
 
     public function setSalaryAttribute()
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $salary = $agencySalaryClass::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
         $this->attributes['salary'] = $salary;
 
@@ -230,7 +239,7 @@ class Agency extends Model
 
     public function getSalaryAttributeAgencyManger()
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $salaryAgency = $agencySalaryClass::query()->where('agency_id', $this->id)->where('is_paid', 0)->sum(DB::raw('sallary - cut_amount'));
         $attributes['salaryAgency'] = $salaryAgency;
 
@@ -240,18 +249,21 @@ class Agency extends Model
     public function AgencyUsersTargets()
     {
         $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
+
         return $this->hasMany($userTargetClass, 'agency_id');
     }
 
     public function UserTarget()
     {
         $userTargetClass = config('agency-package.models.user_target', \App\Models\UserTarget::class);
+
         return $this->hasMany($userTargetClass, 'agency_id');
     }
 
     public function agencySalary()
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $this->hasOne($agencySalaryClass, 'agency_id')
             ->orderByDesc('id')
             ->where('month', now()->month)
@@ -260,7 +272,8 @@ class Agency extends Model
 
     public function getLastMonthSalaryAttribute()
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $this->hasOne($agencySalaryClass, 'agency_id')
             ->orderByDesc('id')
             ->where('month', now()->subMonth()->month)
@@ -272,18 +285,21 @@ class Agency extends Model
     public function salaries()
     {
         $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+
         return $this->hasMany($userSalaryClass, 'sallary');
     }
 
     public function userSalaries()
     {
         $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+
         return $this->hasMany($userSalaryClass, 'user_agency_id');
     }
 
     public function agencySalaries()
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $this->hasMany($agencySalaryClass, 'agency_id')->orderByDesc('id');
     }
 
@@ -292,9 +308,9 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -302,16 +318,16 @@ class Agency extends Model
 
         return floor($agencySalary ?? 0);
     }
+
     public function getTotalTargetAgency($month = null, $year = null)
     {
         $month ??= now()->month;
         $year ??= now()->year;
         $sumTargets =
             UserSallary::where('user_agency_id', $this->id)
-            ->where('month', $month)
-            ->where('year', $year)
-            ->sum('target_diamonds');
-
+                ->where('month', $month)
+                ->where('year', $year)
+                ->sum('target_diamonds');
 
         return floor($sumTargets ?? 0);
     }
@@ -321,9 +337,9 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -336,9 +352,9 @@ class Agency extends Model
     {
         $month ??= now()->month;
         $year ??= now()->year;
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $result = $agencySalaryClass::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->selectRaw('SUM(sallary) - SUM(cut_amount) as total')
@@ -347,16 +363,13 @@ class Agency extends Model
         return round($result, 2);
     }
 
-
-
-
-
     public function getOldAgency($month = null, $year = null)
     {
         $currentYear = date('Y');
         $currentMonth = date('m');
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
+
         return $agencySalaryClass::query()
             ->where('month', '<=', $month)
             ->where('year', '<=', $year)
@@ -371,9 +384,9 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -387,9 +400,9 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
-            ->where(DB::raw('concat(year,"-", month)'), '<=', $year . '-' . $month)
+            ->where(DB::raw('concat(year,"-", month)'), '<=', $year.'-'.$month)
             ->where('is_paid', 0)
             ->where('agency_id', $this->id)
             ->orderByDesc('id')
@@ -403,7 +416,7 @@ class Agency extends Model
         $month ??= now()->month;
         $year ??= now()->year;
 
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
             ->where('year', $year)
             ->where('month', $month)
@@ -415,11 +428,11 @@ class Agency extends Model
 
     public function sumNetSalary($month = null, $year = null)
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
                 });
             })
             ->where('agency_id', $this->id)
@@ -430,11 +443,11 @@ class Agency extends Model
 
     public function sumCutAmount($month = null, $year = null)
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
                 });
             })
             ->where('agency_id', $this->id)
@@ -442,13 +455,14 @@ class Agency extends Model
 
         return floor($agencySalary ?? 0);
     }
+
     public function sumSalary($month = null, $year = null)
     {
-        $agencySalaryClass = config('agency-package.models.agency_salary', \Utd\Agency\Entities\AgencySalary::class);
+        $agencySalaryClass = config('agency-package.models.agency_salary', AgencySalary::class);
         $agencySalary = $agencySalaryClass::query()
             ->when(isset($month) && isset($year), function ($query) use ($year, $month) {
                 $query->where(function ($query) use ($year, $month) {
-                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
+                    $query->where(DB::raw('concat(year,"-", month)'), '=', $year.'-'.$month);
                 });
             })
             ->where('agency_id', $this->id)
@@ -471,10 +485,33 @@ class Agency extends Model
     {
         return $query->where(function ($q) {
             $q->whereDoesntHave('additionalInfo')
-                ->orWhereHas('additionalInfo', fn($q) => $q->where('status', 1));
+                ->orWhereHas('additionalInfo', fn ($q) => $q->where('status', 1));
         })->whereNull('deleted_at')->where('type', 1);
     }
 
+    public function bd()
+    {
+        $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
+
+        return $this->belongsTo($bdClass, 'bd_id');
+    }
+
+    public function creator()
+    {
+        $adminUserClass = config('agency-package.models.admin_user', \App\Models\AdminUser::class);
+
+        return $this->belongsTo($adminUserClass, 'created_by');
+    }
+
+    public function ownerUserId(): ?int
+    {
+        return $this->app_owner_id ?? null;
+    }
+
+    public function bdUserId(): ?int
+    {
+        return $this->bd_id ?? null;
+    }
 
     protected static function boot()
     {
@@ -489,7 +526,7 @@ class Agency extends Model
                 $model->phone_code = request('phone_code');
             }
             if (request()->has('charge_agency')) {
-                if (request('charge_agency') == 1) {
+                if (request('charge_agency') === 1) {
                     ChargeAgency::firstOrCreate([
                         'agency_id' => $model->id,
                     ]);
@@ -538,26 +575,10 @@ class Agency extends Model
         });
     }
 
-
-    public function bd()
+    protected function initializeSalaryTransferTrait()
     {
-        $bdClass = config('agency-package.models.bd', \App\Models\Bd::class);
-        return $this->belongsTo($bdClass, 'bd_id');
-    }
-    public function creator()
-    {
-        $adminUserClass = config('agency-package.models.admin_user', \App\Models\AdminUser::class);
-        return $this->belongsTo($adminUserClass, 'created_by');
-    }
-
-
-    public function ownerUserId(): ?int
-    {
-        return $this->app_owner_id ?? null;
-    }
-
-    public function bdUserId(): ?int
-    {
-        return $this->bd_id ?? null;
+        if (method_exists($this, 'bootSalaryTransferTrait')) {
+            $this->bootSalaryTransferTrait();
+        }
     }
 }

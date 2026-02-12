@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('bd_agency_host_sallaries')) return;
+        if (! Schema::hasTable('bd_agency_host_sallaries')) {
+            return;
+        }
         Schema::table('bd_agency_host_sallaries', function (Blueprint $table) {
             if (Schema::hasColumn('bd_agency_host_sallaries', 'agency_sallary')) {
                 $table->decimal('agency_sallary', 20, 4)->change();

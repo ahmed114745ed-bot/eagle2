@@ -13,9 +13,9 @@ class AddDimondInUserSallaries extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('user_sallaries', 'diamond')) {
+        if (! Schema::hasColumn('user_sallaries', 'diamond')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
-                $table->string('diamond')->nullable()->default("0 / 0");
+                $table->string('diamond')->nullable()->default('0 / 0');
             });
         }
     }

@@ -3,7 +3,6 @@
 namespace Utd\Pk\Console;
 
 use Carbon\Carbon;
-use App\Helpers\Common;
 use Illuminate\Console\Command;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
@@ -18,7 +17,7 @@ class PkEventCommand extends Command
     {
         $pkEvent = PkEvent::endToday()->first();
 
-        if (!$pkEvent) {
+        if (! $pkEvent) {
             return '';
         }
 
@@ -40,14 +39,14 @@ class PkEventCommand extends Command
     public function repeatRewards(PkEvent $pkEvent, int $pkEventNewId)
     {
         $columns = [
-            "pk_event_id",
-            "type",
-            "level",
-            "target",
-            "pk_type",
-            "expire",
-            "created_at",
-            "updated_at",
+            'pk_event_id',
+            'type',
+            'level',
+            'target',
+            'pk_type',
+            'expire',
+            'created_at',
+            'updated_at',
         ];
         $previousRewards = $pkEvent->rewards()->get($columns)->toArray();
 

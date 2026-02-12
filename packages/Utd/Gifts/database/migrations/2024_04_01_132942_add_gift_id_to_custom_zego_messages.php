@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('custom_zego_messages', function (Blueprint $table) {
-           $table->dropColumn('gift_id');
+            $table->dropColumn('gift_id');
         });
     }
 };

@@ -1,20 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Utd\Room\Http\Controllers\Admin\RoomController;
-use Utd\Room\Http\Controllers\Admin\RoomMicController;
-use Utd\Room\Http\Controllers\Admin\RoomVipController;
-use Utd\Room\Http\Controllers\Admin\RoomTargetController;
-use Utd\Room\Http\Controllers\Admin\RoomSettingsController;
-use Utd\Room\Http\Controllers\Admin\RoomGiftTargetController;
-use Utd\Room\Http\Controllers\Admin\BanRoomsController;
+use Utd\Room\Entities\Room;
 use Utd\Room\Http\Controllers\Admin\BackgroundController;
+use Utd\Room\Http\Controllers\Admin\BanRoomsController;
+use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
+use Utd\Room\Http\Controllers\Admin\LiveRoomController;
 use Utd\Room\Http\Controllers\Admin\RequestBackgroundImageController;
 use Utd\Room\Http\Controllers\Admin\RoomCategoryController;
-use Utd\Room\Http\Controllers\Admin\LiveRoomController;
-use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
-use App\Admin\Controllers\GroupChatController;
-use Utd\Room\Entities\Room;
+use Utd\Room\Http\Controllers\Admin\RoomController;
+use Utd\Room\Http\Controllers\Admin\RoomGiftTargetController;
+use Utd\Room\Http\Controllers\Admin\RoomMicController;
+use Utd\Room\Http\Controllers\Admin\RoomSettingsController;
+use Utd\Room\Http\Controllers\Admin\RoomTargetController;
+use Utd\Room\Http\Controllers\Admin\RoomVipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,14 +34,14 @@ Route::group(
             'adminIp',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         // Room Resource Routes
         Route::resource('rooms', RoomController::class, [
             'names' => [
-                'index' => 'rooms'
-            ]
+                'index' => 'rooms',
+            ],
         ]);
         Route::get('rooms/microphones', [RoomController::class, 'getRoomsMicrophones']);
         Route::get('rooms/{room}/microphones', [RoomController::class, 'getRoomMicrophones']);
@@ -57,7 +56,8 @@ Route::group(
         Route::put('rooms/{room}/info', [RoomController::class, 'updateBasicInfo'])->name('rooms.basic_update');
         Route::put('rooms/{id}/update-pin-status', [RoomController::class, 'updatePinStatus']);
         Route::post('rooms/{room}/pin', function (Room $room) {
-            $room->update(['pin' => !$room->pin]);
+            $room->update(['pin' => ! $room->pin]);
+
             return response()->json(['success' => true, 'message' => 'Pin updated successfully']);
         })->name('rooms.pin');
 

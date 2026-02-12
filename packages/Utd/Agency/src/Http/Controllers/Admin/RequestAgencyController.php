@@ -2,37 +2,35 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Admin\Actions\AcceptAgencyAction;
 use App\Admin\Actions\RefuseAgencyAction;
 use App\Admin\Controllers\MainController;
+use Cache;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Widgets\Table as WidgetsTable;
+use Encore\Admin\Show;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class RequestAgencyController extends MainController
 {
     use ResolvesExternalDependencies;
-    
+
     public $permission_name = 'request-agencies';
 
     public function __construct()
     {
         $appFeatureService = $this->getAppFeatureService();
         if ($appFeatureService) {
-            $appFeatureService->validateStatusEnable("agencies");
+            $appFeatureService->validateStatusEnable('agencies');
         }
     }
 
-
     public function index(Content $content)
     {
-        $app_feature = \Cache::get('host_agency');
-        if (!($app_feature == '1' || $app_feature == 1)) {
+        $app_feature = Cache::get('host_agency');
+        if (! ($app_feature === '1' || $app_feature === 1)) {
             admin_error(__('Agency Feature is Disabled, Contact the administration'));
 
             return redirect()->back();
@@ -46,8 +44,7 @@ class RequestAgencyController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -60,8 +57,7 @@ class RequestAgencyController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -78,7 +74,6 @@ class RequestAgencyController extends MainController
             ->body($this->form()));
     }
 
-
     /**
      * Make a grid builder.
      *
@@ -87,14 +82,14 @@ class RequestAgencyController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Agency());
-        $countryID =session('filter_country_id');
+        $countryID = session('filter_country_id');
 
         $grid->model()->where('status', 0)
-            ->when($countryID, fn($q) => $q->where('country_id', $countryID))
+            ->when($countryID, fn ($q) => $q->where('country_id', $countryID))
             ->with(['owner:id,name,uuid,country_id', 'owner.profile', 'additionalInfo'])
-            ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
-            $query->where('status', 0);
-        });
+            ->orderByDesc('id')->whereHas('additionalInfo', function ($query) {
+                $query->where('status', 0);
+            });
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
@@ -105,16 +100,17 @@ class RequestAgencyController extends MainController
         $grid->column('owner.name', trans('name'))->display(function ($name) {
             $uid = @$this->owner->uuid;
             $path = @$this?->owner->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
+            $showUrl = ($this->owner) ? url("admin/users/{$this->owner->id}") : 0;
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -131,11 +127,11 @@ class RequestAgencyController extends MainController
         $grid->column('name', __('agency'))->display(function () {
             $name = @$this->name ?? '';
             $path = @$this->img;
-            $defaultImage = asset("images/icon-agency.jpg");
+            $defaultImage = asset('images/icon-agency.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -152,7 +148,7 @@ class RequestAgencyController extends MainController
         $grid->column('additionalInfo.gmail', __('Email'));
         $grid->column('additionalInfo.video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath = 'https://storage.googleapis.com/tik-chat/' . $this->additionalInfo?->video;
+            $videoPath = 'https://storage.googleapis.com/tik-chat/'.$this->additionalInfo?->video;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
@@ -161,26 +157,28 @@ class RequestAgencyController extends MainController
 
         $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->display(function () {
             $img = $this->additionalInfo?->face_image_nationalId;
-            if ($img == null || $img == '') {
+            if ($img === null || $img === '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
         $grid->column('additionalInfo.back_image_nationalId', __('back nationalId'))->display(function () {
             $img = $this->additionalInfo?->back_image_nationalId;
-            if ($img == null || $img == '') {
+            if ($img === null || $img === '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
 
-
         $grid->column('additionalInfo.salary', __('salary'))->display(function ($salary) {
             $image = asset('images/dollar.jpg'); // Adjust path as needed
+
             return "<div style='display: flex; align-items: center; '>
 
                         <span>{$salary}</span>
@@ -191,16 +189,17 @@ class RequestAgencyController extends MainController
         $grid->column('additionalInfo.user.name', __('The user ID that referred you to us'))->display(function ($name) {
             $uid = @$this->additionalInfo->user->uuid;
             $path = @$this?->additionalInfo->user->profile?->avatar;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl =  ($this->additionalInfo->user) ? url("admin/users/{$this->additionalInfo->user->id}") : 0;
+            $showUrl = ($this->additionalInfo->user) ? url("admin/users/{$this->additionalInfo->user->id}") : 0;
+
             return "
                 <div style='display: flex; align-items: center; gap: 10px;'>
                     $image
@@ -219,10 +218,10 @@ class RequestAgencyController extends MainController
             $actions->disableEdit();
             $actions->disableView();
             $actions->disableDelete();
-            if (Admin::user()->can('browse-' . 'accept-agency') || Admin::user()->can('*')) {
+            if (Admin::user()->can('browse-'.'accept-agency') || Admin::user()->can('*')) {
                 $actions->add(new AcceptAgencyAction($model->id));
             }
-            if (Admin::user()->can('browse-' . 'refuse-agency') || Admin::user()->can('*')) {
+            if (Admin::user()->can('browse-'.'refuse-agency') || Admin::user()->can('*')) {
                 $actions->add(new RefuseAgencyAction($model->id));
             }
 
@@ -230,9 +229,9 @@ class RequestAgencyController extends MainController
         $grid->disableCreateButton();
 
         $grid->tools(function (Grid\Tools $tools) {
-            if (Admin::user()->can('browse-' . 'request-agency-history') || Admin::user()->can('*')) {
+            if (Admin::user()->can('browse-'.'request-agency-history') || Admin::user()->can('*')) {
                 $url = '/admin/request-agencies-filteration';
-                $button = '<a href="' . $url . '" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;' . __("admin.history") . '</a>';
+                $button = '<a href="'.$url.'" class="btn btn-sm btn-success"><i class="fa fa-go"></i>&nbsp;&nbsp;'.__('admin.history').'</a>';
                 $tools->append($button);
             }
         });
@@ -243,7 +242,7 @@ class RequestAgencyController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

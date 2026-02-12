@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedInteger('room_id')->index();
             $table->foreign('room_id')->references('id')->on('rooms')->onDelete('cascade');
-            $table->integer("salary")->default(0);
-            $table->integer("cut_amount")->default(0);
-            $table->integer('month')->default (0);
-            $table->integer('year')->default (0);
-            $table->boolean('is_paid')->default (0);
-            $table->string('diamond')->default ("0/0");
+            $table->integer('salary')->default(0);
+            $table->integer('cut_amount')->default(0);
+            $table->integer('month')->default(0);
+            $table->integer('year')->default(0);
+            $table->boolean('is_paid')->default(0);
+            $table->string('diamond')->default('0/0');
             $table->timestamps();
         });
     }

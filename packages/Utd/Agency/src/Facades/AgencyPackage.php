@@ -7,9 +7,9 @@ use Utd\Agency\Helpers\AgencyModelsHelper;
 
 /**
  * Agency Package Facade
- * 
+ *
  * Provides safe access to Agency package models
- * 
+ *
  * @method static string|null getAgencyClass()
  * @method static string|null getAgencyJoinRequestClass()
  * @method static string|null getAgencySalaryClass()

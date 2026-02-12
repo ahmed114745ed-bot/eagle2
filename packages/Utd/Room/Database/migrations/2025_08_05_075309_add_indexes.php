@@ -74,5 +74,4 @@ return new class extends Migration
             $t->dropIndex(['id']);
         });
     }
-
 };

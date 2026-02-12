@@ -2,14 +2,13 @@
 
 namespace Utd\Agency\Http\Requests;
 
-use Utd\Agency\Traits\RequestTrait;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Http\FormRequest;
+use Utd\Agency\Traits\RequestTrait;
 
 class CreateAgencyRequest extends FormRequest
 {
-
     use RequestTrait;
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -25,7 +24,7 @@ class CreateAgencyRequest extends FormRequest
                 'nullable',
                 'email',
                 function ($attribute, $value, $fail) {
-                    if ($value && !str_contains($value, '@gmail.com')) {
+                    if ($value && ! str_contains($value, '@gmail.com')) {
                         $fail($attribute.' must be a valid Gmail address.');
                     }
                 },
@@ -35,9 +34,9 @@ class CreateAgencyRequest extends FormRequest
             'country' => 'nullable',
             'apps' => 'required',
             'salary' => 'required|integer',
-            'host' => 'required|integer', 
-            'uuid'=> 'nullable|exists:users,uuid',
-            'video'=>'nullable|file|mimes:mp4,ogx,oga,ogv,ogg,webm'
+            'host' => 'required|integer',
+            'uuid' => 'nullable|exists:users,uuid',
+            'video' => 'nullable|file|mimes:mp4,ogx,oga,ogv,ogg,webm',
         ];
     }
 

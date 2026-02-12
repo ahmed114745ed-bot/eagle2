@@ -2,7 +2,6 @@
 
 namespace Utd\Room\Transformers;
 
-use App\Models\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomResource extends JsonResource
@@ -10,12 +9,12 @@ class RoomResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
     {
-        $pk = $this->whenLoaded('lastPk', fn() => $this->lastPk);
+        $pk = $this->whenLoaded('lastPk', fn () => $this->lastPk);
         $isParty = $this->roomCategory && $this->roomCategory->type === 'party';
 
         $data = [
@@ -25,7 +24,7 @@ class RoomResource extends JsonResource
             'owner_name' => $this->owner?->name ?: '',
             'room_name' => $this->room_name ?: '',
             'owner_image' => $this->owner?->profile?->avatar ?: '',
-            'room_id' => (string)($this->id ?: 0),
+            'room_id' => (string) ($this->id ?: 0),
             'name' => $this->room_name ?: '',
             'mode' => $this->mode,
             'visitors_count' => $this->count_room_socket_v2 ?? 0,
@@ -78,6 +77,7 @@ class RoomResource extends JsonResource
     protected function getAdminsIds(): array
     {
         $ids = explode(',', $this->room_admin ?? '');
+
         return array_filter(array_map('intval', $ids));
     }
 }

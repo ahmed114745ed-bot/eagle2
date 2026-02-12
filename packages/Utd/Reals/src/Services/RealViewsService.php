@@ -7,16 +7,15 @@ use Utd\Reals\Entities\Real;
 
 class RealViewsService extends BaseModelService
 {
-
     public function add(Real $real, User $user)
     {
         $userId = $user->id;
         $real->views()->create([
             'user_id' => $userId,
         ]);
+
         return true;
     }
-
 
     public function delete($like_id, Real $real)
     {
@@ -24,7 +23,6 @@ class RealViewsService extends BaseModelService
     }
 
     /**
-     * @param $real
      * @return mixed
      */
     public function showLikes($real)
@@ -32,7 +30,7 @@ class RealViewsService extends BaseModelService
         return $real->likes()->with([
             'user' => function ($query) {
                 $query->withoutAppends()->with('profile')->select(['id', 'name']);
-            }
+            },
         ])->paginate(10);
     }
 }

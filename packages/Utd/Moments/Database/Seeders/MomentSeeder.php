@@ -33,23 +33,17 @@ class MomentSeeder extends Seeder
         //     ]);
         // }
 
-
         $moments = Moment::get();
 
-        foreach($moments as $moment)
-        {
-            if($moment->img)
-            {
+        foreach ($moments as $moment) {
+            if ($moment->img) {
                 MomentGallery::create([
-                    'moment_id' =>  $moment->id,
+                    'moment_id' => $moment->id,
                     'image' => $moment->img,
                 ]);
             }
 
-
         }
-
-
 
     }
 }

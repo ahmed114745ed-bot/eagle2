@@ -2,8 +2,8 @@
 
 namespace Utd\Agency\Console;
 
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
 
 class InstallAgencyCommand extends Command
@@ -37,9 +37,10 @@ class InstallAgencyCommand extends Command
         $this->info('');
 
         // Check if already installed
-        if (!$this->option('force') && $this->isInstalled()) {
+        if (! $this->option('force') && $this->isInstalled()) {
             $this->warn('⚠️  Agency package appears to be already installed.');
             $this->warn('   Use --force to reinstall.');
+
             return Command::SUCCESS;
         }
 
@@ -60,7 +61,7 @@ class InstallAgencyCommand extends Command
         $this->info('   ✅ Caches cleared.');
 
         // Step 4: Add admin menu
-        if (!$this->option('no-menu')) {
+        if (! $this->option('no-menu')) {
             $this->info('📦 Step 4/5: Adding admin menu items...');
             $this->addAdminMenu();
         } else {
@@ -119,19 +120,19 @@ class InstallAgencyCommand extends Command
     protected function resetMigrationHistory(): void
     {
         $migrationPath = base_path('packages/Utd/Agency/Database/Migrations');
-        if (!is_dir($migrationPath)) {
+        if (! is_dir($migrationPath)) {
             return;
         }
 
-        $files = glob($migrationPath . '/*.php');
+        $files = glob($migrationPath.'/*.php');
         $migrationsToReset = [];
 
         foreach ($files as $file) {
             $migrationsToReset[] = basename($file, '.php');
         }
 
-        if (!empty($migrationsToReset)) {
-            $this->info('🔄 Resetting migration history for ' . count($migrationsToReset) . ' files...');
+        if (! empty($migrationsToReset)) {
+            $this->info('🔄 Resetting migration history for '.count($migrationsToReset).' files...');
             \Illuminate\Support\Facades\DB::table('migrations')->whereIn('migration', $migrationsToReset)->delete();
         }
     }
@@ -144,15 +145,16 @@ class InstallAgencyCommand extends Command
         $this->info('🔧 Fixing potential schema issues...');
 
         // Fix 'is_host' on users table (if not exists)
-        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'is_host')) {
+        if (Schema::hasTable('users') && ! Schema::hasColumn('users', 'is_host')) {
             $this->info('   - Adding missing column: users.is_host');
             Schema::table('users', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->boolean('is_host')->default(0)->after('id');
             });
         }
-        
+
         // Other missing columns will be added by migrations automatically
     }
+
     /**
      * Publish the package configuration.
      */
@@ -160,19 +162,20 @@ class InstallAgencyCommand extends Command
     {
         // Check if config file already exists
         $configPath = config_path('agency-package.php');
-        
-        if (file_exists($configPath) && !$this->option('force')) {
+
+        if (file_exists($configPath) && ! $this->option('force')) {
             $this->info('   ⏭️  Config file already exists, skipping...');
+
             return;
         }
-        
+
         try {
             $this->call('vendor:publish', [
                 '--tag' => 'agency-config',
                 '--force' => $this->option('force'),
             ]);
-        } catch (\Exception $e) {
-            $this->warn('   ⚠️  Could not publish config file: ' . $e->getMessage());
+        } catch (Exception $e) {
+            $this->warn('   ⚠️  Could not publish config file: '.$e->getMessage());
             $this->info('   ℹ️  You can manually copy the config file if needed.');
         }
     }

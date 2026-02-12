@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->decimal('sallary', 20, 4)->change();
             });
         }
-        
+
         if (Schema::hasColumn('agency_sallaries', 'cut_amount')) {
             Schema::table('agency_sallaries', function (Blueprint $table) {
                 $table->decimal('cut_amount', 20, 4)->change();

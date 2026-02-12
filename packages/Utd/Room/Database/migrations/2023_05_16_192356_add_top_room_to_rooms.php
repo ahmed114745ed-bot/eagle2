@@ -14,7 +14,7 @@ class AddTopRoomToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('top_room')->nullable ()->default (0);
+            $table->unsignedTinyInteger('top_room')->nullable()->default(0);
         });
     }
 

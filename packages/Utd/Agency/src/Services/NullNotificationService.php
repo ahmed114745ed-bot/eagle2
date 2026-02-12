@@ -10,12 +10,12 @@ class NullNotificationService implements NotificationServiceInterface
     {
         return null;
     }
-    
+
     public function refuseRequestAgency($user)
     {
         return null;
     }
-    
+
     public function charges($user, $title, $body, $data = [])
     {
         return null;

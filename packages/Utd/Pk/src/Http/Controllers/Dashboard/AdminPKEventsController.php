@@ -3,25 +3,23 @@
 namespace Utd\Pk\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Utd\Pk\Entities\PkEvent;
-use Utd\Pk\Entities\PkReward;
 
 class AdminPKEventsController extends Controller
 {
-
     public function index()
     {
         $data = PkEvent::all();
+
         return $data;
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'start_date' => 'required'
+            'start_date' => 'required',
         ]);
         $start = Carbon::parse($request->start_date)->format('Y-m-d');
         $end = Carbon::parse($request->start_date)->addWeek(1)->format('Y-m-d');
@@ -31,19 +29,21 @@ class AdminPKEventsController extends Controller
         $data->start_date = $start;
         $data->end_date = $end;
         $data->save();
+
         return 200;
     }
 
     public function show(string $id)
     {
         $data = PkEvent::find($id);
-        return  $data;
+
+        return $data;
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'start_date' => 'required'
+            'start_date' => 'required',
         ]);
         $data = PkEvent::find($id);
         $start = Carbon::parse($request->start_date)->format('Y-m-d');
@@ -51,6 +51,7 @@ class AdminPKEventsController extends Controller
         $data->start_date = $start;
         $data->end_date = $end;
         $data->save();
+
         return 200;
     }
 
@@ -58,6 +59,7 @@ class AdminPKEventsController extends Controller
     {
         $PkEvent = PkEvent::find($id);
         $PkEvent->delete();
+
         return 200;
     }
 }

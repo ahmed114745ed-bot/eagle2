@@ -4,13 +4,13 @@ namespace Utd\Agency\Helpers;
 
 use Utd\Agency\Entities\Agency;
 use Utd\Agency\Entities\AgencyJoinRequest;
-use Utd\Agency\Entities\AgencySalary;
-use Utd\Agency\Entities\AgencyUserJob;
 use Utd\Agency\Entities\AgencyMangerDeleted;
 use Utd\Agency\Entities\AgencymAngerLink;
 use Utd\Agency\Entities\AgencyMangerPullingOut;
 use Utd\Agency\Entities\AgencyMangLink;
 use Utd\Agency\Entities\AgencyPack;
+use Utd\Agency\Entities\AgencySalary;
+use Utd\Agency\Entities\AgencyUserJob;
 
 class AgencyModelsHelper
 {

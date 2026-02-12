@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('agency_manger_deleteds')) return;
+        if (Schema::hasTable('agency_manger_deleteds')) {
+            return;
+        }
         Schema::create('agency_manger_deleteds', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id')->nullable();

@@ -2,8 +2,8 @@
 
 namespace Utd\Gifts\Entities;
 
-use App\Traits\TimestampsWithTimezone;
 use App\Traits\HostLevelTrait;
+use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Utd\Gifts\Support\ModelResolver;
@@ -13,7 +13,7 @@ use Utd\Gifts\Support\ModelResolver;
  */
 class GiftLog extends Model
 {
-    use TimestampsWithTimezone, HostLevelTrait;
+    use HostLevelTrait, TimestampsWithTimezone;
 
     protected $table = 'gift_logs';
 
@@ -24,58 +24,44 @@ class GiftLog extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-        
-    }
-
-    /**
-     */
     public function gift()
     {
         return $this->belongsTo(Gift::class, 'giftId', 'id');
     }
 
-    /**
-     */
     public function sender()
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($userModel, 'sender_id');
     }
 
-    /**
-     */
     public function receiver()
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($userModel, 'receiver_id');
     }
 
     public function roomOwner()
     {
         $userModel = ModelResolver::getUserModel();
-        
-        if (!$userModel) {
+
+        if (! $userModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($userModel, 'roomowner_id');
     }
 
-    /**
-     */
     public function room()
     {
         // محاولة استخدام PackageHelper إذا كان موجوداً
@@ -83,38 +69,43 @@ class GiftLog extends Model
         if ($packageHelperRelation !== null) {
             return $packageHelperRelation;
         }
-        
+
         $roomModel = ModelResolver::getRoomModel();
-        
-        if (!$roomModel) {
+
+        if (! $roomModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($roomModel, 'room_id');
     }
 
     public function moment(): BelongsTo
     {
         $momentModel = ModelResolver::getMomentModel();
-        
-        if (!$momentModel) {
+
+        if (! $momentModel) {
             return ModelResolver::emptyRelation($this);
         }
-        
+
         return $this->belongsTo($momentModel, 'moent_id');
     }
 
-    /**
-     */
     public function agency()
     {
         $agencyModel = ModelResolver::getAgencyModel();
-        
-        if (!$agencyModel) {
+
+        if (! $agencyModel) {
             $nullAgencyModel = ModelResolver::getNullAgencyModel();
+
             return $this->belongsTo($nullAgencyModel, 'agency_id', 'id')->whereRaw('1 = 0');
         }
-        
+
         return $this->belongsTo($agencyModel, 'agency_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
     }
 }

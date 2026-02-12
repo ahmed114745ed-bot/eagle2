@@ -8,7 +8,7 @@ class RoomBoomLevelResource extends JsonResource
 {
     public function toArray($request)
     {
-        $data =  [
+        $data = [
             'id' => $this->id,
             'level' => $this->level,
             'min_target' => $this->whenHas('min_target'),

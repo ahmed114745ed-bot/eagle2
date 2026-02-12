@@ -3,7 +3,6 @@
 namespace Utd\Room\Repositories;
 
 use Modules\Vip\Entities\Vip;
-use Utd\Room\Repositories\AbstractRepository;
 
 class RoomVipsRepository extends AbstractRepository
 {
@@ -39,8 +38,10 @@ class RoomVipsRepository extends AbstractRepository
         $record = $this->model->find($id);
         if ($record) {
             $record->update($data);
+
             return $record;
         }
+
         return null;
     }
 
@@ -50,6 +51,7 @@ class RoomVipsRepository extends AbstractRepository
         if ($record) {
             return $record->delete();
         }
+
         return false;
     }
 }

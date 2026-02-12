@@ -18,7 +18,7 @@ class MenuAchievementSeeder extends Seeder
             ],
             [
                 'order' => $parentOrder + 1,
-                'icon'  => '🏅',
+                'icon' => '🏅',
             ]
         );
 

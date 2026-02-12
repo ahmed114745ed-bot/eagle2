@@ -7,9 +7,6 @@ interface AgencyHostInviteServiceInterface
     /**
      * Send invitation to host
      *
-     * @param int $agencyId
-     * @param int $hostId
-     * @param array $data
      * @return mixed
      */
     public function sendInvitation(int $agencyId, int $hostId, array $data = []);
@@ -17,7 +14,6 @@ interface AgencyHostInviteServiceInterface
     /**
      * Accept invitation
      *
-     * @param int $invitationId
      * @return mixed
      */
     public function acceptInvitation(int $invitationId);
@@ -25,7 +21,6 @@ interface AgencyHostInviteServiceInterface
     /**
      * Reject invitation
      *
-     * @param int $invitationId
      * @return mixed
      */
     public function rejectInvitation(int $invitationId);
@@ -33,31 +28,30 @@ interface AgencyHostInviteServiceInterface
     /**
      * Get pending invitations for host
      *
-     * @param int $hostId
      * @return mixed
      */
     public function getPendingInvitations(int $hostId);
-    
+
     /**
      * Invite user to agency
      *
-     * @param mixed $request
+     * @param  mixed  $request
      * @return mixed
      */
     public function inviteAgency($request);
-    
+
     /**
      * Get host invitations
      *
-     * @param mixed $request
+     * @param  mixed  $request
      * @return mixed
      */
     public function hostInvitation($request);
-    
+
     /**
      * Handle invite action
      *
-     * @param mixed $request
+     * @param  mixed  $request
      * @return mixed
      */
     public function inviteAction($request);

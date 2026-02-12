@@ -3,33 +3,34 @@
 namespace Utd\LuckyBox\Services;
 
 use App\Enums\UserCoinLogType;
-use Carbon\Carbon;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\CoreWallet;
 use App\Events\SuperLuckyBox;
 use App\Facades\RedisService;
+use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
-use Utd\LuckyBox\Jobs\SuperLuckyBoxJob;
-use Utd\LuckyBox\Jobs\NormalLuckyBoxJob;
+use App\Models\CoreWallet;
+use App\Models\User;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Throwable;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\LuckyBox\Http\Resources\BoxUseResource;
+use Utd\LuckyBox\Jobs\NormalLuckyBoxJob;
+use Utd\LuckyBox\Jobs\SuperLuckyBoxJob;
 
 class BoxService
 {
     public function __construct() {}
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function sendBox($request, $user, $box, $room, $label)
     {
-        $boxCoin = $box->type == 0 ? $box->coins : $this->calculationSendBox($box);
+        $boxCoin = $box->type === 0 ? $box->coins : $this->calculationSendBox($box);
 
         DB::beginTransaction();
-        if ($box->type == 0) {
+        if ($box->type === 0) {
             $boxU = $this->sendNormalBox($box, $request, $boxCoin, $label, $room, $user->id);
         } else {
             $boxU = $this->sendSuperBox($box, $request, $boxCoin, $label, $room, $user);
@@ -50,29 +51,30 @@ class BoxService
             $rem_time = Carbon::createFromTimestamp($boxU->start_at)->diffInSeconds(
                 Carbon::createFromTimestamp($boxU->end_at)
             );
-            $type = $box->type == 1 ? 'super' : 'normal';
+            $type = $box->type === 1 ? 'super' : 'normal';
             $coins = $box->coins;
             $m = [
-                "messageContent" => [
-                    "message" => "showluckybox",
-                    "ownerBoxId" => $user->id,
-                    "ownerBoxName" => $user->name,
-                    "boxCoins" => $coins,
-                    "boxId" => $boxU->id,
-                    "boxType" => $type,
-                    "numOfBoxes" => (int)$c,
-                    "ownerBoxImage" => $user->avatar,
-                    "ownerBoxUId" => $user->uuid,
-                    "end_time" => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
-                ]
+                'messageContent' => [
+                    'message' => 'showluckybox',
+                    'ownerBoxId' => $user->id,
+                    'ownerBoxName' => $user->name,
+                    'boxCoins' => $coins,
+                    'boxId' => $boxU->id,
+                    'boxType' => $type,
+                    'numOfBoxes' => (int) $c,
+                    'ownerBoxImage' => $user->avatar,
+                    'ownerBoxUId' => $user->uuid,
+                    'end_time' => Carbon::createFromTimestamp($boxU->end_at)->toDateTimeString(),
+                ],
             ];
             $json = json_encode($m);
 
             Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
 
             return Common::apiResponse(1, '', new BoxUseResource($boxU), 200);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             DB::rollBack();
+
             return Common::apiResponse(0, 'fail', null, 400);
         }
     }
@@ -100,9 +102,10 @@ class BoxService
         ];
 
         $boxUser = BoxUse::query()->create($box_use_data);
-        $key = 'BoxUse_' . $boxUser->id;
+        $key = 'BoxUse_'.$boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
         dispatch(new NormalLuckyBoxJob())->delay(now()->addHours($normalDuration))->onQueue('test-super-lucky-box');
+
         return $boxUser;
     }
 
@@ -130,41 +133,43 @@ class BoxService
         $boxUser = BoxUse::query()->create($box_use_data);
         dispatch(new SuperLuckyBoxJob($boxUser->id))->delay(now()->addMinutes($box->duration))->onQueue('test-super-lucky-box');
 
-        $key = 'BoxUse_' . $boxUser->id;
+        $key = 'BoxUse_'.$boxUser->id;
         RedisService::updateUnSerialize($key, $box_use_data);
 
-        if (!$user instanceof User) return $boxUser;
+        if (! $user instanceof User) {
+            return $boxUser;
+        }
 
         $d2 = [
             'coins' => $request->coins ?: $box->coins,
-            "boxUId" => $boxUser->id,
-            "end_time" => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
-            "room" => [
-                "id" => $room->id,
-                "uuid" => $room->owner->uuid,
-                "room_name" => $room->room_name ?? '',
-                "room_session" => $room->session,
-                "room_owner_id" => $room->uid,
-                "is_password" => $room->room_pass ? true : false,
-                "room_cover" => $room->room_cover ?? '',
-                "room_background" => $room->final_room_image ?? '',
-                "room_mode" => $room->mode,
-                "room_type" => $room->type,
+            'boxUId' => $boxUser->id,
+            'end_time' => Carbon::createFromTimestamp($boxUser->end_at)->toDateTimeString(),
+            'room' => [
+                'id' => $room->id,
+                'uuid' => $room->owner->uuid,
+                'room_name' => $room->room_name ?? '',
+                'room_session' => $room->session,
+                'room_owner_id' => $room->uid,
+                'is_password' => $room->room_pass ? true : false,
+                'room_cover' => $room->room_cover ?? '',
+                'room_background' => $room->final_room_image ?? '',
+                'room_mode' => $room->mode,
+                'room_type' => $room->type,
             ],
-            "sender" => [
-                "id" => $user->id,
-                "name" => @$user->name ?? '',
-                "s_image" => @$user->profile->avatar ?? '',
-                "s_name" => @$user->name,
-                "s_sender_level" => $user->total_sender_level,
-                "s_receiver_level" => $user->total_received_level,
+            'sender' => [
+                'id' => $user->id,
+                'name' => @$user->name ?? '',
+                's_image' => @$user->profile->avatar ?? '',
+                's_name' => @$user->name,
+                's_sender_level' => $user->total_sender_level,
+                's_receiver_level' => $user->total_received_level,
             ],
-            "ownerBoxAL" => $user->UserVip?->level ?? 0,
+            'ownerBoxAL' => $user->UserVip?->level ?? 0,
         ];
 
         try {
             event(new SuperLuckyBox($d2));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Silently handle event dispatch errors
         }
 

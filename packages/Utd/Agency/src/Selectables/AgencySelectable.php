@@ -2,8 +2,8 @@
 
 namespace Utd\Agency\Selectables;
 
-use Utd\Agency\Entities\Agency;
 use Encore\Admin\Grid\Selectable;
+use Utd\Agency\Entities\Agency;
 
 class AgencySelectable extends Selectable
 {
@@ -15,7 +15,7 @@ class AgencySelectable extends Selectable
         $this->column('name', __('Name'));
         $this->column('owner.name', __('Owner'));
         $this->column('status', __('Status'))->display(function ($status) {
-            return $status == 1 ? 'Active' : 'Inactive';
+            return $status === 1 ? 'Active' : 'Inactive';
         });
 
         $this->filter(function ($filter) {

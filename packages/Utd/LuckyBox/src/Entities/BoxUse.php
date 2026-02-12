@@ -2,11 +2,11 @@
 
 namespace Utd\LuckyBox\Entities;
 
-use App\Support\PackageHelper;
-use Utd\Room\Entities\Room;
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Room\Entities\Room;
 
 class BoxUse extends Model
 {

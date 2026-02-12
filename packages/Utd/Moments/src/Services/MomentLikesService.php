@@ -18,6 +18,7 @@ class MomentLikesService extends MomentBaseModelService
         $moment->likes()->create([
             'user_id' => $userId,
         ]);
+
         return true;
     }
 
@@ -27,13 +28,15 @@ class MomentLikesService extends MomentBaseModelService
         $likeData = $moment->likes()->where('user_id', $userId)->first();
         if ($likeData) {
             $likeData->delete();
+
             return 'un Like';
-        } else {
-            $moment->likes()->create([
-                'user_id' => $userId,
-            ]);
-            return 'Like';
         }
+        $moment->likes()->create([
+            'user_id' => $userId,
+        ]);
+
+        return 'Like';
+
         return true;
     }
 
@@ -43,7 +46,6 @@ class MomentLikesService extends MomentBaseModelService
     }
 
     /**
-     * @param $moment
      * @return mixed
      */
     public function showLikes($moment)
@@ -51,7 +53,7 @@ class MomentLikesService extends MomentBaseModelService
         return $moment->likes()->with([
             'user' => function ($query) {
                 $query->withoutAppends()->with('profile')->select(['id', 'name', 'uuid']);
-            }
+            },
         ])->orderByDesc('id')->paginate(10);
     }
 }

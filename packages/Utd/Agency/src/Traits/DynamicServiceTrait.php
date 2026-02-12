@@ -2,6 +2,8 @@
 
 namespace Utd\Agency\Traits;
 
+use Exception;
+use Log;
 use Utd\Agency\Repositories\ShippingAgencyRepository;
 
 /**
@@ -23,8 +25,8 @@ trait DynamicServiceTrait
             if (app()->bound(\Utd\Agency\Contracts\AgencyServiceInterface::class)) {
                 return app(\Utd\Agency\Contracts\AgencyServiceInterface::class);
             }
-        } catch (\Exception $e) {
-            \Log::warning('AgencyService not available: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('AgencyService not available: '.$e->getMessage());
         }
 
         return null;
@@ -41,8 +43,8 @@ trait DynamicServiceTrait
             if (app()->bound(\Utd\Agency\Contracts\AgencyRepositoryInterface::class)) {
                 return app(\Utd\Agency\Contracts\AgencyRepositoryInterface::class);
             }
-        } catch (\Exception $e) {
-            \Log::warning('AgencyRepository not available: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('AgencyRepository not available: '.$e->getMessage());
         }
 
         return null;
@@ -59,8 +61,8 @@ trait DynamicServiceTrait
             if (class_exists(ShippingAgencyRepository::class)) {
                 return app(ShippingAgencyRepository::class);
             }
-        } catch (\Exception $e) {
-            \Log::warning('ShippingAgencyRepository not available: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('ShippingAgencyRepository not available: '.$e->getMessage());
         }
 
         return null;
@@ -68,8 +70,6 @@ trait DynamicServiceTrait
 
     /**
      * Check if agency package is available
-     *
-     * @return bool
      */
     protected function isAgencyPackageAvailable(): bool
     {
@@ -79,8 +79,7 @@ trait DynamicServiceTrait
     /**
      * Execute callback only if agency service is available
      *
-     * @param callable $callback
-     * @param mixed $default
+     * @param  mixed  $default
      * @return mixed
      */
     protected function withAgencyService(callable $callback, $default = null)
@@ -97,8 +96,7 @@ trait DynamicServiceTrait
     /**
      * Execute callback only if agency repository is available
      *
-     * @param callable $callback
-     * @param mixed $default
+     * @param  mixed  $default
      * @return mixed
      */
     protected function withAgencyRepository(callable $callback, $default = null)

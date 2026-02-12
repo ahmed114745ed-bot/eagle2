@@ -4,29 +4,29 @@ namespace Utd\Agency\Http\Controllers\Api\V2\Dashboard;
 
 use Exception;
 use Illuminate\Http\Request;
-use Utd\Agency\Facades\AgencyHelper;
 use Illuminate\Routing\Controller;
 use Maatwebsite\Excel\Facades\Excel;
-use Utd\Agency\Exports\HostDailyDataExport;
-use Utd\Agency\Transformers\HostDailyReportResource;
+use RuntimeException;
 use Utd\Agency\Contracts\AgencyServiceInterface;
+use Utd\Agency\Exports\HostDailyDataExport;
+use Utd\Agency\Facades\AgencyHelper;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
-
+use Utd\Agency\Transformers\HostDailyReportResource;
 
 class AgencyAppController extends Controller
 {
     use ResolvesExternalDependencies;
-    
+
     protected $agencyService;
 
-    public function __construct(AgencyServiceInterface $agencyService = null)
+    public function __construct(?AgencyServiceInterface $agencyService = null)
     {
         // Use injected service if available, otherwise resolve from config
         $this->agencyService = $agencyService ?? $this->getAgencyService();
-        
+
         // If still null, throw exception
-        if (!$this->agencyService) {
-            throw new \RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
+        if (! $this->agencyService) {
+            throw new RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
         }
     }
 
@@ -39,7 +39,7 @@ class AgencyAppController extends Controller
             return AgencyHelper::apiResponse(false, $e->getMessage(), null, 407);
         }
 
-        return AgencyHelper::apiResponse(1, '', $data,  200);
+        return AgencyHelper::apiResponse(1, '', $data, 200);
     }
 
     public function host_report($id)
@@ -51,7 +51,7 @@ class AgencyAppController extends Controller
             return AgencyHelper::apiResponse(false, $e->getMessage(), null, 407);
         }
 
-        return AgencyHelper::apiResponse(1, '', $data,  200);
+        return AgencyHelper::apiResponse(1, '', $data, 200);
     }
 
     public function host_daily_report(Request $request)
@@ -63,7 +63,8 @@ class AgencyAppController extends Controller
         } catch (Exception $e) {
             return AgencyHelper::apiResponse(false, $e->getMessage(), null, 407);
         }
-        return AgencyHelper::apiResponse(1, '', HostDailyReportResource::collection($hosts),  200);
+
+        return AgencyHelper::apiResponse(1, '', HostDailyReportResource::collection($hosts), 200);
     }
 
     public function host_daily_export_data(Request $request)
@@ -76,6 +77,7 @@ class AgencyAppController extends Controller
             return AgencyHelper::apiResponse(false, $e->getMessage(), null, 407);
         }
         $data = HostDailyReportResource::collection($hosts);
+
         return Excel::download(new HostDailyDataExport($data), 'data.xlsx');
     }
 
@@ -91,6 +93,7 @@ class AgencyAppController extends Controller
         } catch (Exception $e) {
             return AgencyHelper::apiResponse(false, $e->getMessage(), null, 407);
         }
-        return AgencyHelper::apiResponse(1, '', $agency,  200);
+
+        return AgencyHelper::apiResponse(1, '', $agency, 200);
     }
 }

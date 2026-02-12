@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
-use Utd\RoomCup\Http\Controllers\Admin\RoomCupTargetController;
-use Utd\RoomCup\Http\Controllers\Admin\RoomCupSettingsController;
+use Illuminate\Support\Facades\Route;
 use Utd\RoomCup\Http\Controllers\Admin\RoomCupReportsController;
+use Utd\RoomCup\Http\Controllers\Admin\RoomCupSettingsController;
+use Utd\RoomCup\Http\Controllers\Admin\RoomCupTargetController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,8 +21,8 @@ Route::resource('room-cup-reports', RoomCupReportsController::class);
 Route::get('/cup-targets-view', [RoomCupTargetController::class, 'cupTargetHtml'])->withoutMiddleware(['web', 'admin']);
 
 // Manual trigger route (for testing)
-//Route::get('/roomcup/calculate-rewards', function () {
+// Route::get('/roomcup/calculate-rewards', function () {
 //    Artisan::call('roomcup:calculate-rewards');
 //    $output = Artisan::output();
 //    return response()->json(['output' => $output]);
-//});
+// });

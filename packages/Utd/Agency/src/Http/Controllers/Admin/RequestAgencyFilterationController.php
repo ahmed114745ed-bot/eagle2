@@ -2,26 +2,28 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class RequestAgencyFilterationController extends MainController
 {
     use ResolvesExternalDependencies;
 
+    public $permission_name = 'request-agency-history';
+
+    protected $title = 'Agency';
+
     public function __construct()
     {
         $appFeatureService = $this->getAppFeatureService();
         if ($appFeatureService) {
-            $appFeatureService->validateStatusEnable("agencies");
+            $appFeatureService->validateStatusEnable('agencies');
         }
     }
-    public $permission_name = 'request-agency-history';
-
 
     public function index(Content $content)
     {
@@ -29,7 +31,6 @@ class RequestAgencyFilterationController extends MainController
             ->title(trans('Agency'))
             ->body($this->grid()));
     }
-    protected $title = 'Agency';
 
     /**
      * Make a grid builder.
@@ -43,10 +44,10 @@ class RequestAgencyFilterationController extends MainController
             'owner',
             'additionalInfo',
             'additionalInfo.country',
-            'owner.packs' => fn($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value')
+            'owner.packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
 
         ])
-            ->orderByDesc("id")->whereHas('additionalInfo', function ($query) {
+            ->orderByDesc('id')->whereHas('additionalInfo', function ($query) {
                 $query->where('status', '!=', 0);
             });
         $grid->filter(function (Grid\Filter $filter) {
@@ -55,9 +56,9 @@ class RequestAgencyFilterationController extends MainController
                 $filter->equal('owner.uuid', __('uuid'));
             });
             $filter->equal('status', __('Status'))->radio([
-                ''   => 'All',
-                1    => __("accept"),
-                2    => __("denied"),
+                '' => 'All',
+                1 => __('accept'),
+                2 => __('denied'),
             ]);
         });
         $grid->column('id', __('Id'));
@@ -66,7 +67,7 @@ class RequestAgencyFilterationController extends MainController
             return @$this->owner->uuid ?? '';
         });
         $grid->column('status', __('status'))->display(function ($q) {
-            return $this->status == 1 ? __("accept") : __("denied");
+            return $this->status === 1 ? __('accept') : __('denied');
         });
         $grid->column('name', __('Name'));
         $grid->column('phone', __('whats app'));
@@ -75,7 +76,7 @@ class RequestAgencyFilterationController extends MainController
         $grid->column('additionalInfo.gmail', __('Email'));
         $grid->column('additionalInfo.video', __('video'))->display(function () {
             // Assuming you have a 'video_path' field in your model
-            $videoPath = 'https://storage.googleapis.com/tik-chat/' . $this->additionalInfo?->video;
+            $videoPath = 'https://storage.googleapis.com/tik-chat/'.$this->additionalInfo?->video;
 
             // You can customize the HTML to embed the video
             return "<video width='150' height='100' controls><source src='$videoPath' type='video/mp4'>Your browser does not support the video tag.</video>";
@@ -84,23 +85,24 @@ class RequestAgencyFilterationController extends MainController
 
         $grid->column('additionalInfo.face_image_nationalId', __('face nationalId'))->display(function () {
             $img = $this->additionalInfo?->face_image_nationalId;
-            if ($img == null || $img == '') {
+            if ($img === null || $img === '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
         $grid->column('additionalInfo.back_image_nationalId', __('back nationalId'))->display(function () {
             $img = $this->additionalInfo?->back_image_nationalId;
-            if ($img == null || $img == '') {
+            if ($img === null || $img === '') {
                 return 'No image founded';
             }
 
-            $imageUrl = 'https://storage.googleapis.com/tik-chat/' . $img;
+            $imageUrl = 'https://storage.googleapis.com/tik-chat/'.$img;
+
             return "<a href='{$imageUrl}' target='_blank' rel='noopener noreferrer'><img src='{$imageUrl}' style='height: 50px;'></a>";
         });
-
 
         $grid->column('additionalInfo.salary', __('salary'));
         $grid->column('additionalInfo.host', 'host');
@@ -114,14 +116,13 @@ class RequestAgencyFilterationController extends MainController
         });
         $grid->disableCreateButton();
 
-
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

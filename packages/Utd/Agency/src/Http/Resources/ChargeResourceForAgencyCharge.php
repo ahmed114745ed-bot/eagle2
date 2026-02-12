@@ -2,11 +2,11 @@
 
 namespace Utd\Agency\Http\Resources;
 
-use Utd\Agency\Facades\AgencyHelper;
-use Utd\Agency\Entities\ShippingAgency;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Utd\Agency\Entities\ShippingAgency;
+use Utd\Agency\Facades\AgencyHelper;
 
 class ChargeResourceForAgencyCharge extends JsonResource
 {
@@ -18,12 +18,12 @@ class ChargeResourceForAgencyCharge extends JsonResource
             ->exists();
 
         return [
-            'id'   => $this->id ?: 0,
+            'id' => $this->id ?: 0,
             'sender' => $sender,
-            'receiver' =>  AgencyHelper::getReceiverInfo($this),
+            'receiver' => AgencyHelper::getReceiverInfo($this),
             'value' => (int) $this->amount,
             'time' => ($this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d h:i:s A') : null),
-            'coins' =>  (int)$this->amount ?? 0,
+            'coins' => (int) $this->amount ?? 0,
             'usd' => $this->usd ?? 0,
             'is_sender' => $is_sender ?? 0,
         ];

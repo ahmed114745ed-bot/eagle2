@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('user_achievement_levels', 'file')) {
+        if (! Schema::hasColumn('user_achievement_levels', 'file')) {
             Schema::table('user_achievement_levels', function (Blueprint $table) {
-          
+
                 $table->string('file')->nullable();
 
             });
         }
     }
-    
+
     /**
      * Reverse the migrations.
      */

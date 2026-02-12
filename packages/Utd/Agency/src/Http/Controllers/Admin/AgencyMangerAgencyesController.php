@@ -2,15 +2,15 @@
 
 namespace Utd\Agency\Http\Controllers\Admin;
 
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
 use Utd\Agency\Traits\ResolvesModels;
 
 class AgencyMangerAgencyesController extends MainController
@@ -29,8 +29,7 @@ class AgencyMangerAgencyesController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -43,8 +42,7 @@ class AgencyMangerAgencyesController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -114,7 +112,7 @@ class AgencyMangerAgencyesController extends MainController
                     'users.uuid',
                     'users.total_days',
                     'users.name',
-                    DB::raw('COALESCE(mdr.monthly_diamond_received, 0) as monthly_diamond_received')
+                    DB::raw('COALESCE(mdr.monthly_diamond_received, 0) as monthly_diamond_received'),
                 ])
                 ->map(function ($member) {
                     $avatar = $member->profile ? getImagePath($member->profile?->avatar) : null;
@@ -126,7 +124,7 @@ class AgencyMangerAgencyesController extends MainController
                         'name' => $member->name ?? '',
                         'reals_count' => $member->reals_count ?? 0,
                         'total_days' => $member->total_days ?? 0,
-                        'total_hours' => $member->liveTime->sum("hours") ?? 0,
+                        'total_hours' => $member->liveTime->sum('hours') ?? 0,
                         'monthly_diamond_received' => $member->monthly_diamond_received ?? 0,
                         'image' => $imageHtml,
                         'salary' => optional($member->userSallary)->sallary ?? 0,
@@ -145,7 +143,7 @@ class AgencyMangerAgencyesController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -213,7 +211,7 @@ class AgencyMangerAgencyesController extends MainController
         });
         $form->display('ID');
         // $form->select('owner_id', __('owner id'))->options ($ops);
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             $form->select('app_owner_id', __('app owner id'))->options('/api/search/users23')->ajax('/api/search/users3', 'id', 'name');
             // ->options(function ($value) {
             //     $ops2 = [];
@@ -231,11 +229,9 @@ class AgencyMangerAgencyesController extends MainController
 
         if ($form->isEditing()) {
             $form->hidden('app_owner_id', __('app owner id'));
-            //$form->hidden('agency_manger_id', __('app manger id'));
+            // $form->hidden('agency_manger_id', __('app manger id'));
             // $form->hidden('agency_dash_manger_id', __('dash owner id'));
         }
-
-
 
         // $form->text('name', __('name'))->rules('required');
         // $form->text('notice', __('notice'))->rules('required');
@@ -244,7 +240,6 @@ class AgencyMangerAgencyesController extends MainController
         // $form->url('url', __('url'));
         // $form->image('img', __('img'))->rules('required');
         // $form->textarea('contents', __('contents'));
-
 
         // $form->switch('Shipping_agency', trans('Shipping agency'))->default(true);
         // $form->switch('Host_agency', trans('Host agency'))->default(false);
@@ -257,8 +252,6 @@ class AgencyMangerAgencyesController extends MainController
         //     //     Rule::requiredIf(!$shippingAgency && !$form->input('at_least_one_selected'))
         //     // ];
         // });
-
-
 
         if (Session::has('show_alert')) {
             $form->html('<script>
@@ -304,6 +297,7 @@ class AgencyMangerAgencyesController extends MainController
             $user->type_user = 2;
             $user->save();
         });
+
         return $form;
     }
 }

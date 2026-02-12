@@ -16,7 +16,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('achieved_diamond')->default(0)->change();
             });
         }
-        
+
         if (Schema::hasColumn('user_sallaries', 'remaining_diamond')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
                 $table->unsignedBigInteger('remaining_diamond')->default(0)->change();

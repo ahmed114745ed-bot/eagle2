@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Utd\Reals\Entities\Real;
+use Utd\Reals\Entities\ReportReals;
 use Utd\Reals\Http\Controllers\Web\AdminReelController;
 use Utd\Reals\Http\Controllers\Web\ReelController;
 use Utd\Reals\Http\Controllers\Web\ReelSettingsController;
 use Utd\Reals\Http\Controllers\Web\ReportRealsController;
-use Utd\Reals\Entities\Real;
-use Utd\Reals\Entities\ReportReals;
 
 /*
 |--------------------------------------------------------------------------

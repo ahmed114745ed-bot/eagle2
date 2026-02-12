@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddMomentUserLikesTable extends Migration
 {
@@ -13,7 +13,7 @@ class AddMomentUserLikesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('moment_user_likes')) {
+        if (! Schema::hasTable('moment_user_likes')) {
             Schema::create('moment_user_likes', function (Blueprint $table) {
 
                 $table->id();

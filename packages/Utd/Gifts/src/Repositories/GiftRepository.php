@@ -2,14 +2,12 @@
 
 namespace Utd\Gifts\Repositories;
 
-use Utd\Gifts\Entities\Gift;
+use App\Contracts\GiftRepositoryContract as AppGiftRepositoryContract;
 use Illuminate\Support\Facades\Auth;
 use Utd\Gifts\Contracts\GiftRepositoryContract;
-use App\Contracts\GiftRepositoryContract as AppGiftRepositoryContract;
+use Utd\Gifts\Entities\Gift;
 
-
-
-class GiftRepository extends AbstractRepository implements GiftRepositoryContract, AppGiftRepositoryContract
+class GiftRepository extends AbstractRepository implements AppGiftRepositoryContract, GiftRepositoryContract
 {
     public function __construct()
     {
@@ -20,8 +18,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
     {
         $user = Auth::user();
 
-
-        if ($type == 11 && $user) {
+        if ($type === 11 && $user) {
 
             return $user->myGifts()
                 ->withPivot('quantity')
@@ -62,8 +59,6 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
             ->get();
     }
 
-
-
     public function get_images()
     {
 
@@ -74,7 +69,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
 
     public function allGifts($page, $perPage)
     {
-        $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
+        $gifts = $this->model->query()->where('type', '!=', 8)->orderBy('use_count', 'desc');
 
         return $gifts->orderBy('price')->paginate($perPage, ['*'], 'page', $page);
     }
@@ -92,7 +87,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
             'show_img',
             'show_img2',
             'image_type',
-            'gift_category_id'
+            'gift_category_id',
         ])->with('category')->where('id', $giftId)->where('enable', 1)->first();
     }
 
@@ -104,6 +99,7 @@ class GiftRepository extends AbstractRepository implements GiftRepositoryContrac
     public function giftUpdate($giftId, $type, $requestType)
     {
         $this->model->where('id', $giftId)->update([$type => $requestType]);
+
         return true;
     }
 

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('agencies', 'admin_id')) {
+        if (! Schema::hasColumn('agencies', 'admin_id')) {
             Schema::table('agencies', function (Blueprint $table) {
                 $table->unsignedBigInteger('admin_id')->nullable();
             });

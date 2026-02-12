@@ -2,17 +2,18 @@
 
 namespace Utd\CP\Entities;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Vip\Entities\OVip;
 
 class CpLevelGift extends Model
 {
     use TimestampsWithTimezone;
 
     protected $guarded = [];
-     protected $appends = ['type_ware'];
+
+    protected $appends = ['type_ware'];
 
     public function cp_level()
     {
@@ -32,6 +33,16 @@ class CpLevelGift extends Model
     public function getTypeWareAttribute()
     {
         return $this->ware?->type ?? null;
+    }
+
+    public function ware_item()
+    {
+        return $this->belongsTo(Ware::class, 'ware_item_id');
+    }
+
+    public function vip_item()
+    {
+        return $this->belongsTo(OVip::class, 'vip_item_id');
     }
 
     protected static function boot()
@@ -59,17 +70,4 @@ class CpLevelGift extends Model
 
         });
     }
-
-    public function ware_item()
-    {
-        return $this->belongsTo(Ware::class, 'ware_item_id');
-    }
-
-    public function vip_item()
-    {
-        return $this->belongsTo(OVip::class, 'vip_item_id');
-    }
-
 }
-
-

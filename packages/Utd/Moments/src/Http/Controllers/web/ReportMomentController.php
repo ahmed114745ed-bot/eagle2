@@ -2,14 +2,14 @@
 
 namespace Utd\Moments\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Utd\Moments\Entities\Moment;
-use Encore\Admin\Layout\Content;
-use App\Admin\Controllers\MainController;
 use Utd\Moments\Entities\ReportMoment;
-use Encore\Admin\Facades\Admin;
 
 class ReportMomentController extends MainController
 {
@@ -18,8 +18,54 @@ class ReportMomentController extends MainController
      *
      * @var string
      */
-
     public $permission_name = 'report-moment';
+
+    public static function getRoomsShow(Moment $moment)
+    {
+        $show = new Show($moment);
+
+        $show->field('img', __('Image'))->unescape()->as(function ($img) {
+            if (! $img) {
+                return "<span style='color: #e74c3c;'>No Image Available</span>";
+            }
+            $url = getImagePath($img); // استخدام `getImagePath` بدلًا من بناء الرابط يدويًا
+
+            return "<img src='$url' style='max-width: 500px; max-height: 500px; border-radius: 10px;' class='img-thumbnail'/>";
+        });
+
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
+
+        return $show;
+    }
+
+    public static function getDescriptionShow(Real $reel)
+    {
+        $show = new Show($reel);
+
+        $show->field('description', __('Description'))->unescape()->as(function ($description) {
+            $limitedDescription = mb_substr($description, 0, 40).(mb_strlen($description) > 40 ? '...' : '');
+
+            return "<a href='#' class='view-description' data-description=\"".htmlentities($description)."\">$limitedDescription</a>";
+        });
+
+        $show->panel()->tools(function ($tools) {
+            $tools->disableEdit();
+            $tools->disableList();
+            $tools->disableDelete();
+        });
+
+        Admin::script("
+             if (window.innerWidth >= 1024) {
+                 $('.table-responsive').removeClass('table-responsive');
+             }
+         ");
+
+        return $show;
+    }
 
     public function index(Content $content)
     {
@@ -31,8 +77,7 @@ class ReportMomentController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -45,8 +90,7 @@ class ReportMomentController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -68,29 +112,29 @@ class ReportMomentController extends MainController
      *
      * @return Grid
      */
-
-
-
     protected function grid()
     {
         $grid = new Grid(new ReportMoment());
         $grid->model()->whereHas('moment')->orderByDesc('id');
-        $grid->model()->with(['moment' => fn($query) => $query->withExists(['likes', 'comments'])]);
+        $grid->model()->with(['moment' => fn ($query) => $query->withExists(['likes', 'comments'])]);
 
         $grid->column('id', __('Id'));
 
         $grid->column('Reporter_id', __('Reporter'))->display(function () {
-            if (!$this->reporter) return '-';
+            if (! $this->reporter) {
+                return '-';
+            }
 
-            $url = admin_url('users/' . $this->reporter->id);
+            $url = admin_url('users/'.$this->reporter->id);
             $name = $this->reporter->name;
             $uuid = $this->reporter->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$this->reporter->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
+
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -101,17 +145,20 @@ class ReportMomentController extends MainController
         });
 
         $grid->column('Reported_id', __('Reported User'))->display(function () {
-            if (!$this->reportedUser) return '-';
+            if (! $this->reportedUser) {
+                return '-';
+            }
 
-            $url = admin_url('users/' . $this->reportedUser->id);
+            $url = admin_url('users/'.$this->reportedUser->id);
             $name = $this->reportedUser->name;
             $uuid = $this->reportedUser->uuid;
-            $defaultImage = asset("images/businessman-icon.jpg");
+            $defaultImage = asset('images/businessman-icon.jpg');
             $avatarPath = @$this->reportedUser->avatar;
             $avatar = getImagePath($avatarPath) ?? $defaultImage;
-            if (!isImageExists($avatar)) {
+            if (! isImageExists($avatar)) {
                 $avatar = $defaultImage;
             }
+
             return "<div style='display: flex; align-items: center; gap: 10px; cursor: pointer;' onclick=\"window.location.href='$url'\">
                         <img src='$avatar' alt='User Avatar' style='width: 40px; height: 40px; border-radius: 50%;'>
                         <div>
@@ -121,18 +168,14 @@ class ReportMomentController extends MainController
                     </div>";
         });
 
-
-
-
-
-
         $grid->column('moment_id', __('View Moment'))->modal(__('moment'), function ($model) {
             return self::getRoomsShow($model->moment);
         });
 
         $grid->column('description', __('Description'))->display(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
+            $limitedDescription = mb_substr($description, 0, 40).(mb_strlen($description) > 40 ? '...' : '');
+
+            return "<a href='#' class='view-description' data-description=\"".htmlentities($description)."\">$limitedDescription</a>";
         });
         Admin::script("
                 $(document).ready(function () {
@@ -155,68 +198,22 @@ class ReportMomentController extends MainController
                     });
                 }); ");
 
-
         $grid->column('type', __('Type'));
-        if (!Admin::user()->can('*') || !Admin::user()->can('delete-' . 'Moment')) {
+        if (! Admin::user()->can('*') || ! Admin::user()->can('delete-'.'Moment')) {
             $grid->column(__('redirect_button'))->display(function () {
                 $delete_moment = 'حذف اللحظة';
-                if (app()->getLocale() == 'en') {
-                    $delete_moment = "Delete moment";
+                if (app()->getLocale() === 'en') {
+                    $delete_moment = 'Delete moment';
                 }
                 $redirectRoute = 'delete-moment';
-                return '<a href="' . route($redirectRoute, ['moment_id' => $this->moment_id, 'id' => $this->id]) . '" class="btn btn-xs btn-primary">' . $delete_moment . ' </a>';
+
+                return '<a href="'.route($redirectRoute, ['moment_id' => $this->moment_id, 'id' => $this->id]).'" class="btn btn-xs btn-primary">'.$delete_moment.' </a>';
             });
         }
         $this->extendGrid($grid);
+
         return $grid;
     }
-
-    public static function getRoomsShow(Moment $moment)
-    {
-        $show = new Show($moment);
-
-        $show->field('img', __('Image'))->unescape()->as(function ($img) {
-            if (!$img) {
-                return "<span style='color: #e74c3c;'>No Image Available</span>";
-            }
-            $url = getImagePath($img); // استخدام `getImagePath` بدلًا من بناء الرابط يدويًا
-            return "<img src='$url' style='max-width: 500px; max-height: 500px; border-radius: 10px;' class='img-thumbnail'/>";
-        });
-
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableList();
-            $tools->disableDelete();
-        });
-
-        return $show;
-    }
-
-
-    public static function getDescriptionShow(Real $reel)
-    {
-        $show = new Show($reel);
-
-        $show->field('description', __('Description'))->unescape()->as(function ($description) {
-            $limitedDescription = mb_substr($description, 0, 40) . (strlen($description) > 40 ? '...' : '');
-            return "<a href='#' class='view-description' data-description=\"" . htmlentities($description) . "\">$limitedDescription</a>";
-        });
-
-        $show->panel()->tools(function ($tools) {
-            $tools->disableEdit();
-            $tools->disableList();
-            $tools->disableDelete();
-        });
-
-        Admin::script("
-             if (window.innerWidth >= 1024) {
-                 $('.table-responsive').removeClass('table-responsive');
-             }
-         ");
-
-        return $show;
-    }
-
 
     // protected function grid()
     // {
@@ -263,7 +260,7 @@ class ReportMomentController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

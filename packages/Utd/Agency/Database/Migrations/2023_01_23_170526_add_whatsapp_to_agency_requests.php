@@ -13,7 +13,7 @@ class AddWhatsappToAgencyRequests extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('agency_join_requests', 'whatsapp')) {
+        if (! Schema::hasColumn('agency_join_requests', 'whatsapp')) {
             Schema::table('agency_join_requests', function (Blueprint $table) {
                 $table->string('whatsapp')->nullable();
             });

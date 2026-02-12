@@ -2,13 +2,13 @@
 
 namespace Utd\Room\Services;
 
-use Exception;
-use App\Models\User;
-use Utd\Room\Entities\Room;
 use App\Contracts\RoomServiceContract;
+use App\Models\User;
+use Exception;
+use Utd\Room\Entities\Room;
+use Utd\Room\Repositories\RoomMicrophoneRepository;
 use Utd\Room\Repositories\RoomRepository;
 use Utd\Room\Repositories\RoomVisitorRepository;
-use Utd\Room\Repositories\RoomMicrophoneRepository;
 
 class RoomService implements RoomServiceContract
 {
@@ -16,8 +16,7 @@ class RoomService implements RoomServiceContract
         protected RoomRepository $roomRepository,
         protected RoomVisitorRepository $visitorRepository,
         protected RoomMicrophoneRepository $microphoneRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get all rooms with filters
@@ -57,7 +56,7 @@ class RoomService implements RoomServiceContract
     public function createRoom(array $data, User $user): Room
     {
         $data['uid'] = $user->id;
-        
+
         return $this->roomRepository->create($data);
     }
 
@@ -75,8 +74,8 @@ class RoomService implements RoomServiceContract
     public function getRoomDetails($roomId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
@@ -94,13 +93,13 @@ class RoomService implements RoomServiceContract
     public function getRoomAdmins($roomId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
         $adminIds = array_filter(explode(',', $room->room_admin ?? ''));
-        
+
         if (empty($adminIds)) {
             return collect();
         }
@@ -130,12 +129,12 @@ class RoomService implements RoomServiceContract
     public function toggleWriting($roomId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
-        $room->writing_disabled = !$room->writing_disabled;
+        $room->writing_disabled = ! $room->writing_disabled;
         $room->save();
 
         return $room;
@@ -147,8 +146,8 @@ class RoomService implements RoomServiceContract
     public function changePassword($roomId, ?string $password = null)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
@@ -164,8 +163,8 @@ class RoomService implements RoomServiceContract
     public function isOwnerOrAdmin(User $user, $roomId): bool
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             return false;
         }
 
@@ -174,7 +173,7 @@ class RoomService implements RoomServiceContract
         }
 
         $adminIds = array_filter(explode(',', $room->room_admin ?? ''));
-        
+
         return in_array($user->id, $adminIds);
     }
 
@@ -184,14 +183,14 @@ class RoomService implements RoomServiceContract
     public function addAdmin($roomId, $userId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
         $adminIds = array_filter(explode(',', $room->room_admin ?? ''));
-        
-        if (!in_array($userId, $adminIds)) {
+
+        if (! in_array($userId, $adminIds)) {
             $adminIds[] = $userId;
             $room->room_admin = implode(',', $adminIds);
             $room->save();
@@ -206,14 +205,14 @@ class RoomService implements RoomServiceContract
     public function removeAdmin($roomId, $userId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
         $adminIds = array_filter(explode(',', $room->room_admin ?? ''));
         $adminIds = array_diff($adminIds, [$userId]);
-        
+
         $room->room_admin = implode(',', $adminIds);
         $room->save();
 
@@ -225,7 +224,10 @@ class RoomService implements RoomServiceContract
      */
     public function getRoomBackground($room = null): string
     {
-        if ($room == null) return '';
+        if ($room === null) {
+            return '';
+        }
+
         return $room->final_room_image ?? '';
     }
 }

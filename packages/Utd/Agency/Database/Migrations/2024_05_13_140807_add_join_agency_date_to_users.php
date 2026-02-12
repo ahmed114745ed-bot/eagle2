@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasColumn('users', 'join_agency_date')) return;
+        if (Schema::hasColumn('users', 'join_agency_date')) {
+            return;
+        }
         Schema::table('users', function (Blueprint $table) {
             $table->string('join_agency_date')->nullable();
         });

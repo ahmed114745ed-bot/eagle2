@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('moment_user_gifts')) {
+        if (! Schema::hasTable('moment_user_gifts')) {
             Schema::create('moment_user_gifts', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('moment_id')->constrained('moment')->onDelete('cascade');
@@ -35,9 +35,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('moment_user_gifts', function (Blueprint $table) {
-           $table->dropConstrainedForeignId('moment_id');
-           $table->dropConstrainedForeignId('gift_id');
-           $table->dropConstrainedForeignId('user_id');
+            $table->dropConstrainedForeignId('moment_id');
+            $table->dropConstrainedForeignId('gift_id');
+            $table->dropConstrainedForeignId('user_id');
         });
         Schema::dropIfExists('moment_user_gifts');
     }

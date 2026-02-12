@@ -14,9 +14,8 @@
 use Illuminate\Support\Facades\Route;
 use Utd\Achievements\Http\Controllers\AchievementController;
 use Utd\Achievements\Http\Controllers\AchievementLevelController;
-use Utd\Achievements\Services\AchievementLevelsService;
 
-Route::middleware(['auth:sanctum','update.last.seen'])->group(function () {
+Route::middleware(['auth:sanctum', 'update.last.seen'])->group(function () {
     Route::prefix('achievement')->group(function () {
         Route::get('/{id}', [AchievementController::class, 'get_all']);
         Route::get('/', [AchievementController::class, 'get_all']);

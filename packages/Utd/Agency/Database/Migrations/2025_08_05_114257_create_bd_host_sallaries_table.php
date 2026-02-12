@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('bd_agency_host_sallaries')) return;
+        if (Schema::hasTable('bd_agency_host_sallaries')) {
+            return;
+        }
         Schema::create('bd_agency_host_sallaries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('bd_id');
@@ -20,8 +22,8 @@ return new class extends Migration
             $table->decimal('amount', 12, 2);
             $table->decimal('user_sallary', 12, 2);
             $table->decimal('agency_sallary', 12, 2);
-            $table->bigInteger('month'); 
-            $table->bigInteger('year'); 
+            $table->bigInteger('month');
+            $table->bigInteger('year');
             $table->timestamps();
         });
     }

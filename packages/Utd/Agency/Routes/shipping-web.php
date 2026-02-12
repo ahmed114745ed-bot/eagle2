@@ -14,14 +14,14 @@ use Utd\Agency\Http\Controllers\Shipping\Admin\PaymentGetWayController;
 
 Route::group(
     [
-        'prefix'     => config('admin.route.prefix'),
+        'prefix' => config('admin.route.prefix'),
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('charge-agencies', AppearChargerAgencyController::class);

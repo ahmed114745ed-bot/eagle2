@@ -2,14 +2,14 @@
 
 namespace Utd\Achievements\Http\Controllers\web;
 
+use App\Admin\Controllers\MainController;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use App\Admin\Controllers\MainController;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Achievements\Enums\AchievementType;
-use Encore\Admin\Layout\Content;
 
 class AchievementsController extends MainController
 {
@@ -31,7 +31,7 @@ class AchievementsController extends MainController
 
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('Achievements'))
             ->body($this->form()->edit($id)));
     }
@@ -61,49 +61,52 @@ class AchievementsController extends MainController
 
             $lang = app()->getLocale();
             $add = 'اضف هدايا مستخدمين ';
-            if($lang == 'en'){
+            if ($lang === 'en') {
                 $add = 'Add gifts users ';
             }
 
             $button = '';
-            if (Admin::user()->can('browse-' . 'user_achievement_level') || Admin::user()->can('*')) {
-                $button = '<a href="' . $baseUrl . '?achievement_id=' . $this->getKey() . '" class="btn btn-xs btn-primary">'. $add . '</a>';
+            if (Admin::user()->can('browse-'.'user_achievement_level') || Admin::user()->can('*')) {
+                $button = '<a href="'.$baseUrl.'?achievement_id='.$this->getKey().'" class="btn btn-xs btn-primary">'.$add.'</a>';
             }
             $button2 = ($value === 'gift_target') ? $button : null;
 
-            return $value . '<br>' . $button2;
+            return $value.'<br>'.$button2;
         });
 
         // $grid->column('valid_image', __('Valid image'));
         // $grid->column('invalid_image', __('Invalid image'));
         $grid->column('valid_image', __('Valid image'))->display(function ($value) {
-            $value = getDriverUrl() . '/' . $value;
+            $value = getDriverUrl().'/'.$value;
+
             return "<img src='$value' width='80' height='80'>";
         });
 
         $grid->column('invalid_image', __('Invalid image'))->display(function ($value) {
-            $value = getDriverUrl() . '/' . $value;
+            $value = getDriverUrl().'/'.$value;
+
             return "<img src='$value' width='80' height='80'>";
         });
         // $grid->column('description', __('description'));
 
-        if (Admin::user()->can('browse-' . 'achievement_level') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-'.'achievement_level') || Admin::user()->can('*')) {
             $grid->column(__('redirect_button'))->display(function ($value) {
 
                 // $prefix = request()->route()->getPrefix();
                 // $baseUrl = ($prefix === '/preview/admin') ? url('preview/admin/achievement-levels/') :
-                $baseUrl =   url('admin/achievements-levels/');
-                $url1 = url($baseUrl .'/'. $this->id);
+                $baseUrl = url('admin/achievements-levels/');
+                $url1 = url($baseUrl.'/'.$this->id);
                 $lang = app()->getLocale();
                 $add = 'اضف انواع';
 
-                if($lang == 'en'){
+                if ($lang === 'en') {
                     $add = 'add types';
                 }
 
                 $button =
-                    //'<a href="' . $baseUrl . '/' . $this->id . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
-                    "<a href='{$url1}' class='btn btn-xs btn-primary'>". $add . "</a>";
+                    // '<a href="' . $baseUrl . '/' . $this->id . '" class="btn btn-xs btn-primary">اضافة انواع</a>';
+                    "<a href='{$url1}' class='btn btn-xs btn-primary'>".$add.'</a>';
+
                 return $button;
             });
         }
@@ -126,17 +129,16 @@ class AchievementsController extends MainController
         //  $grid->disableActions();
 
         $grid->disableExport();
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
-
-
     protected function detail($id)
     {
         $show = new Show(Achievement::findOrFail($id));
@@ -162,13 +164,13 @@ class AchievementsController extends MainController
         $form = new Form(new Achievement());
         $this->disableFormTools($form);
 
-
         $form->select('type', __('Type'))->options(function () {
             $ops = [0 => ''];
             $typs = AchievementType::cases();
-            foreach ($typs as  $cases) {
+            foreach ($typs as $cases) {
                 $ops[$cases->value] = __($cases->value);
             }
+
             return $ops;
         });
         $form->image('valid_image', __('Valid image'));
@@ -176,7 +178,6 @@ class AchievementsController extends MainController
         // $form->saving(function (Form $form) {
         //     // $data = $form->input('valid_image');
         //     // $add = Achievement::saveAchievement($data);
-
 
         //     //    redirect()->route(nameRoute('admin.achievements'));
 

@@ -3,16 +3,15 @@
 namespace Utd\Room\Services;
 
 use Exception;
-use Utd\Room\Repositories\RoomRepository;
 use Utd\Room\Repositories\RoomMicrophoneRepository;
+use Utd\Room\Repositories\RoomRepository;
 
 class MicrophoneService
 {
     public function __construct(
         protected RoomRepository $roomRepository,
         protected RoomMicrophoneRepository $microphoneRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Get all microphones for a room
@@ -36,8 +35,8 @@ class MicrophoneService
     public function assignUserToMic($roomId, $position, $userId)
     {
         $room = $this->roomRepository->findById($roomId);
-        
-        if (!$room) {
+
+        if (! $room) {
             throw new Exception(__('Room not found'));
         }
 
@@ -91,8 +90,8 @@ class MicrophoneService
     public function getUsersOnMic($roomId)
     {
         $microphones = $this->microphoneRepository->getByRoom($roomId);
-        
-        return $microphones->filter(fn($mic) => $mic->user_id !== null);
+
+        return $microphones->filter(fn ($mic) => $mic->user_id !== null);
     }
 
     /**
@@ -101,7 +100,7 @@ class MicrophoneService
     public function isUserOnMic($roomId, $userId)
     {
         $microphones = $this->microphoneRepository->getByRoom($roomId);
-        
+
         return $microphones->contains('user_id', $userId);
     }
 }

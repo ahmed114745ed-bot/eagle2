@@ -2,9 +2,10 @@
 
 namespace Utd\Reals\Console;
 
+use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class UninstallRealsCommand extends Command
 {
@@ -22,7 +23,6 @@ class UninstallRealsCommand extends Command
      */
     protected $description = 'إلغاء تثبيت حزمة Reals - حذف الجداول والأعمدة';
 
-
     protected array $tables = [
         'report_reals',
         'real_user_views',
@@ -30,9 +30,8 @@ class UninstallRealsCommand extends Command
         'real_user_likes',
         'real_categories',
         'reels_user_settings',
-        'reals', 
+        'reals',
     ];
-
 
     protected array $sharedColumns = [
         'users' => ['reel_following_type'],
@@ -47,9 +46,10 @@ class UninstallRealsCommand extends Command
         $this->warn('⚠️  تحذير: هذا الأمر سيحذف جميع بيانات Reals!');
         $this->newLine();
 
-        if (!$this->option('force')) {
-            if (!$this->confirm('هل أنت متأكد من رغبتك في إلغاء تثبيت حزمة Reals؟')) {
+        if (! $this->option('force')) {
+            if (! $this->confirm('هل أنت متأكد من رغبتك في إلغاء تثبيت حزمة Reals؟')) {
                 $this->info('تم إلغاء العملية.');
+
                 return Command::SUCCESS;
             }
         }
@@ -65,7 +65,7 @@ class UninstallRealsCommand extends Command
         $this->newLine();
 
         // 2. حذف الجداول
-        if (!$this->option('keep-data')) {
+        if (! $this->option('keep-data')) {
             $this->info('🗃️  حذف الجداول...');
             $this->dropTables();
         } else {
@@ -100,12 +100,12 @@ class UninstallRealsCommand extends Command
         return Command::SUCCESS;
     }
 
-    
     protected function removeSharedColumns(): void
     {
         foreach ($this->sharedColumns as $table => $columns) {
-            if (!Schema::hasTable($table)) {
+            if (! Schema::hasTable($table)) {
                 $this->warn("  ⚠️  الجدول {$table} غير موجود");
+
                 continue;
             }
 
@@ -116,8 +116,8 @@ class UninstallRealsCommand extends Command
                             $tableBlueprint->dropColumn($column);
                         });
                         $this->info("  ✅ تم حذف العمود {$column} من الجدول {$table}");
-                    } catch (\Exception $e) {
-                        $this->error("  ❌ فشل في حذف العمود {$column}: " . $e->getMessage());
+                    } catch (Exception $e) {
+                        $this->error("  ❌ فشل في حذف العمود {$column}: ".$e->getMessage());
                     }
                 } else {
                     $this->info("  ℹ️  العمود {$column} غير موجود في الجدول {$table}");
@@ -139,8 +139,8 @@ class UninstallRealsCommand extends Command
                 try {
                     Schema::dropIfExists($table);
                     $this->info("  ✅ تم حذف الجدول {$table}");
-                } catch (\Exception $e) {
-                    $this->error("  ❌ فشل في حذف الجدول {$table}: " . $e->getMessage());
+                } catch (Exception $e) {
+                    $this->error("  ❌ فشل في حذف الجدول {$table}: ".$e->getMessage());
                 }
             } else {
                 $this->info("  ℹ️  الجدول {$table} غير موجود");
@@ -185,21 +185,21 @@ class UninstallRealsCommand extends Command
     protected function removePublishedAssets(): void
     {
         $assetsPath = public_path('modules/reals');
-        
+
         // التحقق إذا كان symlink
         if (is_link($assetsPath)) {
             try {
                 unlink($assetsPath);
                 $this->info("  ✅ تم حذف الرابط الرمزي {$assetsPath}");
-            } catch (\Exception $e) {
-                $this->error("  ❌ فشل في حذف الرابط الرمزي: " . $e->getMessage());
+            } catch (Exception $e) {
+                $this->error('  ❌ فشل في حذف الرابط الرمزي: '.$e->getMessage());
             }
         } elseif (is_dir($assetsPath)) {
             try {
                 $this->deleteDirectory($assetsPath);
                 $this->info("  ✅ تم حذف المجلد {$assetsPath}");
-            } catch (\Exception $e) {
-                $this->error("  ❌ فشل في حذف المجلد: " . $e->getMessage());
+            } catch (Exception $e) {
+                $this->error('  ❌ فشل في حذف المجلد: '.$e->getMessage());
             }
         } else {
             $this->info("  ℹ️  المجلد {$assetsPath} غير موجود");
@@ -208,27 +208,27 @@ class UninstallRealsCommand extends Command
 
     protected function deleteDirectory(string $dir): bool
     {
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return false;
         }
 
         $files = array_diff(scandir($dir), ['.', '..']);
-        
+
         foreach ($files as $file) {
-            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            $path = $dir.DIRECTORY_SEPARATOR.$file;
             is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
         }
 
         return rmdir($dir);
     }
 
- 
     protected function removeFromComposer(): void
     {
         $composerPath = base_path('composer.json');
-        
-        if (!file_exists($composerPath)) {
-            $this->error("  ❌ ملف composer.json غير موجود");
+
+        if (! file_exists($composerPath)) {
+            $this->error('  ❌ ملف composer.json غير موجود');
+
             return;
         }
 
@@ -237,7 +237,8 @@ class UninstallRealsCommand extends Command
             $composer = json_decode($composerContent, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $this->error("  ❌ خطأ في قراءة composer.json: " . json_last_error_msg());
+                $this->error('  ❌ خطأ في قراءة composer.json: '.json_last_error_msg());
+
                 return;
             }
 
@@ -246,30 +247,30 @@ class UninstallRealsCommand extends Command
             if (isset($composer['autoload']['psr-4']['Utd\\Reals\\'])) {
                 unset($composer['autoload']['psr-4']['Utd\\Reals\\']);
                 $modified = true;
-                $this->info("  ✅ تم إزالة Utd\\Reals\\ من autoload.psr-4");
+                $this->info('  ✅ تم إزالة Utd\\Reals\\ من autoload.psr-4');
             }
 
             if (isset($composer['repositories']) && is_array($composer['repositories'])) {
                 foreach ($composer['repositories'] as $key => $repo) {
-                    if (isset($repo['url']) && strpos($repo['url'], 'packages/Utd/Reals') !== false) {
+                    if (isset($repo['url']) && mb_strpos($repo['url'], 'packages/Utd/Reals') !== false) {
                         unset($composer['repositories'][$key]);
                         $composer['repositories'] = array_values($composer['repositories']);
                         $modified = true;
-                        $this->info("  ✅ تم إزالة repository الحزمة");
+                        $this->info('  ✅ تم إزالة repository الحزمة');
                     }
                 }
             }
 
             if ($modified) {
                 $newContent = json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-                file_put_contents($composerPath, $newContent . "\n");
-                $this->info("  ✅ تم تحديث composer.json بنجاح");
+                file_put_contents($composerPath, $newContent."\n");
+                $this->info('  ✅ تم تحديث composer.json بنجاح');
             } else {
-                $this->info("  ℹ️  الحزمة غير موجودة في composer.json");
+                $this->info('  ℹ️  الحزمة غير موجودة في composer.json');
             }
 
-        } catch (\Exception $e) {
-            $this->error("  ❌ فشل في تحديث composer.json: " . $e->getMessage());
+        } catch (Exception $e) {
+            $this->error('  ❌ فشل في تحديث composer.json: '.$e->getMessage());
         }
     }
 }

@@ -17,11 +17,11 @@ class RoomDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'session' => $this->session,
-            //'gifts' => GiftRoomResource::collection($this->gifts),
+            // 'gifts' => GiftRoomResource::collection($this->gifts),
             'top_user_send_gifts' => [
-                'id'    => $this->topUserGift->id ?? 0,
-                'name'  => $this->topUserGift->name ?? '',
-                'uuid'  => $this->topUserGift->uuid ?? 0,
+                'id' => $this->topUserGift->id ?? 0,
+                'name' => $this->topUserGift->name ?? '',
+                'uuid' => $this->topUserGift->uuid ?? 0,
                 'image' => @$this->topUserGift?->profile?->avatar ?? '',
             ],
         ];

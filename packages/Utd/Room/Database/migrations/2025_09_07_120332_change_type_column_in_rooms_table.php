@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('rooms', function (Blueprint $table) {
             $table->string('type', 20)
-                  ->collation('utf8mb4_unicode_ci')
-                  ->change();
+                ->collation('utf8mb4_unicode_ci')
+                ->change();
         });
     }
 
@@ -22,8 +22,8 @@ return new class extends Migration
     {
         Schema::table('rooms', function (Blueprint $table) {
             $table->enum('type', ['audio', 'single_live', 'multi_live'])
-                  ->collation('utf8mb4_unicode_ci')
-                  ->change();
+                ->collation('utf8mb4_unicode_ci')
+                ->change();
         });
     }
 };

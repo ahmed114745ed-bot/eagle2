@@ -4,32 +4,35 @@ namespace Utd\Room\Services;
 
 use App\Exceptions\RoomUserHandling\PermissionNotAllow;
 use App\Facades\RoomHelper;
-use Utd\Room\Entities\RequestBackgroundImage;
+use Exception;
 use Utd\Room\Entities\Room;
-use Illuminate\Support\Facades\DB;
 
 class RoomUserService
 {
     /**
      * @throws PermissionNotAllow
-     * @throws \Exception
+     * @throws Exception
      */
     public function muteUserStatus(int $userId, Room $room, bool $isMute = true)
     {
-        $admins   = $room->room_admin ?? '';
+        $admins = $room->room_admin ?? '';
         $owner_id = $room->uid;
 
-        if (!RoomHelper::checkUserIsAdminOrOwner($admins, $owner_id)) {
+        if (! RoomHelper::checkUserIsAdminOrOwner($admins, $owner_id)) {
             throw new PermissionNotAllow(__('api_responses.you_dont_have_permission'));
         }
 
-        $mutedUsersArr = ($room->muted_users != '') ? explode(',', $room->muted_users) : [];
+        $mutedUsersArr = ($room->muted_users !== '') ? explode(',', $room->muted_users) : [];
 
         if ($isMute) {
-            if (in_array($userId, $mutedUsersArr)) throw new \Exception(__('api_responses.user_already_muted'));
+            if (in_array($userId, $mutedUsersArr)) {
+                throw new Exception(__('api_responses.user_already_muted'));
+            }
             $mutedUsersArr[] = $userId;
         } else {
-            if (!in_array($userId, $mutedUsersArr)) throw new \Exception(__('api_responses.user_already_un_muted'));
+            if (! in_array($userId, $mutedUsersArr)) {
+                throw new Exception(__('api_responses.user_already_un_muted'));
+            }
             $mutedUsersArr = array_diff($mutedUsersArr, [$userId]);
         }
         $room->muted_users = implode(',', $mutedUsersArr);
@@ -39,7 +42,10 @@ class RoomUserService
 
     public function getRoomBackground(?Room $room)
     {
-        if ($room == null) return '';
+        if ($room === null) {
+            return '';
+        }
+
         return @$room->final_room_image ?? '';
 
     }

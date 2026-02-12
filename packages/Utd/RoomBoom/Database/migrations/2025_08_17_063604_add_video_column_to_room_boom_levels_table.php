@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddVideoColumnToRoomBoomLevelsTable extends Migration
 {
@@ -25,8 +25,6 @@ class AddVideoColumnToRoomBoomLevelsTable extends Migration
      */
     public function down()
     {
-        Schema::table('room_boom_levels', function (Blueprint $table) {
-
-        });
+        Schema::table('room_boom_levels', function (Blueprint $table) {});
     }
 }

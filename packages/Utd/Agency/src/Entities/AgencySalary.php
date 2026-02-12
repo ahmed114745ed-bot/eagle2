@@ -67,6 +67,7 @@ class AgencySalary extends Model
     public function markAsPaid(): bool
     {
         $this->is_paid = true;
+
         return $this->save();
     }
 
@@ -87,6 +88,7 @@ class AgencySalary extends Model
         $year = $year ?? now()->year;
 
         $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+
         return $this->hasMany($userSalaryClass, 'user_agency_id', 'agency_id')
             ->where('month', $month)
             ->where('year', $year)

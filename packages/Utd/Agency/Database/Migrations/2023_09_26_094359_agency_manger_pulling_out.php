@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('agency_manger_pulling_out')) return;
+        if (Schema::hasTable('agency_manger_pulling_out')) {
+            return;
+        }
         Schema::create('agency_manger_pulling_out', function (Blueprint $table) {
             $table->id();
             $table->integer('agency_manger_id')->unsigned()->index()->nullable();

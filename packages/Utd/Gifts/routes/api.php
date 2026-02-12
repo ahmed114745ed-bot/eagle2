@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-
-
 Route::prefix('api/')->middleware(['api', 'auth:sanctum'])->group(function () {
 
     // Gift Routes

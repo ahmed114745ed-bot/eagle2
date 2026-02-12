@@ -4,18 +4,17 @@ namespace Utd\Achievements\Http\Controllers\web;
 
 use App\Helpers\Common;
 use App\Models\AchievementValidImage;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\Support\Renderable;
 use Utd\Achievements\Entities\AchievementLevel;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Achievements\Services\AchievementLevelsService;
 
 class AchievementLevelsModuleController extends Controller
 {
-
     protected $userAchievementService;
 
     public function __construct(AchievementLevelsService $userAchievementService)
@@ -32,14 +31,14 @@ class AchievementLevelsModuleController extends Controller
         $adminId = Auth::user()->id;
 
         $achievementLevel = AchievementLevel::find($achievementLevel_id);
-        if ($achievementLevel_id == null && $request->hasFile('custom_image')) {
+        if ($achievementLevel_id === null && $request->hasFile('custom_image')) {
             $customImage = Common::upload('custom_image', $request->file('custom_image'));
             $attributes = [
-                'user_id'       => $userId,
+                'user_id' => $userId,
                 'custom_image' => $customImage,
                 'file' => $customImage,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' =>  $adminId,
+                'admin_id' => $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -48,14 +47,14 @@ class AchievementLevelsModuleController extends Controller
                 'user_id' => Auth::user()->id,
                 'type' => 'user',
             ]);
-        } elseif ($achievementLevel_id == null && $request->hasFile('custom_file')) {
+        } elseif ($achievementLevel_id === null && $request->hasFile('custom_file')) {
             $custom_file = Common::upload('custom_file', $request->file('custom_file'));
             $attributes = [
-                'user_id'       => $userId,
+                'user_id' => $userId,
                 'file' => $custom_file,
                 'custom_image' => $custom_file,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' =>  $adminId,
+                'admin_id' => $adminId,
             ];
 
             UserAchievementLevel::create($attributes);
@@ -64,20 +63,20 @@ class AchievementLevelsModuleController extends Controller
                 'user_id' => Auth::user()->id,
                 'type' => 'user',
             ]);
-        } elseif ($achievementLevel_id == null && request('custom_image')) {
+        } elseif ($achievementLevel_id === null && request('custom_image')) {
             $customImagepath = request('custom_image');
             $attributes = [
-                'user_id'       => $userId,
+                'user_id' => $userId,
                 'custom_image' => $customImagepath,
                 'file' => $customImagepath,
                 'achievement_id' => $request->input('achievement_id'),
-                'admin_id' =>  $adminId,
+                'admin_id' => $adminId,
             ];
 
-           UserAchievementLevel::create($attributes);
-        } elseif ($achievementLevel != null) {
+            UserAchievementLevel::create($attributes);
+        } elseif ($achievementLevel !== null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
-            if (!$res) {
+            if (! $res) {
                 $error = new MessageBag([
                     'title' => 'Error',
                     'message' => __('this user not found'),
@@ -85,9 +84,9 @@ class AchievementLevelsModuleController extends Controller
 
                 return redirect()->route(nameRoute('admin.get-view-page'), compact('error')); // Error message added
             }
-        } elseif ($achievementLevel_id == null && $gift) {
+        } elseif ($achievementLevel_id === null && $gift) {
             $attributes = [
-                'user_id'       => $userId,
+                'user_id' => $userId,
                 'gift_achievement_id' => $gift,
                 'achievement_id' => $request->input('achievement_id'),
             ];
@@ -101,11 +100,13 @@ class AchievementLevelsModuleController extends Controller
     public function getAchievementLevels($achievementId)
     {
         $levels = AchievementLevel::where('achievement_id', $achievementId)->pluck('target', 'id');
+
         return response()->json($levels);
     }
 
     /**
      * Display a listing of the resource.
+     *
      * @return Renderable
      */
     public function index()
@@ -115,6 +116,7 @@ class AchievementLevelsModuleController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
      * @return Renderable
      */
     public function create()
@@ -124,14 +126,15 @@ class AchievementLevelsModuleController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * @param Request $request
+     *
+     * @param  Request  $request
      * @return Renderable
      */
 
-
     /**
      * Show the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function viewPage()
@@ -141,7 +144,8 @@ class AchievementLevelsModuleController extends Controller
 
     /**
      * Show the form for editing the specified resource.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function edit($id)
@@ -151,8 +155,8 @@ class AchievementLevelsModuleController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * @param Request $request
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function update(Request $request, $id)
@@ -162,7 +166,8 @@ class AchievementLevelsModuleController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     * @param int $id
+     *
+     * @param  int  $id
      * @return Renderable
      */
     public function destroy($id)

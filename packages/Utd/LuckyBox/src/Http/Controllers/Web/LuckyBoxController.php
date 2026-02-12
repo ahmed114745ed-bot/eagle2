@@ -2,28 +2,29 @@
 
 namespace Utd\LuckyBox\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\Config;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
+use Encore\Admin\Show;
 use Utd\LuckyBox\Entities\Box;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class LuckyBoxController extends MainController
 {
-    public $permission_name = 'boxes';
-    public $permission_setting = 'box-settings';
     use HasResourceActions;
+
+    public $permission_name = 'boxes';
+
+    public $permission_setting = 'box-settings';
 
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -36,8 +37,7 @@ class LuckyBoxController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -50,13 +50,12 @@ class LuckyBoxController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
     {
-        return  parent::edit($id, $content
+        return parent::edit($id, $content
             ->title(trans('boxes'))
             ->body($this->form()->edit($id)));
     }
@@ -64,7 +63,6 @@ class LuckyBoxController extends MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -72,6 +70,16 @@ class LuckyBoxController extends MainController
         return parent::create($content
             ->title(trans('boxes'))
             ->body($this->form()));
+    }
+
+    public function box_settings(Content $content)
+    {
+        if (! Admin::user()->can('*')) {
+            Permission::check('browse-'.$this->permission_setting);
+        }
+        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration', 'lucky_box_percentage'])->pluck('value', 'name')->toArray();
+
+        return $content->view('box_settings', compact('config'));
     }
 
     /**
@@ -100,13 +108,14 @@ class LuckyBoxController extends MainController
         $grid->column('duration', __('duration'));
         $grid->disableExport();
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -146,18 +155,16 @@ class LuckyBoxController extends MainController
         $form->decimal('users', __('users'))->attribute(['id' => 'users_field']);
         $form->decimal('duration', __('duration'))->help(__('in minutes'))->attribute(['id' => 'duration_field']);
 
-
         $addPlaceholder = __('Enter users count');
         $deleteText = __('Delete');
 
         $form->dynamicFields('dynamic_users_values', __('Dynamic Fields'))
-            ->attribute(['name' => 'dynamic_users_values'])
-        ;
+            ->attribute(['name' => 'dynamic_users_values']);
 
         $form->image('image', __('image'));
         $form->switch('has_label', __('has label'))->states(Common::getSwitchStates());
         $form->text('default_label', __('default label'));
-        $form->html(<<<HTML
+        $form->html(<<<'HTML'
         <script>
            $(document).ready(function () {
                 initDynamicFieldsScript();
@@ -165,15 +172,14 @@ class LuckyBoxController extends MainController
             });
         </script>
         HTML);
-        $form->html("
+        $form->html('
     <script>
         window.translations = {
-            add_placeholder: " . json_encode($addPlaceholder) . ",
-            delete_text: " . json_encode($deleteText) . "
+            add_placeholder: '.json_encode($addPlaceholder).',
+            delete_text: '.json_encode($deleteText).'
         };
     </script>
-");
-
+');
 
         $form->saving(function (Form $form) {
             $dynamicFields = request('dynamic_fields', []);
@@ -183,14 +189,5 @@ class LuckyBoxController extends MainController
         });
 
         return $form;
-    }
-
-    public function box_settings(Content $content)
-    {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-' . $this->permission_setting);
-        }
-        $config = Config::whereIn('name', ['app_wallet_lucky_box', 'normal_box_duration','lucky_box_percentage'])->pluck('value', 'name')->toArray();
-        return $content->view('box_settings', compact('config'));
     }
 }

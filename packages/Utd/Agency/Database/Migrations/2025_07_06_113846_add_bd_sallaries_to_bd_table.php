@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('bd_sallaries')) return;
+        if (! Schema::hasTable('bd_sallaries')) {
+            return;
+        }
         Schema::table('bd_sallaries', function (Blueprint $table) {
             // العمود يمكن أن يكون salary أو sallary حسب الجدول المُنشأ
             if (Schema::hasColumn('bd_sallaries', 'sallary')) {
@@ -38,7 +40,7 @@ return new class extends Migration
             $table->float('cut_amount')->default(0)->change();
             $table->float('total_agency_sallary')->default(0)->change();
             $table->float('total_users_sallary')->default(0)->change();
-         
+
         });
     }
 };

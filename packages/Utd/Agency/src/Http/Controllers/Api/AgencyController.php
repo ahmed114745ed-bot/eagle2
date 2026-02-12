@@ -5,10 +5,9 @@ namespace Utd\Agency\Http\Controllers\Api;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Utd\Agency\Services\AgencyService;
-use Utd\Agency\Http\Resources\AgencyResource;
 use Utd\Agency\Http\Resources\AgencyMemberResource;
-use Utd\Agency\Http\Resources\JoinRequestResource;
+use Utd\Agency\Http\Resources\AgencyResource;
+use Utd\Agency\Services\AgencyService;
 
 class AgencyController extends Controller
 {
@@ -23,7 +22,7 @@ class AgencyController extends Controller
     {
         try {
             $agency = $this->agencyService->find($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agency details',
@@ -45,7 +44,7 @@ class AgencyController extends Controller
         try {
             $user = $request->user();
             $result = $this->agencyService->joinAgency($user, $request);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Join request sent successfully',
@@ -66,7 +65,7 @@ class AgencyController extends Controller
     {
         try {
             $members = $this->agencyService->agencyMembers($id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agency members',
@@ -88,7 +87,7 @@ class AgencyController extends Controller
         try {
             $user = $request->user();
             $result = $this->agencyService->agencyTarget($id, $user, $request);
-            
+
             return response()->json($result);
         } catch (Exception $e) {
             return response()->json([
@@ -105,7 +104,7 @@ class AgencyController extends Controller
     {
         try {
             $result = $this->agencyService->stars($id, $request);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agency stars',
@@ -126,7 +125,7 @@ class AgencyController extends Controller
     {
         try {
             $result = $this->agencyService->heroes($id, $request);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agency heroes',
@@ -148,7 +147,7 @@ class AgencyController extends Controller
         try {
             $user = $request->user();
             $result = $this->agencyService->leaveAgency($user, $user->agency_id);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Leave request sent successfully',
@@ -170,7 +169,7 @@ class AgencyController extends Controller
         try {
             $uuid = $request->uuid ?? $request->user()->uuid;
             $result = $this->agencyService->historyLastThirtyDays($uuid);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Agency history',
@@ -195,7 +194,7 @@ class AgencyController extends Controller
                 $request->per_page ?? 20,
                 $request->page ?? 1
             );
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Active agencies',

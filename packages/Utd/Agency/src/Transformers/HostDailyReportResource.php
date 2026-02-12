@@ -24,9 +24,9 @@ class HostDailyReportResource extends JsonResource
             'hours' => $this->hours ?? 0,
             'target' => $this->target ?? 0,
             'achievement_rate' => $this->achievement_rate ?? 0,
-            
+
             // Relations
-            'user' => $this->whenLoaded('user', function() {
+            'user' => $this->whenLoaded('user', function () {
                 return [
                     'id' => $this->user->id,
                     'name' => $this->user->name,

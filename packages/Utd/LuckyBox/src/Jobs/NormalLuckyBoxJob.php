@@ -3,20 +3,20 @@
 namespace Utd\LuckyBox\Jobs;
 
 use App\Enums\UserCoinLogType;
-use App\Helpers\UserCoinLogHelper;
-use Carbon\Carbon;
-use Utd\Room\Entities\Room;
-use App\Models\User;
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use Utd\Room\Entities\RoomVisitor;
+use App\Helpers\UserCoinLogHelper;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Utd\LuckyBox\Entities\BoxUse;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Utd\LuckyBox\Entities\UserBoxGift;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Facades\CustomNotification;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Utd\LuckyBox\Entities\BoxUse;
+use Utd\LuckyBox\Entities\UserBoxGift;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomVisitor;
 
 class NormalLuckyBoxJob implements ShouldQueue
 {
@@ -39,13 +39,15 @@ class NormalLuckyBoxJob implements ShouldQueue
         $timestamp = Carbon::now($timezone)->timestamp;
 
         $userBoxes = BoxUse::where('end_at', '<', $timestamp)->where('type', 0)->where('is_closed', false)->get();
-        if (!$userBoxes) return;
+        if (! $userBoxes) {
+            return;
+        }
 
         foreach ($userBoxes as $userBox) {
             $user = User::where('id', $userBox->user_id)->first();
             $amountBefore = $user->di;
             UserCoinLogHelper::logByType(
-                $user->id ,
+                $user->id,
                 $userBox->unused_coins,
                 $amountBefore,
                 UserCoinLogType::LUCK_BOX,
@@ -61,7 +63,7 @@ class NormalLuckyBoxJob implements ShouldQueue
             $usersRoomVisit = RoomVisitor::where('room_id', $room->id)->whereNotIn('user_id', $userWinner)->pluck('user_id')->toArray();
 
             $winnerBox = UserBoxGift::where('box_uses_id', $userBox->id)->exists();
-            if (!$winnerBox) {
+            if (! $winnerBox) {
                 CustomNotification::closedLuckyBosWithReturnCoins($user, $userBox->unused_coins, @$userBox?->image, 0);
             } else {
                 CustomNotification::closeLuckyBox($user, @$userBox?->image, 0);
@@ -69,15 +71,15 @@ class NormalLuckyBoxJob implements ShouldQueue
             foreach ($usersRoomVisit as $userRoomVisit) {
 
                 $m = [
-                    "messageContent" => [
-                        "message" => "hideluckybox",
-                        "ownerBoxId" => @$owner->id,
-                        "ownerBoxName" => @$owner->name,
-                        "boxCoins" => $userBox->coins,
-                        "boxId" => $userBox->id,
-                        "boxType" => $userBox->type == 1 ? 'super' : 'normal',
-                        "numOfBoxes" => $c
-                    ]
+                    'messageContent' => [
+                        'message' => 'hideluckybox',
+                        'ownerBoxId' => @$owner->id,
+                        'ownerBoxName' => @$owner->name,
+                        'boxCoins' => $userBox->coins,
+                        'boxId' => $userBox->id,
+                        'boxType' => $userBox->type === 1 ? 'super' : 'normal',
+                        'numOfBoxes' => $c,
+                    ],
                 ];
                 $json = json_encode($m);
                 Common::sendToZego('SendCustomCommand', @$room->id, $userRoomVisit, $json);

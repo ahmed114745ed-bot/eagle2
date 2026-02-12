@@ -2,19 +2,20 @@
 
 namespace Utd\Room\Admin\Actions;
 
-use Utd\Room\Entities\BanRoom;
-use Utd\Room\Entities\Room;
-use App\Models\User;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
+use App\Models\User;
 use Encore\Admin\Actions\Action;
-use Illuminate\Support\Facades\Auth;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin as AdminAuth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Utd\Room\Entities\BanRoom;
+use Utd\Room\Entities\Room;
 
 class BanRoomAction extends Action
 {
     public $name;
+
     public $permission_name = 'ban-rooms';
 
     protected $selector = '.ban_user_action';
@@ -22,21 +23,22 @@ class BanRoomAction extends Action
     public function handle(Request $request)
     {
 
-        if (!AdminAuth::user()->can('*')) {
-            Permission::check('create-' . $this->permission_name);
+        if (! AdminAuth::user()->can('*')) {
+            Permission::check('create-'.$this->permission_name);
         }
         $user = User::query()->searchByUuid($request->uuid)->first();
-        if (!$user) return $this->response()->error('user not found')->refresh();
+        if (! $user) {
+            return $this->response()->error('user not found')->refresh();
+        }
         $room = Room::where('uid', $user->id)->where('type', $request->type)->first();
-        if (!$room) {
+        if (! $room) {
             return $this->response()->error(__('room not found'))->refresh();
         }
 
-        $room_id  = $room->id;
+        $room_id = $room->id;
         $now = now();
         $messages = [];
         $newBan = false;
-
 
         $haveBan = BanRoom::query()->where('room_id', $room_id)->whereRaw("created_at + INTERVAL duration HOUR > '$now'")
             ->exists();
@@ -53,18 +55,14 @@ class BanRoomAction extends Action
                 ]
             );
 
-
         }
-
-
-
 
         if ($room && $newBan) {
             $d = [
-                "messageContent" => [
-                    "message" => "banRoom",
-                    "roomId" => $room->id
-                ]
+                'messageContent' => [
+                    'message' => 'banRoom',
+                    'roomId' => $room->id,
+                ],
             ];
             $json = json_encode($d);
 
@@ -75,8 +73,9 @@ class BanRoomAction extends Action
         }
 
         if (count($messages) > 0) {
-            return $this->response()->error(implode("<br>", $messages))->refresh();
+            return $this->response()->error(implode('<br>', $messages))->refresh();
         }
+
         return $this->response()->success('success')->refresh();
     }
 
@@ -90,6 +89,7 @@ class BanRoomAction extends Action
     public function html()
     {
         $banText = __('create bans'); // Laravel translation
+
         return <<<HTML
     <a href="javascript:void(0);" class="ban_user_action btn btn-sm  text-white"
        style="background-color: #28a745; border-color: #28a745; color: white;">

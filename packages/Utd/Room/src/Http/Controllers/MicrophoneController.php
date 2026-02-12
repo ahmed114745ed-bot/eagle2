@@ -2,8 +2,9 @@
 
 namespace Utd\Room\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Utd\Room\Services\MicrophoneService;
 use Utd\Room\Transformers\RoomMicrophoneResource;
@@ -12,8 +13,7 @@ class MicrophoneController extends Controller
 {
     public function __construct(
         protected MicrophoneService $microphoneService
-    ) {
-    }
+    ) {}
 
     /**
      * Get microphones for room
@@ -51,7 +51,7 @@ class MicrophoneController extends Controller
                 'message' => 'User assigned to microphone',
                 'data' => new RoomMicrophoneResource($microphone),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -75,7 +75,7 @@ class MicrophoneController extends Controller
                 'status' => true,
                 'message' => 'User removed from microphone',
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),
@@ -104,7 +104,7 @@ class MicrophoneController extends Controller
                 'status' => true,
                 'message' => 'Microphone status updated',
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => $e->getMessage(),

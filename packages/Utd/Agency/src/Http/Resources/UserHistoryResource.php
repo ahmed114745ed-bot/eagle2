@@ -16,7 +16,7 @@ class UserHistoryResource extends JsonResource
             'agency' => [
                 'id' => $this->agency?->id,
                 'name' => $this->agency?->name,
-                'img' => $this->agency?->img ? asset('storage/' . $this->agency->img) : null,
+                'img' => $this->agency?->img ? asset('storage/'.$this->agency->img) : null,
             ],
             'join_date' => $this->join_date?->format('Y-m-d H:i:s'),
             'leave_date' => $this->leave_date?->format('Y-m-d H:i:s'),

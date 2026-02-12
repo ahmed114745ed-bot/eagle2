@@ -2,9 +2,9 @@
 
 namespace Utd\CP\Database\Seeders;
 
-use Utd\CP\Entities\Cp;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Utd\CP\Entities\Cp;
 
 class AddingCpsSeeder extends Seeder
 {
@@ -13,26 +13,28 @@ class AddingCpsSeeder extends Seeder
      */
     public function run(): void
     {
-        for($i = 0; $i < 10; $i++){
+        for ($i = 0; $i < 10; $i++) {
             $userOne = User::inRandomOrder()->first();
             $userTwo = User::inRandomOrder()->first();
 
-            if($userOne->id == $userTwo->id)
+            if ($userOne->id === $userTwo->id) {
                 continue;
+            }
 
             $find = Cp::where('user_one_id', $userOne->id)->where('user_two_id', $userTwo->id)->exists();
             $find2 = Cp::where('user_one_id', $userTwo->id)->where('user_two_id', $userOne->id)->exists();
 
-            if($find || $find2)
+            if ($find || $find2) {
                 continue;
+            }
 
             Cp::create([
-                'cp_relation_id' => rand(1,3),
+                'cp_relation_id' => rand(1, 3),
                 'user_one_id' => $userOne->id,
                 'user_two_id' => $userTwo->id,
                 'status' => 1,
                 'di' => 0,
-                'level_id' => rand(1,5),
+                'level_id' => rand(1, 5),
                 'price' => 100,
             ]);
         }

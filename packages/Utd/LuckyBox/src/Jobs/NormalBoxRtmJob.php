@@ -2,16 +2,16 @@
 
 namespace Utd\LuckyBox\Jobs;
 
-use Utd\Room\Entities\Room;
+use App\Facades\CustomNotification;
 use App\Helpers\Common;
-use Utd\Room\Entities\RoomVisitor;
 use Illuminate\Bus\Queueable;
-use Utd\LuckyBox\Entities\BoxUse;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Facades\CustomNotification;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Utd\LuckyBox\Entities\BoxUse;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomVisitor;
 
 class NormalBoxRtmJob implements ShouldQueue
 {
@@ -43,15 +43,15 @@ class NormalBoxRtmJob implements ShouldQueue
         foreach ($usersRoomVisit as $userRoomVisit) {
 
             $m = [
-                "messageContent" => [
-                    "message" => "hideluckybox",
-                    "ownerBoxId" => @$user->id,
-                    "ownerBoxName" => @$user->name,
-                    "boxCoins" => $userBox->coins,
-                    "boxId" => $userBox->id,
-                    "boxType" => $userBox->type == 1 ? 'super' : 'normal',
-                    "numOfBoxes" => $c
-                ]
+                'messageContent' => [
+                    'message' => 'hideluckybox',
+                    'ownerBoxId' => @$user->id,
+                    'ownerBoxName' => @$user->name,
+                    'boxCoins' => $userBox->coins,
+                    'boxId' => $userBox->id,
+                    'boxType' => $userBox->type === 1 ? 'super' : 'normal',
+                    'numOfBoxes' => $c,
+                ],
             ];
             $json = json_encode($m);
             Common::sendToZego('SendCustomCommand', @$room->id, $userRoomVisit, $json);

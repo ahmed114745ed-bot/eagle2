@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-      
-            Schema::table('rooms', function (Blueprint $table) {
-                $table->integer('image_size')->nullable(); 
-            });
-    
-            Schema::table('profiles', function (Blueprint $table) {
-                $table->integer('image_size')->nullable(); 
-            });
-    
+
+        Schema::table('rooms', function (Blueprint $table) {
+            $table->integer('image_size')->nullable();
+        });
+
+        Schema::table('profiles', function (Blueprint $table) {
+            $table->integer('image_size')->nullable();
+        });
+
     }
 
     /**

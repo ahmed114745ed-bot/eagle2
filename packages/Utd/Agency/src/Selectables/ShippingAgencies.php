@@ -20,6 +20,7 @@ class ShippingAgencies extends Selectable
         $this->column('name', __('name'));
         $this->column('img', __('img'))->display(function ($path) {
             $url = getImagePath($path);
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 

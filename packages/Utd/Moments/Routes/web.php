@@ -1,9 +1,9 @@
 <?php
 
 use Utd\Moments\Http\Controllers\web\MomentController;
+use Utd\Moments\Http\Controllers\web\MomentSettingsController;
 use Utd\Moments\Http\Controllers\web\MomentViewerController;
 use Utd\Moments\Http\Controllers\web\ReportMomentController;
-use Utd\Moments\Http\Controllers\web\MomentSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +33,7 @@ Route::group(
             //            'adminGeneralBan',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
         Route::resource('report-moments', ReportMomentController::class);

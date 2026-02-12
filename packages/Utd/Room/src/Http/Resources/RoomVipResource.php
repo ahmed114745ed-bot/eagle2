@@ -16,11 +16,11 @@ class RoomVipResource extends JsonResource
     {
         return [
             'type' => $this->type ?? 0,
-            'img' => $this->img ?? "",
-            'exp' => $this->exp ?? "",
-            'level' => $this->level ?? "",
-            'name_en' => $this->name_en ?? "",
-            'name_ar' => $this->name_ar ?? "",
+            'img' => $this->img ?? '',
+            'exp' => $this->exp ?? '',
+            'level' => $this->level ?? '',
+            'name_en' => $this->name_en ?? '',
+            'name_ar' => $this->name_ar ?? '',
             'updated_at' => $this->updated_at ?? now(),
             'created_at' => $this->created_at ?? now(),
             'id' => $this->id ?? 0,

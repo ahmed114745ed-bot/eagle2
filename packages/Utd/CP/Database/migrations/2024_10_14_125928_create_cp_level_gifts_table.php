@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -15,12 +15,12 @@ return new class extends Migration
     {
         Schema::create('cp_level_gifts', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("vip_id");
-            $table->unsignedBigInteger("item_id");
-            $table->string("type");
-            $table->string("sub_type");
-            $table->string("gender");
-            $table->string("expire");
+            $table->unsignedBigInteger('vip_id');
+            $table->unsignedBigInteger('item_id');
+            $table->string('type');
+            $table->string('sub_type');
+            $table->string('gender');
+            $table->string('expire');
             $table->timestamps();
         });
     }

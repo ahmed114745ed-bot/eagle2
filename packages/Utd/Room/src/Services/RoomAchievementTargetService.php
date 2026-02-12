@@ -3,50 +3,51 @@
 namespace Utd\Room\Services;
 
 use App\Enums\UserCoinLogType;
-use App\Helpers\Common;
-use App\Helpers\UserCoinLogHelper;
-use Utd\Room\Entities\Room;
-use App\Models\User;
-use App\Models\GiftLog;
-use App\Models\AppFeature;
-use Utd\Room\Entities\RoomGiftTarget;
 use App\Facades\CustomNotification;
+use App\Helpers\UserCoinLogHelper;
+use App\Models\AppFeature;
+use App\Models\GiftLog;
+use App\Models\User;
+use Utd\Room\Entities\Room;
+use Utd\Room\Entities\RoomGiftTarget;
 use Utd\Room\Entities\RoomOwnerAchievement;
 
 class RoomAchievementTargetService
 {
-
-
     public function sumGiftPrice($roomId)
     {
-          return GiftLog::where('room_id', $roomId)->where('room_gift_status', true)->sum('giftPrice');
+        return GiftLog::where('room_id', $roomId)->where('room_gift_status', true)->sum('giftPrice');
     }
 
     public function reachTarget($roomId, $targetId)
     {
-        return !RoomOwnerAchievement::where('target_id', $targetId)->where('room_id', $roomId)->exists();
+        return ! RoomOwnerAchievement::where('target_id', $targetId)->where('room_id', $roomId)->exists();
     }
 
     public function roomTarget(Room $room)
     {
         $appFeature = AppFeature::where('slug', 'room_gift_target')->first();
-        if ($appFeature && $appFeature?->status == 1) {
+        if ($appFeature && $appFeature?->status === 1) {
             $totalRoomPrice = $this->sumGiftPrice($room->id);
             $roomTarget = RoomGiftTarget::where('target', '<=', $totalRoomPrice)->orderByDesc('target')->first();
 
-            if (!$roomTarget) return;
+            if (! $roomTarget) {
+                return;
+            }
             if ($this->reachTarget($room->id, $roomTarget->id)) {
                 $user = User::find($room->uid);
-                if (!$user) return;
-              
-                $amountBefore =  $user->di;
+                if (! $user) {
+                    return;
+                }
+
+                $amountBefore = $user->di;
                 UserCoinLogHelper::logByType(
                     $user->id,
                     $roomTarget->coins,
                     $amountBefore,
                     UserCoinLogType::ROOM_TARGET,
                 );
-               
+
                 $user->di += $roomTarget->coins;
                 $user->save();
                 RoomOwnerAchievement::create([

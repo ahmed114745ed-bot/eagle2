@@ -13,17 +13,17 @@ return new class extends Migration
     {
         Schema::create('user_game_challanges', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("game_id");
+            $table->bigInteger('game_id');
             $table->bigInteger('room_id');
-            $table->foreignId ('player_one_id')->constrained('users')->onDelete ('cascade');
-            $table->foreignId ('player_two_id')->constrained('users')->onDelete ('cascade');
-            $table->string("status")->default("waiting");
-            $table->string("type")->default("waiting");
-            $table->double("coins")->default(0);
-            $table->string("answer_player_one")->nullable();
-            $table->string("answer_player_two")->nullable();
-            $table->bigInteger("player_win_id")->nullable();
-            $table->string("note")->nullable();
+            $table->foreignId('player_one_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('player_two_id')->constrained('users')->onDelete('cascade');
+            $table->string('status')->default('waiting');
+            $table->string('type')->default('waiting');
+            $table->double('coins')->default(0);
+            $table->string('answer_player_one')->nullable();
+            $table->string('answer_player_two')->nullable();
+            $table->bigInteger('player_win_id')->nullable();
+            $table->string('note')->nullable();
             $table->timestamps();
         });
     }

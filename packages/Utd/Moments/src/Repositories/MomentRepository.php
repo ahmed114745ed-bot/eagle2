@@ -87,14 +87,14 @@ class MomentRepository
                         $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
                             ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
                     }]);
-            }
+            },
         ])
             ->where('user_id', $userId)
             ->orderByRaw('YEAR(created_at) DESC')
             ->orderByRaw('MONTH(created_at) DESC')
-            ->when($page == 1, function ($query) {
+            ->when($page === 1, function ($query) {
                 $seed = rand(1000, 2000);
-                $query->orderBy(DB::raw('RAND(' . $seed . ')'));
+                $query->orderBy(DB::raw('RAND('.$seed.')'));
             })
             ->paginate(10);
     }
@@ -112,7 +112,7 @@ class MomentRepository
                                 ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
                         }])
                         ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC");
-                }
+                },
             ])
             ->where('user_id', $userId)
             ->orderByDesc('id')
@@ -144,9 +144,9 @@ class MomentRepository
                     ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
             }])
             ->orderByRaw("CASE WHEN (SELECT COUNT(*) FROM moment_user_likes WHERE moment_user_likes.moment_id = moment.id AND moment_user_likes.user_id = $userId) > 0 THEN 1 ELSE 0 END ASC")
-            ->when($page == 1, function ($query) {
+            ->when($page === 1, function ($query) {
                 $seed = rand(1000, 2000);
-                $query->orderBy(DB::raw('RAND(' . $seed . ')'));
+                $query->orderBy(DB::raw('RAND('.$seed.')'));
             })->paginate(10);
     }
 
@@ -209,7 +209,6 @@ class MomentRepository
     /**
      * Methods merged from MomentsRepository
      */
-
     public function all($id, $perPage, $page)
     {
         return Moment::when(isset($id), function ($query) use ($id) {
@@ -257,10 +256,10 @@ class MomentRepository
         $query->whereHas('user', function ($query) use ($user_id) {
             $query->where('id', trim($user_id));
         })->with(['comments', 'likes'])
-        ->with(['gifts' => function ($query) {
-            $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
-                  ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
-        }]);
+            ->with(['gifts' => function ($query) {
+                $query->select(DB::raw('sum(moment_user_gifts.num) as gifts_count'))
+                    ->groupBy('moment_user_gifts.moment_id', 'moment_user_gifts.gift_id');
+            }]);
 
         $result = $query->paginate(10);
 

@@ -2,9 +2,9 @@
 
 namespace Utd\CP\Entities;
 
-use Modules\Vip\Entities\Vip;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Vip\Entities\Vip;
 
 class CpLevel extends Model
 {
@@ -28,4 +28,3 @@ class CpLevel extends Model
         return $this->hasMany(CpLevelGift::class, 'vip_id', 'id');
     }
 }
-

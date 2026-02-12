@@ -6,18 +6,19 @@ use App\Events\RoomBoomRewardsEvent;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Models\GiftLog;
-use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\UserGift;
 use App\Models\Ware;
 use Carbon\Carbon;
 use DB;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Room\Entities\Room;
 use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomBoom\Entities\RoomBoomReward;
 use Utd\RoomBoom\Transformers\RoomBoomRewardResource;
@@ -34,16 +35,20 @@ class OldRoomBoomRewardJob implements ShouldQueue
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle()
     {
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
-        if (!$boom || !$boom->roomBoomLevel || !$boom->totalRoomGift) return;
+        if (! $boom || ! $boom->roomBoomLevel || ! $boom->totalRoomGift) {
+            return;
+        }
 
         $level = $boom->roomBoomLevel;
         $roomId = $boom->totalRoomGift->room_id;
-        if (!$roomId) return;
+        if (! $roomId) {
+            return;
+        }
 
         $rewards = RoomBoomReward::where('room_boom_level_id', $level->id)->orderBy('priority')->get();
 
@@ -56,8 +61,7 @@ class OldRoomBoomRewardJob implements ShouldQueue
             }
         }
 
-        $topContributorIds = GiftLog::
-        select('sender_id',
+        $topContributorIds = GiftLog::select('sender_id',
             DB::raw('SUM(giftPrice) as total_gift'),
             DB::raw('MIN(created_at) as first_contribution')
         )
@@ -77,8 +81,10 @@ class OldRoomBoomRewardJob implements ShouldQueue
         $winnerData = [];
 
         foreach ($topContributorIds as $i => $userId) {
-            if (!isset($rewardItems[$i])) break;
-            $reward = $rewardItems[$i];             //first user will take first reward ordered by priority and quantity
+            if (! isset($rewardItems[$i])) {
+                break;
+            }
+            $reward = $rewardItems[$i];             // first user will take first reward ordered by priority and quantity
             $this->distributeBoomRewards($userId, $reward);
 
             $assignedUserIds[] = $userId;
@@ -86,21 +92,21 @@ class OldRoomBoomRewardJob implements ShouldQueue
 
             $winnerData[] = [
                 'user_id' => $userId,
-                'image'   => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
-                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
+                'image' => (new RoomBoomRewardResource((object) $reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object) $reward))->getGiftImageType(),
             ];
         }
 
-//        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
-//            ->where('room_boom_level', $level->level)
-//            ->where('start_boom_ranking', 1)
-//            ->orderByDesc('created_at')
-//            ->value('sender_id');
+        //        $lastTriggerSenderId = GiftLog::where('room_id', $roomId)
+        //            ->where('room_boom_level', $level->level)
+        //            ->where('start_boom_ranking', 1)
+        //            ->orderByDesc('created_at')
+        //            ->value('sender_id');
 
         $lastTriggerSenderId = GiftLog::where('id', $boom->final_gift_id)->value('sender_id');
 
-        if ($lastTriggerSenderId && !in_array($lastTriggerSenderId, $topContributorIds)) {
-            if ($rewards->isNotEmpty()){
+        if ($lastTriggerSenderId && ! in_array($lastTriggerSenderId, $topContributorIds)) {
+            if ($rewards->isNotEmpty()) {
                 $randomReward = $rewards->random();
                 $this->distributeBoomRewards($lastTriggerSenderId, $randomReward);
 
@@ -109,14 +115,14 @@ class OldRoomBoomRewardJob implements ShouldQueue
 
                 $winnerData[] = [
                     'user_id' => $lastTriggerSenderId,
-                    'image'   => (new RoomBoomRewardResource((object)$randomReward))->getImageUrl(),
-                    'image_type' => (new RoomBoomRewardResource((object)$randomReward))->getGiftImageType(),
+                    'image' => (new RoomBoomRewardResource((object) $randomReward))->getImageUrl(),
+                    'image_type' => (new RoomBoomRewardResource((object) $randomReward))->getGiftImageType(),
                 ];
             }
         }
 
         $numAssigned = count($assignments);
-        $remainingRewards = array_slice($rewardItems, $numAssigned);    //remaining rewards by order
+        $remainingRewards = array_slice($rewardItems, $numAssigned);    // remaining rewards by order
 
         $room = Room::where('id', $roomId)->first();
 
@@ -124,24 +130,26 @@ class OldRoomBoomRewardJob implements ShouldQueue
         $unrewardedVisitorIds = array_diff($allVisitorIds, $assignedUserIds);
         shuffle($unrewardedVisitorIds);
 
-        foreach ($unrewardedVisitorIds as $visitorId){
-            if (!isset($remainingRewards[$i])) break;
+        foreach ($unrewardedVisitorIds as $visitorId) {
+            if (! isset($remainingRewards[$i])) {
+                break;
+            }
             $reward = $remainingRewards[$i];
             $this->distributeBoomRewards($visitorId, $reward);
 
             $winnerData[] = [
                 'user_id' => $visitorId,
-                'image' => (new RoomBoomRewardResource((object)$reward))->getImageUrl(),
-                'image_type' => (new RoomBoomRewardResource((object)$reward))->getGiftImageType(),
+                'image' => (new RoomBoomRewardResource((object) $reward))->getImageUrl(),
+                'image_type' => (new RoomBoomRewardResource((object) $reward))->getGiftImageType(),
             ];
         }
 
         foreach ($winnerData as $winner) {
             $data = [
-                "message" => "roomBoomEnded",
+                'message' => 'roomBoomEnded',
                 'roomBoomLevel' => $level->level,
                 'duration' => 10,
-                'winner' => $winner
+                'winner' => $winner,
             ];
 
             event(new RoomBoomRewardsEvent($data));
@@ -149,20 +157,20 @@ class OldRoomBoomRewardJob implements ShouldQueue
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function distributeBoomRewards($userId, $reward): void
     {
         info($userId);
         $user = User::find($userId);
-        if ($user){
+        if ($user) {
             $expire = $reward['expire_days'];
-            if ($reward['target_type'] == 'ware') {
+            if ($reward['target_type'] === 'ware') {
                 $ware = Ware::find($reward->target);
-                UserCommon::addEvintsWareToUser($user, $ware, $expire,null,'room-boom');
+                UserCommon::addEvintsWareToUser($user, $ware, $expire, null, 'room-boom');
             }
-            if ($reward['target_type'] == 'achieve') {
-                if (!class_exists(UserAchievementLevel::class)) {
+            if ($reward['target_type'] === 'achieve') {
+                if (! class_exists(UserAchievementLevel::class)) {
                     return;
                 }
                 $target = $reward->target;
@@ -181,7 +189,7 @@ class OldRoomBoomRewardJob implements ShouldQueue
                 // }
             }
 
-            if ($reward['target_type'] == 'gift') {
+            if ($reward['target_type'] === 'gift') {
                 $target = $reward['target'];
                 $title = __('Gift Reward');
                 $body = __('You have received a new gift.');
@@ -191,7 +199,7 @@ class OldRoomBoomRewardJob implements ShouldQueue
                     'user_id' => $userId,
                     'quantity' => $reward['quantity'],
                 ];
-                if ($expire){
+                if ($expire) {
                     $data['expire'] = $expire;
                 }
                 UserGift::create($data);

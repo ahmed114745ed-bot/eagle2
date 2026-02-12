@@ -2,9 +2,9 @@
 
 namespace Utd\Gifts\Listeners;
 
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Utd\Gifts\Events\GiftSent;
 use Utd\Gifts\Support\ModelResolver;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class UpdateAgencySalary implements ShouldQueue
 {
@@ -13,18 +13,18 @@ class UpdateAgencySalary implements ShouldQueue
     public function handle(GiftSent $event): void
     {
         // Only for room gifts
-        if (!$event->isRoomGift()) {
+        if (! $event->isRoomGift()) {
             return;
         }
-        
+
         $userModel = ModelResolver::getUserModel();
-        if (!$userModel) {
+        if (! $userModel) {
             return;
         }
 
         foreach ($event->getReceiverIds() as $receiverId) {
             $user = $userModel::find($receiverId);
-            
+
             if ($user && ($user->agency_id ?? null)) {
                 // Update agency salary logic
                 $this->updateSalary($user, $event->getPricePerReceiver());

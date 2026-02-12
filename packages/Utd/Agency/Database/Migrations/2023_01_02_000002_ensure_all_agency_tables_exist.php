@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-
 return new class extends Migration
 {
     /**
@@ -12,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('agencies')) {
+        if (! Schema::hasTable('agencies')) {
             Schema::create('agencies', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('app_owner_id')->comment('owner user id');
@@ -31,7 +30,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('region_id')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
-                
+
                 $table->index('app_owner_id');
                 $table->index('type');
                 $table->index('bd_id');
@@ -39,7 +38,7 @@ return new class extends Migration
         }
 
         // 2. جدول رواتب المستخدمين
-        if (!Schema::hasTable('user_sallaries')) {
+        if (! Schema::hasTable('user_sallaries')) {
             Schema::create('user_sallaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id')->default(0);
@@ -53,14 +52,14 @@ return new class extends Migration
                 $table->integer('year')->default(0);
                 $table->boolean('is_paid')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('user_id');
                 $table->index('user_agency_id');
             });
         }
 
         // 3. جدول رواتب الوكالات
-        if (!Schema::hasTable('agency_sallaries')) {
+        if (! Schema::hasTable('agency_sallaries')) {
             Schema::create('agency_sallaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id')->default(0);
@@ -74,12 +73,12 @@ return new class extends Migration
                 $table->integer('year')->default(0);
                 $table->boolean('is_paid')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
 
-        if (!Schema::hasTable('agency_join_requests')) {
+        if (! Schema::hasTable('agency_join_requests')) {
             Schema::create('agency_join_requests', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -88,14 +87,14 @@ return new class extends Migration
                 $table->unsignedBigInteger('change_status_admin_id')->nullable()->default(0);
                 $table->string('whatsapp')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('user_id');
                 $table->index('agency_id');
                 $table->index('status');
             });
         }
 
-        if (!Schema::hasTable('targets')) {
+        if (! Schema::hasTable('targets')) {
             Schema::create('targets', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id')->nullable();
@@ -107,7 +106,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('agency_manger_deleteds')) {
+        if (! Schema::hasTable('agency_manger_deleteds')) {
             Schema::create('agency_manger_deleteds', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
@@ -115,12 +114,12 @@ return new class extends Migration
                 $table->unsignedBigInteger('deleted_by_admin_id')->nullable();
                 $table->text('reason')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
 
-        if (!Schema::hasTable('agency_manger_pulling_out')) {
+        if (! Schema::hasTable('agency_manger_pulling_out')) {
             Schema::create('agency_manger_pulling_out', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
@@ -128,23 +127,23 @@ return new class extends Migration
                 $table->decimal('amount', 15, 2)->default(0);
                 $table->string('status')->default('pending');
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
 
-        if (!Schema::hasTable('percentage_agency_manger')) {
+        if (! Schema::hasTable('percentage_agency_manger')) {
             Schema::create('percentage_agency_manger', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
                 $table->decimal('percentage', 5, 2)->default(0);
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
             });
         }
 
-        if (!Schema::hasTable('additional_infos')) {
+        if (! Schema::hasTable('additional_infos')) {
             Schema::create('additional_infos', function (Blueprint $table) {
                 $table->id();
                 $table->morphs('infoable');
@@ -156,7 +155,7 @@ return new class extends Migration
             });
         }
 
-        if (!Schema::hasTable('agency_host_invites')) {
+        if (! Schema::hasTable('agency_host_invites')) {
             Schema::create('agency_host_invites', function (Blueprint $table) {
                 $table->id();
                 $table->bigInteger('agency_id');
@@ -164,14 +163,14 @@ return new class extends Migration
                 $table->unsignedBigInteger('user_id')->nullable();
                 $table->integer('status')->default(0);
                 $table->timestamps();
-                
+
                 $table->index('user_invite_id');
                 $table->index('user_id');
                 $table->index('agency_id');
             });
         }
 
-        if (!Schema::hasTable('leave_agency_requests')) {
+        if (! Schema::hasTable('leave_agency_requests')) {
             Schema::create('leave_agency_requests', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedInteger('agency_id');
@@ -179,25 +178,25 @@ return new class extends Migration
                 $table->unsignedInteger('admin_id');
                 $table->unsignedInteger('status')->nullable();
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
                 $table->index('user_id');
             });
         }
 
-        if (!Schema::hasTable('agency_user_jobs')) {
+        if (! Schema::hasTable('agency_user_jobs')) {
             Schema::create('agency_user_jobs', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
                 $table->unsignedBigInteger('user_id');
                 $table->string('job_type')->comment('admin, moderator, etc');
                 $table->timestamps();
-                
+
                 $table->index(['agency_id', 'user_id']);
             });
         }
 
-        if (!Schema::hasTable('users_joined_agencies')) {
+        if (! Schema::hasTable('users_joined_agencies')) {
             Schema::create('users_joined_agencies', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('agency_id');
@@ -209,14 +208,14 @@ return new class extends Migration
                 $table->unsignedBigInteger('kicked_by_admin_id')->nullable();
                 $table->tinyInteger('status')->default(1)->comment('1:active, 0:inactive');
                 $table->timestamps();
-                
+
                 $table->index('agency_id');
                 $table->index('user_id');
                 $table->index(['agency_id', 'user_id', 'leave_date']);
             });
         }
 
-        if (!Schema::hasTable('bd_sallaries')) {
+        if (! Schema::hasTable('bd_sallaries')) {
             Schema::create('bd_sallaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('bd_id')->default(0);
@@ -230,12 +229,12 @@ return new class extends Migration
                 $table->decimal('total_users_sallary', 15, 2)->default(0);
                 $table->decimal('total_diamond', 15, 2)->default(0);
                 $table->timestamps();
-                
+
                 $table->index('bd_id');
             });
         }
 
-        if (!Schema::hasTable('bd_agency_host_sallaries')) {
+        if (! Schema::hasTable('bd_agency_host_sallaries')) {
             Schema::create('bd_agency_host_sallaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('bd_id');
@@ -246,12 +245,12 @@ return new class extends Migration
                 $table->integer('add_month');
                 $table->integer('add_year');
                 $table->timestamps();
-                
+
                 $table->index(['bd_id', 'agency_id']);
             });
         }
 
-        if (!Schema::hasTable('bd_salaries')) {
+        if (! Schema::hasTable('bd_salaries')) {
             Schema::create('bd_salaries', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('bd_id');
@@ -260,23 +259,23 @@ return new class extends Migration
                 $table->integer('month');
                 $table->integer('year');
                 $table->timestamps();
-                
+
                 $table->index('bd_id');
             });
         }
 
         if (Schema::hasTable('users')) {
             Schema::table('users', function (Blueprint $table) {
-                if (!Schema::hasColumn('users', 'agency_id')) {
+                if (! Schema::hasColumn('users', 'agency_id')) {
                     $table->unsignedInteger('agency_id')->nullable()->default(0);
                 }
-                if (!Schema::hasColumn('users', 'type_user')) {
+                if (! Schema::hasColumn('users', 'type_user')) {
                     $table->integer('type_user')->default(0)->comment('0:normal, 1:owner, 2:admin, 3:host, 4:professional');
                 }
-                if (!Schema::hasColumn('users', 'is_manger')) {
+                if (! Schema::hasColumn('users', 'is_manger')) {
                     $table->boolean('is_manger')->default(false);
                 }
-                if (!Schema::hasColumn('users', 'is_host')) {
+                if (! Schema::hasColumn('users', 'is_host')) {
                     $table->unsignedTinyInteger('is_host')->nullable()->default(0);
                 }
             });
@@ -285,7 +284,7 @@ return new class extends Migration
         // 18. إضافة agency_id في جدول gift_logs
         if (Schema::hasTable('gift_logs')) {
             Schema::table('gift_logs', function (Blueprint $table) {
-                if (!Schema::hasColumn('gift_logs', 'agency_id')) {
+                if (! Schema::hasColumn('gift_logs', 'agency_id')) {
                     $table->unsignedInteger('agency_id')->nullable();
                 }
             });
@@ -294,7 +293,7 @@ return new class extends Migration
         // 19. إضافة agency_id في جدول charges
         if (Schema::hasTable('charges')) {
             Schema::table('charges', function (Blueprint $table) {
-                if (!Schema::hasColumn('charges', 'agency_id')) {
+                if (! Schema::hasColumn('charges', 'agency_id')) {
                     $table->integer('agency_id')->nullable();
                 }
             });

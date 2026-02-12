@@ -3,8 +3,10 @@
 namespace Utd\Gifts\Http\Middleware;
 
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Log;
 
 class HideGiftsMenuIfNotInstalled
 {
@@ -12,21 +14,19 @@ class HideGiftsMenuIfNotInstalled
      * Handle an incoming request.
      * Hide gifts menu items from admin panel if package is not installed
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         // Only run on admin routes
-        if (!$request->is('admin/*')) {
+        if (! $request->is('admin/*')) {
             return $next($request);
         }
 
         // Check if package is installed
         $packageInstalled = class_exists(\Utd\Gifts\GiftsServiceProvider::class);
 
-        if (!$packageInstalled) {
+        if (! $packageInstalled) {
             // Hide menu items from database
             $this->hideGiftsMenuItems();
         } else {
@@ -53,7 +53,7 @@ class HideGiftsMenuIfNotInstalled
                 '/wares_dedicate',
                 '/vips_dedicate',
                 '/level-intervals',
-                'achievement-dedicate'
+                'achievement-dedicate',
             ];
 
             // Hide menus by setting show = 0
@@ -67,9 +67,9 @@ class HideGiftsMenuIfNotInstalled
                 ->orWhere('title', 'like', '%Gift%')
                 ->update(['show' => 0]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Silently fail if admin_menu table doesn't exist or has issues
-            \Log::warning('Failed to hide gifts menu: ' . $e->getMessage());
+            Log::warning('Failed to hide gifts menu: '.$e->getMessage());
         }
     }
 
@@ -96,8 +96,8 @@ class HideGiftsMenuIfNotInstalled
                 })
                 ->update(['show' => 1]);
 
-        } catch (\Exception $e) {
-            \Log::warning('Failed to show gifts menu: ' . $e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Failed to show gifts menu: '.$e->getMessage());
         }
     }
 }

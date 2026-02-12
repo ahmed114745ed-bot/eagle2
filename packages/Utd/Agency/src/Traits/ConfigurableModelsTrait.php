@@ -2,6 +2,8 @@
 
 namespace Utd\Agency\Traits;
 
+use InvalidArgumentException;
+
 /**
  * Trait to provide configurable model classes
  * This allows the package to be independent of the main application
@@ -14,6 +16,7 @@ trait ConfigurableModelsTrait
     protected function getModelClass(string $key, ?string $fallback = null): string
     {
         $default = $fallback ?? $this->getDefaultModelClass($key);
+
         return config("agency-package.models.{$key}", $default);
     }
 
@@ -22,7 +25,7 @@ trait ConfigurableModelsTrait
      */
     protected function getDefaultModelClass(string $key): string
     {
-        return match($key) {
+        return match ($key) {
             'user' => \App\Models\User::class,
             'admin' => \App\Models\Admin::class,
             'admin_user' => \App\Models\AdminUser::class,
@@ -36,7 +39,7 @@ trait ConfigurableModelsTrait
             'payment_gateway' => \App\Models\PaymentGateway::class,
             'config' => \App\Models\Config::class,
             'language' => \App\Models\Language::class,
-            default => throw new \InvalidArgumentException("Unknown model key: {$key}"),
+            default => throw new InvalidArgumentException("Unknown model key: {$key}"),
         };
     }
 
@@ -46,6 +49,7 @@ trait ConfigurableModelsTrait
     protected function getHelperClass(string $key): ?string
     {
         $class = config("agency-package.helpers.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -55,6 +59,7 @@ trait ConfigurableModelsTrait
     protected function getControllerClass(string $key): ?string
     {
         $class = config("agency-package.controllers.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -63,7 +68,7 @@ trait ConfigurableModelsTrait
      */
     protected function isModuleEnabled(string $module): bool
     {
-        return config("agency-package.modules.{$module}.enabled", false) 
+        return config("agency-package.modules.{$module}.enabled", false)
             && $this->isModuleClassesExist($module);
     }
 
@@ -74,13 +79,13 @@ trait ConfigurableModelsTrait
     {
         $classes = config("agency-package.modules.{$module}", []);
         unset($classes['enabled']);
-        
+
         foreach ($classes as $class) {
-            if (is_string($class) && !class_exists($class)) {
+            if (is_string($class) && ! class_exists($class)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -89,11 +94,12 @@ trait ConfigurableModelsTrait
      */
     protected function getModuleClass(string $module, string $key): ?string
     {
-        if (!$this->isModuleEnabled($module)) {
+        if (! $this->isModuleEnabled($module)) {
             return null;
         }
-        
+
         $class = config("agency-package.modules.{$module}.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 }

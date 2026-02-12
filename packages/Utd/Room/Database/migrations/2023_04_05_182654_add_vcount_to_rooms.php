@@ -14,7 +14,7 @@ class AddVcountToRooms extends Migration
     public function up()
     {
         Schema::table('rooms', function (Blueprint $table) {
-            $table->integer ('visitor_count')->nullable ()->default (0);
+            $table->integer('visitor_count')->nullable()->default(0);
         });
     }
 

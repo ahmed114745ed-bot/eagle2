@@ -10,10 +10,10 @@ class JoinedAgencyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'join_date'  => $this->join_date ?? '',
+            'join_date' => $this->join_date ?? '',
             'leave_date' => $this->leave_date ?? '',
-            'agency_id'  => $this->agency_id ?? 0,
-            'img' => $this->agency->img ?? '', 
+            'agency_id' => $this->agency_id ?? 0,
+            'img' => $this->agency->img ?? '',
         ];
     }
 }

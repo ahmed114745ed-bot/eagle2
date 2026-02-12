@@ -3,15 +3,14 @@
 namespace Utd\Agency\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Artisan;
+use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Artisan;
 
 class PackageController extends Controller
 {
     /**
      * Install the Agency package.
-     *
-     * @return JsonResponse
      */
     public function install(): JsonResponse
     {
@@ -23,18 +22,16 @@ class PackageController extends Controller
                 'message' => 'Agency package installed successfully.',
                 'output' => Artisan::output(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Installation failed: ' . $e->getMessage(),
+                'message' => 'Installation failed: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Uninstall the Agency package.
-     *
-     * @return JsonResponse
      */
     public function uninstall(): JsonResponse
     {
@@ -46,18 +43,16 @@ class PackageController extends Controller
                 'message' => 'Agency package uninstalled successfully.',
                 'output' => Artisan::output(),
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Uninstallation failed: ' . $e->getMessage(),
+                'message' => 'Uninstallation failed: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Debug installation status.
-     *
-     * @return JsonResponse
      */
     public function debug(): JsonResponse
     {
@@ -72,7 +67,7 @@ class PackageController extends Controller
             if ($tableExists) {
                 $tableCount = \Illuminate\Support\Facades\DB::table('agencies')->count();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $tableError = $e->getMessage();
         }
 

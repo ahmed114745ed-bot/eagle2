@@ -13,7 +13,7 @@ abstract class MomentBaseModelService
         $this->model = $model;
     }
 
-    public function findOrFail($id)
+    final public function findOrFail($id)
     {
         return $this->model->findOrFail($id);
     }

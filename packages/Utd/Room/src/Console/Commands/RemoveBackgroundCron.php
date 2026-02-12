@@ -3,10 +3,10 @@
 namespace Utd\Room\Console\Commands;
 
 use Illuminate\Console\Command;
-use Utd\Room\Entities\Room;
+use Illuminate\Support\Facades\Storage;
 use Utd\Room\Entities\Background;
 use Utd\Room\Entities\RequestBackgroundImage;
-use Illuminate\Support\Facades\Storage;
+use Utd\Room\Entities\Room;
 
 class RemoveBackgroundCron extends Command
 {
@@ -43,22 +43,22 @@ class RemoveBackgroundCron extends Command
     {
 
         $bgfirst = Background::first();
-        $RequestBackgroundImage = RequestBackgroundImage::whereIn('status',[1,3])->where(function ($q) {
-                    $q->where('expair', '<', now()->timestamp)
-                        ->orWhere('expair', 0);
-                })->get();
-        $owner_ids =  $RequestBackgroundImage->pluck('owner_room_id');
-        $rooms = Room::whereIn('uid',$owner_ids)->update([
-            'room_background' => $bgfirst ? $bgfirst->id : null
+        $RequestBackgroundImage = RequestBackgroundImage::whereIn('status', [1, 3])->where(function ($q) {
+            $q->where('expair', '<', now()->timestamp)
+                ->orWhere('expair', 0);
+        })->get();
+        $owner_ids = $RequestBackgroundImage->pluck('owner_room_id');
+        $rooms = Room::whereIn('uid', $owner_ids)->update([
+            'room_background' => $bgfirst ? $bgfirst->id : null,
         ]);
-        foreach($RequestBackgroundImage as $img){
+        foreach ($RequestBackgroundImage as $img) {
             $path = $img->img;
-            if(Storage::exists(Storage::disk('images')->path($path))){
+            if (Storage::exists(Storage::disk('images')->path($path))) {
                 unlink(Storage::disk('images')->path($path));
             }
             $img->delete();
         }
-//        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
+        //        $this->info(now()->toDateTimeString() . ' '. $this->signature . ' Run successful...');
 
         $this->info('update-room-user-now:cron Command Run Successfully !');
     }

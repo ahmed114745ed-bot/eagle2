@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AddMomentTable extends Migration
 {
@@ -13,7 +13,7 @@ class AddMomentTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('moment')) {
+        if (! Schema::hasTable('moment')) {
             Schema::create('moment', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

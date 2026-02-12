@@ -5,9 +5,9 @@ namespace Utd\Agency\Http\Controllers\Utd;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Utd\Agency\Services\AgencyService;
-use Utd\Agency\Http\Resources\AgencyResource;
 use Utd\Agency\Http\Resources\AgencyRequestResource;
+use Utd\Agency\Http\Resources\AgencyResource;
+use Utd\Agency\Services\AgencyService;
 
 class AgencyController extends Controller
 {
@@ -22,7 +22,7 @@ class AgencyController extends Controller
     {
         try {
             $data = $this->agencyService->allRequest();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'success',

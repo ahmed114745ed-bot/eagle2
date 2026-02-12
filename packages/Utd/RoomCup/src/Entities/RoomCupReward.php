@@ -2,8 +2,8 @@
 
 namespace Utd\RoomCup\Entities;
 
-use App\Support\PackageHelper;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Utd\Room\Entities\Room;

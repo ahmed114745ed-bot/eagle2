@@ -23,6 +23,30 @@ class RoomCupSettingsController extends AdminController
             ]));
     }
 
+    public function save()
+    {
+        $data = [
+            'enabled' => request()->has('enabled'),
+            'type' => request('type', 'daily'),
+            'time' => request('time', '00:00'),
+            'day' => (int) request('day', 0),
+            'interval' => (int) request('interval', 1),
+        ];
+
+        foreach ($data as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => 'roomcup_'.$key],
+                ['value' => $value]
+            );
+
+            Cache::put('roomcup_'.$key, $value, now()->addDays(30));
+        }
+
+        admin_success('Saved successfully ✅');
+
+        return redirect()->back();
+    }
+
     private function saveUrl()
     {
         return admin_url('room-cup-settings/save');
@@ -41,7 +65,7 @@ class RoomCupSettingsController extends AdminController
         $settings = [];
 
         foreach ($default as $key => $defaultValue) {
-            $cacheKey = 'roomcup_' . $key;
+            $cacheKey = 'roomcup_'.$key;
             $value = Cache::get($cacheKey);
 
             if ($value === null) {
@@ -60,28 +84,5 @@ class RoomCupSettingsController extends AdminController
         }
 
         return $settings;
-    }
-
-    public function save()
-    {
-        $data = [
-            'enabled' => request()->has('enabled'),
-            'type' => request('type', 'daily'),
-            'time' => request('time', '00:00'),
-            'day' => (int) request('day', 0),
-            'interval' => (int) request('interval', 1),
-        ];
-
-        foreach ($data as $key => $value) {
-            Setting::updateOrCreate(
-                ['key' => 'roomcup_' . $key],
-                ['value' => $value]
-            );
-
-            Cache::put('roomcup_' . $key, $value, now()->addDays(30));
-        }
-
-        admin_success('Saved successfully ✅');
-        return redirect()->back();
     }
 }

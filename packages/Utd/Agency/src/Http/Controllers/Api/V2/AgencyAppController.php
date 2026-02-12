@@ -2,36 +2,38 @@
 
 namespace Utd\Agency\Http\Controllers\Api\V2;
 
-use Exception;
+use App\Helpers\Common;
+use Auth;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use Utd\Agency\Emails\SendAgencyEmail;
-use Utd\Agency\Services\TargetService;
-use Utd\Agency\Traits\ResolvesExternalDependencies;
+use Log;
+use RuntimeException;
+// Import external classes via facade or config
+use stdClass;
 use Utd\Agency\Classes\Agencies\AgencyDataSearch;
 use Utd\Agency\Contracts\AgencyServiceInterface;
-
-// Import external classes via facade or config
-use App\Helpers\Common;
+use Utd\Agency\Emails\SendAgencyEmail;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyAppController extends Controller
 {
     use ResolvesExternalDependencies;
-    
+
     protected $agencyService;
 
-    public function __construct(AgencyServiceInterface $agencyService = null)
+    public function __construct(?AgencyServiceInterface $agencyService = null)
     {
         // Use injected service if available, otherwise resolve from config
         $this->agencyService = $agencyService ?? $this->getAgencyService();
-        
+
         // If still null, throw exception
-        if (!$this->agencyService) {
-            throw new \RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
+        if (! $this->agencyService) {
+            throw new RuntimeException('AgencyService is not configured. Please configure it in agency-dependencies.php');
         }
     }
 
@@ -46,8 +48,8 @@ class AgencyAppController extends Controller
                 'nullable',
                 'email',
                 function ($attribute, $value, $fail) {
-                    if ($value && !str_contains($value, '@gmail.com')) {
-                        $fail($attribute . __('api.gmail'));
+                    if ($value && ! str_contains($value, '@gmail.com')) {
+                        $fail($attribute.__('api.gmail'));
                     }
                 },
             ],
@@ -58,16 +60,19 @@ class AgencyAppController extends Controller
             'salary' => 'required|integer',
             'host' => 'required|integer',
             'uuid' => 'nullable|exists:users,uuid',
-            'video' => 'nullable|file|mimes:mp4,ogx,oga,ogv,ogg,webm'
+            'video' => 'nullable|file|mimes:mp4,ogx,oga,ogv,ogg,webm',
         ]);
 
         if ($validator->fails()) {
             $errors = implode(',', $validator->errors()->all());
-            return Common::apiResponse(0, $errors,  200);
+
+            return Common::apiResponse(0, $errors, 200);
         }
-        if ($user->is_bd) return Common::apiResponse(false, 'You are BD ,You can\'t create agency', null, 407);
+        if ($user->is_bd) {
+            return Common::apiResponse(false, 'You are BD ,You can\'t create agency', null, 407);
+        }
         try {
-            $agencyWithAdditionalInfo =  $this->agencyService->create($user->id, $request);
+            $agencyWithAdditionalInfo = $this->agencyService->create($user->id, $request);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
@@ -75,9 +80,10 @@ class AgencyAppController extends Controller
         try {
             Mail::to($gmail)->send(new SendAgencyEmail($agencyWithAdditionalInfo));
         } catch (\Illuminate\Database\QueryException $e) {
-            return Common::apiResponse(1, __("api_responses.created"),  200);
+            return Common::apiResponse(1, __('api_responses.created'), 200);
         }
-        return Common::apiResponse(1, __("api_responses.created"),  200);
+
+        return Common::apiResponse(1, __('api_responses.created'), 200);
     }
 
     public function actionRequestAgency(Request $request)
@@ -87,53 +93,67 @@ class AgencyAppController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        if ($request->status != 1) {
-            return Common::apiResponse(1, 'deleted request',  200);
-        } else {
-            return Common::apiResponse(1, 'accept request',  200);
+        if ($request->status !== 1) {
+            return Common::apiResponse(1, 'deleted request', 200);
         }
+
+        return Common::apiResponse(1, 'accept request', 200);
+
     }
 
     public function allAgencyRequest()
     {
         $agencies = $this->agencyService->allRequest();
-        return Common::apiResponse(1, '', $agencies,  200);
+
+        return Common::apiResponse(1, '', $agencies, 200);
     }
 
     public function agency_last_thirty_day()
     {
         $userUuid = \request('uuid');
-        if (!$userUuid) return Common::apiResponse(0, 'missing parameters', []);
+        if (! $userUuid) {
+            return Common::apiResponse(0, 'missing parameters', []);
+        }
         $data = $this->agencyService->historyLastThirtyDays($userUuid);
+
         return Common::apiResponse(1, '', $data);
     }
 
     public function agency_total_reports()
     {
-        $agencyId  = \request('agency_id');
-        if (!$agencyId) return Common::apiResponse(0, 'missing parameters', []);
+        $agencyId = \request('agency_id');
+        if (! $agencyId) {
+            return Common::apiResponse(0, 'missing parameters', []);
+        }
 
         $data = $this->agencyService->agencyReport($agencyId);
+
         return Common::apiResponse(1, '', $data);
     }
 
     public function leave_agency(Request $request)
     {
         $user = $request->user();
-        if (!$user->agency) return Common::apiResponse(0, __("api_responses.agency"), []);
+        if (! $user->agency) {
+            return Common::apiResponse(0, __('api_responses.agency'), []);
+        }
         $agency = $user->agency;
-        if (date("d") >= 10) return Common::apiResponse(0, __('api_responses.leave_agency'), []);
+        if (date('d') >= 10) {
+            return Common::apiResponse(0, __('api_responses.leave_agency'), []);
+        }
         try {
             $this->agencyService->leaveAgency($user->id, $agency);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
-        return Common::apiResponse(0, __("api_responses.request_sent"), []);
+
+        return Common::apiResponse(0, __('api_responses.request_sent'), []);
     }
 
     public function historyDataAgency(Request $request)
     {
         $data = (new AgencyDataSearch())->fetchData($request);
+
         return Common::apiResponse(1, '', $data);
     }
 
@@ -141,12 +161,15 @@ class AgencyAppController extends Controller
     {
         $user = $request->user();
         $agency = $user->ownAgency;
-        if (!$user->ownAgency)   return Common::apiResponse(0, 'لا يوجد وكاله!', []);
+        if (! $user->ownAgency) {
+            return Common::apiResponse(0, 'لا يوجد وكاله!', []);
+        }
         try {
             $this->agencyService->handlingRequest($agency->id, $request->user_id);
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
+
         return Common::apiResponse(1, 'تم اضافه المستخدم بنجاح', []);
     }
 
@@ -157,8 +180,10 @@ class AgencyAppController extends Controller
         $kickOutEndPerDays = Common::getConfig('kick_out_greater_than_day') ?? 10;
 
         // if (Carbon::now()->day < $kickOutStartPerDays || Carbon::now()->day > $kickOutEndPerDays) return Common::apiResponse(0,__('api.kickRole', ['startDay' => $kickOutStartPerDays, 'endDay' => $kickOutEndPerDays], ), []);
-        if (!$request->user_id) return Common::apiResponse(0, 'missing_parameters', 404);
-        
+        if (! $request->user_id) {
+            return Common::apiResponse(0, 'missing_parameters', 404);
+        }
+
         $userClass = $this->getUserModel();
         $user_kicked = $userClass::find($request->user_id);
         try {
@@ -166,43 +191,45 @@ class AgencyAppController extends Controller
         } catch (Exception $e) {
             return Common::apiResponse(false, $e->getMessage(), null, 407);
         }
+
         return Common::apiResponse(1, 'تم حذف المستخدم بنجاح', []);
     }
 
     public function agency_filter(Request $request)
     {
         $app_feature = Cache::get('host_agency');
-        if (!$app_feature) {
+        if (! $app_feature) {
             throw new Exception(__('Agency Feature is Disabled, Contact the administration'));
         }
 
         $keyword = $request->keyword;
         [$agencies, $agencyManger] = $this->agencyService->filter($keyword);
-        
+
         // Check if SalaryTransaction module exists for resources
         $filterAgancyResourceClass = class_exists('\\Modules\\SalaryTransaction\\Transformers\\FilterAgancyResource')
             ? '\\Modules\\SalaryTransaction\\Transformers\\FilterAgancyResource'
             : null;
-            
+
         $filterAgencyMangerResourceClass = class_exists('\\Modules\\SalaryTransaction\\Transformers\\FilterAgencyMangerResource')
             ? '\\Modules\\SalaryTransaction\\Transformers\\FilterAgencyMangerResource'
             : null;
-        
+
         $data = [
             'agencies' => $filterAgancyResourceClass ? $filterAgancyResourceClass::collection($agencies) : $agencies,
             'agency_masters' => $filterAgencyMangerResourceClass ? $filterAgencyMangerResourceClass::collection($agencyManger) : $agencyManger,
         ];
+
         return Common::apiResponse(1, '', $data);
     }
 
     public function dailyReport()
     {
-        $user  = \Auth::user();
+        $user = Auth::user();
         $month = request()->month ?? now()->format('m');
         $year = request()->year ?? now()->year;
         $agencyId = request()->agency_id ?? $user->agency_id;
 
-        \Log::info('[AgencyAppController::dailyReport] START', [
+        Log::info('[AgencyAppController::dailyReport] START', [
             'user_id' => $user->id,
             'month' => $month,
             'year' => $year,
@@ -211,13 +238,14 @@ class AgencyAppController extends Controller
         ]);
 
         $userModel = $this->getUserModel();
-        if (!$user instanceof $userModel) {
-            \Log::warning('[AgencyAppController::dailyReport] User not instance of userModel');
+        if (! $user instanceof $userModel) {
+            Log::warning('[AgencyAppController::dailyReport] User not instance of userModel');
+
             return;
         }
-        $userId        = $user->id;
+        $userId = $user->id;
 
-        $cacheKey = 'cache-data-my-store-' . $user->id;
+        $cacheKey = 'cache-data-my-store-'.$user->id;
         if (Cache::add($cacheKey, true, now()->addSeconds(30))) {
             // Check if FixedTargetService module exists before using
             if (class_exists('\\Modules\\FixedTarget\\Services\\FixedTargetService')) {
@@ -227,14 +255,15 @@ class AgencyAppController extends Controller
         }
 
         $data = $this->agencyService->dailyReport($user, $month, $year, $agencyId);
-        
-        \Log::info('[AgencyAppController::dailyReport] Service returned', [
+
+        Log::info('[AgencyAppController::dailyReport] Service returned', [
             'data_empty' => empty($data),
             'data_is_array' => is_array($data),
             'data_count' => is_array($data) ? count($data) : 'not_array',
         ]);
-        
-        $data = empty($data) ? new \stdClass() : $data;
+
+        $data = empty($data) ? new stdClass() : $data;
+
         return Common::apiResponse(true, 'success', $data);
     }
 }

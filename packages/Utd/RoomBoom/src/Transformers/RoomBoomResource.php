@@ -20,7 +20,7 @@ class RoomBoomResource extends JsonResource
             'total_gifts_value' => $this->total_gifts_value,
             'level' => $this->roomBoomLevel ? $this->roomBoomLevel->level : null,
             'top_contributors' => $this->ended_at ? TopUsersRankResource::collection($this->getTopContributors()) : [],
-//            'top_contributors' => $this->ended_at ? TopUsersRankResource::collection($this->getTopContributors()) : [],
+            //            'top_contributors' => $this->ended_at ? TopUsersRankResource::collection($this->getTopContributors()) : [],
         ];
     }
 
@@ -42,47 +42,47 @@ class RoomBoomResource extends JsonResource
             ->get();
     }
 
-//    protected function getTopContributors()
-//    {
-//        $topContributors = GiftLog::select('sender_id',
-//            DB::raw('SUM(giftPrice) as total_gift'),
-//            DB::raw('MIN(created_at) as first_contribution')
-//        )
-//            ->where('room_id', $this->totalRoomGift->room_id)
-//            ->where('room_boom_level', $this->roomBoomLevel->level)
-//            ->where('start_boom_ranking', 1)
-//            ->where('created_at', '>=', Carbon::today())
-//            ->groupBy('sender_id')
-//            ->orderByDesc('total_gift')
-//            ->orderBy('first_contribution', 'asc')
-//            ->limit(3)
-//            ->get();
-//
-//
-//        if ($topContributors->isEmpty()) {
-//            return collect([$this->getEmptyUser()]);
-////            $lastGift = GiftLog::find($this->final_gift_id);
-////            if ($lastGift) {
-////                $user = User::with('profile')->find($lastGift->sender_id);
-////                if ($user) {
-////                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
-////                        ->where('sender_id', $lastGift->sender_id)
-////                        ->sum('giftPrice');
-////
-////                    return collect([$user]);
-////                }
-////            }
-//        }
-//
-//        return $topContributors->map(function($contributor) {
-//            $user = User::with('profile')->find($contributor->sender_id);
-//            if ($user) {
-//                $user->total_gift = $contributor->total_gift;
-//                return $user;
-//            }
-//            return null;
-//        })->filter();
-//    }
+    //    protected function getTopContributors()
+    //    {
+    //        $topContributors = GiftLog::select('sender_id',
+    //            DB::raw('SUM(giftPrice) as total_gift'),
+    //            DB::raw('MIN(created_at) as first_contribution')
+    //        )
+    //            ->where('room_id', $this->totalRoomGift->room_id)
+    //            ->where('room_boom_level', $this->roomBoomLevel->level)
+    //            ->where('start_boom_ranking', 1)
+    //            ->where('created_at', '>=', Carbon::today())
+    //            ->groupBy('sender_id')
+    //            ->orderByDesc('total_gift')
+    //            ->orderBy('first_contribution', 'asc')
+    //            ->limit(3)
+    //            ->get();
+    //
+    //
+    //        if ($topContributors->isEmpty()) {
+    //            return collect([$this->getEmptyUser()]);
+    // //            $lastGift = GiftLog::find($this->final_gift_id);
+    // //            if ($lastGift) {
+    // //                $user = User::with('profile')->find($lastGift->sender_id);
+    // //                if ($user) {
+    // //                    $user->total_gift = GiftLog::where('room_boom_uuid', $lastGift->room_boom_uuid)
+    // //                        ->where('sender_id', $lastGift->sender_id)
+    // //                        ->sum('giftPrice');
+    // //
+    // //                    return collect([$user]);
+    // //                }
+    // //            }
+    //        }
+    //
+    //        return $topContributors->map(function($contributor) {
+    //            $user = User::with('profile')->find($contributor->sender_id);
+    //            if ($user) {
+    //                $user->total_gift = $contributor->total_gift;
+    //                return $user;
+    //            }
+    //            return null;
+    //        })->filter();
+    //    }
 
     protected function getEmptyUser(): object
     {

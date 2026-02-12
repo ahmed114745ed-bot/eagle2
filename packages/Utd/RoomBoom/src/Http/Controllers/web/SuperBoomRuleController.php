@@ -2,12 +2,12 @@
 
 namespace Utd\RoomBoom\Http\Controllers\web;
 
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Utd\RoomBoom\Entities\SuperBoomRule;
 
 class SuperBoomRuleController extends MainController
@@ -19,7 +19,6 @@ class SuperBoomRuleController extends MainController
     /**
      * Index interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function index(Content $content)
@@ -32,8 +31,7 @@ class SuperBoomRuleController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -46,8 +44,7 @@ class SuperBoomRuleController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -60,7 +57,6 @@ class SuperBoomRuleController extends MainController
     /**
      * Create interface.
      *
-     * @param Content $content
      * @return Content
      */
     public function create(Content $content)
@@ -92,7 +88,7 @@ class SuperBoomRuleController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)

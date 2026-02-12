@@ -4,35 +4,37 @@ namespace Utd\Room\Http\Controllers\Api;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Utd\Room\Entities\RoomTarget;
 use Illuminate\Http\Request;
+use Utd\Room\Entities\RoomTarget;
 
 class RoomTargetController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
-        $perPage = request('per_page')?? 10;
+        $perPage = request('per_page') ?? 10;
         $search = request('search');
-        $imageColors = RoomTarget::when($search, function($q) use($search){
+        $imageColors = RoomTarget::when($search, function ($q) use ($search) {
             $q->where('id', $search);
         })->paginate($perPage);
-
 
         return Common::apiResponse(true, '', $imageColors, 200);
 
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $room_target  = RoomTarget::create([
+        $room_target = RoomTarget::create([
             'coins' => $request->coins,
             'usd' => $request->usd,
         ]);
 
-        return Common::apiResponse(true, '',  $room_target, 200);
+        return Common::apiResponse(true, '', $room_target, 200);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id)
+    {
 
         RoomTarget::findOrFail($id)->update([
             'coins' => $request->coins,
@@ -41,16 +43,17 @@ class RoomTargetController extends Controller
 
         return Common::apiResponse(1, 'Room Target updated successfully');
 
-
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $room_target = RoomTarget::findOrFail($id);
 
         return Common::apiResponse(true, '', $room_target, 200);
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
 
         RoomTarget::findOrFail($id)->delete();
 

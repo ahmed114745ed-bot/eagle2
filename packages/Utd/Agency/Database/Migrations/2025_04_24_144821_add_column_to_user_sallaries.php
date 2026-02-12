@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('user_sallaries')) return;
-        
-        if (!Schema::hasColumn('user_sallaries', 'dB')) {
+        if (! Schema::hasTable('user_sallaries')) {
+            return;
+        }
+
+        if (! Schema::hasColumn('user_sallaries', 'dB')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
                 $table->double('dB')->nullable();
             });
         }
-        
-        if (!Schema::hasColumn('user_sallaries', 'app_profit')) {
+
+        if (! Schema::hasColumn('user_sallaries', 'app_profit')) {
             Schema::table('user_sallaries', function (Blueprint $table) {
                 $table->double('app_profit')->nullable();
             });
@@ -32,8 +34,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_sallaries', function (Blueprint $table) {
-           $table->dropColumn('app_profit');
-           $table->dropColumn('dB');
+            $table->dropColumn('app_profit');
+            $table->dropColumn('dB');
         });
     }
 };

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('room_cup_rewards')) {
+        if (! Schema::hasTable('room_cup_rewards')) {
             Schema::create('room_cup_rewards', function (Blueprint $table) {
                 $table->id();
                 $table->unsignedBigInteger('room_id');

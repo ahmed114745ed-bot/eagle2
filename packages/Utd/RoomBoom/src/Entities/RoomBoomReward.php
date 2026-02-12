@@ -15,7 +15,7 @@ class RoomBoomReward extends Model
 {
     protected $fillable = ['room_boom_level_id', 'target', 'target_type', 'priority', 'quantity', 'expire_days'];
 
-     protected $guarded = ['ware_target_id', 'gift_target_id'];
+    protected $guarded = ['ware_target_id', 'gift_target_id'];
 
     public function ware(): HasOne
     {
@@ -81,18 +81,18 @@ class RoomBoomReward extends Model
             }
         });
         self::creating(function ($model) {
-            if ($model->target_type == 'ware') {
+            if ($model->target_type === 'ware') {
                 $model->target = request('target1', $model->target);
-            } elseif ($model->target_type == 'achievement') {
+            } elseif ($model->target_type === 'achievement') {
                 $file = request('target4', $model->target);
 
                 if ($file instanceof UploadedFile) {
                     $url = Common::upload('events', $file);
                 }
                 $model->target = $url ?? '';
-            } elseif ($model->target_type == 'gift') {
+            } elseif ($model->target_type === 'gift') {
                 $model->target = request('target5', $model->target);
-            } elseif ($model->target_type == 'coin') {
+            } elseif ($model->target_type === 'coin') {
                 $model->target = request('target6', $model->target);
             }
             unset($model->target1);
@@ -102,18 +102,18 @@ class RoomBoomReward extends Model
         });
 
         self::updating(function ($model) {
-            if ($model->target_type == 'ware') {
+            if ($model->target_type === 'ware') {
                 $model->target = request('target1', $model->target);
-            } elseif ($model->target_type == 'achievement') {
+            } elseif ($model->target_type === 'achievement') {
                 $file = request('target4', $model->target);
                 if ($file instanceof UploadedFile) {
                     $url = Common::upload('events', $file);
                     Storage::delete($model->target);
                 }
                 $model->target = $url ?? '';
-            } elseif ($model->target_type == 'gift') {
+            } elseif ($model->target_type === 'gift') {
                 $model->target = request('target5', $model->target);
-            } elseif ($model->target_type == 'coin') {
+            } elseif ($model->target_type === 'coin') {
                 $model->target = request('target6', $model->target);
             }
             unset($model->target1);

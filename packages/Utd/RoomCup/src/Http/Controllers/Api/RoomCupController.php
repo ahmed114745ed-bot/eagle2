@@ -5,7 +5,7 @@ namespace Utd\RoomCup\Http\Controllers\Api;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Support\PackageHelper;
-use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +18,7 @@ class RoomCupController extends Controller
 {
     public function myReward($roomId, Request $request)
     {
-        if (!PackageHelper::isInstalled('room')) {
+        if (! PackageHelper::isInstalled('room')) {
             return Common::apiResponse(0, 'Room package not installed', null, 400);
         }
 
@@ -26,24 +26,27 @@ class RoomCupController extends Controller
         $user = $request->user();
         $room = $roomClass::find($roomId);
 
-        if (!$room) {
+        if (! $room) {
             return Common::apiResponse(0, 'Room not found', null, 404);
         }
 
         $check = $this->checkAdmin($room, $user->id);
-        if ($user->id != $room->uid && !$check) {
+        if ($user->id !== $room->uid && ! $check) {
             return Common::apiResponse(0, 'You do not have permission', null, 444);
         }
 
         $rewards = RoomCupReward::where('room_id', $roomId)->where('user_id', $user->id)->get();
+
         return Common::apiResponse(true, '', RoomCupRewardResource::collection($rewards), 200);
     }
 
     public function checkAdmin($room, $admin_id)
     {
         $roomAdmin = $room->room_admin;
-        $adm_arr = ($roomAdmin == '') ? [] : explode(",", trim($roomAdmin));
-        if (count($adm_arr) > 0 && $adm_arr[0] == '') unset($adm_arr[0]);
+        $adm_arr = ($roomAdmin === '') ? [] : explode(',', trim($roomAdmin));
+        if (count($adm_arr) > 0 && $adm_arr[0] === '') {
+            unset($adm_arr[0]);
+        }
         $adm_arr = array_unique($adm_arr);
 
         return in_array($admin_id, $adm_arr);
@@ -51,7 +54,7 @@ class RoomCupController extends Controller
 
     public function roomAdministratorManagement($roomId, Request $request)
     {
-        if (!PackageHelper::isInstalled('room')) {
+        if (! PackageHelper::isInstalled('room')) {
             return Common::apiResponse(0, 'Room package not installed', null, 400);
         }
 
@@ -101,13 +104,13 @@ class RoomCupController extends Controller
             'room' => [
                 'admin_count' => count(array_filter(explode(',', @$currentData->room->room_admin))),
             ],
-            'link' => url('/cup-targets-view?lang=' . $langCode),
+            'link' => url('/cup-targets-view?lang='.$langCode),
         ];
 
         return Common::apiResponse(true, '', $data, 200);
     }
 
-    public function period($builder, $key = 'current', $type)
+    public function period($builder, $key, $type)
     {
         $now = now();
         switch ($type) {
@@ -144,10 +147,19 @@ class RoomCupController extends Controller
                 break;
 
             default:
-                throw new \Exception('Time period not defined in settings.');
+                throw new Exception('Time period not defined in settings.');
         }
 
         return $builder;
+    }
+
+    public function cupTargetHtml(Request $request)
+    {
+        $lang = $request->get('lang', 'en');
+        app()->setLocale($lang);
+        $cupTargets = RoomCupTarget::get();
+
+        return view('roomcup::cup_target', compact('cupTargets'));
     }
 
     private function getSettings(): array
@@ -161,7 +173,7 @@ class RoomCupController extends Controller
         $settings = [];
 
         foreach ($default as $key => $defaultValue) {
-            $cacheKey = 'roomcup_' . $key;
+            $cacheKey = 'roomcup_'.$key;
             $value = Cache::get($cacheKey);
 
             if ($value === null) {
@@ -174,13 +186,5 @@ class RoomCupController extends Controller
         }
 
         return $settings;
-    }
-
-    public function cupTargetHtml(Request $request)
-    {
-        $lang = $request->get('lang', 'en');
-        app()->setLocale($lang);
-        $cupTargets = RoomCupTarget::get();
-        return view('roomcup::cup_target', compact("cupTargets"));
     }
 }

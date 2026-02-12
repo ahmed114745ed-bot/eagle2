@@ -2,31 +2,38 @@
 
 namespace Utd\Pk\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
 use App\Models\Ware;
+use App\Selectables\Badges;
+use App\Selectables\WaresByType;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
-use Encore\Admin\Facades\Admin;
-use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
+use Encore\Admin\Show;
 use Modules\Badge\Entities\Badge;
-use App\Services\AppFeatureService;
-use Utd\Pk\Entities\PkReward;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Pk\Entities\PkReward;
 
 class PkEventGiftController extends MainController
 {
-
     use HasResourceActions;
+
     public $permission_name = 'pk-event-rewards';
+
+    /**
+     * Title for current resource.
+     *
+     * @var string
+     */
+    protected $title = 'PkEvent';
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("pk_event");
+        (new AppFeatureService)->validateStatusEnable('pk_event');
     }
 
     public function index(Content $content)
@@ -62,12 +69,14 @@ class PkEventGiftController extends MainController
     public function update($id)
     {
         $id = request()->route('id');
+
         return $this->form()->update($id);
     }
 
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
+
         return parent::edit($id, $content
             ->header(trans('admin.edit'))
             ->description(trans('admin.description'))
@@ -83,13 +92,6 @@ class PkEventGiftController extends MainController
     }
 
     /**
-     * Title for current resource.
-     *
-     * @var string
-     */
-    protected $title = 'PkEvent';
-
-    /**
      * Make a grid builder.
      *
      * @return Grid
@@ -101,40 +103,46 @@ class PkEventGiftController extends MainController
         $grid = new Grid(new PkReward());
         $grid->model()->orderBy('level');
         $grid->column('created_at')->hide();
-        $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 1);
+        $grid->model()->where('pk_event_id', $pkEventId)->where('pk_type', $pkType)->where('level', 1);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
+                if ($this->type === 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type === 'vip') {
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
+                } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
+                } elseif ($this->type === 'achievement') {
                     $path = $this->target;
                 } else {
                     $path = 'coin.png';
                 }
 
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
@@ -146,7 +154,7 @@ class PkEventGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('pk_event_id') . "/1/create";
+            $url = request()->route('pk_event_id').'/1/create';
 
             $add = __('add');
             $gifts = __('winner first gifts');
@@ -163,6 +171,7 @@ class PkEventGiftController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
         return $grid;
     }
 
@@ -172,40 +181,46 @@ class PkEventGiftController extends MainController
         $pkEventId = request('pk_event_id');
         $grid = new Grid(new PkReward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 2);
+        $grid->model()->where('pk_event_id', $pkEventId)->where('pk_type', $pkType)->where('level', 2);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
+                if ($this->type === 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type === 'vip') {
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
+                } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
+                } elseif ($this->type === 'achievement') {
                     $path = $this->target;
                 } else {
                     $path = 'coin.png';
                 }
 
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
@@ -217,7 +232,7 @@ class PkEventGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('pk_event_id') . "/2/create";
+            $url = request()->route('pk_event_id').'/2/create';
             $add = __('add');
             $gifts = __('winner second gifts');
             $customButtonHTML = <<<HTML
@@ -233,6 +248,7 @@ class PkEventGiftController extends MainController
             $('.table-responsive').removeClass('table-responsive');
             }
         ");
+
         return $grid;
     }
 
@@ -243,40 +259,46 @@ class PkEventGiftController extends MainController
         $grid = new Grid(new PkReward());
         $grid->model()->orderBy('level');
         $grid->column('created_at')->hide();
-        $grid->model()->where("pk_event_id", $pkEventId)->where("pk_type", $pkType)->where("level", 3);
+        $grid->model()->where('pk_event_id', $pkEventId)->where('pk_type', $pkType)->where('level', 3);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('gifts'))->display(function () {
-            if ($this->type == "ware") {
+            if ($this->type === 'ware') {
                 return @$this->ware->name ?? '';
-            } elseif ($this->type == "vip") {
+            }
+            if ($this->type === 'vip') {
                 return @$this->vip->name ?? '';
-            } elseif ($this->type == "badge") {
+            }
+            if ($this->type === 'badge') {
                 return @$this->badge->name ?? '';
-            } elseif ($this->type == "coins") {
+            }
+            if ($this->type === 'coins') {
                 return @$this->target;
-            } elseif ($this->type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
+            }
+            if ($this->type === 'achievement') {
+                $value = getDriverUrl().'/'.@$this->target;
+
                 return "<img src='$value' width='80' height='80'>";
             }
         });
-        if (!request()->filled('_export_')) {
+        if (! request()->filled('_export_')) {
             $grid->column('image', __('image'))->display(function ($path) {
-                if ($this->type == 'ware') {
+                if ($this->type === 'ware') {
                     $ware = Ware::find($this->target);
-                    $path = $ware->img2 ?? ($ware->show_img ?? "");
-                } elseif ($this->type == 'vip') {
+                    $path = $ware->img2 ?? ($ware->show_img ?? '');
+                } elseif ($this->type === 'vip') {
                     $vips = OVip::find($this->target);
                     $path = $vips->img ?? '';
-                } elseif ($this->type == 'badge') {
+                } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
-                } elseif ($this->type == 'achievement') {
+                } elseif ($this->type === 'achievement') {
                     $path = $this->target;
                 } else {
                     $path = 'coin.png';
                 }
 
                 $url = getImagePath($path);
+
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
             });
         }
@@ -288,7 +310,7 @@ class PkEventGiftController extends MainController
         });
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) {
-            $url = request()->route('pk_event_id') . "/3/create";
+            $url = request()->route('pk_event_id').'/3/create';
             $add = __('add');
             $gifts = __('winner third gifts');
             $customButtonHTML = <<<HTML
@@ -311,7 +333,7 @@ class PkEventGiftController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -333,39 +355,42 @@ class PkEventGiftController extends MainController
         $form->hidden('pk_type')->value(request('pk_type'));
 
         $form->hidden('level')->value(request()->route('level'));
-        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        $typeOptions = ['ware' => __('ware'), 'badge' => __('badge'), 'vip' => __('vip'), 'coins' => __('coins')];
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
         $form->select('type', trans('type'))->options($typeOptions)
-            ->when("ware", function () use ($form) {
+            ->when('ware', function () use ($form) {
                 $this->addWareField($form);
             })
-            ->when("badge", function () use ($form) {
+            ->when('badge', function () use ($form) {
                 $this->addBadgeField($form);
             })
-            ->when("vip", function () use ($form) {
+            ->when('vip', function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
                     $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as  $vip) {
+                    foreach ($vips as $vip) {
                         $ops[$vip->id] = $vip->name;
                     }
+
                     return $ops;
                 });
             })
-            ->when("coins", function () use ($form) {
-                $form->number("target3", __("coins"));
-            })->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
+            ->when('coins', function () use ($form) {
+                $form->number('target3', __('coins'));
+            })->when('achievement', function () use ($form) {
+                $form->image('target4', __('image'))->name(function ($file) {
+                    return now()->timestamp.'.'.$file->guessExtension();
                 })->disk('gcs');
             });
         $form->number('expire', __('expire'));
 
         $form->saved(function (Form $form) {
-            $route = url('admin/pk-events-gift/' . request('pk_type') . '/' . request('pk_event_id'));
+            $route = url('admin/pk-events-gift/'.request('pk_type').'/'.request('pk_event_id'));
+
             return redirect($route);
         });
+
         return $form;
     }
 
@@ -373,16 +398,19 @@ class PkEventGiftController extends MainController
     {
         $prefix = 'badges';
         $form->belongsTo('target5', Badges::class, __('Badges'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target5')
+            $form->setElementName($prefix.'target5')
                 ->select('id', __('badges'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Badge::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
@@ -395,16 +423,19 @@ class PkEventGiftController extends MainController
     {
         $prefix = 'wares';
         $form->belongsTo('target1', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
-            $form->setElementName($prefix . 'target1')
+            $form->setElementName($prefix.'target1')
                 ->select('id', __('wares'))
                 ->options(function ($id) {
-                    if (!$id) return [];
+                    if (! $id) {
+                        return [];
+                    }
                     $ware = Ware::find($id);
+
                     return $ware ? [$ware->id => "{$ware->name}_{$ware->id}"] : [];
                 })
                 ->attribute([
                     'data-image-select' => 1,
-                    'data-load-url' => admin_url('wares-by-id')
+                    'data-load-url' => admin_url('wares-by-id'),
                 ]);
 
             $form->html('<div id="ware-image-preview" style="margin-top:10px;"></div>');
