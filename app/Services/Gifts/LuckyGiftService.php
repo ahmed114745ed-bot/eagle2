@@ -645,11 +645,11 @@ class LuckyGiftService
             $iterationPopular = false;
             $iterationMaxCashback = 0;
             $message = null;
+            $unitPrice = $giftPrice * $number;
 
             foreach ($receiversIds as $receiverId) {
                 $isWinner = $this->is_winner($gift);
                 if ($isWinner) {
-                    $unitPrice = $giftPrice * $number;
                     $appWalletCoins = $appWallet->coins;
                     if ($appWalletCoins > $unitPrice) {
                         $properties = $gift->luckyGift?->min_percentage;
@@ -666,18 +666,17 @@ class LuckyGiftService
                             $total_count_win++;
                             $iterationMaxCashback = max($iterationMaxCashback, $cashback_percentage);
                             
-                            $displayMultiplier = $this->resolveWinnerMultiplier($cashback_value, $unitPrice, $cashback_percentage);
-
-                            if ($displayMultiplier > 1 && !$message) {
-                                $message = $this->winnerMessage($displayMultiplier);
-                            }
-                            
                             if ($this->isPopular($cashback_percentage)) {
                                 $iterationPopular = true;
                             }
                         }
                     }
                 }
+            }
+
+            if ($iterationTotalWin > 0) {
+                $displayMultiplier = $this->resolveWinnerMultiplier($iterationTotalWin, $unitPrice, $iterationMaxCashback);
+                $message = $displayMultiplier > 1 ? $this->winnerMessage($displayMultiplier) : null;
             }
 
             if ($iterationPopular) {
