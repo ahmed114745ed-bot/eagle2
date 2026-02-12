@@ -1197,6 +1197,28 @@ class LuckyGiftService
         return $cashback_percentage;
     }
 
+    public function resolveWinnerMultiplier(float|int $winCoins, float|int $unitPrice, float|int $fallbackMultiplier): float|int
+    {
+        if ($unitPrice <= 0) {
+            return $fallbackMultiplier;
+        }
+
+        $calculatedMultiplier = $winCoins / $unitPrice;
+
+        if ($calculatedMultiplier > 1) {
+            $roundedMultiplier = round($calculatedMultiplier, 2);
+            $roundedInt        = round($roundedMultiplier);
+
+            if (abs($roundedMultiplier - $roundedInt) < 0.01) {
+                return (int)$roundedInt;
+            }
+
+            return $roundedMultiplier;
+        }
+
+        return $fallbackMultiplier;
+    }
+
     /**
      * @param mixed $cashback_percentage
      * @return string
