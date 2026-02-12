@@ -230,7 +230,10 @@ class AchievementController extends Controller
 
         $achievementsQuery = UserAchievementLevel::with(['customAchievement.images', "achievementLevel"]);
 
-        $achievementsQuery->where("user_id", $userId);
+        $achievementsQuery->where("user_id", $userId)->where(function ($query) {
+            $query->whereNull('end_at')
+                ->orWhere('end_at', '>', now());
+        });
 
         if (request('type')) {
             $achievementsQuery->where(function ($outerQuery) {
