@@ -32,7 +32,6 @@ class CharismaWork implements RoomJobInterface
         $json = json_encode($ms);
 
         return $json;
-        return Common::sendToZego3('SendCustomCommand', $roomId, $user_id, $json);
     }
 
     public function prepareDataToZego($data) : array

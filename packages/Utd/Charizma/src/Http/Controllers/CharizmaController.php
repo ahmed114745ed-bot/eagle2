@@ -35,11 +35,15 @@ class CharizmaController extends Controller
 
     public function changeStatus(Request $request): JsonResponse
     {
+        $request->validate([
+            'room_id' => 'required|integer',
+        ]);
+
         $roomId = $request->room_id;
-        $room = Room::find($roomId);
+        $room = Room::where('id', $roomId)->where('uid', auth()->id())->first();
 
         if (!$room) {
-            return Common::apiResponse(0, __('api_responses.room_not_found'), null, 404);
+            return Common::apiResponse(0, __('api_responses.room_not_found'), null, 4043);
         }
 
         $room->charizma_status = !$room->charizma_status;
@@ -73,6 +77,11 @@ class CharizmaController extends Controller
 
     public function reset(Request $request)
     {
+        $request->validate([
+            'room_id' => 'nullable|integer',
+            'owner_id' => 'required_without:room_id',
+        ]);
+
         $roomId = $request->room_id;
         $room = $roomId
             ? Room::find($roomId)
@@ -96,7 +105,7 @@ class CharizmaController extends Controller
         ];
         $json = json_encode($ms);
 
-        Common::sendToZego('SendCustomCommand', $room->id, $request->owner_id, $json);
+        Common::sendToZego('SendCustomCommand', $room->id, $room->uid, $json);
 
         return Common::apiResponse(true, 'successfully', $collections);
     }

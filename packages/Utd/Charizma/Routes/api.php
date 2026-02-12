@@ -9,7 +9,7 @@ use Utd\Charizma\Http\Controllers\CharizmaController;
 |--------------------------------------------------------------------------
 */
 
-Route::group(['middleware' => ['auth:sanctum', 'update.last.seen'], 'prefix' => 'api'], function () {
+Route::group(['middleware' => ['auth:sanctum', 'update.last.seen', 'userBan'], 'prefix' => 'api'], function () {
     Route::prefix('charisma')->group(function () {
         Route::post('/change-status', [CharizmaController::class, 'changeStatus']);
         Route::post('/reset', [CharizmaController::class, 'reset']);
