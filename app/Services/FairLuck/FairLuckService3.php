@@ -24,7 +24,8 @@ class FairLuckService3
         private DeviationCalculator $deviationCalculator,
         private BeginnerProtection $beginnerProtection,
         private ProbabilityEngine $probabilityEngine,
-        private MultiplierSelector $multiplierSelector
+        private MultiplierSelector $multiplierSelector,
+        private HighMultiplierLedger $highMultiplierLedger
     ) {}
 
     public function processBet(User $user, Gift $gift, float $betAmount, ?int $roomId = null): object
@@ -49,6 +50,8 @@ class FairLuckService3
             $requiredContribution = (int) max(1, round($betAmount * 150));
             $unlockContribution = (int) max(1, round($requiredContribution * 0.5));
             $hasPaidForJackpot = $unlockContribution > 0 && $contributionBank >= $unlockContribution;
+
+            $eligibilitySignal = $this->highMultiplierLedger->evaluateEligibility($user->id, $betAmount);
 
             // 2. Calculate "System Mood" (Chaos Factor)
             $chaosFactor = mt_rand(85, 115) / 100;
@@ -130,6 +133,10 @@ class FairLuckService3
                 $finalProbability = min($finalProbability, 0.12);
             }
 
+            if ($eligibilitySignal->probabilityFloor > 0) {
+                $finalProbability = max($finalProbability, $eligibilitySignal->probabilityFloor);
+            }
+
             $forceMiniWins = false;
             if (!$isDrainLocked && $jackpotPity < 800 && $user->di <= ($betAmount * 20)) {
                 $finalProbability = max($finalProbability, 0.32);
@@ -156,6 +163,10 @@ class FairLuckService3
                 }
             }
 
+            if (!$forceJackpot && $eligibilitySignal->forceJackpot) {
+                $forceJackpot = true;
+            }
+
             // Add extra randomness layer
             $random = mt_rand(0, 10000) / 10000;
             $isWinner = $random <= $finalProbability;
@@ -175,7 +186,8 @@ class FairLuckService3
                     $contributionBank,
                     $unlockContribution,
                     $isDrainLocked,
-                    $forceMiniWins
+                    $forceMiniWins,
+                    $eligibilitySignal
                 );
                 
                 \Illuminate\Support\Facades\Redis::del($lossKey);
@@ -208,6 +220,14 @@ class FairLuckService3
 
             // 6. Update Stats
             $profitAmount = $isWinner ? (($multiplier * $betAmount) - $betAmount) : -$betAmount;
+
+            $this->highMultiplierLedger->recordOutcome(
+                $user->id,
+                $betAmount,
+                $profitAmount,
+                $isWinner,
+                $multiplier
+            );
             
             $newDeviation = $this->deviationCalculator->calculate(
                 $profile->total_bets + $betAmount,
@@ -254,7 +274,8 @@ class FairLuckService3
         int $contributionBank = 0,
         int $unlockContribution = 0,
         bool $isDrainLocked = false,
-        bool $forceMiniWins = false
+        bool $forceMiniWins = false,
+        ?HighMultiplierSignal $highMultiplierSignal = null
     ): int
     {
         $multipliers = [5, 10, 20, 50, 100, 250, 500, 1000];
@@ -266,40 +287,38 @@ class FairLuckService3
 
         foreach ($multipliers as $m) {
             $baseWeight = $this->getNaturalWeight($m);
-            
+            $weight = 0.0;
+
             // Logic 0: Survival Mini-Wins (pre-jackpot bailout)
             if ($forceMiniWins && !$forceJackpot) {
-                if ($m == 5) {
-                    $weights[] = $baseWeight * 40;
-                } elseif ($m == 10) {
-                    $weights[] = $baseWeight * 6;
-                } else {
-                    $weights[] = 0;
-                }
+                $weight = match ($m) {
+                    5 => $baseWeight * 40,
+                    10 => $baseWeight * 6,
+                    default => 0,
+                };
+                $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
                 continue;
             }
 
             // Logic 1: Drain Lock Mode (restrict wins to tiny bait payouts)
             if ($isDrainLocked && !$forceJackpot) {
-                if ($m == 5) {
-                    $weights[] = $baseWeight * 40;
-                } elseif ($m == 10) {
-                    $weights[] = $baseWeight * 4;
-                } else {
-                    $weights[] = 0;
-                }
+                $weight = match ($m) {
+                    5 => $baseWeight * 40,
+                    10 => $baseWeight * 4,
+                    default => 0,
+                };
+                $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
                 continue;
             }
 
             // Logic 2: Forced Jackpot Mode (Ensure they get 250x+ every 800-1000 bets)
             if ($forceJackpot) {
-                if ($m == 250) {
-                    $weights[] = $baseWeight * 250;
-                } elseif ($m == 500) {
-                    $weights[] = $baseWeight * 10;
-                } else {
-                    $weights[] = 0;
-                }
+                $weight = match ($m) {
+                    250 => $baseWeight * 250,
+                    500 => $baseWeight * 10,
+                    default => 0,
+                };
+                $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
                 continue;
             }
 
@@ -315,54 +334,73 @@ class FairLuckService3
             // Logic 4: "Middle Distribution" (Phase 0-500 hits)
             // Focus on small profits and losses (5x, 10x, 20x) to keep user engaged without big swings.
             if ($pityCount < 500 && $deviation < 0.1 && $deviation > -0.1) {
-                if ($m == 5) {
-                    $weights[] = $baseWeight * 30; 
-                } elseif ($m == 10) {
-                    $weights[] = $baseWeight * 10;
-                } elseif ($m == 20) {
-                    $weights[] = $baseWeight * 2;
-                } elseif ($m <= 100) {
-                    $weights[] = $baseWeight * 0.25;
-                } else {
-                    $weights[] = 0; // No jackpots in the strictly stabilized middle phase
-                }
+                $weight = match (true) {
+                    $m == 5 => $baseWeight * 30,
+                    $m == 10 => $baseWeight * 10,
+                    $m == 20 => $baseWeight * 2,
+                    $m <= 100 => $baseWeight * 0.25,
+                    default => 0,
+                };
+                $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
                 continue;
             }
 
             // Logic 3: Engagement & Drain Mode
             // Allow 250x+ even in profit, but with very controlled weights to prevent huge jumps.
-            if ($streak >= 3 || $deviation >= -0.05) { 
+            if ($streak >= 3 || $deviation >= -0.05) {
                 if ($m >= 250) {
                     // EXTREME Drain: If balance/deviation is very positive, kill high multipliers.
                     if ($deviation > 0.15) {
-                        $weights[] = 0; 
+                        $weight = 0;
                     } else {
                         // Very rare occurrence in normal transitions (scaled by how much they prepaid)
-                        $weights[] = max(0.01, $baseWeight * 0.05 * $chaos * $jackpotScaling); 
+                        $weight = max(0.01, $baseWeight * 0.05 * $chaos * $jackpotScaling);
                     }
                 } elseif ($m > 20) {
-                    $weights[] = (int)($baseWeight * 0.1); 
+                    $weight = $baseWeight * 0.1;
                 } elseif ($m == 5) {
-                    $weights[] = $baseWeight * 10; 
+                    $weight = $baseWeight * 10;
                 } else {
-                    $weights[] = $baseWeight * 5;
+                    $weight = $baseWeight * 5;
                 }
-            } 
+            }
             // Logic 4: Small "Hope" Wins
             // If user is losing (Deviation -15% to -35%), allow 250x-500x more often
             elseif ($deviation < -0.15 && $deviation > -0.35) {
-                if ($m >= 500) $weights[] = $baseWeight * 0.5 * $chaos; 
-                elseif ($m >= 250) $weights[] = $baseWeight * 2 * $chaos;
-                else $weights[] = $baseWeight;
+                if ($m >= 500) {
+                    $weight = $baseWeight * 0.5 * $chaos;
+                } elseif ($m >= 250) {
+                    $weight = $baseWeight * 2 * $chaos;
+                } else {
+                    $weight = $baseWeight;
+                }
             }
             // Logic 5: Recovery Tiers
             else {
-                if ($m >= 250) $weights[] = $baseWeight * 3 * $chaos * $jackpotScaling;
-                else $weights[] = $baseWeight * $chaos;
+                if ($m >= 250) {
+                    $weight = $baseWeight * 3 * $chaos * $jackpotScaling;
+                } else {
+                    $weight = $baseWeight * $chaos;
+                }
             }
+
+            $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
         }
 
         return $this->weightedRandom($multipliers, $weights);
+    }
+
+    private function finalizeMultiplierWeight(float $weight, int $multiplier, ?HighMultiplierSignal $highMultiplierSignal): int
+    {
+        if ($weight <= 0) {
+            return 0;
+        }
+
+        if ($highMultiplierSignal && $highMultiplierSignal->hasPriority($multiplier)) {
+            $weight *= max(1.0, $highMultiplierSignal->weightFor($multiplier));
+        }
+
+        return (int) max(0, round($weight));
     }
 
     private function getNaturalWeight(int $multiplier): int

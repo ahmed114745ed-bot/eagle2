@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         Commands\CloseStatusAppFeature::class,
         Commands\DeleteTrashedUsers::class,
         Commands\FreezeUsersCommand::class,
+        Commands\FairLuckLeaderboardCommand::class,
         WeeklyCpWinnerConsole::class
     ];
 
