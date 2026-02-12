@@ -43,6 +43,11 @@ class PkRepository extends AbstractRepository implements PkRepositoryContract
         return $this->model->query()->where('id', $id)->where('status', 1)->orderByDesc('id')->first();
     }
 
+    public function findByIdAny($id)
+    {
+        return $this->model->query()->find($id);
+    }
+
     public function roomPks($userId, $perPage, $page)
     {
         return $this->model->whereHas('room', function ($q) use ($userId) {

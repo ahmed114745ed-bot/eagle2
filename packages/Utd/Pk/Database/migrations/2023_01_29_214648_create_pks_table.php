@@ -18,7 +18,7 @@ class CreatePksTable extends Migration
             $table->integer('team_1_boss')->nullable();
             $table->string('team_1')->nullable()->default('0,0,0,0');
             $table->integer('team_2_boss')->nullable();
-            $table->string('team_2')->nullable('0,0,0,0');
+            $table->string('team_2')->nullable()->default('0,0,0,0');
             $table->integer('judge')->nullable();
             $table->unsignedTinyInteger('status')->nullable()->default(0);
             $table->double('prize_value')->nullable()->default(0);

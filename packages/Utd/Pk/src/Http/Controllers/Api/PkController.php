@@ -46,6 +46,12 @@ class PkController extends Controller
 
     public function createPK(Request $request)
     {
+        $request->validate([
+            'room_id' => 'required_without:owner_id|nullable|integer',
+            'owner_id' => 'required_without:room_id|nullable|integer',
+            'minutes' => 'required|integer|min:1',
+        ]);
+
         $userId = $request->user()->id;
         try {
             [$pk, $roomId] = $this->pkService->create($request, $userId);
@@ -66,6 +72,12 @@ class PkController extends Controller
 
     public function createPKWithoutZego(Request $request)
     {
+        $request->validate([
+            'room_id' => 'required_without:owner_id|nullable|integer',
+            'owner_id' => 'required_without:room_id|nullable|integer',
+            'minutes' => 'required|integer|min:1',
+        ]);
+
         $userId = Auth::id();
         try {
             [$pk, $roomId] = $this->pkService->create($request, $userId);
