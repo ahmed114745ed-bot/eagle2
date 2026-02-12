@@ -43,7 +43,7 @@ class SuperAdminRewardController extends MainController
     {
         $type = request()->get('type', 'vip');
         $grid = new Grid(new SuperAdminReward());
-        $grid->model()->where('type',  $type);
+        $grid->model()->with(['ware', 'vip', 'badge', 'badge.images', 'customAchievement', 'customAchievement.images'])->where('type',  $type);
         $authId = Admin::user()->id;
         $grid->column('id', __('Id'));
         $authId = auth()->user()->type == 'superadmin' ? auth()->user()->id : auth()->user()->parent_id;
@@ -72,7 +72,7 @@ class SuperAdminRewardController extends MainController
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
-                    $path = @$this->badge->image ?? '';
+                    $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } elseif ($this->type == 'achievement') {
                     $path = $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                 } else {

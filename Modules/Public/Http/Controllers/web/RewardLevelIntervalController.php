@@ -99,7 +99,7 @@ class RewardLevelIntervalController extends MainController
                 ]);
             });
         });
-        $grid->model()->with(['ware', 'vip','customAchievement','customAchievement.images'])->where('level_interval_id', $level_interval);
+        $grid->model()->with(['ware', 'vip','customAchievement','customAchievement.images','badge','badge.images'])->where('level_interval_id', $level_interval);
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
         $grid->column('gift_id', __('Gifts'))->display(function () {
@@ -123,7 +123,7 @@ class RewardLevelIntervalController extends MainController
                 $path = $vips->img ?? '';
             } elseif ($this->type == 'badge') {
                 // $vips = Badge::find($this->target);
-                $path = @$this->badge->image ?? '';
+                $path = @$this->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
             } elseif ($this->type == 'achievement') {
                 $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
             } else {

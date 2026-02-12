@@ -54,6 +54,7 @@ class WinnerRankingController extends  MainController
             'reward.ware:id,name,img2,show_img',
             'reward.vip:id,name,img',
             'reward.badge:id,name,image',
+            'reward.badge.images',
             "reward.customAchievement",
             'reward.customAchievement.images',
         ]);
@@ -131,7 +132,7 @@ class WinnerRankingController extends  MainController
             $path = match ($this->reward->target_type) {
                 'ware'        => $this->reward->ware->img2 ?? $this->reward->ware->show_img,
                 'vip'         => $this->reward->vip->img ?? '',
-                'badge'       => $this->reward->badge->image ?? '',
+                'badge'       => $this->reward->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '',
                 'achievement' => $this->reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '',
                 default       => 'coin.png',
             };
