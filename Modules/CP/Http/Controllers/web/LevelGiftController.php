@@ -112,7 +112,7 @@ class LevelGiftController extends MainController
             } elseif ($this?->type == "coins") {
                 return @$this?->item_id;
             } elseif ($this?->type == "achievement") {
-               $defaultImage = asset("images/image.png");
+                $defaultImage = asset("images/image.png");
                 $path = getImagePath($this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '');
                 $url = $path ?: $defaultImage;
                 return handleShowImageWithTypes($this->id, $url, 50, 50);
@@ -137,15 +137,21 @@ class LevelGiftController extends MainController
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
+
             $url = url('admin/cp-levels/' . $vip->cp_relation_id);
+
+            $backText = __('Back to Levels');
+            $specialGiftText = __('Special gifts for');
+
             $customButtonHTML = <<<HTML
-                     <div style="display: contents; align-items: center;">
-                        <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                            <i class="fa fa-arrow-left"></i> الرجوع إلى levels
-                        </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
-                    </div>
-                HTML;
+        <div style="display: contents; align-items: center;">
+            <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                <i class="fa fa-arrow-left"></i> {$backText}
+            </a>
+            <label style="margin: 0;">{$specialGiftText} : {$vip->level}</label>
+        </div>
+    HTML;
+
             $tools->append($customButtonHTML);
         });
 
@@ -153,7 +159,7 @@ class LevelGiftController extends MainController
             $actions->disableView();
         });
 
-         Admin::script("
+        Admin::script("
         if (window.innerWidth >= 1024) { // Example threshold for desktop screens
             $('.table-responsive').removeClass('table-responsive');
             }
@@ -325,7 +331,7 @@ class LevelGiftController extends MainController
         } elseif ($form->type == 'coins') {
             $form->item_id = $form->coins;
         } elseif ($form->type == 'achievement') {
-           
+
             $form->item_id = $form->achievement;
         }
     }
