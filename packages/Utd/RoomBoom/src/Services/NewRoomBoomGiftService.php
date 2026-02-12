@@ -4,6 +4,7 @@ namespace Utd\RoomBoom\Services;
 
 use App\Contracts\NewRoomBoomGiftServiceContract;
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -22,6 +23,10 @@ class NewRoomBoomGiftService implements NewRoomBoomGiftServiceContract
      */
     public function sendGift($room, $totalPrice, $userId): void
     {
+        if (! PackageHelper::isInstalled('room')) {
+            return;
+        }
+
         DB::transaction(function () use ($room, $totalPrice, $userId) {
             $roomId = $room->id;
             $roomUid = $room->uid;

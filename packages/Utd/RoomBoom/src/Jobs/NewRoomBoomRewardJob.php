@@ -8,7 +8,6 @@ use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\Gift;
-use App\Models\GiftLog;
 use App\Models\User;
 use App\Models\UserGift;
 use App\Models\Ware;
@@ -21,6 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
+use App\Support\PackageHelper;
 use Throwable;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Room\Entities\Room;
@@ -70,6 +70,10 @@ class NewRoomBoomRewardJob implements ShouldQueue
     public function handle()
     {
         info('in room boom reward job');
+
+        if (! PackageHelper::isInstalled('room')) {
+            return;
+        }
 
         $boom = RoomBoom::with(['roomBoomLevel', 'totalRoomGift'])->find($this->boomId);
         $level = $boom->roomBoomLevel;
@@ -187,11 +191,11 @@ class NewRoomBoomRewardJob implements ShouldQueue
      */
     public function distributeBoomRewards($userId, $reward): void
     {
-        info($userId);
         $user = $this->users[$userId] ?? null;
-        $token = $user->notification_id;
 
         if ($user) {
+            $token = $user->notification_id;
+
             $expire = $reward['expire_days'];
             if ($reward['target_type'] === 'ware') {
                 $this->wareNotifications[$reward['target']]['user_ids'][] = $userId;
