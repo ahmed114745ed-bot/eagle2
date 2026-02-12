@@ -3,13 +3,9 @@
 namespace Utd\Family\Admin\Actions;
 
 use Utd\Family\Entities\FamilyUser;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class KickOfFamilyAction extends RowAction
@@ -25,7 +21,8 @@ class KickOfFamilyAction extends RowAction
      */
     public function handle(Model $model, Request $request)
     {
-        if (UserHandling::checkIfUserOwnerOfFamily($model->id)){
+        $userHandling = family_facade('user_handling');
+        if ($userHandling && $userHandling::checkIfUserOwnerOfFamily($model->id)) {
             throw ValidationException::withMessages(['error' => __('This User is the host Of family can\'t delete it go to remove family first')]);
         }
         $model->family_id = null;

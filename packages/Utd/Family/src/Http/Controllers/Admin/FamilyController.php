@@ -23,7 +23,10 @@ class FamilyController extends MainController
 
     public function __construct()
     {
-        (new family_service('app_feature'))->validateStatusEnable("families");
+        $appFeatureService = family_service('app_feature');
+        if ($appFeatureService) {
+            $appFeatureService->validateStatusEnable('families');
+        }
     }
 
     public function familyLevelExcel()

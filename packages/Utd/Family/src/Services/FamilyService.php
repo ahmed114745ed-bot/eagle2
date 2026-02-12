@@ -3,16 +3,16 @@
 namespace Utd\Family\Services;
 
 use Carbon\CarbonInterface;
-use Illuminate\Support\Facades\DB;
 use Utd\Agency\Repositories\UserRepository;
-use Utd\Family\Repositories\FamilyRepository;
+use Utd\Family\Contracts\FamilyServiceContract;
 use Utd\Family\Http\Resources\V2\FamilyResource;
 use Utd\Family\Repositories\FamilyRankRepository;
+use Utd\Family\Repositories\FamilyRepository;
 use Utd\Family\Repositories\FamilyUserRepository;
-use Modules\Milestones\Helpers\MilestoneHelper;
+use Utd\Family\Services\RoomRepositoryContract;
 use App\Contracts\FamilyContract;
 
-class FamilyService implements FamilyContract
+class FamilyService implements FamilyContract, FamilyServiceContract
 {
 
     public function __construct(
@@ -76,7 +76,10 @@ class FamilyService implements FamilyContract
         );
         $this->userRepository->decrementCoins($user->id, $price);
         $this->userRepository->updateFamilyId($user, $family->id);
-        MilestoneHelper::grantMilestoneToUser($user, 'family-owner');
+        $milestoneHelper = family_module('milestones', 'helper');
+        if ($milestoneHelper && method_exists($milestoneHelper, 'grantMilestoneToUser')) {
+            $milestoneHelper::grantMilestoneToUser($user, 'family-owner');
+        }
 
         return $family;
     }

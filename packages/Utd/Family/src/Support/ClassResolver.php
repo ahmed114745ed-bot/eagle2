@@ -46,6 +46,24 @@ class ClassResolver
     }
 
     /**
+     * Get controller class from config
+     */
+    public static function controller(string $key): ?string
+    {
+        $class = config("family.controllers.{$key}");
+        return $class && class_exists($class) ? $class : null;
+    }
+
+    /**
+     * Get admin widget/controller class from config
+     */
+    public static function admin(string $key): ?string
+    {
+        $class = config("family.admin.{$key}");
+        return $class && class_exists($class) ? $class : null;
+    }
+
+    /**
      * Get resource class from config
      */
     public static function resource(string $key): ?string
@@ -113,5 +131,24 @@ class ClassResolver
     public static function make(string $class, array $parameters = [])
     {
         return app()->make($class, $parameters);
+    }
+
+    /**
+     * Resolve module class from config
+     */
+    public static function module(string $module, ?string $key = null)
+    {
+        $moduleConfig = config("family.modules.{$module}", []);
+
+        if (!($moduleConfig['enabled'] ?? false)) {
+            return null;
+        }
+
+        if ($key === null) {
+            return $moduleConfig;
+        }
+
+        $class = $moduleConfig[$key] ?? null;
+        return $class && class_exists($class) ? $class : null;
     }
 }

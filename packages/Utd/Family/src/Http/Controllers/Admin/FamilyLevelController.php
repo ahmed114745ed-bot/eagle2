@@ -19,7 +19,10 @@ class FamilyLevelController extends MainController
     public $hiddenColumns = [];
     public function __construct()
     {
-        (new family_service('app_feature'))->validateStatusEnable("families");
+        $appFeatureService = family_service('app_feature');
+        if ($appFeatureService) {
+            $appFeatureService->validateStatusEnable('families');
+        }
     }
 
     public function index(Content $content)

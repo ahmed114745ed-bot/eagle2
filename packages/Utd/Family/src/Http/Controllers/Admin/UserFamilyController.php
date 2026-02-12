@@ -9,7 +9,6 @@ use Utd\Family\Entities\Family;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Vip\Entities\UserVip;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;
@@ -25,7 +24,6 @@ use Illuminate\Support\Facades\Session;
 use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use Encore\Admin\Widgets\Table;
 
-use Modules\SwitchAccount\Entities\UserAccount;
 // use Encore\Admin\Actions\Response;
 
 class UserFamilyController extends MainController
@@ -373,10 +371,15 @@ class UserFamilyController extends MainController
         });
 
         $grid->column('custom_button3', __('تبديل الحساب'))->modal('حسابات اخري علي نفس الجهاز', function ($model) {
+            $userAccountClass = family_module('switch_account', 'user_account');
+            if (!$userAccountClass) {
+                return __('Module not available');
+            }
+
             $device_token  = $this->device_token;
-            $users = UserAccount::where('device_token', $device_token)->get();
-            $parentUserIds = $users->pluck('parent_user_id');
-            $childUserIds = $users->pluck('child_user_id');
+            $accounts = $userAccountClass::where('device_token', $device_token)->get();
+            $parentUserIds = $accounts->pluck('parent_user_id');
+            $childUserIds = $accounts->pluck('child_user_id');
 
             $allIds = $parentUserIds->merge($childUserIds)->unique()->values()->all();
             $userId = $this->id;
@@ -384,9 +387,9 @@ class UserFamilyController extends MainController
                 return $id != $userId;
             });
             $filteredIds = array_values($filteredIds);
-            $users = User::query()->whereIn('id', $filteredIds)->select("name", 'uuid', 'phone')->get();
+            $users = User::query()->whereIn('id', $filteredIds)->select('name', 'uuid', 'phone')->get();
             $filteredUsers = $users->map(function ($user) {
-                return $user->only(["name", "uuid", "phone"]);
+                return $user->only(['name', 'uuid', 'phone']);
             });
             return new Table([__('Name'), __('uuid'), __('phone')], $filteredUsers->toArray());
         });

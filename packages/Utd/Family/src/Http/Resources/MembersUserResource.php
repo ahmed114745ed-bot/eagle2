@@ -2,12 +2,7 @@
 
 namespace Utd\Family\Http\Resources;
 
-use Utd\Family\Entities\Family;
-use Utd\Family\Entities\FamilyUser;
-use Utd\Room\Entities\Room;
-use Modules\Vip\Entities\Vip;
 use Carbon\Carbon;
-use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class MembersUserResource extends JsonResource
@@ -39,7 +34,7 @@ class MembersUserResource extends JsonResource
             ],
             'type_user'            => intval(@$this->type_user) ?: 0, // both
             'vip_level' => $this->userVip->level ?? 0,
-            "manger_type"          => new MangerTypeResource(@$this->mangerType),
+            'manger_type' => $this->resolveMangerType(),
             'uuid'                 => @$this->uuid, // both
             'monthly_diamond_received' => $this->monthly_diamond_received,
             'id_image'             => @$this->specialId?->ware?->show_img ?? '',
@@ -57,5 +52,15 @@ class MembersUserResource extends JsonResource
         ];
 
         return $data;
+    }
+
+    protected function resolveMangerType()
+    {
+        $resourceClass = family_resource('manger_type');
+        if ($resourceClass && class_exists($resourceClass)) {
+            return new $resourceClass(@$this->mangerType);
+        }
+
+        return null;
     }
 }

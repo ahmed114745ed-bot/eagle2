@@ -3,8 +3,9 @@
 namespace Utd\Family\Services;
 
 use App\Contracts\FamilyContract;
+use Utd\Family\Contracts\FamilyServiceContract;
 
-class NullFamilyService implements FamilyContract
+class NullFamilyService implements FamilyContract, FamilyServiceContract
 {
     public function getWithSearch($search = null) { return collect(); }
     public function show($id) { return null; }

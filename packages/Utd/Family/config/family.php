@@ -27,10 +27,13 @@ return [
     ],
     'helpers' => [
         'common' => \App\helper\Common::class,
-        'app_feature' => \App\Services\AppFeatureService::class,
         'custom_notification' => \App\Classes\CustomNotification::class,
         'user_coin_log' => \App\Helpers\UserCoinLogHelper::class,
         'agency_package' => \App\Helpers\AgencyPackageHelper::class,
+    ],
+
+    'services' => [
+        'app_feature' => \App\Services\AppFeatureService::class,
     ],
     'facades' => [
         'user_handling' => \App\Facades\UserHandling::class,
@@ -39,6 +42,7 @@ return [
     'contracts' => [
         'room_repository' => \App\Contracts\RoomRepositoryContract::class,
         'user_achievement' => \App\Contracts\UserAchievementContract::class,
+        'family_service' => \App\Contracts\FamilyContract::class,
     ],
     'resources' => [
         'room' => \App\Http\Resources\Api\V1\RoomResource::class,
@@ -49,10 +53,15 @@ return [
     ],
     'controllers' => [
         'base' => \App\Http\Controllers\Controller::class,
+        'admin_main' => \App\Admin\Controllers\MainController::class,
     ],
     'traits' => [
         'dashboard' => \App\Traits\Dashboard\DashBoardTrait::class,
         'timestamps' => \App\Traits\TimestampsWithTimezone::class,
+    ],
+
+    'enums' => [
+        'user_coin_log_type' => \App\Enums\UserCoinLogType::class,
     ],
     'repositories' => [
         'abstract' => \App\Tik\Repositories\AbstractRepository::class,
@@ -65,5 +74,23 @@ return [
         'delete_user_vip' => \App\Admin\Actions\DeleteUserVipAction::class,
         'edit_pack_expire' => \App\Admin\Actions\EditPackExpireAction::class,
         'table' => \App\Admin\Widgets\Table::class,
+    ],
+
+    'modules' => [
+        'milestones' => [
+            'enabled' => class_exists(\Modules\Milestones\Helpers\MilestoneHelper::class),
+            'helper' => \Modules\Milestones\Helpers\MilestoneHelper::class,
+            'entity' => \Modules\Milestones\Entities\Milestone::class,
+        ],
+        'vip' => [
+            'enabled' => class_exists(\Modules\Vip\Entities\UserVip::class),
+            'user_vip' => \Modules\Vip\Entities\UserVip::class,
+            'vip' => \Modules\Vip\Entities\Vip::class,
+            'o_vip' => \Modules\Vip\Entities\OVip::class,
+        ],
+        'switch_account' => [
+            'enabled' => class_exists(\Modules\SwitchAccount\Entities\UserAccount::class),
+            'user_account' => \Modules\SwitchAccount\Entities\UserAccount::class,
+        ],
     ],
 ];

@@ -4,8 +4,6 @@ namespace Utd\Family\Observers;
 
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Helpers\MilestoneHelper;
 
 class FamilyObserver
 {
@@ -16,10 +14,23 @@ class FamilyObserver
      */
     public function deleted(Family $family)
     {
-        $owner = User::find($family->user_id);
-        MilestoneHelper::removeReward($owner, 'family-owner');
-        User::query()->where('family_id', $family->id)->update(['family_id' => null]);
+        $userClass = family_model('user');
+        if (!$userClass) {
+            return;
+        }
+
+        $owner = $userClass::find($family->user_id);
+        $milestoneHelper = family_module('milestones', 'helper');
+
+        if ($milestoneHelper && $owner) {
+            $milestoneHelper::removeReward($owner, 'family-owner');
+        }
+
+        $userClass::query()->where('family_id', $family->id)->update(['family_id' => null]);
         FamilyUser::query()->where('family_id', $family->id)->delete();
-        MilestoneHelper::removeReward($owner, 'family-owner');
+
+        if ($milestoneHelper && $owner) {
+            $milestoneHelper::removeReward($owner, 'family-owner');
+        }
     }
 }

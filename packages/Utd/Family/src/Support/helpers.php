@@ -19,7 +19,7 @@ if (!function_exists('family_helper')) {
 if (!function_exists('family_service')) {
     function family_service(string $key)
     {
-        return ClassResolver::service($key);
+        return ClassResolver::getService($key);
     }
 }
 
@@ -77,4 +77,15 @@ if (!function_exists('family_admin')) {
     {
         return ClassResolver::admin($key);
     }
+}
+
+if (!function_exists('family_module')) {
+    function family_module(string $module, ?string $key = null)
+    {
+        return ClassResolver::module($module, $key);
+    }
+}
+
+if (!interface_exists(\App\Contracts\FamilyContract::class) && interface_exists(\Utd\Family\Contracts\FamilyServiceContract::class)) {
+    class_alias(\Utd\Family\Contracts\FamilyServiceContract::class, \App\Contracts\FamilyContract::class);
 }
