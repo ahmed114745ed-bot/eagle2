@@ -584,19 +584,20 @@ class EnteranceRoomServices
     public function deleteOldRoomMic($user, $room)
     {
         RoomMicrophone::where('user_id', $user->id)->delete();
-        $cpHistory = CpRoomHistory::where("user_one_id", $user->id)->orWhere("user_two_id", $user->id)->first();
-        if (!$cpHistory) return;
-        $userIIId = $cpHistory->user_one_id == $user->id ? $cpHistory->user_two_id : $cpHistory->user_one_id;
-        $nowRoomId = User::where('id', $userIIId)->value('now_room_uid');
+        $partner = $user->lovelyRelations()
+            ->with(['userOne', 'userTwo'])
+            ->first()?->partner;
 
         CpRoomHistory::where("user_one_id", $user->id)
             ->orWhere("user_two_id", $user->id)->delete();
-        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
-        $json = $this->cpMapJson($indices);
-        if ($nowRoomId) Common::sendToZego('SendCustomCommand', @$nowRoomId, $user->id, $json);
+
+        $json = $this->cpMapJson([]);
+        Log::info('CP Partner Found enter room', [
+            'auth_user_id'   => $user->id,
+            'partner_id'     => $partner->id,
+            'partner_room'   => $partner->now_room_uid,
+        ]);
+        if ($partner) Common::sendToZego('SendCustomCommand', @$partner->now_room_uid, $partner->id, $json);
     }
 
 

@@ -385,13 +385,17 @@ class RoomController extends Controller
         RoomMicrophone::where('user_id', $user->id)->delete();
         CpRoomHistory::where("user_one_id", $user->id)
             ->orWhere("user_two_id", $user->id)->delete();
-        $cpRoomHistories = CpRoomHistory::where("room_id", $room->id)->get(['index1', 'index2']);
-        $indices = $cpRoomHistories->map(function ($history) {
-            return [$history->index1, $history->index2];
-        })->toArray();
-        $json = $this->cpMapJson($indices);
+        $partner = $user->lovelyRelations()
+            ->with(['userOne', 'userTwo'])
+            ->first()?->partner;
+        $json = $this->cpMapJson([]);
 
-        Common::sendToZego('SendCustomCommand', $room->id, $user->id, $json);
+        Log::info('CP Partner Found quite room', [
+            'auth_user_id'   => $user->id,
+            'partner_id'     => $partner->id,
+            'partner_room'   => $partner->now_room_uid,
+        ]);
+        if ($partner) Common::sendToZego('SendCustomCommand', @$partner->now_room_uid, $partner->id, $json);
     }
 
 

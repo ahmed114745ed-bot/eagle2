@@ -169,7 +169,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(self::class, 'device_token', 'device_token');
     }
-
+    public function lovelyRelations()
+    {
+        return Cp::where(function ($q) {
+            $q->where('user_one_id', $this->id)
+                ->orWhere('user_two_id', $this->id);
+        })
+            ->whereIn('status', [1, 4])
+            ->whereHas('relation', function ($q) {
+                $q->where('type', 'lovely');
+            });
+    }
     public function likes()
     {
         return $this->belongsToMany(self::class, 'profile_user_likes', 'user_id', 'liked_user_id')
@@ -556,7 +566,7 @@ class User extends Authenticatable
             return;
         }
 
-//        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
+        //        return @$this->profile()->first()->avatar ?: Common::getConf('default_img');
         return @$this->profile()->first()->avatar ?: "images/businessman-icon.jpg";
     }
 

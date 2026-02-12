@@ -29,6 +29,16 @@ class Cp extends Model
         return $this->belongsTo(CpRelation::class, 'cp_relation_id');
     }
 
+    public function userOne()
+    {
+        return $this->belongsTo(User::class, 'user_one_id');
+    }
+
+    public function userTwo()
+    {
+        return $this->belongsTo(User::class, 'user_two_id');
+    }
+
     public function relation()
     {
         return $this->belongsTo(CpRelation::class, 'cp_relation_id');
@@ -39,6 +49,12 @@ class Cp extends Model
         return $query->whereHas('relation', function ($query) {
             $query->where('type', 'lovely');
         });
+    }
+
+    public function getPartnerAttribute()
+    {
+        return $this->user_one_id == auth()->id()
+            ? $this->fromUser : $this->toUser;
     }
 
     public function level()
@@ -56,9 +72,6 @@ class Cp extends Model
 
     protected static function booted()
     {
-        static::created(function ($cp) {
-
-        });
+        static::created(function ($cp) {});
     }
-
 }
