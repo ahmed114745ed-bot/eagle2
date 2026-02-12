@@ -622,83 +622,66 @@ class LuckyGiftService
         $max_single_win  = 0;
         $total_count_win = 0;
 
-        UserCoinLogHelper::logByType(
-            $user->id,
-            -abs($totalPrice),
-            $amountBefore,
-            UserCoinLogType::LUCKY_GIFT,
-            $gift?->name,
-        );
-
         $totalPrice = $giftPrice * $number * $receiversCount;
         $coinsForApp   = $totalPrice * $appPercentage;
         $coinsForOwner = $totalPrice * $roomrPercentage;
 
         while ($user->di >= $totalPrice && $index > 0) {
+            $balanceBeforeIteration = $user->di;
+            UserCoinLogHelper::logByType(
+                $user->id,
+                -abs($totalPrice),
+                $balanceBeforeIteration,
+                UserCoinLogType::LUCKY_GIFT,
+                $gift?->name,
+            );
 
             // $appWallet->coins   += $price * 8;
             $appWallet->coins   += $coinsForApp;
             $ownerWallet->coins += $price; //        $appWallet->save();
             //        $ownerWallet->save();
 
-            $iterationWins = [];
             $iterationTotalWin = 0;
             $iterationPopular = false;
+            $iterationMaxCashback = 0;
             $message = null;
 
             foreach ($receiversIds as $receiverId) {
-                $isWinner       = $this->is_winner($gift);
-                $isPopular      = false;
-                $totalGiftPrice = $giftPrice * $number;
-                $appWalletCoins = $appWallet->coins;
-                $cashback_percentage = 0;
-                $cashback_value = 0;
+                $isWinner = $this->is_winner($gift);
+                if ($isWinner) {
+                    $unitPrice = $giftPrice * $number;
+                    $appWalletCoins = $appWallet->coins;
+                    if ($appWalletCoins > $unitPrice) {
+                        $properties = $gift->luckyGift?->min_percentage;
+                        $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $unitPrice, $properties);
+                        $cashback_value = $cashback_percentage * $unitPrice;
+                        
+                        if ($cashback_percentage > 0) {
+                            $user->enableSaving = false;
+                            $user->di           += $cashback_value;
+                            $appWallet->coins   -= $cashback_value;
+                            
+                            $iterationTotalWin += $cashback_value;
+                            $total_user_win += $cashback_value;
+                            $total_count_win++;
+                            $iterationMaxCashback = max($iterationMaxCashback, $cashback_percentage);
+                            
+                            $displayMultiplier = $this->resolveWinnerMultiplier($cashback_value, $unitPrice, $cashback_percentage);
 
-                if ($isWinner && $appWalletCoins > ($totalGiftPrice)) {
-                    $properties = $gift->luckyGift?->min_percentage;
-
-                    $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $totalGiftPrice, $properties);
-
-                    $cashback_value = $cashback_percentage * $giftPrice * $number;
-                    if ($cashback_percentage > 0) {
-
-                        $user->enableSaving = false;
-                        $user->di           += $cashback_value;
-                        $appWallet->coins   -= $cashback_value;
-                        if ($cashback_percentage > 1) {
-                            $message = $this->winnerMessage($cashback_percentage);
+                            if ($displayMultiplier > 1 && !$message) {
+                                $message = $this->winnerMessage($displayMultiplier);
+                            }
+                            
+                            if ($this->isPopular($cashback_percentage)) {
+                                $iterationPopular = true;
+                            }
                         }
-                    } else {
-                        $isWinner = false;
-                    }
-
-                    //send to zigo this data to show in all rooms if cashback percentage > 20
-                    $isPopular = $this->isPopular($cashback_percentage);
-
-                    if ($isPopular) {
-                        $iterationPopular = true;
-                        $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $cashback_percentage, cashbackValue: $cashback_value);
                     }
                 }
+            }
 
-                $current_win = (int)($totalGiftPrice * $cashback_percentage);
-
-                if ($current_win > 0) {
-                    $total_user_win += $current_win;
-                    $iterationTotalWin += $current_win;
-                    $total_count_win++;
-                    $max_single_win = max($max_single_win, $current_win);
-                }
-
-                $total_cashback_percentage += $cashback_percentage;
-
-                $iterationWins[] = [
-                    'receiver_id'     => $receiverId,
-                    'win_coins'       => $current_win,
-                    'is_win'          => $current_win > 0,
-                    'is_popular'      => $isPopular,
-                    'cashback_percent' => $cashback_percentage,
-                ];
+            if ($iterationPopular) {
+                $this->sendPopularToZegoV2($userId, $user, $gift, $ownerId, $room, $iterationMaxCashback, cashbackValue: $iterationTotalWin);
             }
 
             [$commentMessage, $sendMessage] =
@@ -718,7 +701,7 @@ class LuckyGiftService
 
             $user->di -= $totalPrice;
             $index--;
-            //            $this->save_data_win_for_user($user->id,$totalGiftPrice,$cashback_percentage);
+            $total_cashback_percentage += $iterationMaxCashback;
         }
 
 
@@ -746,7 +729,7 @@ class LuckyGiftService
 
         // update room session
         // $room->session      += (int)$gift->price * $number * $count * 0.1;
-        $room->session      +=  $coinsForOwner;
+        $room->session      +=  $coinsForOwner * $count;
         $room->save();
 
         // add session to response
@@ -791,22 +774,10 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
-        // \Log::info('sendLuckyGift2V3 - Room Type Check', [
-        //     'room_id' => $room->id,
-        //     'room_type' => $room->type,
-        //     'total_diamond' => $room->total_diamond,
-        //     'totalPrice' => $totalPrice,
-        // ]);
 
-        // Upgrade room level for audio rooms
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
-            // \Log::info('sendLuckyGift2V3 - Upgrading Room Level', [
-            //     'room_id' => $room->id,
-            //     'diamonds' => $totalPrice,
-            //     'type' => $room->type,
-            // ]);
-            $serviceLevel->sendGift($room, $totalPrice);
+            $serviceLevel->sendGift($room, $totalPrice * $count);
         }
 
         return  $responseData;
@@ -1224,6 +1195,28 @@ class LuckyGiftService
         $properties1         = $properties ? explode(',', $properties) : null;
         $cashback_percentage = $this->getRandomDuplicate($probability, $cashback_percentage, $properties1);
         return $cashback_percentage;
+    }
+
+    public function resolveWinnerMultiplier(float|int $winCoins, float|int $unitPrice, float|int $fallbackMultiplier): float|int
+    {
+        if ($unitPrice <= 0) {
+            return $fallbackMultiplier;
+        }
+
+        $calculatedMultiplier = $winCoins / $unitPrice;
+
+        if ($calculatedMultiplier > 1) {
+            $roundedMultiplier = round($calculatedMultiplier, 2);
+            $roundedInt        = round($roundedMultiplier);
+
+            if (abs($roundedMultiplier - $roundedInt) < 0.01) {
+                return (int)$roundedInt;
+            }
+
+            return $roundedMultiplier;
+        }
+
+        return $fallbackMultiplier;
     }
 
     /**
