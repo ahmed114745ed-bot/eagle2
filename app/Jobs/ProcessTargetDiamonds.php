@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Target;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\MonthlyDiamondReceive;
 use App\Models\TargetEdit;
 use Illuminate\Bus\Queueable;

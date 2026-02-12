@@ -18,7 +18,9 @@ use App\Models\Language;
 use App\Models\FamilyUser;
 use App\Admin\Fields\Image;
 use App\Helpers\RoomHelper;
-use App\Models\UserSallary;
+use App\Contracts\Agency\AgencyEntityResolverContract;
+use App\Support\Agency\NullAgencyEntityResolver;
+use Utd\Agency\Entities\UserSallary;
 use App\Helpers\CacheHelper;
 use Illuminate\Http\Request;
 use App\Classes\UserHandling;
@@ -97,6 +99,10 @@ class AppServiceProvider extends ServiceProvider
             $this->app->bind(ShippingAgencyRepositoryInterface::class, \Utd\Agency\Repositories\ShippingAgencyRepository::class);
         } else {
             $this->app->bind(ShippingAgencyRepositoryInterface::class, NullShippingAgencyRepository::class);
+        }
+
+        if (!$this->app->bound(AgencyEntityResolverContract::class)) {
+            $this->app->singleton(AgencyEntityResolverContract::class, fn () => new NullAgencyEntityResolver());
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

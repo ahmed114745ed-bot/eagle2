@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;

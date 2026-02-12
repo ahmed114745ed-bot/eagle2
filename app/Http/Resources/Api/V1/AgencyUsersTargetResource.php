@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\JsonResource;
 

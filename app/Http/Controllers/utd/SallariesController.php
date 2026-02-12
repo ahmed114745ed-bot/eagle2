@@ -9,7 +9,7 @@ use App\Models\AgencySallary;
 use App\Models\SalaryTrx;
 use App\Models\UsdTransfer;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\UserTarget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

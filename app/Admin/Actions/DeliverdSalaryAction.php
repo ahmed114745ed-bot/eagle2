@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Classes\Enums\SubTypeMessagesType;
 use Modules\Public\Http\Services\UpgradeLevelServices;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\Charge;
 class DeliverdSalaryAction extends RowAction
 {

@@ -4,7 +4,7 @@ namespace App\Observers;
 
 use App\Models\Agency;
 use App\Models\BdSalary;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use App\Classes\Enums\NotificationType;
 use App\Jobs\SendCustomOfficialMessageToUser;

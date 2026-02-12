@@ -100,7 +100,7 @@ trait ResolvesModels
      */
     protected function getUserSallaryModel(): ?string
     {
-        return $this->resolveModel('user_salary', \App\Models\UserSallary::class);
+        return $this->resolveModel('user_salary', \Utd\Agency\Entities\UserSallary::class);
     }
 
     /**

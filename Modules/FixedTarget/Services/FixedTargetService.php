@@ -11,7 +11,7 @@ use App\Models\Target;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
 use App\Helpers\UserCommon;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Modules\Reals\Entities\Real;
 use Modules\Moment\Entities\Moment;
 use Illuminate\Database\Eloquent\Model;

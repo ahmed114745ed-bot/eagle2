@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use App\Models\Agency;
 use App\Models\Target;
 use App\Models\GiftLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Resources\Json\JsonResource;

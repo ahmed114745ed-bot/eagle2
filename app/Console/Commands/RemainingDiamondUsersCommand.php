@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Carbon\Carbon;
 use App\Helpers\Common;
 use App\Models\GiftLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Enums\UserCoinLogType;
 use Illuminate\Console\Command;
 use App\Models\RemainingDiamond;

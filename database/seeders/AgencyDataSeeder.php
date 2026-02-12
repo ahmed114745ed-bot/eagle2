@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Carbon\Carbon;
 use App\Models\Agency;
 use App\Models\GiftLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\UserTarget;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;

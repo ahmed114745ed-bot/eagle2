@@ -36,7 +36,7 @@ class RecalculateWalletsSeeder extends Seeder
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // Recalculate balances per UserSallary (preserve per-target wallet logs and distributions)
-        \App\Models\UserSallary::query()
+        \Utd\Agency\Entities\UserSallary::query()
             ->orderBy('id')
             ->chunk(500, function ($salaries) {
                 foreach ($salaries as $s) {

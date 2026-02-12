@@ -14,7 +14,7 @@ use App\Models\Charge;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;

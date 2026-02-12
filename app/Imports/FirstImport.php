@@ -7,7 +7,7 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 
 class FirstImport implements ToCollection, WithHeadingRow

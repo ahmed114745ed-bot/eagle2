@@ -14,7 +14,7 @@ use App\Models\GiftLog;
 use App\Models\AppFeature;
 use App\Models\CoreWallet;
 use App\Helpers\UserCommon;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
 use GuzzleHttp\Promise\Utils;

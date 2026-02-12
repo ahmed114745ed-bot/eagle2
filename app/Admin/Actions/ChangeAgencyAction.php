@@ -16,7 +16,7 @@ use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Facades\DB;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Support\Facades\Auth;

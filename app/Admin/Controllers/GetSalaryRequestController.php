@@ -14,7 +14,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 

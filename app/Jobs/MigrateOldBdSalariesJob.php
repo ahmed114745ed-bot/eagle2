@@ -9,7 +9,7 @@ use App\Models\BDSallary;
 use App\Models\BdAgencyHostSallary;
 use App\Models\BdSalary;
 use App\Models\Charge;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Services\BdAgencyHostSallaryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\DB;

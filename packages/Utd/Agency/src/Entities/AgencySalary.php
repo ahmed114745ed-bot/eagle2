@@ -86,7 +86,7 @@ class AgencySalary extends Model
         $month = $month ?? now()->month;
         $year = $year ?? now()->year;
 
-        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+        $userSalaryClass = config('agency-package.models.user_salary', \Utd\Agency\Entities\UserSallary::class);
         return $this->hasMany($userSalaryClass, 'user_agency_id', 'agency_id')
             ->where('month', $month)
             ->where('year', $year)

@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Layout\Content;
 use App\Http\Controllers\Controller;
 use App\Admin\Controllers\MainController;

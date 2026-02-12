@@ -4,7 +4,7 @@ namespace App\Admin\Extensions;
 
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use Illuminate\Support\Facades\DB;
 

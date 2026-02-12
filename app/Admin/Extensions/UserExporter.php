@@ -3,7 +3,7 @@
 namespace App\Admin\Extensions;
 
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;

@@ -11,7 +11,7 @@ use App\Models\Agency;
 use App\Models\AgencySallary;
 use App\Models\Config;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Auth;
 use Carbon\Carbon;
 use Google\Service\CloudWorkstations\Host;

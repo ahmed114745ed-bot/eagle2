@@ -16,7 +16,7 @@ use App\Models\GiftLog;
 use Modules\Vip\Entities\UserVip;
 use App\Models\LiveTime;
 use App\Models\RealtimeProject;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Utd\Agency\Entities\AgencyUserJob;

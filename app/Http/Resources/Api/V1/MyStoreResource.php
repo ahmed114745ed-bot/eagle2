@@ -10,7 +10,7 @@ use App\Models\Pack;
 use App\Models\Room;
 use App\Models\RoomSalary;
 use App\Models\Target;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

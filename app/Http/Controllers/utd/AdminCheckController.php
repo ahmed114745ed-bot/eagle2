@@ -5,7 +5,7 @@ namespace App\Http\Controllers\utd;
 use Exception;
 use App\Models\User;
 use App\Helpers\Common;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;

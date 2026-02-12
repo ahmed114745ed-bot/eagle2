@@ -11,7 +11,7 @@ use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\SalaryTrx;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Actions\Action;
 use Encore\Admin\Form;
 use Illuminate\Http\Request;

@@ -152,7 +152,7 @@ trait AgencyRelationsTrait
      */
     public function userSalaries(): HasMany
     {
-        return $this->hasMany($this->getModelClass('user_salary', \App\Models\UserSallary::class), 'user_agency_id');
+        return $this->hasMany($this->getModelClass('user_salary', \Utd\Agency\Entities\UserSallary::class), 'user_agency_id');
     }
 
     /**

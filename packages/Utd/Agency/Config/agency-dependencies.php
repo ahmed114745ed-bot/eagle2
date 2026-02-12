@@ -20,7 +20,7 @@ return [
             'agency_user_job' => \Utd\Agency\Entities\AgencyUserJob::class,
             'agency_salary' => \Utd\Agency\Entities\AgencySalary::class,
             'gift_log' => \App\Models\GiftLog::class,
-            'user_salary' => \App\Models\UserSallary::class,
+            'user_salary' => \Utd\Agency\Entities\UserSallary::class,
             'target' => \Utd\Agency\Entities\Target::class,
             'admin' => \App\Models\Admin::class,
             'admin_user' => \App\Models\AdminUser::class,

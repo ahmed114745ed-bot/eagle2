@@ -8,7 +8,7 @@ use App\Models\CoinLog;
 use Encore\Admin\Widgets\Box;
 use App\Models\User;
 use App\Models\GameWallet;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use Encore\Admin\Layout\Content;
 use App\Models\GameChargeHistory;

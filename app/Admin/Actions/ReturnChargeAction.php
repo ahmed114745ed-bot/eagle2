@@ -11,7 +11,7 @@ use App\Models\User;
 use App\Models\Charge;
 use App\Models\ReturnCharge;
 use Utd\Agency\Entities\ShippingAgency;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Actions\Action;
 use Auth;
 

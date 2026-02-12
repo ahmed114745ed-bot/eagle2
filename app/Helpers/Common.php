@@ -21,7 +21,7 @@ use App\Models\Setting;
 use App\Models\Background;
 use App\Models\RoomVisitor;
 use App\Models\UserCoinLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use Kreait\Firebase\Factory;

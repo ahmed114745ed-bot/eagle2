@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Http\Resources\Api\V1\MyDataForAgancyResource;
 use App\Models\Agency;
 use App\Models\Target;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AgencyRankingRecourse extends JsonResource

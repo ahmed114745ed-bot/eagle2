@@ -14,7 +14,7 @@ use App\Models\Config;
 use App\Enums\UserType;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;

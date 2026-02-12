@@ -9,7 +9,7 @@ use App\Models\Config;
 use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\AdminUser;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Http\Request;
 use App\Facades\ManagerHelper;
 use Utd\Agency\Entities\ShippingAgency;

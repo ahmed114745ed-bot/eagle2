@@ -2,43 +2,50 @@
 
 namespace Utd\Agency\Http\Controllers\Api;
 
-use Admin;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use App\Facades\CustomNotification;
-use Utd\Agency\Facades\AgencyHelper;
-use Utd\Agency\Notifications\AcceptAgency;
-use Utd\Agency\Notifications\RefuseAgency;
+use App\Models\Follow;
+use App\Models\GiftLog;
+use App\Models\LiveTime;
+use App\Models\ProfileVisitor;
+use App\Models\User;
+use Utd\Agency\Entities\UserSallary;
 use Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
-use Utd\Agency\Emails\SendAgencyEmail;
-use Utd\Agency\Entities\AdditionalInfo;
-use Utd\Agency\Notifications\AgencyMail;
-use Utd\Agency\Http\Requests\CreateAgencyRequest;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use Utd\Agency\Entities\AgencyHostInvite;
+use Modules\Reals\Http\Services\RealsService;
 use Utd\Agency\Exports\HostDailyDataExport;
+use Utd\Agency\Emails\SendAgencyEmail;
+use Utd\Agency\Entities\AdditionalInfo;
+use Utd\Agency\Entities\Agency;
+use Utd\Agency\Entities\AgencyHostInvite;
+use Utd\Agency\Entities\AgencyJoinRequest;
+use Utd\Agency\Facades\AgencyHelper;
+use Utd\Agency\Http\Requests\CreateAgencyRequest;
+use Utd\Agency\Notifications\AcceptAgency;
+use Utd\Agency\Notifications\AgencyMail;
+use Utd\Agency\Notifications\RefuseAgency;
+use Utd\Agency\Traits\ResolvesExternalDependencies;
 use Utd\Agency\Transformers\AgencyHostResource;
 use Utd\Agency\Transformers\AgencyInvitationResource;
 use Utd\Agency\Transformers\AgencyMonthlyHostResource;
 use Utd\Agency\Transformers\HostDailyReportResource;
-use Utd\Agency\Traits\ResolvesExternalDependencies;
 
 class AgencyAppController extends Controller
 {
     use ResolvesExternalDependencies;
 
     public function get_user(Request $request) {
+        $userClass = $this->resolveModelClass('user', User::class);
         if($request->user_id){
-            $adminClass = config('agency-package.models.admin');
-            $userClass = config('agency-package.models.user');
-            
+            $adminClass = $this->resolveModelClass('admin', \App\Models\Admin::class);
+
             $admin = $adminClass::find($request->user()->id);
-            $user = $userClass::find($request->user_id);
             if(isset($admin)&& $admin->isRole("admin")){
                 $user = $userClass::find($request->user_id);
             }else{
@@ -46,12 +53,13 @@ class AgencyAppController extends Controller
             }
         }
         else{
-            $user = User::find($request->user()->id);
+            $user = $userClass::find($request->user()->id);
         }
         return $user;
     }
     public function actionInvitation(Request $request)
     {
+        $agencyHostInviteClass = $this->resolveModelClass('agency_host_invite', AgencyHostInvite::class);
         if (!$request->invite_id || !$request->status) {
             return AgencyHelper::apiResponse(0, 'البيانات غير مكتمله',  423);
         }
@@ -59,7 +67,7 @@ class AgencyAppController extends Controller
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
-        $invitation = AgencyHostInvite::findOrFail($request->invite_id);
+        $invitation = $agencyHostInviteClass::findOrFail($request->invite_id);
         if ($invitation->created_at->addDays(7) < now()) {
             $invitation->update(['status'=>3]);
             return AgencyHelper::apiResponse(0, 'لقد مر اكثر من 7 ايام علي الدعوه',  423);
@@ -73,16 +81,19 @@ class AgencyAppController extends Controller
 
     public function agencyHostInvitation(Request $request)
     {
+        $agencyHostInviteClass = $this->resolveModelClass('agency_host_invite', AgencyHostInvite::class);
         $user = $this->get_user(request());
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
-        $invitations = AgencyHostInvite::where("agency_id",$user->agency_id)->get();
+        $invitations = $agencyHostInviteClass::query()->where("agency_id",$user->agency_id)->get();
         return AgencyHelper::apiResponse(1, '', AgencyInvitationResource::collection($invitations),  200);
     }
 
     public function invite_user_to_hostAgency(Request $request)
     {
+        $userClass = $this->resolveModelClass('user', User::class);
+        $agencyHostInviteClass = $this->resolveModelClass('agency_host_invite', AgencyHostInvite::class);
         if (!$request->user_id2) {
             return AgencyHelper::apiResponse(0, 'المستخدم مطلوب!',  423);
         }
@@ -90,16 +101,16 @@ class AgencyAppController extends Controller
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
-        $newhost = User::find($request->user_id2);
+        $newhost = $userClass::find($request->user_id2);
 
         if ($newhost->agency_id != 0) {
             return AgencyHelper::apiResponse(0, 'المستخدم موجود في وكاله!',  423);
         }
-        $check = AgencyHostInvite::where([ 'agency_id' => $user->agency_id,'user_id'  => $newhost->id])->latest('id')->first();
+        $check = $agencyHostInviteClass::query()->where([ 'agency_id' => $user->agency_id,'user_id'  => $newhost->id])->latest('id')->first();
         if ($check!=null && $check->created_at->addDays(7) > now() && $check->status == 0) {
             return AgencyHelper::apiResponse(0, 'لم يمر علي اخر دعوه 7 ايام!',  423);
         }
-        AgencyHostInvite::create([
+        $agencyHostInviteClass::create([
             'user_invite_id' => $user->id,
             'agency_id' => $user->agency_id,
             'user_id'  => $newhost->id,
@@ -111,6 +122,7 @@ class AgencyAppController extends Controller
 
     public function host_daily_export_data(Request $request)
     {
+        $userClass = $this->resolveModelClass('user', User::class);
         if (!$request->date) {
             return AgencyHelper::apiResponse(0, 'التاريخ مطلوب!',  200);
         }
@@ -123,7 +135,7 @@ class AgencyAppController extends Controller
         if (!$user->agency) {
             return AgencyHelper::apiResponse(0, 'لا تملك وكاله!',  200);
         }
-        $hosts = User::where("agency_id",$user->agency_id)->where("type_user",'!=',0);
+        $hosts = $userClass::query()->where("agency_id",$user->agency_id)->where("type_user",'!=',0);
         if ($request->host_id != null) {
             $hosts = $hosts ->where("id",$request->host_id);
         }
@@ -134,6 +146,7 @@ class AgencyAppController extends Controller
 
     public function host_daily_report(Request $request)
     {
+        $userClass = $this->resolveModelClass('user', User::class);
         if (!$request->date) {
             return AgencyHelper::apiResponse(0, 'التاريخ مطلوب!',  200);
         }
@@ -146,7 +159,7 @@ class AgencyAppController extends Controller
         if (!$user->agency) {
             return AgencyHelper::apiResponse(0, 'لا تملك وكاله!',  200);
         }
-        $hosts = User::where("agency_id",$user->agency_id)->where("type_user",'!=',0);
+        $hosts = $userClass::query()->where("agency_id",$user->agency_id)->where("type_user",'!=',0);
         if ($request->host_id != null) {
             $hosts = $hosts ->where("id",$request->host_id);
         }
@@ -157,11 +170,16 @@ class AgencyAppController extends Controller
 
     public function host_report($id)
     {
+        $userClass = $this->resolveModelClass('user', User::class);
+        $userSalaryClass = $this->resolveModelClass('user_salary', UserSallary::class);
+        $agencyJoinRequestClass = $this->resolveModelClass('agency_join_request', AgencyJoinRequest::class);
+        $liveTimeClass = $this->resolveModelClass('live_time', LiveTime::class);
+        $giftLogClass = $this->resolveModelClass('gift_log', GiftLog::class);
         $user = $this->get_user(request());
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
         }
-        $host = User::find($id);
+        $host = $userClass::find($id);
         if (!$host) {
             return AgencyHelper::apiResponse(0, 'لا يوجد هذا المضيف!',  200);
         }
@@ -172,8 +190,8 @@ class AgencyAppController extends Controller
 
         $today = Carbon::today();
         $previousMonth = $today->subMonth();
-        $user_sallary = UserSallary::where(['user_id' => $host->id, 'month'=> $previousMonth->format('m'), 'year'=> $previousMonth->format('Y')])->first();
-        $join_date = AgencyJoinRequest::where(['user_id' => $host->id, 'agency_id'=>$user->agency_id])->first()?->updated_at;
+        $user_sallary = $userSalaryClass::query()->where(['user_id' => $host->id, 'month'=> $previousMonth->format('m'), 'year'=> $previousMonth->format('Y')])->first();
+        $join_date = $agencyJoinRequestClass::query()->where(['user_id' => $host->id, 'agency_id'=>$user->agency_id])->first()?->updated_at;
 
         $last_month_di = 0;
         if ($user_sallary) {
@@ -190,7 +208,7 @@ class AgencyAppController extends Controller
         $total_diamonds = 0;
         $days = 0;
         for ($date = $start_date; $date <= $end_date; $date->addDay(1)) {
-            $hours = LiveTime::query()
+            $hours = $liveTimeClass::query()
                 ->where('uid', $host->id)
                 ->whereDate('created_at', $date->toDateString())
                 ->sum('hours');
@@ -202,7 +220,7 @@ class AgencyAppController extends Controller
                 $total_hours = 0;
                 $total_total_hours +=$hours;
             }
-           $diamonds = GiftLog::query()->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total')->groupBy("receiver_id")->where('receiver_id', $host->id)->whereDate("created_at",$date)->first();
+           $diamonds = $giftLogClass::query()->selectRaw('receiver_id, SUM(giftNum * giftPrice) AS total')->groupBy("receiver_id")->where('receiver_id', $host->id)->whereDate("created_at",$date)->first();
             $total_diamonds +=  $diamonds?->total ?? 0;
            $dAilyReport[] = [
                 'date'          => $date->toDateString(),
@@ -235,6 +253,13 @@ class AgencyAppController extends Controller
 
     public function agency_data(Request $request)
     {
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $giftLogClass = $this->resolveModelClass('gift_log', GiftLog::class);
+        $liveTimeClass = $this->resolveModelClass('live_time', LiveTime::class);
+        $profileVisitorClass = $this->resolveModelClass('profile_visitor', ProfileVisitor::class);
+        $followClass = $this->resolveModelClass('follow', Follow::class);
+        $userClass = $this->resolveModelClass('user', User::class);
+        $userSalaryClass = $this->resolveModelClass('user_salary', UserSallary::class);
         $user = $this->get_user(request());
         if (!$user) {
             return AgencyHelper::apiResponse(0, 'لا يوجد مستخدم!',  200);
@@ -242,11 +267,11 @@ class AgencyAppController extends Controller
         if (!$user->ownAgency) {
             return AgencyHelper::apiResponse(0, 'هذا المستخدم لا يمتلك وكاله!',  200);
         }
-        $agency = Agency::where("id",$user->agency_id)->first();
+        $agency = $agencyClass::query()->where("id",$user->agency_id)->first();
         $users      = $agency?->mempers?->pluck("id")->toArray();
-        $diamonds   = GiftLog::query()->whereMonth('created_at', now()->month)
+        $diamonds   = $giftLogClass::query()->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)->whereIn("receiver_id",$users)->sum('giftPrice');
-        $days       =  LiveTime::query()
+        $days       =  $liveTimeClass::query()
                                 ->whereIn('uid', $users)
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)
@@ -255,18 +280,18 @@ class AgencyAppController extends Controller
                                 ->havingRaw('SUM(hours) >= 1')
                                 ->get()
                                 ->sum('days') ?? 0;
-        $hours       = LiveTime::query()->where('uid', $users)
+        $hours       = $liveTimeClass::query()->where('uid', $users)
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)
                                 ->sum('hours');
-        $visitors   = ProfileVisitor::query()->whereIn('user_id',$users)
+        $visitors   = $profileVisitorClass::query()->whereIn('user_id',$users)
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)->count();
-        $follows    = Follow::query()->where(fn($q)=>$q->whereIn("followed_user_id",$users)
+        $follows    = $followClass::query()->where(fn($q)=>$q->whereIn("followed_user_id",$users)
                                 ->orWhere(fn($q2)=>$q2->whereIn("user_id",$users)->where("status",1)))
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)->count();
-        $friends    =   Follow::query()->where(fn($q)=>$q->whereIn("followed_user_id",$users)->orWhereIn("user_id",$users))
+        $friends    =   $followClass::query()->where(fn($q)=>$q->whereIn("followed_user_id",$users)->orWhereIn("user_id",$users))
                                 ->where("status",1)
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)->count();
@@ -280,12 +305,12 @@ class AgencyAppController extends Controller
             $hosts = $hosts ->where('id',request('host_id'));
         }
         $AllHosts = AgencyHostResource::collection($hosts);
-        $monthlyHost = User::where("agency_id",$agency->id)->where("type_user",'!=',0)->whereMonth("join_agency_date",date("m"))->get();
+        $monthlyHost = $userClass::query()->where("agency_id",$agency->id)->where("type_user",'!=',0)->whereMonth("join_agency_date",date("m"))->get();
         $month_hosts = AgencyMonthlyHostResource::collection($monthlyHost);
         $totalSalary = $agency->salary;
         $last_salary = $agency->last_month_salary;
         $current_salary = $agency->agencySalary ? $agency->agencySalary->sum(\DB::raw('sallary - cut_amount')) : 0;
-        $userSallaries= UserSallary::whereIn("user_id",$hosts->pluck("id")->toArray())->where("month",date("m"))->where("year",date("Y"))->get();
+        $userSallaries= $userSalaryClass::query()->whereIn("user_id",$hosts->pluck("id")->toArray())->where("month",date("m"))->where("year",date("Y"))->get();
         $total_hosts_achieve= $userSallaries->sum("sallary");
         $total_hosts_percentages= $userSallaries->sum("agency_sallary");
         $data= [
@@ -319,6 +344,7 @@ class AgencyAppController extends Controller
 
     public function host_agency_edit(Request $request)
     {
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
         $request->validate([
             'name' => 'required',
             'phone' => 'required',
@@ -331,7 +357,7 @@ class AgencyAppController extends Controller
         if (!$user->ownAgency) {
             return AgencyHelper::apiResponse(0, 'هذا المستخدم لا يمتلك وكاله!',  200);
         }
-        $agency = Agency::where("id",$user->agency_id)->first();
+        $agency = $agencyClass::query()->where("id",$user->agency_id)->first();
         $agency->name = $request->name;
         $agency->notice = $request->notice;
         $agency->phone = $request->phone;
@@ -340,6 +366,9 @@ class AgencyAppController extends Controller
     }
     public function createAgency(Request $request)
     {
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $additionalInfoClass = $this->resolveModelClass('additional_info', AdditionalInfo::class);
+        $userClass = $this->resolveModelClass('user', User::class);
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'phone' => 'required',
@@ -367,11 +396,11 @@ class AgencyAppController extends Controller
             $errors = implode(',',$validator->errors()->all());
             return AgencyHelper::apiResponse(0, $errors,  200);
         }
-        $checkAgency = Agency::where(['app_owner_id'=>$request->user()->id,'status' => 0])->first();
+        $checkAgency = $agencyClass::query()->where(['app_owner_id'=>$request->user()->id,'status' => 0])->first();
         if ($checkAgency) {
             return AgencyHelper::apiResponse(0, 'لقد قمت بتقديم طلب من قبل ولم يتم اتخاذ اي اجراء فيه!',  200);
         }
-        $checkUserAgency = Agency::where(['app_owner_id'=>$request->user()->id,'status' => 1])->first();
+        $checkUserAgency = $agencyClass::query()->where(['app_owner_id'=>$request->user()->id,'status' => 1])->first();
         if ($checkUserAgency) {
             return AgencyHelper::apiResponse(0, 'انت تملك وكاله بالفعل',  200);
         }
@@ -379,7 +408,7 @@ class AgencyAppController extends Controller
             $img = $request->file('img');
             $image = AgencyHelper::upload('agency', $img);
         }
-        $agency = Agency::create(
+        $agency = $agencyClass::create(
             [
                 'app_owner_id' => $request->user()->id,
                 'name' => $request->input('name'),
@@ -399,12 +428,12 @@ class AgencyAppController extends Controller
             $img = $request->file('back_image');
             $back_image_nationalId = AgencyHelper::upload('nationalId', $img);
         }
-        $user = User::query()->searchByUuid($request->user_id)->first();
+        $user = $userClass::query()->searchByUuid($request->user_id)->first();
         if ($request->hasFile('video')) {
             $data        = $request->file('video');
             $video = RealsService::upload($data);
         }
-        $additionalInfo = AdditionalInfo::create([
+        $additionalInfo = $additionalInfoClass::create([
             'agency_id' => $agency->id,
             'gmail' => $request->input('email'),
             'status' => 0,
@@ -420,7 +449,7 @@ class AgencyAppController extends Controller
         ]);
 
 
-        $agencyWithAdditionalInfo = Agency::with('additionalInfo')->find($agency->id);
+        $agencyWithAdditionalInfo = $agencyClass::with('additionalInfo')->find($agency->id);
         $gmail = AgencyHelper::getConfig('gmail');
         try {
             Mail::to($gmail)->send(new SendAgencyEmail($agencyWithAdditionalInfo));
@@ -433,7 +462,8 @@ class AgencyAppController extends Controller
 
     public function allAgencyRequest()
     {
-        $agency = Agency::where('status', 0)->whereHas('additionalInfo', function ($query) {
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $agency = $agencyClass::query()->where('status', 0)->whereHas('additionalInfo', function ($query) {
             $query->where('status', 0);
         })->with('additionalInfo')->get();
         return AgencyHelper::apiResponse(1, '', $agency,  200);
@@ -441,8 +471,11 @@ class AgencyAppController extends Controller
 
     public function actionRequestAgency(Request $request)
     {
-        $agency = Agency::with('additionalInfo')->find($request->agency_id);
-        $user = User::find($agency->app_owner_id);
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $userClass = $this->resolveModelClass('user', User::class);
+        $additionalInfoClass = $this->resolveModelClass('additional_info', AdditionalInfo::class);
+        $agency = $agencyClass::with('additionalInfo')->find($request->agency_id);
+        $user = $userClass::find($agency->app_owner_id);
         if (!$agency) AgencyHelper::apiResponse(0, 'agency not found',  404);
         if ($request->status != 1) {
 
@@ -457,13 +490,13 @@ class AgencyAppController extends Controller
         $agency->status = $request->status;
 
         $agency->save();
-        $additionalInfo = AdditionalInfo::where('agency_id', $agency->id)->first();
+        $additionalInfo = $additionalInfoClass::query()->where('agency_id', $agency->id)->first();
         $additionalInfo->status = $request->status;
         $additionalInfo->save();
         $appOwnerId = $agency->app_owner_id;
         // type = 1 means host agency, type = 2 means shipping agency
         if ($agency->type == 1) {
-            $user = User::find($appOwnerId);
+            $user = $userClass::find($appOwnerId);
             $user->type_user = 2;
             $user->agency_id = $agency->id;
             $user->save();
@@ -477,11 +510,13 @@ class AgencyAppController extends Controller
 
     public function cancel_request_createAgency(Request $request)
     {
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $additionalInfoClass = $this->resolveModelClass('additional_info', AdditionalInfo::class);
         $user = $request->user();
         if ($request->agency_id) {
-            $agency = Agency::find($request->agency_id);
+            $agency = $agencyClass::find($request->agency_id);
         } else {
-            $agency = Agency::where('app_owner_id', $user->id)->latest()->first();
+            $agency = $agencyClass::query()->where('app_owner_id', $user->id)->latest()->first();
         }
         if (!$agency) return AgencyHelper::apiResponse(0, __('not found request'), []);
 
@@ -492,14 +527,16 @@ class AgencyAppController extends Controller
         if ($agency->created_at > $time_after24) return AgencyHelper::apiResponse(0, __("24 hours have passed since your request"), []);
 
         $agency->delete();
-        AdditionalInfo::where('agency_id', $agency->id)->update(['status' => 3]);
+        $additionalInfoClass::query()->where('agency_id', $agency->id)->update(['status' => 3]);
         return AgencyHelper::apiResponse(1, __("The request has been successfully cancelled"), []);
     }
 
     public function agency_request_info(Request $request)
     {
         $user = Auth::user();
-        $additional = AdditionalInfo::where('owner_id', $user->id)->latest()->first();
+        $additionalInfoClass = $this->resolveModelClass('additional_info', AdditionalInfo::class);
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $additional = $additionalInfoClass::query()->where('owner_id', $user->id)->latest()->first();
         $can_make_request = true;
         $can_cancel_request = false;
 
@@ -513,7 +550,7 @@ class AgencyAppController extends Controller
                 $can_cancel_request = true;
             }
         }
-        $chekAgency = Agency::where("app_owner_id", $user->id)->first();
+        $chekAgency = $agencyClass::query()->where("app_owner_id", $user->id)->first();
         if ($chekAgency) {
             $can_make_request = false;
         }
@@ -529,10 +566,12 @@ class AgencyAppController extends Controller
         $user   =   Auth::user();
         $month  =   \request('month');
         $year  =   \request('year');
+        $agencyClass = $this->resolveModelClass('agency', Agency::class);
+        $userSalaryClass = $this->resolveModelClass('user_salary', UserSallary::class);
 
-        $agency = Agency::query()->where('app_owner_id', $user->id)->first();
+        $agency = $agencyClass::query()->where('app_owner_id', $user->id)->first();
         if (!$agency) return AgencyHelper::apiResponse(0, __("api_responses.u_not_owner_agncy"), []);
-        $total_host_target = UserSallary::where('user_agency_id', $agency->id);
+        $total_host_target = $userSalaryClass::query()->where('user_agency_id', $agency->id);
 
         if ($month != null && $year != null) {
             $total_host_target = $total_host_target->where('month', $month)
@@ -550,5 +589,10 @@ class AgencyAppController extends Controller
             'agency_target'     => $agency->getSalary($month, $year),
         ];
         return AgencyHelper::apiResponse(1, '', $data);
+    }
+
+    protected function resolveModelClass(string $configKey, string $defaultClass): string
+    {
+        return config("agency-package.models.$configKey", $defaultClass);
     }
 }

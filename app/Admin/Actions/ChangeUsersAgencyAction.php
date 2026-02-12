@@ -7,7 +7,7 @@ use App\Models\AgencyUserJob;
 use App\Models\GiftLog;
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Models\UsersJoinedAgency;

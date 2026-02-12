@@ -119,6 +119,20 @@ class AgencyServiceProvider extends ServiceProvider
         $this->app->singleton('agency.models', function ($app) {
             return new \Utd\Agency\Helpers\AgencyModelsHelper();
         });
+
+        // Register Entity Resolver
+        $this->app->singleton('agency.entity-resolver', function ($app) {
+            return new \Utd\Agency\Services\AgencyEntityResolver();
+        });
+        
+        if (interface_exists(\App\Contracts\Agency\AgencyEntityResolverContract::class)) {
+            $this->app->singleton(
+                \App\Contracts\Agency\AgencyEntityResolverContract::class,
+                function ($app) {
+                    return $app->make('agency.entity-resolver');
+                }
+            );
+        }
         
         // Register External Model Service
         $this->app->singleton('agency.external.model', function ($app) {

@@ -30,7 +30,7 @@ trait ConfigurableModelsTrait
             'charge' => \App\Models\Charge::class,
             'coin_log' => \App\Models\CoinLog::class,
             'gift_log' => \App\Models\GiftLog::class,
-            'user_salary' => \App\Models\UserSallary::class,
+            'user_salary' => \Utd\Agency\Entities\UserSallary::class,
             'user_target' => \App\Models\UserTarget::class,
             'bd' => \App\Models\Bd::class,
             'payment_gateway' => \App\Models\PaymentGateway::class,

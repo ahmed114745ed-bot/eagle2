@@ -13,7 +13,7 @@ use Encore\Admin\Grid;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use Utd\Agency\Entities\ShippingAgency;
 use Encore\Admin\Facades\Admin;

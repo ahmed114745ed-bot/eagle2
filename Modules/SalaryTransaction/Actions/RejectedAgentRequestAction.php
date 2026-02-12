@@ -8,7 +8,7 @@ use App\Models\FamilyUser;
 use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Modules\Vip\Entities\UserVip;
 use App\Models\Ware;
 use Encore\Admin\Actions\RowAction;

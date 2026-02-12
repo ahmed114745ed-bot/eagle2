@@ -15,7 +15,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Models\AgencySallary;
 use App\Models\AgencyUserJob;
 use Utd\Agency\Entities\ShippingAgency;

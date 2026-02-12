@@ -11,7 +11,7 @@ use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Helpers\UserCommon;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use App\Enums\UserCoinLogType;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;

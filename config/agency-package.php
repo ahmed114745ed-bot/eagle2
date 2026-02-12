@@ -159,7 +159,10 @@ return [
         'charge' => \App\Models\Charge::class,
         'coin_log' => \App\Models\CoinLog::class,
         'gift_log' => \App\Models\GiftLog::class,
-        'user_salary' => \App\Models\UserSallary::class,
+        'live_time' => \App\Models\LiveTime::class,
+        'profile_visitor' => \App\Models\ProfileVisitor::class,
+        'follow' => \App\Models\Follow::class,
+        'user_salary' => \Utd\Agency\Entities\UserSallary::class,
         'user_target' => \App\Models\UserTarget::class,
         'target' => \App\Models\Target::class,
         'bd' => \App\Models\Bd::class,
@@ -172,6 +175,8 @@ return [
         'agency_salary' => \Utd\Agency\Entities\AgencySalary::class,
         'agency_join_request' => \Utd\Agency\Entities\AgencyJoinRequest::class,
         'agency_user_job' => \Utd\Agency\Entities\AgencyUserJob::class,
+        'agency_host_invite' => \Utd\Agency\Entities\AgencyHostInvite::class,
+        'additional_info' => \Utd\Agency\Entities\AdditionalInfo::class,
     ],
 
     /*

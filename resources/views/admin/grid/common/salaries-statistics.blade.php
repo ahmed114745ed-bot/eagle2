@@ -10,7 +10,7 @@
             $user = \App\Models\User::where('uuid', @request('uuid') ?? '0')->first();
             $year =  request('year');
             $month =   request('month');
-            $userSalaries = \App\Models\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
+            $userSalaries = \Utd\Agency\Entities\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
                 $query->where('user_id', @$user->id);
             })
                 // ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {

@@ -2,7 +2,7 @@
 
 namespace Modules\SalaryTransaction\Traits;
 
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Modules\SalaryTransaction\Entities\AgencyTransferSalary;
 
 trait UserTransferTrait

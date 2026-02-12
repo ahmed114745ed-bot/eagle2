@@ -35,7 +35,7 @@
             $user = \App\Models\User::where('uuid', @request('uuid') ?? '0')->first();
             $year = request('year') == null ? now()->year : request('year');
             $month = request('month') == null ? now()->month : request('month');
-            $userSalaries = \App\Models\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
+            $userSalaries = \Utd\Agency\Entities\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
                 $query->where('user_id', @$user->id);
             })
                 // ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {
@@ -49,7 +49,7 @@
                 })
                 ->select(DB::raw('sum(sallary) as totalTarget2'), DB::raw('sum(sallary - cut_amount) as totalSalary2'))
                 ->first();
-            $userCutAmoubt = \App\Models\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
+            $userCutAmoubt = \Utd\Agency\Entities\UserSallary::when(request()->has('uuid') && request('uuid') != null, function ($query) use ($user) {
                 $query->where('user_id', @$user->id);
             })
                 ->when(request()->has('agency_id') && request('agency_id') != null, function ($query) {

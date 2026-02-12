@@ -5,7 +5,7 @@ use App\Jobs\MigrateOldBdSalariesJob;
 use App\Models\Bd;
 use App\Models\BdAgencyHostSallary;
 use App\Models\BdSalary;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Facades\DB;
 
 class BdSalaryMigrationController extends Controller

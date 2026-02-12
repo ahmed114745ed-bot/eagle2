@@ -2,7 +2,7 @@
 
 namespace App\Tik\Repositories;
 
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Illuminate\Support\Facades\DB;
 
 

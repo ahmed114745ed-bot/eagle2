@@ -16,7 +16,7 @@ use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\Profile;
 use App\Models\UserCoinLog;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 use Encore\Admin\Widgets\Box;

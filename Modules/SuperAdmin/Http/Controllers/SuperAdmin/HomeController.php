@@ -15,7 +15,7 @@ use App\Models\Agency;
 use App\Models\GiftLog;
 use App\Models\LiveTime;
 use App\Models\UserTarget;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Carbon\CarbonPeriod;
 use Encore\Admin\Layout\Row;
 use Illuminate\Http\JsonResponse;

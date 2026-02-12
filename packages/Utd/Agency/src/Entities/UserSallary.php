@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Agency\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -25,28 +25,31 @@ class UserSallary extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        $userClass = config('agency-package.models.user', \App\Models\User::class);
+        return $this->belongsTo($userClass, 'user_id', 'id');
     }
 
     public function agency()
     {
-        return $this->belongsTo(Agency::class, 'user_agency_id');
+        $agencyClass = config('agency-package.models.agency', \Utd\Agency\Entities\Agency::class);
+        return $this->belongsTo($agencyClass, 'user_agency_id');
     }
 
     public function target()
     {
-        return $this->belongsTo(Target::class, 'target_id');
+        $targetClass = config('agency-package.models.target', \App\Models\Target::class);
+        return $this->belongsTo($targetClass, 'target_id');
     }
 
     protected static function booted()
     {
-        self::saved(function ($model) {
+        static::saved(function ($model) {
             if ($model->agency_id) {
                 clearAgencyCache($model->agency_id);
             }
         });
 
-        self::deleted(function ($model) {
+        static::deleted(function ($model) {
             if ($model->agency_id) {
                 clearAgencyCache($model->agency_id);
             }

@@ -479,7 +479,7 @@ return [
             'agency_join_request' => App\Models\AgencyJoinRequest::class,
 
             'user_target' => App\Models\UserTarget::class,
-            'user_salary' => App\Models\UserSallary::class,
+            'user_salary' => Utd\Agency\Entities\UserSallary::class,
 
         ],
 

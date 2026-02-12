@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use App\Models\AgencyJoinRequest;
 use App\Models\FamilyUser;
 use App\Models\User;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;

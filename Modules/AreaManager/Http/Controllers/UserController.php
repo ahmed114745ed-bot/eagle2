@@ -24,7 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Modules\Vip\Entities\UserVip;
-use App\Models\UserSallary;
+use Utd\Agency\Entities\UserSallary;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
 use App\Models\UsersJoinedAgency;

@@ -38,11 +38,13 @@ class Agency extends Model
      */
     public function additionalInfo()
     {
-        if (class_exists('Utd\\Agency\\Entities\\AdditionalInfo')) {
-            $additionalInfoClass = \Utd\Agency\Entities\AdditionalInfo::class;
-            return $this->hasOne($additionalInfoClass, 'agency_id');
+        $additionalInfoClass = config('agency-package.models.additional_info', \Utd\Agency\Entities\AdditionalInfo::class);
+
+        if (! class_exists($additionalInfoClass)) {
+            return $this->hasOne(self::class, 'agency_id')->whereRaw('1 = 0');
         }
-        return $this->hasOne(self::class, 'agency_id')->whereRaw('1 = 0');
+
+        return $this->hasOne($additionalInfoClass, 'agency_id');
     }
 
     protected $guarded = [];
@@ -54,19 +56,23 @@ class Agency extends Model
 
     public function chargeAgency()
     {
-        if (!class_exists('Modules\\SalaryTransaction\\Entities\\ChargeAgency')) {
+        $chargeAgencyClass = config('agency-package.modules.salary_transaction.charge_agency', \Modules\SalaryTransaction\Entities\ChargeAgency::class);
+
+        if (! $chargeAgencyClass || ! class_exists($chargeAgencyClass)) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        $chargeAgencyClass = 'Modules\\SalaryTransaction\\Entities\\ChargeAgency';
+
         return $this->hasMany($chargeAgencyClass, 'agency_id');
     }
     
     public function salaryRequests()
     {
-        if (!class_exists('Modules\\SalaryTransaction\\Entities\\SalaryRequest')) {
+        $salaryRequestClass = config('agency-package.modules.salary_transaction.salary_request', \Modules\SalaryTransaction\Entities\SalaryRequest::class);
+
+        if (! $salaryRequestClass || ! class_exists($salaryRequestClass)) {
             return $this->hasMany(self::class, 'id', 'id')->whereRaw('1 = 0');
         }
-        $salaryRequestClass = 'Modules\\SalaryTransaction\\Entities\\SalaryRequest';
+
         return $this->hasMany($salaryRequestClass, 'agency_id');
     }
 
@@ -115,7 +121,8 @@ class Agency extends Model
 
     public function admins()
     {
-        return $this->hasMany(AgencyUserJob::class, 'agency_id')->where('type', 'requestManger');
+        $agencyUserJobClass = config('agency-package.models.agency_user_job', \Utd\Agency\Entities\AgencyUserJob::class);
+        return $this->hasMany($agencyUserJobClass, 'agency_id')->where('type', 'requestManger');
     }
 
     public function scopeOfOwner($query, $owner_id)
@@ -271,13 +278,13 @@ class Agency extends Model
 
     public function salaries()
     {
-        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+        $userSalaryClass = config('agency-package.models.user_salary', \Utd\Agency\Entities\UserSallary::class);
         return $this->hasMany($userSalaryClass, 'sallary');
     }
 
     public function userSalaries()
     {
-        $userSalaryClass = config('agency-package.models.user_salary', \App\Models\UserSallary::class);
+        $userSalaryClass = config('agency-package.models.user_salary', \Utd\Agency\Entities\UserSallary::class);
         return $this->hasMany($userSalaryClass, 'user_agency_id');
     }
 
@@ -306,8 +313,9 @@ class Agency extends Model
     {
         $month ??= now()->month;
         $year ??= now()->year;
-        $sumTargets =
-            UserSallary::where('user_agency_id', $this->id)
+        $userSalaryClass = config('agency-package.models.user_salary', \Utd\Agency\Entities\UserSallary::class);
+        $sumTargets = $userSalaryClass::query()
+            ->where('user_agency_id', $this->id)
             ->where('month', $month)
             ->where('year', $year)
             ->sum('target_diamonds');
@@ -422,7 +430,6 @@ class Agency extends Model
                     $query->where(DB::raw('concat(year,"-", month)'), '=', $year . '-' . $month);
                 });
             })
-            ->where('agency_id', $this->id)
             ->sum(DB::raw('sallary - cut_amount'));
 
         return truncateAndTrim($agencySalary ?? 0);
@@ -459,7 +466,8 @@ class Agency extends Model
 
     public function joinRequests()
     {
-        return $this->hasMany(AgencyJoinRequest::class, 'agency_id');
+        $agencyJoinRequestClass = config('agency-package.models.agency_join_request', \Utd\Agency\Entities\AgencyJoinRequest::class);
+        return $this->hasMany($agencyJoinRequestClass, 'agency_id');
     }
 
     public function getIsFrozenAttribute($value)
@@ -488,13 +496,14 @@ class Agency extends Model
             if (request()->has('phone_code')) {
                 $model->phone_code = request('phone_code');
             }
-            if (request()->has('charge_agency')) {
+            $chargeAgencyClass = config('agency-package.modules.salary_transaction.charge_agency', \Modules\SalaryTransaction\Entities\ChargeAgency::class);
+            if (request()->has('charge_agency') && $chargeAgencyClass && class_exists($chargeAgencyClass)) {
                 if (request('charge_agency') == 1) {
-                    ChargeAgency::firstOrCreate([
+                    $chargeAgencyClass::firstOrCreate([
                         'agency_id' => $model->id,
                     ]);
                 } else {
-                    ChargeAgency::where('agency_id', $model->id)->delete();
+                    $chargeAgencyClass::where('agency_id', $model->id)->delete();
                 }
             }
 
