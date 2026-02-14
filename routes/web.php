@@ -1468,26 +1468,21 @@ Route::get('/debug/test-user-online', function () {
 });
 
 Route::get('/time-start-week', function () {
-    $startOfWeek = Carbon::now(getTimezone())->startOfWeek();
-    $endOfWeek = Carbon::now(getTimezone())->endOfWeek();
-
-    $startAt = $startOfWeek->toDateTimeString();
-    $endAt = $endOfWeek->toDateTimeString();
+    $date = '2026-02-11';
 
     // room_id => sum(current_total)
-    $totalRoomGifts = TotalRoomGift::whereDate('created_at', '11-02-2026')
+    $totalRoomGifts = TotalRoomGift::whereDate('created_at', $date)
         ->groupBy('room_id')
         ->pluck(DB::raw('SUM(current_total)'), 'room_id');
 
     // room_id => sum(giftPrice)
-    $totalGiftLogs = GiftLog::whereDate('created_at', '11-02-2026')
+    $totalGiftLogs = GiftLog::whereDate('created_at', $date)
         ->groupBy('room_id')
         ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
 
     dd([
+        'date' => $date,
         'total_room_gifts' => $totalRoomGifts,
         'total_gift_logs' => $totalGiftLogs,
-        'start_at' => $startAt,
-        'end_at' => $endAt
     ]);
 });
