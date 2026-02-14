@@ -1463,3 +1463,9 @@ Route::get('/debug/test-user-online', function () {
         ], 500, [], JSON_PRETTY_PRINT);
     }
 });
+
+Route::get('/debug/test-pusher-config', function () {
+    $startOfWeek = Carbon::now(getTimezone())->subWeek()->startOfWeek();
+    $endOfWeek = Carbon::now(getTimezone())->subWeek()->endOfWeek();
+dd($startOfWeek, $endOfWeek);
+});
