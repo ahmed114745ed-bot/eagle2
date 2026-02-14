@@ -1465,7 +1465,7 @@ Route::get('/debug/test-user-online', function () {
 });
 
 Route::get('/time-start-week', function () {
-    $startOfWeek = Carbon::now(getTimezone())->subWeek()->startOfWeek();
-    $endOfWeek = Carbon::now(getTimezone())->subWeek()->endOfWeek();
+    $startOfWeek = Carbon::now(getTimezone())->startOfWeek();
+    $endOfWeek = Carbon::now(getTimezone())->endOfWeek();
 dd($startOfWeek, $endOfWeek);
 });
