@@ -1486,3 +1486,52 @@ Route::get('/time-start-week', function () {
         'total_gift_logs' => $totalGiftLogs,
     ]);
 });
+
+Route::get('/fix-total-room-gifts', function () {
+    $startOfWeek = Carbon::now(getTimezone())->startOfWeek();
+    $endOfWeek = Carbon::now(getTimezone())->endOfWeek();
+
+    // Get correct totals from gift_logs for each room per day
+    $correctTotals = GiftLog::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+        ->groupBy('room_id', DB::raw('DATE(created_at)'))
+        ->selectRaw('room_id, DATE(created_at) as gift_date, SUM(giftPrice) as correct_total')
+        ->get();
+
+    $updated = 0;
+    $results = [];
+
+    foreach ($correctTotals as $row) {
+        $roomId = $row->room_id;
+        $giftDate = $row->gift_date;
+        $correctTotal = $row->correct_total;
+
+        // Find TotalRoomGift record for this room on this date
+        $record = TotalRoomGift::whereDate('created_at', $giftDate)
+            ->where('room_id', $roomId)
+            ->first();
+
+        if ($record) {
+            $oldValue = $record->current_total;
+            if ($oldValue != $correctTotal) {
+                $record->current_total = $correctTotal;
+                $record->save();
+                $updated++;
+                
+                $results[] = [
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => $oldValue,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal - $oldValue,
+                ];
+            }
+        }
+    }
+
+    return response()->json([
+        'start' => $startOfWeek->toDateTimeString(),
+        'end' => $endOfWeek->toDateTimeString(),
+        'updated_count' => $updated,
+        'results' => $results,
+    ]);
+});
