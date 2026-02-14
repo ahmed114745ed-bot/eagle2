@@ -130,16 +130,34 @@ class CalculateRoomCupRewards extends Command
         };
     }
 
-    private function processGiftsInPeriod(Carbon $start, Carbon $end ): void
+    private function processGiftsInPeriod(Carbon $start, Carbon $end): void
     {
-        TotalRoomGift::whereBetween('created_at', [$start, $end])
-            ->orderBy('id')
-            ->chunk(100, function ($gifts) {
-                foreach ($gifts as $gift) {
-                    
-                    $this->processGift($gift);
-                }
-            });
+        if ($this->type === 'daily') {
+            // Daily: process each gift record individually
+            TotalRoomGift::whereBetween('created_at', [$start, $end])
+                ->orderBy('id')
+                ->chunk(100, function ($gifts) {
+                    foreach ($gifts as $gift) {
+                        $this->processGift($gift);
+                    }
+                });
+        } else {
+            // Weekly/Monthly: aggregate gifts per room
+            $aggregatedGifts = TotalRoomGift::whereBetween('created_at', [$start, $end])
+                ->select(
+                    'room_id',
+                    DB::raw('SUM(current_total) as current_total'),
+                    DB::raw('SUM(number_of_visitors) as number_of_visitors'),
+                    DB::raw('MAX(id) as id')
+                )
+                ->groupBy('room_id')
+                ->orderBy('room_id')
+                ->get();
+
+            foreach ($aggregatedGifts as $gift) {
+                $this->processGift($gift);
+            }
+        }
     }
 
     private function logStart(Carbon $start, Carbon $end): void

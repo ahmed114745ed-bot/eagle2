@@ -55,7 +55,10 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Models\GiftLog;
 use Modules\Form\Http\Controllers\FormTemplateController;
+use Modules\RoomBoom\Entities\TotalRoomGift;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -1467,5 +1470,24 @@ Route::get('/debug/test-user-online', function () {
 Route::get('/time-start-week', function () {
     $startOfWeek = Carbon::now(getTimezone())->startOfWeek();
     $endOfWeek = Carbon::now(getTimezone())->endOfWeek();
-dd($startOfWeek, $endOfWeek);
+
+    $startAt = $startOfWeek->toDateTimeString();
+    $endAt = $endOfWeek->toDateTimeString();
+
+    // room_id => sum(current_total)
+    $totalRoomGifts = TotalRoomGift::whereBetween('created_at', [$startAt, $endAt])
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(current_total)'), 'room_id');
+
+    // room_id => sum(giftPrice)
+    $totalGiftLogs = GiftLog::whereBetween('created_at', [$startAt, $endAt])
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
+
+    dd([
+        'total_room_gifts' => $totalRoomGifts,
+        'total_gift_logs' => $totalGiftLogs,
+        'start_at' => $startAt,
+        'end_at' => $endAt
+    ]);
 });
