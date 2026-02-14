@@ -1475,12 +1475,12 @@ Route::get('/time-start-week', function () {
     $endAt = $endOfWeek->toDateTimeString();
 
     // room_id => sum(current_total)
-    $totalRoomGifts = TotalRoomGift::whereBetween('created_at', [$startAt, $endAt])
+    $totalRoomGifts = TotalRoomGift::whereDate('created_at', '11-02-2026')
         ->groupBy('room_id')
         ->pluck(DB::raw('SUM(current_total)'), 'room_id');
 
     // room_id => sum(giftPrice)
-    $totalGiftLogs = GiftLog::whereBetween('created_at', [$startAt, $endAt])
+    $totalGiftLogs = GiftLog::whereDate('created_at', '11-02-2026')
         ->groupBy('room_id')
         ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
 
