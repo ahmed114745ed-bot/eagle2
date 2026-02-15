@@ -8,6 +8,7 @@ use App\Http\Resources\RankingUserV2Resource;
 use App\Http\Resources\TopUserResource;
 use App\Support\PackageHelper;
 use Utd\Pk\Entities\Pk;
+use Utd\CP\Transformers\RankingResource;
 
 use App\Models\User;
 use App\Helpers\Common;
@@ -20,12 +21,12 @@ use Illuminate\Pagination\Paginator;
 use App\Repositories\RankingRepositoryV2;
 use App\Http\Resources\GameRankingResource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Modules\CP\Transformers\TopRankingResource;
+use Utd\CP\Transformers\TopRankingResource;
 use App\Tik\Repositories\CoinGameUserRepository;
 use App\Http\Resources\Api\V1\MangerTypeResource;
 use App\Http\Resources\Api\V1\UserRankingCollection;
 use App\Http\Resources\Api\V1\UsersRankingCollection;
-use Modules\CP\Repositories\CpRepository as RepositoriesCpRepository;
+use App\Contracts\CpRepositoryContract;
 use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
 use App\Contracts\GiftLogRepositoryContract;
@@ -41,7 +42,7 @@ class rankingServiceV2
         private readonly ?GiftLogRepositoryContract $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
         public UserAchievementContract $achievementService,
-        RepositoriesCpRepository $cpRepository
+        CpRepositoryContract $cpRepository
     ) {
         $this->cpRepository = $cpRepository;
         $this->rankingRepo = $rankingRepo;
