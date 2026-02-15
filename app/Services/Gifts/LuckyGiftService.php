@@ -24,6 +24,9 @@ use App\Traits\Gifts\LuckyGiftProbability;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use Illuminate\Validation\ValidationException;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
+use Carbon\Carbon;
+use App\Helpers\CacheHelper;
+use Modules\RoomBoom\Services\NewRoomBoomGiftService;
 
 class LuckyGiftService
 {
@@ -763,6 +766,20 @@ class LuckyGiftService
 
         $updateUserWhenSendGift->updateUsers($coinsForReceiver, $receiversIds);
 
+        // Update total_room_gifts table
+        $settings = CacheHelper::cacheSettings();
+        if (gettype($settings) !== 'array') {
+            $settings = $settings->pluck('value', 'key')->toArray();
+        }
+        $roomBoomSettings = $settings['room_boom'] ?? 1;
+        if ($roomBoomSettings) {
+            (new NewRoomBoomGiftService())->sendGift($room, $totalDiamond, $userId);
+        } else {
+            $tz = getTimezone();
+            $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
+            $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
+            $totalRoomGift->increment('current_total', $totalDiamond);
+        }
 
         if ($room->type == 'audio') {
             $serviceLevel = new UpgradeRoomLevelServices();
