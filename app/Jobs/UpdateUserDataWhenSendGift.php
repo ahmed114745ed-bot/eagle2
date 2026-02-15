@@ -50,7 +50,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                        ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
-                                      ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
+                                      ])->where('id', $this->giftId)->where('enable', 1)->first();
 
         $numberOfGift = $this->number * count($this->receiversIds);
         $totalPrice   = $gift->price * $numberOfGift;
