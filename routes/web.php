@@ -1457,7 +1457,7 @@ Route::get('/debug/test-user-online', function () {
 });
 
 Route::get('/time-start-week', function () {
-    $date = '2026-02-13';
+    $date = '2026-02-14';
 
     // room_id => sum(current_total)
     $totalRoomGifts = TotalRoomGift::whereDate('created_at', $date)
