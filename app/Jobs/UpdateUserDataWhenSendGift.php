@@ -26,7 +26,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null,private $totalNumWin,private $totalUserWin)
+    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null, private $totalNumWin = 0, private $totalUserWin = 0)
     {
         $this->roomTopUsersRepository = new RoomTopUsersRepository();
 
