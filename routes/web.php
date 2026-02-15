@@ -1488,8 +1488,9 @@ Route::get('/time-start-week', function () {
 });
 
 Route::get('/fix-total-room-gifts', function () {
-    $startOfWeek = Carbon::now(getTimezone())->startOfWeek();
-    $endOfWeek = Carbon::now(getTimezone())->endOfWeek();
+    $tz = getTimezone();
+    $startOfWeek = Carbon::now($tz)->startOfWeek()->copy()->setTimezone('UTC');
+    $endOfWeek = Carbon::now($tz)->endOfWeek()->copy()->setTimezone('UTC');
 
     // Get correct totals from gift_logs for each room per day
     $correctTotals = GiftLog::whereBetween('created_at', [$startOfWeek, $endOfWeek])
@@ -1498,6 +1499,7 @@ Route::get('/fix-total-room-gifts', function () {
         ->get();
 
     $updated = 0;
+    $created = 0;
     $results = [];
 
     foreach ($correctTotals as $row) {
@@ -1505,7 +1507,7 @@ Route::get('/fix-total-room-gifts', function () {
         $giftDate = $row->gift_date;
         $correctTotal = $row->correct_total;
 
-        // Find TotalRoomGift record for this room on this date
+        // Find or create TotalRoomGift record for this room on this date
         $record = TotalRoomGift::whereDate('created_at', $giftDate)
             ->where('room_id', $roomId)
             ->first();
@@ -1518,6 +1520,7 @@ Route::get('/fix-total-room-gifts', function () {
                 $updated++;
                 
                 $results[] = [
+                    'action' => 'updated',
                     'room_id' => $roomId,
                     'date' => $giftDate,
                     'old' => $oldValue,
@@ -1525,6 +1528,24 @@ Route::get('/fix-total-room-gifts', function () {
                     'diff' => $correctTotal - $oldValue,
                 ];
             }
+        } else {
+            // Create missing record
+            TotalRoomGift::create([
+                'room_id' => $roomId,
+                'current_total' => $correctTotal,
+                'created_at' => Carbon::parse($giftDate)->startOfDay(),
+                'updated_at' => now(),
+            ]);
+            $created++;
+            
+            $results[] = [
+                'action' => 'created',
+                'room_id' => $roomId,
+                'date' => $giftDate,
+                'old' => 0,
+                'new' => $correctTotal,
+                'diff' => $correctTotal,
+            ];
         }
     }
 
@@ -1532,6 +1553,8 @@ Route::get('/fix-total-room-gifts', function () {
         'start' => $startOfWeek->toDateTimeString(),
         'end' => $endOfWeek->toDateTimeString(),
         'updated_count' => $updated,
+        'created_count' => $created,
+        'total_processed' => $updated + $created,
         'results' => $results,
     ]);
 });
