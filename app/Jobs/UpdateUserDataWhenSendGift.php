@@ -40,6 +40,8 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
         $user = User::Find($this->userId);
         $hostPercentage  = getGiftPercentage('host_lucky_gift')  / 10;
 
+        \Log::info('Start processing lucky gift  job for user_id: ' . $this->userId . ', room_id: ' . $this->roomId);
+
         $room =
             Room::withoutAppends()->where(['id' => $this->roomId])
                 ->selectRaw('id,uid,room_visitor,play_num,hot,room_pass,session,microphone')
