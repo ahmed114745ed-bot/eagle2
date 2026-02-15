@@ -61,7 +61,8 @@
         "utd/room": "*",
         "utd/room-boom": "*",
         "utd/room-cup": "*",
-        "utd/task-stream": "dev-achievmentPackage"
+        "utd/task-stream": "*",
+        "utd/chat": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
