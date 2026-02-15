@@ -239,6 +239,15 @@ Route::get('/badge-seeders', function () {
     ]);
 });
 
+Route::get('/config-badges-seeder', function () {
+    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ ConfigBadgesSeeder executed successfully.'
+    ]);
+});
+
 Route::get('/update-flag', function () {
 
     Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
