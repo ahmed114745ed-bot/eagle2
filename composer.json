@@ -52,7 +52,6 @@
         "utd/achievements": "dev-achievmentPackage",
         "utd/agency": "*",
         "utd/charizma": "*",
-        "utd/chat": "dev-achievmentPackage",
         "utd/cp": "*",
         "utd/gifts": "*",
         "utd/lucky-box": "*",
