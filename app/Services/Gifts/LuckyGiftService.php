@@ -306,7 +306,7 @@ class LuckyGiftService
 
 
         $gift = Gift::query()->select(['id', 'name', 'e_name', 'type', 'price', 'vip_level', 'is_play', 'img', 'show_img', 'show_img2'])
-           // ->where('type', 6)
+            // ->where('type', 6)
             ->where('id', $giftId)
             ->where('enable', 1)
             ->first();
@@ -649,17 +649,17 @@ class LuckyGiftService
                         $properties = $gift->luckyGift?->min_percentage;
                         $cashback_percentage = $this->getTimesOfPrice($appWalletCoins, $unitPrice, $properties);
                         $cashback_value = $cashback_percentage * $unitPrice;
-                        
+
                         if ($cashback_percentage > 0) {
                             $user->enableSaving = false;
                             $user->di           += $cashback_value;
                             $appWallet->coins   -= $cashback_value;
-                            
+
                             $iterationTotalWin += $cashback_value;
                             $total_user_win += $cashback_value;
                             $total_count_win++;
                             $iterationMaxCashback = max($iterationMaxCashback, $cashback_percentage);
-                            
+
                             if ($this->isPopular($cashback_percentage)) {
                                 $iterationPopular = true;
                             }
@@ -773,13 +773,15 @@ class LuckyGiftService
             $settings = $settings->pluck('value', 'key')->toArray();
         }
         $roomBoomSettings = $settings['room_boom'] ?? 1;
+         $totalHostDiamond = (int)$totalPrice * $hostPercentage;
         if ($roomBoomSettings) {
-            (new NewRoomBoomGiftService())->sendGift($room, $totalDiamond, $userId);
+           
+            (new NewRoomBoomGiftService())->sendGift($room, $totalHostDiamond, $userId);
         } else {
             $tz = getTimezone();
             $todayStart = Carbon::now($tz)->startOfDay()->copy()->setTimezone('UTC');
             $totalRoomGift = (new NewRoomBoomGiftService())->getOrCreateTotalRoomGift($room->id, $todayStart);
-            $totalRoomGift->increment('current_total', $totalDiamond);
+            $totalRoomGift->increment('current_total', $totalHostDiamond);
         }
 
         if ($room->type == 'audio') {
