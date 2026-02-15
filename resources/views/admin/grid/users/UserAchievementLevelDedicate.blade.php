@@ -1,4 +1,4 @@
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
 
 <style>
@@ -193,136 +193,71 @@
     }
 </style>
 
-{{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // $(document).ready(function() {
-    //   $('#user_id').select2({
-    //         ajax: {
-    //             url: '{{ route("search.users") }}',
-    //             dataType: 'json',
-    //             delay: 250,
-    //             data: function(params) {
-    //                 return {
-    //                     search: params.term,
-    //                     type: 'public',
-    //                     page: params.page || 1
-    //                 };
-    //             },
-    //             processResults: function(data, params) {
-    //                 params.page = params.page || 1;
-    //                 return {
-    //                     results: data.data.map(function(user) {
-    //                         return {
-    //                             id: user.id,
-    //                             text: user.name || '',
-    //                             image: user.avatar? "{{ getImagePath('__PATH__') }}".replace('__PATH__', user.avatar)
-    //                                             : "{{ asset('images/default-user.png') }}",
-    //                         };
-    //                     }),
-    //                     pagination: {
-    //                         more: (params.page * 10) < data.total
-    //                     }
-    //                 };
-    //             },
-    //             cache: true
-    //         },
-    //         templateResult: formatUser,
-    //         templateSelection: formatUserSelection,
-    //         placeholder: '{{ __("admin.searchUsers") }}',
-    //         minimumInputLength: 1
-    //     });
+    $(document).ready(function() {
+      $('#user_id').select2({
+            ajax: {
+                url: '{{ route("search.users") }}',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        type: 'public',
+                        page: params.page || 1
+                    };
+                },
+                processResults: function(data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.data.map(function(user) {
+                            return {
+                                id: user.id,
+                                text: user.name || '',
+                                image: user.avatar? "{{ getImagePath('__PATH__') }}".replace('__PATH__', user.avatar)
+                                                : "{{ asset('images/default-user.png') }}",
+                            };
+                        }),
+                        pagination: {
+                            more: (params.page * 10) < data.total
+                        }
+                    };
+                },
+                cache: true
+            },
+            templateResult: formatUser,
+            templateSelection: formatUserSelection,
+            placeholder: '{{ __("admin.searchUsers") }}',
+            minimumInputLength: 1
+        });
 
-    //     function formatUser(user) {
-    //         if (!user.id) return user.text;
+        function formatUser(user) {
+            if (!user.id) return user.text;
 
-    //         var $container = $(
-    //             '<div class="d-flex align-items-center">' +
-    //             '<img src="' + user.image + '" class="rounded-circle me-2" width="30" height="30">' +
-    //             '<span>' + user.text + '</span>' +
-    //             '</div>'
-    //         );
-    //         return $container;
-    //     }
+            var $container = $(
+                '<div class="d-flex align-items-center">' +
+                '<img src="' + user.image + '" class="rounded-circle me-2" width="30" height="30">' +
+                '<span>' + user.text + '</span>' +
+                '</div>'
+            );
+            return $container;
+        }
 
-    //     function formatUserSelection(user) {
-    //         if (!user.id) return user.text;
+        function formatUserSelection(user) {
+            if (!user.id) return user.text;
 
-    //         return $(
-    //             '<div class="d-flex align-items-center">' +
-    //             '<img src="' + user.image + '" class="rounded-circle me-2" width="20" height="20">' +
-    //             '<span>' + user.text + '</span>' +
-    //             '</div>'
-    //         );
-    //     }
+            return $(
+                '<div class="d-flex align-items-center">' +
+                '<img src="' + user.image + '" class="rounded-circle me-2" width="20" height="20">' +
+                '<span>' + user.text + '</span>' +
+                '</div>'
+            );
+        }
 
 
        
-    // });
-
-
-
-    $(document).ready(function() {
-
-    $('#user_id').select2({
-        ajax: {
-            url: '{{ route("search.users") }}',
-            dataType: 'json',
-            delay: 250,
-            data: function(params) {
-                return {
-                    search: params.term,
-                    page: params.page || 1
-                };
-            },
-            processResults: function(data, params) {
-                params.page = params.page || 1;
-
-                return {
-                    results: data.data.map(function(user) {
-                        return {
-                            id: user.id,
-                            text: user.name,
-                            image: user.avatar 
-                                ? "{{ url('/') }}/storage/" + user.avatar
-                                : "{{ asset('images/default-user.png') }}"
-                        };
-                    }),
-                    pagination: {
-                        more: (params.page * 10) < data.total
-                    }
-                };
-            }
-        },
-        templateResult: formatUser,
-        templateSelection: formatUserSelection,
-        minimumInputLength: 1
     });
 
-    function formatUser(user) {
-        if (!user.id) return user.text;
-
-        return $(
-            '<div style="display:flex;align-items:center;">' +
-            '<img src="' + user.image + '" width="30" height="30" style="border-radius:50%;margin-right:8px;">' +
-            '<span>' + user.text + '</span>' +
-            '</div>'
-        );
-    }
-
-    function formatUserSelection(user) {
-        if (!user.id) return user.text;
-
-        return $(
-            '<div style="display:flex;align-items:center;">' +
-            '<img src="' + user.image + '" width="20" height="20" style="border-radius:50%;margin-right:5px;">' +
-            '<span>' + user.text + '</span>' +
-            '</div>'
-        );
-    }
-
-});
 
 </script>
