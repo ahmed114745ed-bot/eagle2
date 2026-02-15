@@ -1,4 +1,4 @@
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
 
 <style>
@@ -146,29 +146,7 @@
     }
 </style>
 
-<div class="achievement-container">
-    <h3 class="text-center mb-4">{{ __('assign achievement') }}</h3>
 
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle me-2"></i>
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i>
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
-    <form method="POST" action="{{ route('admin.store-custom-achievement') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
-        @csrf
-<br>
-<br>
         <div class="form-section active">
             <div class="form-group mb-3">
                 <label for="user_id" class="form-label">{{ __('admin.users') }}</label>
@@ -179,32 +157,9 @@
             </div>
         </div>
 
-         <div class="form-section active">
-            <div class="form-group mb-3">
-                <label for="custom_achievement_id" class="form-label">{{ __('Custom achievement') }}</label>
-                <select name="custom_achievement_id" id="custom_achievement_id" class="form-control select2" required>
-                    <option value="">{{ __('select Custom achievement') }}</option>
-                </select>
-
-            </div>
-        </div>
-
-       
-        <br>
-        <br>
 
 
-
-    <br>
-    <br>
-        <div class="d-grid mt-4">
-            <button type="submit" class="btn btn-primary submit-btn">
-                <i class="fas fa-paper-plane me-2"></i>
-                {{ __('admin.submit') }}
-            </button>
-        </div>
-    </form>
-</div>
+   
 
 <style>
     #file-preview-container {
@@ -240,7 +195,7 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> --}}
 
 <script>
     $(document).ready(function() {
@@ -302,117 +257,6 @@
                 '</div>'
             );
         }
-
-
-
-
-
-
-
-        // $('#custom_achievement_id').select2({
-        //     ajax: {
-        //         url: '{{ route("search.custom-achievements") }}',
-        //         dataType: 'json',
-        //         delay: 250,
-        //         data: function(params) {
-        //             return {
-        //                 search: params.term,
-        //                 type: 'public',
-        //                 page: params.page || 1
-        //             };
-        //         },
-        //         processResults: function(data, params) {
-        //             params.page = params.page || 1;
-        //             return {
-        //                 results: data.data.map(function(achievement) {
-        //                     return {
-        //                         id: achievement.id,
-        //                         text: achievement.name || '',
-        //                         image: achievement.image? "{{ getImagePath('__PATH__') }}".replace('__PATH__', achievement.image)
-        //                                         : "{{ asset('images/default-user.png') }}",
-        //                     };
-        //                 }),
-        //                 pagination: {
-        //                     more: (params.page * 10) < data.total
-        //                 }
-        //             };
-        //         },
-        //         cache: true
-        //     },
-        //     templateResult: formatAchievement,
-        //     templateSelection: formatAchievementSelection,
-        //     placeholder: '{{ __("admin.searchAchievements") }}',
-        //     minimumInputLength: 1
-        // });
-
-        $('#custom_achievement_id').select2({
-    ajax: {
-        url: '{{ route("search.custom-achievements") }}',
-        dataType: 'json',
-        delay: 250,
-        data: function(params) {
-            return {
-                search: params.term || '', // empty string for initial load
-                type: 'public',
-                page: params.page || 1
-            };
-        },
-        processResults: function(data, params) {
-            params.page = params.page || 1;
-            return {
-                results: data.data.map(function(achievement) {
-                    return {
-                        id: achievement.id,
-                        text: achievement.name || '',
-                        image: achievement.image
-                            ? "{{ getImagePath('__PATH__') }}".replace('__PATH__', achievement.image)
-                            : "{{ asset('images/default-user.png') }}"
-                    };
-                }),
-                pagination: {
-                    more: (params.page * 10) < data.total
-                }
-            };
-        },
-        cache: true
-    },
-    templateResult: formatAchievement,
-    templateSelection: formatAchievementSelection,
-    placeholder: '{{ __("admin.searchAchievements") }}',
-    minimumInputLength: 0, // allow empty search
-});
-
-
-        function formatAchievement(achievement) {
-            if (!achievement.id) return achievement.text;
-
-            var $container = $(
-                '<div class="d-flex align-items-center">' +
-                '<img src="' + achievement.image + '" class="rounded-circle me-2" width="30" height="30">' +
-                '<span>' + achievement.text + '</span>' +
-                '</div>'
-            );
-            return $container;
-        }
-
-        function formatAchievementSelection(achievement) {
-            if (!achievement.id) return achievement.text;
-
-            return $(
-                '<div class="d-flex align-items-center">' +
-                '<img src="' + achievement.image + '" class="rounded-circle me-2" width="20" height="20">' +
-                '<span>' + achievement.text + '</span>' +
-                '</div>'
-            );
-        }
-
-        $('#custom_achievement_id').on('select2:open', function() {
-            var select = $(this);
-            if (!select.data('loaded')) {
-                select.select2('open'); // ensure dropdown opens
-                select.data('loaded', true);
-            }
-        });
 
 
        

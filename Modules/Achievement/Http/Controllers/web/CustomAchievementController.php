@@ -62,19 +62,14 @@ class CustomAchievementController extends MainController
     protected function grid()
     {
         $grid = new Grid(new CustomAchievement());
-        $lang = app()->getLocale();
-        $grid->model()
-            ->whereHas('images', function ($query) use ($lang) {
-                $query->where('language', $lang);
-            })
-            ->with('images');
+        $grid->model()->with('images');
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
 
         if (!request()->filled('_export_')) {
             $grid->column('images.image', __('image'))->display(function ($path) {
-                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image ?? $this->images->firstWhere('language', 'en')?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
