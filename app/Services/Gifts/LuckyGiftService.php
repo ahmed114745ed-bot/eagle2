@@ -536,6 +536,7 @@ class LuckyGiftService
 
     public function sendLuckyGift2V3(array $data, User $user, UpdateUserWhenSendGift $updateUserWhenSendGift)
     {
+        Log::info("ddddddddddddddddddddddddddd");
         $this->updateUserWhenSendGift = $updateUserWhenSendGift;
         $userId   = $user->id;
         $ownerId = @$data['owner_id'];
