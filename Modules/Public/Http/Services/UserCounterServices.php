@@ -3,31 +3,18 @@
 namespace Modules\Public\Http\Services;
 
 use App\Http\Controllers\Api\V1\Auth\LoginController;
-use Modules\Vip\Entities\Vip;
-use Modules\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use App\Models\Banner;
-use App\Models\Config;
 use App\Models\Follow;
-use App\Helpers\Common;
-use App\Helpers\UserCommon;
-use App\Models\EarnedDiamond;
 use App\Models\ProfileVisitor;
 use App\Models\OfficialMessage;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Modules\Public\Entities\UserCounter;
-use Modules\Public\Entities\levelInterval;
-use Modules\Public\Jobs\RewardWinnerLevel;
-use Utd\Gifts\Services\UpdateUserWhenSendGift;
+use Utd\Chat\Entities\ChatMessage;
 use Modules\Public\Events\UnreadCounterGroup;
-use Modules\Public\Entities\RewardLevelInterval;
-use Modules\Public\Entities\WinnerLevelInterval;
 use Modules\Public\Events\UnreadCounterIndividual;
-use Utd\Achievements\Entities\UserAchievementLevel;
-use Modules\Chat\Entities\ChatMessage;
+use App\Support\PackageHelper;
 
 class UserCounterServices
 {
@@ -160,7 +147,10 @@ class UserCounterServices
                 ->whereIn ('get_type',[4,6])->count();
                 return $ware;
             case 'message':
-                return ChatMessage::where('user_id', $user->id)->where('status', 'received')->count();
+                if (PackageHelper::isInstalled('chat')) {
+                    return ChatMessage::where('user_id', $user->id)->where('status', 'received')->count();
+                }
+                return 0;
             default:
                 return 0;
         }

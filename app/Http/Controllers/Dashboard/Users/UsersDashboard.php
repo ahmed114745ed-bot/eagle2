@@ -7,26 +7,25 @@ use App\Http\Resources\Api\V1\MyPacksResource;
 use App\Http\Resources\Dashboard\Bans\BansResource;
 use App\Http\Resources\Dashboard\Users\AdminUsersResource;
 use App\Http\Resources\Dashboard\Users\SingleUserResource;
-use App\Http\Resources\Dashboard\Users\UsersResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Modules\Events\Entities\RewardWinnerPk;
-use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\WinnerReward;
 use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
-use App\Http\Resources\Dashboard\GroupChat\GroupChatResource;
 use App\Http\Resources\Dashboard\Posts\AdminMomentResource;
 use App\Http\Resources\Dashboard\Posts\AdminReelsResource;
 use App\Http\Resources\Dashboard\Wares\AdminSpecialHistoryResource;
 use App\Models\Ban;
-use App\Models\GroupChat;
 use App\Models\Profile;
+use App\Support\PackageHelper;
 use App\Support\DynamicReals;
 use App\Traits\Dashboard\DashBoardTrait;
 use Carbon\Carbon;
 use DB;
 use Modules\Moment\Entities\Moment;
 use Modules\SpecialId\Entities\SpecialHistory;
+use Utd\Chat\Entities\GroupChat;
+use Utd\Chat\Http\Resources\Dashboard\GroupChatResource;
 
 class UsersDashboard extends Controller
 {
@@ -168,8 +167,13 @@ class UsersDashboard extends Controller
 
     public function user_group_chats(Request $request , $id)
     {
-        $data = GroupChat::where('user_id',$id)->orderBy('id','desc')->with('user')->paginate(10);
-        return  GroupChatResource::collection($data);
+        if (!PackageHelper::isInstalled('chat')) {
+            return response()->json(['data' => [], 'message' => 'Chat feature not available'], 200);
+        }
+        $groupChatClass = GroupChat::class;
+        $resourceClass = GroupChatResource::class;
+        $data = $groupChatClass::where('user_id',$id)->orderBy('id','desc')->with('user')->paginate(10);
+        return $resourceClass::collection($data);
     }
 
     public function event_report( $id ,$type)

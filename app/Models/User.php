@@ -28,7 +28,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Utd\Agency\Entities\AdditionalInfo;
 use Modules\Badge\Entities\Badge;
 use Modules\Badge\Entities\UserBadge;
-use Modules\Chat\Traits\ChatUserTrait;
+use App\Traits\ChatUserTrait;
 use Utd\CP\Entities\Cp;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Utd\LuckyBox\Entities\UserLuckyGift;

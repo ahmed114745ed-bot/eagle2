@@ -1,9 +1,10 @@
 <?php
 
+use Utd\Chat\Http\Services\ChatRoomService;
 use Utd\Room\Entities\RoomVisitor;
 use Illuminate\Support\Facades\Broadcast;
 use Utd\Room\Entities\Room;
-use Modules\Chat\Http\Services\ChatRoomService;
+use App\Support\PackageHelper;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +63,10 @@ Broadcast::channel('room.boom.rewards.{roomId}', function ($user, $roomId) {
 });
 
 Broadcast::channel('chat.room.{chatRoomId}', function ($user, $chatRoomId) {
+    if (! PackageHelper::isInstalled('chat')) {
+        return false;
+    }
+
     $chatRoomService = app(ChatRoomService::class);
     $checkRoom = $chatRoomService->getCreateChatRoomId($chatRoomId);
     if (!$checkRoom){

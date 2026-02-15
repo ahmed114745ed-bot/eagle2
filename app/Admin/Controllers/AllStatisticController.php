@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Bd;
 use Carbon\Carbon;
+use Utd\Chat\Entities\ChatMessage;
 use Utd\Room\Entities\Room;
 use App\Models\Agency;
 use App\Models\GiftLog;
@@ -26,7 +27,7 @@ use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 
 use Modules\AreaManager\Entities\AreaManager;
-use Modules\Chat\Entities\ChatMessage;
+use App\Support\PackageHelper;
 use App\Models\CoinGameUserDailyAggregated;
 use Carbon\CarbonPeriod;
 use Modules\UsersWallet\Entities\WalletLog;
@@ -711,7 +712,6 @@ class AllStatisticController extends MainController
         ]);
     }
 
-
     public function getStatsData(Request $request)
     {
         try {
@@ -747,27 +747,36 @@ class AllStatisticController extends MainController
             }
 
             // Chat Statistics
-            $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
-            });
+            $stats['messagesToday'] = 0;
+            $stats['messagesThisMonth'] = 0;
+            $stats['usersWhoSend'] = 0;
+            $stats['usersWhoNeverSend'] = $stats['usersCount'];
+            $stats['openConversationsToday'] = 0;
+            $stats['avgConversationDuration'] = 0;
 
-            $stats['messagesToday'] = $chatMessageQuery->whereDate('created_at', today())->count();
-            $stats['messagesThisMonth'] = $chatMessageQuery->whereMonth('created_at', now()->month)
-                ->whereYear('created_at', now()->year)->count();
+            if (PackageHelper::isInstalled('chat')) {
+                $chatMessageQuery = ChatMessage::when($countryID, function ($q) use ($countryID) {
+                    $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
+                });
 
-            $stats['usersWhoSend'] = $chatMessageQuery->distinct('user_id')->count('user_id');
-            $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
+                $stats['messagesToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())->count();
+                $stats['messagesThisMonth'] = (clone $chatMessageQuery)->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)->count();
 
-            $stats['openConversationsToday'] = $chatMessageQuery->whereDate('created_at', today())
-                ->distinct('chat_room_id')->count('chat_room_id');
+                $stats['usersWhoSend'] = (clone $chatMessageQuery)->distinct('user_id')->count('user_id');
+                $stats['usersWhoNeverSend'] = $stats['usersCount'] - $stats['usersWhoSend'];
 
-            $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
-                $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
-            })
-                ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
-                ->groupBy('chat_room_id')
-                ->pluck('duration')
-                ->avg() ?? 0;
+                $stats['openConversationsToday'] = (clone $chatMessageQuery)->whereDate('created_at', today())
+                    ->distinct('chat_room_id')->count('chat_room_id');
+
+                $stats['avgConversationDuration'] = ChatMessage::when($countryID, function ($q) use ($countryID) {
+                    $q->whereHas('user', fn($query) => $query->whereIn('country_id', $countryID));
+                })
+                    ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+                    ->groupBy('chat_room_id')
+                    ->pluck('duration')
+                    ->avg() ?? 0;
+            }
 
             return response()->json([
                 'success' => true,

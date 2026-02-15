@@ -9,7 +9,7 @@
     "SpechialId": true,
     "SpecialId": true,
     "SwitchAccount": true,
-    "Chat": true,
+    "Chat": false,
     "Public": true,
     "AgencyApp": false,
     "Whatsapp": true,

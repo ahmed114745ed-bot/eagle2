@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
-use Modules\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatMessage;
 use Modules\Vip\Entities\Vip;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
@@ -418,7 +418,8 @@ class Room extends Model
 
     public function messages(): HasMany
     {
-        return $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
+        return PackageHelper::checkRelation($this, 'chat', 'hasMany') ??
+            $this->hasMany(ChatMessage::class, 'chat_room_id', 'id');
     }
 
     public function getFinalRoomImageAttribute()

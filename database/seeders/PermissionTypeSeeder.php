@@ -7,10 +7,6 @@ use App\Enums\PermissionType;
 use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Utd\Achievements\Entities\Achievement;
-use Utd\Moments\Entities\Moment;
-use Utd\Reals\Entities\Real;
-
 
 class PermissionTypeSeeder extends Seeder
 {
@@ -742,21 +738,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Group chat',
-                'sort' => 29,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 29],
-                ],
-                'permissions' => [
-                    ['key' => 'group-chat', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'updates_group_chat', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => ['browse'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Events',
                 'sort' => 31,
                 'types' => [
@@ -1297,11 +1278,28 @@ class PermissionTypeSeeder extends Seeder
             ];
         }
 
+        if (PackageHelper::isInstalled('chat')) {
+            $categories[] = [
+                'name' => 'Group chat',
+                'sort' => 29,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 29],
+                ],
+                'permissions' => [
+                    ['key' => 'group-chat', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'updates_group_chat', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ];
+        }
+
         $allSlugs = [];
 
         foreach ($categories as $category) {
 
-            // ✅ Ensure 'types' exists
             if (!isset($category['types'])) continue;
 
             foreach ($category['types'] as $type => $typeData) {

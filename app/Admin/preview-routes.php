@@ -22,8 +22,8 @@ use App\Admin\Controllers\CustomController;
 use Utd\Room\Http\Controllers\Admin\CustomZegoMessageController;
 use App\Admin\Controllers\ExportController;
 use App\Admin\Controllers\FamilyConfigSettingController;
-use App\Admin\Controllers\GroupChatController;
-use App\Admin\Controllers\GroupChatSettingController;
+// use Utd\Chat\Http\Controllers\Admin\GroupChatController; // Moved to Chat package routes
+// use Utd\Chat\Http\Controllers\Admin\GroupChatSettingController; // Moved to Chat package routes
 use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\MomentController;
 use App\Admin\Controllers\MomentSettingsController;
@@ -138,13 +138,13 @@ Route::group([
     Route::resource('colors', ColorController::class);
     Route::resource('agency-settings', AgencySettingsController::class);
     Route::get('agency-settings', 'AgencySettingController@index');
-    Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
+    // chat-settings route moved to Chat package
     // Route::get('ovip-settings', [OVipController::class, 'vip_settings']);
     Route::get('lucy-box-settings', [BoxController::class, 'box_settings']);
     Route::resource('moment-settings', MomentSettingsController::class);
     Route::resource('reel-settings', ReelSettingsController::class);
     Route::resource('custom-settings', CustomController::class);
-    Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+    // setting-group-char route moved to Chat package
     Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
     Route::get('/agency-setting-manger', [MangerSettingController::class, 'index']);
     Route::resource('settings', SettingController::class);
@@ -283,7 +283,7 @@ Route::group([
     Route::get('/vips_dedicate', 'DedicateVipController@index');
     Route::resource('/bans', 'BanController');
     Route::resource('/request-background-image', 'RequestBackgroundImageController');
-    Route::resource('/group-chat', 'GroupChatController');
+    // group-chat route moved to Chat package
     Route::resource('interests', \App\Admin\Controllers\InterestsController::class);
     Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
     Route::resource('agencies-agency-manger', AgencyMangerAgencyesController::class);

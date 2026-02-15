@@ -2,12 +2,12 @@
 
 namespace Modules\SwitchAccount\Transformers;
 
-use App\Models\User;
 use App\Helpers\Common;
-use Modules\Chat\Entities\ChatRoom;
-use Modules\Chat\Entities\ChatMessage;
+use App\Support\PackageHelper;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatRoom;
 
 class AccountResource extends JsonResource
 {
@@ -25,8 +25,12 @@ class AccountResource extends JsonResource
         })
             ->first();
 
-        $chats_id = ChatRoom::where('user_id', $this->id)->orWhere('user_id2', $this->id)->pluck('id')->toArray();
-        $total_unread_message =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $this->id)->where('status', 'not Like', 'seen')->count();
+        $total_unread_message = 0;
+        if (PackageHelper::isInstalled('chat')) {
+            $chats_id = ChatRoom::where('user_id', $this->id)->orWhere('user_id2', $this->id)->pluck('id')->toArray();
+            $total_unread_message = ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $this->id)->where('status', 'not Like', 'seen')->count();
+        }
+
         return [
             'id'            =>  $this->id,
             'image'         =>  $this->profile->avatar,

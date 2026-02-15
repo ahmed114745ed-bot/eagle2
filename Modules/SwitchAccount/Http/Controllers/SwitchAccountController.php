@@ -5,18 +5,16 @@ namespace Modules\SwitchAccount\Http\Controllers;
 use App\helper\AccountHelper;
 use App\helper\TryCatchHelper;
 use App\Models\User;
-use Dotenv\Util\Str;
+use App\Support\PackageHelper;
 use App\Helpers\Common;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Modules\Chat\Entities\ChatRoom;
-use Modules\Chat\Entities\ChatMessage;
-use Illuminate\Contracts\Support\Renderable;
-use Laravel\Sanctum\PersonalAccessToken;
 use Modules\SwitchAccount\Entities\UserAccount;
 use Modules\SwitchAccount\Transformers\AccountResource;
+use Utd\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatRoom;
 
 class SwitchAccountController extends Controller
 {
@@ -141,7 +139,7 @@ class SwitchAccountController extends Controller
                     ->orWhere('child_user_id', $userId);
             })
             ->get();
-    
+
 
         $userIds = $accounts->flatMap(function ($account) {
             return [$account->parent_user_id, $account->child_user_id];
@@ -206,7 +204,7 @@ class SwitchAccountController extends Controller
         $new_account->is_logout = 0;
         $new_account->save();
         $new_account->auth_token = $token;
-        
+
         $data = [
             'id'            => $new_account->id,
             'is_first'      => @(bool)$new_account->is_points_first,
@@ -219,7 +217,7 @@ class SwitchAccountController extends Controller
 
     public function isTokenFromLastTwoWeeks($otherUser, $tokenString): bool
     {
-        
+
         [$id, $plainToken] = explode('|', $tokenString);
 
         $token = $otherUser->tokens()->find($id);
@@ -252,8 +250,12 @@ class SwitchAccountController extends Controller
     {
         $user = \Auth::user();
         $currentUser = User::find($user->id);
-        $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->pluck('id')->toArray();
-        $total_unread_message =  ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $user->id)->where('status', 'not Like', 'seen')->count();
+
+        $total_unread_message = 0;
+        if (PackageHelper::isInstalled('chat')) {
+            $chats_id = ChatRoom::where('user_id', $user->id)->orWhere('user_id2', $user->id)->pluck('id')->toArray();
+            $total_unread_message = ChatMessage::whereIn('chat_room_id', $chats_id)->where('user_id', 'not Like', $user->id)->where('status', 'not Like', 'seen')->count();
+        }
 
         $accounts = $this->getAllAccounts($user->id, 0, $user->device_token);
         $user_acount = UserAccount::query()->where(function ($q) use ($user) {

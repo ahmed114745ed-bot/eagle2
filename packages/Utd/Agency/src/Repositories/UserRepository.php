@@ -4,11 +4,12 @@ namespace Utd\Agency\Repositories;
 
 use App\Helpers\Common;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Cache;
 use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Modules\Chat\Jobs\SendMessageToAllUsers;
+use Utd\Chat\Jobs\SendMessageToAllUsers;
 
 /** @property User $model*/
 class UserRepository extends AbstractRepository
@@ -421,6 +422,10 @@ class UserRepository extends AbstractRepository
 
     public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
     {
+        if (! PackageHelper::isInstalled('chat')) {
+            return;
+        }
+
         $timeZone = request()->hasHeader('tz') ? request()->header()['tz'][0] : 'UTC';
         dispatchJobToQueue(new SendMessageToAllUsers($userId, $userIds, $message, timezone: $timeZone), 'heavyProcessing');
     }

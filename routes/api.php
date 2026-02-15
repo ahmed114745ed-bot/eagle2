@@ -46,7 +46,7 @@ use App\Admin\Controllers\AgencySettingsController;
 use App\Http\Controllers\Api\V1\QuestionController;
 use App\Http\Controllers\Api\V1\Ranking2Controller;
 use App\Http\Controllers\Api\V1\CommunityController;
-use App\Http\Controllers\Api\V1\GroupChatController;
+// use App\Http\Controllers\Api\V1\GroupChatController; // Moved to Chat package
 use App\Http\Controllers\Api\V1\BackgroundController;
 use App\Http\Controllers\Api\V1\CoinReportController;
 use App\Http\Controllers\Api\V1\ReportUserController;
@@ -306,11 +306,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
            
 
 
-
-            Route::prefix('group-chat')->group(function () {
-                Route::get('/', [GroupChatController::class, 'index']);
-                Route::post('/send', [GroupChatController::class, 'store']);
-            });
+            // group-chat routes moved to packages/Utd/Chat/Routes/api.php
 
             Route::prefix('countries')->group(function () {
                 Route::get('/', [CountryController::class, 'allCountries']);

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\RoomBoom\Http\Controllers\web\RoomBoomLevelController;
 use Utd\RoomBoom\Http\Controllers\web\RoomBoomRewardController;
 use Utd\RoomBoom\Http\Controllers\web\RoomBoomWinnerController;

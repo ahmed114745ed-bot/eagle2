@@ -50,8 +50,8 @@ use App\Admin\Controllers\GameSettingsController;
 // use App\Admin\Controllers\GiftController; // Moved to package
 use App\Admin\Controllers\GiftLogSummaryController;
 use App\Admin\Controllers\GiftLogTestController;
-use App\Admin\Controllers\GroupChatController;
-use App\Admin\Controllers\GroupChatSettingController;
+// use App\Admin\Controllers\GroupChatController; // Moved to Chat package
+// use App\Admin\Controllers\GroupChatSettingController; // Moved to Chat package
 use App\Admin\Controllers\HomeCarouselController;
 use App\Admin\Controllers\ImageColorController;
 use App\Admin\Controllers\InterestsController;
@@ -589,18 +589,12 @@ Route::group(
 
         // request-background-image moved to packages/Utd/Room/Routes/web.php
 
-        Route::resource('/group-chat', 'GroupChatController');
-        Route::get('chat/view', [GroupChatController::class, 'chatView'])->name('chat.view');
-        Route::get('chat/messages', [GroupChatController::class, 'getMessages'])->name('chat.messages');
-        Route::post('chat/message', [GroupChatController::class, 'storeMessage'])->name('chat.store');
-        Route::put('chat/message', [GroupChatController::class, 'updateMessage'])->name('chat.update');
-        Route::delete('chat/message/{id}', [GroupChatController::class, 'deleteMessage'])->name('chat.delete');
-        Route::get('rooms/{id}/image', [GroupChatController::class, 'getRoomImage'])->name('rooms.image');
+        // GroupChat routes moved to packages/Utd/Chat/Routes/admin.php
 
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+        // setting-group-char moved to packages/Utd/Chat/Routes/admin.php
         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
 
         // Agency manager routes - only if package installed
@@ -638,7 +632,7 @@ Route::group(
         }
         Route::resource('app-feature', FeatureAppController::class);
         Route::resource('zego-feature', ZegoFeatureController::class);
-        Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
+        // chat-settings moved to packages/Utd/Chat/Routes/admin.php
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
         //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         Route::get('convert-is_gold', function () {

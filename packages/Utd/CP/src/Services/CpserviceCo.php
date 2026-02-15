@@ -7,15 +7,16 @@ use App\Facades\CustomNotification;
 use App\Helpers\Common;
 use App\Helpers\UserCoinLogHelper;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\Chat\Entities\ChatMessage;
-use Modules\Chat\Entities\ChatRoom;
-use Modules\Chat\Events\Chat;
-use Modules\Chat\Events\Conversation;
-use Modules\Chat\Events\OpenChat;
-use Modules\Chat\Http\Resources\ChatMessageResource;
-use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Utd\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatRoom;
+use Utd\Chat\Events\Chat;
+use Utd\Chat\Events\Conversation;
+use Utd\Chat\Events\OpenChat;
+use Utd\Chat\Http\Resources\ChatMessageResource;
+use Utd\Chat\Http\Resources\ChatRoomResourcePusher;
 use Throwable;
 use Utd\CP\Enums\CpStatus;
 use Utd\CP\Http\Resources\CpsUserResourceV2;
@@ -144,59 +145,62 @@ class CpserviceCo
                 ]);
             }
 
-            $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
-            if (! $chatRoom) {
-                $chatRoom = ChatRoom::create([
-                    'user_id' => $user->id,
-                    'user_id2' => $request->user_id,
-                ]);
-                $user->current_room_chat = $chatRoom->id;
-                $user->save();
-            }
-
             $user2 = User::find($request->user_id);
-
-            $data = [
-                'id' => $cp_request->id,
-                'title' => $cpRelation->description,
-                'price' => $cpRelation->price,
-                'image' => $cpRelation->image,
-                'status' => 0,
-            ];
-
-            $chatMessageData = [
-                'chat_room_id' => $chatRoom->id,
-                'user_id' => $user->id,
-                'message' => json_encode($data),
-                'type' => 'CP',
-                'status' => 'sent',
-            ];
-
-            if ($user2->online === 1 && $user2->current_room_chat === $chatRoom->id) {
-                $chatMessageData['status'] = 'seen';
-            } elseif ($user2->online === 1) {
-                $chatMessageData['status'] = 'received';
-            }
-
-            $chatMessage = ChatMessage::create($chatMessageData);
 
             CustomNotification::makeCp($user2, $user, $cpRelation->type);
 
             DB::commit();
 
-            $message_resource = new ChatMessageResource($chatMessage);
-            $room_resource = new ChatRoomResourcePusher($chatRoom);
+            // Send chat notification if chat package is installed
+            if (PackageHelper::isInstalled('chat')) {
+                $chatRoom = ChatRoom::BetweenUsers($user->id, $request->user_id)->first();
+                if (! $chatRoom) {
+                    $chatRoom = ChatRoom::create([
+                        'user_id' => $user->id,
+                        'user_id2' => $request->user_id,
+                    ]);
+                    $user->current_room_chat = $chatRoom->id;
+                    $user->save();
+                }
 
-            $chatuser = ($chatRoom->user_id === $user->id) ? User::find($chatRoom->user_id2) : User::find($chatRoom->user_id);
+                $data = [
+                    'id' => $cp_request->id,
+                    'title' => $cpRelation->description,
+                    'price' => $cpRelation->price,
+                    'image' => $cpRelation->image,
+                    'status' => 0,
+                ];
 
-            try {
-                event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
-            } catch (Throwable $th) {
-                return $th->getMessage();
+                $chatMessageData = [
+                    'chat_room_id' => $chatRoom->id,
+                    'user_id' => $user->id,
+                    'message' => json_encode($data),
+                    'type' => 'CP',
+                    'status' => 'sent',
+                ];
+
+                if ($user2->online === 1 && $user2->current_room_chat === $chatRoom->id) {
+                    $chatMessageData['status'] = 'seen';
+                } elseif ($user2->online === 1) {
+                    $chatMessageData['status'] = 'received';
+                }
+
+                $chatMessage = ChatMessage::create($chatMessageData);
+
+                $message_resource = new ChatMessageResource($chatMessage);
+                $room_resource = new ChatRoomResourcePusher($chatRoom);
+
+                $chatuser = ($chatRoom->user_id === $user->id) ? User::find($chatRoom->user_id2) : User::find($chatRoom->user_id);
+
+                try {
+                    event(new OpenChat($room_resource->toResponse(request())->getData()->data, $chatuser, $chatRoom));
+                } catch (Throwable $th) {
+                    // Chat event failed, but CP request was successful
+                }
+
+                event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
+                event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
             }
-
-            event(new Conversation($message_resource->toResponse(request())->getData()->data, $user2, $room_resource));
-            event(new Chat($room_resource->toResponse(request())->getData()->data, $user2));
 
             return Common::apiResponse(1, __('request sent'));
         } catch (Throwable $e) {
@@ -220,11 +224,14 @@ class CpserviceCo
     public function respondToRequest(Request $request)
     {
         // Todo get message_id to update status in this message
-        $messageId = $request->message_id;
+        $message = null;
+        $decryptedData = [];
 
-        $message = ChatMessage::find($messageId);
-
-        $decryptedData = json_decode($message->message, true);
+        if (PackageHelper::isInstalled('chat')) {
+            $messageId = $request->message_id;
+            $message = ChatMessage::find($messageId);
+            $decryptedData = $message ? json_decode($message->message, true) : [];
+        }
 
         $cp = $this->cpRepository->findCpById($request->cp_id);
 
@@ -286,9 +293,10 @@ class CpserviceCo
             CustomNotification::cpAction($user2, $user, 2);
         }
 
-        $message->message = json_encode($decryptedData);
-
-        $message->save();
+        if (PackageHelper::isInstalled('chat') && $message) {
+            $message->message = json_encode($decryptedData);
+            $message->save();
+        }
 
         return Common::apiResponse(1, 'تم الرد علي الطلب بنجاح');
     }

@@ -53,7 +53,7 @@ use App\Http\Controllers\utd\EventPeriodController;
 use App\Http\Controllers\utd\ExchangeController;
 use App\Http\Controllers\utd\FamilyController;
 use App\Http\Controllers\utd\FamilyLevelController;
-use App\Http\Controllers\utd\GroupChatController;
+// use App\Http\Controllers\utd\GroupChatController; // Moved to Chat package
 use App\Http\Controllers\utd\HomeCarouselController;
 use App\Http\Controllers\utd\ImageColorController;
 use App\Http\Controllers\utd\ImageController;
@@ -138,14 +138,7 @@ Route::middleware([])->group(function () {
         Route::get('/wares', [RewardLevelIntervalController::class, 'wareInterval']);
         Route::get('/vip', [RewardLevelIntervalController::class, 'vipInterval']);
     });
-    Route::prefix('group-chat')->group(function () {
-        Route::get('/', [GroupChatController::class, 'index']);
-        Route::post('/', [GroupChatController::class, 'store']);
-        Route::post('/add-experience-points', [GroupChatController::class, 'add_experience_points']);
-        Route::post('/update/{id}', [GroupChatController::class, 'update']);
-        Route::post('/delete/{id}', [GroupChatController::class, 'destroy']);
-        Route::get('/{id}', [GroupChatController::class, 'show']);
-    });
+    // group-chat routes moved to packages/Utd/Chat/Routes/utd.php
 
     Route::prefix('image-colors')->group(function () {
         Route::get('/', [ImageColorController::class, 'index']);

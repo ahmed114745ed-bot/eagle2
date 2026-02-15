@@ -27,7 +27,7 @@ use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Auth;
-use Modules\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatMessage;
 use App\Admin\Controllers\MainController;
 use App\Models\CoinGameUserDailyAggregated;
 use Modules\SuperAdmin\Entities\SuperAdmin;

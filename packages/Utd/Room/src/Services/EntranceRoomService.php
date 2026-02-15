@@ -15,13 +15,13 @@ use DB;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Modules\Chat\Entities\ChatMessage;
-use Modules\Chat\Entities\ChatRoom;
-use Modules\Chat\Events\Chat;
-use Modules\Chat\Events\Conversation;
-use Modules\Chat\Events\OpenChat;
-use Modules\Chat\Http\Resources\ChatMessageResource;
-use Modules\Chat\Http\Resources\ChatRoomResourcePusher;
+use Utd\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\ChatRoom;
+use Utd\Chat\Events\Chat;
+use Utd\Chat\Events\Conversation;
+use Utd\Chat\Events\OpenChat;
+use Utd\Chat\Http\Resources\ChatMessageResource;
+use Utd\Chat\Http\Resources\ChatRoomResourcePusher;
 use Throwable;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Charizma\Jobs\ResetCharisma;
@@ -348,6 +348,10 @@ class EntranceRoomService implements EnteranceRoomContract
 
     public function makeRequestInviteRoom($user, $request)
     {
+        if (! PackageHelper::isInstalled('chat')) {
+            return Common::apiResponse(0, 'Chat module is not installed');
+        }
+
         $tokens_notfacion = [];
 
         $room = Room::where('uid', '=', $request->owner_id)->first();

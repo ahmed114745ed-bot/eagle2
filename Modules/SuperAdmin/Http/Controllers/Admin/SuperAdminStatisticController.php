@@ -5,8 +5,8 @@ namespace Modules\SuperAdmin\Http\Controllers\Admin;
 use App\Admin\Controllers\MainController;
 use App\Models\Bd;
 use App\Models\Country;
-use Modules\SuperAdmin\Entities\SuperAdmin;
 use Carbon\Carbon;
+use Utd\Chat\Entities\ChatMessage;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Models\Agency;
@@ -24,10 +24,8 @@ use App\Models\AgencyJoinRequest;
 use Encore\Admin\Widgets\InfoBox;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
-use App\Admin\Widgets\CustomInfoBox;
-use App\Http\Controllers\Controller;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\Auth;
-use Modules\Chat\Entities\ChatMessage;
 use App\Models\CoinGameUserDailyAggregated;
 
 class SuperAdminStatisticController extends MainController
@@ -67,37 +65,48 @@ class SuperAdminStatisticController extends MainController
             ->orderByDesc('total_sessions')
             ->limit(1)
             ->first();
-        $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->whereDate('created_at', today())
-            ->count();
-        $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->count();
-        $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->distinct('user_id')
-            ->count('user_id');
+
+        // Chat statistics (only if chat package is installed)
+        $messagesToday = 0;
+        $messagesThisMonth = 0;
+        $usersWhoSend = 0;
+        $openConversationsToday = 0;
+        $avgConversationDuration = 0;
+
+        if (PackageHelper::isInstalled('chat')) {
+            $messagesToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+                ->whereDate('created_at', today())
+                ->count();
+            $messagesThisMonth = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+                ->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year)
+                ->count();
+            $usersWhoSend = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+                ->distinct('user_id')
+                ->count('user_id');
+            $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+                ->whereDate('created_at', today())
+                ->distinct('chat_room_id')
+                ->count('chat_room_id');
+            $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
+                $q->where('country_id', $countryID);
+            })
+                ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
+                ->groupBy('chat_room_id')
+                ->pluck('duration')
+                ->avg() ?? 0;
+        }
+
         $totalUsers = User::where('country_id', $countryID)->count();
         $usersWhoNeverSend = $totalUsers - $usersWhoSend;
-        $openConversationsToday = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->whereDate('created_at', today())
-            ->distinct('chat_room_id')
-            ->count('chat_room_id');
-        $avgConversationDuration = ChatMessage::whereHas('user', function ($q) use ($countryID) {
-            $q->where('country_id', $countryID);
-        })
-            ->selectRaw('chat_room_id, TIMESTAMPDIFF(MINUTE, MIN(created_at), MAX(created_at)) as duration')
-            ->groupBy('chat_room_id')
-            ->pluck('duration')
-            ->avg() ?? 0;
 
         // game
 

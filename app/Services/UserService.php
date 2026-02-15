@@ -8,6 +8,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Models\Code;
 //use Utd\Agency\Repositories\ShippingAgencyRepository;
+use Utd\Chat\Entities\ChatRoom;
 use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
@@ -21,7 +22,7 @@ use App\Helpers\UserCoinLogHelper;
 use App\Http\Services\WhatsappOtp;
 use App\Models\ChangeLevelHistory;
 use App\Facades\CustomNotification;
-use Modules\Chat\Entities\ChatRoom;
+use App\Support\PackageHelper;
 use App\Repositories\PackRepository;
 use App\Http\Services\WhatsappWebhook;
 use App\Repositories\FollowRepository;
@@ -932,6 +933,10 @@ class UserService
 
     protected function typeRoomChat($user_id, $user_id2)
     {
+        if (! PackageHelper::isInstalled('chat')) {
+            return 0;
+        }
+
         $updateType = ChatRoom::where(function ($q) use ($user_id, $user_id2) {
             $q->where('user_id', $user_id)
                 ->where('user_id2', $user_id2);

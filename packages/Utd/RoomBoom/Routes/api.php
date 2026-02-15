@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Utd\RoomBoom\Http\Controllers\Api\RoomBoomLevelController;
 use Utd\RoomBoom\Http\Controllers\Api\SuperBoomRuleController;
 

@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\ProfileResource;
 use App\Http\Resources\Api\V1\ShowUserSettingResource;
 use App\Http\Resources\Api\V1\UserAgencyResource;
 use App\Http\Resources\Api\V1\UserRoomResource;
+use App\Models\ChatSetting;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -60,9 +61,9 @@ class UserResource extends JsonResource
         $isHideCountry = $this->getPackWithTypeV2(13);
         $userHandling = new \App\Classes\UserHandling();
         $color_image = @$this->color_image;
-        $chat_setting = \App\Models\ChatSetting::where("user_id", $this->id)->first();
+        $chat_setting = ChatSetting::where("user_id", $this->id)->first();
         if ($chat_setting == null) {
-            $chat_setting = \App\Models\ChatSetting::create([
+            $chat_setting = ChatSetting::create([
                 'user_id'     => $this->id,
                 'chat_with_friends'     =>  1,
                 'chat_with_all'         =>  0,

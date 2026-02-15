@@ -1,0 +1,31 @@
+{
+    "name": "utd/chat",
+    "description": "Chat Laravel Package - Real-time messaging, chat rooms, reactions and media sharing functionality",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "UTD Team",
+            "email": "dev@utd.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Utd\\Chat\\": "src/",
+            "Utd\\Chat\\Database\\": "Database/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Chat\\ChatServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

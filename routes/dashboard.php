@@ -38,7 +38,7 @@ use App\Http\Controllers\Dashboard\Events\PeriodEvent\AdminPeriodEventController
 use App\Http\Controllers\Dashboard\Events\PeriodEvent\AdminPeriodEventRewordsController;
 use App\Http\Controllers\Dashboard\Events\WeeklyStar\AdminWeeklyStarEvents;
 use App\Http\Controllers\Dashboard\Events\WeeklyStar\AdminWeeklyStarEventsRewords;
-use App\Http\Controllers\Dashboard\GroupChat\AdminGroupChatController;
+// use App\Http\Controllers\Dashboard\GroupChat\AdminGroupChatController; // Moved to Chat package
 use App\Http\Controllers\Dashboard\Interests\AdminInterestsController;
 use App\Http\Controllers\Dashboard\Posts\AdminMomentController;
 use App\Http\Controllers\Dashboard\Posts\AdminReelsController;
@@ -258,7 +258,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
         Route::get('admin-event-delete-reports/{id}/{type}',[AdminGeneralRolesController::class,'delete_reports']);
     //************************** End Events **************************** \\
 
-        Route::resource('admin-GroupChat',AdminGroupChatController::class);
+        // admin-GroupChat route moved to packages/Utd/Chat/Routes/dashboard.php
         Route::resource('admin-codes',AdminCodesController::class);
         Route::resource('admin-countries',AdminCountriesController::class);
         Route::get('enable-admin-countries/{id}/{status}',[AdminCountriesController::class,'enable_country']);
