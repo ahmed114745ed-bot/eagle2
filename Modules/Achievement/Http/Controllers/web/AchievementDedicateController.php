@@ -33,7 +33,7 @@ class AchievementDedicateController extends MainController
 
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-            //  ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
+           //   ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
             ->body($this->form()));
     }
 
@@ -234,7 +234,13 @@ class AchievementDedicateController extends MainController
     {
         $form = new Form(new UserAchievementLevel());
         $form->html('<div class="full-column-width">');
-        $form->belongsTo('user_id', AllUsers::class, trans('user'));
+    //    $form->belongsTo('user_id', AllUsers::class, trans('user'));
+        $form->html(function () use ($form) {
+
+            return view('admin.grid.users.UserAchievementLevelDedicate');
+        });
+
+       
         $form->belongsTo('custom_achievement_id', CustomAchievements::class, trans('Custom achievement'));
         $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
         $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');

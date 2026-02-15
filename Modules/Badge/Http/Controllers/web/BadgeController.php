@@ -54,18 +54,14 @@ class BadgeController extends MainController
     protected function grid()
     {
         $grid = new Grid(new Badge());
-        $lang = app()->getLocale();
         $grid->model()
-            ->whereHas('images', function ($query) use ($lang) {
-                $query->where('language', $lang);
-            })
             ->with('images')->orderBy('priority', 'desc');
 
         $grid->column('id', __('ID'));
         $grid->column('name', __('name'));
         if (!request()->filled('_export_')) {
             $grid->column('images.image', __('image'))->display(function ($path) {
-                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image ?? $this->images->firstWhere('language', 'en')?->image;
                 /** @var Ware $this */
                 $url = getImagePath($path);
                 return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
