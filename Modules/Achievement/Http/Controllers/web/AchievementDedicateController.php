@@ -33,7 +33,7 @@ class AchievementDedicateController extends MainController
 
         return parent::create($content
             ->title(trans('user-achievement-levels'))
-           //   ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
+            //   ->body(view('admin.grid.users.UserAchievementLevelDedicate'))
             ->body($this->form()));
     }
 
@@ -234,17 +234,18 @@ class AchievementDedicateController extends MainController
     {
         $form = new Form(new UserAchievementLevel());
         $form->html('<div class="full-column-width">');
-    //    $form->belongsTo('user_id', AllUsers::class, trans('user'));
+        //    $form->belongsTo('user_id', AllUsers::class, trans('user'));
         $form->html(function () use ($form) {
 
             return view('admin.grid.users.UserAchievementLevelDedicate');
         });
 
-       
+
         $form->belongsTo('custom_achievement_id', CustomAchievements::class, trans('Custom achievement'));
         $form->hidden('admin_id', __('is_frozen'))->default(auth()->id());
         $form->hidden('receive_type', __('is_frozen'))->default('admin_dedication');
         $form->html('</div>');
+
 
         Admin::style('
 
@@ -256,6 +257,15 @@ class AchievementDedicateController extends MainController
             width: 50% !important;
         }
     ');
+
+        $form->saving(function (Form $form) {
+            $userId = request('user_id');
+            if (!$userId) {
+                throw new \Exception('Please select a user!');
+            }
+            // ensure the model gets the user_id so it's included in the DB insert
+            $form->model()->user_id = $userId;
+        });
         return $form;
     }
 }
