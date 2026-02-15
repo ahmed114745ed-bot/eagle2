@@ -1518,23 +1518,25 @@ Route::get('/fix-total-room-gifts', function () {
                 ];
             }
         } else {
-            // Create missing record
-            TotalRoomGift::create([
-                'room_id' => $roomId,
-                'current_total' => $correctTotal,
-                'created_at' => Carbon::parse($giftDate)->startOfDay(),
-                'updated_at' => now(),
-            ]);
-            $created++;
-            
-            $results[] = [
-                'action' => 'created',
-                'room_id' => $roomId,
-                'date' => $giftDate,
-                'old' => 0,
-                'new' => $correctTotal,
-                'diff' => $correctTotal,
-            ];
+            // Create missing record only if correct_total > 0
+            if ($correctTotal > 0) {
+                TotalRoomGift::create([
+                    'room_id' => $roomId,
+                    'current_total' => $correctTotal,
+                    'created_at' => Carbon::parse($giftDate)->startOfDay(),
+                    'updated_at' => now(),
+                ]);
+                $created++;
+                
+                $results[] = [
+                    'action' => 'created',
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => 0,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal,
+                ];
+            }
         }
     }
 
