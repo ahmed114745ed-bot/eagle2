@@ -15,6 +15,8 @@ use Modules\Vip\Services\Api\VipService;
 use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Http\Resources\Api\V1\NewAgencyRankingResource;
 
+use function Laravel\Prompts\info;
+
 class RankingController extends Controller
 {
 
@@ -53,6 +55,7 @@ class RankingController extends Controller
     public function ranking2(Request $request)
     {
 
+    info('ranking2 called with request: ');
         // return Common::apiResponse(0, __('closed for update'));
 
         // throw new Exception(__('closed for update'));
