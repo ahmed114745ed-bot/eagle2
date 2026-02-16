@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\helper\TryCatchHelper;
 use App\Helpers\Common;
 use App\helper\RankingHelper;
-use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Services\RankingServiceV2;
 use App\Services\RankingService;
@@ -22,14 +21,11 @@ class RankingController extends Controller
 
     protected $rankingService;
     protected $rankingServiceV2;
-    protected $userService;
 
-    public function __construct(RankingService $rankingService, RankingServiceV2 $rankingServiceV2, UserService $userService)
+    public function __construct(RankingService $rankingService, RankingServiceV2 $rankingServiceV2)
     {
         $this->rankingService = $rankingService;
         $this->rankingServiceV2 = $rankingServiceV2;
-        $this->userService = $userService;
-
     }
 
     public function ranking(Request $request)
