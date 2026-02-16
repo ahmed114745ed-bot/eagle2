@@ -23,6 +23,7 @@ use App\Http\Resources\GiftLogUtdResource;
 use App\Classes\Gifts\UpdateUserWhenSendGift;
 use App\Http\Resources\Api\V1\GiftLogResource;
 use App\Repositories\Room\RoomTopUsersRepository;
+use App\Services\Gifts\LuckyGiftService;
 use Modules\Public\Http\Services\UpgradeRoomLevelServices;
 
 
@@ -33,6 +34,7 @@ class GiftLogController extends Controller
     public function __construct(
         RoomTopUsersRepository $roomTopUsersRepository,
         private GiftLogService $giftLogService,
+        private LuckyGiftService $luckyGiftService,
     ) {
 
         $this->roomTopUsersRepository = $roomTopUsersRepository;
@@ -361,7 +363,7 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
+            $data = $this->luckyGiftService->sendLuckyGift2($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
@@ -392,7 +394,7 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
+            $data = $this->luckyGiftService->sendLuckyGift2V2($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }
@@ -423,7 +425,7 @@ class GiftLogController extends Controller
         $user = $request->user();
 
         try {
-            $data = (new \App\Services\Gifts\LuckyGiftService())->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
+            $data = $this->luckyGiftService->sendLuckyGift2V3($data, $user, $updateUserWhenSendGift);
         } catch (\Exception $e) {
             return Common::apiResponse(0, $e->getMessage());
         }

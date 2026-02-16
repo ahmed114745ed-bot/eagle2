@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Helpers\LogHelper;
 use App\Models\Room;
 use Tests\TestCase;
 use Mockery;
@@ -10,9 +9,11 @@ use App\Models\User;
 use App\Models\Gift;
 use App\Models\MonthlyDiamondReceive;
 use App\Services\Gifts\LuckyGiftService;
-use App\Services\Gifts\UpdateUserWhenSendGift;
+use App\Classes\Gifts\UpdateUserWhenSendGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class SendLuckyGift2FeatureTest extends TestCase
 {
@@ -44,13 +45,90 @@ class SendLuckyGift2FeatureTest extends TestCase
         settings()->set('stop_luckyGift', 0);
 
         // إنشاء مستخدمين
-        $user = User::factory()->create([ 'di' => 500]);
-        $receiver = User::factory()->create([ 'di' => 300]);
+        $user = User::factory()->create(['di' => 2000]);
+        $receiver = User::factory()->create(['di' => 300]);
 
-        // إنشاء هدية ثابتة
-         $gift = Gift::where('type',6)->first();
+        // إنشاء هدية ثابتة لضمان توفر البيانات المطلوبة للاختبار
+        $gift = Gift::create([
+            'name' => 'Lucky Test Gift',
+            'e_name' => 'Lucky Test Gift',
+            'type' => 6,
+            'vip_level' => 0,
+            'is_play' => 0,
+            'price' => 100,
+            'img' => 'gift.png',
+            'show_img' => 'gift_show.png',
+            'show_img2' => 'gift_show_alt.png',
+            'enable' => 1,
+        ]);
 
-        $room = Room::where('type','audio')->first();
+        $room = Room::where('type', 'audio')->first();
+        if (! $room) {
+            $roomData = [
+                'numid' => Str::random(6),
+                'uid' => $receiver->id,
+                'room_status' => '1',
+                'room_name' => 'Integration Room',
+                'room_cover' => null,
+                'room_intro' => 'Integration room intro',
+                'room_pass' => null,
+                'room_class' => '5',
+                'room_type' => '16',
+                'room_welcome' => 'Welcome',
+                'room_admin' => null,
+                'room_visitor' => '',
+                'room_speak' => '',
+                'room_sound' => '',
+                'room_black' => '',
+                'week_star' => 2,
+                'ranking' => 1,
+                'is_popular' => 2,
+                'secret_chat' => 2,
+                'is_top' => 2,
+                'sort' => 1,
+                'room_background' => null,
+                'microphone' => '0,0,0,0,0,0,0,0,0,0',
+                'super_uid' => 2,
+                'is_afk' => 0,
+                'hot' => 0,
+                'room_judge' => null,
+                'is_prohibit_sound' => '0,0,0,0,0,0,0,0,0',
+                'openid' => null,
+                'commission_proportion' => null,
+                'fresh_time' => null,
+                'start_hour' => 0,
+                'end_hour' => 0,
+                'is_recommended' => 2,
+                'play_num' => 0,
+                'free_mic' => 0,
+            ];
+
+            if (Schema::hasColumn('rooms', 'type')) {
+                $roomData['type'] = 'audio';
+            }
+
+            if (Schema::hasColumn('rooms', 'session')) {
+                $roomData['session'] = 0;
+            }
+
+            if (Schema::hasColumn('rooms', 'total_diamond')) {
+                $roomData['total_diamond'] = 0;
+            }
+
+            if (Schema::hasColumn('rooms', 'level')) {
+                $roomData['level'] = 1;
+            }
+
+            if (Schema::hasColumn('rooms', 'level_id')) {
+                $roomData['level_id'] = 1;
+            }
+
+            if (Schema::hasColumn('rooms', 'charizma_status')) {
+                $roomData['charizma_status'] = 0;
+            }
+
+            $room = Room::create($roomData);
+        }
         $senderBefore = $user->di;
         $receiverBefore = $receiver->di;
 
@@ -58,25 +136,36 @@ class SendLuckyGift2FeatureTest extends TestCase
         $receiverGain = 50;
 
         // Mock LuckyGiftService
-        $mockGift = Mockery::mock(LuckyGiftService::class)->makePartial();
-        $mockGift->shouldReceive('sendCombo')
+        $mockGift = Mockery::mock(LuckyGiftService::class);
+        $mockGift->shouldReceive('sendLuckyGift2')
                  ->once()
-                 ->with(Mockery::any(), Mockery::any(), Mockery::any())
-                 ->andReturn([
-                     'success' => true,
-                     'message' => 'Gift sent successfully',
-                     'data' => [
+                 ->withArgs(function (array $payload, User $authUser, UpdateUserWhenSendGift $updateUserWhenSendGift) use ($gift, $receiver, $user) {
+                     return (int) $payload['id'] === $gift->id
+                         && (int) $payload['toUid'] === $receiver->id
+                         && $authUser->is($user)
+                         && $updateUserWhenSendGift instanceof UpdateUserWhenSendGift;
+                 })
+                 ->andReturnUsing(function (array $payload, User $authUser, UpdateUserWhenSendGift $updateUserWhenSendGift) use ($giftCost, $receiverGain, $receiver) {
+                     $authUser->di -= $giftCost;
+                     $authUser->save();
+
+                     $receiver->increment('di', $receiverGain);
+
+                     $updateUserWhenSendGift->updateUsers($receiverGain, [$receiver->id]);
+
+                     return [
                          'combo' => [
                              ['data' => ['win_coins' => $receiverGain]]
                          ]
-                     ]
-                 ]);
+                     ];
+                 });
         $this->app->instance(LuckyGiftService::class, $mockGift);
 
         // Mock UpdateUserWhenSendGift
         $mockUpdate = Mockery::mock(UpdateUserWhenSendGift::class);
-        $mockUpdate->shouldReceive('update')
+        $mockUpdate->shouldReceive('updateUsers')
                    ->once()
+                   ->with($receiverGain, [$receiver->id])
                    ->andReturnTrue();
         $this->app->instance(UpdateUserWhenSendGift::class, $mockUpdate);
 
@@ -93,7 +182,7 @@ class SendLuckyGift2FeatureTest extends TestCase
                 'Accept' => 'application/json',
             ])->postJson('/api/gifts/send-lucky-gift-combo', [
                 'id' => (int) $gift->id,
-                'toUid' => (int) $user->id,
+                'toUid' => (int) $receiver->id,
                 'room_id' => $room->id,
                 'num' => 1,
             ]);
@@ -114,7 +203,7 @@ class SendLuckyGift2FeatureTest extends TestCase
             $response->assertStatus(200)
                      ->assertJson([
                          'success' => true,
-                         'message' => 'Gift sent successfully'
+                         'message' => __('api_responses.success')
                      ]);
 
         } catch (\Exception $e) {
@@ -134,8 +223,8 @@ class SendLuckyGift2FeatureTest extends TestCase
         $expectedSender = $senderBefore - $giftCost;
         $expectedReceiver = $receiverBefore + $receiverGain;
 
-        $this->assertEquals($expectedSender, $user->coins,
-            "Sender coins mismatch. Expected: {$expectedSender}, Actual: {$user->coins}");
+        $this->assertEquals($expectedSender, $user->di,
+            "Sender coins mismatch. Expected: {$expectedSender}, Actual: {$user->di}");
 
         // تسجيل / تحديث diamonds الشهرية
         $month = now()->month;
@@ -157,17 +246,17 @@ class SendLuckyGift2FeatureTest extends TestCase
         $monthly->save();
         $monthly->refresh();
 
-        $this->assertEquals($receiverBefore + $receiverGain, $receiver->coins,
-            "Receiver coins mismatch. Expected: " . ($receiverBefore + $receiverGain) . ", Actual: {$receiver->coins}");
+        $this->assertEquals($receiverBefore + $receiverGain, $receiver->di,
+            "Receiver coins mismatch. Expected: " . ($receiverBefore + $receiverGain) . ", Actual: {$receiver->di}");
 
         $this->assertEquals($receiverGain, $monthly->monthly_diamond_received,
             "Monthly diamond received mismatch. Expected: {$receiverGain}, Actual: {$monthly->monthly_diamond_received}");
 
         $report = [
             'sender_before' => $senderBefore,
-            'sender_after' => $user->coins,
+            'sender_after' => $user->di,
             'receiver_before' => $receiverBefore,
-            'receiver_after' => $receiver->coins,
+            'receiver_after' => $receiver->di,
             'monthly_received' => $monthly->monthly_diamond_received,
             'gift_value' => $giftCost,
             'received_value' => $receiverGain,

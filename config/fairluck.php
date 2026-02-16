@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'house_edge_rate' => (float) env('FAIRLUCK_HOUSE_EDGE', 0.02),
     'high_multiplier' => [
         'tiers' => [
             100 => (float) env('FAIRLUCK_TIER_100', 3500),
@@ -30,5 +31,8 @@ return [
         'leaderboard_limit' => (int) env('FAIRLUCK_LEADERBOARD_LIMIT', 50),
         'pool_alert_floor' => (float) env('FAIRLUCK_POOL_ALERT_FLOOR', 50000),
         'pool_alert_ttl' => (int) env('FAIRLUCK_POOL_ALERT_TTL', 1800),
+    ],
+    'loss_rotation' => [
+        'cooldown_hours' => (int) env('FAIRLUCK_LOSS_ROTATION_HOURS', 6),
     ],
 ];

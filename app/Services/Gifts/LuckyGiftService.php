@@ -190,7 +190,6 @@ class LuckyGiftService
                 'error_message' => '',
             ];
 
-            $user->di -= $totalPrice;
             $index--;
             $message = null;
             $total_user_win += ($totalGiftPrice * $cashback_percentage);
@@ -429,6 +428,15 @@ class LuckyGiftService
                 ],
                 'error_message' => '',
             ];
+
+            $user->di -= $totalPrice;
+
+            $houseCut = (int) ($luckResult->houseCut ?? 0);
+            if ($houseCut > 0) {
+                $houseCut = min($houseCut, max(0, $user->di));
+                $user->di -= $houseCut;
+                $appWallet->coins += $houseCut;
+            }
 
             $user->di -= $totalPrice;
             $index--;
