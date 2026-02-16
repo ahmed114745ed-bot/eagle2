@@ -21,6 +21,11 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
+    @php
+        $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
+        $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
+    @endphp
+    <script data-exec-on-popstate src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
     <script data-exec-on-popstate>
         (function () {
             const updateNavbarLayout = () => {
@@ -1041,41 +1046,69 @@
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
-@php
-    $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
-    $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
-@endphp
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
 <script data-exec-on-popstate>
     (function () {
-        const initReelsComponent = () => {
-            const root = document.querySelector('.reels-main-container[x-data]');
-            if (!root || !window.Alpine || !window.reelsManager) {
+        const initializeReelsComponent = () => {
+            if (!window.Alpine || !window.reelsManager) {
                 return false;
             }
 
-            if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
-                window.Alpine.destroyTree(root);
+            const root = document.querySelector('.reels-main-container[x-data]');
+            if (!root) {
+                return false;
             }
 
-            window.Alpine.initTree(root);
+            try {
+                if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
+                    window.Alpine.destroyTree(root);
+                }
+
+                if (window.Alpine.discoverUninitializedComponents && window.Alpine.initializeComponent) {
+                    window.Alpine.discoverUninitializedComponents((el) => {
+                        if (el === root || root.contains(el)) {
+                            window.Alpine.initializeComponent(el);
+                        }
+                    });
+                } else if (window.Alpine.initTree) {
+                    window.Alpine.initTree(root);
+                } else if (window.Alpine.start) {
+                    window.Alpine.start();
+                }
+
+                root.removeAttribute('x-cloak');
+            } catch (error) {
+                console.error('Unable to initialize reels Alpine component:', error);
+                return false;
+            }
+
             return true;
         };
 
-        const retryUntilReady = () => {
-            if (!initReelsComponent()) {
-                setTimeout(retryUntilReady, 50);
-            }
+        const scheduleInitialization = () => {
+            let attempts = 0;
+            const tryInit = () => {
+                if (initializeReelsComponent()) {
+                    return;
+                }
+
+                if (attempts++ < 40) {
+                    setTimeout(tryInit, 50);
+                }
+            };
+
+            tryInit();
         };
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', retryUntilReady, { once: true });
+            document.addEventListener('DOMContentLoaded', scheduleInitialization, { once: true });
         } else {
-            retryUntilReady();
+            scheduleInitialization();
         }
 
-        document.addEventListener('pjax:complete', () => {
-            setTimeout(retryUntilReady, 0);
+        ['alpine:init', 'pjax:complete', 'pjax:success'].forEach((eventName) => {
+            document.addEventListener(eventName, () => {
+                setTimeout(scheduleInitialization, 0);
+            });
         });
     })();
 </script>
