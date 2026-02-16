@@ -11,8 +11,8 @@ use App\Models\UsersJoinedAgency;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
+use Utd\Family\Entities\FamilyUser;
 use Utd\Vip\Entities\UserVip;
-use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;
@@ -44,27 +44,27 @@ class ChangeAgencyAction extends RowAction
     {
         return DB::transaction(function () use ($request) {
                 $user = User::find($request->id);
-        
+
                 $agencyOwner = Agency::query()
                     ->where('owner_id', $request->id)
                     ->orWhere('app_owner_id', $request->id)
                     ->exists();
-        
+
                 if ($agencyOwner) {
                     throw ValidationException::withMessages([
                         'error' => __('This user is the agency owner and cannot be deleted')
                     ]);
                 }
-        
+
                 $oldAgencyId = $user->agency_id;
-        
+
                 uploadMonthlyDiamondReceive($user->id, 0);
-        
+
                 $this->handleUserSalaries($user);
                 $this->clearUserAgencyLogs($user ,$oldAgencyId);
-        
+
                 $this->updatePreviousAgencyJoined($user, $oldAgencyId);
-        
+
                 UsersJoinedAgency::create([
                     'user_id'   => $user->id,
                     'agency_id' => $request->agency_id,
@@ -72,11 +72,11 @@ class ChangeAgencyAction extends RowAction
                     'join_date' => now(),
                     'status'    => 'Joined',
                 ]);
-        
+
                 $user->agency_id = $request->agency_id;
                 $user->save();
-    
-        
+
+
                 return $this->response()->success('success')->refresh();
          });
     }
@@ -95,11 +95,11 @@ class ChangeAgencyAction extends RowAction
             ->where('year', $currentYear)
             ->where('is_finished', 0)
             ->first();
-         
+
         if (!$userSalaries) return;
-       
+
         if ($userSalaries->month == $currentMonth && $userSalaries->year == $currentYear) {
-          
+
             $userSalaries->update(['is_finished' => 1]);
         }
     }

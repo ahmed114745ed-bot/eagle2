@@ -239,7 +239,7 @@ return [
       
         App\Providers\RealsPackageServiceProvider::class,
         App\Providers\GiftsMenuServiceProvider::class,
-
+        \Utd\Family\FamilyServiceProvider::class,
     ],
 
     /*

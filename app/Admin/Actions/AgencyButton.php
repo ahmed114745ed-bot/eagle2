@@ -5,7 +5,7 @@ namespace App\Admin\Actions;
 use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Models\AgencyJoinRequest;
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;

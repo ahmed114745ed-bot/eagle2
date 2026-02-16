@@ -12,7 +12,7 @@ use Encore\Admin\Facades\Admin;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\AgencyPackageHelper;
 use App\Support\PackageHelper;
-use App\Admin\Actions\KickOfFamilyAction;
+use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 
 

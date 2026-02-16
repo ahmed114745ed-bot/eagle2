@@ -37,9 +37,8 @@ use App\Contracts\CpRepositoryContract;
 use Utd\Agency\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
-use App\Tik\Repositories\ProfileRepository;
+use App\Contracts\FamilyContract;
 use Utd\Vip\Repositories\VipRepository;
-use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
 use App\Contracts\RoomVisitorRepositoryContract;
@@ -70,7 +69,7 @@ class UserService
         private readonly TargetRepository $targetRepository,
         private readonly UserDevicesHistoryRepository $userDevicesHistoryRepository,
         private readonly UserTargetRepository $userTargetRepository,
-        private readonly FamilyUserRepository $familyUserRepository,
+        private readonly FamilyContract $familyService,
         private readonly AgencyRepository $agencyRepository,
         private readonly ShippingAgencyRepositoryInterface $shippingAgencyRepository,
         private readonly AgencySalaryRepository $agencySalaryRepository,
@@ -1032,7 +1031,7 @@ class UserService
             'family_id' => null,
         ];
         $user = $this->userRepository->update($data, $userId);
-        $this->familyUserRepository->deleteByUserId($userId);
+        $this->familyService->kickFamily($userId);
         return true;
     }
 

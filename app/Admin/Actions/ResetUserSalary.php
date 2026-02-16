@@ -5,7 +5,7 @@ namespace App\Admin\Actions;
 use App\Facades\UserHandling;
 use App\Helpers\Common;
 use App\Models\AgencyJoinRequest;
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\User;
 use App\Models\UserSallary;
 

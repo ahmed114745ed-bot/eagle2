@@ -37,6 +37,8 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use Modules\UsersWallet\Entities\UserWallet;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyUser;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\UserVip;
 use Utd\Vip\Entities\Vip;

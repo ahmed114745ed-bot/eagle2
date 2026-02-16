@@ -3,8 +3,8 @@
 namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
-use App\Models\Family;
-use App\Models\FamilyLevel;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
 use Illuminate\Http\Resources\Json\JsonResource;

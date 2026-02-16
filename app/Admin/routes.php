@@ -42,7 +42,7 @@ use App\Admin\Controllers\DeleteAccountController;
 use App\Admin\Controllers\EmojiCategoryController;
 use App\Admin\Controllers\EmojiController;
 use App\Admin\Controllers\ExportController;
-use App\Admin\Controllers\FamilyConfigSettingController;
+// use App\Admin\Controllers\FamilyConfigSettingController;
 use App\Admin\Controllers\FeatureAppController;
 use App\Admin\Controllers\GameChargeHistoryController;
 use App\Admin\Controllers\GameSettingsController;
@@ -282,7 +282,7 @@ Route::group(
         Route::resource('free-users', 'FreeUserController');
         Route::post('home-carousel-display-toggle', [HomeCarouselController::class, 'toggleStatus']);
 
-        Route::resource('family-users', 'UserFamilyController');
+        // Route::resource('family-users', 'UserFamilyController'); // Moved to package
         Route::post('send-request-invite-code', 'UserController@request_invite_code');
         Route::resource('user-statistics', 'UserStatisticsController');
         Route::resource('profiles', 'ProfileController');
@@ -341,7 +341,7 @@ Route::group(
 
 
 
-        Route::resource('families', 'FamilyController');
+        // Route::resource('families', 'FamilyController'); // Moved to package
 
         // Target routes - only if agency installed
         if (\App\Helpers\AgencyPackageHelper::isAgencyInstalled()) {
@@ -401,14 +401,14 @@ Route::group(
             ExportController::class,
             'exchangeChargeExcel'
         ])->name('exchange-charge-history');
-        Route::get('/family-level', [
-            ExportController::class,
-            'familyLevelExcel'
-        ])->name('family-level');
-        Route::get('/families-excel', [
-            ExportController::class,
-            'familiesExcel'
-        ])->name('families-excel');
+//         Route::get('/family-level', [
+//             ExportController::class,
+//             'familyLevelExcel'
+//         ])->name('family-level');
+//         Route::get('/families-excel', [
+//             ExportController::class,
+//             'familiesExcel'
+//         ])->name('families-excel');
         Route::get('/exchange-coin-history', [
             ExportController::class,
             'exchangeCoinExcel'
@@ -455,7 +455,7 @@ Route::group(
         Route::resource('requests-for-get-salary', 'GetSalaryRequestController');
         Route::resource('requests-for-get-salary-history', 'GetSalaryRequestFilterationController');
         Route::resource('special-id-requests', 'SpecialIdRequestController');
-        Route::resource('family_levels', 'FamilyLevelController');
+        // Route::resource('family_levels', 'FamilyLevelController'); // Moved to package
         Route::resource('silver', 'SilverController');
 
         Route::prefix('coins/{paymentGatwayId}')->group(function () {
@@ -594,8 +594,8 @@ Route::group(
         Route::resource('interests', InterestsController::class);
         Route::resource('custom-settings', CustomController::class);
         Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-        // setting-group-char moved to packages/Utd/Chat/Routes/admin.php
-        Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
+        Route::get('/setting-group-char', [GroupChatSettingController::class, 'index']);
+//         Route::get('/setting-family', [FamilyConfigSettingController::class, 'index']);
 
         // Agency manager routes - only if package installed
 

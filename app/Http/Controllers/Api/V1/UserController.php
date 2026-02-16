@@ -443,14 +443,14 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function userFamily(Request $request)
-    {
-        $key = $request->q;
-        $page = $request->get('page', 1);
-        $users = $this->userService->searchUsersInFamily($key, $page);
-
-        return response()->json($users);
-    }
+//     public function userFamily(Request $request)
+//     {
+//         $key = $request->q;
+//         $page = $request->get('page', 1);
+//         $users = $this->userService->searchUsersInFamily($key, $page);
+// 
+//         return response()->json($users);
+//     }
 
     public function joinAccount(Request $request)
     {
@@ -1174,16 +1174,15 @@ class UserController extends Controller
         }
     }
 
-    public function kickFamily($id)
-    {
-        try {
-            $this->userService->kickFamily($id);
-            return Common::apiResponse(true, 'removed');
-        } catch (Exception $exception) {
-
-            return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
+//     public function kickFamily($id)
+//     {
+//         try {
+//             $this->userService->kickFamily($id);
+//             return Common::apiResponse(true, 'removed');
+//         } catch (Exception $exception) {
+// 
+//             return Common::apiResponse(0, $exception->getMessage(), null, 400);
+    
 
     public function changeAgency(Request $request)
     {

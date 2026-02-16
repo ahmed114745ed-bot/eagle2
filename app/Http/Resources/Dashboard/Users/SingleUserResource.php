@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use App\Facades\UserHandling;
 use App\Http\Resources\Dashboard\Families\AdminFamiliesResource;
 use App\Http\Resources\Dashboard\Room\AdminRoomsResource;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Traits\Dashboard\DashBoardTrait;
 
 class SingleUserResource extends JsonResource

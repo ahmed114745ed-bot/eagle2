@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Helpers\Common;
 use App\Models\ImageColor;
 use App\Helpers\UserCommon;

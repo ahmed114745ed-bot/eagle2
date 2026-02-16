@@ -5,7 +5,7 @@ namespace App\Helpers;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use Utd\Vip\Entities\Vip;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserOfficialMessage;

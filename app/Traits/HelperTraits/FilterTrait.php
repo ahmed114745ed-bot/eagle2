@@ -8,7 +8,7 @@ use App\Support\PackageHelper;
 use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 
 trait FilterTrait
 {
