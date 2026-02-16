@@ -96,6 +96,11 @@ function reelsManager() {
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
                 
+                // التحقق الدوري من حالة الفيديوهات (للتعامل مع PJAX)
+                this.checkExistingVideosReady();
+                setTimeout(() => this.checkExistingVideosReady(), 500);
+                setTimeout(() => this.checkExistingVideosReady(), 1000);
+                
                 // تحميل مسبق لأول فيديوهين فوراً
                 if (this.isMobile) {
                     this.preloadFirstVideos();
@@ -523,6 +528,9 @@ function reelsManager() {
             this.selectedReelId = this.visibleReels[0]?.id;
             this.selectedReel = this.visibleReels[0] || null;
             
+            // التحقق من جميع الفيديوهات المحملة مسبقاً وتحديث حالتها
+            this.checkExistingVideosReady();
+            
             this.$nextTick(() => {
                 setTimeout(() => {
                     const firstVideo = document.getElementById('video-' + this.selectedReelId);
@@ -532,13 +540,25 @@ function reelsManager() {
                             console.log('⚡ تشغيل من الكاش');
                         }
                         
+                        // التحقق مرة أخرى وتحديث حالة الفيديو
                         if (firstVideo.readyState >= 2) {
+                            this.markVideoReady(this.selectedReelId);
                             firstVideo.play().catch(err => {
                                 console.log('تشغيل تلقائي معطل:', err);
                             });
                         }
                     }
                 }, 300); 
+            });
+        },
+        
+        // التحقق من الفيديوهات الموجودة مسبقاً (للتعامل مع PJAX navigation)
+        checkExistingVideosReady() {
+            this.visibleReels.forEach((reel) => {
+                const video = document.getElementById('video-' + reel.id);
+                if (video && video.readyState >= 2) {
+                    this.markVideoReady(reel.id);
+                }
             });
         },
         
@@ -571,8 +591,14 @@ function reelsManager() {
                 
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     const newVideo = document.getElementById('video-' + this.visibleReels[newIndex]?.id);
-                    if (newVideo && newVideo.paused && newVideo.readyState >= 2) {
-                        newVideo.play().catch(() => {});
+                    if (newVideo) {
+                        // تحديث حالة الفيديو إذا كان جاهزاً
+                        if (newVideo.readyState >= 2) {
+                            this.markVideoReady(this.visibleReels[newIndex]?.id);
+                        }
+                        if (newVideo.paused && newVideo.readyState >= 2) {
+                            newVideo.play().catch(() => {});
+                        }
                     }
                 }
                 
@@ -882,11 +908,14 @@ function reelsManager() {
             if (video.readyState < 2) {
                 const onCanPlay = () => {
                     video.removeEventListener('canplay', onCanPlay);
+                    this.markVideoReady(reelId);
                     video.play().catch(() => {});
                 };
                 video.addEventListener('canplay', onCanPlay, { once: true });
                 video.load();
             } else {
+                // تحديث حالة الفيديو للتأكد من إظهاره
+                this.markVideoReady(reelId);
                 video.play().catch(() => {});
             }
         },
