@@ -539,7 +539,7 @@ $(function() {
                 $showImagePath = !empty($imageData?->show_image) ? $imageData->show_image : $defaultImageData?->show_image;
             @endphp
 
-            @dump($code, $imageData, $defaultImageData, $imagePath, $showImagePath)
+            {{-- @dump($code, $imageData, $defaultImageData, $imagePath, $showImagePath) --}}
 
             <div class="tab-pane {{ $code === $selectedLang ? 'active' : '' }}"
                  id="lang-{{ $code }}"
