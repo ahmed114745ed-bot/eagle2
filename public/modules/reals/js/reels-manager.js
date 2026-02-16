@@ -820,18 +820,29 @@ function reelsManager() {
         async selectReel(reelId) {
             this.scrollingToSelection = true;
             this.pauseAllVideos();
-            this.selectedReelId = reelId;
-            this.selectedReel = this.visibleReels.find(r => r.id === reelId);
 
-            const targetIndex = this.visibleReels.findIndex(r => r.id === reelId);
-            if (targetIndex !== -1) {
-                this.currentVideoIndex = targetIndex;
-                this.loadedVideos = new Set([
-                    Math.max(0, targetIndex - 1),
-                    targetIndex,
-                    Math.min(this.visibleReels.length - 1, targetIndex + 1)
-                ]);
+            let targetIndex = this.visibleReels.findIndex(r => r.id === reelId);
+            if (targetIndex === -1) {
+                targetIndex = this.ensureReelVisible(reelId);
             }
+
+            const targetReel = this.allReels.find(r => r.id === reelId) ||
+                this.filteredReels.find(r => r.id === reelId);
+
+            if (targetIndex === -1 || !targetReel) {
+                this.scrollingToSelection = false;
+                return;
+            }
+
+            this.selectedReelId = reelId;
+            this.selectedReel = targetReel;
+
+            this.currentVideoIndex = targetIndex;
+            this.loadedVideos = new Set([
+                Math.max(0, targetIndex - 1),
+                targetIndex,
+                Math.min(this.visibleReels.length - 1, targetIndex + 1)
+            ]);
 
             const reelElement = document.querySelector(`[data-reel-id="${reelId}"]`);
             if (reelElement) {
@@ -843,12 +854,24 @@ function reelsManager() {
                 }
             }
 
-            // Play only the selected video after scroll settles
             this.$nextTick(() => {
                 this.playVideoById(reelId);
-                // Allow normal scroll autoplay again
                 this.scrollingToSelection = false;
             });
+        },
+
+        ensureReelVisible(reelId) {
+            const targetIndexAll = this.allReels.findIndex(r => r.id === reelId);
+            if (targetIndexAll === -1) {
+                return -1;
+            }
+
+            if (this.visibleReels.length < targetIndexAll + 1) {
+                const toAdd = this.allReels.slice(this.visibleReels.length, targetIndexAll + 1);
+                this.visibleReels = [...this.visibleReels, ...toAdd];
+            }
+
+            return this.visibleReels.findIndex(r => r.id === reelId);
         },
 
         playVideoById(reelId) {
@@ -1162,4 +1185,8 @@ function reelsManager() {
             }
         }
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.reelsManager = window.reelsManager || reelsManager;
 }
