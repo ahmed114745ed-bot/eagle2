@@ -34,8 +34,10 @@ Route::group(['prefix' => 'api'], function () {
         Route::post('/invite-room', [ChatRoomController::class, 'inviteRoom']);
 
         // Group Chat API
-        Route::get('/group-chat', [GroupChatController::class, 'index']);
-        Route::post('/group-chat', [GroupChatController::class, 'store']);
+        Route::prefix('group-chat')->group(function () {
+            Route::get('/', [GroupChatController::class, 'index']);
+            Route::post('/send', [GroupChatController::class, 'store']);
+        });
     });
 
 });
