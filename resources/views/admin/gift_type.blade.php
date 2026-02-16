@@ -92,13 +92,21 @@ $(document).ready(function () {
     }
 
     // ✅ AUTO RENDER FROM ROUTE CATEGORY
+    console.log('[gift-type] categories array:', categories);
     if (categories.length > 0) {
-        const category = categories[0]; // only one
+        const category = categories[0];
+        console.log('[gift-type] selected category:', category);
         if (category.type === 'lucky_gift') {
+            console.log('[gift-type] rendering lucky gift fields', @json($luckyGiftData));
             renderLuckyGift(@json($luckyGiftData));
         } else if (category.type === 'vip') {
+            console.log('[gift-type] rendering vip fields', @json($vipLevel));
             renderVIP(@json($vipLevel));
+        } else {
+            console.log('[gift-type] unsupported category type:', category.type);
         }
+    } else {
+        console.log('[gift-type] categories array is empty');
     }
 
     // Validation stays the same
