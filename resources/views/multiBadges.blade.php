@@ -296,8 +296,8 @@ $selectedLang = request()->input('tab', $defaultLang);
 }
 </style>
 
-<div class="language-manager">
-    {{-- Modern Tabs --}}
+{{-- <div class="language-manager">
+  
     <ul class="language-tabs" role="tablist">
         @foreach ($languages as $code => $label)
             <li class="nav-item">
@@ -311,13 +311,13 @@ $selectedLang = request()->input('tab', $defaultLang);
         @endforeach
     </ul>
 
-    {{-- Tab Content --}}
+  
     <div class="tab-content-modern">
         @foreach ($languages as $code => $label)
-            {{-- @php
+             @php
                 $imageData = $badgeImages[$code] ?? null;
                 $defaultImageData = $badgeImages['default'] ?? null;
-            @endphp --}}
+            @endphp 
 
             @php
                 $imageData = $badgeImages[$code] ?? null;
@@ -342,7 +342,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                  data-overridden="false"
                  style="{{ $code !== 'default' ? 'position: relative;' : '' }}">
 
-                {{-- Inheritance indicator --}}
+                
                 @if($code !== 'default')
                     <div class="inherit-container">
                         @if(!($badgeImages[$code] ?? null))
@@ -357,7 +357,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                 @endif
 
                 <div class="form-grid">
-                    {{-- Default Image --}}
+                    
                     <div class="form-group-modern">
                         <label>
                             {{ __('Default Image') }}
@@ -381,7 +381,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                                data-lang="{{ $code }}">
                     </div>
 
-                    {{-- Presentation File --}}
+                    
                     <div class="form-group-modern">
                         <label>
                             {{ __('Presentation file') }}
@@ -405,7 +405,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                     </div>
                 </div>
 
-                {{-- Image Type --}}
+               
                 <div class="form-group-modern" style="margin-top: 0.5rem;">
                     <label>
                         {{ __('Image Type') }}
@@ -428,7 +428,7 @@ $selectedLang = request()->input('tab', $defaultLang);
     </div>
 </div>
 
-{{-- Enhanced JS for inheritance --}}
+
 <script>
 $(function() {
     'use strict';
@@ -515,6 +515,213 @@ $(function() {
         $('.language-tabs .nav-link').removeClass('active');
         $(this).addClass('active');
         
+        $('.tab-pane').removeClass('active');
+        $(target).addClass('active');
+    });
+});
+</script> --}}
+
+
+
+
+
+<div class="language-manager">
+    {{-- Modern Tabs --}}
+    <ul class="language-tabs" role="tablist">
+        @foreach ($languages as $code => $label)
+            <li class="nav-item">
+                <a class="nav-link {{ $code === $selectedLang ? 'active' : '' }}"
+                   href="#lang-{{ $code }}"
+                   data-toggle="tab"
+                   data-lang="{{ $code }}">
+                    {{ $label }}
+                </a>
+            </li>
+        @endforeach
+    </ul>
+
+    {{-- Tab Content --}}
+    <div class="tab-content-modern">
+        @foreach ($languages as $code => $label)
+            @php
+                $imageData = $badgeImages[$code] ?? null;
+                $defaultImageData = $badgeImages['default'] ?? null;
+
+                // Show image / presentation
+                $showImagePath = $imageData?->show_image ?? $defaultImageData?->show_image ?? '';
+                $presentationImagePath = $imageData?->image ?? $defaultImageData?->image ?? '';
+                $imageType = $imageData?->image_type ?? $defaultImageData?->image_type ?? '';
+            @endphp
+
+            <div class="tab-pane {{ $code === $selectedLang ? 'active' : '' }}"
+                 id="lang-{{ $code }}"
+                 data-lang="{{ $code }}"
+                 data-overridden="false"
+                 style="{{ $code !== 'default' ? 'position: relative;' : '' }}">
+
+                {{-- Inheritance indicator --}}
+                @if($code !== 'default')
+                    <div class="inherit-container">
+                        @if(empty($imageData?->image) && !empty($defaultImageData?->image))
+                            <div class="inherit-badge">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-5m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                {{ __('Inheriting from default') }}
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="form-grid">
+                    {{-- Default Image --}}
+                    <div class="form-group-modern">
+                        <label>
+                            {{ __('Default Image') }}
+                            <span class="language-badge">{{ $label }}</span>
+                        </label>
+                        <div class="image-preview-modern">
+                            {!! handleShowImageWithTypes(
+                                $code.'_default',
+                                getImagePath($showImagePath),
+                                100,
+                                100,
+                                4,
+                                'contain'
+                            ) !!}
+                        </div>
+                        <input type="file"
+                               name="images[{{ $code }}][default_image]"
+                               class="file-input-modern file-input"
+                               data-lang="{{ $code }}">
+                    </div>
+
+                    {{-- Presentation File --}}
+                    <div class="form-group-modern">
+                        <label>
+                            {{ __('Presentation file') }}
+                            <span class="language-badge">{{ $label }}</span>
+                        </label>
+                        <div class="image-preview-modern">
+                            {!! handleShowImageWithTypes(
+                                $code.'_presentation',
+                                getImagePath($presentationImagePath),
+                                100,
+                                100,
+                                4,
+                                'contain'
+                            ) !!}
+                        </div>
+                        <input type="file"
+                               name="images[{{ $code }}][image]"
+                               class="file-input-modern file-input"
+                               data-lang="{{ $code }}">
+                    </div>
+                </div>
+
+                {{-- Image Type --}}
+                <div class="form-group-modern" style="margin-top: 0.5rem;">
+                    <label>
+                        {{ __('Image Type') }}
+                        <span class="language-badge">{{ $label }}</span>
+                    </label>
+                    <select name="images[{{ $code }}][image_type]"
+                            class="select-modern image-type"
+                            data-lang="{{ $code }}"
+                            required>
+                        @foreach(\App\Enums\ImageType::options() as $key => $val)
+                            <option value="{{ $key }}"
+                                {{ $imageType == $key ? 'selected' : '' }}>
+                                {{ $val }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+{{-- Enhanced JS for inheritance --}}
+<script>
+$(function() {
+    'use strict';
+
+    const DEFAULT = 'default';
+    const INHERIT_BADGE_TEMPLATE = `
+        <div class="inherit-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-5m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {{ __('Inheriting from default') }}
+        </div>
+    `;
+
+    function applyInheritance() {
+        const defaultType = $('select[data-lang="default"]').val();
+        const defaultShowImage = $('div#lang-default .form-group-modern').eq(0).find('img').attr('src');
+        const defaultPresentationImage = $('div#lang-default .form-group-modern').eq(1).find('img').attr('src');
+
+        $('.tab-pane').each(function () {
+            const pane = $(this);
+            const lang = pane.data('lang');
+            if(lang === DEFAULT) return;
+
+            const overridden = pane.data('overridden');
+            if(!overridden) {
+                const defaultImgExists = defaultShowImage || defaultPresentationImage;
+                if(defaultImgExists){
+                    pane.find('.inherit-container').html(`
+                        <input type="hidden" name="images[${lang}][inherit]" value="1">
+                        ${INHERIT_BADGE_TEMPLATE}
+                    `);
+                    pane.find('.image-type').val(defaultType).trigger('change.select2');
+                    if(!pane.find('.form-group-modern').eq(0).find('img').attr('src')){
+                        pane.find('.form-group-modern').eq(0).find('img').attr('src', defaultShowImage);
+                    }
+                    if(!pane.find('.form-group-modern').eq(1).find('img').attr('src')){
+                        pane.find('.form-group-modern').eq(1).find('img').attr('src', defaultPresentationImage);
+                    }
+                }
+            }
+        });
+    }
+
+    function createImagePreview(input, imgElement) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imgElement.attr('src', e.target.result);
+                applyInheritance();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $('select[data-lang="default"]').on('change', applyInheritance);
+    $('div#lang-default input[type="file"]').on('change', function(e) {
+        const img = $(this).closest('.form-group-modern').find('img');
+        createImagePreview(this, img);
+    });
+
+    $('.file-input').on('change', function() {
+        const pane = $(this).closest('.tab-pane');
+        const lang = pane.data('lang');
+        if(lang !== DEFAULT) {
+            pane.data('overridden', true);
+            pane.find('.inherit-container').empty();
+            const img = $(this).closest('.form-group-modern').find('img');
+            createImagePreview(this, img);
+        }
+    });
+
+    applyInheritance();
+
+    $('.language-tabs .nav-link').on('click', function(e) {
+        e.preventDefault();
+        const target = $(this).attr('href');
+        $('.language-tabs .nav-link').removeClass('active');
+        $(this).addClass('active');
         $('.tab-pane').removeClass('active');
         $(target).addClass('active');
     });
