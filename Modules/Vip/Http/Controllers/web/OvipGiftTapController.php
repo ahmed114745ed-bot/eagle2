@@ -315,7 +315,7 @@ class OvipGiftTapController extends MainController
             }
         }
 
-        if ($isType18or21 && ($isEditing && $ware && in_array($ware->type, [18, 21]))) {
+        if ($isType18or21 || ($isEditing && $ware && in_array($ware->type, [18, 21]))) {
            
             $form->color('color', trans('color'))->default('#ccc');
 
