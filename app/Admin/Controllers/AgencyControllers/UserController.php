@@ -26,7 +26,7 @@ use App\Admin\Actions\ChangeAgencyAction;
 use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfAgencyAction;
-use App\Admin\Actions\KickOfFamilyAction;
+use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Controllers\MainController;
 use App\Admin\Actions\CanPlaySwitchAction;
 use Modules\SwitchAccount\Entities\UserAccount;

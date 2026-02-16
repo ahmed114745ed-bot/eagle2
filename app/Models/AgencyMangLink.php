@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Utd\Agency\Helpers\AgencyModelsHelper;
 
-if ($agencymanglinkClass = AgencyModelsHelper::getAgencyMangLinkClass()) {
+
+if (class_exists("Utd\\Agency\\Helpers\\AgencyModelsHelper") && $agencyClass = \\Utd\\Agency\\Helpers\\AgencyModelsHelper::getAgencyMangLinkClass()) {
     class_alias($agencymanglinkClass, __NAMESPACE__ . '\AgencyMangLink');
 }

@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
 use Utd\Agency\Entities\ShippingAgency;

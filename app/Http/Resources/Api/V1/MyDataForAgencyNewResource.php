@@ -5,7 +5,7 @@ namespace App\Http\Resources\Api\V1;
 use App\Helpers\Common;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use Illuminate\Http\Resources\Json\JsonResource;

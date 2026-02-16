@@ -2,7 +2,7 @@
 
 namespace App\Selectables;
 
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Helpers\Common;
 use Encore\Admin\Grid\Filter;
 use Modules\Vip\Entities\OVip;

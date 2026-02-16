@@ -8,7 +8,7 @@ use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
-use App\Models\Family;
+use Utd\Family\Entities\Family;
 use App\Models\Setting;
 use App\Models\OfficialMessage;
 use Illuminate\Support\Facades\DB;

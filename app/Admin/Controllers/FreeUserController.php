@@ -6,7 +6,7 @@ use App\Helpers\AgencyPackageHelper;
 use App\Admin\Actions\DeletePackAction;
 use App\Admin\Actions\DeleteUserVipAction;
 use App\Admin\Actions\EditPackExpireAction;
-use App\Admin\Actions\KickOfFamilyAction;
+use Utd\Family\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Forms\ProfileForm;
 use App\Admin\Selectable\ImageColors;
 use App\Admin\Widgets\InfoBox;

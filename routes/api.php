@@ -34,7 +34,7 @@ use App\Http\Controllers\Api\V1\EmojiController;
 use App\Http\Controllers\Api\V1\MusicController;
 use App\Http\Controllers\FirebaseAuthController;
 use App\Http\Controllers\Api\V1\ChargeController;
-use App\Http\Controllers\Api\V1\FamilyController;
+use Utd\Family\Http\Controllers\Api\FamilyController;
 use App\Http\Controllers\Api\V2\AgencyController;
 use App\Http\Controllers\Api\V2\WalletController;
 use App\Http\Controllers\Api\V1\AllGameController;
@@ -132,7 +132,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
         Route::get('users-by-country', [UserController::class, 'usersByCountry'])->name('users-superadmin.country');
         Route::get('users-by-countries', [UserController::class, 'usersByCountries'])->name('users-by-countries');
         Route::get('users3', [UserController::class, 'userAgency'])->name('users3');
-        Route::get('users4', [UserController::class, 'userFamily'])->name('users4');
+        Route::get('users4', [FamilyController::class, 'userFamily'])->name('users4');
         Route::get('users5', [UserController::class, 'userAgencyShipping'])->name('users5');
         Route::get('app-manger', [UserController::class, 'userAgency'])->name('app-manger');
         Route::get('agencies', [UserController::class, 'agencies'])->name('agencies');
@@ -279,24 +279,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
 
-            Route::prefix('families')->middleware(['appFeatureEnable:families'])->group(function () {
-                Route::get('all', [FamilyController::class, 'index']);
-                Route::get('show/{id}', [FamilyController::class, 'show']);
-                Route::post('create', [FamilyController::class, 'store']);
-                Route::post('ranking', [FamilyController::class, 'ranking']);
-                Route::post('top-ranking', [FamilyController::class, 'topUserRanking']);
-                Route::post('edit/{id}', [FamilyController::class, 'update']);
-                Route::post('join', [FamilyController::class, 'join']);
-                Route::get('delete/{id}', [FamilyController::class, 'destroy']);
-                Route::post('remove_user', [FamilyController::class, 'removeUser']);
-                Route::post('req_list', [FamilyController::class, 'req_list']);
-                Route::post('take_action', [FamilyController::class, 'RequestFamilyAction']);
-                Route::post('change_user_type', [FamilyController::class, 'changeFamilyUserType']);
-                Route::post('getMembersList', [FamilyController::class, 'getMembersList']);
-                Route::post('getFamilyRooms', [FamilyController::class, 'getFamilyRooms']);
-                Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
-            });
-
+     
 
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);

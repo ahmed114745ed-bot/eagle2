@@ -62,7 +62,9 @@
         "utd/room-boom": "*",
         "utd/room-cup": "*",
         "utd/task-stream": "*",
-        "utd/chat": "*"
+        "utd/chat": "*",
+        "utd/family": "*"
+
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -77,13 +79,16 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
             "Utd\\CP\\Database\\Seeders\\": "vendor/utd/cp/Database/Seeders/",
-            "Utd\\LuckyBox\\Database\\Seeders\\": "vendor/utd/lucky-box/Database/Seeders/"
+            "Utd\\LuckyBox\\Database\\Seeders\\": "vendor/utd/lucky-box/Database/Seeders/",
+            "Utd\\Family\\": "packages/Utd/Family/src/"
+
         },
         "files": [
             "app/helpers.php",
             "app/helper/helpers.php",
             "app/helper/helperType.php",
-            "app/Helpers/UserCoinLogHelper.php"
+            "app/Helpers/UserCoinLogHelper.php",
+            "packages/Utd/Family/src/Support/helpers.php"
         ]
     },
     "autoload-dev": {
@@ -151,7 +156,6 @@
                 "symlink": true
             }
         },
-
         {
             "type": "path",
             "url": "packages/Utd/Reals",
@@ -172,6 +176,14 @@
         },
         {
             "type": "path", "url": "./packages/Utd/Gifts"
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Charizma"
+        },
+        {
+            "type": "path",
+            "url": "./packages/Utd/Gifts"
         },
         {
             "type": "path",
@@ -200,6 +212,11 @@
         {
             "type": "path",
             "url": "packages/Utd/Chat"
+        }
+        ,   {
+            "type": "path",
+            "url": "packages/Utd/Family",
+            "options": {"symlink": true}
         }
     ]
 }

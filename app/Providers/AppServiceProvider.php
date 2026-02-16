@@ -14,8 +14,6 @@ use App\Helpers\RoomHelper;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\Emoji;
-use App\Models\Family;
-use App\Models\FamilyUser;
 use App\Models\Gift;
 use App\Models\Language;
 use App\Models\Setting;
@@ -26,8 +24,6 @@ use App\Observers\AgencyJoinRequestObserver;
 use App\Observers\AgencyObserver;
 use App\Observers\ConfigObserver;
 use App\Observers\EmojiObserver;
-use App\Observers\FamilyObserver;
-use App\Observers\FamilyUserObserver;
 use App\Observers\GiftObserver;
 use App\Observers\SettingObserver;
 use App\Observers\UserObserver;
@@ -64,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bindIf(\App\Contracts\FamilyContract::class, \App\Services\Family\NullFamilyService::class);
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
@@ -357,8 +354,6 @@ class AppServiceProvider extends ServiceProvider
         Emoji::observe(EmojiObserver::class);
         Ware::observe(WareObserver::class);
         UserSallary::observe(UserSallaryObserver::class);
-        Family::observe(FamilyObserver::class);
-        FamilyUser::observe(FamilyUserObserver::class);
 
         if (class_exists(Agency::class) && class_exists(AgencyObserver::class)) {
             try {

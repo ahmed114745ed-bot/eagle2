@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static momentComment($moment, $user)
  * @method static familyLevelUpgrade(int $id)
  * @method static officialMsg(\App\Models\OfficialMessageAdmin $officialMessageAdmin,$usersId)
- * @method static family(\App\Models\Family $family, mixed $user)
+ * @method static family(\Utd\Family\Entities\Family $family, mixed $user)
  */
 class CustomNotification extends Facade
 {

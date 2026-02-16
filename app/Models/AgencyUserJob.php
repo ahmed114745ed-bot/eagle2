@@ -1,9 +1,5 @@
 <?php
-
 namespace App\Models;
-
-use Utd\Agency\Helpers\AgencyModelsHelper;
-
-if ($agencyUserJobClass = AgencyModelsHelper::getAgencyUserJobClass()) {
-    class_alias($agencyUserJobClass, __NAMESPACE__ . '\AgencyUserJob');
+if (class_exists('Utd\Agency\Helpers\AgencyModelsHelper') && $agencyClass = \Utd\Agency\Helpers\AgencyModelsHelper::getAgencyUserJobClass()) {
+    class_alias($agencyClass, __NAMESPACE__ . '\AgencyUserJob');
 }

@@ -12,7 +12,7 @@ use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
 use Modules\Vip\Entities\UserVip;
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;
 use App\Facades\UserHandling;

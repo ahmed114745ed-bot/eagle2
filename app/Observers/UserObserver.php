@@ -8,7 +8,7 @@ use App\Models\UserSetting;
 use App\Models\Ware;
 use App\Models\Follow;
 use App\Models\BlackList;
-use App\Models\FamilyUser;
+use Utd\Family\Entities\FamilyUser;
 use App\Models\Report_user;
 use App\Models\AgencyJoinRequest;
 
