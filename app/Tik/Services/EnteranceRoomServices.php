@@ -592,11 +592,6 @@ class EnteranceRoomServices
             ->orWhere("user_two_id", $user->id)->delete();
 
         $json = $this->cpMapJson([]);
-        Log::info('CP Partner Found enter room', [
-            'auth_user_id'   => $user->id,
-            'partner_id'     => $partner->id,
-            'partner_room'   => $partner->now_room_uid,
-        ]);
         if ($partner) Common::sendToZego('SendCustomCommand', @$partner->now_room_uid, $partner->id, $json);
     }
 
