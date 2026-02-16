@@ -332,6 +332,11 @@ Route::group(
                 'index' => 'gifts'
             ]
         ]);
+
+         Route::prefix('gifts')->group(function () {
+            Route::get('/{type}/create', [GiftController::class, 'create']);
+            Route::post('/{type}', [GiftController::class, 'store']);
+        });
         Route::get('lucky-gift-settings', [GiftController::class, 'luckyGiftSettings']);
         Route::get('home-carousel-settings', [HomeCarouselController::class, 'homeCarouselSettings']);
 
@@ -364,7 +369,7 @@ Route::group(
         Route::prefix('emojis')->group(function () {
             Route::get('/{filter?}', [EmojiController::class, 'index']);
         });
-        Route::resource('percentage-games', PercentageGameController::class);
+       
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
         Route::resource('vip_prev', 'VipAuthController');

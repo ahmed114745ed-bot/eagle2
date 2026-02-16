@@ -77,7 +77,7 @@ class UserRelationsResource extends JsonResource
             'is_followed'          => $this->followedByAuthUser !== null,
             'is_follow'            => $this->followerByAuthUser !== null,
             'image_color'          => @$this->color_image,
-            'color_name'   => common::wareUserVipColorV2($this, 18) ?? '',
+            'color_name'   => (fn($c) => is_string($c) ? $c : '')(common::wareUserVipColorV2($this, 18)),
             'chat_id' => $chatRoom->id ?? null,
             'deleted_at' => $this->deleted_at,
             'unread_messages_count' => $chatRoom->unread_messages_count ?? 0,

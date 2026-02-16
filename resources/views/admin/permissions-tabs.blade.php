@@ -31,7 +31,7 @@
         }
     });
 }
-//dd($allGroupedPermissions);
+    //dd($allGroupedPermissions);
     $firstCategory = $categories->first()->slug ?? null;
 @endphp
 
@@ -40,8 +40,28 @@
     font-size: 12px;
 }
     .nav-tabs{
-        background: var(--box-background-color);
+        background: #f9f9f9;
+         padding: 6px;
+        border-radius: 12px;
+        border: none;
     }
+
+.nav-tabs .nav-item {
+    margin: 0 4px;
+}
+
+.nav-tabs .nav-link {
+    border-radius: 10px;
+    padding: 8px 18px;
+    color: #555;
+    font-weight: 500;
+    transition: all .25s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background: rgba(0,0,0,.05);
+}
+    
     .nav-link.active {
         background-color: var(--primary-color);
         color: white;
@@ -58,7 +78,7 @@
         gap: 15px;
     }
     .permission-group {
-        background-color: var(--box-background-color);
+        background-color: #f9f9f9;
         border-radius: 8px;
         padding: 15px;
     }
@@ -115,6 +135,9 @@
     display: block !important;
 }
 </style>
+
+
+
 
 <input type="hidden" name="permissions_all" id="permissions_all">
 <ul class="nav nav-tabs mb-3" role="tablist" id="permission-tabs">

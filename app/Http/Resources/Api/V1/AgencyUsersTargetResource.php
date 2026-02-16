@@ -132,7 +132,7 @@ class AgencyUsersTargetResource extends JsonResource
             'top_users' => $giftLog->map(function ($log) {
                 return $log->sender?->profile?->avatar ?? '';
             })->filter()->values()->toArray(),
-            'colored_name' => $hasColor ? Common::wareUserVip(@$this->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip(@$this->id, 18, 'color') : null),
         ];
     }
 

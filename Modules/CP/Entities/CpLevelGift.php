@@ -2,17 +2,18 @@
 
 namespace Modules\CP\Entities;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
+use Modules\Vip\Entities\OVip;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Achievement\Entities\CustomAchievement;
 
 class CpLevelGift extends Model
 {
     use TimestampsWithTimezone;
 
     protected $guarded = [];
-     protected $appends = ['type_ware'];
+    protected $appends = ['type_ware'];
 
     public function cp_level()
     {
@@ -56,7 +57,6 @@ class CpLevelGift extends Model
             unset($model->attributes['type_ware']);
             unset($model->attributes['ware_item_id']);
             unset($model->attributes['vip_item_id']);
-
         });
     }
 
@@ -70,5 +70,8 @@ class CpLevelGift extends Model
         return $this->belongsTo(OVip::class, 'vip_item_id');
     }
 
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'item_id');
+    }
 }
-

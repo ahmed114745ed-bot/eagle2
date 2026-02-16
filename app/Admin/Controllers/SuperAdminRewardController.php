@@ -208,14 +208,17 @@ class SuperAdminRewardController extends MainController
 
     protected function badge($grid)
     {
-        $grid->model()->orderBy('priority', 'desc');
+        $grid->model()->whereHas('images', function ($query) use ($lang) {
+                $query->where('language', $lang);
+            })->with('images')->orderBy('priority', 'desc');
         $grid->column('name', __('name'))->sortable();
         $grid->column('priority', __('Priority'))->sortable();
-        $grid->column('image', __('image'))->display(function ($path) {
-            /** @var Ware $this */
-            $url = getImagePath($path);
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
+         $grid->column('images.image', __('image'))->display(function ($path) {
+                $path =   $this->images->firstWhere('language', app()->getLocale())?->image;
+                /** @var Ware $this */
+                $url = getImagePath($path);
+                return handleShowImageWithTypes($this->id, $url, 100, 100, 4, 'contain');
+            });
         $grid->filter(function ($filter) {
             $filter->like('name', 'Name');
             $filter->equal('priority', 'Priority');
@@ -249,6 +252,8 @@ class SuperAdminRewardController extends MainController
                 'ware:id,name,img2,show_img',
                 'vip:id,name,img',
                 'badge:id,name,image',
+                "customAchievement",
+                'customAchievement.images',
             ])
             ->select('id', 'type', 'target', 'expire', 'quantity', 'super_package_id')
             ->get()
@@ -270,7 +275,7 @@ class SuperAdminRewardController extends MainController
 
                     case 'badge':
                         $gifts = $memper->badge->name ?? '';
-                        $path  = $memper->badge->image ?? '';
+                        $path  = $memper->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
 
                     case 'coins':
@@ -279,8 +284,8 @@ class SuperAdminRewardController extends MainController
                         break;
 
                     case 'achievement':
-                        $gifts = "<img src='" . getDriverUrl() . "/{$memper->target}' width='80'>";
-                        $path  = $memper->target;
+                        $gifts = $memper->customAchievement?->name ?? '';
+                        $path  = $memper->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                         break;
                 }
 

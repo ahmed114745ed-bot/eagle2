@@ -736,7 +736,7 @@
 
     .input-with-result .result-badge {
         position: absolute;
-        left: 10px;
+        right: 10px;
         top: 50%;
         transform: translateY(-50%);
         background: var(--primary-color, #e74c3c);
@@ -798,9 +798,9 @@
         flex-direction: row-reverse;
     }
 
-    [dir="rtl"] .input-with-result .result-badge {
-        left: auto;
-        right: 10px;
+    .rtl .input-with-result .result-badge {
+        right: auto;
+        left: 10px;
     }
 
     /* Mobile Links Grid */

@@ -97,7 +97,6 @@ class RoomRepo implements RoomRepoInterface {
 
     public function findByType ( $id ,$type)
     {
-        info($type);
         return $this->model->where('uid', $id)->where('type' , $type)->first();
     }
 

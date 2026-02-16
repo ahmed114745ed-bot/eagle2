@@ -10,6 +10,7 @@ use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 
 class WeeklyCpGift extends Model
 {
@@ -30,6 +31,11 @@ class WeeklyCpGift extends Model
     public function badge()
     {
         return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     public function getTarget5Attribute()
@@ -81,12 +87,7 @@ class WeeklyCpGift extends Model
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
 
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -115,12 +116,7 @@ class WeeklyCpGift extends Model
             } elseif ($model->type === 'coins') {
                 $model->target = request('target3', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

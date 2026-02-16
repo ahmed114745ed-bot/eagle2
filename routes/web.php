@@ -55,7 +55,10 @@ use App\Admin\Controllers\MangerSettingController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\BdSalaryMigrationController;
 use App\Http\Controllers\SuperAdminCountryController;
+use App\Models\GiftLog;
 use Modules\Form\Http\Controllers\FormTemplateController;
+use Modules\RoomBoom\Entities\TotalRoomGift;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -222,6 +225,26 @@ Route::get('/run-seeders', function () {
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/badge-seeders', function () {
+
+    // Run multiple seeders one by one
+    Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ All seeders executed successfully.'
+    ]);
+});
+
+Route::get('/config-badges-seeder', function () {
+    Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ ConfigBadgesSeeder executed successfully.'
     ]);
 });
 
@@ -612,7 +635,7 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
     //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
-
+ Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
 
 Route::get('/test-games', function () {
@@ -1451,4 +1474,98 @@ Route::get('/debug/test-user-online', function () {
             'line' => $e->getLine(),
         ], 500, [], JSON_PRETTY_PRINT);
     }
+});
+
+Route::get('/time-start-week', function () {
+    $date = '2026-02-15';
+
+    // room_id => sum(current_total)
+    $totalRoomGifts = TotalRoomGift::whereDate('created_at', $date)
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(current_total)'), 'room_id');
+
+    // room_id => sum(giftPrice)
+    $totalGiftLogs = GiftLog::whereDate('created_at', $date)
+        ->groupBy('room_id')
+        ->pluck(DB::raw('SUM(giftPrice)'), 'room_id');
+
+    dd([
+        'date' => $date,
+        'total_room_gifts' => $totalRoomGifts,
+        'total_gift_logs' => $totalGiftLogs,
+    ]);
+});
+
+Route::get('/fix-total-room-gifts', function () {
+    $tz = getTimezone();
+    $startOfWeek = Carbon::now($tz)->startOfWeek()->copy()->setTimezone('UTC');
+    $endOfWeek = Carbon::now($tz)->endOfWeek()->copy()->setTimezone('UTC');
+
+    // Get correct totals from gift_logs for each room per day
+    $correctTotals = GiftLog::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+        ->groupBy('room_id', DB::raw('DATE(created_at)'))
+        ->selectRaw('room_id, DATE(created_at) as gift_date, SUM(giftPrice) as correct_total')
+        ->get();
+
+    $updated = 0;
+    $created = 0;
+    $results = [];
+
+    foreach ($correctTotals as $row) {
+        $roomId = $row->room_id;
+        $giftDate = $row->gift_date;
+        $correctTotal = $row->correct_total;
+
+        // Find or create TotalRoomGift record for this room on this date
+        $record = TotalRoomGift::whereDate('created_at', $giftDate)
+            ->where('room_id', $roomId)
+            ->first();
+
+        if ($record) {
+            $oldValue = $record->current_total;
+            if ($oldValue != $correctTotal) {
+                $record->current_total = $correctTotal;
+                $record->save();
+                $updated++;
+                
+                $results[] = [
+                    'action' => 'updated',
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => $oldValue,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal - $oldValue,
+                ];
+            }
+        } else {
+            // Create missing record only if correct_total > 0
+            if ($correctTotal > 0) {
+                TotalRoomGift::create([
+                    'room_id' => $roomId,
+                    'current_total' => $correctTotal,
+                    'created_at' => Carbon::parse($giftDate)->startOfDay(),
+                    'updated_at' => now(),
+                ]);
+                $created++;
+                
+                $results[] = [
+                    'action' => 'created',
+                    'room_id' => $roomId,
+                    'date' => $giftDate,
+                    'old' => 0,
+                    'new' => $correctTotal,
+                    'diff' => $correctTotal,
+                ];
+            }
+        }
+    }
+
+    return response()->json([
+        'start' => $startOfWeek->toDateTimeString(),
+        'end' => $endOfWeek->toDateTimeString(),
+        'updated_count' => $updated,
+        'created_count' => $created,
+        'total_processed' => $updated + $created,
+        'results' => $results,
+    ]);
 });

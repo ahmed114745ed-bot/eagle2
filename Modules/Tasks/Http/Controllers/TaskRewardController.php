@@ -2,19 +2,20 @@
 
 namespace Modules\Tasks\Http\Controllers;
 
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use Modules\Tasks\Entities\TaskReward;
-use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Events\Entities\Reward;
-use Modules\Tasks\Entities\Day;
 use Encore\Admin\Form\Request;
-use Modules\CP\Entities\CpLevelGift;
-use Modules\DailyPrize\Entities\DailyGift;
+use Modules\Vip\Entities\OVip;
+use Modules\Tasks\Entities\Day;
 use Encore\Admin\Layout\Content;
+use Modules\Events\Entities\Reward;
+use Modules\CP\Entities\CpLevelGift;
+use Modules\Tasks\Entities\TaskReward;
+use App\Selectables\CustomAchievements;
+use Modules\DailyPrize\Entities\DailyGift;
+use Encore\Admin\Controllers\AdminController;
 
 class TaskRewardController extends AdminController
 {
@@ -28,7 +29,7 @@ class TaskRewardController extends AdminController
             ->body($this->grid());
     }
 
-   
+
 
     public function create(Content $content)
     {
@@ -44,37 +45,35 @@ class TaskRewardController extends AdminController
         return $this->form()->update($id);
     }
 
- 
+
 
     protected function grid()
     {
         $dayId = request('day_id');
         $grid = new Grid(new TaskReward());
         $grid->column('created_at')->hide();
-        $grid->model()->where("day_id",$dayId);
+        $grid->model()->where("day_id", $dayId);
 
         $grid->column('id', __('Id'));
         $grid->column('type', __('Type'));
-        $grid->column('gift_id', __('gifts'))->display(function (){
-            if ($this->type == "ware"){
+        $grid->column('gift_id', __('gifts'))->display(function () {
+            if ($this->type == "ware") {
                 return @$this->ware->name;
-            }elseif ($this->type == "vip"){
+            } elseif ($this->type == "vip") {
                 return @$this->vip->name;
-            }elseif ($this->type == "coins"){
+            } elseif ($this->type == "coins") {
                 return @$this->target;
-            }elseif ($this->type == "achievement"){
-                $value = getDriverUrl() . '/'. @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+            } elseif ($this->type == "achievement") {
+                return $this->customAchievement?->name ?? '';
             }
-
         });
         $grid->column('created_at', __('Created at'));
 
-        $grid->tools(function ($tools) use ($dayId){
+        $grid->tools(function ($tools) use ($dayId) {
             $day = Day::find($dayId);
             $createUrl = url('admin/days');
             $tools->append('<a href="' . $createUrl . '" class="btn btn-success btn-sm">الذهاب الي قائمه الايام</a>');
-            $tools->append('<div><h5 style="color:yellow">قائمه هدايا  '.$day?->title.' </h5></div>');
+            $tools->append('<div><h5 style="color:yellow">قائمه هدايا  ' . $day?->title . ' </h5></div>');
         });
         return $grid;
     }
@@ -94,16 +93,16 @@ class TaskRewardController extends AdminController
 
         return $show;
     }
-    
+
     public function edit($id, Content $content)
     {
         $id = request()->route('id');
         $model = TaskReward::findOrFail($id);
-        
+
         $form = $this->form()->edit($id);
 
         if ($model->type == 'coins') {
-            $form->coins =(int) $model->target;
+            $form->coins = (int) $model->target;
         }
 
         return $content
@@ -129,41 +128,39 @@ class TaskRewardController extends AdminController
             "coins" => __('coins'),
             "achievement" => __('achievement')
         ])
-        ->when("ware", function () use ($form) {
-            $form->select('target', trans('wares'))->options(function () {
-                $ops = [0 => ''];
-                $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
-                foreach ($wares as $ware) {
-                    $ops[$ware->id] = $ware->name . '_' . $ware->id;
-                    if ($ware->type == 4) {
-                        $ops[$ware->id] .= '_bubble';
-                    } elseif ($ware->type == 5) {
-                        $ops[$ware->id] .= '_intro';
-                    } elseif ($ware->type == 6) {
-                        $ops[$ware->id] .= '_frame';
+            ->when("ware", function () use ($form) {
+                $form->select('target', trans('wares'))->options(function () {
+                    $ops = [0 => ''];
+                    $wares = Ware::query()->select(['id', 'name', 'type'])->whereIn('type', [4, 5, 6])->get();
+                    foreach ($wares as $ware) {
+                        $ops[$ware->id] = $ware->name . '_' . $ware->id;
+                        if ($ware->type == 4) {
+                            $ops[$ware->id] .= '_bubble';
+                        } elseif ($ware->type == 5) {
+                            $ops[$ware->id] .= '_intro';
+                        } elseif ($ware->type == 6) {
+                            $ops[$ware->id] .= '_frame';
+                        }
                     }
-                }
-                return $ops;
+                    return $ops;
+                });
+            })
+            ->when("vip", function () use ($form) {
+                $form->select('target', trans('vips'))->options(function () {
+                    $vips = OVip::query()->select('id', 'name')->get();
+                    $ops = [];
+                    foreach ($vips as $vip) {
+                        $ops[$vip->id] = $vip->name;
+                    }
+                    return $ops;
+                });
+            })
+            ->when("coins", function () use ($form) {
+                $form->number("coins", __("coins"));
+            })
+            ->when("achievement", function () use ($form) {
+                $form->belongsTo('achievement', CustomAchievements::class, trans('Custom achievement'));
             });
-        })
-        ->when("vip", function () use ($form) {
-            $form->select('target', trans('vips'))->options(function () {
-                $vips = OVip::query()->select('id', 'name')->get();
-                $ops = [];
-                foreach ($vips as $vip) {
-                    $ops[$vip->id] = $vip->name;
-                }
-                return $ops;
-            });
-        })
-        ->when("coins", function () use ($form) {
-            $form->number("coins", __("coins"));
-        })
-        ->when("achievement", function () use ($form) {
-            $form->image("achievement", __('image'))->name(function ($file) {
-                return now()->timestamp . '.' . $file->guessExtension();
-            })->disk('gcs');
-        });
 
         $form->number('expire', __('expire'));
 
@@ -180,7 +177,6 @@ class TaskRewardController extends AdminController
                     }
                 }
             } elseif ($form->type == 'vip') {
-                
             } elseif ($form->type == 'coins') {
                 $form->target = $form->coins;
             } elseif ($form->type == 'achievement') {

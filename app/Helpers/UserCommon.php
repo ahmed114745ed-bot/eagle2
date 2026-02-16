@@ -93,7 +93,7 @@ class UserCommon
     public static function getColoredName(User $user)
     {
         $hasColor  = Common::hasInPack(@$user?->senderShippingAgency?->owner?->id, 18, true);
-        $colorName = $hasColor ? common::wareUserVip(@$user?->senderShippingAgency?->owner?->id, 18, 'color') ?? '' : '';
+        $colorName = (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip(@$user?->senderShippingAgency?->owner?->id, 18, 'color') : null);
         return $colorName;
     }
 
@@ -481,10 +481,25 @@ class UserCommon
     }
 
 
-    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null)
+    public static function addEvintsWareToUser(User $user, Ware $ware, $expir, $sender = null, $receiveType = null, $isUsed = null, $feature = null)
     {
         $title = __('congratulations');
-        $body = $user->name . ':' .  __('You have received a gift: :ware', ['ware' => $ware->name]);
+        $body = $user->name . ':' . __('You have received a gift: :ware', [
+            'ware' => $ware->name
+        ]);
+        if ($feature) {
+            $body = $user->name . ':' . __('wareGiftNotification', [
+                'wareName' => $ware->name,
+                'type'     => $feature->name
+            ]);
+
+            // Log::info('Adding event ware to user', [
+            //     'user_id' => $user->id,
+            //     'ware_id' => $ware->id,
+            //     'feature' => $feature->name,
+            // ]);
+        }
+
 
         DB::beginTransaction();
         try {

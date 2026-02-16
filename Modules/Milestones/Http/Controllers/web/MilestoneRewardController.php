@@ -2,21 +2,22 @@
 
 namespace Modules\Milestones\Http\Controllers\web;
 
-use App\Selectables\Badges;
-use App\Selectables\OVips;
-use Encore\Admin\Controllers\HasResourceActions;
+use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Admin;
-use Modules\Milestones\Entities\Milestone;
-use Modules\Milestones\Entities\MilestoneReward;
-use Modules\Achievement\Entities\Achievement;
-use Modules\Badge\Entities\Badge;
-use Modules\Vip\Entities\OVip;
-use App\Models\Ware;
+use App\Selectables\OVips;
 use App\Selectables\Wares;
+use App\Selectables\Badges;
+use Modules\Vip\Entities\OVip;
+use Encore\Admin\Layout\Content;
+use Modules\Badge\Entities\Badge;
+use App\Selectables\CustomAchievements;
+use Modules\Milestones\Entities\Milestone;
+use Modules\Achievement\Entities\Achievement;
+use Encore\Admin\Controllers\HasResourceActions;
+use Modules\Milestones\Entities\MilestoneReward;
 
 class MilestoneRewardController
 {
@@ -81,7 +82,7 @@ class MilestoneRewardController
             } elseif ($this->type === "vip") {
                 return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "achievement") {
-                return $this->rewardable?->title ?? "-";
+                return $this->rewardable?->name ?? "-";
             } elseif ($this->type === "badge") {
                 return $this->rewardable?->title ?? "-";
             }
@@ -96,9 +97,9 @@ class MilestoneRewardController
                 } elseif ($this->type === "vip") {
                     $path = $this->rewardable?->img;
                 } elseif ($this->type === "achievement") {
-                    $path = $this->reward;
+                    $path = $this->rewardable?->images->firstWhere('language', app()->getLocale())?->image;
                 } elseif ($this->type === "badge") {
-                    $path = $this->rewardable?->image;
+                    $path = $this->rewardable?->images->firstWhere('language', app()->getLocale())?->image;
                 } else {
                     $path = 'coin.png';
                 }
@@ -134,7 +135,7 @@ class MilestoneRewardController
     protected function form()
     {
         $form = new Form(new MilestoneReward());
-         $form->html('<div class="full-column-width">');
+        $form->html('<div class="full-column-width">');
         $form->hidden('milestone_id')->value(request('milestone_id'));
 
         $form->select('type', __('Type'))->options([
@@ -154,9 +155,11 @@ class MilestoneRewardController
             })
             ->when("achievement", function (Form $form) {
 
-                $form->image("reward1", __('Image'))
-                    ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
-                    ->disk('gcs');
+                // $form->image("reward1", __('Image'))
+                //     ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+                //     ->disk('gcs');
+                $form->belongsTo('reward1', CustomAchievements::class, trans('Custom achievement'));
+
 
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
@@ -167,9 +170,9 @@ class MilestoneRewardController
             ->when("coins", function (Form $form) {
                 $form->number("reward2", __('Coins'))->rules('required|integer|min:1');
             });
-           $form->html('</div>');
+        $form->html('</div>');
 
-         Admin::style('
+        Admin::style('
 
         .rtl .fields-group .form-group {
             display: block !important;
@@ -197,10 +200,10 @@ class MilestoneRewardController
                     break;
 
                 case 'achievement':
-                    $form->rewardable_id = 0;
-                    $form->model()->rewardable_id = 0;
-                    $form->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
-                    $form->model()->rewardable_type = \Modules\Achievement\Entities\Achievement::class;
+                    // $form->rewardable_id = 0;
+                    // $form->model()->rewardable_id = 0;
+                    $form->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
+                    $form->model()->rewardable_type = \Modules\Achievement\Entities\CustomAchievement::class;
 
 
                     break;
