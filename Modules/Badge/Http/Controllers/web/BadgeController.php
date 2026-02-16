@@ -89,6 +89,7 @@ class BadgeController extends MainController
     protected function form()
     {
         $form = new Form(new Badge());
+        dd($form->model()->images()->get());
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
