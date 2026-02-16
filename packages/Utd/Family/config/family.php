@@ -16,6 +16,7 @@ return [
         'user' => \App\Models\User::class,
         'family' => \Utd\Family\Entities\Family::class,
         'family_member' => \Utd\Family\Entities\FamilyMember::class,
+        'profile' => \App\Models\Profile::class,
         'pack' => \App\Models\Pack::class,
         'ware' => \App\Models\Ware::class,
         'agency' => \App\Models\Agency::class,
@@ -73,6 +74,7 @@ return [
         'delete_pack' => \App\Admin\Actions\DeletePackAction::class,
         'delete_user_vip' => \App\Admin\Actions\DeleteUserVipAction::class,
         'edit_pack_expire' => \App\Admin\Actions\EditPackExpireAction::class,
+        'user_action' => \App\Admin\Actions\UserAction::class,
         'table' => \App\Admin\Widgets\Table::class,
     ],
 

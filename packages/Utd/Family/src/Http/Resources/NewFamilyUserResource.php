@@ -18,6 +18,7 @@ class NewFamilyUserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $mangerTypeResource = family_resource('manger_type');
         return [
             'id'    => $this->id,
             'user'  => [
@@ -41,7 +42,7 @@ class NewFamilyUserResource extends JsonResource
                 'frame'     => family_helper('common')::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img2', true)?:family_helper('common')::getUserDress(@$this->user?->id,@$this->user?->dress_1,4,'img1', true),
                 'frame_id'  => @$this->dress_1,
                 'type_user'            => intval(@$this->user->type_user) ?: 0, // both
-                "manger_type"          =>new MangerTypeResource(@$this->user->mangerType)
+                'manger_type'          => $mangerTypeResource ? new $mangerTypeResource(@$this->user->mangerType) : null
             ],
             'time'  =>\Carbon\Carbon::parse($this->created_at)->diffForHumans(),
         ];

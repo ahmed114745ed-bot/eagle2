@@ -306,7 +306,8 @@ class FamilyController extends Controller
             DB::rollBack();
             return family_helper('common')::apiResponse(0, $exception->getMessage(), null, 400);
         }
-        return family_helper('common')::apiResponse(1, '', RoomResource::collection($rooms), 200);
+        $roomResource = family_resource_or_fail('room');
+        return family_helper('common')::apiResponse(1, '', $roomResource::collection($rooms), 200);
     }
 
     public function exitFamily(Request $request)

@@ -187,25 +187,56 @@
 
     <section>
         <h2>⚙️ التثبيت السريع</h2>
-        
+
         <div class="step">
             <div class="step-number">1</div>
             <div class="step-content">
-                <p class="step-title">تشغيل أمر التثبيت التلقائي</p>
-                <p class="step-desc">قم بتنفيذ الأمر التالي في الطرفية ليقوم بنشر الإعدادات وتشغيل التهجيرات:</p>
-                <pre><code>php artisan family:install</code></pre>
+                <p class="step-title">تهيئة composer.json</p>
+                <p class="step-desc">أضف الاعتماد والمستودع المحلي:</p>
+<pre><code>"require": {
+    "utd/family": "*"
+},
+"repositories": [
+    {
+        "type": "path",
+        "url": "packages/Utd/Family",
+        "options": {"symlink": true}
+    }
+]</code></pre>
             </div>
         </div>
 
         <div class="step">
             <div class="step-number">2</div>
             <div class="step-content">
-                <p class="step-title">تحديث ملف composer.json (اختياري)</p>
-                <p class="step-desc">تأكد من وجود المسار في قسم autoload:</p>
-                <pre><code>"psr-4": {
+                <p class="step-title">ضبط autoload</p>
+                <p class="step-desc">تأكد من وجود إعدادات التحميل التالية:</p>
+<pre><code>"psr-4": {
     "Utd\\Family\\": "packages/Utd/Family/src/"
-}</code></pre>
-                <pre><code>composer dump-autoload</code></pre>
+},
+"files": [
+    "packages/Utd/Family/src/Support/helpers.php"
+]</code></pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <p class="step-title">إضافة مزود الخدمة</p>
+                <p class="step-desc">في <code>config/app.php</code> داخل مصفوفة <code>providers</code> أضف:</p>
+                <pre><code>\Utd\Family\FamilyServiceProvider::class,</code></pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <p class="step-title">تشغيل أوامر التثبيت</p>
+                <p class="step-desc">قم بتحديث Composer ثم نفّذ أمر التثبيت:</p>
+<pre><code>composer dump-autoload
+php artisan family:install --force</code></pre>
+                <p class="step-desc">الأمر يقوم بنشر الإعدادات، تشغيل هجرت الحزمة، وتنظيف الكاش تلقائياً.</p>
             </div>
         </div>
     </section>
@@ -230,11 +261,10 @@
 
     <section>
         <h2 style="color: var(--danger);">🗑️ إلغاء التثبيت</h2>
-        <p>إذا كنت ترغب في حذف الحزمة بالكامل مع بياناتها:</p>
-        <pre><code>php artisan family:uninstall</code></pre>
+        <p>الأمر التالي يفصل الحزمة عن المشروع دون حذف بيانات قاعدة البيانات، ويقوم تلقائياً بتحديث Composer ومسح الكاش:</p>
+        <pre><code>php artisan family:uninstall --force</code></pre>
         <div class="note note-warning">
-            استخدم خيار <code>--keep-data</code> إذا كنت تريد حذف الأعمدة فقط والاحتفاظ بجداول الحزمة.
-        </div>
+            بعد الإزالة، ستحتاج لإعادة تنفيذ خطوات التثبيت أعلاه إذا رغبت في تفعيل الحزمة مرة أخرى.</div>
     </section>
 
     <div class="footer">

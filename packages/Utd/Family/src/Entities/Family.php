@@ -21,7 +21,14 @@ class Family extends Model
 
     public function users()
     {
-        return $this->hasManyThrough(family_model('user'), Familyfamily_model('user'), 'family_id', 'family_id');
+        return $this->hasManyThrough(
+            family_model_or_fail('user'),
+            FamilyUser::class,
+            'family_id',
+            'id',
+            'id',
+            'user_id'
+        );
     }
 
     public function owner()
@@ -38,12 +45,12 @@ class Family extends Model
 
     public function members()
     {
-        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', 0);
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 0);
     }
 
     public function allMembers()
     {
-        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', '!=', 2);
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', '!=', 2);
     }
 
     public function currentLevel()
@@ -67,7 +74,7 @@ class Family extends Model
 
     public function admins()
     {
-        return $this->hasMany(Familyfamily_model('user'), 'family_id')->where('status', 1)->where('user_type', 1);
+        return $this->hasMany(FamilyUser::class, 'family_id')->where('status', 1)->where('user_type', 1);
     }
 
     public function getLevelAttribute()

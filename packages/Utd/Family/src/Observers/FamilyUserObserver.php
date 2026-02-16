@@ -15,7 +15,8 @@ class FamilyUserObserver
     public function created(FamilyUser $familyUser)
     {
         if ($familyUser->status == 1) {
-            User::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
+            $userModel = family_model_or_fail('user');
+            $userModel::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
         }
     }
 
@@ -27,7 +28,8 @@ class FamilyUserObserver
     public function updated(FamilyUser $familyUser)
     {
         if ($familyUser->status == 1) {
-            User::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
+            $userModel = family_model_or_fail('user');
+            $userModel::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
         }
     }
 
@@ -38,11 +40,12 @@ class FamilyUserObserver
      */
     public function deleted(FamilyUser $familyUser)
     {
+        $userModel = family_model_or_fail('user');
         $family = Family::query()->where('id', $familyUser->family_id)->first();
         if ($family) {
-            User::query()->where('id', $familyUser->user_id)->where('id', '!=', $family->user_id)->update(['family_id' => 0]);
+            $userModel::query()->where('id', $familyUser->user_id)->where('id', '!=', $family->user_id)->update(['family_id' => 0]);
         } else {
-            User::query()->where('id', $familyUser->user_id)->update(['family_id' => 0]);
+            $userModel::query()->where('id', $familyUser->user_id)->update(['family_id' => 0]);
         }
     }
 }

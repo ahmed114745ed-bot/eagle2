@@ -2,11 +2,8 @@
 
 namespace Utd\Family\Database\Seeders;
 
-use App\Models\User;
-use App\Models\Family;
-use App\Models\Profile;
-use App\Models\FamilyUser;
 use Illuminate\Database\Seeder;
+use Utd\Family\Entities\Family;
 
 class FamilyCountryUpdateSeeder extends Seeder
 {

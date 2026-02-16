@@ -2,10 +2,8 @@
 
 namespace Utd\Family\Database\Seeders;
 
-use App\Models\FamilyUser;
-use App\Models\Profile;
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Utd\Family\Entities\FamilyUser;
 
 class FamilyUserSeeder extends Seeder
 {
@@ -15,11 +13,15 @@ class FamilyUserSeeder extends Seeder
      * @return void
      */
     public function run()
-    {$users = User::factory(100)->create(['di' => 900000]);
+    {
+        $userModel = family_model_or_fail('user');
+        $profileModel = family_model_or_fail('profile');
+
+        $users = $userModel::factory(100)->create(['di' => 900000]);
 
         foreach ($users as $user) {
-            Profile::factory()->create(['user_id' =>$user->id]);
-            FamilyUser::factory()->create(['user_id' =>$user->id, 'family_id' => 325]);
+            $profileModel::factory()->create(['user_id' => $user->id]);
+            FamilyUser::factory()->create(['user_id' => $user->id, 'family_id' => 325]);
         }
     }
 }

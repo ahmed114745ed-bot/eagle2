@@ -15,7 +15,9 @@ class FamilyResource extends JsonResource
      */
     public function toArray($request)
     {
-        $user = User::find($this->user_id);
+        $userModel = family_model_or_fail('user');
+        $mangerTypeResource = family_resource('manger_type');
+        $user = $userModel::find($this->user_id);
         if ($user) {
             $owner = [
                 'id'        => $user->id,
@@ -32,7 +34,7 @@ class FamilyResource extends JsonResource
                 ],
                 'family_status' => 2,
                 'type_user'            => intval(@$user->type_user) ?: 0, // both
-                "manger_type"          => new MangerTypeResource(@$user->mangerType),
+                'manger_type'          => $mangerTypeResource ? new $mangerTypeResource(@$user->mangerType) : null,
                 'uuid'                 => @$user->uuid, // both
                 'id_image'             => @$user->specialId?->ware?->show_img ?? '',
                 'special_id'          =>  @$user->specialId?->ware?->id ?? 0,

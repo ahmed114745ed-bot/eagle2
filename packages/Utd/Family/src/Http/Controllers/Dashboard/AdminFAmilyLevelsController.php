@@ -2,6 +2,7 @@
 
 namespace Utd\Family\Http\Controllers\Dashboard;
 
+use Utd\Family\Traits\DashBoardTrait;
 use Utd\Family\Http\Controllers\Controller;
 
 use Utd\Family\Entities\FamilyLevel;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 class AdminFAmilyLevelsController extends Controller
 {
     use DashBoardTrait;
+
 
     public function index()
     {

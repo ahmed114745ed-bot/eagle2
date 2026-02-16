@@ -55,7 +55,9 @@ class FamilyRepository extends AbstractRepository
 
     public function searchUserFamily($key, $page, $perPage)
     {
-        return \App\Models\User::whereHas('family')
+        $userModel = family_model_or_fail('user');
+
+        return $userModel::whereHas('family')
             ->where(function ($query) use ($key) {
                 $query->where('name', 'like', '%' . $key . '%')
                     ->orWhere('id', 'like', '%' . $key . '%')

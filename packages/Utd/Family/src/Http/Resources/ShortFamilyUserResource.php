@@ -6,7 +6,6 @@ use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
 use Utd\Room\Entities\Room;
 use Carbon\Carbon;
-use http\Client\Curl\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ShortFamilyUserResource extends JsonResource
@@ -22,6 +21,7 @@ class ShortFamilyUserResource extends JsonResource
        if(!@$this->id){
            return ;
        }
+        $mangerTypeResource = family_resource('manger_type');
 
         $data = [
             'id'=>@$this->user?->id,
@@ -35,7 +35,7 @@ class ShortFamilyUserResource extends JsonResource
             
             'family_status' => @$this->user_type,
             'type_user'            => intval(@$this->user?->type_user) ?: 0, // both
-            "manger_type"          =>new MangerTypeResource(@$this->user?->mangerType),
+            'manger_type'          => $mangerTypeResource ? new $mangerTypeResource(@$this->user?->mangerType) : null,
         ];
         return $data;
     }

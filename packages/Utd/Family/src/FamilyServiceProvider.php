@@ -28,10 +28,10 @@ class FamilyServiceProvider extends ServiceProvider
     protected function registerAliases(): void
     {
         if (!class_exists('Utd\\Family\\Http\\Controllers\\Controller')) {
-            class_alias(
-                config('family.controllers.base', \App\Http\Controllers\Controller::class),
-                'Utd\\Family\\Http\\Controllers\\Controller'
-            );
+            $baseController = config('family.controllers.base');
+            if ($baseController && class_exists($baseController)) {
+                class_alias($baseController, 'Utd\\Family\\Http\\Controllers\\Controller');
+            }
         }
 
         if (!class_exists('Utd\\Family\\Http\\Controllers\\Admin\\MainController')) {
@@ -42,24 +42,24 @@ class FamilyServiceProvider extends ServiceProvider
         }
 
         if (!class_exists('Utd\\Family\\Repositories\\AbstractRepository')) {
-            class_alias(
-                config('family.repositories.abstract', \App\Tik\Repositories\AbstractRepository::class),
-                'Utd\\Family\\Repositories\\AbstractRepository'
-            );
+            $abstractRepository = config('family.repositories.abstract');
+            if ($abstractRepository && class_exists($abstractRepository)) {
+                class_alias($abstractRepository, 'Utd\\Family\\Repositories\\AbstractRepository');
+            }
         }
 
         if (!interface_exists('Utd\\Family\\Services\\RoomRepositoryContract')) {
-            class_alias(
-                config('family.contracts.room_repository', \App\Contracts\RoomRepositoryContract::class),
-                'Utd\\Family\\Services\\RoomRepositoryContract'
-            );
+            $roomRepositoryContract = config('family.contracts.room_repository');
+            if ($roomRepositoryContract && interface_exists($roomRepositoryContract)) {
+                class_alias($roomRepositoryContract, 'Utd\\Family\\Services\\RoomRepositoryContract');
+            }
         }
 
-        if (!interface_exists('Utd\\Family\\Traits\\DashBoardTrait')) {
-            class_alias(
-                config('family.traits.dashboard', \App\Traits\Dashboard\DashBoardTrait::class),
-                'Utd\\Family\\Traits\\DashBoardTrait'
-            );
+        if (!trait_exists('Utd\\Family\\Traits\\DashBoardTrait', false)) {
+            $dashboardTrait = config('family.traits.dashboard');
+            if ($dashboardTrait && trait_exists($dashboardTrait)) {
+                class_alias($dashboardTrait, 'Utd\\Family\\Traits\\DashBoardTrait');
+            }
         }
     }
 

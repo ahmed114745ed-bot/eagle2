@@ -22,7 +22,14 @@ trait ResourceTrait
 
     public function usersRequests()
     {
-        return $this->hasManyThrough(family_model('user'), Familyfamily_model('user'), 'family_id', 'family_id')->where('family_user.status', 0);
+        return $this->hasManyThrough(
+            family_model_or_fail('user'),
+            FamilyUser::class,
+            'family_id',
+            'id',
+            'id',
+            'user_id'
+        )->where('family_user.status', 0);
     }
 
     public function getUsersRequestsCountAttribute()

@@ -14,10 +14,12 @@ class FamilyController extends Controller
     use DashBoardTrait;
 
     protected $familyService;
+    protected string $userModel;
 
     public function __construct(FamilyService $familyService)
     {
         $this->familyService = $familyService;
+        $this->userModel = family_model_or_fail('user');
     }
 
     public function index()
@@ -64,7 +66,8 @@ class FamilyController extends Controller
         ]);
 
         // Update the user's family_id
-        User::where('id', $family->user_id)->update(['family_id' => $family->id]);
+        $userModel = $this->userModel;
+        $userModel::where('id', $family->user_id)->update(['family_id' => $family->id]);
 
         // Create FamilyUser entry
         FamilyUser::create([
@@ -90,7 +93,8 @@ class FamilyController extends Controller
         $family =  Family::findOrFail($id);
 
         if ($family->user_id != $request->user_id) {
-            User::where('id', $request->user_id)->update(['family_id' => null]);
+            $userModel = $this->userModel;
+            $userModel::where('id', $request->user_id)->update(['family_id' => null]);
             FamilyUser::where([
                 'user_id' => $request->user_id,
                 'family_id' => $family->id,
@@ -98,7 +102,7 @@ class FamilyController extends Controller
                 'status' => 1,
             ])->delete();
 
-            User::where('id', $request->user_id)->update(['family_id' => $family->id]);
+            $userModel::where('id', $request->user_id)->update(['family_id' => $family->id]);
             FamilyUser::create([
                 'user_id' => $request->user_id,
                 'family_id' => $family->id,

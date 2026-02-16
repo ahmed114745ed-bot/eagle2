@@ -25,9 +25,11 @@ class FamilyUserResource extends JsonResource
             'normal'=>0,
             'admin'=>1,
         ];
+        $userModel = family_model_or_fail('user');
+        $userResourceClass = family_resource_or_fail('user');
         return [
             'id'=>$this->id,
-            'user'=> new UserResource(User::query ()->find ($this->user_id)),
+            'user'=> new $userResourceClass($userModel::query()->find($this->user_id)),
             'family'=>new FamilyResource(Family::query ()->find ($this->family_id)),
             'status'=>$statuses[$this->status],
             'time'=>\Carbon\Carbon::parse($this->created_at)->diffForHumans(),

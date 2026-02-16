@@ -20,6 +20,7 @@ class FamilyController extends MainController
     use HasResourceActions;
     public $permission_name = 'families';
     public $hiddenColumns = [];
+    protected string $userModel;
 
     public function __construct()
     {
@@ -27,6 +28,8 @@ class FamilyController extends MainController
         if ($appFeatureService) {
             $appFeatureService->validateStatusEnable('families');
         }
+
+        $this->userModel = family_model_or_fail('user');
     }
 
     public function familyLevelExcel()
@@ -243,20 +246,21 @@ class FamilyController extends MainController
         $form->text('notice', __('notice'))->rules('required');
         $form->image('image', __('image'));
         $form->text('num', __('number of people'))->rules('required|integer|max:10000')->default('20');
-        $form->select('user_id', __('user id'))->options(function ($value) {
+        $userModel = $this->userModel;
+        $form->select('user_id', __('user id'))->options(function ($value) use ($userModel) {
             $ops2 = [];
-            foreach (User::Where('id', $value)->get() as $user) {
+            foreach ($userModel::where('id', $value)->get() as $user) {
                 $ops2[$user->id] = $user->uuid . '_' . $user->name;
             }
             return $ops2;
         })->ajax('/api/search/users4', 'id', 'name')->rules('required');
         $form->hidden('is_success', 'is_success')->default(1)->rules('required');
 
-        $form->saving(function (Form $form) {
+        $form->saving(function (Form $form) use ($userModel) {
             $oldOwnerFamily = $form->model()->user_id;
             $newOwnerFamily = request()->user_id;
             if ($form->model()->exists && ($oldOwnerFamily != $newOwnerFamily)) {
-                User::where('id', $form->model()->user_id)->update(['family_id' => 0]);
+                $userModel::where('id', $form->model()->user_id)->update(['family_id' => 0]);
                 FamilyUser::where([
                     'user_id' => $form->model()->user_id,
                     'family_id' => $form->model()->id,
@@ -265,7 +269,7 @@ class FamilyController extends MainController
                 ])->delete();
             }
         });
-        $form->saved(function (Form $form) {
+        $form->saved(function (Form $form) use ($userModel) {
             $checkFamilyUser = FamilyUser::where([
                 'user_id' => $form->model()->user_id,
                 'family_id' => $form->model()->id,
@@ -273,7 +277,7 @@ class FamilyController extends MainController
                 'status' => 1,
             ])->exists();
             if (!$checkFamilyUser) {
-                User::where('id', $form->model()->user_id)->update(['family_id' => $form->model()->id]);
+                $userModel::where('id', $form->model()->user_id)->update(['family_id' => $form->model()->id]);
                 FamilyUser::create([
                     'user_id' => $form->model()->user_id,
                     'family_id' => $form->model()->id,

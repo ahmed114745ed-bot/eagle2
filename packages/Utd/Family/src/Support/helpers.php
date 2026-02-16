@@ -86,6 +86,54 @@ if (!function_exists('family_module')) {
     }
 }
 
+if (!function_exists('family_model_or_fail')) {
+    function family_model_or_fail(string $key): string
+    {
+        $class = family_model($key);
+        if (!$class) {
+            throw new \RuntimeException("family.models.{$key} is not configured or unavailable.");
+        }
+
+        return $class;
+    }
+}
+
+if (!function_exists('family_admin_or_fail')) {
+    function family_admin_or_fail(string $key): string
+    {
+        $class = family_admin($key);
+        if (!$class) {
+            throw new \RuntimeException("family.admin.{$key} is not configured or unavailable.");
+        }
+
+        return $class;
+    }
+}
+
+if (!function_exists('family_resource_or_fail')) {
+    function family_resource_or_fail(string $key): string
+    {
+        $class = family_resource($key);
+        if (!$class) {
+            throw new \RuntimeException("family.resources.{$key} is not configured or unavailable.");
+        }
+
+        return $class;
+    }
+}
+
+if (!function_exists('family_contract_or_fail')) {
+    function family_contract_or_fail(string $key): string
+    {
+        $class = family_contract($key);
+        if (!$class) {
+            throw new \RuntimeException("family.contracts.{$key} is not configured or unavailable.");
+        }
+
+        return $class;
+    }
+}
+
 if (!interface_exists(\App\Contracts\FamilyContract::class) && interface_exists(\Utd\Family\Contracts\FamilyServiceContract::class)) {
     class_alias(\Utd\Family\Contracts\FamilyServiceContract::class, \App\Contracts\FamilyContract::class);
 }

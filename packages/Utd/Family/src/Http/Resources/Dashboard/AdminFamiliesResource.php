@@ -14,7 +14,8 @@ class AdminFamiliesResource extends JsonResource
      * @return array<string, mixed>
      */
     function get_user($id ){
-        $user = User::withTrashed()->find($id);
+        $userModel = family_model_or_fail('user');
+        $user = $userModel::withTrashed()->find($id);
         if($user)
         {
             return [
