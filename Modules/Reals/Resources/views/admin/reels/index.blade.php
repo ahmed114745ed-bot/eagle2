@@ -239,6 +239,7 @@
             <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
                     <div @click="selectReel(reel.id); closeMobileSidebar()"
+                         :data-reel-id="reel.id"
                          :class="selectedReelId === reel.id ? 'ring-2 reel-ring shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
@@ -458,6 +459,7 @@
                             <div class="flex items-center gap-3">
                                 <!-- Mute/Unmute Button -->
                                 <button @click.stop="toggleMute(reel.id)"
+                                        data-mute-btn="true"
                                         :style="isMuted(reel.id) ? 'background-color: #ef4444cc;' : 'background-color: rgba(255, 255, 255, 0.2);'"
                                         class="w-10 h-10 hover:bg-white/30 rounded-full backdrop-blur-md flex items-center justify-center text-white transition transform hover:scale-110 shadow-xl flex-shrink-0">
                                     <i :class="isMuted(reel.id) ? 'fa-volume-mute' : 'fa-volume-up'" class="fas text-lg"></i>
@@ -991,6 +993,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 sm:p-3">
             <template x-for="reel in filteredReels" :key="reel.id">
                 <div @click="selectReel(reel.id); closeMobileSidebar()"
+                     :data-reel-id="reel.id"
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
                     <div class="relative aspect-[9/16] bg-gray-200 dark:bg-gray-700">
@@ -1046,69 +1049,64 @@
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
-<script data-exec-on-popstate>
-    (function () {
-        const initializeReelsComponent = () => {
-            if (!window.Alpine || !window.reelsManager) {
-                return false;
-            }
-
-            const root = document.querySelector('.reels-main-container[x-data]');
-            if (!root) {
-                return false;
-            }
-
-            try {
-                if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
-                    window.Alpine.destroyTree(root);
+    <script data-exec-on-popstate>
+        (function () {
+            const initAlpineInsideContainer = () => {
+                if (!window.Alpine || !window.reelsManager) {
+                    return false;
                 }
 
-                if (window.Alpine.discoverUninitializedComponents && window.Alpine.initializeComponent) {
-                    window.Alpine.discoverUninitializedComponents((el) => {
-                        if (el === root || root.contains(el)) {
-                            window.Alpine.initializeComponent(el);
+                const container = document.querySelector('#pjax-container') || document.body;
+                if (!container) {
+                    return false;
+                }
+
+                try {
+                    if (window.Alpine.destroyTree) {
+                        const oldRoot = container.querySelector('.reels-main-container[x-data]');
+                        if (oldRoot && oldRoot._x_dataStack) {
+                            window.Alpine.destroyTree(oldRoot);
                         }
-                    });
-                } else if (window.Alpine.initTree) {
-                    window.Alpine.initTree(root);
-                } else if (window.Alpine.start) {
-                    window.Alpine.start();
+                    }
+
+                    if (window.Alpine.initTree) {
+                        window.Alpine.initTree(container);
+                    } else if (window.Alpine.start) {
+                        window.Alpine.start();
+                    }
+
+                    container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
+                } catch (error) {
+                    console.error('Alpine reinit error:', error);
+                    return false;
                 }
 
-                root.removeAttribute('x-cloak');
-            } catch (error) {
-                console.error('Unable to initialize reels Alpine component:', error);
-                return false;
-            }
-
-            return true;
-        };
-
-        const scheduleInitialization = () => {
-            let attempts = 0;
-            const tryInit = () => {
-                if (initializeReelsComponent()) {
-                    return;
-                }
-
-                if (attempts++ < 40) {
-                    setTimeout(tryInit, 50);
-                }
+                return true;
             };
 
-            tryInit();
-        };
+            const scheduleInit = () => {
+                let attempts = 0;
+                const attempt = () => {
+                    if (initAlpineInsideContainer()) {
+                        return;
+                    }
+                    if (attempts++ < 40) {
+                        setTimeout(attempt, 50);
+                    }
+                };
+                attempt();
+            };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', scheduleInitialization, { once: true });
-        } else {
-            scheduleInitialization();
-        }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', scheduleInit, { once: true });
+            } else {
+                scheduleInit();
+            }
 
-        ['alpine:init', 'pjax:complete', 'pjax:success'].forEach((eventName) => {
-            document.addEventListener(eventName, () => {
-                setTimeout(scheduleInitialization, 0);
+            ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
+                document.addEventListener(eventName, () => {
+                    setTimeout(scheduleInit, 0);
+                });
             });
-        });
-    })();
-</script>
+        })();
+    </script>
