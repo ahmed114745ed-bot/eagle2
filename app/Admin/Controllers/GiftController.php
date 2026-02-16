@@ -267,8 +267,8 @@ class GiftController extends MainController
         $form->text('name', __('name'));
 
 
-        // Build Gift Category options
-        $categories = GiftCategory::where('id', request('type'))->get();
+        $selectedCategoryId = request('type') ?? $form->model()->gift_category_id;
+        $categories = GiftCategory::where('id', $selectedCategoryId)->get();
         //  dd($categories);
         $locale = App::getLocale();
 
@@ -285,7 +285,6 @@ class GiftController extends MainController
 
 
         $form->file('img', __('img'))->name(function ($file) {
-            // الحصول على الامتداد الحقيقي مع fallback
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();
@@ -295,13 +294,11 @@ class GiftController extends MainController
        
 
         $form->file('show_img', __('show_img'))->name(function ($file) {
-            // الحصول على الامتداد الحقيقي مع fallback
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();
             }
 
-            // تطبيع الامتدادات
             $extension = strtolower($extension);
             if ($extension === 'svg') {
                 return 'svga_' . Str::random(8) . '.svg';
@@ -376,7 +373,6 @@ class GiftController extends MainController
                 return back()->with(compact('error'));
             }
 
-            // معالجة show_img
             if ($form->img instanceof UploadedFile) {
                 $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
 
