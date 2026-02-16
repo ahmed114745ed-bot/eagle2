@@ -48,11 +48,17 @@ class FamilyServiceProvider extends ServiceProvider
             }
         }
 
-        if (!interface_exists('Utd\\Family\\Services\\RoomRepositoryContract')) {
-            $roomRepositoryContract = config('family.contracts.room_repository');
-            if ($roomRepositoryContract && interface_exists($roomRepositoryContract)) {
-                class_alias($roomRepositoryContract, 'Utd\\Family\\Services\\RoomRepositoryContract');
+        $roomRepositoryContract = config('family.contracts.room_repository');
+        if ($roomRepositoryContract) {
+            if (! interface_exists('Utd\\Family\\Services\\RoomRepositoryContract')) {
+                if ($roomRepositoryContract && interface_exists($roomRepositoryContract)) {
+                    class_alias($roomRepositoryContract, 'Utd\\Family\\Services\\RoomRepositoryContract');
+                }
             }
+
+            $this->app->bind('Utd\\Family\\Services\\RoomRepositoryContract', function ($app) use ($roomRepositoryContract) {
+                return $app->make($roomRepositoryContract);
+            });
         }
 
         if (!trait_exists('Utd\\Family\\Traits\\DashBoardTrait', false)) {
