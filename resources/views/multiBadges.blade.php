@@ -314,9 +314,26 @@ $selectedLang = request()->input('tab', $defaultLang);
     {{-- Tab Content --}}
     <div class="tab-content-modern">
         @foreach ($languages as $code => $label)
-            @php
+            {{-- @php
                 $imageData = $badgeImages[$code] ?? null;
                 $defaultImageData = $badgeImages['default'] ?? null;
+            @endphp --}}
+
+            @php
+                $imageData = $badgeImages[$code] ?? null;
+
+                // Fallback logic: use default language first, then any other existing image
+                if (empty($imageData?->image)) {
+                    $fallback = collect($badgeImages)
+                        ->filter(fn($b) => !empty($b->image))
+                        ->first();
+
+                    $imageData = $fallback ?: $imageData;
+                }
+
+                // Show image / presentation
+                $showImagePath = $imageData?->show_image ?? '';
+                $presentationImagePath = $imageData?->image ?? '';
             @endphp
 
             <div class="tab-pane {{ $code === $selectedLang ? 'active' : '' }}"
