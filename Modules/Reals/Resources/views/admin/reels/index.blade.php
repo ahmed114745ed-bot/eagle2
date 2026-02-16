@@ -239,6 +239,7 @@
             <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
                     <div @click="selectReel(reel.id); closeMobileSidebar()"
+                         :data-reel-id="reel.id"
                          :class="selectedReelId === reel.id ? 'ring-2 reel-ring shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
@@ -458,6 +459,7 @@
                             <div class="flex items-center gap-3">
                                 <!-- Mute/Unmute Button -->
                                 <button @click.stop="toggleMute(reel.id)"
+                                        data-mute-btn="true"
                                         :style="isMuted(reel.id) ? 'background-color: #ef4444cc;' : 'background-color: rgba(255, 255, 255, 0.2);'"
                                         class="w-10 h-10 hover:bg-white/30 rounded-full backdrop-blur-md flex items-center justify-center text-white transition transform hover:scale-110 shadow-xl flex-shrink-0">
                                     <i :class="isMuted(reel.id) ? 'fa-volume-mute' : 'fa-volume-up'" class="fas text-lg"></i>
@@ -991,6 +993,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 sm:p-3">
             <template x-for="reel in filteredReels" :key="reel.id">
                 <div @click="selectReel(reel.id); closeMobileSidebar()"
+                     :data-reel-id="reel.id"
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
                     <div class="relative aspect-[9/16] bg-gray-200 dark:bg-gray-700">

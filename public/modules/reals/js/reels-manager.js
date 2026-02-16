@@ -45,8 +45,8 @@ function reelsManager() {
             // تهيئة التخزين المؤقت
             this.initCache();
             
-            // إضافة event delegation للضغط على الفيديو (للتعامل مع PJAX)
-            this.setupVideoClickHandler();
+            // إضافة event delegation للضغط على الفيديو والأزرار (للتعامل مع PJAX)
+            this.setupEventDelegation();
             
             this.$nextTick(() => {
                 if (window.requestIdleCallback) {
@@ -57,18 +57,25 @@ function reelsManager() {
             });
         },
         
-        // Event delegation للتعامل مع click على الفيديوهات
-        setupVideoClickHandler() {
+        // Event delegation للتعامل مع جميع الأحداث (PJAX support)
+        setupEventDelegation() {
             const container = this.$el;
-            if (!container) return;
-            
-            // إزالة أي listener سابق
-            if (this._videoClickHandler) {
-                container.removeEventListener('click', this._videoClickHandler);
+            if (!container) {
+                // fallback إذا لم يكن الـ container متاحاً
+                setTimeout(() => this.setupEventDelegation(), 100);
+                return;
             }
             
-            this._videoClickHandler = (event) => {
-                const video = event.target.closest('video');
+            // إزالة أي listener سابق
+            if (this._mainClickHandler) {
+                container.removeEventListener('click', this._mainClickHandler);
+            }
+            
+            this._mainClickHandler = (event) => {
+                const target = event.target;
+                
+                // 1. الضغط على الفيديو للتشغيل/الإيقاف
+                const video = target.closest('video');
                 if (video && video.id && video.id.startsWith('video-')) {
                     event.stopPropagation();
                     if (video.paused) {
@@ -78,10 +85,34 @@ function reelsManager() {
                     } else {
                         video.pause();
                     }
+                    return;
+                }
+                
+                // 2. زر الميوت
+                const muteButton = target.closest('[data-mute-btn]') || 
+                    (target.closest('button') && target.closest('button').querySelector('.fa-volume-up, .fa-volume-mute'));
+                if (muteButton || (target.classList.contains('fa-volume-up') || target.classList.contains('fa-volume-mute'))) {
+                    event.stopPropagation();
+                    this.isGlobalMuted = !this.isGlobalMuted;
+                    const allVideos = document.querySelectorAll('video');
+                    allVideos.forEach(v => {
+                        v.muted = this.isGlobalMuted;
+                    });
+                    return;
+                }
+                
+                // 3. الضغط على thumbnail في الـ sidebar أو Mobile Overlay
+                const sidebarItem = target.closest('[data-reel-id]');
+                if (sidebarItem && !target.closest('.video-container')) {
+                    const reelId = sidebarItem.dataset?.reelId;
+                    if (reelId) {
+                        this.selectReel(parseInt(reelId));
+                        this.closeMobileSidebar();
+                    }
                 }
             };
             
-            container.addEventListener('click', this._videoClickHandler);
+            container.addEventListener('click', this._mainClickHandler);
         },
         
         loadInitialData() {
