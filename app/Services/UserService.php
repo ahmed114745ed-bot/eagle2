@@ -38,7 +38,7 @@ use Utd\Agency\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Tik\Repositories\ProfileRepository;
-use Modules\Vip\Repositories\VipRepository;
+use Utd\Vip\Repositories\VipRepository;
 use App\Tik\Repositories\FamilyUserRepository;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;

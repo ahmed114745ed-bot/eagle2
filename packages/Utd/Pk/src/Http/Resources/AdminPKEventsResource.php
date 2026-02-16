@@ -3,9 +3,10 @@
 namespace Utd\Pk\Http\Resources;
 
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 
 class AdminPKEventsResource extends JsonResource
 {
@@ -29,6 +30,9 @@ class AdminPKEventsResource extends JsonResource
 
         }
         if ($type === 'vip') {
+            if (!PackageHelper::isInstalled('vip')) {
+                return '';
+            }
             $item = OVip::find($id);
             if ($item) {
                 return [

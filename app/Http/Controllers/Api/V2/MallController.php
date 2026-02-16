@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V2;
 use Carbon\Carbon;
 use App\Models\Ware;
 use App\Helpers\Common;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use App\Tik\Services\MallService;
 use App\Http\Controllers\Controller;
@@ -15,6 +15,7 @@ use App\Http\Resources\WarePaddingResource;
 use App\Http\Resources\BestWareSaleResource;
 use App\Models\Pack;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Support\PackageHelper;
 
 
 class MallController extends Controller
@@ -128,6 +129,10 @@ class MallController extends Controller
 
     public function updateExpireUserVip()
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return 'done';
+        }
+
         $userVips = UserVip::where('expire', 0)->with('packs')->get();
         
         if ($userVips) {

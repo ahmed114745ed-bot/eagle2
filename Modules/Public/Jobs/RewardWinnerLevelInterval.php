@@ -14,7 +14,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 
 class RewardWinnerLevelInterval implements ShouldQueue
 {
@@ -58,8 +59,10 @@ class RewardWinnerLevelInterval implements ShouldQueue
                         $user->di += $rewad->target;
                         $user->save();
                     } elseif ($rewad->type == "vip") {
-                        $vip = OVip::query()->find($rewad->target);
-                        if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-interval');
+                        if (PackageHelper::isInstalled('vip')) {
+                            $vip = OVip::query()->find($rewad->target);
+                            if ($vip) UserCommon::addVipToUser($user, $vip, $rewad->expire,null,'reward-winner-interval');
+                        }
                     } elseif ($rewad->type == "ware") {
                         $ware = Ware::query()->find($rewad->target);
                         if ($ware) UserCommon::addWareToUser($user, $ware, $rewad->expire,null,'reward-winner-interval');

@@ -3,10 +3,10 @@
 namespace App\Admin\Actions;
 
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\Ware;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;

@@ -11,8 +11,9 @@ use App\Selectables\Gifts;
 use App\Helpers\UserCommon;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
+use App\Support\PackageHelper;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
@@ -238,7 +239,7 @@ class WeeklyEventNController extends MainController
                 $ware = Ware::find($target);
                 return  $ware ? ($ware->name ?? '') : "";
             } elseif ($this->type == "vip") {
-                $vip = OVip::find($target);
+                $vip = PackageHelper::isInstalled('vip') ? OVip::find($target) : null;
                 return  $vip ? ($vip->name ?? '') : "";
             } elseif ($this->type == "badge") {
                 $vip = Badge::find($target);

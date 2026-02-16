@@ -17,7 +17,7 @@
 
         @php
             $oldExpData = cache('exp_percentages');
-            use Modules\Vip\Entities\Vip;
+            use Utd\Vip\Entities\Vip;
         @endphp
 
             <!-- Experience Tab -->
@@ -60,7 +60,7 @@
                                 </div>
                             </div>
 
-                            @php $sender = Vip::where('type',2)->count(); @endphp
+                            @php $sender = \App\Support\PackageHelper::isInstalled('vip') ? Vip::where('type',2)->count() : 0; @endphp
                             @if ($sender == 0)
                                 <div class="alert-link">
                                     <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>
@@ -106,7 +106,7 @@
                                 </div>
                             </div>
 
-                            @php $receiver = Vip::where('type',1)->count(); @endphp
+                            @php $receiver = \App\Support\PackageHelper::isInstalled('vip') ? Vip::where('type',1)->count() : 0; @endphp
                             @if ($receiver == 0)
                                 <div class="alert-link">
                                     <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>
@@ -152,7 +152,7 @@
                                 </div>
                             </div>
 
-                            @php $charger = Vip::where('type',5)->count(); @endphp
+                            @php $charger = \App\Support\PackageHelper::isInstalled('vip') ? Vip::where('type',5)->count() : 0; @endphp
                             @if ($charger == 0)
                                 <div class="alert-link">
                                     <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>
@@ -198,7 +198,7 @@
                                 </div>
                             </div>
 
-                            @php $rooms = Vip::where('type',4)->count(); @endphp
+                            @php $rooms = \App\Support\PackageHelper::isInstalled('vip') ? Vip::where('type',4)->count() : 0; @endphp
                             @if ($rooms == 0)
                                 <div class="alert-link">
                                     <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>
@@ -245,7 +245,7 @@
                                 </div>
                             </div>
 
-                            @php $cp = Vip::where('type',3)->count(); @endphp
+                            @php $cp = \App\Support\PackageHelper::isInstalled('vip') ? Vip::where('type',3)->count() : 0; @endphp
                             @if ($cp == 0)
                                 <div class="alert-link">
                                     <a href="/admin/vips"><i class="fas fa-cog"></i> {{ __('Go to Settings') }}</a>

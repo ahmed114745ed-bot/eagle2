@@ -7,13 +7,14 @@ use App\Models\Ware;
 use App\Selectables\Badges;
 use App\Selectables\WaresByType;
 use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use Modules\Events\Entities\WeeklyStar;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
 use Utd\CP\Entities\WeeklyCpGift;
 
@@ -266,10 +267,12 @@ class WeeklyCpGiftController extends MainController
     {
         $typeOptions = [
             'ware' => __('ware'),
-            'vip' => __('vip'),
             'badge' => __('badge'),
             'coins' => __('coins'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions['vip'] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -347,9 +350,11 @@ class WeeklyCpGiftController extends MainController
     {
         $form->select('target2', trans('vips'))->options(function () {
             $ops = [];
-            $vips = OVip::query()->select('id', 'name')->get();
-            foreach ($vips as $vip) {
-                $ops[$vip->id] = $vip->name;
+            if (PackageHelper::isInstalled('vip')) {
+                $vips = OVip::query()->select('id', 'name')->get();
+                foreach ($vips as $vip) {
+                    $ops[$vip->id] = $vip->name;
+                }
             }
 
             return $ops;

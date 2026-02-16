@@ -5,10 +5,11 @@ namespace App\Helpers;
 use App\Enums\UserCoinLogType;
 use App\helper\InvitationEarningHelper;
 use App\helper\InvitationWalletHelper;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\Log;
 use Modules\SwitchAccount\Entities\UserDevicesHistory;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
@@ -22,7 +23,7 @@ use GuzzleHttp\Client;
 use App\Models\Country;
 use App\Models\GiftLog;
 use App\Models\PackLog;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\UserSallary;
 use Illuminate\Support\Str;
 use GuzzleHttp\Psr7\Request;
@@ -37,7 +38,7 @@ use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\ZegoTrait;
-use Modules\Vip\Helpers\VipCommon;
+use Utd\Vip\Helpers\VipCommon;
 use Twilio\Rest\Client as TwilioClint;
 
 use App\Http\Resources\CountryResource;
@@ -319,9 +320,12 @@ class UserCommon
 
     public static function userVip(User $user, $receiveType = 'vip-check')
     {
-        $vip = OVip::query()->first();
-        $user_vip_check = UserVip::query()->where('user_id', $user->id)
-            ->where('level', '>=', $vip->level)->first();
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->first() : null;
+        if (!$vip) {
+            return;
+        }
+        $user_vip_check = PackageHelper::isInstalled('vip') ? UserVip::query()->where('user_id', $user->id)
+            ->where('level', '>=', $vip->level)->first() : null;
         $expire = $vip->expire;
 
 

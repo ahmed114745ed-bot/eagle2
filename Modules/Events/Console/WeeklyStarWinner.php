@@ -8,8 +8,9 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Illuminate\Console\Command;
+use App\Support\PackageHelper;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Modules\Events\Entities\Winner;
@@ -75,8 +76,11 @@ class WeeklyStarWinner extends Command
                             $entry->sender->di += $reward->target;
                             $entry->sender->save();
                         } elseif ($reward->type == "vip") {
-                            $vip = OVip::query()->find($reward->target);
-                            UserCommon::addVipToUser($entry->sender, $vip, $reward->expire, null, 'weekly-star');
+                            $vip = null;
+                            if (PackageHelper::isInstalled('vip')) {
+                                $vip = OVip::query()->find($reward->target);
+                            }
+                            if ($vip) UserCommon::addVipToUser($entry->sender, $vip, $reward->expire, null, 'weekly-star');
                         } elseif ($reward->type == "ware") {
                             $ware = Ware::query()->find($reward->target);
                             UserCommon::addWareToUser($entry->sender, $ware, $reward->expire, null, 'weekly-star');

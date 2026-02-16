@@ -2,11 +2,12 @@
 
 namespace Database\Seeders;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
-use Modules\Vip\Entities\UserVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\UserVip;
 use Utd\Room\Entities\RoomGame;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -52,7 +53,7 @@ class RemoveChargeReward extends Seeder
                 $rewards = RewardTarget::where('charge_event_id', $target->id)->get();
 
                 foreach ($rewards as $reward) {
-                    if ($reward->type === 'vip') {
+                    if ($reward->type === 'vip' && PackageHelper::isInstalled('vip')) {
                         $vip = OVip::find($reward->target);
 
                         if ($vip) {

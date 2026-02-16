@@ -22,7 +22,7 @@
     "Wallet": true,
     "LuckyBox": false,
     "TribeReward": true,
-    "Vip": true,
+    "Vip": false,
     "Badge": true,
     "RoleRewards": true,
     "Milestones": true,

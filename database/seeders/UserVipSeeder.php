@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use Modules\Vip\Entities\UserVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\UserVip;
 use Illuminate\Database\Seeder;
 
 
@@ -13,8 +14,7 @@ class UserVipSeeder extends Seeder
      */
     public function run(): void
     {
-
-        $userVips = UserVip::where('expire', 0)->with('packs')->get();
+        $userVips = PackageHelper::isInstalled('vip') ? UserVip::where('expire', 0)->with('packs')->get() : collect();
 
         foreach ($userVips as $userVip) {
             $expires = $userVip->packs->pluck('expire')->filter(function ($value) {

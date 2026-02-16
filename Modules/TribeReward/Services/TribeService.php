@@ -11,7 +11,8 @@ use Exception;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\TribeReward\Entities\AgencyReward;
 use Modules\TribeReward\Entities\TribePeriod;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 
 class TribeService
 {
@@ -102,8 +103,10 @@ class TribeService
             for ($i = 0; $i < $data['quantity']; $i++) {
                 switch ($AgencyReward->target_type) {
                     case "vip":
-                        $vip = OVip::find($AgencyReward->target);
-                        UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days, $userOwnAgency,'tribe');
+                        if (PackageHelper::isInstalled('vip')) {
+                            $vip = OVip::find($AgencyReward->target);
+                            UserCommon::addVipToUser($user, $vip, $AgencyReward->expire_days, $userOwnAgency,'tribe');
+                        }
                         break;
                     case "ware":
                         $ware = Ware::find($AgencyReward->target);

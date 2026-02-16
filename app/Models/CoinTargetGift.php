@@ -5,7 +5,8 @@ namespace App\Models;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class CoinTargetGift extends Model
 {
@@ -17,7 +18,8 @@ class CoinTargetGift extends Model
 
     public function vip()
     {
-        return $this->belongsTo(OVip::class, 'item_id');
+        return PackageHelper::checkRelation($this, 'vip', 'belongsTo') ??
+            $this->belongsTo(OVip::class, 'item_id');
     }
 
     public function ware()

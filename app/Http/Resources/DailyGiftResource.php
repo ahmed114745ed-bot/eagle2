@@ -2,8 +2,9 @@
 
 namespace App\Http\Resources;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,7 +21,7 @@ class DailyGiftResource extends JsonResource
             $ware = Ware::find($this->target);
             $imagePath = $ware->img2 ?? $ware->show_img ?? 'default.png';
         } elseif ($this->gift_type == 'vip') {
-            $vip = OVip::find($this->target);
+            $vip = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
             $imagePath = $vip->img ?? 'default.png';
         } elseif ($this->gift_type == 'achievement') {
             $imagePath = $this->target;

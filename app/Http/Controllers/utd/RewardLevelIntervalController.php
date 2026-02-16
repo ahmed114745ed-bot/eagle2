@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\utd;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use App\Enums\IntervalLevel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -94,7 +95,7 @@ class RewardLevelIntervalController extends Controller
 
     public function vipInterval()
     {
-        $vips = OVip::query()->get();
+        $vips = PackageHelper::isInstalled('vip') ? OVip::query()->get() : collect();
 
         return Common::apiResponse(1, 'success', IntervalOVipResource::collection($vips), 200);
     }

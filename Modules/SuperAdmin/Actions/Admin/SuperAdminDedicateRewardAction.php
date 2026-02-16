@@ -9,12 +9,13 @@ use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use App\Support\PackageHelper;
 
 class SuperAdminDedicateRewardAction extends Action
 {
@@ -104,8 +105,10 @@ function pu(val) {
 
                 break;
             case "vip":
-                $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'super_admin_dedicate');
+                if (PackageHelper::isInstalled('vip')) {
+                    $vip = OVip::find($reward->target);
+                    UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'super_admin_dedicate');
+                }
                 break;
             case "ware":
                 $ware = Ware::find($reward->target);

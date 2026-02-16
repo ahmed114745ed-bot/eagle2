@@ -3,8 +3,9 @@
 namespace Modules\Events\Http\Controllers\web;
 
 use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Column;
@@ -199,7 +200,7 @@ class EventPeriodController extends MainController
                 $ware = Ware::find($target);
                 return @$ware->name ?? '';
             } elseif ($this->type == "vip") {
-                $vip = OVip::find($target);
+                $vip = PackageHelper::isInstalled('vip') ? OVip::find($target) : null;
                 return @$vip->name  ?? '';
             } elseif ($this->type == "badge") {
                 $vip = Badge::find($target);

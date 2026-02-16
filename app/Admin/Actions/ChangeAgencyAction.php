@@ -3,7 +3,7 @@
 namespace App\Admin\Actions;
 
 use App\Models\GiftLog;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\AgencyUserJob;
 use App\Models\Pack;
 use App\Models\User;
@@ -11,7 +11,7 @@ use App\Models\UsersJoinedAgency;
 use App\Models\Ware;
 use App\Models\Agency;
 use App\Helpers\Common;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\FamilyUser;
 use Encore\Admin\Admin;
 use Illuminate\Http\Request;

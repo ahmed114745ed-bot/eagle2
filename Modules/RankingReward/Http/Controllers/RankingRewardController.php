@@ -14,7 +14,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\Badge\Entities\Badge;
 use Modules\RankingReward\Entities\RankingReward;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 
 class RankingRewardController extends MainController
 {

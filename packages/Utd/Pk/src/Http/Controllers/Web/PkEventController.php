@@ -6,6 +6,7 @@ use App\Admin\Controllers\MainController;
 use App\Helpers\UserCommon;
 use App\Models\Ware;
 use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -16,7 +17,7 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Modules\Badge\Entities\Badge;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
 
@@ -251,7 +252,10 @@ class PkEventController extends MainController
                 return $ware ? ($ware->name ?? '') : '';
             }
             if ($this->type === 'vip') {
-                $vip = OVip::find($target);
+                $vip = null;
+                if (PackageHelper::isInstalled('vip')) {
+                    $vip = OVip::find($target);
+                }
 
                 return $vip ? ($vip->name ?? '') : '';
             }

@@ -3,16 +3,17 @@
 namespace App\Admin\Actions;
 
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\Ware;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Support\PackageHelper;
 
 class DeleteUserVipAction extends RowAction
 {
@@ -32,7 +33,7 @@ class DeleteUserVipAction extends RowAction
             $user = User::query()->find($model->user_id);
             if ($user) {
                 if ($user->vip == $model->id) {
-                    $uvip = UserVip::query()->where('user_id', $user->id)->where('id', '!=', $model->id)->orderByDesc('level')->first();
+                    $uvip = PackageHelper::isInstalled('vip') ? UserVip::query()->where('user_id', $user->id)->where('id', '!=', $model->id)->orderByDesc('level')->first() : null;
                     if ($uvip) {
                         $user->vip = $uvip->id;
                         $user->save();

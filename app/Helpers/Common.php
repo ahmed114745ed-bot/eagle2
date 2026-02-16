@@ -23,7 +23,7 @@ use Illuminate\Support\Str;
 use App\Models\ChargeWinner;
 use Kreait\Firebase\Factory;
 use App\Facades\UserHandling;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Utd\Agency\Entities\ShippingAgency;
 use Illuminate\Support\Carbon;
 use App\Models\OfficialMessage;
@@ -31,7 +31,7 @@ use Encore\Admin\Facades\Admin;
 use App\Models\Owner_pid_target;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Http\JsonResponse;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Charges\UserTypeEnum;
 use Illuminate\Support\Facades\Log;
@@ -149,7 +149,7 @@ class Common
 
     public static function userVipLevel($userId, $level)
     {
-        return UserVip::where(['user_id' => $userId])->where('level', ">=", $level)->active()->exists();
+        return PackageHelper::isInstalled('vip') && UserVip::where(['user_id' => $userId])->where('level', ">=", $level)->active()->exists();
     }
 
     public static function level_center_min($user_id)
@@ -160,11 +160,15 @@ class Common
         }
 
         $star_level = $user->received_level + $user->sub_receiver_level;
-        $firstVip = Vip::where('level', $star_level)->where('type', 1)->first();
+        $firstVip = PackageHelper::isInstalled('vip')
+            ? Vip::where('level', $star_level)->where('type', 1)->first()
+            : null;
         $data['receiver_img'] = !is_null($firstVip) ? $firstVip->img : '';
 
         $gold_level = $user->sender_level + $user->sub_sender_level;
-        $firstVip_type2 = Vip::where('level', $gold_level)->where('type', 2)->first();
+        $firstVip_type2 = PackageHelper::isInstalled('vip')
+            ? Vip::where('level', $gold_level)->where('type', 2)->first()
+            : null;
         $data['sender_img'] = !is_null($firstVip_type2) ? $firstVip_type2->img : '';
 
         return $data;
@@ -172,7 +176,9 @@ class Common
 
     public static function getLevels($levels): Collection
     {
-        return Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get();
+        return PackageHelper::isInstalled('vip')
+            ? Vip::query()->whereIn('type', [1, 2])->whereIn('level', $levels)->select(['id', 'type', 'img', 'level'])->get()
+            : collect();
     }
 
     public static function apiResponse2(bool $success, $message, $data = null, $statusCode = null, $paginates = null, $isPagination = false)

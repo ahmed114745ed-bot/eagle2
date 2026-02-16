@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Modules\SuperAdmin\Entities\SuperAdmin;
-use Modules\Vip\Entities\VipPrivilege;
+use App\Support\PackageHelper;
 use Symfony\Component\Process\Process;
 use Utd\Agency\Http\Controllers\Admin\AppearChargerAgencyController;
 use Utd\Agency\Http\Controllers\Admin\MangerSettingController;
@@ -70,55 +70,60 @@ Route::get('/payment-cancel', function () {
     return 'Payment was cancelled.';
 })->name('payment.cancel');
 Route::get('update-need', function () {
+    if (!PackageHelper::isInstalled('vip')) {
+        return 'VIP package not installed';
+    }
 
-    $two = VipPrivilege::find(2);
+    $vipPrivilege = \Utd\Vip\Entities\VipPrivilege::class;
+
+    $two = $vipPrivilege::find(2);
     $two->en_name = 'Special frame';
     $two->save();
 
-    $three = VipPrivilege::find(3);
+    $three = $vipPrivilege::find(3);
     $three->en_name = 'Get the car';
     $three->save();
 
-    $four = VipPrivilege::find(4);
+    $four = $vipPrivilege::find(4);
     $four->en_name = 'Special entry effect';
     $four->save();
 
 
-    $four = VipPrivilege::find(7);
+    $four = $vipPrivilege::find(7);
     $four->en_name = 'Colorful message';
     $four->save();
 
 
-    $five = VipPrivilege::find(8);
+    $five = $vipPrivilege::find(8);
     $five->en_name = 'Flying comment';
     $five->save();
 
 
-    $six = VipPrivilege::find(10);
+    $six = $vipPrivilege::find(10);
     $six->en_name = 'Exclusive gift';
     $six->save();
 
-    $seven = VipPrivilege::find(11);
+    $seven = $vipPrivilege::find(11);
     $seven->en_name = 'Prevent from being kicked';
     $seven->save();
 
-    $eight = VipPrivilege::find(12);
+    $eight = $vipPrivilege::find(12);
     $eight->en_name = 'Anti ban';
     $eight->save();
 
-    $nine = VipPrivilege::find(13);
+    $nine = $vipPrivilege::find(13);
     $nine->en_name = 'Hidden';
     $nine->save();
 
-    $ten = VipPrivilege::find(14);
+    $ten = $vipPrivilege::find(14);
     $ten->en_name = 'Mystery man just entered the room';
     $ten->save();
 
-    $eleven = VipPrivilege::find(15);
+    $eleven = $vipPrivilege::find(15);
     $eleven->en_name = 'Colorful nickname';
     $eleven->save();
 
-    $twelve = VipPrivilege::find(16);
+    $twelve = $vipPrivilege::find(16);
     $twelve->en_name = 'Hide the viewing history';
     $twelve->save();
 });

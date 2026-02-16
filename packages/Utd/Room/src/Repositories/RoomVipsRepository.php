@@ -2,7 +2,7 @@
 
 namespace Utd\Room\Repositories;
 
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 class RoomVipsRepository extends AbstractRepository
 {

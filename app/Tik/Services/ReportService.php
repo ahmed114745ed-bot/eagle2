@@ -3,7 +3,7 @@
 namespace App\Tik\Services;
 
 use App\Models\Pack;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Utd\Agency\Repositories\UserRepository;
 use Modules\Events\Entities\WinnerReward;
 use App\Http\Resources\UserReportResource;
@@ -15,6 +15,7 @@ use App\Tik\Repositories\AdminUsersRepository;
 use Modules\Events\Services\LoseWinnerRewards;
 use App\Http\Resources\AdminUserReportResource;
 use Utd\Achievements\Entities\UserAchievementLevel;
+use App\Support\PackageHelper;
 
 class ReportService
 {
@@ -70,7 +71,7 @@ class ReportService
                 $winner_reward->winner->di -= $target;
                 $winner_reward->winner->save();
             } elseif ($winner_reward->reward->type == 'vip') {
-                $userVip = UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first();
+                $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first() : null;
                 $userVip->delete();
 
                 (new LoseWinnerRewards())->removePacksVip($winner_reward, $userVip, $winner, $winner_reward->reward->expire);

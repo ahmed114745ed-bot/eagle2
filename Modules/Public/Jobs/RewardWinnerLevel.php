@@ -8,7 +8,7 @@ use App\Models\Ware;
 use App\Helpers\UserCommon;
 use Illuminate\Bus\Queueable;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,6 +19,7 @@ use Modules\Public\Entities\RewardLevelInterval;
 use Modules\Public\Entities\WinnerLevelInterval;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use App\Contracts\UserAchievementContract;
+use App\Support\PackageHelper;
 
 class RewardWinnerLevel implements ShouldQueue
 {
@@ -60,9 +61,11 @@ class RewardWinnerLevel implements ShouldQueue
                         UserCoinLogType::ROOM_LEVEL,
                     );
                 } elseif ($rewad->type == "vip") {
-                    $vip = OVip::query()->find($rewad->target);
-                    if (!$vip) return;
-                    UserCommon::addVipToUser($user, $vip, $rewad->expire, null, 'reward-winner-level');
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vip = OVip::query()->find($rewad->target);
+                        if (!$vip) return;
+                        UserCommon::addVipToUser($user, $vip, $rewad->expire, null, 'reward-winner-level');
+                    }
                 } elseif ($rewad->type == "ware") {
                     $ware = Ware::query()->find($rewad->target);
                     if (!$ware) return;

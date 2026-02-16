@@ -2,7 +2,8 @@
 
 namespace App\Helpers;
 
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 use Carbon\Carbon;
 use Utd\Achievements\Entities\UserAchievementLevel;
 
@@ -13,7 +14,7 @@ class CoinsTarget
     }
     public static function assignVipUser($vipId, $expire, $userOne)
     {
-        $vip = OVip::find($vipId);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::find($vipId) : null;
         UserCommon::addVipToUser($userOne, $vip, $expire,null,'coins-target');
     }
 

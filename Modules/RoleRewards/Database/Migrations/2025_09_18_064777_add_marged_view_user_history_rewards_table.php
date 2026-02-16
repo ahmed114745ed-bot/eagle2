@@ -51,7 +51,7 @@ return new class extends Migration
             LEFT JOIN wares w
                 ON uhr.rewardable_type = 'App\\\\Models\\\\Ware' AND uhr.rewardable_id = w.id
             LEFT JOIN o_vips v
-                ON uhr.rewardable_type = 'Modules\\\\Vip\\\\Entities\\\\OVip' AND uhr.rewardable_id = v.id
+                ON uhr.rewardable_type = 'Utd\\\\Vip\\\\Entities\\\\OVip' AND uhr.rewardable_id = v.id
             LEFT JOIN badges b
                 ON uhr.rewardable_type = 'Modules\\\\Badge\\\\Entities\\\\Badge' AND uhr.rewardable_id = b.id
             ");

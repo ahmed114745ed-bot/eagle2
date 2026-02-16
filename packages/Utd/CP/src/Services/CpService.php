@@ -10,11 +10,12 @@ use App\Helpers\UserCoinLogHelper;
 use App\Helpers\UserCommon;
 use App\Models\User;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Helpers\VipCommon;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Helpers\VipCommon;
 use Throwable;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\CP\Entities\Cp as EntitiesCp;
@@ -249,7 +250,7 @@ class CpService implements CpServiceContract
         [$userOneGender, $userTwoGender, $rewardGender] = $this->getGenders($userOne, $userTwo, $reward);
 
         $vipId = $reward->item_id;
-        $vip = OVip::find($vipId);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::find($vipId) : null;
         if ($vip) {
             if ($rewardGender === $userOneGender || $rewardGender === 'all') {
                 VipCommon::createUserVip($vip, $userOne, $expire, 0, '', 1, 0, 0, 'cp-gifts');

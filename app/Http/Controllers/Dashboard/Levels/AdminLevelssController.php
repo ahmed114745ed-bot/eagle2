@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Dashboard\Levels;
 
 use App\Http\Controllers\Controller;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
+use App\Support\PackageHelper;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 
@@ -12,12 +13,18 @@ class AdminLevelssController extends Controller
     use DashBoardTrait;
     public function index($type)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return collect();
+        }
         $data = Vip::where('type',$type)->orderBy('level','desc')->get();
         return $data;
     }
 
     public function store(Request $request)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return response()->json(['status' => 400, 'message' => 'VIP package not installed'], 400);
+        }
         $request->validate([
             'img'        => 'required|image|mimes:png,jpg',
             'level'       => 'required|max:255',
@@ -39,12 +46,18 @@ class AdminLevelssController extends Controller
 
     public function show(string $id)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return null;
+        }
         $data = Vip::find($id);
         return $data;
     }
 
     public function update(Request $request, string $id)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return response()->json(['status' => 400, 'message' => 'VIP package not installed'], 400);
+        }
         $Vip = Vip::find($id);
         $request->validate([
             'level'       => 'required|max:255',
@@ -66,6 +79,9 @@ class AdminLevelssController extends Controller
 
     public function destroy(string $id)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return response()->json(['status' => 400, 'message' => 'VIP package not installed'], 400);
+        }
         $Vip = Vip::find($id);
         if( $Vip->img)
         {

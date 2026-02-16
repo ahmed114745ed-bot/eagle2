@@ -5,7 +5,8 @@ namespace App\Http\Services;
 use App\Http\Resources\Api\V1\UserRelationsResource;
 use App\Models\Follow;
 use App\Models\User;
-use Modules\Vip\Entities\Vip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\Vip;
 use Illuminate\Database\Query\JoinClause;
 
 class ProfileRelationsService
@@ -103,8 +104,9 @@ class ProfileRelationsService
      */
     public function getLevel($levelsList, $type = 1)
     {
-        return Vip::query()->whereIn('level', $levelsList)
-                  ->where('type', $type)->select('img', 'level')->get();
+        return PackageHelper::isInstalled('vip')
+            ? Vip::query()->whereIn('level', $levelsList)->where('type', $type)->select('img', 'level')->get()
+            : collect();
     }
 
 }

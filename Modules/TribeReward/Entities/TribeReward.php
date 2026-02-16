@@ -7,7 +7,8 @@ use App\Models\Ware;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class TribeReward extends Model
 {
@@ -20,7 +21,8 @@ class TribeReward extends Model
 
     public function vip()
     {
-        return $this->hasOne(OVip::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(OVip::class, 'id', 'target');
     }
 
     protected static function boot(): void

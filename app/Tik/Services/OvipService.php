@@ -2,10 +2,9 @@
 
 namespace App\Tik\Services;
 
-use Exception;
 use App\Helpers\Common;
-use  Modules\Vip\Repositories\OvipRepository;
-use  Modules\Vip\Repositories\VipPrivilegeRepository;
+use  Utd\Vip\Repositories\OvipRepository;
+use  Utd\Vip\Repositories\VipPrivilegeRepository;
 use App\Tik\Repositories\WareRepository;
 
 
@@ -78,8 +77,8 @@ class OvipService
             'exp' => $request->exp
         ];
         if ($request->hasFile('image')) {
-            $dataOvip['img']= Common::upload('images', $request->file('image')); 
-        } 
+            $dataOvip['img']= Common::upload('images', $request->file('image'));
+        }
         $privileges = json_decode($request->privileges);
         $this->ovipRepository->update($dataOvip, $request->o_vip_id);
         $ovip = $this->ovipRepository->findById($request->o_vip_id);

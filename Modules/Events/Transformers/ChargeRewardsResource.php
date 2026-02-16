@@ -2,7 +2,8 @@
 
 namespace Modules\Events\Transformers;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,7 +22,7 @@ class ChargeRewardsResource extends JsonResource
             $name=$dataa?->name;
             $image=$dataa?->show_img;
         }elseif ($this->type == 'vip'){
-            $dataa = OVip::query()->select("id",'name','img')->find($this->target);
+            $dataa = PackageHelper::isInstalled('vip') ? OVip::query()->select("id",'name','img')->find($this->target) : null;
             $name=$dataa?->name;
             $image=$dataa?->img;
         }else{

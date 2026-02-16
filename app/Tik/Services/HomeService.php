@@ -16,8 +16,8 @@ use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
-use Modules\Vip\Repositories\OvipRepository;
-use Modules\Vip\Repositories\UserVipRepository;
+use Utd\Vip\Repositories\OvipRepository;
+use Utd\Vip\Repositories\UserVipRepository;
 
 
 class HomeService

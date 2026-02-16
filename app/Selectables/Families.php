@@ -5,7 +5,7 @@ namespace App\Selectables;
 use App\Models\Family;
 use App\Helpers\Common;
 use Encore\Admin\Grid\Filter;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
 use Illuminate\Support\Facades\Auth;
 

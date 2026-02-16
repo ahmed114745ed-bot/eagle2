@@ -17,10 +17,10 @@ use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
 //use App\Tik\Repositories\UserVipRepository;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Vip\Repositories\OvipRepository;
-use Modules\Vip\Repositories\UserVipRepository;
-use Modules\Vip\Repositories\VipPrivilegeRepository;
-use Modules\Vip\Repositories\VipRepository;
+use Utd\Vip\Repositories\OvipRepository;
+use Utd\Vip\Repositories\UserVipRepository;
+use Utd\Vip\Repositories\VipPrivilegeRepository;
+use Utd\Vip\Repositories\VipRepository;
 
 //use App\Tik\Repositories\VipPrivilegeRepository;
 

@@ -5,22 +5,23 @@ namespace App\Classes;
 use Carbon\Carbon;
 use App\Models\Ban;
 use Modules\Milestones\Helpers\MilestoneHelper;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use App\Models\Gift;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Config;
 use App\Helpers\Common;
 use App\Models\BanType;
 use App\Models\GiftLog;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\LiveTime;
 use App\Models\RealtimeProject;
 use App\Models\UserSallary;
 use App\Models\UsersJoinedAgency;
 use Illuminate\Support\Facades\DB;
 use Utd\Agency\Entities\AgencyUserJob;
-use Modules\Vip\Helpers\VipCommon;
+use Utd\Vip\Helpers\VipCommon;
+use App\Support\PackageHelper;
 
 class UserHandling
 {
@@ -304,7 +305,7 @@ class UserHandling
 
     public function getLevel(int $type, int $totalCoins)
     {
-        return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
+        return PackageHelper::isInstalled('vip') ? Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first() : null;
     }
 
     public function getTopThreeSupport($userId)

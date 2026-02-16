@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Exception;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Utd\Room\Entities\Room;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Classes\Packs\AllowPacks;
 use App\Tik\Services\HomeService;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -31,8 +32,8 @@ class HomeController extends Controller
 
     public function countVipsold()
     {
-        $count = Vip::query()->where('type', 3)->count();
-        $vips =  Vip::query()->where('type', 3)->select('id', 'level', 'type', 'img')->get();
+        $count = PackageHelper::isInstalled('vip') ? Vip::query()->where('type', 3)->count() : 0;
+        $vips = PackageHelper::isInstalled('vip') ? Vip::query()->where('type', 3)->select('id', 'level', 'type', 'img')->get() : collect();
         return Common::apiResponse(1, '', ['vip_count' => $count, 'vips' => $vips]);
     }
 

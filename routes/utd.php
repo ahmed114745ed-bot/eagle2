@@ -46,7 +46,7 @@ use App\Http\Controllers\utd\CountryController;
 use App\Http\Controllers\utd\CpRelationController;
 use App\Http\Controllers\utd\DailyGiftsController;
 use App\Http\Controllers\utd\DailyGiftTypesController;
-use App\Http\Controllers\utd\DedicateVipController;
+// use App\Http\Controllers\utd\DedicateVipController; // Moved to VIP package
 use App\Http\Controllers\utd\DedicateWareController;
 use App\Http\Controllers\utd\EmojiController;
 use App\Http\Controllers\utd\EventPeriodController;
@@ -355,11 +355,7 @@ Route::middleware([])->group(function () {
         Route::post('dedicate/{id}', [DedicateWareController::class, 'dedicate']);
     });
 
-    Route::prefix('vips-dedicate')->group(function () {
-        Route::get('/', [DedicateVipController::class, 'index']);
-        Route::post('/delete-all', [DedicateVipController::class, 'delete_all']);
-        Route::post('dedicate/{id}', [DedicateVipController::class, 'dedicate']);
-    });
+    // vips-dedicate routes moved to packages/Utd/Vip/Routes/utd.php
 
 
     Route::prefix('banners')->group(function () {

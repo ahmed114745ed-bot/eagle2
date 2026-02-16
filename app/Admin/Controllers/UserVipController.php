@@ -2,13 +2,14 @@
 
 namespace App\Admin\Controllers;
 
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
+use App\Support\PackageHelper;
 
 class UserVipController extends Controller
 {
@@ -45,6 +46,9 @@ class UserVipController extends Controller
      */
     protected function detail($id)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            abort(404, 'VIP package not installed');
+        }
         $show = new Show(UserVip::findOrFail($id));
 
         $show->id('ID');

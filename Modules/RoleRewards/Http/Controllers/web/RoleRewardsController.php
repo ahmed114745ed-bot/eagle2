@@ -3,7 +3,6 @@
 namespace Modules\RoleRewards\Http\Controllers\web;
 
 use App\Models\Role;
-use App\Selectables\OVips;
 use Modules\RoleRewards\Actions\DeleteRoleReward;
 use Modules\Badge\Entities\Badge;
 use Modules\RoleRewards\Entities\RoleReward;
@@ -18,6 +17,9 @@ use App\Admin\Controllers\MainController;
 use App\Services\AppFeatureService;
 use Encore\Admin\Controllers\HasResourceActions;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Selectables\OVips;
 
 class RoleRewardsController extends MainController
 {
@@ -181,9 +183,11 @@ class RoleRewardsController extends MainController
         $options = [
             "coins" => __('Coins'),
             "ware" => __('Wares'),
-            "vip" => __('vip'),
             "badge" => __('Badge'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $options["vip"] = __('vip');
+        }
 
         if (class_exists(Achievement::class)) {
             $options['achievement'] = __('Achievement');
@@ -200,7 +204,9 @@ class RoleRewardsController extends MainController
             ->when("ware", function (Form $form) {
                 $form->belongsTo('rewardable_id1', Wares::class, trans('wares'));
             })->when("vip", function () use ($form) {
-                $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
+                if (class_exists(OVips::class)) {
+                    $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
+                }
             })->when("achievement", function (Form $form) {
                 if (! class_exists(Achievement::class)) {
                     return;
@@ -253,8 +259,8 @@ class RoleRewardsController extends MainController
                     $form->model()->rewardable_type = \App\Models\Ware::class;
                     break;
                 case 'vip':
-                    $form->rewardable_type = \Modules\Vip\Entities\OVip::class;
-                    $form->model()->rewardable_type = \Modules\Vip\Entities\OVip::class;
+                    $form->rewardable_type = OVip::class;
+                    $form->model()->rewardable_type = OVip::class;
                     break;
                 case 'badge':
                     $form->rewardable_type = \Modules\Badge\Entities\Badge::class;

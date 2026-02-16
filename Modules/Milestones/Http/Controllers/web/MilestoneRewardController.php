@@ -3,7 +3,6 @@
 namespace Modules\Milestones\Http\Controllers\web;
 
 use App\Selectables\Badges;
-use App\Selectables\OVips;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -15,6 +14,9 @@ use Modules\Milestones\Entities\MilestoneReward;
 use Modules\Badge\Entities\Badge;
 use App\Selectables\Wares;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Selectables\OVips;
 
 class MilestoneRewardController
 {
@@ -137,9 +139,11 @@ class MilestoneRewardController
         $options = [
             "coins" => __('Coins'),
             "ware" => __('Wares'),
-            "vip" => __('vip'),
             "badge" => __('Badge'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $options["vip"] = __('vip');
+        }
 
         if (class_exists(Achievement::class)) {
             $options['achievement'] = __('Achievement');
@@ -158,7 +162,9 @@ class MilestoneRewardController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
-                $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
+                if (class_exists(OVips::class)) {
+                    $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
+                }
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {
@@ -198,8 +204,8 @@ class MilestoneRewardController
                     break;
 
                 case 'vip':
-                    $form->rewardable_type = \Modules\Vip\Entities\OVip::class;
-                    $form->model()->rewardable_type = \Modules\Vip\Entities\OVip::class;
+                    $form->rewardable_type = OVip::class;
+                    $form->model()->rewardable_type = OVip::class;
                     break;
 
                 case 'badge':

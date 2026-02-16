@@ -4,7 +4,7 @@ namespace Utd\CP\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 class CpLevel extends Model
 {

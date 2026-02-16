@@ -5,8 +5,9 @@ namespace Modules\DailyPrize\Http\Controllers\Api;
 use App\Enums\UserCoinLogType;
 use App\Helpers\UserCoinLogHelper;
 use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
@@ -143,7 +144,10 @@ class DailyGiftController extends Controller
             $user->di += $target;
             $user->save();
         } elseif ($type == "vip") {
-            $vip = OVip::query()->find($target);
+            $vip = null;
+            if (PackageHelper::isInstalled('vip')) {
+                $vip = OVip::query()->find($target);
+            }
             if ($vip) UserCommon::addVipToUser($user, $vip, $expire, null, 'daily-gift');
         } elseif ($type == "ware") {
 

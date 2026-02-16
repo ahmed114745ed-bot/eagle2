@@ -9,8 +9,6 @@ use Illuminate\Http\Request;
 use App\Services\RankingServiceV2;
 use App\Services\RankingService;
 use App\Http\Controllers\Controller;
-use Mockery\Exception;
-use Modules\Vip\Services\Api\VipService;
 use App\Http\Resources\Api\V1\AgencyRankingRecourse;
 use App\Http\Resources\Api\V1\NewAgencyRankingResource;
 

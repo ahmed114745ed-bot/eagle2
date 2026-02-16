@@ -6,10 +6,10 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\OVips;
 use App\Selectables\Wares;
 use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
@@ -17,6 +17,7 @@ use App\Admin\Controllers\MainController;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Vip\Selectables\OVips;
 
 class DailyPrizeController extends MainController
 {
@@ -110,7 +111,7 @@ class DailyPrizeController extends MainController
                             : __('Not Found');
 
                     case 'vip':
-                        $vip = \Modules\Vip\Entities\OVip::find($this->target);
+                        $vip = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                         return $vip
                             ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
                             : __('Not Found');
@@ -130,7 +131,7 @@ class DailyPrizeController extends MainController
                 $ware = Ware::find($this->target);
                 $path = $ware->img2 ?? $ware?->show_img;
             } elseif ($this->gift_type == 'vip') {
-                $vips = OVip::find($this->target);
+                $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                 $path = $vips?->img;
             } elseif ($this->gift_type == 'achievement') {
                 $path = $this->target;
@@ -234,10 +235,12 @@ class DailyPrizeController extends MainController
 
         $giftTypeOptions = [
             "ware"        => __('ware'),
-            "vip"         => __('vip'),
             "coins"       => __('coins'),
             "badge" => __('badge'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $giftTypeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $giftTypeOptions['achievement'] = __('achievement');
         }
@@ -252,7 +255,9 @@ class DailyPrizeController extends MainController
                 $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
-                $form->belongsTo('target2', OVips::class, trans('vips'));
+                if (class_exists(OVips::class)) {
+                    $form->belongsTo('target2', OVips::class, trans('vips'));
+                }
                 $form->number('expire', __('expire'));
             })
             ->when('coins', function () use ($form) {

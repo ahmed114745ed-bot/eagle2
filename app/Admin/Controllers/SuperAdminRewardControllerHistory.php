@@ -8,7 +8,7 @@ use Encore\Admin\Grid;
 use App\Selectables\Badges;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\SuperAdmins;
@@ -20,6 +20,7 @@ use App\Admin\Controllers\MainController;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
 
 class SuperAdminRewardControllerHistory extends MainController
 {
@@ -104,7 +105,11 @@ class SuperAdminRewardControllerHistory extends MainController
                 }, __('username'))->placeholder(__('search for host by username'));
             });
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('type', __('status'))->select(['ware' => __('ware'), "vip" => __('vip'), 'badge' => __("badge")]);
+                $typeFilterOptions = ['ware' => __('ware'), 'badge' => __("badge")];
+                if (PackageHelper::isInstalled('vip')) {
+                    $typeFilterOptions['vip'] = __('vip');
+                }
+                $filter->equal('type', __('status'))->select($typeFilterOptions);
             });
 
 
@@ -309,7 +314,10 @@ class SuperAdminRewardControllerHistory extends MainController
         $form = new Form(new SuperAdminReward());
 
         $this->addSuperAdminField($form);
-        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "coins" => __('coins')];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions['vip'] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -324,11 +332,11 @@ class SuperAdminRewardControllerHistory extends MainController
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::query()->select('id', 'name')->get() : collect();
                     foreach ($vips as  $vip) {
                         $ops[$vip->id] = $vip->name;
                     }
-                    return $ops;
+                    return $ops ?? [];
                 });
                 $form->number('expire', __('expire'))->default(1);
             })

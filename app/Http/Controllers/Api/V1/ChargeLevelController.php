@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use Auth;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 
 class ChargeLevelController extends Controller
@@ -13,11 +14,11 @@ class ChargeLevelController extends Controller
     public function chargeLevel(Request $request)
     {
         $user = $request->user();
-        $currentLevel = Vip::where("level", @$user->total_charge_level)->where('type', 5)->orderBy('level')->first();
+        $currentLevel = PackageHelper::isInstalled('vip') ? Vip::where("level", @$user->total_charge_level)->where('type', 5)->orderBy('level')->first() : null;
         if (!$currentLevel) {
             return Common::apiResponse(true, 'لا يملك اي مستوي', []);;
         }
-        $secondLevel = Vip::where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('level')->first();
+        $secondLevel = PackageHelper::isInstalled('vip') ? Vip::where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('level')->first() : null;
         $remaining = 0;
         $progress = 0;
         if ($secondLevel != null) {

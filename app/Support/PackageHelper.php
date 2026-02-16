@@ -15,6 +15,7 @@ use Utd\Pk\Entities\Pk;
 use Utd\Room\Entities\Room;
 use Utd\RoomBoom\Entities\RoomBoom;
 use Utd\RoomCup\Entities\RoomCupTarget;
+use Utd\Vip\Entities\OVip;
 
 class PackageHelper
 {
@@ -31,6 +32,7 @@ class PackageHelper
         'cp' => Cp::class,
         'luckyBox' => Box::class,
         'chat' => ChatMessage::class,
+        'vip' => OVip::class,
     ];
 
     /**

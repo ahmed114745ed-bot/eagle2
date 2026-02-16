@@ -23,7 +23,8 @@ use Encore\Admin\Widgets\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
+use App\Support\PackageHelper;
 use App\Models\UserSallary;
 use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\App;
@@ -107,8 +108,8 @@ class UserController extends MainController
         $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
             $q->select('id', 'show_img');
         }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
-        $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
-        $hasVip = UserVip::where('user_id', $id)
+        $userVips = PackageHelper::isInstalled('vip') ? UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page') : collect();
+        $hasVip = PackageHelper::isInstalled('vip') && UserVip::where('user_id', $id)
             ->where('is_used', 1)
             ->exists();
 

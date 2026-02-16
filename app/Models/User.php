@@ -37,9 +37,9 @@ use Modules\SalaryTransaction\Entities\SalaryRequest;
 use Modules\SalaryTransaction\Traits\UserTransferTrait;
 use Modules\SpecialId\Traits\SpecialId;
 use Modules\UsersWallet\Entities\UserWallet;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\UserVip;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Entities\UserVip;
+use Utd\Vip\Entities\Vip;
 use Utd\Moments\Entities\Moment;
 use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Entities\Room;
@@ -245,7 +245,8 @@ class User extends Authenticatable
 
     public function vipImage()
     {
-        return $this->hasOne(Vip::class, 'level', 'total_received_level')
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(Vip::class, 'level', 'total_received_level')
             ->where('type', 1);
     }
 
@@ -877,27 +878,31 @@ class User extends Authenticatable
 
     public function UserVip()
     {
-        return $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(UserVip::class, 'user_id')->where(function ($q) {
             $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
     public function userHaveVip()
     {
-        return $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
+        return PackageHelper::checkRelation($this, 'vip', 'hasMany') ??
+            $this->hasMany(UserVip::class, 'user_id')->where(function ($q) {
             $q->where('is_used', 1)->where(fn($q) => $q->where('expire', 0)->orWhere('expire', '>=', now()->timestamp));
         })->with('OVip')->orderByDesc('level');
     }
 
     public function Ovip()
     {
-        return $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
+        return PackageHelper::checkRelation($this, 'vip', 'hasOneThrough') ??
+            $this->hasOneThrough(OVip::class, UserVip::class, 'user_id', 'id', 'id', 'vip_id')
             ->with('privilegs');
     }
 
     public function haveVip()
     {
-        return $this->hasMany(UserVip::class, 'user_id');
+        return PackageHelper::checkRelation($this, 'vip', 'hasMany') ??
+            $this->hasMany(UserVip::class, 'user_id');
     }
 
     public function getImageReceiverOrSender($name, $type)
@@ -1718,7 +1723,8 @@ class User extends Authenticatable
 
     public function userVips()
     {
-        return $this->hasMany(UserVip::class, 'user_id');
+        return PackageHelper::checkRelation($this, 'vip', 'hasMany') ??
+            $this->hasMany(UserVip::class, 'user_id');
     }
 
     public function getIsFrozenAttribute()

@@ -3,7 +3,8 @@
 namespace Modules\Events\Http\Actions;
 
 use App\Models\Pack;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
+use App\Support\PackageHelper;
 use Encore\Admin\Actions\Action;
 use Illuminate\Http\Request;
 use Utd\Achievements\Entities\UserAchievementLevel;
@@ -43,8 +44,8 @@ class EventReportAction extends Action
                 $winner_reward->winner->di -= $target;
                 $winner_reward->winner->save();
             }elseif ($winner_reward->reward->type == 'vip'){
-                $userVip = UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first();
-                $userVip->delete();
+                $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first() : null;
+                if ($userVip) $userVip->delete();
                 /*if ($userVip){
 
                     Pack::query()->where(['user_id'=>$winner->id,"target_id"=>$winner_reward->reward->target])->delete();

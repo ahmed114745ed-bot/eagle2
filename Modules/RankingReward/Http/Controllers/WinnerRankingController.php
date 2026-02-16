@@ -6,7 +6,7 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Facades\Admin;
 use Modules\Badge\Entities\Badge;

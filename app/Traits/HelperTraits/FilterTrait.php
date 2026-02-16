@@ -4,7 +4,8 @@
 namespace App\Traits\HelperTraits;
 
 
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Family;
@@ -55,7 +56,7 @@ trait FilterTrait
     public static function by_ovip_filter()
     {
         $ops = [0 => 'no ovip'];
-        $OVips = OVip::query()->get();
+        $OVips = PackageHelper::isInstalled('vip') ? OVip::query()->get() : collect();
         foreach ($OVips as $OVips) {
             $ops[$OVips->id] = $OVips->level;
         }

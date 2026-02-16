@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

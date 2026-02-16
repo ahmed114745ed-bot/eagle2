@@ -9,9 +9,10 @@ use App\Helpers\UserCommon;
 use App\Models\GiftLog;
 use App\Models\Ware;
 use Carbon\Carbon;
+use App\Support\PackageHelper;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkWinner;
@@ -109,8 +110,10 @@ class PKEventWinnerCommand extends Command
                     );
                     break;
                 case 'vip':
-                    $vip = OVip::find($reward->target);
-                    UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'pk-event');
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vip = OVip::find($reward->target);
+                        UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'pk-event');
+                    }
                     break;
                 case 'ware':
                     $ware = Ware::find($reward->target);

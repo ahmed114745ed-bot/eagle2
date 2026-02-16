@@ -6,6 +6,7 @@ use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
 use App\Models\Ware;
 use App\Selectables\WaresByType;
+use App\Support\PackageHelper;
 use Encore\Admin\Admin;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
@@ -13,8 +14,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Entities\Vip;
 use Utd\Achievements\Entities\Achievement;
 use Utd\CP\Entities\CpLevel;
 use Utd\CP\Entities\CpLevelGift;
@@ -127,7 +128,7 @@ class LevelGiftController extends MainController
     {
         $q = $request->get('q');
         // If you want to filter by $q, add where clauses.
-        $vips = OVip::select('id', 'name')->get();
+        $vips = PackageHelper::isInstalled('vip') ? OVip::select('id', 'name')->get() : collect();
 
         $data = [];
         foreach ($vips as $vip) {
@@ -232,9 +233,11 @@ class LevelGiftController extends MainController
 
         $typeOptions = [
             'ware' => __('ware'),
-            'vip' => __('vip'),
             'coins' => __('coins'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions['vip'] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -259,8 +262,9 @@ class LevelGiftController extends MainController
 
     protected function addVipFields($form, $prefix = ''): void
     {
+        $vipOptions = PackageHelper::isInstalled('vip') ? OVip::pluck('name', 'id') : collect();
         $form->select($prefix.'item_id', __('VIP'))
-            ->options(OVip::pluck('name', 'id'))
+            ->options($vipOptions)
             ->default(function ($form) {
                 return $form->model()->type === 'vip'
                     ? $form->model()->item_id

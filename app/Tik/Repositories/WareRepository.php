@@ -4,7 +4,7 @@ namespace App\Tik\Repositories;
 
 use App\Models\Ware;
 use Illuminate\Support\Facades\Cache;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 
 class WareRepository extends AbstractRepository

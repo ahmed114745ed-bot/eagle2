@@ -21,7 +21,8 @@ use Illuminate\Validation\ValidationException;
 use App\Support\DynamicReals;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 
 
 class OvipGiftTapController extends MainController
@@ -41,9 +42,9 @@ class OvipGiftTapController extends MainController
         HTML;
         $ovip = null;
         if (request('ovip_id')) {
-            $ovip = OVip::find(request('ovip_id'));
+            $ovip = PackageHelper::isInstalled('vip') ? OVip::find(request('ovip_id')) : null;
         } elseif (request('level')) {
-            $ovip = OVip::where('level', request('level'));
+            $ovip = PackageHelper::isInstalled('vip') ? OVip::where('level', request('level'))->first() : null;
         }
 
 
@@ -263,7 +264,7 @@ class OvipGiftTapController extends MainController
     public function destroy($id)
     {
         $ware = Ware::where('id', $id)->first();
-        $ovip = Ovip::where('level', $ware->level)->first();
+        $ovip = PackageHelper::isInstalled('vip') ? Ovip::where('level', $ware->level)->first() : null;
         $type = $ware->type;
         $ware->delete();
         $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
@@ -414,7 +415,7 @@ class OvipGiftTapController extends MainController
         $form->saved(function (Form $form) {
             $level = $form->model()->level;
             $type = $form->model()->type;
-            $ovip = Ovip::where('level', $level)->first();
+            $ovip = PackageHelper::isInstalled('vip') ? Ovip::where('level', $level)->first() : null;
             $url = url('admin/ovip-gift/' . $ovip->id) . '?type=' . $type;
             return redirect()->to($url);
         });

@@ -5,11 +5,12 @@ namespace Database\Seeders;
 
 
 use App\Models\User;
+use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;
-use Modules\Vip\Helpers\VipCommon;
+use Utd\Vip\Helpers\VipCommon;
 use Illuminate\Support\Facades\Hash;
-use Modules\Vip\Entities\OVip;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Entities\UserVip;
 
 class CreateUsersAccountsSeeder extends Seeder
 {
@@ -21,7 +22,7 @@ class CreateUsersAccountsSeeder extends Seeder
         $basePhone = '+2010';
         $startNumber = 12; // This will increment: 12, 22, 32, 42 ...
         $suffix = '22222'; // Last 6 digits
-        $vips = OVip::all();
+        $vips = PackageHelper::isInstalled('vip') ? OVip::all() : collect();
         for ($i = 0; $i < 20; $i++) {
             $phoneMiddle = $startNumber + ($i * 10); // 12, 22, 32, 42...
             $number = $phoneMiddle . $suffix;
@@ -39,11 +40,13 @@ class CreateUsersAccountsSeeder extends Seeder
                 'password' => 111,
             ]);
 
-            $vip = $vips->random();
-            VipCommon::createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, 'buy-vip');
-            $userVip = UserVip::where('user_id', $user->id)->first();
+            if (PackageHelper::isInstalled('vip') && $vips->isNotEmpty()) {
+                $vip = $vips->random();
+                VipCommon::createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, 'buy-vip');
+                $userVip = UserVip::where('user_id', $user->id)->first();
 
-            VipCommon::handleVipActivation($userVip);
+                VipCommon::handleVipActivation($userVip);
+            }
         }
     }
 }

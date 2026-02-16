@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Dashboard\Events;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
 use App\Models\Pack;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Events\Entities\GeneralRole;
@@ -14,6 +14,7 @@ use Modules\Events\Entities\UserChargeEvent;
 use Modules\Events\Entities\WinnerReward;
 use Modules\Events\Http\Actions\EventReportAction;
 use Modules\Events\Services\LoseWinnerRewards;
+use App\Support\PackageHelper;
 
 class AdminGeneralRolesController extends Controller
 {
@@ -97,7 +98,7 @@ class AdminGeneralRolesController extends Controller
                 $winner_reward->winner->save();
             }
             elseif ($winner_reward->reward->type == 'vip'){
-                $userVip = UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first();
+                $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first() : null;
                 $userVip->delete();
                 /*if ($userVip){
 

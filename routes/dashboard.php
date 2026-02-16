@@ -24,8 +24,8 @@ use App\Http\Controllers\Dashboard\Room\AdminGiftRoomController;
 use App\Http\Controllers\Dashboard\Room\AdminRoomCategoriesController;
 use Utd\Room\Http\Controllers\Dashboard\AdminRoomsController;
 use App\Http\Controllers\Dashboard\Users\UsersDashboard;
-use App\Http\Controllers\Dashboard\Vips\AdminPrivilegeVipsController;
-use App\Http\Controllers\Dashboard\Vips\AdminVipsController;
+// use App\Http\Controllers\Dashboard\Vips\AdminPrivilegeVipsController; // Moved to VIP package
+// use App\Http\Controllers\Dashboard\Vips\AdminVipsController; // Moved to VIP package
 use App\Http\Controllers\Dashboard\Wares\AdminWaresController;
 use App\Http\Controllers\Dashboard\Achievement\AdminAchievementLevelsController;
 use App\Http\Controllers\Dashboard\Achievement\AdminSendAchievementController;
@@ -199,18 +199,7 @@ Route::middleware('auth:sanctum','verified')->group(function(){
     Route::get('get-bans-type',[ AdminBansController::class,'types']);
 
 
-    //Vips Previlage
-    Route::resource('admin-vip-privilege', AdminPrivilegeVipsController::class);
-
-    //Vips
-    Route::controller(AdminVipsController::class)->group(function(){
-        Route::resource('admin-vips', AdminVipsController::class);
-        route::get('/Sort-vips','sort');
-        route::post('/Send-vips','Send');
-        route::post('/Change-Sort-vips','change_sort');
-        route::get('/vips-autocomplete','autocomplete');
-
-    });
+    // Vips routes moved to packages/Utd/Vip/Routes/dashboard.php
 
     //Cuarsel
     Route::controller(AdminCuarselController::class)->group(function(){

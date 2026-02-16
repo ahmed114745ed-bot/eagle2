@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Utd\Vip\Http\Controllers\Web\DedicateVipController;
+use Utd\Vip\Http\Controllers\Web\OVipController;
+use Utd\Vip\Http\Controllers\Web\OvipGiftTapController;
+use Utd\Vip\Http\Controllers\Web\VipPrivilegeController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+
+Route::group(
+    [
+        'prefix' => config('admin.route.prefix'),
+        'middleware' => [
+            'web',
+            'admin',
+            'adminIp',
+            'multiLanguage',
+        ],
+        'as' => config('admin.route.prefix') . '.',
+    ],
+    function () {
+
+        Route::resource('vip_privilege', VipPrivilegeController::class);
+        Route::resource('ovip', OVipController::class);
+        Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);
+        Route::get('/vips_dedicate', [DedicateVipController::class, 'index']);
+
+        Route::prefix('ovip-theme')->group(function () {
+            Route::get('/{ovip_id}', [OVipController::class, 'editBackgroundImage']);
+             Route::put('{ovip_id}', [OVipController::class, 'updateBackgroundImage']);
+
+        });
+
+        Route::get('ovip-settings', [OVipController::class, 'vipSettings']);
+        Route::prefix('ware-gift')->group(function () {
+            Route::get('/{level}/{type}', [OvipGiftTapController::class, 'create']);
+            Route::post('/{level}', [OvipGiftTapController::class, 'store']);
+        });
+        Route::resource('ware-gifts', OvipGiftTapController::class);
+        Route::prefix('ware-gifts')->group(function () {
+            Route::get('/{id}/edit', [OvipGiftTapController::class, 'edit'])->where('id', '[0-9]+');
+            Route::put('/{id}', [OvipGiftTapController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [OvipGiftTapController::class, 'destroy'])->where('id', '[0-9]+');
+        });
+    }
+);

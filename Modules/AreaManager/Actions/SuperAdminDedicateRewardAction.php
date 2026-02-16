@@ -10,7 +10,8 @@ use App\Models\Country;
 use App\Helpers\UserCommon;
 use Illuminate\Http\Request;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Actions\Action;
 use App\Helpers\UserCoinLogHelper;
@@ -195,8 +196,8 @@ function pu(val) {
 
                 break;
             case "vip":
-                $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'region_manager_dedicate');
+                $vip = PackageHelper::isInstalled('vip') ? OVip::find($reward->target) : null;
+                if ($vip) UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'region_manager_dedicate');
                 break;
             case "ware":
                 $ware = Ware::find($reward->target);

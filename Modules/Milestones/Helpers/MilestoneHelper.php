@@ -17,7 +17,8 @@ use Modules\Milestones\Entities\MilestoneReward;
 use App\Helpers\UserCommon;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Illuminate\Support\Facades\Log;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 
 
 class MilestoneHelper
@@ -110,8 +111,10 @@ class MilestoneHelper
                 break;
 
             case 'vip':
-                $vip = OVip::find($mr->rewardable_id);
-                UserCommon::addVipToUser($user, $vip, $mr->expire, 0, $receiveType, 1);
+                if (PackageHelper::isInstalled('vip')) {
+                    $vip = OVip::find($mr->rewardable_id);
+                    UserCommon::addVipToUser($user, $vip, $mr->expire, 0, $receiveType, 1);
+                }
                 break;
 
             case 'ware':

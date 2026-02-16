@@ -580,7 +580,7 @@ Route::group(
 
         Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
         Route::resource('/uuid_dedicate', 'SpecialWareDedicateController');
-        Route::get('/vips_dedicate', 'DedicateVipController@index');
+        // vips_dedicate route moved to packages/Utd/Vip/Routes/web.php
         Route::get('/bans', [BanController::class, 'index']);
         Route::post('custom-delete-ban', [BanController::class, 'deleteBan']);
 

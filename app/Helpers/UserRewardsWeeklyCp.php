@@ -2,8 +2,9 @@
 
 namespace App\Helpers;
 
+use App\Support\PackageHelper;
 use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\UserCommon;
@@ -47,7 +48,7 @@ class UserRewardsWeeklyCp
 
     public static function assignVip($vipId, $expire, $userOne, $userTwo)
     {
-        $vip = OVip::find($vipId);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::find($vipId) : null;
         UserCommon::addVipToUser($userOne, $vip, $expire, null, 'weekly-cp');
         UserCommon::addVipToUser($userTwo, $vip, $expire, null, 'weekly-cp');
     }

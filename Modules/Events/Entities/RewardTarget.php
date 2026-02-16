@@ -4,8 +4,9 @@ namespace Modules\Events\Entities;
 
 use App\Models\Ware;
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Illuminate\Http\UploadedFile;
+use App\Support\PackageHelper;
 use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +38,8 @@ class RewardTarget extends Model
 
     public function vip()
     {
-        return $this->hasOne(OVip::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(OVip::class, 'id', 'target');
     }
 
     public function badge()

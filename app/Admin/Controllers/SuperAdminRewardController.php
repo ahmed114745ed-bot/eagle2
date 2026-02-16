@@ -5,7 +5,7 @@ namespace App\Admin\Controllers;
 use App\Models\Ware;
 use Encore\Admin\Grid;
 use Modules\SuperAdmin\Actions\Admin\DedicateSuperAdminRewardAction;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;

@@ -8,7 +8,7 @@ use Encore\Admin\Layout\Row;
 use Illuminate\Http\Request;
 
 use Encore\Admin\Widgets\Box;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\AreaManager\Entities\Region;

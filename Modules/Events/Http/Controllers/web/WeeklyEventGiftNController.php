@@ -8,7 +8,8 @@ use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Admin;
 use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
@@ -153,7 +154,7 @@ class WeeklyEventGiftNController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -229,7 +230,7 @@ class WeeklyEventGiftNController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -302,7 +303,7 @@ class WeeklyEventGiftNController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -354,7 +355,10 @@ class WeeklyEventGiftNController extends MainController
         $form->hidden('weekly_star_id')->value(request('weekly_event_id'));
         $form->hidden('level')->value(request('level'));
 
-        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "vip" => __('vip'), "coins" => __('coins')];
+        $typeOptions = ["ware" => __('ware'), "badge" => __('badge'), "coins" => __('coins')];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -369,11 +373,11 @@ class WeeklyEventGiftNController extends MainController
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::query()->select('id', 'name')->get() : collect();
                     foreach ($vips as  $vip) {
                         $ops[$vip->id] = $vip->name;
                     }
-                    return $ops;
+                    return $ops ?? [];
                 });
                 $form->number('expire', __('expire'))->default(1);
             })

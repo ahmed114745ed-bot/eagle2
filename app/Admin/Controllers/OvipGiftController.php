@@ -2,7 +2,7 @@
 
 namespace App\Admin\Controllers;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -13,6 +13,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\Session;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Support\PackageHelper;
 
 class OvipGiftController extends MainController
 {
@@ -30,9 +31,11 @@ class OvipGiftController extends MainController
     </a>
     HTML;
         if (request('ovip_id')) {
-            $ovip = OVip::find(request('ovip_id'));
+            $ovip = PackageHelper::isInstalled('vip') ? OVip::find(request('ovip_id')) : null;
         } elseif (request('level')) {
-            $ovip = OVip::where('level', request('level'));
+            $ovip = PackageHelper::isInstalled('vip') ? OVip::where('level', request('level'))->first() : null;
+        } else {
+            $ovip = null;
         }
 
 
@@ -223,7 +226,7 @@ class OvipGiftController extends MainController
 
         $form->saved(function (Form $form) {
             $level = $form->model()->level; // Get the saved model's ID
-            $ovip = Ovip::where('level', $level)->first();
+            $ovip = PackageHelper::isInstalled('vip') ? Ovip::where('level', $level)->first() : null;
             $url = url('admin/ovip-gift/' . $ovip->id);
             return redirect()->to($url);
         });

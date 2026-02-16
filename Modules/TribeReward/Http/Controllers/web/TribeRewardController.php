@@ -12,8 +12,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\TribeReward\Entities\TribeReward;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
 
 class TribeRewardController extends MainController
 {
@@ -72,7 +73,10 @@ class TribeRewardController extends MainController
                 $ware = Ware::find($this->target);
                 $path = $ware->img2 ?? $ware?->show_img;
             } elseif ($this->target_type == 'vip') {
-                $vips = OVip::find($this->target);
+                $vips = null;
+                if (PackageHelper::isInstalled('vip')) {
+                    $vips = OVip::find($this->target);
+                }
                 $path = $vips?->img;
             } elseif ($this->target_type == 'achievement') {
                 $path = $this?->target;
@@ -132,8 +136,10 @@ class TribeRewardController extends MainController
             ->when('share_rewards', function (Form $form) {
                 $targetTypeOptions = [
                     "ware" => __('ware'),
-                    "vip" => __('vip'),
                 ];
+                if (PackageHelper::isInstalled('vip')) {
+                    $targetTypeOptions["vip"] = __('vip');
+                }
                 if (class_exists(Achievement::class)) {
                     $targetTypeOptions['achievement'] = __('achievement');
                 }
@@ -144,9 +150,11 @@ class TribeRewardController extends MainController
                     ->when("vip", function (Form $form) {
                         $form->select('target2', trans('vips'))->options(function () {
                             $ops = [];
-                            $vips = OVip::query()->select('id', 'name')->get();
-                            foreach ($vips as  $vip) {
-                                $ops[$vip->id] = $vip->name;
+                            if (PackageHelper::isInstalled('vip')) {
+                                $vips = OVip::query()->select('id', 'name')->get();
+                                foreach ($vips as  $vip) {
+                                    $ops[$vip->id] = $vip->name;
+                                }
                             }
                             return $ops;
                         })->rules('required');

@@ -7,6 +7,7 @@ use App\Models\Ware;
 use App\Selectables\Badges;
 use App\Selectables\WaresByType;
 use App\Services\AppFeatureService;
+use App\Support\PackageHelper;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -14,7 +15,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Modules\Badge\Entities\Badge;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Pk\Entities\PkReward;
 
@@ -131,7 +132,10 @@ class PkEventGiftController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? '');
                 } elseif ($this->type === 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = null;
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vips = OVip::find($this->target);
+                    }
                     $path = $vips->img ?? '';
                 } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
@@ -209,7 +213,10 @@ class PkEventGiftController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? '');
                 } elseif ($this->type === 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = null;
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vips = OVip::find($this->target);
+                    }
                     $path = $vips->img ?? '';
                 } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
@@ -287,7 +294,10 @@ class PkEventGiftController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? '');
                 } elseif ($this->type === 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = null;
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vips = OVip::find($this->target);
+                    }
                     $path = $vips->img ?? '';
                 } elseif ($this->type === 'badge') {
                     $path = @$this->badge->image ?? '';
@@ -355,7 +365,10 @@ class PkEventGiftController extends MainController
         $form->hidden('pk_type')->value(request('pk_type'));
 
         $form->hidden('level')->value(request()->route('level'));
-        $typeOptions = ['ware' => __('ware'), 'badge' => __('badge'), 'vip' => __('vip'), 'coins' => __('coins')];
+        $typeOptions = ['ware' => __('ware'), 'badge' => __('badge'), 'coins' => __('coins')];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions['vip'] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -368,9 +381,12 @@ class PkEventGiftController extends MainController
             })
             ->when('vip', function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
-                    foreach ($vips as $vip) {
-                        $ops[$vip->id] = $vip->name;
+                    $ops = [];
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vips = OVip::query()->select('id', 'name')->get();
+                        foreach ($vips as $vip) {
+                            $ops[$vip->id] = $vip->name;
+                        }
                     }
 
                     return $ops;

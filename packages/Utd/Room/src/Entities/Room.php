@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
@@ -77,7 +77,8 @@ class Room extends Model
 
     public function level()
     {
-        return $this->belongsTo(Vip::class, 'level_id');
+        return PackageHelper::checkRelation($this, 'vip', 'belongsTo') ??
+            $this->belongsTo(Vip::class, 'level_id');
     }
 
     public function roomSalary()

@@ -4,11 +4,12 @@ namespace App\Services;
 
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserGameChallange;
 use Utd\Room\Entities\Room;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use App\Models\Ware;
 use Utd\Achievements\Entities\UserAchievementLevel;
 
@@ -21,7 +22,9 @@ class RoomLevelServices
         }
         if ($amount > 0) {
             $room->total_diamond +=$amount ;
-            $level = Vip::where("exp","<=",$room->total_diamond)->where('type', 4)->latest()->first();
+            $level = PackageHelper::isInstalled('vip')
+                ? Vip::where("exp","<=",$room->total_diamond)->where('type', 4)->latest()->first()
+                : null;
             if ($level) {
                 $room->level_id = $level->id;
                 $room->level = $level->level;

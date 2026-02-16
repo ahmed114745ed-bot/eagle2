@@ -4,7 +4,8 @@ namespace Modules\TribeReward\Transformers;
 
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 
 class TribeRewardResource extends JsonResource
 {
@@ -24,7 +25,10 @@ class TribeRewardResource extends JsonResource
             $ware = Ware::find($this->target);
             $path = $ware->img2 ?? $ware?->show_img;
         } elseif ($this->target_type == 'vip') {
-            $vip = OVip::find($this->target);
+            $vip = null;
+            if (PackageHelper::isInstalled('vip')) {
+                $vip = OVip::find($this->target);
+            }
             $path = $vip?->img;
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;
@@ -39,7 +43,10 @@ class TribeRewardResource extends JsonResource
             $ware = Ware::find($this->target);
             return $ware?->name ?? '';
         } elseif ($this->target_type == 'vip') {
-            $vip = OVip::find($this->target);
+            $vip = null;
+            if (PackageHelper::isInstalled('vip')) {
+                $vip = OVip::find($this->target);
+            }
             return $vip?->name ?? '';
         } elseif ($this->target_type == 'achievement') {
             return 'Achievement';

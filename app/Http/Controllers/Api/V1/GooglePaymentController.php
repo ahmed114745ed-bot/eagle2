@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use App\Models\Coin;
 use App\Models\User;
 use GuzzleHttp\Client;
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use App\Models\CoinLog;
 use Illuminate\Http\Request;
 use App\Traits\User\PaymentTrait;
@@ -122,7 +123,7 @@ class GooglePaymentController extends Controller
         $user = User::where("id", $request->user()->id)->first();
         $user->total_charge_coins += $request->amount;
         $chargeUserExp = $user->total_charge_coins + $user->sub_charger_level;
-        $level = Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first();
+        $level = PackageHelper::isInstalled('vip') ? Vip::where("exp", "<=",  $chargeUserExp)->where('type', 5)->orderByDesc("exp")->first() : null;
 
         if ($level) {
             $user->charge_level = $level->level;

@@ -2,7 +2,7 @@
 
 namespace Modules\Tasks\Http\Controllers;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use Modules\Tasks\Entities\TaskReward;
 use Encore\Admin\Controllers\AdminController;
@@ -16,6 +16,7 @@ use Utd\CP\Entities\CpLevelGift;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Layout\Content;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
 
 class TaskRewardController extends AdminController
 {
@@ -126,9 +127,11 @@ class TaskRewardController extends AdminController
 
         $typeOptions = [
             "ware" => __('ware'),
-            "vip" => __('vip'),
             "coins" => __('coins'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -152,10 +155,12 @@ class TaskRewardController extends AdminController
         })
         ->when("vip", function () use ($form) {
             $form->select('target', trans('vips'))->options(function () {
-                $vips = OVip::query()->select('id', 'name')->get();
                 $ops = [];
-                foreach ($vips as $vip) {
-                    $ops[$vip->id] = $vip->name;
+                if (PackageHelper::isInstalled('vip')) {
+                    $vips = OVip::query()->select('id', 'name')->get();
+                    foreach ($vips as $vip) {
+                        $ops[$vip->id] = $vip->name;
+                    }
                 }
                 return $ops;
             });

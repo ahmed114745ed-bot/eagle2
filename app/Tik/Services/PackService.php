@@ -5,13 +5,11 @@ namespace App\Tik\Services;
 use Exception;
 
 use App\Models\User;
-use App\Helpers\Common;
 use App\Tik\Repositories\PackRepository;
 use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
-use Illuminate\Database\Eloquent\Collection;
-use Modules\Vip\Repositories\UserVipRepository;
+use Utd\Vip\Repositories\UserVipRepository;
 use phpDocumentor\Reflection\Types\Mixed_;
 
 

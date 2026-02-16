@@ -10,7 +10,7 @@ use App\Models\GiftLog;
 use App\Helpers\UserCommon;
 use App\Models\CoinGameUser;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Illuminate\Console\Command;
 use App\Helpers\UserCoinLogHelper;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +19,7 @@ use Modules\RankingReward\Entities\WinnerRanking;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use App\Jobs\SendFirebaseNotificationIndividualUserJob;
 use Illuminate\Support\Facades\Log;
+use App\Support\PackageHelper;
 
 class WeeklyRankingCommand extends Command
 {
@@ -295,8 +296,10 @@ class WeeklyRankingCommand extends Command
 
             // VIP
             elseif ($reward->target_type == "vip") {
-                $vip = OVip::find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking', sendNotification: 0);
+                if (PackageHelper::isInstalled('vip')) {
+                    $vip = OVip::find($reward->target);
+                    UserCommon::addVipToUser($user, $vip, $reward->expire_days, null, 'gift-ranking', sendNotification: 0);
+                }
             }
 
             // Ware

@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\PackageHelper;
 use App\Traits\AutoReceiveType;
 use App\Traits\TimestampsWithTimezone;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 
 class Pack extends Model
 {
@@ -45,7 +46,8 @@ class Pack extends Model
 
     public function userVip()
     {
-        return $this->belongsTo(UserVip::class, 'vip_user_id');
+        return PackageHelper::checkRelation($this, 'vip', 'belongsTo') ??
+            $this->belongsTo(UserVip::class, 'vip_user_id');
     }
 
     public function scopeActive($query)

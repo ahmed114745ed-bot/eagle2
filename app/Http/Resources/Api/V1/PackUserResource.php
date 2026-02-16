@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources\Api\V1;
 
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PackUserResource extends JsonResource

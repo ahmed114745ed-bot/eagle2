@@ -8,10 +8,11 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Widgets\Box;
 use Modules\SuperAdmin\Actions\Admin\SuperAdminDedicateRewardAction;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use App\Admin\Controllers\MainController;
+use App\Support\PackageHelper;
 
 class SuperAdminRewardController extends MainController
 {
@@ -68,7 +69,10 @@ class SuperAdminRewardController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = null;
+                    if (PackageHelper::isInstalled('vip')) {
+                        $vips = OVip::find($this->target);
+                    }
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);

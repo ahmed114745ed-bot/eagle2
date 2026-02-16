@@ -3,8 +3,9 @@
 namespace App\Classes\Packs;
 
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Models\Ware;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -104,7 +105,7 @@ class AllowPacks
 
         // Retrieve the data from the cache or execute the query if it's not cached
         $ovips = Cache::remember($cacheKey, $seconds, function () {
-            return OVip::query()->select(['id', 'price'])->get();
+            return PackageHelper::isInstalled('vip') ? OVip::query()->select(['id', 'price'])->get() : collect();
         });
 
         return $ovips;

@@ -280,7 +280,7 @@ Route::group([
     });
 
     Route::resource('/wares_dedicate', 'DedicateWareController')->only('index', 'create', 'store');
-    Route::get('/vips_dedicate', 'DedicateVipController@index');
+    // vips_dedicate route moved to packages/Utd/Vip/Routes/web.php
     Route::resource('/bans', 'BanController');
     Route::resource('/request-background-image', 'RequestBackgroundImageController');
     // group-chat route moved to Chat package

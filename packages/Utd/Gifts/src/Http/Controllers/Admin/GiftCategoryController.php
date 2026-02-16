@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Utd\Gifts\Entities\GiftCategory;
+use App\Support\PackageHelper;
 
 class GiftCategoryController
 {
@@ -175,7 +176,7 @@ class GiftCategoryController
         $form->text('title.ar', __('Title (Arabic)'))->required();
         $form->text('title.en', __('Title (English)'))->required();
 
-        $form->select('type', __('Type'))->options([
+        $typeOptions = [
             'normal' => __('Normal'),
             'hot' => __('Hot'),
             'country' => __('Country'),
@@ -183,8 +184,12 @@ class GiftCategoryController
             'famous' => __('Famous'),
             'lucky_gift' => __('Lucky Gift'),
             'cp' => __('CP'),
-            'vip' => __('VIP'),
-        ])->required();
+        ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions['vip'] = __('VIP');
+        }
+
+        $form->select('type', __('Type'))->options($typeOptions)->required();
 
         $form->number('sort', __('Sort'))->default(1);
 

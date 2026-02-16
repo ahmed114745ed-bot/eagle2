@@ -5,6 +5,7 @@ namespace Modules\TribeReward\Transformers;
 use App\Models\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Support\PackageHelper;
 
 class AgencyRewardResource extends JsonResource
 {
@@ -38,7 +39,10 @@ class AgencyRewardResource extends JsonResource
             $ware = $this->getWare();
             $path = $ware->img2 ?? $ware?->show_img;
         } elseif ($this->target_type == 'vip') {
-            $vip = OVip::find($this->target);
+            $vip = null;
+            if (PackageHelper::isInstalled('vip')) {
+                $vip = OVip::find($this->target);
+            }
             $path = $vip?->img;
         } elseif ($this->target_type == 'achievement') {
             $path = $this->target;

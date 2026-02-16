@@ -5,7 +5,8 @@ namespace Utd\CP\Entities;
 use App\Models\Ware;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class CpLevelGift extends Model
 {
@@ -22,7 +23,8 @@ class CpLevelGift extends Model
 
     public function vip()
     {
-        return $this->belongsTo(OVip::class, 'item_id');
+        return PackageHelper::checkRelation($this, 'vip', 'belongsTo') ??
+            $this->belongsTo(OVip::class, 'item_id');
     }
 
     public function ware()
@@ -42,7 +44,8 @@ class CpLevelGift extends Model
 
     public function vip_item()
     {
-        return $this->belongsTo(OVip::class, 'vip_item_id');
+        return PackageHelper::checkRelation($this, 'vip', 'belongsTo') ??
+            $this->belongsTo(OVip::class, 'vip_item_id');
     }
 
     protected static function boot()

@@ -3,11 +3,12 @@
 namespace Utd\Room\Http\Controllers\Admin;
 
 use App\Admin\Controllers\MainController;
+use App\Support\PackageHelper;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 class RoomVipController extends MainController
 {
@@ -20,6 +21,10 @@ class RoomVipController extends MainController
 
     public function index(Content $content)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return $content->title(trans('room-vips'))->body('VIP package is not installed');
+        }
+
         return parent::index($content
             ->title(trans('room-vips'))
             ->body($this->grid()));
@@ -33,6 +38,10 @@ class RoomVipController extends MainController
      */
     public function show($id, Content $content)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return $content->title(trans('room-vips'))->body('VIP package is not installed');
+        }
+
         return parent::show($id, $content
             ->title(trans('room-vips'))
             ->body($this->detail($id)));
@@ -46,6 +55,10 @@ class RoomVipController extends MainController
      */
     public function edit($id, Content $content)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return $content->title(trans('room-vips'))->body('VIP package is not installed');
+        }
+
         return parent::edit($id, $content
             ->title(trans('room-vips'))
             ->body($this->form()->edit($id)));
@@ -53,6 +66,10 @@ class RoomVipController extends MainController
 
     public function create(Content $content)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return $content->title(trans('room-vips'))->body('VIP package is not installed');
+        }
+
         return parent::create($content
             ->title(trans('room-vips'))
             ->body($this->form()));

@@ -3,12 +3,12 @@
 namespace App\Admin\Actions;
 
 use Carbon\Carbon;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use Encore\Admin\Facades\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

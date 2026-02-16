@@ -2,8 +2,8 @@
 
 namespace Modules\Public\Http\Services;
 
-use Modules\Vip\Entities\Vip;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\Vip;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Banner;

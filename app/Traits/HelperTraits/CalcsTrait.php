@@ -8,11 +8,12 @@ use App\Models\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\UserLevelLog;
-use Modules\Vip\Entities\UserVip;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\UserVip;
+use Utd\Vip\Entities\Vip;
 use App\Models\Ware;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -102,12 +103,12 @@ trait CalcsTrait
 
         $total = $value;
         $exp   = $value * 1;
-        $level = Vip::collectionBuilder()
+        $level = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()
             ->where('type', $type)
             ->where('exp', '<=', $exp)
             ->orderByDesc('exp')
             ->limit(1)
-            ->value('level');
+            ->value('level') : null;
 
 
         if ($type == 1) {
@@ -120,9 +121,9 @@ trait CalcsTrait
         if ($is_image) {
             $img = '';
             if ($level >= 0) {
-                $img = Vip::collectionBuilder()
+                $img = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()
                     ->where(['level' => $level, 'type' => $type])
-                    ->value('img') ?? '';
+                    ->value('img') ?? '' : '';
             }
             return $img;
         } else {
@@ -140,7 +141,7 @@ trait CalcsTrait
         }
 
         if ($is_img) {
-            $img = Vip::query()->where(['level' => $level, 'type' => 4])->value('img');
+            $img = PackageHelper::isInstalled('vip') ? Vip::query()->where(['level' => $level, 'type' => 4])->value('img') : null;
             return $img;
         } else {
             return $level ?: 0;
@@ -277,7 +278,7 @@ trait CalcsTrait
 
     public static function vipByLevelAndType($level, $type)
     {
-        return Vip::where('level', $level)->where('type', $type)->first();
+        return PackageHelper::isInstalled('vip') ? Vip::where('level', $level)->where('type', $type)->first() : null;
     }
 
     //مركز الصف
@@ -577,7 +578,7 @@ trait CalcsTrait
 
         // $current_star_num       = self::getCurrentLevel(1, $star_level, 'exp');
         //        $vipsData = DB::table('vips')->get();
-        $vipsData = Vip::collectionBuilder()->get();
+        $vipsData = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->get() : collect();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
         //        $firstVip_type1          = self::vipByLevelAndType($star_level, 1);
@@ -809,7 +810,7 @@ trait CalcsTrait
 
         $star_level = $user->total_received_level;
 
-        $vipsData = Vip::collectionBuilder()->get();
+        $vipsData = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->get() : collect();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
 
@@ -886,7 +887,7 @@ trait CalcsTrait
         }
         $uvip = $user->UserVip;
         if (!$uvip) return new stdClass();
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
         if (!$vip) return new stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
         $hasColor = Common::hasInPack($user->id, 18, true);
@@ -960,7 +961,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return new stdClass();
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
 
         if (!$vip) return new stdClass();
         $vipIcon = Ware::where('level', $vip->level)->where('type', 12)->where('get_type', 1)->first();
@@ -1017,7 +1018,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
 
         if (!$vip) return '';
         $vipIcon = Ware::where('level', $vip->level)->where('type', 10)->where('get_type', 1)->first();
@@ -1089,7 +1090,7 @@ trait CalcsTrait
         $uvip = $user->UserVip;
         if (!$uvip) return new stdClass();
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
         if (!$vip) return new stdClass();
         $vipIcon = $vip->wares->firstWhere('type', 10) ?? null; // preloaded relation
         $hasColor = $user->packs->contains(fn($p) => $p->type == 18 && $p->is_used);
@@ -1130,7 +1131,7 @@ trait CalcsTrait
         $uvip = $user?->UserVip;
         if (!$uvip) return '';
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
 
         if (!$vip) return  '';
         $ware = Ware::where('level', $vip->level)->where('type', $type)->where('get_type', 1)->first();
@@ -1219,7 +1220,7 @@ trait CalcsTrait
         if (isset($user->UserVip)) return new stdClass();
         $uvip = $user->UserVip;
         if (!$uvip) return new stdClass();
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
         if (!$vip) return new stdClass();
         //        $p = $vip->privilegs;
         //        return $vip;
@@ -1474,11 +1475,11 @@ trait CalcsTrait
             ];
         }
         $expLevel = $user->total_charge_coins + $user->sub_charger_coins;
-        $currentLevel = Vip::collectionBuilder()->where("level", $user->charge_level)->where('type', 5)->orderByDesc('level')->first();
+        $currentLevel = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->where("level", $user->charge_level)->where('type', 5)->orderByDesc('level')->first() : null;
         if ($currentLevel) {
-            $secondLevel = Vip::collectionBuilder()->where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('id')->first();
+            $secondLevel = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->where("type", 5)->where("level", ">", $currentLevel->level)->orderBy('id')->first() : null;
         } else {
-            $secondLevel = Vip::collectionBuilder()->where("type", 5)->orderBy('level')->first();
+            $secondLevel = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->where("type", 5)->orderBy('level')->first() : null;
         }
 
 
@@ -1575,7 +1576,7 @@ trait CalcsTrait
         $star_level = $user->total_received_level;
         $gold_level = $user->total_sender_level;
 
-        $vipsData = Vip::collectionBuilder()->get();
+        $vipsData = PackageHelper::isInstalled('vip') ? Vip::collectionBuilder()->get() : collect();
 
         $firstVip_type1 = self::searchVipByLevelAndType($vipsData, $star_level, 1);
         $firstVip_type2 = self::searchVipByLevelAndType($vipsData, $gold_level, 2);
@@ -1598,7 +1599,7 @@ trait CalcsTrait
         $uvip = $user->UserVip;
         if (!$uvip) return new stdClass();
 
-        $vip = OVip::query()->find($uvip->vip_id);
+        $vip = PackageHelper::isInstalled('vip') ? OVip::query()->find($uvip->vip_id) : null;
         if (!$vip) return new stdClass();
 
         $vipIcon = Ware::where('level', $vip->level)

@@ -3,8 +3,9 @@
 namespace Modules\Public\Entities;
 
 use App\Helpers\Common;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -32,7 +33,8 @@ class RewardLevelInterval extends Model
 
     public function vip()
     {
-        return $this->hasOne(OVip::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(OVip::class, 'id', 'target');
     }
 
     public function getTarget1Attribute()

@@ -8,8 +8,9 @@ use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
+use App\Support\PackageHelper;
 use Modules\Events\Entities\GeneralRole;
 use Modules\HostLevel\Entities\HostLevel;
 use Modules\HostLevel\Entities\HostLevelWinner;
@@ -113,13 +114,18 @@ class HostLevelService
                     'body'  => str_replace(':coin', $reward->target, __('You have received :coin coin.')),
                 ];
             } elseif ($reward->type == "vip") {
-                $vip = OVip::query()->find($reward->target);
-                UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
+                $vip = null;
+                if (PackageHelper::isInstalled('vip')) {
+                    $vip = OVip::query()->find($reward->target);
+                }
+                if ($vip) {
+                    UserCommon::addVipToUser($user, $vip, $reward->expire, null, 'charge-event');
 
-                $notifications[] = [
-                    'title' => __('congratulations'),
-                    'body'  => __('vip_message', ['vip_name' => $vip->name]),
-                ];
+                    $notifications[] = [
+                        'title' => __('congratulations'),
+                        'body'  => __('vip_message', ['vip_name' => $vip->name]),
+                    ];
+                }
             } elseif ($reward->type == "ware") {
                 $ware = Ware::query()->find($reward->target);
                 if ($ware){

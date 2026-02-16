@@ -7,7 +7,7 @@ namespace Modules\SuperAdmin\Services;
 use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Models\Admin;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 class SuperAdminService
 {

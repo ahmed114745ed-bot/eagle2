@@ -6,16 +6,17 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\OVips;
 use App\Selectables\Wares;
 use App\Selectables\Badges;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
+use App\Support\PackageHelper;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Admin\Controllers\MainController;
 use Modules\HostLevel\Entities\HostLevelReward;
 use Utd\Achievements\Entities\Achievement;
+use Utd\Vip\Selectables\OVips;
 
 class HostLevelRewardController extends MainController
 {
@@ -102,7 +103,7 @@ class HostLevelRewardController extends MainController
                     $ware = Ware::find($this->target);
                     $path = $ware->img2 ?? ($ware->show_img ?? "");
                 } elseif ($this->type == 'vip') {
-                    $vips = OVip::find($this->target);
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::find($this->target) : null;
                     $path = $vips->img ?? '';
                 } elseif ($this->type == 'badge') {
                     // $vips = Badge::find($this->target);
@@ -189,9 +190,11 @@ class HostLevelRewardController extends MainController
         $typeOptions = [
             "coins"        => __('Coins'),
             "ware"         => __('Wares'),
-            "vip"          => __('vip'),
             "badge"        => __('Badge'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('Achievement');
         }
@@ -201,7 +204,9 @@ class HostLevelRewardController extends MainController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
-                $form->belongsTo('target2', OVips::class, trans('vip'));
+                if (class_exists(OVips::class)) {
+                    $form->belongsTo('target2', OVips::class, trans('vip'));
+                }
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("achievement", function (Form $form) {

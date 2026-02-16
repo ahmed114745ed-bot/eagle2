@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
 use App\Helpers\Common;
-use Modules\Vip\Entities\UserVip;
-use Modules\Vip\Services\Api\VipService;
+use Utd\Vip\Entities\UserVip;
+use Utd\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Facades\CustomNotification;

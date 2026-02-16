@@ -7,12 +7,13 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use App\Helpers\UserCommon;
 use App\Enums\UserCoinLogType;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
 use Modules\RoleRewards\Entities\RoleReward;
 use Modules\RoleRewards\Entities\UserHistoryReward;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Modules\Badge\Entities\Badge;
+use App\Support\PackageHelper;
 
 class UserRoleRewardHelper
 {
@@ -80,8 +81,10 @@ class UserRoleRewardHelper
     protected static function applyReward(User $user, $reward, $receiveType): void
     {
         if ($reward->type === "vip") {
-            $vip = OVip::find($reward->rewardable_id);
-            UserCommon::addVipToUser($user, $vip, $reward->expire, null, $receiveType);
+            if (PackageHelper::isInstalled('vip')) {
+                $vip = OVip::find($reward->rewardable_id);
+                UserCommon::addVipToUser($user, $vip, $reward->expire, null, $receiveType);
+            }
         } elseif ($reward->type === "ware") {
             $ware = Ware::find($reward->rewardable_id);
             UserCommon::addEvintsWareToUser($user, $ware, $reward->expire, null, $receiveType);

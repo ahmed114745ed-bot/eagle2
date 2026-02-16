@@ -6,7 +6,7 @@ use App\Admin\Extensions\Form\Field\CustomFile;
 use App\Admin\Services\FileService;
 use App\Helpers\LogHelper;
 use Illuminate\Support\Facades\Log;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
@@ -26,6 +26,7 @@ use App\Admin\Controllers\MainController;
 use Illuminate\Validation\ValidationException;
 use App\Support\DynamicReals;
 use Encore\Admin\Controllers\HasResourceActions;
+use App\Support\PackageHelper;
 
 
 class WareTabController extends MainController
@@ -316,7 +317,8 @@ class WareTabController extends MainController
 
         $form->select('level', __('buy with vip'))->options(function ($value) {
             $ops2 = [];
-            foreach (OVip::orderBy('level')->get() as $level) {
+            $vips = PackageHelper::isInstalled('vip') ? OVip::orderBy('level')->get() : collect();
+            foreach ($vips as $level) {
                 $ops2[$level->level] = $level->level;
             }
             return $ops2;

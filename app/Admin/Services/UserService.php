@@ -8,7 +8,7 @@ use App\Helpers\LogHelper;
 use App\Helpers\UserLevelHelper;
 use App\Models\Admin;
 use Encore\Admin\Facades\Admin as Super;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 
 class UserService
 {

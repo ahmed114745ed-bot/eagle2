@@ -7,13 +7,14 @@ use App\Exceptions\NotInfMoneyException;
 use App\Jobs\IncreaseDiamondJob;
 use App\Jobs\SendCustomOfficialMessageToUser;
 use App\Models\User;
+use App\Support\PackageHelper;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Throwable;
 use Utd\Gifts\Entities\UserGift;
 
@@ -127,6 +128,9 @@ class UpdateUserWhenSendGift
 
     public function getLevel(int $type, int $totalCoins)
     {
+        if (!PackageHelper::isInstalled('vip')) {
+            return null;
+        }
 
         return Vip::query()->where(['type' => $type])->where('exp', '<=', $totalCoins)->orderByDesc('exp')->limit(1)->first();
     }

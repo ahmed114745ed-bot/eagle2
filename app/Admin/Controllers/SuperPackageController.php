@@ -6,10 +6,9 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\OVips;
 use App\Selectables\Badges;
 use App\Models\PackageReward;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Widgets\Table;
 use App\Selectables\WaresByType;
@@ -17,9 +16,9 @@ use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use App\Models\SuperPackageReward;
 use Illuminate\Support\MessageBag;
-use App\Admin\Controllers\MainController;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
 
 
 
@@ -257,7 +256,7 @@ class SuperPackageController extends MainController
                         $name = $badge->name ?? $reward->target;
                         $url = getImagePath($badge->img ?? '');
                     } elseif ($reward->type == 'vip') {
-                        $vip = OVip::find($reward->target);
+                        $vip = PackageHelper::isInstalled('vip') ? OVip::find($reward->target) : null;
                         $name = $vip->name ?? $reward->target;
                         $url = getImagePath($vip->img ?? '');
                     } elseif ($reward->type == 'coin') {
@@ -318,9 +317,11 @@ class SuperPackageController extends MainController
         $typeOptions = [
             "ware" => __('ware'),
             "badge" => __('badge'),
-            "vip" => __('vip'),
             "coin" => __('coins'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -337,7 +338,7 @@ class SuperPackageController extends MainController
             })
             ->when("vip", function () use ($form) {
                 $form->select('target2', trans('vips'))->options(function () {
-                    $vips = OVip::query()->select('id', 'name')->get();
+                    $vips = PackageHelper::isInstalled('vip') ? OVip::query()->select('id', 'name')->get() : collect();
                     foreach ($vips as $vip) {
                         $ops[$vip->id] = $vip->name;
                     }

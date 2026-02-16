@@ -132,7 +132,7 @@ return [
     'models' => [
         'user' => env('GIFTS_USER_MODEL', 'App\Models\User'),
         
-        'vip' => env('GIFTS_VIP_MODEL', 'Modules\Vip\Entities\OVip'),
+        'vip' => env('GIFTS_VIP_MODEL', 'Utd\Vip\Entities\OVip'),
         
         'moment' => env('GIFTS_MOMENT_MODEL', 'Utd\Moments\Entities\Moment'),
         

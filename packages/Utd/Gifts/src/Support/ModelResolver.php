@@ -25,7 +25,7 @@ class ModelResolver
      */
     public static function getVipModel(): ?string
     {
-        $model = config('gifts.models.vip', 'Modules\Vip\Entities\OVip');
+        $model = config('gifts.models.vip', 'Utd\Vip\Entities\OVip');
 
         return class_exists($model) ? $model : null;
     }

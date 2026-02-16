@@ -56,7 +56,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Utd\Pk\Entities\Pk;
 use Utd\Pk\Observers\PKObserver;
 

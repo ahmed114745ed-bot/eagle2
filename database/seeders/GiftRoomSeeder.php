@@ -8,9 +8,10 @@ use Utd\Room\Entities\Room;
 use App\Models\Agency;
 
 use App\Models\GiftLog;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\ExchangeLog;
 use App\Models\AgencySallary;
+use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -84,7 +85,9 @@ class GiftRoomSeeder  extends Seeder
         // ->where('get_type', '!=', 1)
         // ->take(2)
         // ->update(['user_id' => 828]);
-        UserVip::take(2)
-            ->update(['user_id' => 828, 'expire' => 0, 'is_used' => 1]);
+        if (PackageHelper::isInstalled('vip')) {
+            UserVip::take(2)
+                ->update(['user_id' => 828, 'expire' => 0, 'is_used' => 1]);
+        }
     }
 }

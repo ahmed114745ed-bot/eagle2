@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Modules\Badge\Entities\Badge;
-use Modules\Vip\Entities\OVip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class WeeklyCpGift extends Model
 {
@@ -24,7 +25,8 @@ class WeeklyCpGift extends Model
 
     public function vip()
     {
-        return $this->hasOne(OVip::class, 'id', 'target');
+        return PackageHelper::checkRelation($this, 'vip', 'hasOne') ??
+            $this->hasOne(OVip::class, 'id', 'target');
     }
 
     public function badge()

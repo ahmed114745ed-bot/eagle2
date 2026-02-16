@@ -5,7 +5,7 @@ namespace App\Selectables;
 
 use Modules\SuperAdmin\Entities\SuperAdmin;
 use Encore\Admin\Grid\Filter;
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
 
 class SuperAdmins extends Selectable

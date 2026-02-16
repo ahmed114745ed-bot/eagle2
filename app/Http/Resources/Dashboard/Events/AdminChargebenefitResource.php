@@ -2,8 +2,9 @@
 
 namespace App\Http\Resources\Dashboard\Events;
 
-use Modules\Vip\Entities\OVip;
+use Utd\Vip\Entities\OVip;
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 class AdminChargebenefitResource extends JsonResource
@@ -30,7 +31,7 @@ class AdminChargebenefitResource extends JsonResource
         }
         else if($type == 'vip')
         {
-            $item = OVip::find($id);
+            $item = PackageHelper::isInstalled('vip') ? OVip::find($id) : null;
             if($item)
             {
                 return [

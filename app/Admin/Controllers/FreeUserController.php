@@ -36,7 +36,7 @@ use Modules\Moment\Entities\Moment;
 use Modules\Moment\Entities\MomentGallery;
 use App\Support\DynamicReals;
 use Modules\SwitchAccount\Entities\UserAccount;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 
 // use Encore\Admin\Actions\Response;
 

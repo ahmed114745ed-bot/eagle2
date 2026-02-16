@@ -2,7 +2,7 @@
 
 namespace App\Builders;
 
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

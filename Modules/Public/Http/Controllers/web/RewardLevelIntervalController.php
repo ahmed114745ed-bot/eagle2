@@ -7,12 +7,13 @@ use App\Admin\Controllers\MainController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use App\Selectables\OVips;
 use App\Selectables\Wares;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Controllers\HasResourceActions;
 use Modules\Public\Entities\RewardLevelInterval;
 use Utd\Achievements\Entities\Achievement;
+use App\Support\PackageHelper;
+use Utd\Vip\Selectables\OVips;
 
 class RewardLevelIntervalController extends MainController
 {
@@ -89,13 +90,15 @@ class RewardLevelIntervalController extends MainController
         $grid->filter(function (Grid\Filter $filter) {
             $filter->expand();
             $filter->column(1 / 2, function ($filter) {
-                $filter->equal('type', __('type'))->select([
-                    "vip" => __('vip'),
+                $filterOptions = [
                     'coins' => __('coins'),
                     'achievement' => __('achievement'),
                     "ware" => __("ware"),
-
-                ]);
+                ];
+                if (PackageHelper::isInstalled('vip')) {
+                    $filterOptions["vip"] = __('vip');
+                }
+                $filter->equal('type', __('type'))->select($filterOptions);
             });
         });
         $grid->model()->where('level_interval_id', $level_interval);
@@ -153,9 +156,11 @@ class RewardLevelIntervalController extends MainController
 
         $typeOptions = [
             "ware"        => __('ware'),
-            "vip"         => __('vip'),
             "coins"       => __('coins'),
         ];
+        if (PackageHelper::isInstalled('vip')) {
+            $typeOptions["vip"] = __('vip');
+        }
         if (class_exists(Achievement::class)) {
             $typeOptions['achievement'] = __('achievement');
         }
@@ -166,7 +171,9 @@ class RewardLevelIntervalController extends MainController
                 $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
-                $form->belongsTo('target2', OVips::class, trans('vips'));
+                if (class_exists(OVips::class)) {
+                    $form->belongsTo('target2', OVips::class, trans('vips'));
+                }
                 $form->number('expire', __('expire'));
             })
             ->when('coins', function () use ($form) {

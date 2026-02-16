@@ -120,7 +120,6 @@ class SpecialIdRequestController extends MainController
         $grid->disableActions();
         $grid->actions(function ($actions) {
             $actions->disableView();
-            // $actions->add(new DedicateAction());
         });
 
         return $grid;

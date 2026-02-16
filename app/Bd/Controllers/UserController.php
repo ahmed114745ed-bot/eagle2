@@ -3,49 +3,20 @@
 namespace App\Bd\Controllers;
 
 use App\Admin\Controllers\MainController;
-use App\Admin\Services\AgencyService;
-use App\Admin\Services\UserService;
 use App\Models\UserCoinLog;
 use Carbon\Carbon;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Agency;
 use App\Models\Charge;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
 use App\Helpers\Common;
 use App\Models\Country;
 use App\Models\GiftLog;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\UserSallary;
-use Encore\Admin\Layout\Row;
-use Illuminate\Http\Request;
-use Encore\Admin\Widgets\Box;
-use Encore\Admin\Widgets\Tab;
-use App\Admin\Widgets\InfoBox;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
-use Illuminate\Validation\Rule;
-use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Models\ChangeLevelHistory;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use App\Admin\Selectable\ImageColors;
-use Illuminate\Support\Facades\Cache;
-use App\Admin\Actions\DeletePackAction;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Redirect;
-use App\Admin\Actions\ChargeSwitchAction;
-use App\Admin\Actions\InviteSwitchAction;
-use App\Admin\Actions\KickOfFamilyAction;
-use App\Admin\Actions\CanPlaySwitchAction;
-use App\Admin\Actions\DeleteUserVipAction;
-use App\Admin\Actions\EditPackExpireAction;
-use App\Models\Profile;
+use App\Support\PackageHelper;
 use App\Models\UsersJoinedAgency;
 
 class UserController extends MainController
@@ -95,8 +66,8 @@ class UserController extends MainController
             $packs = Pack::where('user_id', $id)->where('type', $type)->with('admin', 'userVip')->whereHas('ware')->with(['ware' => function ($q) {
                 $q->select('id', 'show_img');
             }])->orderByDesc('is_used')->paginate(10, ['*'], 'pack_page');
-            $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
-            $hasVip = UserVip::where('user_id', $id)
+            $userVips = PackageHelper::isInstalled('vip') ? UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page') : collect();
+            $hasVip = PackageHelper::isInstalled('vip') && UserVip::where('user_id', $id)
                 ->where('is_used', 1)
                 ->exists();
 
@@ -166,7 +137,7 @@ class UserController extends MainController
                 $query->whereDate('join_date', $joinDate);
             })->orderByDesc('id')->paginate(10, ['*'], 'user_agency_page');
 
-            \DB::enableQueryLog(); 
+            \DB::enableQueryLog();
 
             $usersCoins = UserCoinLog::where('user_id', $id)
                 ->when(request('from_date'), fn($q) => $q->whereDate('from_date', '>=', request('from_date')))
@@ -194,5 +165,5 @@ class UserController extends MainController
             }
             return $ops;
         }
-    
+
 }

@@ -29,7 +29,7 @@ use App\Admin\Forms\ProfileForm;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Auth\Permission;
 use Modules\UsersWallet\Entities\WalletLog;
-use Modules\Vip\Entities\UserVip;
+use Utd\Vip\Entities\UserVip;
 use App\Models\ChangeLevelHistory;
 use Illuminate\Support\Facades\DB;
 use App\Admin\Services\UserService;
@@ -45,6 +45,7 @@ use App\Admin\Actions\ChargeSwitchAction;
 use App\Admin\Actions\InviteSwitchAction;
 use App\Admin\Actions\KickOfFamilyAction;
 use App\Admin\Actions\CanPlaySwitchAction;
+use App\Support\PackageHelper;
 
 class UserController extends MainController
 {
@@ -537,8 +538,8 @@ class UserController extends MainController
                 break;
 
             case 'vips':
-                $userVips = UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page');
-                $hasVip = $userVips->contains('is_used', 1);
+                $userVips = PackageHelper::isInstalled('vip') ? UserVip::where('user_id', $id)->paginate(10, ['*'], 'vip_page') : collect();
+                $hasVip = $userVips instanceof \Illuminate\Pagination\LengthAwarePaginator ? $userVips->contains('is_used', 1) : false;
                 break;
 
             case 'salary':
@@ -686,11 +687,11 @@ class UserController extends MainController
 
     public static function typesByLevel($id)
     {
-        $userVipLevels = UserVip::where('user_id', $id)
+        $userVipLevels = PackageHelper::isInstalled('vip') ? UserVip::where('user_id', $id)
             ->with(['OVip.privilegs'])
             ->get()
             ->filter(fn($vip) => $vip->OVip)
-            ->groupBy(fn($vip) => $vip->OVip->level);
+            ->groupBy(fn($vip) => $vip->OVip->level) : collect();
 
         $typesByLevel = [];
 
@@ -998,12 +999,15 @@ class UserController extends MainController
 
     public function deleteUserVip($id)
     {
-        $userVip = UserVip::find($id);
+        $userVip = PackageHelper::isInstalled('vip') ? UserVip::find($id) : null;
+        if (!$userVip) {
+            return Redirect::back();
+        }
         $userVip->packs()->delete();
         $user = User::query()->find($userVip->user_id);
         if ($user) {
             if ($user->vip == $userVip->id) {
-                $uvip = UserVip::query()->where('user_id', $user->id)->where('id', '!=', $userVip->id)->orderByDesc('level')->first();
+                $uvip = PackageHelper::isInstalled('vip') ? UserVip::query()->where('user_id', $user->id)->where('id', '!=', $userVip->id)->orderByDesc('level')->first() : null;
                 if ($uvip) {
                     $user->vip = $uvip->id;
                     $user->save();

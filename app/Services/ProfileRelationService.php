@@ -5,7 +5,8 @@ namespace App\Services;
 use App\Repositories\ProfileRepository;
 use App\Models\Follow;
 use App\Models\User;
-use Modules\Vip\Entities\Vip;
+use App\Support\PackageHelper;
+use Utd\Vip\Entities\Vip;
 use App\Repositories\User\UserRepository;
 
 class ProfileRelationService
@@ -34,7 +35,9 @@ class ProfileRelationService
 
     public function getLevel($levelsList, $type = 1)
     {
-        return Vip::collectionBuilder()->whereIn("level", $levelsList)->where('type', $type)->get();
+        return PackageHelper::isInstalled('vip')
+            ? Vip::collectionBuilder()->whereIn("level", $levelsList)->where('type', $type)->get()
+            : collect();
 
 //        return Vip::query()->whereIn('level', $levelsList)
 //                  ->where('type', $type)->select('img', 'level')->get();

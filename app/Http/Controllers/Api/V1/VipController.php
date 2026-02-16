@@ -6,14 +6,15 @@ use App\Http\Resources\Api\V1\OVipNewResource;
 use Exception;
 use App\Helpers\Common;
 
-use Modules\Vip\Services\Api\VipService;
+use Utd\Vip\Services\Api\VipService;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Controller;
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\Api\V1\VipResource;
 use App\Http\Resources\Api\V1\OVipResource;
-use Modules\Vip\Entities\Vip;
+use Utd\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Cache;
 use Modules\Public\Http\Services\UserCounterServices;
 use Modules\Public\Http\Services\UpgradeLevelServices;
@@ -194,9 +195,9 @@ class VipController extends Controller
         // Use Cache::remember to cache the results for 1 hour
         return Cache::remember('levels_chunks', 3600, function () {
             // Fetch all rows for the given type and order by level
-            $sender_vips = Vip::where('type', 2)->orderBy('level', 'asc')->get();
-            $receiver_vips = Vip::where('type', 1)->orderBy('level', 'asc')->get();
-            $charge_vip = Vip::where('type', 5)->orderBy('level', 'asc')->get();
+            $sender_vips = PackageHelper::isInstalled('vip') ? Vip::where('type', 2)->orderBy('level', 'asc')->get() : collect();
+            $receiver_vips = PackageHelper::isInstalled('vip') ? Vip::where('type', 1)->orderBy('level', 'asc')->get() : collect();
+            $charge_vip = PackageHelper::isInstalled('vip') ? Vip::where('type', 5)->orderBy('level', 'asc')->get() : collect();
 
             // Group rows into chunks of 9
             $sender_chunks = $sender_vips->chunk(10);
