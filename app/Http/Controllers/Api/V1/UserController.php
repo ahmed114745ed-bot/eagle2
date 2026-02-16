@@ -1182,8 +1182,7 @@ class UserController extends Controller
 //         } catch (Exception $exception) {
 // 
 //             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-        }
-    }
+    
 
     public function changeAgency(Request $request)
     {
