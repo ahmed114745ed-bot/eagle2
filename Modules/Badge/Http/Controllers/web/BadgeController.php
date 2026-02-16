@@ -112,7 +112,7 @@ class BadgeController extends MainController
                 $badge = Badge::with('images')->find(request()->route('badge'));
                 $badgeImages = $badge?->images->keyBy('language') ?? collect();
             }
-            dd($badgeImages);
+          //  dd($badgeImages);
 
             return view('multiBadges', compact('badgeImages'));
         });
