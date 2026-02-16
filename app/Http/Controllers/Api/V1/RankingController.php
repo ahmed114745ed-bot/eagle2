@@ -22,7 +22,10 @@ class RankingController extends Controller
     protected $rankingService;
     protected $rankingServiceV2;
 
-    public function __construct(RankingService $rankingService, RankingServiceV2 $rankingServiceV2)
+    public function __construct(
+        RankingService $rankingService,
+        RankingServiceV2 $rankingServiceV2
+    )
     {
         $this->rankingService = $rankingService;
         $this->rankingServiceV2 = $rankingServiceV2;

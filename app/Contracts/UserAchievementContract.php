@@ -2,12 +2,33 @@
 
 namespace App\Contracts;
 
-/**
- * Alias for backward compatibility
- * @deprecated Use Utd\Agency\Contracts\UserAchievementContract instead
- */
-interface UserAchievementContract extends \Utd\Agency\Contracts\UserAchievementContract
+use App\Models\Gift;
+use App\Models\User;
+
+interface UserAchievementContract
 {
-    // This interface is just an alias for backward compatibility
-    // All methods are inherited from the package
+    /**
+     * Insert charging achievement for user
+     */
+    public function insertCharging(User $user, $totalCoins): void;
+
+    /**
+     * Get room target achievement
+     */
+    public function roomTarget(User $user, $totalCoins);
+
+    /**
+     * Get gift target achievement
+     */
+    public function giftTarget(Gift $gift, $total);
+
+    /**
+     * Get user achievement data
+     */
+    public function getUserAchievement(User $user);
+
+    /**
+     * Get room achievement by owner ID
+     */
+    public function roomAchievement(int $ownerId);
 }
