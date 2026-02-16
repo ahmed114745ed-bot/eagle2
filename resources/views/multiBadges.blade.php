@@ -317,6 +317,7 @@ $selectedLang = request()->input('tab', $defaultLang);
             @php
                 $imageData = $badgeImages[$code] ?? null;
                 $defaultImageData = $badgeImages['default'] ?? $badgeImages['en'] ?? null;
+                 @dump($code, $imageData, $defaultImageData)
             @endphp
 
             <div class="tab-pane {{ $code === $selectedLang ? 'active' : '' }}"
