@@ -1045,4 +1045,56 @@
     $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
     $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
 @endphp
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}"></script>
+<script data-exec-on-popstate>
+    (function () {
+        const scriptUrl = '{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}';
+
+        const initReelsAlpineTree = () => {
+            if (!window.Alpine) return;
+            const root = document.querySelector('.reels-main-container');
+            if (root) {
+                window.Alpine.initTree(root);
+            }
+        };
+
+        const ensureReelsManagerLoaded = () => {
+            if (window.__reelsManagerBundleLoaded) {
+                initReelsAlpineTree();
+                return;
+            }
+
+            const existing = document.querySelector('script[data-reels-manager="true"]');
+            if (existing) {
+                if (existing.dataset.loaded === 'true') {
+                    window.__reelsManagerBundleLoaded = true;
+                    initReelsAlpineTree();
+                }
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = scriptUrl;
+            script.dataset.reelsManager = 'true';
+            script.onload = () => {
+                window.__reelsManagerBundleLoaded = true;
+                script.dataset.loaded = 'true';
+                initReelsAlpineTree();
+            };
+            document.head.appendChild(script);
+        };
+
+        const bootstrapReelsPage = () => {
+            ensureReelsManagerLoaded();
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', bootstrapReelsPage, { once: true });
+        } else {
+            bootstrapReelsPage();
+        }
+
+        document.addEventListener('pjax:complete', () => {
+            setTimeout(bootstrapReelsPage, 0);
+        });
+    })();
+</script>
