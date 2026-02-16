@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Modules\Milestones\Entities\Milestone;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Modules\Milestones\Helpers\MilestoneHelper;
 
 class MilestoneJob implements ShouldQueue
@@ -34,7 +35,10 @@ class MilestoneJob implements ShouldQueue
      */
     public function handle(): void
     {
+       \Log::info("Starting MilestoneJob for milestone ID: {$this->milestoneId}");
+       Log::info("1111111111111111111111");
 
+         $milestone = Milestone::with('rewards')->find($this->milestoneId);
         $milestone = Milestone::with('rewards')->findOrFail($this->milestoneId);
         $usersQuery = match ($milestone->slug) {
             'super-admin' => User::where('is_super_admin', 1),
