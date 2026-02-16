@@ -22,7 +22,7 @@ class ConfigBadgesSeeder extends Seeder
             'bd',
         ];
 
-        $lang = ['en', 'ar', 'tr', 'hi', 'id'];
+        $lang = ['default','en', 'ar', 'tr', 'hi', 'id'];
         $configKeys = [];
 
         foreach ($types as $type) {
@@ -33,14 +33,14 @@ class ConfigBadgesSeeder extends Seeder
             foreach ($lang as $l) {
                 $configKeys = "{$l}_{$type}";
                 $configs = ConfigModel::where('name', $configKeys)->value('value');
-                if ($configs) {
+                
                     $badge->images()->create([
                         'language' => $l,
-                        'image' => $configs,
-                        'show_image' => $configs,
+                        'image' => $configs ?? '',
+                        'show_image' => $configs ?? '',
                         'image_type' => 'image',
                     ]);
-                }
+              
             }
         }
     }
