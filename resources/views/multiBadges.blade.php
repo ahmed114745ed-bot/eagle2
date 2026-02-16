@@ -348,14 +348,10 @@ $selectedLang = request()->input('tab', $defaultLang);
                         </label>
                         <div class="image-preview-modern">
 
-                           
-                            {{-- <img src="{{ getImagePath($imageData->show_image ?? $defaultImageData?->show_image) }}" 
-                               
-                                 loading="lazy"> --}}
 
                                  {!! handleShowImageWithTypes(
                                     $code . '_presentation',
-                                    getImagePath($imageData->show_image ?? $defaultImageData?->show_image),
+                                    getImagePath($imageData->show_image ),
                                     100,
                                     100,
                                     4,
@@ -375,13 +371,10 @@ $selectedLang = request()->input('tab', $defaultLang);
                             <span class="language-badge">{{ $label }}</span>
                         </label>
                         <div class="image-preview-modern">
-                            {{-- <img src="{{ getImagePath($imageData->image ?? $defaultImageData?->image) }}" 
-
-                                 loading="lazy"> --}}
-
+                          
                                  {!! handleShowImageWithTypes(
                                         $code . '_presentation',
-                                        getImagePath($imageData->image ?? $defaultImageData?->image),
+                                        getImagePath($imageData->image),
                                         100,
                                         100,
                                         4,
