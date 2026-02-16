@@ -35,10 +35,10 @@ class MilestoneJob implements ShouldQueue
      */
     public function handle(): void
     {
-       \Log::info("Starting MilestoneJob for milestone ID: {$this->milestoneId}");
-       Log::info("1111111111111111111111");
+        \Log::info("Starting MilestoneJob for milestone ID: {$this->milestoneId}");
+        Log::info("1111111111111111111111");
 
-         $milestone = Milestone::with('rewards')->find($this->milestoneId);
+        $milestone = Milestone::with('rewards')->find($this->milestoneId);
         $milestone = Milestone::with('rewards')->findOrFail($this->milestoneId);
         $usersQuery = match ($milestone->slug) {
             'super-admin' => User::where('is_super_admin', 1),
@@ -51,13 +51,16 @@ class MilestoneJob implements ShouldQueue
             default => User::query(),
         };
 
+        $allUserIds = $usersQuery->pluck('id')->toArray();
+        Log::info("Processing milestone '{$milestone->slug}' for users: " . implode(', ', $allUserIds));
+
         DB::transaction(function () use ($usersQuery, $milestone) {
             $usersQuery->chunk(100, function ($users) use ($milestone) {
                 foreach ($users as $user) {
                     MilestoneHelper::removeReward($user, $milestone->slug);
-                     \Log::info("Removed reward for user {$user->id} for milestone {$milestone->slug}");
+                    \Log::info("Removed reward for user {$user->id} for milestone {$milestone->slug}");
                     MilestoneHelper::grantMilestoneToUser($user, $milestone->slug);
-                     \Log::info("Granted milestone '{$milestone->slug}' to user {$user->id}");
+                    \Log::info("Granted milestone '{$milestone->slug}' to user {$user->id}");
                 }
             });
         });
