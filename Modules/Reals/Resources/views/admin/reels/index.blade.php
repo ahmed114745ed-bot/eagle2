@@ -1046,69 +1046,64 @@
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
-<script data-exec-on-popstate>
-    (function () {
-        const initializeReelsComponent = () => {
-            if (!window.Alpine || !window.reelsManager) {
-                return false;
-            }
-
-            const root = document.querySelector('.reels-main-container[x-data]');
-            if (!root) {
-                return false;
-            }
-
-            try {
-                if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
-                    window.Alpine.destroyTree(root);
+    <script data-exec-on-popstate>
+        (function () {
+            const initAlpineInsideContainer = () => {
+                if (!window.Alpine || !window.reelsManager) {
+                    return false;
                 }
 
-                if (window.Alpine.discoverUninitializedComponents && window.Alpine.initializeComponent) {
-                    window.Alpine.discoverUninitializedComponents((el) => {
-                        if (el === root || root.contains(el)) {
-                            window.Alpine.initializeComponent(el);
+                const container = document.querySelector('#pjax-container') || document.body;
+                if (!container) {
+                    return false;
+                }
+
+                try {
+                    if (window.Alpine.destroyTree) {
+                        const oldRoot = container.querySelector('.reels-main-container[x-data]');
+                        if (oldRoot && oldRoot._x_dataStack) {
+                            window.Alpine.destroyTree(oldRoot);
                         }
-                    });
-                } else if (window.Alpine.initTree) {
-                    window.Alpine.initTree(root);
-                } else if (window.Alpine.start) {
-                    window.Alpine.start();
+                    }
+
+                    if (window.Alpine.initTree) {
+                        window.Alpine.initTree(container);
+                    } else if (window.Alpine.start) {
+                        window.Alpine.start();
+                    }
+
+                    container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
+                } catch (error) {
+                    console.error('Alpine reinit error:', error);
+                    return false;
                 }
 
-                root.removeAttribute('x-cloak');
-            } catch (error) {
-                console.error('Unable to initialize reels Alpine component:', error);
-                return false;
-            }
-
-            return true;
-        };
-
-        const scheduleInitialization = () => {
-            let attempts = 0;
-            const tryInit = () => {
-                if (initializeReelsComponent()) {
-                    return;
-                }
-
-                if (attempts++ < 40) {
-                    setTimeout(tryInit, 50);
-                }
+                return true;
             };
 
-            tryInit();
-        };
+            const scheduleInit = () => {
+                let attempts = 0;
+                const attempt = () => {
+                    if (initAlpineInsideContainer()) {
+                        return;
+                    }
+                    if (attempts++ < 40) {
+                        setTimeout(attempt, 50);
+                    }
+                };
+                attempt();
+            };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', scheduleInitialization, { once: true });
-        } else {
-            scheduleInitialization();
-        }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', scheduleInit, { once: true });
+            } else {
+                scheduleInit();
+            }
 
-        ['alpine:init', 'pjax:complete', 'pjax:success'].forEach((eventName) => {
-            document.addEventListener(eventName, () => {
-                setTimeout(scheduleInitialization, 0);
+            ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
+                document.addEventListener(eventName, () => {
+                    setTimeout(scheduleInit, 0);
+                });
             });
-        });
-    })();
-</script>
+        })();
+    </script>
