@@ -1041,3 +1041,8 @@
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
+@php
+    $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
+    $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
+@endphp
+<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" defer></script>
