@@ -45,6 +45,9 @@ function reelsManager() {
             // تهيئة التخزين المؤقت
             this.initCache();
             
+            // إضافة event delegation للضغط على الفيديو (للتعامل مع PJAX)
+            this.setupVideoClickHandler();
+            
             this.$nextTick(() => {
                 if (window.requestIdleCallback) {
                     requestIdleCallback(() => this.loadInitialData());
@@ -52,6 +55,33 @@ function reelsManager() {
                     setTimeout(() => this.loadInitialData(), 100);
                 }
             });
+        },
+        
+        // Event delegation للتعامل مع click على الفيديوهات
+        setupVideoClickHandler() {
+            const container = this.$el;
+            if (!container) return;
+            
+            // إزالة أي listener سابق
+            if (this._videoClickHandler) {
+                container.removeEventListener('click', this._videoClickHandler);
+            }
+            
+            this._videoClickHandler = (event) => {
+                const video = event.target.closest('video');
+                if (video && video.id && video.id.startsWith('video-')) {
+                    event.stopPropagation();
+                    if (video.paused) {
+                        video.play().catch(err => {
+                            console.log('تعذر تشغيل الفيديو:', err);
+                        });
+                    } else {
+                        video.pause();
+                    }
+                }
+            };
+            
+            container.addEventListener('click', this._videoClickHandler);
         },
         
         loadInitialData() {
