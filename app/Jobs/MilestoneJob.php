@@ -51,7 +51,9 @@ class MilestoneJob implements ShouldQueue
             $usersQuery->chunk(100, function ($users) use ($milestone) {
                 foreach ($users as $user) {
                     MilestoneHelper::removeReward($user, $milestone->slug);
+                     \Log::info("Removed reward for user {$user->id} for milestone {$milestone->slug}");
                     MilestoneHelper::grantMilestoneToUser($user, $milestone->slug);
+                     \Log::info("Granted milestone '{$milestone->slug}' to user {$user->id}");
                 }
             });
         });
