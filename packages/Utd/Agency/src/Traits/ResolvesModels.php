@@ -174,7 +174,7 @@ trait ResolvesModels
      */
     protected function getRoomModel(): ?string
     {
-        return $this->resolveModel('room', \App\Models\Room::class);
+        return $this->resolveModel('room', \Utd\Room\Entities\Room::class);
     }
 
     /**

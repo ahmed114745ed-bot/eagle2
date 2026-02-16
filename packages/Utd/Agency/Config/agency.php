@@ -93,7 +93,7 @@ return [
         'setting' => App\Models\Setting::class,
         'country_rate' => App\Models\CountryRate::class,
         'gift' => App\Models\Gift::class,
-        'room' => App\Models\Room::class,
+        'room' => Utd\Room\Entities\Room::class,
         'chat' => App\Models\Chat::class,
         'notification' => App\Models\Notification::class,
         'user_gift' => App\Models\UserGift::class,

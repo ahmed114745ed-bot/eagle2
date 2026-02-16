@@ -34,7 +34,7 @@ return [
             'bd' => App\Models\Bd::class,
             'user_target' => App\Models\UserTarget::class,
             'gift' => App\Models\Gift::class,
-            'room' => App\Models\Room::class,
+            'room' => Utd\Room\Entities\Room::class,
             'ware' => App\Models\Ware::class,
             'salary_trx' => App\Models\SalaryTrx::class,
         ],

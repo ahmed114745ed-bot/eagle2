@@ -8,18 +8,12 @@ use Utd\Room\Entities\Room;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Models\GiftLog;
-use App\helper\TimeHelper;
 use App\Models\GiftRanking;
 use App\Models\CoinGameUser;
-use App\helper\RankingHelper;
-use App\Models\CoinGameUserAll;
 use App\Models\CoinGameUserMerged;
 use Illuminate\Support\Facades\DB;
-use App\Models\CoinGameUserArchive;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\CoinGameUserMergedMonthly;
 use Utd\Achievements\Enums\AchievementType;
-use App\Http\Resources\Api\V1\UsersRankingCollection;
 use Utd\LuckyBox\Entities\UserLuckyGift;
 use App\Support\PackageHelper;
 

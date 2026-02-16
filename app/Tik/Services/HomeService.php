@@ -5,7 +5,6 @@ namespace App\Tik\Services;
 
 use Exception;
 use App\Models\Pack;
-use App\Models\Room;
 use App\Models\User;
 use App\Models\Ware;
 use App\Helpers\Common;
@@ -17,7 +16,6 @@ use App\Tik\Repositories\ImageRepository;
 use App\Tik\Repositories\TicketRepository;
 use App\Tik\Repositories\GiftLogRepository;
 use App\Tik\Repositories\LiveTimeRepository;
-use Illuminate\Support\Facades\Log;
 use Modules\Vip\Repositories\OvipRepository;
 use Modules\Vip\Repositories\UserVipRepository;
 
