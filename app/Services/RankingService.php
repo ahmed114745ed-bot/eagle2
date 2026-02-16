@@ -34,7 +34,7 @@ class RankingService
         RankingRepository $rankingRepo,
         private readonly ?GiftLogRepositoryContract $GiftLogRepository,
         private readonly CoinGameUserRepository $coinGameUserRepository,
-//        public UserAchievementContract $achievementService,
+        public UserAchievementContract $achievementService,
         CpRepositoryContract $cpRepository
     ) {
         $this->cpRepository = $cpRepository;

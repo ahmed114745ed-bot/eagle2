@@ -127,8 +127,9 @@ class AgencyServiceProvider extends ServiceProvider
         $this->app->bind(
             Contracts\UserAchievementServiceInterface::class,
             function ($app) {
-                // Check if App\Contracts\UserAchievementContract exists
-                if (interface_exists(\App\Contracts\UserAchievementContract::class)) {
+                // Check if App\Contracts\UserAchievementContract exists and is bound
+                if (interface_exists(\App\Contracts\UserAchievementContract::class) 
+                    && $app->bound(\App\Contracts\UserAchievementContract::class)) {
                     return $app->make(\App\Contracts\UserAchievementContract::class);
                 }
 
@@ -136,15 +137,8 @@ class AgencyServiceProvider extends ServiceProvider
             }
         );
 
-        // Backward compatibility - bind old contract name to new one
-        if (interface_exists(\App\Contracts\UserAchievementContract::class)) {
-            $this->app->bind(
-                \App\Contracts\UserAchievementContract::class,
-                function ($app) {
-                    return $app->make(Contracts\UserAchievementServiceInterface::class);
-                }
-            );
-        }
+        // REMOVED: Backward compatibility binding was causing circular dependency
+        // App\Contracts\UserAchievementContract should be bound by Achievements package only
     }
 
     /**
