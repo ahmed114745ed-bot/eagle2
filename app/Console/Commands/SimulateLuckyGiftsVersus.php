@@ -13,7 +13,7 @@ class SimulateLuckyGiftsVersus extends Command
 {
     private const LABELS = ['A', 'B', 'C', 'D', 'E'];
 
-    protected $signature = 'simulate:lucky-gifts-versus {gift_id?} {--rounds=30} {--balance=30000} {--player-count=3} {--userA=} {--userB=} {--userC=} {--userD=} {--userE=}';
+    protected $signature = 'simulate:lucky-gifts-versus {gift_id?} {--rounds=30} {--balance=30000} {--player-count=3} {--price=} {--userA=} {--userB=} {--userC=} {--userD=} {--userE=}';
     protected $description = 'Simulate Service 3 among multiple users and generate an HTML timeline report';
 
     public function handle(FairLuckService3 $fairLuckService)
@@ -27,6 +27,12 @@ class SimulateLuckyGiftsVersus extends Command
         if (!$gift) {
             $this->error('No lucky gift found. Pass a gift_id or enable at least one type 6 gift.');
             return Command::FAILURE;
+        }
+
+        $overridePrice = $this->option('price');
+        if ($overridePrice !== null) {
+            $gift = clone $gift;
+            $gift->price = max(1, (int) $overridePrice);
         }
 
         $players = [];
@@ -53,6 +59,8 @@ class SimulateLuckyGiftsVersus extends Command
                 'balance' => (int) $player->di,
                 'house_cut' => 0,
                 'drained_at_round' => null,
+                'high_multipliers' => 0,
+                'max_multiplier' => 0,
             ];
         }
 
@@ -101,6 +109,12 @@ class SimulateLuckyGiftsVersus extends Command
                 $stats[$label]['balance'] = $currentBalance;
                 if ($result->isWinner) {
                     $stats[$label]['wins'] += 1;
+                    if ($result->multiplier >= 250) {
+                        $stats[$label]['high_multipliers'] += 1;
+                    }
+                    if ($result->multiplier > $stats[$label]['max_multiplier']) {
+                        $stats[$label]['max_multiplier'] = $result->multiplier;
+                    }
                 }
                 if ($currentBalance < $gift->price && $stats[$label]['drained_at_round'] === null) {
                     $stats[$label]['drained_at_round'] = $round;
@@ -219,13 +233,7 @@ class SimulateLuckyGiftsVersus extends Command
         }
 
         $remaining = max(0, (int) $player->di);
-        if ($remaining > 0) {
-            $stat['house_cut'] += $remaining;
-        }
-
-        $player->di = 0;
-        $player->save();
-        $stat['balance'] = 0;
+        $stat['balance'] = $remaining;
     }
 
     private function allPlayersExhausted(array $stats, int $betPrice): bool
@@ -241,17 +249,38 @@ class SimulateLuckyGiftsVersus extends Command
 
     private function generateHtmlReport(Gift $gift, array $stats, array $history): string
     {
+        $totals = [
+            'initial' => 0,
+            'spent' => 0,
+            'won' => 0,
+            'house_cut' => 0,
+            'final' => 0,
+            'available' => 0,
+        ];
+
         $summaryCards = '';
         foreach ($stats as $summary) {
+            $totals['initial'] += $summary['initial'];
+            $totals['spent'] += $summary['spent'];
+            $totals['won'] += $summary['won'];
+            $totals['house_cut'] += $summary['house_cut'];
+            $totals['final'] += $summary['balance'];
+            $totalAvailable = $summary['initial'] + $summary['won'];
+            $totals['available'] += $totalAvailable;
+
             $rtp = $summary['spent'] > 0 ? ($summary['won'] / $summary['spent']) * 100 : 0;
+            $netFlow = $summary['won'] - $summary['spent'];
+            $balanceDelta = $summary['balance'] - $summary['initial'];
+            $playerEquation = number_format($summary['initial']) . ' + ' . number_format($netFlow) . ' - ' . number_format($summary['house_cut']) . ' = ' . number_format($summary['balance']);
             $drainRound = $summary['drained_at_round'] ? (string) $summary['drained_at_round'] : 'لم ينفد بعد';
+            $maxMultiplierDisplay = $summary['max_multiplier'] > 0 ? number_format($summary['max_multiplier']) . 'x' : 'لا شيء';
+
             $summaryCards .= "
                 <div class='col-md-4 mb-4'>
                     <div class='card shadow-sm h-100'>
                         <div class='card-body'>
                             <h4 class='card-title'>المستخدم {$summary['user']->name} ({$summary['label']})</h4>
                             <p class='mb-1 text-secondary'>الرصيد الابتدائي: " . number_format($summary['initial']) . "</p>
-                            <p class='mb-3 text-warning'>خصم التطبيق التراكمي: " . number_format($summary['house_cut']) . "</p>
                             <div class='row text-center g-3'>
                                 <div class='col-6 col-lg-4'>
                                     <small>المحاولات</small>
@@ -266,8 +295,8 @@ class SimulateLuckyGiftsVersus extends Command
                                     <p class='h5 mb-0'>{$drainRound}</p>
                                 </div>
                                 <div class='col-6 col-lg-4'>
-                                    <small>إجمالي المدفوع</small>
-                                    <p class='h5 text-danger mb-0'>" . number_format($summary['spent']) . "</p>
+                                    <small>إجمالي الرهانات</small>
+                                    <p class='h5 mb-0'>" . number_format($totalAvailable) . "</p>
                                 </div>
                                 <div class='col-6 col-lg-4'>
                                     <small>إجمالي المكاسب</small>
@@ -281,43 +310,88 @@ class SimulateLuckyGiftsVersus extends Command
                                     <small>RTP</small>
                                     <p class='h5 mb-0'>" . number_format($rtp, 2) . "%</p>
                                 </div>
+                               
                                 <div class='col-6 col-lg-4'>
-                                    <small>الرصيد المتوقع بعد النسبة</small>
-                                    <p class='h5 mb-0'>0</p>
+                                    <small>مضاعفات ≥250</small>
+                                    <p class='h5 mb-0'>" . number_format($summary['high_multipliers']) . "</p>
                                 </div>
+                                <div class='col-6 col-lg-4'>
+                                    <small>أعلى مضاعف</small>
+                                    <p class='h5 mb-0'>{$maxMultiplierDisplay}</p>
+                                </div>
+                            </div>
+                            <div class='mt-3'>
+                                <p class='mb-1 small text-muted'>صافي اللاعب (المكاسب − المدفوع): <strong>" . number_format($netFlow) . "</strong></p>
+                                <p class='mb-1 small text-muted'>تغير الرصيد (النهاية − البداية): <strong>" . number_format($balanceDelta) . "</strong></p>
+                                <p class='mb-0 small text-muted'>معادلة التحقق: {$playerEquation}</p>
                             </div>
                         </div>
                     </div>
                 </div>";
         }
 
-        $timelineRows = '';
-        foreach ($history as $entry) {
-            $rowClass = $entry['outcome'] === 'WIN' ? 'table-success' : '';
-            $trendBadge = match ($entry['trend']) {
-                'UP' => "<span class='badge bg-success'>↑ ارتفع</span>",
-                'DOWN' => "<span class='badge bg-danger'>↓ انخفض</span>",
-                default => "<span class='badge bg-secondary'>→ ثابت</span>",
-            };
-
-            $timelineRows .= "
-                <tr class='{$rowClass}'>
-                    <td>{$entry['step']}</td>
-                    <td>{$entry['round']}</td>
-                    <td>{$entry['user']} ({$entry['label']})</td>
-                    <td>" . ($entry['outcome'] === 'WIN' ? '✅ فوز' : '❌ خسارة') . "</td>
-                    <td>{$entry['multiplier']}</td>
-                    <td>" . number_format($entry['bet']) . "</td>
-                    <td>" . number_format($entry['win']) . "</td>
-                    <td>" . number_format($entry['house_cut']) . "</td>
-                    <td>" . number_format($entry['balance_before']) . " → " . number_format($entry['balance_after']) . "</td>
-                    <td>{$entry['mood']}</td>
-                    <td>" . number_format($entry['deviation_before'], 4) . " → " . number_format($entry['deviation_after'], 4) . "</td>
-                    <td>{$trendBadge}</td>
+        $summaryTableRows = '';
+        foreach ($stats as $summary) {
+            $netFlow = $summary['won'] - $summary['spent'];
+            $drainRound = $summary['drained_at_round'] ? (string) $summary['drained_at_round'] : 'لم ينفد بعد';
+            $maxMultiplierCell = $summary['max_multiplier'] > 0 ? number_format($summary['max_multiplier']) . 'x' : '—';
+            $totalAvailable = $summary['initial'] + $summary['won'];
+            $summaryTableRows .= "
+                <tr>
+                    <td>{$summary['user']->name} ({$summary['label']})</td>
+                    <td>" . number_format($summary['bets']) . "</td>
+                    <td>" . number_format($summary['wins']) . "</td>
+                    <td>" . number_format($summary['high_multipliers']) . "</td>
+                    <td>" . number_format($summary['won']) . "</td>
+                    <td>" . number_format($totalAvailable) . "</td>
+                    <td>" . number_format($netFlow) . "</td>
+                    <td>" . number_format($summary['house_cut']) . "</td>
+                    <td>" . number_format($summary['balance']) . "</td>
+                    <td>{$drainRound}</td>
+                    <td>" . number_format($summary['spent'] > 0 ? ($summary['won'] / $summary['spent']) * 100 : 0, 2) . "%</td>
+                    <td>{$maxMultiplierCell}</td>
                 </tr>";
         }
 
         $lastRound = $history ? $history[count($history) - 1]['round'] : 0;
+        $totals['net'] = $totals['won'] - $totals['spent'];
+        $globalRtp = $totals['spent'] > 0 ? ($totals['won'] / $totals['spent']) * 100 : 0;
+        $scenarioEquation = number_format($totals['initial']) . ' + ' . number_format($totals['net']) . ' - ' . number_format($totals['house_cut']) . ' = ' . number_format($totals['final']);
+        $playersCount = count($stats);
+
+        $scenarioOverview = "
+        <div class='alert alert-info shadow-sm mb-4'>
+            <p class='mb-1 fw-bold'>هدف السيناريو</p>
+            <p class='mb-3 mb-lg-4'>هذه المحاكاة تراقب طريقة توزيع Service 3 عندما يتنافس {$playersCount} لاعب/لاعبة على {$gift->name} بسعر رهان " . number_format($gift->price) . " عبر {$lastRound} دوراً، لقياس صافي كل لاعب مقابل مكسب التطبيق.</p>
+            <div class='row text-center g-3'>
+                <div class='col-6 col-lg-4'>
+                    <small>إجمالي الرصيد الابتدائي</small>
+                    <p class='h6 mb-0'>" . number_format($totals['initial']) . "</p>
+                </div>
+                <div class='col-6 col-lg-4'>
+                    <small>إجمالي الرهانات</small>
+                    <p class='h6 mb-0'>" . number_format($totals['available']) . "</p>
+                </div>
+                <div class='col-6 col-lg-4'>
+                    <small>إجمالي المكاسب</small>
+                    <p class='h6 mb-0 text-success'>" . number_format($totals['won']) . "</p>
+                </div>
+                
+                <div class='col-6 col-lg-4'>
+                    <small>صافي اللاعبين</small>
+                    <p class='h6 mb-0'>" . number_format($totals['net']) . "</p>
+                </div>
+                <div class='col-6 col-lg-4'>
+                    <small>خصم التطبيق</small>
+                    <p class='h6 mb-0 text-warning'>" . number_format($totals['house_cut']) . "</p>
+                </div>
+                <div class='col-6 col-lg-4'>
+                    <small>الرصيد النهائي المجمع</small>
+                    <p class='h6 mb-0'>" . number_format($totals['final']) . "</p>
+                </div>
+            </div>
+            <p class='mb-0 small text-muted'>RTP الكلي: " . number_format($globalRtp, 2) . "% | معادلة التحقق الجماعية: {$scenarioEquation}</p>
+        </div>";
 
         $html = "<!DOCTYPE html>
 <html lang='ar' dir='rtl'>
@@ -334,33 +408,34 @@ class SimulateLuckyGiftsVersus extends Command
 <body>
     <div class='container py-5'>
         <h1 class='text-center mb-4'>تقرير مواجهة خدمة FairLuck Service 3</h1>
-        <p class='text-center text-muted mb-5'>الهدية: {$gift->name} | السعر: " . number_format($gift->price) . " | إجمالي الأدوار: {$lastRound}</p>
+        <p class='text-center text-muted mb-4 mb-lg-5'>الهدية: {$gift->name} | السعر: " . number_format($gift->price) . " | إجمالي الأدوار: {$lastRound}</p>
+        {$scenarioOverview}
         <div class='row'>
             {$summaryCards}
         </div>
         <div class='card shadow-sm'>
             <div class='card-body'>
-                <h2 class='h4 mb-4'>الخط الزمني للمراهنات</h2>
+                <h2 class='h4 mb-4'>ملخص المستخدمين</h2>
                 <div class='table-responsive'>
-                    <table class='table table-hover'>
+                    <table class='table table-striped align-middle'>
                         <thead class='table-dark'>
                             <tr>
-                                <th>#</th>
-                                <th>الدور</th>
                                 <th>المستخدم</th>
-                                <th>النتيجة</th>
-                                <th>المضاعف</th>
-                                <th>قيمة الرهان</th>
-                                <th>المكسب</th>
+                                <th>المحاولات</th>
+                                <th>مرات الفوز</th>
+                                <th>مضاعفات ≥250</th>
+                                <th>إجمالي المكاسب</th>
+                                <th>إجمالي المدفوع</th>
+                                <th>صافي اللاعب</th>
                                 <th>خصم التطبيق</th>
-                                <th>الرصيد قبل↔بعد</th>
-                                <th>مزاج النظام</th>
-                                <th>التقييم قبل↔بعد</th>
-                                <th>اتجاه التقييم</th>
+                                <th>الرصيد النهائي</th>
+                                <th>الدور الذي نفد فيه</th>
+                                <th>RTP</th>
+                                <th>أعلى مضاعف</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {$timelineRows}
+                            {$summaryTableRows}
                         </tbody>
                     </table>
                 </div>
