@@ -53,12 +53,6 @@ class RankingController extends Controller
 
     public function ranking2(Request $request)
     {
-
-        info('ranking2 called with request: ');
-        // return Common::apiResponse(0, __('closed for update'));
-
-        // throw new Exception(__('closed for update'));
-
         return TryCatchHelper::handle(function () use ($request) {
 
             $class = (int) ($request->class ?? 1);
