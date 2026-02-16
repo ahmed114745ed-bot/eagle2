@@ -1045,4 +1045,37 @@
     $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
     $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
 @endphp
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}"></script>
+<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
+<script data-exec-on-popstate>
+    (function () {
+        const initReelsComponent = () => {
+            const root = document.querySelector('.reels-main-container[x-data]');
+            if (!root || !window.Alpine || !window.reelsManager) {
+                return false;
+            }
+
+            if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
+                window.Alpine.destroyTree(root);
+            }
+
+            window.Alpine.initTree(root);
+            return true;
+        };
+
+        const retryUntilReady = () => {
+            if (!initReelsComponent()) {
+                setTimeout(retryUntilReady, 50);
+            }
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', retryUntilReady, { once: true });
+        } else {
+            retryUntilReady();
+        }
+
+        document.addEventListener('pjax:complete', () => {
+            setTimeout(retryUntilReady, 0);
+        });
+    })();
+</script>
