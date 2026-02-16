@@ -2,22 +2,11 @@
 
 namespace App\Admin\Actions;
 
-use Carbon\Carbon;
-use Utd\Vip\Entities\OVip;
-use App\Models\Pack;
 use App\Models\User;
-use App\Models\Ware;
-use App\Helpers\Common;
-use Utd\Vip\Entities\UserVip;
-use Encore\Admin\Facades\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Facades\CustomNotification;
 use Encore\Admin\Actions\RowAction;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use App\Classes\Enums\SubTypeMessagesType;
-use Modules\Public\Http\Services\UpgradeLevelServices;
 use App\Models\UserSallary;
 use App\Models\Charge;
 class DeliverdSalaryAction extends RowAction
@@ -52,7 +41,7 @@ class DeliverdSalaryAction extends RowAction
             'user_type' => $user->type_user,
             'amount_type' => 3,
         ]);
-        
+
         return $this->response()->success (__('dashboard.successful'))->refresh ();
     }
 
@@ -60,5 +49,5 @@ class DeliverdSalaryAction extends RowAction
     {
         // $this->integer('days', 'days');
     }
-    
+
 }
