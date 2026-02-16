@@ -69,7 +69,7 @@ class MessageService
         if ($user2->is_logout !== 1) {
             $notificationId = $this->messageRepo->getUserNotificationId($user2->id);
             $tokens_notfacion = [$notificationId];
-            $title = $message->user->name;
+            $title = $message->user?->name;
             $body = $message->message;
             $type = $message->type ?? 'text';
 
