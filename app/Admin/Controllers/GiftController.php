@@ -261,21 +261,25 @@ class GiftController extends MainController
 
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
-        $type = old('type', $form->model()->type ?? null);
+        $model = $id
+            ? Gift::with('luckyGift')->findOrFail($id)
+            : $form->model();
+        $type = old('type', $model?->type ?? null);
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
 
-        // Build Gift Category options
-        $categories = GiftCategory::where('id', request('type'))->get();
-        //  dd($categories);
+        $selectedCategoryId = request('type') ?? $model?->gift_category_id;
+        $categories = $selectedCategoryId
+            ? GiftCategory::query()->whereKey($selectedCategoryId)->get()
+            : collect();
         $locale = App::getLocale();
 
         $form->html(view('admin.gift_type', [
             'categories' => $categories,
             'locale' => $locale,
-            'model' => $id ? Gift::find($id) : [],
+                        'model' => $model,
         ]));
 
 
@@ -285,7 +289,6 @@ class GiftController extends MainController
 
 
         $form->file('img', __('img'))->name(function ($file) {
-            // الحصول على الامتداد الحقيقي مع fallback
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();
@@ -295,13 +298,11 @@ class GiftController extends MainController
        
 
         $form->file('show_img', __('show_img'))->name(function ($file) {
-            // الحصول على الامتداد الحقيقي مع fallback
             $extension = $file->getClientOriginalExtension();
             if (empty($extension)) {
                 $extension = $file->guessExtension();
             }
 
-            // تطبيع الامتدادات
             $extension = strtolower($extension);
             if ($extension === 'svg') {
                 return 'svga_' . Str::random(8) . '.svg';
@@ -376,7 +377,6 @@ class GiftController extends MainController
                 return back()->with(compact('error'));
             }
 
-            // معالجة show_img
             if ($form->img instanceof UploadedFile) {
                 $allowedExtensions = ['svga', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
 

@@ -417,6 +417,12 @@ class UserCommon
             ->where('badge_id',  $id)->delete();
     }
 
+    public static function removeBadgeFromUserByReceiverType(User $user, $id = null, $receiveType)
+    {
+        UserBadge::where('receive_type', $receiveType)->where('user_id', $user->id)->delete();
+        
+    }
+
 
     public static function addWareToUser(User $user, Ware $ware, $expire, $sender = null, $receiveType = null, $sendNotification = 1)
     {

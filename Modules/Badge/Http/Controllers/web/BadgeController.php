@@ -89,6 +89,7 @@ class BadgeController extends MainController
     protected function form()
     {
         $form = new Form(new Badge());
+
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
@@ -101,9 +102,17 @@ class BadgeController extends MainController
         $form->html(function () use ($form) {
 
             // Get existing images for this badge
-            $badgeImages = $form->model()->exists
-                ? $form->model()->images()->get()->keyBy('language')
-                : collect();
+            // $badgeImages = $form->model()->exists
+            //     ? $form->model()->images()->get()->keyBy('language')
+            //     : collect();
+
+            $badgeImages = collect();
+
+            if (request()->route('badge')) {
+                $badge = Badge::with('images')->find(request()->route('badge'));
+                $badgeImages = $badge?->images->keyBy('language') ?? collect();
+            }
+          //  dd($badgeImages);
 
             return view('multiBadges', compact('badgeImages'));
         });
