@@ -316,7 +316,7 @@ $selectedLang = request()->input('tab', $defaultLang);
         @foreach ($languages as $code => $label)
             @php
                 $imageData = $badgeImages[$code] ?? null;
-                $defaultImageData = $badgeImages['default'] ?? null;
+                $defaultImageData = $badgeImages['default'] ?? $badgeImages['en'] ?? null;
             @endphp
 
             <div class="tab-pane {{ $code === $selectedLang ? 'active' : '' }}"
@@ -349,9 +349,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                         <div class="image-preview-modern">
 
                            
-                            {{-- <img src="{{ getImagePath($imageData->show_image ?? $defaultImageData?->show_image) }}" 
-                               
-                                 loading="lazy"> --}}
+                            
 
                                  {!! handleShowImageWithTypes(
                                     $code . '_presentation',
