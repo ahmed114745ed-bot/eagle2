@@ -48,7 +48,7 @@ class GroupChatService
         }
 
         // Update user unread message counter
-        $user->increment('unread_counter_message');
+        $user->increment('unread_count_message');
 
         return $groupChatMessage;
     }

@@ -36,7 +36,7 @@ class GroupChatController extends Controller
 
         // Update user unread message counter
         if ($user) {
-            $user->update(['unread_counter_message' => 0]);
+            $user->update(['unread_count_message' => 0]);
         }
 
         return response()->json([
