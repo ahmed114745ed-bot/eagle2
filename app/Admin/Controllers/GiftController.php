@@ -261,23 +261,25 @@ class GiftController extends MainController
 
         $form = new TabsFrom(new Gift);
         $this->disableFormTools($form);
-        $type = old('type', $form->model()->type ?? null);
+        $model = $id
+            ? Gift::with('luckyGift')->findOrFail($id)
+            : $form->model();
+        $type = old('type', $model?->type ?? null);
 
         $form->display(__('ID'));
         $form->text('name', __('name'));
 
 
-        $selectedCategoryId = request('type') ?? $form->model()->gift_category_id;
-        $categories = GiftCategory::where('id', $selectedCategoryId)->get();
-          dd($categories
-          
-          ,request('type') , $form->model()->gift_category_id);
+        $selectedCategoryId = request('type') ?? $model?->gift_category_id;
+        $categories = $selectedCategoryId
+            ? GiftCategory::query()->whereKey($selectedCategoryId)->get()
+            : collect();
         $locale = App::getLocale();
 
         $form->html(view('admin.gift_type', [
             'categories' => $categories,
             'locale' => $locale,
-            'model' => $id ? Gift::find($id) : [],
+                        'model' => $model,
         ]));
 
 
