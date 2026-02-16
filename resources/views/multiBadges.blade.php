@@ -351,7 +351,7 @@ $selectedLang = request()->input('tab', $defaultLang);
 
                                  {!! handleShowImageWithTypes(
                                     $code . '_presentation',
-                                    getImagePath($imageData->show_image ),
+                                    getImagePath(@$imageData->show_image  ?? ''),
                                     100,
                                     100,
                                     4,
@@ -374,7 +374,7 @@ $selectedLang = request()->input('tab', $defaultLang);
                           
                                  {!! handleShowImageWithTypes(
                                         $code . '_presentation',
-                                        getImagePath($imageData->image),
+                                        getImagePath(@$imageData->image ?? ''),
                                         100,
                                         100,
                                         4,
