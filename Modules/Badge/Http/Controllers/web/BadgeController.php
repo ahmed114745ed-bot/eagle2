@@ -89,7 +89,7 @@ class BadgeController extends MainController
     protected function form()
     {
         $form = new Form(new Badge());
-        dd($form->model()->images()->get());
+        
         $form->text('name', __('Name'))
             ->rules('required|unique:badges,name,{{id}}');
 
@@ -105,6 +105,7 @@ class BadgeController extends MainController
             $badgeImages = $form->model()->exists
                 ? $form->model()->images()->get()->keyBy('language')
                 : collect();
+                dd($badgeImages);
 
             return view('multiBadges', compact('badgeImages'));
         });
