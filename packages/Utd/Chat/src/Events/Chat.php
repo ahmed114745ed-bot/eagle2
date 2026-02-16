@@ -2,12 +2,8 @@
 
 namespace Utd\Chat\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
@@ -16,14 +12,16 @@ class Chat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $chat , $user2;
-    public function __construct($chat , $user2)
+    public $chat;
+
+    public $user2;
+
+    public function __construct($chat, $user2)
     {
         $this->chat = $chat;
         $this->user2 = $user2;
 
     }
-
 
     public function broadcastOn()
     {
@@ -35,12 +33,12 @@ class Chat implements ShouldBroadcast
         return 'getChatUsersBloc';
     }
 
-    public function broadcastWith() : array
+    public function broadcastWith(): array
     {
-//        Log::info('Broadcasting chat event', [
-//            'user_id' => $this->user2->id,
-//            'chat_id' => $this->chat->id ?? null,
-//        ]);
+        //        Log::info('Broadcasting chat event', [
+        //            'user_id' => $this->user2->id,
+        //            'chat_id' => $this->chat->id ?? null,
+        //        ]);
 
         return (array) $this->chat;
     }

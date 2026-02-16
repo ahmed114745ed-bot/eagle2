@@ -4,24 +4,22 @@ namespace Utd\Chat\Http\Controllers;
 
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\Rule;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Utd\Chat\Http\Services\ChatRoomService;
 use Utd\Chat\Http\Services\ChatService;
 
 class ChatRoomController extends Controller
 {
+    public function __construct(public ChatRoomService $chatRoomService, public ChatService $chatService) {}
 
-    public function __construct(public ChatRoomService $chatRoomService, public ChatService $chatService)
+    public function users_list()
     {
-
-    }
-
-    public function users_list(){
         return Common::get_users_list();
     }
+
     public function inviteRoom(Request $request)
     {
 
@@ -29,7 +27,7 @@ class ChatRoomController extends Controller
 
         $data = [
             'message' => $request->message,
-            'url'     => $request->image_url,
+            'url' => $request->image_url,
         ];
 
         $type = $request->type;
@@ -58,18 +56,17 @@ class ChatRoomController extends Controller
         $uuid = $request->keyword;
         $response = $this->chatRoomService->getChatRooms($request->user(), $uuid);
 
-
-        if (!$response['success']) {
+        if (! $response['success']) {
             return response()->json($response['message'], $response['status']);
         }
 
-//  \Log::info('ChatRooms Response', [
-//         'success' => $response['success'],
-//         'status'  => $response['status'],
-//         'data' => $response['data'],
-//         'message' => $response['message'],
-//         'rooms_count' => isset($response['data']) ? count($response['data']) : 0,
-//     ]);
+        //  \Log::info('ChatRooms Response', [
+        //         'success' => $response['success'],
+        //         'status'  => $response['status'],
+        //         'data' => $response['data'],
+        //         'message' => $response['message'],
+        //         'rooms_count' => isset($response['data']) ? count($response['data']) : 0,
+        //     ]);
         return Common::apiResponse(
             1,
             $response['message'],
@@ -84,8 +81,7 @@ class ChatRoomController extends Controller
     {
         $response = $this->chatRoomService->getGUestChatRooms($request->user());
 
-
-        if (!$response['success']) {
+        if (! $response['success']) {
             return response()->json($response['message'], $response['status']);
         }
 
@@ -102,8 +98,9 @@ class ChatRoomController extends Controller
     public function close_Chat(Request $request)
     {
         $user = User::find($request->user()->id);
-        $user->current_room_chat  = null;
+        $user->current_room_chat = null;
         $user->save();
+
         return 200;
     }
 
@@ -147,7 +144,7 @@ class ChatRoomController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'type' => ['sometimes', 'string', Rule::in(['new', 'old'])],
-            'message_id' => ['sometimes', 'integer']
+            'message_id' => ['sometimes', 'integer'],
         ]);
 
         $user = $request->user();
@@ -155,8 +152,8 @@ class ChatRoomController extends Controller
 
         $user->current_room_chat = $checkRoom->id;
         $user->update();
-        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request,$user);
-     //   dd( $messages->toArray());
+        $messages = $this->chatRoomService->getChatMessages($checkRoom->id, $request, $user);
+        //   dd( $messages->toArray());
 
         $this->chatRoomService->markMessagesAsSeen($checkRoom, $user);
 

@@ -3,6 +3,7 @@
 namespace Utd\Chat\Http\Services;
 
 use App\Helpers\Common;
+use App\Support\PackageHelper;
 use Utd\Chat\Entities\GroupChat;
 use Utd\Chat\Http\Repositories\GroupChatRepository;
 
@@ -42,7 +43,7 @@ class GroupChatService
         $groupChatMessage = $this->groupChatRepository->create($data);
 
         // Count reel shares if applicable
-        if ($request->message_type != null && $request->message_type == 'reel') {
+        if ($request->message_type !== null && $request->message_type === 'reel') {
             $this->countReel($request->text);
         }
 
@@ -82,7 +83,7 @@ class GroupChatService
         }
 
         // Check if Reals package is installed
-        if (! class_exists(\Utd\Reals\Entities\Real::class)) {
+        if (! PackageHelper::isInstalled('reals')) {
             return;
         }
 

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use Throwable;
 use Utd\Chat\Events\GroupChat as GroupChatEvent;
 use Utd\Chat\Http\Resources\GroupChatResource;
 use Utd\Chat\Http\Services\GroupChatService;
@@ -47,7 +48,6 @@ class GroupChatController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
@@ -84,7 +84,7 @@ class GroupChatController extends Controller
 
         try {
             event(new GroupChatEvent($resourceData));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             Log::error('GroupChatController: Failed to fire GroupChat event', [
                 'error' => $th->getMessage(),
                 'user_id' => $user->id,
@@ -105,7 +105,7 @@ class GroupChatController extends Controller
                     dispatchJobToQueue(new SendNotificationsToAllUsers($user, $request->text, $resourceData), queueName: 'heavyProcessing');
                     break;
             }
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             Log::error('GroupChatController: Failed to dispatch notification job', [
                 'error' => $th->getMessage(),
                 'trace' => $th->getTraceAsString(),

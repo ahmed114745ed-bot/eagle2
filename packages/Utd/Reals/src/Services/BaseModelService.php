@@ -13,7 +13,7 @@ abstract class BaseModelService
         $this->model = $model;
     }
 
-    final public function findOrFail($id)
+    public function findOrFail($id)
     {
         return $this->model->findOrFail($id);
     }

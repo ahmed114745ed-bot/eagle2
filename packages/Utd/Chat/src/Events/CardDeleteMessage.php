@@ -9,8 +9,11 @@ class CardDeleteMessage implements ShouldBroadcastNow
 {
     use SerializesModels;
 
-    public $chat , $user2;
-    public function __construct($chat , $user2)
+    public $chat;
+
+    public $user2;
+
+    public function __construct($chat, $user2)
     {
         $this->chat = $chat;
         $this->user2 = $user2;
@@ -27,7 +30,7 @@ class CardDeleteMessage implements ShouldBroadcastNow
         return 'card-delete-message';
     }
 
-    public function broadcastWith() : array
+    public function broadcastWith(): array
     {
         return (array) $this->chat;
     }

@@ -11,11 +11,11 @@ class GroupChat implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(private readonly array $data) {
+    public function __construct(private readonly array $data)
+    {
         info('hi');
 
     }
-
 
     public function broadcastOn()
     {
@@ -27,7 +27,7 @@ class GroupChat implements ShouldBroadcastNow
         return 'getGroupChatBloc';
     }
 
-    public function broadcastWith() : array
+    public function broadcastWith(): array
     {
         return (array) $this->data;
     }

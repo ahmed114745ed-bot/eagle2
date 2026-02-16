@@ -7,8 +7,6 @@ use Utd\Chat\Http\Repositories\PinToTopRepository;
 
 class PinToTopService
 {
-
-
     public function __construct(public ChatRepository $chatRoomRepo, public PinToTopRepository $pinToTopRepo) {}
 
     public function store(int $userId, int $otherUserId): array
@@ -17,7 +15,7 @@ class PinToTopService
         $checkRoom = $this->chatRoomRepo->findChatRoomBetweenUsers($userId, $otherUserId);
 
         // If the chat room doesn't exist, return an error response
-        if (!$checkRoom) {
+        if (! $checkRoom) {
             return [
                 'status' => 404,
                 'message' => 'Chat not Found',
@@ -38,7 +36,7 @@ class PinToTopService
         // Check if the chat room exists for the user
         $checkRoom = $this->chatRoomRepo->findChatRoomForUser($userId, $chatRoomId);
 
-        if (!$checkRoom) {
+        if (! $checkRoom) {
             return [
                 'status' => 404,
                 'message' => 'Chat not Found',

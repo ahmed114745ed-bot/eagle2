@@ -8,8 +8,8 @@ use Utd\Chat\Traits\CreatedAtConvert;
 
 class ChatMessage extends Model
 {
-    use HasFactory;
     use CreatedAtConvert;
+    use HasFactory;
 
     protected $fillable = [
         'chat_room_id',
@@ -25,7 +25,7 @@ class ChatMessage extends Model
         'duration',
     ];
 
-     /**
+    /**
      * Relations.
      */
     public function albums()

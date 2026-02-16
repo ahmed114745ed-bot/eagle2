@@ -33,6 +33,6 @@ class GroupChat extends Model
 
     public function replies(): HasMany
     {
-        return $this->hasMany(GroupChat::class, 'parent_id');
+        return $this->hasMany(self::class, 'parent_id');
     }
 }

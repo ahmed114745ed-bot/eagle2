@@ -2,12 +2,8 @@
 
 namespace Utd\Chat\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -15,29 +11,36 @@ class OpenChat implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $chat, $user2, $check_room, $isConversation;
+    public $chat;
+
+    public $user2;
+
+    public $check_room;
+
+    public $isConversation;
+
     public function __construct($chat, $user2, $check_room, $isConversation = true)
     {
         $this->chat = $chat;
         $this->user2 = $user2;
-        $this->check_room = $check_room ;
-        $this->isConversation = $isConversation ;
+        $this->check_room = $check_room;
+        $this->isConversation = $isConversation;
     }
 
-    public function broadcastOn() :array
+    public function broadcastOn(): array
     {
         if ($this->isConversation) {
             return [
-                'user-' . $this->user2->id,
-                'conversation-' . $this->check_room->id,
+                'user-'.$this->user2->id,
+                'conversation-'.$this->check_room->id,
             ];
         }
 
         return [
-            'user-' . $this->user2->id,
+            'user-'.$this->user2->id,
         ];
 
-//        return ['user-'.$this->user2->id ,'conversation-'.$this->check_room->id];
+        //        return ['user-'.$this->user2->id ,'conversation-'.$this->check_room->id];
     }
 
     public function broadcastAs()
@@ -45,7 +48,7 @@ class OpenChat implements ShouldBroadcast
         return 'open_chat';
     }
 
-    public function broadcastWith() : array
+    public function broadcastWith(): array
     {
         return (array) $this->chat;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Utd\Chat\Http\Repositories;
 
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,7 @@ class MessageRepository
     public function updateMessageStatus(ChatMessage $message, $status)
     {
         $message->status = $status;
+
         return $message->update();
     }
 

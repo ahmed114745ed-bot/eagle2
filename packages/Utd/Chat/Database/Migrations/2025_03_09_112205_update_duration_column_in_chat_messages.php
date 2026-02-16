@@ -9,14 +9,14 @@ return new class extends Migration
     public function up()
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->string('duration', 20)->change(); 
+            $table->string('duration', 20)->change();
         });
     }
 
     public function down()
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-            $table->integer('duration')->change(); 
+            $table->integer('duration')->change();
         });
     }
 };

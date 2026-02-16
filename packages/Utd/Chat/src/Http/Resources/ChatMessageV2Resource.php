@@ -3,14 +3,14 @@
 namespace Utd\Chat\Http\Resources;
 
 use App\Helpers\UserCommon;
-use Utd\Chat\Entities\ChatMessage;
-use Utd\Chat\Entities\MessageAlbum;
-use Utd\Chat\Entities\MessageReplay;
-use Utd\Chat\Entities\React;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Utd\Chat\Entities\ChatMessage;
+use Utd\Chat\Entities\MessageAlbum;
+use Utd\Chat\Entities\MessageReplay;
+use Utd\Chat\Entities\React;
 
 class ChatMessageV2Resource extends JsonResource
 {
@@ -19,42 +19,46 @@ class ChatMessageV2Resource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    function Replay_page($message_id, $check_room_id)
+    public function Replay_page($message_id, $check_room_id)
     {
         $message_id = (int) $message_id;
         $perPage = 15;
         $pageNumber = ceil(ChatMessage::where('chat_room_id', $check_room_id)->where('id', '>', $message_id)->count() / $perPage);
+
         return $pageNumber;
     }
 
-
-
-
-    function create_at($timeZone = null)
+    public function create_at($timeZone = null)
     {
-        $createdAt = Carbon::parse($this->created_at);//->setTimezone($timeZone);
+        $createdAt = Carbon::parse($this->created_at); // ->setTimezone($timeZone);
 
         if ($createdAt->isCurrentHour() || $createdAt->isCurrentDay()) {
-            if (app()->getLocale() == 'ar') {
+            if (app()->getLocale() === 'ar') {
                 return UserCommon::englishToArabicNumbers($createdAt);
             }
-            return $createdAt->isoFormat('h:mm:ss A');
-        } else if ($createdAt->isYesterday()) {
-            return __('messages.yesterday');
-        } else if ($createdAt->isCurrentWeek()) {
-            $dayName = $createdAt->locale(app()->getLocale())->dayName; // ترجم اسم اليوم
-            return $dayName;
-        } else if ($createdAt->isCurrentDay()) {
-            $daysSinceCreation = $createdAt->diffInHours(Carbon::now());
-            return __('messages.days_ago', ['days' => $daysSinceCreation]);
-        } else {
-            if (app()->getLocale() == 'ar') {
-                return UserCommon::englishToArabicNumbersDate($createdAt);
-            }
-            return $createdAt->locale(app()->getLocale())->format('Y-m-d');
-        }
-    }
 
+            return $createdAt->isoFormat('h:mm:ss A');
+        }
+        if ($createdAt->isYesterday()) {
+            return __('messages.yesterday');
+        }
+        if ($createdAt->isCurrentWeek()) {
+            $dayName = $createdAt->locale(app()->getLocale())->dayName; // ترجم اسم اليوم
+
+            return $dayName;
+        }
+        if ($createdAt->isCurrentDay()) {
+            $daysSinceCreation = $createdAt->diffInHours(Carbon::now());
+
+            return __('messages.days_ago', ['days' => $daysSinceCreation]);
+        }
+        if (app()->getLocale() === 'ar') {
+            return UserCommon::englishToArabicNumbersDate($createdAt);
+        }
+
+        return $createdAt->locale(app()->getLocale())->format('Y-m-d');
+
+    }
 
     public function toArray(Request $request)
     {
@@ -65,11 +69,11 @@ class ChatMessageV2Resource extends JsonResource
         $album_array = [];
         foreach ($albums as $album) {
             $album_array[] = [
-                'id'      => $album->id,
+                'id' => $album->id,
                 'user_id' => $album->user_id,
-                'file'    => $album->file,
-                'frame'    => $album->frame ? $album->frame : null,
-                'type'    => $album->type,
+                'file' => $album->file,
+                'frame' => $album->frame ? $album->frame : null,
+                'type' => $album->type,
                 'duration' => $this->duration ?? '',
             ];
         }
@@ -79,26 +83,26 @@ class ChatMessageV2Resource extends JsonResource
             $data = $replay->from_message;
 
             $replay_array = [
-                'message_id'      => $data->id,
+                'message_id' => $data->id,
                 'message_user_id' => $data->user_id,
-                'message'         => $data->message,
-                'message_type'    => $data->type,
-                'duration'        => $data->duration,
-                'message_albums'  => $data->albums->count() > 0 ?
+                'message' => $data->message,
+                'message_type' => $data->type,
+                'duration' => $data->duration,
+                'message_albums' => $data->albums->count() > 0 ?
                     $data->albums->map(function ($item) {
                         return [
-                            'id'      => $item->id,
+                            'id' => $item->id,
                             'user_id' => $item->user_id,
-                            'file'    => $item->file,
-                            'type'    => $item->type,
-                            'frame'    => $item->frame,
+                            'file' => $item->file,
+                            'type' => $item->type,
+                            'frame' => $item->frame,
                         ];
                     })
                     : null,
-                'page' => $this->Replay_page($data->id, $data->chat_room_id)
+                'page' => $this->Replay_page($data->id, $data->chat_room_id),
             ];
         }
-         $authUser =$this->user_id == Auth::user()->id;
+        $authUser = $this->user_id === Auth::user()->id;
 
         return [
             'replay' => $replay ? $replay_array : null,
@@ -106,17 +110,17 @@ class ChatMessageV2Resource extends JsonResource
             'user_id' => $this->user_id,
             'message' => $this->message,
             'status' => $this->status,
-            'room_owner_id' =>  is_numeric($this->room_owner_id) ? intval($this->room_owner_id) : 0,
-            'room_id' =>  is_numeric($this->room_id) ? intval($this->room_id) : 0,
+            'room_owner_id' => is_numeric($this->room_owner_id) ? (int) ($this->room_owner_id) : 0,
+            'room_id' => is_numeric($this->room_id) ? (int) ($this->room_id) : 0,
             'type' => $this->type,
             'duration' => $this->duration ?? '',
             'chat_room_id ' => $this->chat_room_id,
-            'sender_deleted'   => ($this->user_1_deleted && $this->user_2_deleted) ? true : false,
-            'receiver_deleted' =>  ($this->user_1_deleted && $this->user_2_deleted) ? true : false,
+            'sender_deleted' => ($this->user_1_deleted && $this->user_2_deleted) ? true : false,
+            'receiver_deleted' => ($this->user_1_deleted && $this->user_2_deleted) ? true : false,
             'reacts' => $reacts->count() > 0 ? ChatReactResource::collection($reacts) : null,
-            'albums' => $albums->count() > 0 ?  $album_array : null,
+            'albums' => $albums->count() > 0 ? $album_array : null,
             'created_at' => $this->create_at($timeZone),
-            "date_time" => $this->created_at,
+            'date_time' => $this->created_at,
         ];
     }
 }

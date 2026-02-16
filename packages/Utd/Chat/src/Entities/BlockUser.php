@@ -14,9 +14,9 @@ class BlockUser extends Model
     /**
      * Scope a query to filter block users between two specific users.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param int $userId The ID of the first user.
-     * @param int $fromUserId The ID of the second user.
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  int  $userId  The ID of the first user.
+     * @param  int  $fromUserId  The ID of the second user.
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function scopeBetweenUsers($query, $userId, $fromUserId)

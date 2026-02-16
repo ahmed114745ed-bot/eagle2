@@ -13,25 +13,25 @@ class GroupChatResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    function get_user($id ){
+    public function get_user($id)
+    {
         $user = User::withTrashed()->find($id);
-        if($user)
-        {
+        if ($user) {
             return [
-                'id'   =>$user->id  ?? '',
-                'name' =>$user->name ?? '',
-                'img'  =>$user->profile->avatar ?? null,
+                'id' => $user->id ?? '',
+                'name' => $user->name ?? '',
+                'img' => $user->profile->avatar ?? null,
             ];
         }
-        else{
-            return null;
-        }
+
+        return null;
+
     }
 
     public function toArray(Request $request): array
     {
         return [
-            'id'   => $this->id,
+            'id' => $this->id,
             'text' => $this->text,
             'user' => $this->get_user($this->user_id),
         ];

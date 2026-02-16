@@ -2,10 +2,12 @@
 
 namespace Utd\Chat\Http\Services;
 
-use Illuminate\Http\Request;
+use App\Helpers\Common;
 use App\Models\ChatRoom;
 use App\Models\User;
-use App\Helpers\Common;
+use Illuminate\Http\Request;
+use Modules\Public\Events\UnreadCounterIndividual;
+use Throwable;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Chat\Entities\ChatRoom as EntitiesChatRoom;
 use Utd\Chat\Http\Repositories\MessageAlbumRepository;
@@ -13,7 +15,6 @@ use Utd\Chat\Http\Repositories\MessageRepository;
 use Utd\Chat\Http\Resources\ChatMessageResource;
 use Utd\Chat\Http\Resources\ChatRoomPusherV2Resource;
 use Utd\Chat\Traits\FfmpegTrait;
-use Modules\Public\Events\UnreadCounterIndividual;
 
 class MessageService
 {
@@ -26,15 +27,14 @@ class MessageService
         $this->messageAlbumRepository = $messageAlbumRepository;
     }
 
-
     public function handleFileUpload(Request $request, $chatRoom, $message, $user)
     {
         if ($request->hasFile('file')) {
             $files = $request->file('file');
             $validExtensions = ['jpeg', 'jpg', 'png', 'gif', 'mp4', 'mp3', 'wav', 'pdf'];
-//            $count = count($files);
+            //            $count = count($files);
 
-            if (!is_array($files)) {
+            if (! is_array($files)) {
                 $this->processSingleFile($files, $validExtensions, $chatRoom, $message, $user);
             } else {
                 $this->processMultipleFiles($files, $validExtensions, $chatRoom, $message, $user);
@@ -46,22 +46,53 @@ class MessageService
         }
     }
 
+    public function handleMessage($request, $message, $user, $user2, $chatRoom)
+    {
+        // Update message status based on user conditions
+        $this->updateMessageStatus($message, $user2, $chatRoom);
+
+        // Handle message reply
+        if ($request->message_id) {
+            $this->messageRepo->createMessageReplay($message->id, $request->message_id);
+        }
+        //        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
+
+        // Return the message and chat room resources
+        return [
+            'message_resource' => new ChatMessageResource($this->messageRepo->findMessageById($message->id)),
+            'room_resource' => new ChatRoomPusherV2Resource($chatRoom),
+        ];
+    }
+
+    public function sendNotification(User $user2, ChatMessage $message)
+    {
+        if ($user2->is_logout !== 1) {
+            $notificationId = $this->messageRepo->getUserNotificationId($user2->id);
+            $tokens_notfacion = [$notificationId];
+            $title = $message->user->name;
+            $body = $message->message;
+            $type = $message->type ?? 'text';
+
+            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type, user: $message->user);
+        }
+    }
+
     private function processSingleFile($file, $validExtensions, $chatRoom, $message, $user, $duration = null)
     {
         $extension = $file->getClientOriginalExtension();
-        if (!$this->isValidExtension($extension, $validExtensions)) {
-            return response()->json(['status' => 404, 'message' => "Invalid file type"], 404);
+        if (! $this->isValidExtension($extension, $validExtensions)) {
+            return response()->json(['status' => 404, 'message' => 'Invalid file type'], 404);
         }
 
         if (in_array($extension, ['jpeg', 'jpg', 'png'])) {
             $this->processImageFile($file, $chatRoom, $message, $user);
-        } elseif ($extension == 'gif') {
+        } elseif ($extension === 'gif') {
             $this->processGifFile($file, $chatRoom, $message, $user);
-        } elseif ($extension == 'mp4' || is_string($file)) {
+        } elseif ($extension === 'mp4' || is_string($file)) {
             $this->processVideoFile($file, $chatRoom, $message, $user, $duration);
         } elseif (in_array($extension, ['mp3', 'wav', 'm4a', 'aac'])) {
             $this->processAudioFile($file, $chatRoom, $message, $user);
-        } elseif ($extension == 'pdf') {
+        } elseif ($extension === 'pdf') {
             $this->processPdfFile($file, $chatRoom, $message, $user);
         }
     }
@@ -86,7 +117,7 @@ class MessageService
 
     private function processImageFile($file, $chatRoom, $message, $user)
     {
-        $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        $file_name = Common::upload('Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id, $file);
         $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'img');
 
         $message->type = 'img';
@@ -95,7 +126,7 @@ class MessageService
 
     private function processGifFile($file, $chatRoom, $message, $user)
     {
-        $fileName = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        $fileName = Common::upload('Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id, $file);
         $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $fileName, 'gif');
 
         $message->type = 'gif';
@@ -105,8 +136,8 @@ class MessageService
 
     private function processVideoFile($file, $chatRoom, $message, $user, $duration = null)
     {
-        if (!is_string($file)) {
-            $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        if (! is_string($file)) {
+            $file_name = Common::upload('Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id, $file);
         } else {
             $file_name = $file;
         }
@@ -114,10 +145,10 @@ class MessageService
         $name = pathinfo($file_name, PATHINFO_FILENAME);
         $album = $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'video');
         $videoPath = $file_name;
-        $thumbnailPath = 'Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id . '/' . $name . '.jpg';
+        $thumbnailPath = 'Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id.'/'.$name.'.jpg';
         try {
             $this->extract_frame($videoPath, $thumbnailPath);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $e->getMessage();
         }
 
@@ -132,7 +163,7 @@ class MessageService
 
     private function processAudioFile($file, $chatRoom, $message, $user)
     {
-        $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        $file_name = Common::upload('Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id, $file);
         $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'voice');
 
         $message->type = 'voice';
@@ -142,7 +173,7 @@ class MessageService
 
     private function processPdfFile($file, $chatRoom, $message, $user)
     {
-        $file_name = Common::upload('Chat_' . env('APP_ENV') . '/chat_' . $chatRoom->id, $file);
+        $file_name = Common::upload('Chat_'.env('APP_ENV').'/chat_'.$chatRoom->id, $file);
         $this->messageAlbumRepository->createAlbum($chatRoom, $message, $user, $file, $file_name, 'file');
 
         $message->type = 'file';
@@ -150,50 +181,19 @@ class MessageService
         $message->update();
     }
 
-    public function handleMessage($request, $message, $user, $user2, $chatRoom)
-    {
-        // Update message status based on user conditions
-        $this->updateMessageStatus($message, $user2, $chatRoom);
-
-        // Handle message reply
-        if ($request->message_id) {
-            $this->messageRepo->createMessageReplay($message->id, $request->message_id);
-        }
-//        \Log::info('chatRoom: ', ['chatRoom' =>  $chatRoom]);
-
-        // Return the message and chat room resources
-        return [
-            'message_resource' => new ChatMessageResource($this->messageRepo->findMessageById($message->id)),
-            'room_resource' => new ChatRoomPusherV2Resource($chatRoom)
-        ];
-    }
-
     private function updateMessageStatus(ChatMessage $message, User $user2, EntitiesChatRoom $chatRoom)
     {
         // \Log::info('updateMessageStatus: ', ['user2' =>  $user2->id]);
 
-        if ($user2->online == 1) {
-            $condition = ($user2->current_room_chat == $chatRoom->id);
+        if ($user2->online === 1) {
+            $condition = ($user2->current_room_chat === $chatRoom->id);
             // \Log::info('current_room_chat: ', ['$user2->current_room_chat' =>  $user2->current_room_chat]);
 
             $status = $condition ? 'seen' : 'received';
             $this->messageRepo->updateMessageStatus($message, $status);
-            if (!$condition) {
+            if (! $condition) {
                 event(new UnreadCounterIndividual('message', $user2, 1));
             }
-        }
-    }
-
-    public function sendNotification(User $user2, ChatMessage $message)
-    {
-        if ($user2->is_logout != 1) {
-            $notificationId = $this->messageRepo->getUserNotificationId($user2->id);
-            $tokens_notfacion = [$notificationId];
-            $title = $message->user->name;
-            $body = $message->message;
-            $type = $message->type ?? 'text';
-
-            Common::send_firebase_notification($tokens_notfacion, $title, $body, messageType: $type, user: $message->user);
         }
     }
 }

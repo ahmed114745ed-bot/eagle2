@@ -4,6 +4,7 @@ namespace Utd\Chat\Http\Resources;
 
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class ReplayGroupChatResource extends JsonResource
 {
@@ -11,12 +12,12 @@ class ReplayGroupChatResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray($request)
     {
         $framePack = $this->user?->packs
-            ->firstWhere(fn($p) => $p->type == 4 && $p->target_id == $this->user->dress_1);
+            ->firstWhere(fn ($p) => $p->type === 4 && $p->target_id === $this->user->dress_1);
 
         $frame = $framePack?->ware?->img2 ?? $framePack?->ware?->img1 ?? '';
 
@@ -28,7 +29,7 @@ class ReplayGroupChatResource extends JsonResource
                 'image' => @$this->user->profile->avatar ?? '',
             ],
             'frame' => $frame,
-            'frame_id' => $frame != '' ? (@$this->user->dress_1 ?? 0) : 0,
+            'frame_id' => $frame !== '' ? (@$this->user->dress_1 ?? 0) : 0,
             'vip' => [
                 'level' => @$this->user?->UserVip?->level ?? 0,
             ],

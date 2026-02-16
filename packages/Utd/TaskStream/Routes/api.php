@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Utd\TaskStream\Http\Controllers\PkSessionController;
 use Utd\TaskStream\Http\Controllers\TaskStreamController;
 
-Route::group(['prefix' => 'api'], function (){
+Route::group(['prefix' => 'api'], function () {
     Route::group([
         'prefix' => 'v1/task-stream',
         'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'localization', 'update.last.seen'],

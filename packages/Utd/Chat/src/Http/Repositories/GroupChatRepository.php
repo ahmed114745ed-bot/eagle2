@@ -46,13 +46,13 @@ class GroupChatRepository
             'user.receiverLevel',
             'user.senderLevel',
             'user.packs.ware',
-            'user.packs' => fn($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
+            'user.packs' => fn ($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
             'parent.user.profile:id,user_id,avatar',
             'parent.user.UserVip',
             'parent.user.receiverLevel',
             'parent.user.senderLevel',
             'parent.user.packs.ware',
-            'parent.user.packs' => fn($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
+            'parent.user.packs' => fn ($q) => $q->whereIn('type', [25, 18, 4])->where('is_used', true)->with('ware:id,value'),
         ])->orderBy('created_at', 'DESC')->paginate($perPage);
     }
 

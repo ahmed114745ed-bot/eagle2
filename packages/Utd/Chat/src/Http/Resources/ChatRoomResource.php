@@ -3,22 +3,21 @@
 namespace Utd\Chat\Http\Resources;
 
 use App\Helpers\Common;
-use Utd\Chat\Entities\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Chat\Entities\ChatMessage;
 
 class ChatRoomResource extends JsonResource
 {
-
     public function toArray(Request $request)
     {
 
         if ($this->user_id !== $request->user()->id) {
-            $user  = User::withTrashed()->find($this->user_id2);
+            $user = User::withTrashed()->find($this->user_id2);
             $user2 = User::withTrashed()->find($this->user_id);
         } else {
-            $user  = User::withTrashed()->find($this->user_id);
+            $user = User::withTrashed()->find($this->user_id);
             $user2 = User::withTrashed()->find($this->user_id2);
         }
 
@@ -26,14 +25,14 @@ class ChatRoomResource extends JsonResource
         $hasColor = Common::hasInPack($user2, 18, true);
 
         return [
-            'user_id'             => @$user2->id,
-            'name'                => @$user2->name,
-            'img'                 => @$user2->profile->avatar,
-            'deleted_at'          => @$user2->deleted_at,
-            'in_room'             => @$user2?->now_room_uid ? true : false,
-            'chat_id'             => $this->id,
-            'unread_message'      => $total_undread_message,
-            'colored_name'        => $hasColor ? common::wareUserVip($user2, 18, 'color') ?? '' : '',
+            'user_id' => @$user2->id,
+            'name' => @$user2->name,
+            'img' => @$user2->profile->avatar,
+            'deleted_at' => @$user2->deleted_at,
+            'in_room' => @$user2?->now_room_uid ? true : false,
+            'chat_id' => $this->id,
+            'unread_message' => $total_undread_message,
+            'colored_name' => $hasColor ? Common::wareUserVip($user2, 18, 'color') ?? '' : '',
             'last_message' => @new ChatMessageV2Resource(
                 $this->messages
                     // ->filter(function ($msg) {
@@ -43,6 +42,6 @@ class ChatRoomResource extends JsonResource
                     ->sortByDesc('id')
                     ->first()
             ),
-            ];
+        ];
     }
 }

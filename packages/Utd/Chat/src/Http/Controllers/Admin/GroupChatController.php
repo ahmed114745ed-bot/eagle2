@@ -16,6 +16,7 @@ use Encore\Admin\Widgets\Box;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\Public\Http\Services\UpgradeLevelServices;
+use Throwable;
 use Utd\Chat\Entities\GroupChat;
 use Utd\Chat\Events\GroupChat as GroupChatEvent;
 
@@ -50,17 +51,6 @@ class GroupChatController extends MainController
     }
 
     /**
-     * Make a grid builder.
-     */
-    protected function grid2()
-    {
-        $form = new Box();
-        $form->view('chat::admin.grid.group-chat');
-
-        return $form;
-    }
-
-    /**
      * Show interface.
      */
     public function show($id, Content $content)
@@ -88,128 +78,6 @@ class GroupChatController extends MainController
         return parent::create($content
             ->title(__('group Chat'))
             ->body($this->form()));
-    }
-
-    /**
-     * Make a grid builder.
-     */
-    protected function grid()
-    {
-        $grid = new Grid(new GroupChat());
-        $countryID = session('filter_country_id');
-        $grid->model()->when($countryID, function ($query) use ($countryID) {
-            $query->where(function ($q) use ($countryID) {
-                $q->whereHas('user', function ($subQuery) use ($countryID) {
-                    $subQuery->where('country_id', $countryID);
-                });
-            });
-        })->orderByDesc('id');
-        $grid->quickSearch();
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->disableIdFilter();
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $input = $this->input;
-                    $query->whereHas('user', function ($query) use ($input) {
-                        $query->where('name', 'like', "%$input%")
-                            ->orWhere('uuid', 'like', "%$input%");
-                    });
-                }, __('User'))->placeholder(__('Search by name or UUID'));
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->like('text', __('Message'));
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->equal('user_id', __('User ID'));
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->between('created_at', __('Created At'))->date();
-            });
-        });
-
-        $grid->tools(function ($tools) {
-            $tools->append('<a href="'.route('admin.chat.view').'" class="btn btn-sm btn-success" style="margin-left: 10px;">
-                <i class="fa fa-comments"></i> '.__('View Chat Interface').'
-            </a>');
-        });
-
-        $grid->column('id', __('ID'))->sortable();
-        $grid->column('text', __('Message'))->limit(50);
-        $grid->column('user_id', __('User ID'));
-        $grid->column('image', __('Image'))->image('', 50, 50);
-        $grid->column('parent_id', __('Parent ID'));
-        $grid->column('created_at', __('Created at'))->sortable();
-        $grid->column('updated_at', __('Updated at'))->sortable();
-
-        return $grid;
-    }
-
-    /**
-     * Make a show builder.
-     */
-    protected function detail($id)
-    {
-        $show = new Show(GroupChat::findOrFail($id));
-
-        $show->field('id', __('ID'));
-        $show->field('text', __('Message'));
-        $show->field('user_id', __('User ID'));
-        $show->field('image', __('Image'))->image();
-        $show->field('parent_id', __('Parent ID'));
-        $show->created_at(trans('admin.created_at'));
-        $show->updated_at(trans('admin.updated_at'));
-
-        return $show;
-    }
-
-    /**
-     * Make a form builder.
-     */
-    protected function form()
-    {
-        $form = new Form(new GroupChat());
-        $this->disableFormTools($form);
-
-        $form->textarea('text', __('Message'))->required();
-        $form->number('user_id', __('User ID'))->required();
-        $form->image('image', __('Image'));
-        $form->number('parent_id', __('Parent ID'));
-
-        $form->display(trans('admin.created_at'));
-        $form->display(trans('admin.updated_at'));
-
-        return $form;
-    }
-
-    private function canAdminSendMessages(): bool
-    {
-        $admin = Admin::user();
-
-        if (! $admin || empty($admin->app_id) || $admin->app_id <= 0) {
-            return false;
-        }
-
-        return $admin->user()->exists();
-    }
-
-    private function getAdminAppId(): ?int
-    {
-        $admin = Admin::user();
-
-        if (! $admin || empty($admin->app_id) || $admin->app_id <= 0) {
-            return null;
-        }
-
-        if (! $admin->user()->exists()) {
-            return null;
-        }
-
-        return (int) $admin->app_id;
     }
 
     public function chatView(Content $content)
@@ -404,7 +272,7 @@ class GroupChatController extends MainController
 
         try {
             event(new GroupChatEvent($responseData));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
             // Log error if needed
         }
 
@@ -452,11 +320,144 @@ class GroupChatController extends MainController
                 'room_id' => $id,
                 'room_name' => $room->name ?? '',
             ]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error fetching room image: '.$e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Make a grid builder.
+     */
+    protected function grid2()
+    {
+        $form = new Box();
+        $form->view('chat::admin.grid.group-chat');
+
+        return $form;
+    }
+
+    /**
+     * Make a grid builder.
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new GroupChat());
+        $countryID = session('filter_country_id');
+        $grid->model()->when($countryID, function ($query) use ($countryID) {
+            $query->where(function ($q) use ($countryID) {
+                $q->whereHas('user', function ($subQuery) use ($countryID) {
+                    $subQuery->where('country_id', $countryID);
+                });
+            });
+        })->orderByDesc('id');
+        $grid->quickSearch();
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $input = $this->input;
+                    $query->whereHas('user', function ($query) use ($input) {
+                        $query->where('name', 'like', "%$input%")
+                            ->orWhere('uuid', 'like', "%$input%");
+                    });
+                }, __('User'))->placeholder(__('Search by name or UUID'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->like('text', __('Message'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->equal('user_id', __('User ID'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->between('created_at', __('Created At'))->date();
+            });
+        });
+
+        $grid->tools(function ($tools) {
+            $tools->append('<a href="'.route('admin.chat.view').'" class="btn btn-sm btn-success" style="margin-left: 10px;">
+                <i class="fa fa-comments"></i> '.__('View Chat Interface').'
+            </a>');
+        });
+
+        $grid->column('id', __('ID'))->sortable();
+        $grid->column('text', __('Message'))->limit(50);
+        $grid->column('user_id', __('User ID'));
+        $grid->column('image', __('Image'))->image('', 50, 50);
+        $grid->column('parent_id', __('Parent ID'));
+        $grid->column('created_at', __('Created at'))->sortable();
+        $grid->column('updated_at', __('Updated at'))->sortable();
+
+        return $grid;
+    }
+
+    /**
+     * Make a show builder.
+     */
+    protected function detail($id)
+    {
+        $show = new Show(GroupChat::findOrFail($id));
+
+        $show->field('id', __('ID'));
+        $show->field('text', __('Message'));
+        $show->field('user_id', __('User ID'));
+        $show->field('image', __('Image'))->image();
+        $show->field('parent_id', __('Parent ID'));
+        $show->created_at(trans('admin.created_at'));
+        $show->updated_at(trans('admin.updated_at'));
+
+        return $show;
+    }
+
+    /**
+     * Make a form builder.
+     */
+    protected function form()
+    {
+        $form = new Form(new GroupChat());
+        $this->disableFormTools($form);
+
+        $form->textarea('text', __('Message'))->required();
+        $form->number('user_id', __('User ID'))->required();
+        $form->image('image', __('Image'));
+        $form->number('parent_id', __('Parent ID'));
+
+        $form->display(trans('admin.created_at'));
+        $form->display(trans('admin.updated_at'));
+
+        return $form;
+    }
+
+    private function canAdminSendMessages(): bool
+    {
+        $admin = Admin::user();
+
+        if (! $admin || empty($admin->app_id) || $admin->app_id <= 0) {
+            return false;
+        }
+
+        return $admin->user()->exists();
+    }
+
+    private function getAdminAppId(): ?int
+    {
+        $admin = Admin::user();
+
+        if (! $admin || empty($admin->app_id) || $admin->app_id <= 0) {
+            return null;
+        }
+
+        if (! $admin->user()->exists()) {
+            return null;
+        }
+
+        return (int) $admin->app_id;
     }
 }

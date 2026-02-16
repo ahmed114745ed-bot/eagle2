@@ -2,31 +2,29 @@
 
 namespace Utd\Chat\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Models\Config;
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+use Throwable;
 use Utd\Chat\Events\Chat;
 use Utd\Chat\Events\Conversation;
-use App\Http\Controllers\Controller;
 use Utd\Chat\Events\OpenChat;
-use Utd\Chat\Http\Resources\ChatMessageResource;
-use Utd\Chat\Http\Resources\ChatRoomResource;
-use App\Models\BlockList;
-use App\Models\User;
-use Utd\Chat\Traits\FfmpegTrait;
-use App\Models\Config;
-use DB;
-use Utd\Chat\Http\Services\ChatService;
-use Utd\Chat\Http\Services\MessageService;
 use Utd\Chat\Http\Requests\ChatStoreRequest;
 use Utd\Chat\Http\Requests\DeleteForMeRequest;
 use Utd\Chat\Http\Requests\DeleteMessagesRequest;
 use Utd\Chat\Http\Requests\UpdateMessageRequest;
+use Utd\Chat\Http\Resources\ChatMessageResource;
+use Utd\Chat\Http\Resources\ChatRoomResource;
+use Utd\Chat\Http\Services\ChatService;
+use Utd\Chat\Http\Services\MessageService;
+use Utd\Chat\Traits\FfmpegTrait;
 
 class ChatMessagesController extends Controller
 {
     use FfmpegTrait;
 
     public function __construct(public ChatService $chatService, public MessageService $messageService) {}
-
-
 
     public function store(ChatStoreRequest $request)
     {
@@ -36,13 +34,13 @@ class ChatMessagesController extends Controller
         if ($this->chatService->isUserBlocked($request->user()->id, $request->user_id)) {
             return response()->json([
                 'status' => 404,
-                'message' => "Unauthorized Block Condition"
+                'message' => 'Unauthorized Block Condition',
             ], 404);
         }
 
         $chatRoom = $this->chatService->findChatRoomBetweenUsers($user->id, $request->user_id);
 
-        if (!$chatRoom) {
+        if (! $chatRoom) {
             return response()->json([
                 'status' => 404,
                 'message' => 'Chat not Found',
@@ -53,29 +51,30 @@ class ChatMessagesController extends Controller
 
         $totalDistinctUsers = $this->chatService->countDistinctUsersInRoom($chatRoom->id);
 
-        $maxMessage = \Cache::rememberForever('max_message', function () {
-            $setting =   Config::where('name', 'max_message')->first();
+        $maxMessage = Cache::rememberForever('max_message', function () {
+            $setting = Config::where('name', 'max_message')->first();
+
             return $setting?->value ?? 0;
         });
 
-        if ($chatRoom->type == 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
+        if ($chatRoom->type === 'guest' && $total_message >= $maxMessage && $totalDistinctUsers < 2) {
             return response()->json([
                 'status' => 404,
                 'message' => 'You have reached the limit for sending messages',
             ], 404);
         }
 
-        if ($chatRoom->user_id != $user->id) {
+        if ($chatRoom->user_id !== $user->id) {
             $user2 = User::withoutAppends()->find($chatRoom->user_id);
         } else {
             $user2 = User::withoutAppends()->find($chatRoom->user_id2);
         }
 
-        //Files Validations
+        // Files Validations
         if ($request->hasFile('file')) {
             $validExtensions = ['jpeg', 'jpg', 'png', 'gif', 'mp4', 'mp3', 'wav', 'pdf'];
             foreach ($request->file('file') as $file) {
-                if (!$this->isValidFileExtension($file, $validExtensions)) {
+                if (! $this->isValidFileExtension($file, $validExtensions)) {
                     return $this->fileValidationErrorResponse();
                 }
             }
@@ -89,13 +88,13 @@ class ChatMessagesController extends Controller
 
         $message = $this->chatService->createChatMessage($messageData);
 
-        //insert files to database
+        // insert files to database
 
         $this->messageService->handleFileUpload($request, $chatRoom, $message, $user);
 
         $response = $this->messageService->handleMessage($request, $message, $user, $user2, $chatRoom);
 
-        //add status for message
+        // add status for message
         if ($totalDistinctUsers >= 2) {
             $chatRoom->type = 'friend';
         }
@@ -108,32 +107,17 @@ class ChatMessagesController extends Controller
             event(new Conversation($response['message_resource']->toResponse(request())->getData()->data, $user2, $response['room_resource']));
             event(new Chat($response['room_resource']->toResponse(request())->getData()->data, $user2));
             event(new OpenChat($response['room_resource']->toResponse(request())->getData()->data, $user2 ?? $user, $chatRoom, false));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
         }
 
-        if (!$user2->current_room_chat !=  $chatRoom->id){
+        if (! $user2->current_room_chat !== $chatRoom->id) {
             $this->messageService->sendNotification($user2, $message);
         }
 
         return [
-            'message' =>    $response['message_resource'],
-            'card' =>  new ChatRoomResource($chatRoom)
+            'message' => $response['message_resource'],
+            'card' => new ChatRoomResource($chatRoom),
         ];
-    }
-
-    private function isValidFileExtension($file, $validExtensions)
-    {
-        $extension = $file->getClientOriginalExtension();
-
-        return in_array($extension, $validExtensions);
-    }
-
-    private function fileValidationErrorResponse()
-    {
-        return response()->json([
-            'status' => 404,
-            'message' => "File doesn't match our records",
-        ], 404);
     }
 
     public function update(UpdateMessageRequest $request)
@@ -175,5 +159,20 @@ class ChatMessagesController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    private function isValidFileExtension($file, $validExtensions)
+    {
+        $extension = $file->getClientOriginalExtension();
+
+        return in_array($extension, $validExtensions);
+    }
+
+    private function fileValidationErrorResponse()
+    {
+        return response()->json([
+            'status' => 404,
+            'message' => "File doesn't match our records",
+        ], 404);
     }
 }

@@ -21,19 +21,19 @@ class ReactService
     public function handleReact($user, $messageId, $reactType)
     {
         $message = ChatMessage::find($messageId);
-        if (!$message) {
+        if (! $message) {
             return ['status' => 404, 'message' => 'Message not found'];
         }
 
         $chatRoom = ChatRoom::find($message->chat_room_id);
-        if (!$chatRoom) {
+        if (! $chatRoom) {
             return ['status' => 404, 'message' => 'Chat room not found'];
         }
 
         $existingReact = $this->reactRepository->findExistingReact($chatRoom->id, $messageId, $user->id);
         $status = null;
 
-        if ($existingReact && $existingReact->react == $reactType) {
+        if ($existingReact && $existingReact->react === $reactType) {
             $this->reactRepository->deleteReact($existingReact);
             $status = 'react removed';
         } elseif ($existingReact && $existingReact->react !== $reactType) {
@@ -72,6 +72,4 @@ class ReactService
 
         return ['status' => 200, 'react' => $status, 'message' => $messageResource];
     }
-
-
 }

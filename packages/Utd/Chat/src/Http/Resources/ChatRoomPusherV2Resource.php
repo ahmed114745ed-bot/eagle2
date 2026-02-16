@@ -2,19 +2,18 @@
 
 namespace Utd\Chat\Http\Resources;
 
-use Utd\Chat\Entities\ChatMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Chat\Entities\ChatMessage;
 
 class ChatRoomPusherV2Resource extends JsonResource
 {
-
     public function toArray(Request $request)
     {
         $authUser = $request->user();
 
-        if ($authUser && $this->user_id == $authUser->id) {
+        if ($authUser && $this->user_id === $authUser->id) {
             $user2 = User::find($this->user_id);
         } else {
             $user2 = User::find($this->user_id2);
@@ -25,18 +24,18 @@ class ChatRoomPusherV2Resource extends JsonResource
             ->where('status', '!=', 'seen')
             ->count();
 
-    //    \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'chat_room_id' => $this->id]);
-    //    \Log::info('Total unread messages: ', ['total_unread_message' => $total_unread_message]);
+        //    \Log::info('Chat Receiver: ', ['receiver_id' => $user2->id, 'receiver_name' => $user2->name , 'chat_room_id' => $this->id]);
+        //    \Log::info('Total unread messages: ', ['total_unread_message' => $total_unread_message]);
 
         return [
-            'id'             => $this->id,
-            'user_id'        => $user2->id,
-            'name'           => $user2->name,
-            'img'            => @$user2->profile->avatar,
-            'chat_id'        => $this->id,
-            'type'           => $this->type,
+            'id' => $this->id,
+            'user_id' => $user2->id,
+            'name' => $user2->name,
+            'img' => @$user2->profile->avatar,
+            'chat_id' => $this->id,
+            'type' => $this->type,
             'unread_message' => $total_unread_message,
-            'last_message'   => @$this->messages->first() ? new ChatMessageResource($this->messages->first()) : null,
+            'last_message' => @$this->messages->first() ? new ChatMessageResource($this->messages->first()) : null,
         ];
     }
 }

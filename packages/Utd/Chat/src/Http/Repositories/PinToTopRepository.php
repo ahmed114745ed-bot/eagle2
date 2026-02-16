@@ -1,4 +1,5 @@
 <?php
+
 namespace Utd\Chat\Http\Repositories;
 
 use Utd\Chat\Entities\PinToTop;
@@ -9,7 +10,7 @@ class PinToTopRepository
     {
         $pinToTop = PinToTop::create([
             'chat_room_id' => $chatRoomId,
-            'user_id' => $userId
+            'user_id' => $userId,
         ]);
 
         return $pinToTop;

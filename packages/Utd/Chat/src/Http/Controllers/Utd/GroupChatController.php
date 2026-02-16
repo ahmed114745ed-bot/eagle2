@@ -5,8 +5,8 @@ namespace Utd\Chat\Http\Controllers\Utd;
 use App\Helpers\Common;
 use App\Http\Controllers\Controller;
 use App\Models\Config;
-use Utd\Chat\Entities\GroupChat;
 use Illuminate\Http\Request;
+use Utd\Chat\Entities\GroupChat;
 
 class GroupChatController extends Controller
 {
@@ -29,7 +29,7 @@ class GroupChatController extends Controller
 
         $chat = GroupChat::create([
             'text' => $request->text,
-            'user_id' => $request->user_id
+            'user_id' => $request->user_id,
         ]);
 
         return Common::apiResponse(1, 'success', $chat, 200);
@@ -46,7 +46,7 @@ class GroupChatController extends Controller
     {
         GroupChat::findOrFail($id)->update([
             'text' => $request->text,
-            'user_id' => $request->user_id
+            'user_id' => $request->user_id,
         ]);
 
         return Common::apiResponse(1, 'success', [], 200);
@@ -56,9 +56,9 @@ class GroupChatController extends Controller
     {
 
         $conf = Config::where('name', 'send_world_chat')->first();
-        if (!$conf) {
-            config::create([
-                'name'  => 'send_world_chat',
+        if (! $conf) {
+            Config::create([
+                'name' => 'send_world_chat',
                 'value' => $request->number,
             ]);
         } else {

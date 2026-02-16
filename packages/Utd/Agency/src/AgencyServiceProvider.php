@@ -128,7 +128,7 @@ class AgencyServiceProvider extends ServiceProvider
             Contracts\UserAchievementServiceInterface::class,
             function ($app) {
                 // Check if App\Contracts\UserAchievementContract exists and is bound
-                if (interface_exists(\App\Contracts\UserAchievementContract::class) 
+                if (interface_exists(\App\Contracts\UserAchievementContract::class)
                     && $app->bound(\App\Contracts\UserAchievementContract::class)) {
                     return $app->make(\App\Contracts\UserAchievementContract::class);
                 }

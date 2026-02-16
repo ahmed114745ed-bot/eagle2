@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('chat_messages', function (Blueprint $table) {
-           $table->dropColumn('duration');
+            $table->dropColumn('duration');
         });
     }
 };

@@ -1,4 +1,5 @@
 <?php
+
 namespace Utd\Chat\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;

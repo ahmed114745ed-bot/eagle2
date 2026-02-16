@@ -15,8 +15,8 @@ class ChatStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id'    => 'required|exists:users,id',
-            'message'    => 'nullable|string',
+            'user_id' => 'required|exists:users,id',
+            'message' => 'nullable|string',
             'message_id' => 'nullable|exists:chat_messages,id',
         ];
     }

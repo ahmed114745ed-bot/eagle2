@@ -2,6 +2,7 @@
 
 namespace Utd\Chat\Http\Repositories;
 
+use App\Models\User;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Chat\Entities\ChatRoom;
 
@@ -34,9 +35,9 @@ class ChatRepository
 
     public function findChatRoomForUser(int $userId, string $chatRoomId): ?ChatRoom
     {
-        return ChatRoom::where(function ($query) use ($userId, $chatRoomId) {
-                $query->where('user_id', $userId)->orWhere('user_id2', $userId);
-            })
+        return ChatRoom::where(function ($query) use ($userId) {
+            $query->where('user_id', $userId)->orWhere('user_id2', $userId);
+        })
             ->where('id', $chatRoomId)
             ->first();
     }
@@ -76,12 +77,17 @@ class ChatRepository
 
     public function updateDeletedTimestamp(ChatMessage $message, $userId)
     {
-        if ($message->user_id == $userId) {
+        if ($message->user_id === $userId) {
             $message->user_1_deleted = now();
         } else {
             $message->user_2_deleted = now();
         }
+
         return $message->save();
     }
 
+    public function getUserByUUID($uuid)
+    {
+        return User::where('uuid', $uuid)->first();
+    }
 }

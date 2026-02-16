@@ -2,12 +2,13 @@
 
 namespace Utd\Chat\Http\Services;
 
-use App\Models\GiftLog;
-use Utd\Room\Entities\Room;
 use App\Models\User;
+use App\Support\PackageHelper;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\Chat\Entities\ChatRoom;
 use Utd\Chat\Entities\MessageAlbum;
@@ -17,18 +18,13 @@ use Utd\Chat\Http\Resources\ChatMessageResource;
 use Utd\Chat\Http\Resources\ChatRoomResource;
 use Utd\Chat\Http\Resources\ChatRoomResourcePusher;
 use Utd\Chat\Jobs\SendMessageToAllUsers;
-use Illuminate\Database\Eloquent\Builder;
+use Utd\Room\Entities\Room;
 
 class ChatRoomService
 {
     /**
      * Handle the invitation logic.
      *
-     * @param array  $data
-     * @param int    $userId
-     * @param string $type
-     * @param array  $userIds
-     * @param array  $exceptIds
      * @return void
      */
     public function handleInvite(array $data, int $userId, string $type, array $userIds = [], array $exceptIds = [])
@@ -42,59 +38,30 @@ class ChatRoomService
         $this->countReel($data, $type, $userId, $userIds);
     }
 
-    public function countReel($data,  $type, $userId, $userIds)
+    public function countReel($data, $type, $userId, $userIds)
     {
+        if (! PackageHelper::isInstalled('reals')) {
+            return true;
+        }
+
         $parts = explode(':', str_replace("\n", ':', $data['message']));
         $reelId = $parts[4] ?? null;
-        $reel = Real::find($reelId);
-        if (!$reel) return true;
+        $reel = \Utd\Reals\Entities\Real::find($reelId);
+        if (! $reel) {
+            return true;
+        }
         $user = User::find($userId);
-        if ($type == 'all' && $userIds == null) {
+        if ($type === 'all' && $userIds === null) {
             $reel->share_num += $user->friend;
-        } elseif ($type == 'not' && $userIds != null) {
+        } elseif ($type === 'not' && $userIds !== null) {
             $reel->share_num += ($user->friend - count($userIds));
-        } elseif ($type == 'one') {
+        } elseif ($type === 'one') {
             $countUsers = count($userIds);
             $reel->share_num += $countUsers;
         }
         $reel->save();
+
         return true;
-    }
-
-    /**
-     * Invite all followers and followeds except specified IDs.
-     *
-     * @param int   $userId
-     * @param array $data
-     * @param array $exceptIds
-     * @return void
-     */
-    private function inviteToAll(int $userId, array $data, array $exceptIds)
-    {
-        User::query()
-            ->select('id')
-            ->whereHas('followers', fn($q) => $q->where('user_id', $userId))
-            ->whereHas('followeds', fn($q) => $q->where('followed_user_id', $userId))
-            ->whereNotIn('id', $exceptIds)
-            ->chunk(400, function ($users) use ($userId, $data) {
-                $userIds = $users->pluck('id')->toArray();
-                $this->sendMessageToUsers($userId, $userIds, $data);
-            });
-    }
-
-    /**
-     * Invite specific users.
-     *
-     * @param int   $userId
-     * @param array $data
-     * @param array $userIds
-     * @return void
-     */
-    private function inviteToSpecificUsers(int $userId, array $data, array $userIds)
-    {
-        if (!empty($userIds)) {
-            $this->sendMessageToUsers($userId, $userIds, $data);
-        }
     }
 
     public function sendMessageToUsers(int|string|null $userId, mixed $userIds, array $message): void
@@ -110,7 +77,7 @@ class ChatRoomService
 
     public function findUsersByName(string $name)
     {
-        return User::where('name', 'LIKE', '%' . $name . '%')
+        return User::where('name', 'LIKE', '%'.$name.'%')
             ->select('id', 'name')
             ->get();
     }
@@ -118,7 +85,7 @@ class ChatRoomService
     public function getChatRooms($user, $uuid)
     {
         $user = User::with('chats')->find($user->id);
-        if (!$user) {
+        if (! $user) {
             return [
                 'success' => false,
                 'message' => 'user not found',
@@ -132,8 +99,8 @@ class ChatRoomService
         // Get user chats (friends)
         $friends = ChatRoom::withCount([
             'messages as distinct_users_count' => function ($query) {
-                $query->select(DB::raw("COUNT(DISTINCT user_id)"));
-            }
+                $query->select(DB::raw('COUNT(DISTINCT user_id)'));
+            },
         ])->WhereHas('messages')
             ->select(
                 'chat_rooms.*',
@@ -232,7 +199,7 @@ class ChatRoomService
     public function getGUestChatRooms($user)
     {
         $user = User::with('chats')->find($user->id);
-        if (!$user) {
+        if (! $user) {
             return [
                 'success' => false,
                 'message' => 'user not found',
@@ -251,8 +218,8 @@ class ChatRoomService
             ->has('messages')
             ->withCount([
                 'messages as distinct_users_count' => function ($query) {
-                    $query->select(DB::raw("COUNT(DISTINCT user_id)"));
-                }
+                    $query->select(DB::raw('COUNT(DISTINCT user_id)'));
+                },
             ])
             ->having('distinct_users_count', '<', 2)
             // ->join('chat_messages', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
@@ -281,7 +248,6 @@ class ChatRoomService
         ];
     }
 
-
     public function getOrCreateChatRoom($user, $userId2)
     {
         // Find existing chat room or create a new one
@@ -296,7 +262,7 @@ class ChatRoomService
                 });
         })->first();
 
-        if (!$chatRoom) {
+        if (! $chatRoom) {
             $user2 = User::find($userId2);
             $type = 'guest';
             if ($user->followBack($user2)) {
@@ -327,7 +293,7 @@ class ChatRoomService
     {
         $chatRoom = ChatRoom::where('id', $id)->first();
 
-        if (!$chatRoom) {
+        if (! $chatRoom) {
             return false;
         }
 
@@ -344,7 +310,7 @@ class ChatRoomService
         return $chatRoom;
     }
 
-    public function getChatMessages($chatRoomId, $request = null, $user)
+    public function getChatMessages($chatRoomId, $request, $user)
     {
         // Get messages with reacts and albums for the chat room
         // $query = ChatMessage::where('chat_room_id', $chatRoomId)
@@ -369,16 +335,17 @@ class ChatRoomService
                                 $inner->whereNull('user_2_deleted');
                             });
                     })
-                    ->orWhere(function ($sub) use ($user) {
+                    ->orWhere(function ($sub) {
                         // If current user is receiver (user_2)
                         $sub->whereNotNull('user_1_deleted')->whereNotNull('user_2_deleted');
                     });
             });
 
         if ($request && $request->type && $request->message_id) {
-            if ($request->type == 'new') {
+            if ($request->type === 'new') {
                 return $query->where('id', '>', $request->message_id)->get();
-            } elseif ($request->type == 'old') {
+            }
+            if ($request->type === 'old') {
                 return $query->where('id', '<', $request->message_id)->paginate(request('per_page', 10));
             }
         }
@@ -398,7 +365,7 @@ class ChatRoomService
     public function getUserInChatRoom($checkRoom, $user)
     {
         // Get the second user in the chat room
-        return $checkRoom->user_id == $user->id
+        return $checkRoom->user_id === $user->id
             ? User::withTrashed()->find($checkRoom->user_id2)
             : User::withTrashed()->find($checkRoom->user_id);
     }
@@ -409,7 +376,7 @@ class ChatRoomService
         try {
             $roomResource = new ChatRoomResourcePusher($checkRoom);
             event(new OpenChat($roomResource->toResponse(request())->getData()->data, $user2 ?? $user, $checkRoom));
-        } catch (\Throwable $th) {
+        } catch (Throwable $th) {
 
             throw $th;
         }
@@ -420,7 +387,8 @@ class ChatRoomService
         $room = Room::where('id', $user2?->now_room_uid)->first();
         // $room = $user2?->nowRoom;
         $isHideRoom = $room?->owner->getPackWithType(16);
-        $room = !$isHideRoom ? $room : null;
+        $room = ! $isHideRoom ? $room : null;
+
         return [
             'room_owner_id' => $user2?->now_room_uid,
             'owner' => [
@@ -430,15 +398,14 @@ class ChatRoomService
             'has_password' => $room && $room->room_pass ? true : false,
             'room' => [
                 'id' => @$room->id ?? 0,
-                'name'  => @$room->room_name ?? '',
-                'image' =>  @$room->room_cover ?? '',
+                'name' => @$room->room_name ?? '',
+                'image' => @$room->room_cover ?? '',
                 'mode' => @$room->mode ?? 0,
                 'room_background' => @$room->final_room_image ?? '',
                 'exp' => @$room?->session_string,
-                "is_live" => @$room->is_live ?: false,
-                'stream_type'         =>  @$room->type ?? 'audio',
+                'is_live' => @$room->is_live ?: false,
+                'stream_type' => @$room->type ?? 'audio',
             ],
-
 
         ];
     }
@@ -449,14 +416,12 @@ class ChatRoomService
         return [
             'messages' => ChatMessageResource::collection($messages),
             'chat_room_id' => $checkRoom->id,
-            'user_now_room' => $roomData
+            'user_now_room' => $roomData,
         ];
     }
 
-
     public function deleteChatRoom($user, $userId2)
     {
-
 
         $checkRoom = ChatRoom::where(function ($query) use ($user, $userId2) {
             $query->where(function ($q) use ($user, $userId2) {
@@ -468,10 +433,10 @@ class ChatRoomService
             });
         })->first();
 
-        if (!$checkRoom) {
+        if (! $checkRoom) {
             return [
                 'status' => 404,
-                'message' => 'Chat not Found'
+                'message' => 'Chat not Found',
             ];
         }
 
@@ -480,23 +445,21 @@ class ChatRoomService
             return [$item->file, $item->frame];
         })->toArray();
 
-
-        if ($checkRoom->user_id == $user->id){
+        if ($checkRoom->user_id === $user->id) {
             $checkRoom->update(['user_1_deleted' => now()]);
         } else {
             $checkRoom->update(['user_2_deleted' => now()]);
         }
 
-
-        if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted){
+        if ($checkRoom->user_1_deleted && $checkRoom->user_2_deleted) {
             // Log::info("user_1_deleted &&  user_2_deleted ", [
 
             //     'checkRoom'    => $checkRoom,
             // ]);
             try {
-                Storage::disk('gcs')->deleteDirectory('Chat_' . env('APP_ENV') . '/chat_' . $checkRoom->id);
-            } catch (\Throwable $th) {
-                Log::error('Error deleting chat room storage: ' . $th->getMessage());
+                Storage::disk('gcs')->deleteDirectory('Chat_'.env('APP_ENV').'/chat_'.$checkRoom->id);
+            } catch (Throwable $th) {
+                Log::error('Error deleting chat room storage: '.$th->getMessage());
             }
 
             MessageAlbum::where('chat_room_id', $checkRoom->id)->delete();
@@ -512,7 +475,7 @@ class ChatRoomService
             ChatMessage::where('chat_room_id', $checkRoom->id)
                 ->chunk(200, function ($messages) use ($user) {
                     foreach ($messages as $msg) {
-                        if ($msg->user_id == $user->id) {
+                        if ($msg->user_id === $user->id) {
                             $msg->user_1_deleted = now();
                         } else {
                             $msg->user_2_deleted = now();
@@ -530,10 +493,9 @@ class ChatRoomService
         return [
             'status' => 200,
             'message' => 'Chat Deleted',
-            'midea' => $mideaStrings
+            'midea' => $mideaStrings,
         ];
     }
-
 
     public function acceptRequest($request)
     {
@@ -545,7 +507,7 @@ class ChatRoomService
             ->where('type', 'guest')
             ->first();
 
-        if (!$checkRoom) {
+        if (! $checkRoom) {
             return [
                 'status' => 404,
                 'message' => 'Chat not Found',
@@ -572,10 +534,10 @@ class ChatRoomService
 
         ChatRoom::query()
             ->select(['id', 'user_id', 'user_id2'])
-            ->where(fn(Builder $q) => $q->where('user_id', $userId)->whereIn('user_id2', $userIds))
-            ->orWhere(fn(Builder $q) => $q->where('user_id2', $userId)->whereIn('user_id', $userIds))
+            ->where(fn (Builder $q) => $q->where('user_id', $userId)->whereIn('user_id2', $userIds))
+            ->orWhere(fn (Builder $q) => $q->where('user_id2', $userId)->whereIn('user_id', $userIds))
             ->chunk(400, function ($chatRooms) use (&$userIds, $userId, $message, $url) {
-                $ids  = $chatRooms->pluck('user_id')->toArray();
+                $ids = $chatRooms->pluck('user_id')->toArray();
                 $ids2 = $chatRooms->pluck('user_id2')->toArray();
 
                 $allIds = array_unique(array_merge($ids, $ids2));
@@ -584,24 +546,24 @@ class ChatRoomService
 
                 $data = [];
                 foreach ($chatRooms as $chatRoom) {
-                    $userChatId = $chatRoom->user_id != $userId ? $chatRoom->user_id : $chatRoom->user_id2;
-                    $data[]     = [
+                    $userChatId = $chatRoom->user_id !== $userId ? $chatRoom->user_id : $chatRoom->user_id2;
+                    $data[] = [
                         'chat_room_id' => $chatRoom->id,
-                        'user_id'      => $userChatId,
-                        'message'      => $message,
-                        'status'       => 'received',
-                        'type'         => 'img',
-                        'file'         => $url,
-                        'created_at'   => now(),
-                        'updated_at'   => now(),
+                        'user_id' => $userChatId,
+                        'message' => $message,
+                        'status' => 'received',
+                        'type' => 'img',
+                        'file' => $url,
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
 
                 ChatMessage::insert($data);
             });
+
         return $userIds;
     }
-
 
     public function createNewChatRooms(mixed $userIds, int|string|null $userId): void
     {
@@ -610,13 +572,43 @@ class ChatRoomService
         foreach ($userIds as $userIdDiff) {
 
             $data[] = [
-                'user_id'  => $userId,
+                'user_id' => $userId,
                 'user_id2' => $userIdDiff,
             ];
         }
         $chunks = array_chunk($data, 1000);
         foreach ($chunks as $chunk) {
             ChatRoom::query()->insert($chunk);
+        }
+    }
+
+    /**
+     * Invite all followers and followeds except specified IDs.
+     *
+     * @return void
+     */
+    private function inviteToAll(int $userId, array $data, array $exceptIds)
+    {
+        User::query()
+            ->select('id')
+            ->whereHas('followers', fn ($q) => $q->where('user_id', $userId))
+            ->whereHas('followeds', fn ($q) => $q->where('followed_user_id', $userId))
+            ->whereNotIn('id', $exceptIds)
+            ->chunk(400, function ($users) use ($userId, $data) {
+                $userIds = $users->pluck('id')->toArray();
+                $this->sendMessageToUsers($userId, $userIds, $data);
+            });
+    }
+
+    /**
+     * Invite specific users.
+     *
+     * @return void
+     */
+    private function inviteToSpecificUsers(int $userId, array $data, array $userIds)
+    {
+        if (! empty($userIds)) {
+            $this->sendMessageToUsers($userId, $userIds, $data);
         }
     }
 }

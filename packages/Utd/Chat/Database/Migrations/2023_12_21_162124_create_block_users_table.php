@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('blocker_id')->nullable();
             $table->foreign('blocker_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
 
-
             $table->unsignedBigInteger('blocked_id')->nullable();
             $table->foreign('blocked_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
 

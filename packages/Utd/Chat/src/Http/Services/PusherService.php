@@ -10,7 +10,7 @@ class PusherService
 {
     protected $chatRoomRepo;
 
-    public function __construct( ChatRepository $chatRoomRepo)
+    public function __construct(ChatRepository $chatRoomRepo)
     {
         $this->chatRoomRepo = $chatRoomRepo;
     }
@@ -23,11 +23,11 @@ class PusherService
             $channelName = $parts[0];
             $userId = $parts[1];
 
-            if ($channelName == 'user') {
+            if ($channelName === 'user') {
                 $user = User::find($userId);
 
                 if ($user) {
-                    if ($eventName == 'channel_vacated') {
+                    if ($eventName === 'channel_vacated') {
                         // Mark user as offline
                         $this->setUserOffline($user);
                     } else {

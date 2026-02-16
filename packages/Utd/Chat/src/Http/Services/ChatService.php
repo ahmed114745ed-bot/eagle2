@@ -2,19 +2,19 @@
 
 namespace Utd\Chat\Http\Services;
 
-use Exception;
 use Carbon\Carbon;
-use Utd\Chat\Entities\ChatRoom;
 use Illuminate\Support\Facades\Event;
-use Utd\Chat\Events\DeleteMessage;
+use Utd\Chat\Entities\ChatRoom;
 use Utd\Chat\Events\CardDeleteMessage;
-use Utd\Chat\Http\Repositories\ChatRepository;
+use Utd\Chat\Events\DeleteMessage;
 use Utd\Chat\Http\Repositories\BlacklistRepository;
+use Utd\Chat\Http\Repositories\ChatRepository;
 use Utd\Chat\Http\Resources\ChatRoomResourcePusher;
 
 class ChatService
 {
     protected $chatRepository;
+
     protected $blacklistRepository;
 
     public function __construct(
@@ -29,6 +29,7 @@ class ChatService
     {
         return $this->chatRepository->getUserByUUID($uuid);
     }
+
     public function isUserBlocked($userId, $fromUserId)
     {
         return $this->blacklistRepository->isUserBlocked($userId, $fromUserId);
@@ -58,11 +59,11 @@ class ChatService
     {
         $message = $this->chatRepository->findChatMessageById($messageId);
 
-        if (!$message || $message->user_id !== $user->id) {
+        if (! $message || $message->user_id !== $user->id) {
             return ['status' => 404, 'message' => 'Unauthorized'];
         }
 
-        if (!$message->canBeEdited()) {
+        if (! $message->canBeEdited()) {
             return [
                 'status' => 404,
                 'message' => 'Deletion is permissible within 15 minutes after sending.',
@@ -70,25 +71,25 @@ class ChatService
         }
 
         $updatedMessage = $this->chatRepository->updateMessage($message, $newMessage);
+
         return $updatedMessage;
     }
-
 
     public function deleteMessages(array $ids, $user)
     {
         $chatRoomId = null;
 
         foreach ($ids as $id) {
-            $message = $this->chatRepository->findChatMessageById((int)$id);
+            $message = $this->chatRepository->findChatMessageById((int) $id);
 
-            if (!$message || $message->user_id !== $user->id) {
+            if (! $message || $message->user_id !== $user->id) {
                 return [
                     'status' => 404,
                     'message' => 'Unauthorized or message not found',
                 ];
             }
 
-            if (!Carbon::parse($message->created_at)->greaterThanOrEqualTo(now()->subDay())) {
+            if (! Carbon::parse($message->created_at)->greaterThanOrEqualTo(now()->subDay())) {
                 return [
                     'status' => 404,
                     'message' => 'Deletion is permissible within a day after sending.',
@@ -103,9 +104,6 @@ class ChatService
         }
 
         // $this->chatRepository->deleteMessages($ids);
-
-
-
 
         $chatRoom = ChatRoom::find($chatRoomId);
         $otherUser = $chatRoom->user_id === $user->id
@@ -128,7 +126,7 @@ class ChatService
         foreach ($ids as $id) {
             $message = $this->chatRepository->findChatMessageById($id);
 
-            if (!$message) {
+            if (! $message) {
                 return [
                     'status' => 404,
                     'message' => 'Message not found',
@@ -137,7 +135,7 @@ class ChatService
 
             $chatRoom = ChatRoom::find($message->chat_room_id);
 
-            if (!$chatRoom || ($chatRoom->user_id !== $user->id && $chatRoom->user_id2 !== $user->id)) {
+            if (! $chatRoom || ($chatRoom->user_id !== $user->id && $chatRoom->user_id2 !== $user->id)) {
                 return [
                     'status' => 404,
                     'message' => 'Unauthorized access to the message',

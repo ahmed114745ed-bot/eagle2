@@ -3,16 +3,14 @@
 namespace Utd\Chat\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Throwable;
 use Utd\Chat\Http\Requests\ReactStoreRequest;
 use Utd\Chat\Http\Services\ReactService;
 
 class ChatReactsController extends Controller
 {
+    public function __construct(public ReactService $reactService) {}
 
-    public function __construct(public ReactService $reactService)
-    {
-
-    }
     public function store(ReactStoreRequest $request)
     {
 
@@ -35,7 +33,7 @@ class ChatReactsController extends Controller
                 'message' => $response['message'],
             ]);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json(['status' => 500, 'error' => $e->getMessage()], 500);
         }
     }
