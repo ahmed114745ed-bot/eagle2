@@ -1163,3 +1163,7 @@ function reelsManager() {
         }
     }
 }
+
+if (typeof window !== 'undefined') {
+    window.reelsManager = window.reelsManager || reelsManager;
+}
