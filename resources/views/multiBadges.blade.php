@@ -349,9 +349,9 @@ $selectedLang = request()->input('tab', $defaultLang);
                         <div class="image-preview-modern">
 
                            
-                            {{-- <img src="{{ getImagePath($imageData->show_image ?? $defaultImageData?->show_image) }}" 
+                            <img src="{{ getImagePath($imageData->show_image ?? $defaultImageData?->show_image) }}" 
                                
-                                 loading="lazy"> --}}
+                                 loading="lazy">
 
                                  {!! handleShowImageWithTypes(
                                     $code . '_presentation',
