@@ -269,7 +269,9 @@ class GiftController extends MainController
 
         $selectedCategoryId = request('type') ?? $form->model()->gift_category_id;
         $categories = GiftCategory::where('id', $selectedCategoryId)->get();
-        //  dd($categories);
+          dd($categories
+          
+          ,request('type') , $form->model()->gift_category_id);
         $locale = App::getLocale();
 
         $form->html(view('admin.gift_type', [
