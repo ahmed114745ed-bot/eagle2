@@ -179,7 +179,7 @@ class MilestoneHelper
                 break;
 
             case 'badge':
-                UserCommon::removeBadgeFromUser($user, $rid, $receiveType);
+                UserCommon::removeBadgeFromUserByReceiverType($user, $rid, $receiveType);
                 break;
 
             case 'achievement':
