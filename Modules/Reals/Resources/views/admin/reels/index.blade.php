@@ -21,6 +21,11 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
+    @php
+        $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
+        $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
+    @endphp
+    <script data-exec-on-popstate src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
     <script data-exec-on-popstate>
         (function () {
             const updateNavbarLayout = () => {
@@ -1041,11 +1046,6 @@
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
-@php
-    $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
-    $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
-@endphp
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
 <script data-exec-on-popstate>
     (function () {
         const initReelsComponent = () => {
