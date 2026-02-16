@@ -1045,56 +1045,37 @@
     $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
     $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
 @endphp
+<script src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
 <script data-exec-on-popstate>
     (function () {
-        const scriptUrl = '{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}';
-
-        const initReelsAlpineTree = () => {
-            if (!window.Alpine) return;
-            const root = document.querySelector('.reels-main-container');
-            if (root) {
-                window.Alpine.initTree(root);
+        const initReelsComponent = () => {
+            const root = document.querySelector('.reels-main-container[x-data]');
+            if (!root || !window.Alpine || !window.reelsManager) {
+                return false;
             }
+
+            if (typeof window.Alpine.destroyTree === 'function' && root._x_dataStack) {
+                window.Alpine.destroyTree(root);
+            }
+
+            window.Alpine.initTree(root);
+            return true;
         };
 
-        const ensureReelsManagerLoaded = () => {
-            if (window.__reelsManagerBundleLoaded) {
-                initReelsAlpineTree();
-                return;
+        const retryUntilReady = () => {
+            if (!initReelsComponent()) {
+                setTimeout(retryUntilReady, 50);
             }
-
-            const existing = document.querySelector('script[data-reels-manager="true"]');
-            if (existing) {
-                if (existing.dataset.loaded === 'true') {
-                    window.__reelsManagerBundleLoaded = true;
-                    initReelsAlpineTree();
-                }
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = scriptUrl;
-            script.dataset.reelsManager = 'true';
-            script.onload = () => {
-                window.__reelsManagerBundleLoaded = true;
-                script.dataset.loaded = 'true';
-                initReelsAlpineTree();
-            };
-            document.head.appendChild(script);
-        };
-
-        const bootstrapReelsPage = () => {
-            ensureReelsManagerLoaded();
         };
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', bootstrapReelsPage, { once: true });
+            document.addEventListener('DOMContentLoaded', retryUntilReady, { once: true });
         } else {
-            bootstrapReelsPage();
+            retryUntilReady();
         }
 
         document.addEventListener('pjax:complete', () => {
-            setTimeout(bootstrapReelsPage, 0);
+            setTimeout(retryUntilReady, 0);
         });
     })();
 </script>
