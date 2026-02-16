@@ -315,42 +315,37 @@ class OvipGiftTapController extends MainController
             }
         }
 
-        // if ($isType18or21 || ($isEditing && $ware && in_array($ware->type, [18, 21]))) {
 
-
-        //     $form->color('color', trans('color'));
-
-        // }
 
         if ($isType18or21 || ($isEditing && $ware && in_array($ware->type, [18, 21]))) {
 
-            $form->html('
-                <div class="form-group">
-                    <label for="color">' . trans("color") . ':</label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="color" id="color" name="color"
-                            value="' . ($ware->color ?? '#ccc') . '"
-                            style="width: 50px; height: 45px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer;">
-                        <input type="text" id="color_text" class="form-control"
-                            value="' . ($ware->color ?? '#ccc') . '"
-                            placeholder="ادخل لون" style="flex: 1;" readonly>
-                    </div>
-                </div>
 
-                <script>
-                    const colorInput = document.getElementById("color");
-                    const colorText = document.getElementById("color_text");
-                    colorInput.addEventListener("input", function() {
-                        colorText.value = this.value;
-                    });
-                </script>
-            ');
+            $form->html('
+                    <div class="form-group">
+                        <label for="color">' . trans("color") . ':</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="color" name="color"
+                                value="' . ($ware->color ?? '#ccc') . '"
+                                style="width: 50px; height: 45px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer;">
+                            <input type="text" id="color_text" class="form-control"
+                                value="' . ($ware->color ?? '#ccc') . '"
+                                placeholder="ادخل لون" style="flex: 1;" readonly>
+                        </div>
+                    </div>
+
+                    <script>
+                        const colorInput = document.getElementById("color");
+                        const colorText = document.getElementById("color_text");
+                        colorInput.addEventListener("input", function() {
+                            colorText.value = this.value;
+                        });
+                    </script>
+                ');
         }
 
 
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
-
-
+            if (request('color')) $form->model()->color = request('color');
             if (isset($form->key_json) && is_array($form->key_json)) {
                 // Normalize posted structure to ['keys' => [...], 'values' => [...]]
                 // Handle both formats: the KeyValue widget posts ['keys'=>[], 'values'=>[]]
