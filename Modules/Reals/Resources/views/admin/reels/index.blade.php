@@ -14,8 +14,6 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" as="style">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" media="print" onload="this.media='all'">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Reels Styles -->
@@ -23,43 +21,12 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // إظهار navbar على الشاشات الصغيرة فقط
-            const nav = document.querySelector('.navbar');
-            const isMobile = window.innerWidth <= 768;
-            
-            if (nav) {
-                if (isMobile) {
-                    // إظهار navbar على الموبايل
-                    nav.classList.remove('navbar-hidden');
-                    nav.style.display = '';
-                } else {
-                    // إخفاء navbar على الديسكتوب
-                    if (!nav.classList.contains('navbar-hidden')) {
-                        nav.classList.add('navbar-hidden');
-                    }
-                }
-            }
-
-            const updateAppClassMargin = () => {
-                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+    <script data-exec-on-popstate>
+        (function () {
+            const updateNavbarLayout = () => {
+                const nav = document.querySelector('.navbar');
                 const isMobile = window.innerWidth <= 768;
-                
-                document.querySelectorAll('.app-class').forEach(el => {
-                    if (isMobile) {
-                        el.style.setProperty('margin-top', '50px', 'important');
-                    } else {
-                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
-                    }
-                });
-            };
 
-            updateAppClassMargin();
-            
-            // تحديث عند تغيير حجم الشاشة
-            window.addEventListener('resize', () => {
-                const isMobile = window.innerWidth <= 768;
                 if (nav) {
                     if (isMobile) {
                         nav.classList.remove('navbar-hidden');
@@ -68,9 +35,57 @@
                         nav.classList.add('navbar-hidden');
                     }
                 }
-                updateAppClassMargin();
-            }, { passive: true });
-        });
+
+                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                document.querySelectorAll('.app-class').forEach((el) => {
+                    if (window.innerWidth <= 768) {
+                        el.style.setProperty('margin-top', '50px', 'important');
+                    } else {
+                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    }
+                });
+            };
+
+            const initNavbarTweaks = () => {
+                updateNavbarLayout();
+
+                if (!window.__reelsNavbarResizeBound) {
+                    window.addEventListener('resize', updateNavbarLayout, { passive: true });
+                    window.__reelsNavbarResizeBound = true;
+                }
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initNavbarTweaks, { once: true });
+            } else {
+                initNavbarTweaks();
+            }
+
+            const ensureAdminGrid = () => {
+                if (window.$ && $.admin) {
+                    if (!$.admin.grid) {
+                        $.admin.grid = {
+                            selects: {},
+                            select(id) {
+                                this.selects[id] = id;
+                            },
+                            unselect(id) {
+                                delete this.selects[id];
+                            },
+                            selected() {
+                                return Object.keys(this.selects);
+                            },
+                        };
+                    }
+                }
+            };
+
+            ensureAdminGrid();
+            if (!window.__reelsEnsureAdminGridBound) {
+                document.addEventListener('pjax:complete', ensureAdminGrid);
+                window.__reelsEnsureAdminGridBound = true;
+            }
+        })();
     </script>
     <style>
                 .content-header,
@@ -1022,10 +1037,7 @@
 </div>
 
 <!-- Reels Data -->
-<script>
+<script data-exec-on-popstate>
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
-
-<!-- Reels Manager Script -->
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}"></script>
