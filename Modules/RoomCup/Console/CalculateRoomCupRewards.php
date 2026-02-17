@@ -43,7 +43,6 @@ class CalculateRoomCupRewards extends Command
             return EnumCommand::SUCCESS;
         }
         [$start, $end] = $this->getPeriodByType($type);
-        Log::info("Starting RoomCup rewards calculation for period: {$start} to {$end}");
  
 
         $this->logStart($start, $end);

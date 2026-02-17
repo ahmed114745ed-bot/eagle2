@@ -27,7 +27,6 @@ class SetDataFromJob extends Command
 
             $value = null;
 
-            Log::info('Processing Redis key: ' . $cleanKey . ' of type: ' . $type);
             if ($type == 'string') {
                 $value = Redis::get($cleanKey);
                 if ($value !== false || $value === 'b:0;') {

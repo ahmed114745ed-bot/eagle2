@@ -390,11 +390,6 @@ class RoomController extends Controller
             ->first()?->partner;
         $json = $this->cpMapJson([]);
 
-        Log::info('CP Partner Found quite room', [
-            'auth_user_id'   => $user->id,
-            'partner_id'     => $partner->id,
-            'partner_room'   => $partner->now_room_uid,
-        ]);
         if ($partner) Common::sendToZego('SendCustomCommand', @$partner->now_room_uid, $partner->id, $json);
     }
 
