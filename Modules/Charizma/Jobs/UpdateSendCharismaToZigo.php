@@ -49,22 +49,16 @@ class UpdateSendCharismaToZigo implements ShouldQueue
             ->first();
 
         if (!$room) {
-            Log::warning('UpdateSendCharismaToZigo: Room not found', ['roomId' => $this->roomId]);
             return;
         }
 
         if (!$room->charizma_status) {
-            Log::info('UpdateSendCharismaToZigo: Charizma disabled for room', ['roomId' => $this->roomId]);
             return;
         }
 
         $data = (new UserCharismaService())->addTotalEarnedCoinsInUserRoom($room, $this->userIds, $this->earnedCoinsPerUser);
 
         if (empty($data)) {
-            Log::info('UpdateSendCharismaToZigo: No charisma data to send', [
-                'roomId' => $this->roomId,
-                'userIds' => $this->userIds,
-            ]);
             return;
         }
 

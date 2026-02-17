@@ -47,8 +47,6 @@ class MilestoneJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info("Starting MilestoneJob for milestone ID: {$this->milestoneId}");
-
         $milestone = Milestone::with('rewards')->findOrFail($this->milestoneId);
         
         $usersQuery = match ($milestone->slug) {
@@ -63,7 +61,6 @@ class MilestoneJob implements ShouldQueue
         };
 
         $totalUsers = $usersQuery->count();
-        Log::info("Processing milestone '{$milestone->slug}' for {$totalUsers} users");
 
         $processedCount = 0;
         $failedCount = 0;
@@ -88,13 +85,6 @@ class MilestoneJob implements ShouldQueue
                 }
             }
         });
-
-        Log::info("MilestoneJob completed", [
-            'milestone_id' => $this->milestoneId,
-            'milestone_slug' => $milestone->slug,
-            'processed' => $processedCount,
-            'failed' => $failedCount,
-        ]);
     }
 
     /**
