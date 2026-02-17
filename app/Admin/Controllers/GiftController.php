@@ -473,6 +473,14 @@ class GiftController extends MainController
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+        
+        // Calculate next sort value for new gifts
+        $nextSort = 0;
+        if (!$id && $selectedCategoryId) {
+            $maxSort = Gift::where('gift_category_id', $selectedCategoryId)->max('sort');
+            $nextSort = ($maxSort ?? 0) + 1;
+        }
+        $form->number('sort', __('Sort'))->default($nextSort)->help(__('Lower numbers appear first'));
 
 
         $form->file('img', __('img'))->name(function ($file) {
@@ -516,7 +524,25 @@ class GiftController extends MainController
 
             if (request()->has('_edit_inline')) return;
 
+            // Handle sort shifting to avoid duplicates
+            $newSort = (int) $form->input('sort');
             $categoryId = $form->input('gift_category_id');
+            $currentId = $form->model()->id;
+            
+            if ($categoryId && $newSort > 0) {
+                // Check if sort value exists in the same category
+                $query = Gift::where('gift_category_id', $categoryId)
+                    ->where('sort', '>=', $newSort);
+                
+                // Exclude current gift if editing
+                if ($currentId) {
+                    $query->where('id', '!=', $currentId);
+                }
+                
+                // Shift all gifts with sort >= newSort
+                $query->increment('sort');
+            }
+
             $category = GiftCategory::find($categoryId);
             $type = $category?->type;
 
