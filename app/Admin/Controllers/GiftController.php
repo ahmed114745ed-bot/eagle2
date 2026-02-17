@@ -473,6 +473,7 @@ class GiftController extends MainController
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
+        $form->number('sort', __('Sort'))->default(0)->help(__('Lower numbers appear first'));
 
 
         $form->file('img', __('img'))->name(function ($file) {
