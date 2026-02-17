@@ -108,7 +108,7 @@ class CoinService
                 $Active = config('is_utd_paymob_active');
                 if (! $Active) return Common::apiResponse(0, __('This payment method is currently unavailable. Please choose another one.'), null, 400);
                 $paymobService = new PaymobPaymentService();
-                $exterData = ["type" => 'charge_coin', 'paymentType' => "expenses"];
+                $exterData = ["type" => 'charge_coin', 'paymentType' => "expenses", 'payment_method' => 'wallet'];
 
                 $paymentUrl = $paymobService->makePayment($log->trx, $coin->usd, $exterData);
                 if (isset($response['status']) && $paymentUrl['status']  == 0) {
