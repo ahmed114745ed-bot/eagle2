@@ -58,7 +58,7 @@ class MallController extends Controller
         $merged[] = [
             'id' => 0,
             'image_type' => 'png',
-            'key_json' => [],
+            'key_json' => (object)[],
             'image' => 'wappel.png',
             'img' => 'wappel.png',
         ];
