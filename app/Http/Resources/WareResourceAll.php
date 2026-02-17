@@ -18,7 +18,7 @@ class WareResourceAll extends JsonResource
             'image'     =>  $this->show_img == null ? '' : $this->show_img,
             'img'       =>  @($this->img2 == null ? $this->img1 : $this->img2) ?? '',
             'image_type' => $this->image_type ?? "",
-            'key_json'  => empty($this->key_json) ? [] : $this->key_json,
+            'key_json'  => empty($this->key_json) ? (object)[] : $this->key_json,
         ];
     }
 }
