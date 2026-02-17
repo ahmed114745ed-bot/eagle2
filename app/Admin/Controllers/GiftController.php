@@ -24,6 +24,8 @@ use App\Models\Setting;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Auth\Permission;
 use App\Admin\Services\FileService;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class GiftController extends MainController
 {
@@ -117,12 +119,14 @@ class GiftController extends MainController
             ->with('vip')
             ->where('type', '!=', 8)
             ->when($filterType !== 'all', fn($q) => $q->where('gift_category_id', $filterType))
-            // ->orderByDesc('enable')   // 1️⃣ enabled first
-            // ->orderBy('sort', 'asc');
+            ->orderByRaw('ISNULL(`sort`), `sort` ASC')
             ->orderBy('use_count', 'desc')
-            ->orderBy('type')
-            ->orderByRaw('ISNULL(`sort`), `sort`')
             ->orderBy('price');
+        
+        // Enable drag-drop sorting only when filtering by category
+        if ($filterType !== 'all') {
+            $grid->sortable();
+        }
 
         $grid->paginate(20);
         $grid->header(function () use ($filterType) {
@@ -223,7 +227,87 @@ class GiftController extends MainController
             $batch->disableDelete();
             $batch->add(new MoveGroupsGifts());
         });
-        if (request('filter')) {
+        if (request('filter') && request('filter') !== 'all') {
+            $grid->tools(function ($tools) use ($filterType) {
+                $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
+                
+                // Add JavaScript for custom drag-drop handling per category
+                $tools->append('
+                <script>
+                $(document).ready(function() {
+                    console.log("🎁 Gift sortable initialized for category: ' . $filterType . '");
+                    
+                    // Clear cache before sorting starts
+                    $(".grid-sortable tbody").on("sortstart", function(event, ui) {
+                        console.log("⚡ Sort started - clearing cache...");
+                        $.ajax({
+                            url: "/admin/gifts/clear-cache",
+                            method: "POST",
+                            data: { _token: LA.token },
+                            async: false
+                        });
+                    });
+                    
+                    // Intercept save order button
+                    $(document).on("click", ".grid-save-order", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        console.log("💾 Saving gift order...");
+                        
+                        var $btn = $(this);
+                        var sorts = [];
+                        
+                        // Collect sort data
+                        $(".grid-sortable tbody tr").each(function(index) {
+                            sorts.push({
+                                id: $(this).data("id"),
+                                sort: index + 1
+                            });
+                        });
+                        
+                        console.log("📊 Sort data:", sorts);
+                        
+                        // Send to custom endpoint
+                        $.ajax({
+                            url: "/admin/gifts/sort-update",
+                            method: "POST",
+                            data: {
+                                _token: LA.token,
+                                _sort: sorts,
+                                category_id: "' . $filterType . '"
+                            },
+                            cache: false,
+                            headers: {
+                                "Cache-Control": "no-cache, no-store, must-revalidate",
+                                "Pragma": "no-cache",
+                                "Expires": "0"
+                            },
+                            success: function(response) {
+                                console.log("✅ Sort saved:", response);
+                                toastr.success(response.message || "تم حفظ الترتيب بنجاح");
+                                
+                                // Force reload after 1 second to ensure fresh data
+                                setTimeout(function() {
+                                    console.log("🔄 Force reloading...");
+                                    location.reload(true);
+                                }, 1000);
+                            },
+                            error: function(xhr) {
+                                console.error("❌ Sort failed:", xhr);
+                                toastr.error("فشل حفظ الترتيب");
+                            }
+                        });
+                        
+                        return false;
+                    });
+                    
+                    console.log("✅ Gift sortable handlers ready");
+                });
+                </script>
+                ');
+            });
+        } elseif (request('filter')) {
             $grid->tools(function ($tools) {
                 $tools->append('<a href="' . admin_url('gifts/' . request('filter') . '/create') . '" class="btn btn-sm btn-default">' . __('create') . '</a>');
             });
@@ -232,6 +316,109 @@ class GiftController extends MainController
         $grid->disableCreateButton();
 
         return $grid;
+    }
+    
+    /**
+     * Clear cache for Octane (called from JavaScript before sorting)
+     */
+    public function clearCache()
+    {
+        try {
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
+            }
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'Cache cleared'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+    
+    /**
+     * Handle sort update from grid-sortable extension
+     */
+    public function sortUpdate()
+    {
+        $sorts = request()->input('_sort');
+        $categoryId = request()->input('category_id');
+        
+        if (empty($sorts)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No sort data provided'
+            ]);
+        }
+        
+        try {
+            // Clear ALL caches before updating
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            // Use DB transaction for atomicity
+            DB::beginTransaction();
+            
+            $updated = 0;
+            foreach ($sorts as $sort) {
+                // Use raw DB query to bypass Eloquent caching
+                $result = DB::table('gifts')
+                    ->where('id', $sort['id'])
+                    ->when($categoryId, fn($q) => $q->where('gift_category_id', $categoryId))
+                    ->update([
+                        'sort' => $sort['sort'],
+                        'updated_at' => now()
+                    ]);
+                $updated += $result;
+            }
+            
+            DB::commit();
+            
+            // Clear all caches after updating
+            Cache::flush();
+            \Artisan::call('cache:clear');
+            
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+            }
+            
+            // Force PHP to clear stat cache
+            if (function_exists('clearstatcache')) {
+                clearstatcache(true);
+            }
+            
+            return response()->json([
+                'status' => true,
+                'message' => 'تم تحديث ترتيب الهدايا بنجاح'
+            ])->withHeaders([
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'status' => false,
+                'message' => 'فشل تحديث الترتيب: ' . $e->getMessage()
+            ]);
+        }
     }
 
 
