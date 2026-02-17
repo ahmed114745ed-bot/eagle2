@@ -473,7 +473,14 @@ class GiftController extends MainController
 
         $form->currency('price', __('price'))->symbol('💎');
         $form->switch('enable', __('enable'))->states(Common::getSwitchStates());
-        $form->number('sort', __('Sort'))->default(0)->help(__('Lower numbers appear first'));
+        
+        // Calculate next sort value for new gifts
+        $nextSort = 0;
+        if (!$id && $selectedCategoryId) {
+            $maxSort = Gift::where('gift_category_id', $selectedCategoryId)->max('sort');
+            $nextSort = ($maxSort ?? 0) + 1;
+        }
+        $form->number('sort', __('Sort'))->default($nextSort)->help(__('Lower numbers appear first'));
 
 
         $form->file('img', __('img'))->name(function ($file) {
