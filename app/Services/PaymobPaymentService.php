@@ -60,6 +60,7 @@ class PaymobPaymentService
         $signature = hash('sha256', $syn);
 
         $data = [
+            "payment_method" => "wallet",
             "merchantCode" => $merchantCode,
             "merchantRefNum" => $merchantRefNum,
             "language" => "en-gb",
