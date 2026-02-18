@@ -18,6 +18,10 @@ Route::group(
     ],
     function () {
         Route::resource('room_boom_levels', RoomBoomLevelController::class);
+        Route::prefix('room_boom-theme')->group(function () {
+            Route::get('/{level_id}', [RoomBoomLevelController::class, 'editBackgroundImage']);
+            Route::put('/{level_id}', [RoomBoomLevelController::class, 'updateBackgroundImage']);
+        });
         Route::resource('super-boom-rules', SuperBoomRuleController::class);
         Route::get('room_boom_winners', [RoomBoomWinnerController::class, 'index']);
 
