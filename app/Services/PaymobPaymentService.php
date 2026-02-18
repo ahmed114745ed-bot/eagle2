@@ -88,7 +88,7 @@ class PaymobPaymentService
         $returnUrl = url(config("services.utd_paymob.utd_paymob_return_url"));
         $orderId = 'ORDER-' . time();
         $price = number_format($amount, 2, '.', '');
-        
+
         $syn = $merchantCode . $orderId . "" . $returnUrl . $orderId . "1" . $price . $secure_key;
         $signature = hash('sha256', $syn);
 
@@ -118,11 +118,8 @@ class PaymobPaymentService
             ],
         ];
 
-        info('Paymob Payment Link Request', ['url' => $baseUrl, 'data' => $data]);
-
         $response = Http::post($baseUrl, $data);
 
-        info('Paymob Payment Link Response', ['response' => $response->body()]);
         return json_decode($response, true);
     }
 }

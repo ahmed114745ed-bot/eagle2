@@ -110,6 +110,77 @@ class PaymentMethodController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.'], 400);
     }
 
+    /**
+     * Handle PayMob callback forwarded from UTD
+     */
+    public function utdPayMobCallback(Request $request): JsonResponse
+    {
+        $webhookData = $request->all();
+        info('UTD PayMob Callback received', $webhookData);
+
+        $obj = $webhookData['obj'] ?? [];
+        $order = $obj['order'] ?? [];
+
+        $success = $obj['success'] ?? false;
+        $transactionId = $obj['id'] ?? null;
+        $amountCents = $obj['amount_cents'] ?? 0;
+
+        // Get merchant_order_id - could be in order or in items name
+        $merchantOrderId = $order['merchant_order_id'] ?? null;
+
+        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 872504210283505906")
+        if (!$merchantOrderId && !empty($order['items'])) {
+            $itemName = $order['items'][0]['name'] ?? '';
+            if (preg_match('/- (\w+)$/', $itemName, $matches)) {
+                $merchantOrderId = $matches[1];
+            }
+        }
+
+        if (!$merchantOrderId) {
+            return response()->json(['status' => 'error', 'message' => 'Missing merchant order ID'], 400);
+        }
+
+        // Find the coin log by trx
+        $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
+        $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
+
+        if (!$coinLog && !$paymentMethod) {
+            return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
+        }
+
+        if ($success) {
+            if ($coinLog) {
+                $this->webhookPayment($coinLog->id);
+                $coinLog->pid = $transactionId;
+                $coinLog->save();
+            }
+
+            if ($paymentMethod) {
+                $paymentMethod->status = 'paid';
+                $paymentMethod->ref_code = $transactionId;
+                $paymentMethod->save();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Payment successful',
+                'transaction_id' => $transactionId,
+                'amount' => $amountCents / 100,
+            ]);
+        }
+
+        if ($paymentMethod) {
+            $paymentMethod->status = 'failed';
+            $paymentMethod->save();
+        }
+
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Payment failed',
+            'transaction_id' => $transactionId,
+        ], 400);
+    }
+
     public function success(Request $request): JsonResponse
     {
         try {
