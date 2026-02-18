@@ -453,9 +453,10 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
+            $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
             
             $query = Ware::where('level', $level)
-                ->where('type', $form->type)
+                ->where('type', $type)
                 ->where('get_type', 1);
             
             // Exclude current record when editing (use !== null for proper null check)
@@ -472,7 +473,7 @@ class OvipGiftTapController extends MainController
                 ]);
             }
 
-            if (!in_array(request('type'), [18, 21])) {
+            if (!in_array($type, [18, 21])) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
                 $final = $profileFrameType ?? $imageType1;

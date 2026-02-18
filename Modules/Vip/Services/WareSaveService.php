@@ -46,9 +46,11 @@ class WareSaveService
     protected function ensureUniqueCombination($form)
     {
         $id = $form->model()->id;
+        $level = $form->model()->level;
+        $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
 
-        $query = Ware::where('level', $form->model()->level)
-            ->where('type', $form->type)
+        $query = Ware::where('level', $level)
+            ->where('type', $type)
             ->where('get_type', 1);
 
         // Exclude current record when editing (use !== null instead of when() for proper null check)
