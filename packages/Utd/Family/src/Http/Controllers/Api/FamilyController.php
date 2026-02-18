@@ -86,6 +86,9 @@ class FamilyController extends Controller
     public function store(Request $request)
     {
         $user = $request->user();
+        if (!$user) {
+            return family_helper('common')::apiResponse(0, 'Unauthorized', null, 401);
+        }
 
         $family_price = family_helper('common')::getConfig('family_price');
         if (!isset($family_price)) {
