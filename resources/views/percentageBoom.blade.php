@@ -1,5 +1,5 @@
 
-<form action="{{ url('admin/room-boom.save') }}" method="POST" enctype="multipart/form-data">
+<form action="{{ url('admin/room-boom/save') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     @foreach($percentages as $percentage)
