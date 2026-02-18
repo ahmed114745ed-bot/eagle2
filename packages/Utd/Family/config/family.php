@@ -27,7 +27,7 @@ return [
         'configes_model' => \App\Models\configesModel::class,
     ],
     'helpers' => [
-        'common' => \App\helper\Common::class,
+        'common' => \App\Helpers\Common::class,
         'custom_notification' => \App\Classes\CustomNotification::class,
         'user_coin_log' => \App\Helpers\UserCoinLogHelper::class,
         'agency_package' => \App\Helpers\AgencyPackageHelper::class,
