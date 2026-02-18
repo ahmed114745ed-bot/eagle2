@@ -2,18 +2,18 @@
 
 namespace App\Helpers;
 
-use App\Models\Gift;
-use App\Models\User;
 use App\Models\Agency;
-use Utd\Family\Entities\Family;
-use Modules\Vip\Entities\Vip;
-use Illuminate\Support\Facades\DB;
-use App\Models\UserOfficialMessage;
-use Modules\Moment\Entities\Moment;
+use App\Models\Gift;
 use App\Models\OfficialMessageAdmin;
-use Illuminate\Support\Facades\Lang;
+use App\Models\User;
+use App\Models\UserOfficialMessage;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Modules\Moments\Entities\Moment;
 use Modules\Public\Http\Services\UserCounterServices;
+use Modules\Vip\Entities\Vip;
+use App\Support\FamilyPackage;
 
 class CustomNotification
 {
@@ -288,7 +288,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($receiver, 'official-messages');
     }
 
-    public function removeFamilyUser(Family $family, User $user)
+    public function removeFamilyUser($family, User $user)
     {
         $tokens_notification = $user?->notification_id;
         $lang = $user->lan ?? 'en';
@@ -300,7 +300,7 @@ class CustomNotification
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function adminFamily(Family $family, User $user)
+    public function adminFamily($family, User $user)
     {
         $tokens_notification = $user?->notification_id;
         $lang = $user->lan ?? 'en';
@@ -654,7 +654,16 @@ class CustomNotification
 
     public function familyLevelUpgrade(int $familyId)
     {
-        $family = Family::query()->with(['users' => fn($query) => $query->withoutAppends()->select(['users.id', 'notification_id', 'lan'])])->where('families.id', $familyId)->first();
+        $familyQuery = FamilyPackage::newQuery('family');
+
+        if (!$familyQuery) {
+            return 0;
+        }
+
+        $family = $familyQuery
+            ->with(['users' => fn($query) => $query->withoutAppends()->select(['users.id', 'notification_id', 'lan'])])
+            ->where('families.id', $familyId)
+            ->first();
         if (!$family) {
             return 0;
         }

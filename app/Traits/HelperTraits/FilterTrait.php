@@ -7,7 +7,7 @@ namespace App\Traits\HelperTraits;
 use Modules\Vip\Entities\OVip;
 use App\Models\User;
 use App\Models\Agency;
-use Utd\Family\Entities\Family;
+use App\Support\FamilyPackage;
 
 trait FilterTrait
 {
@@ -45,7 +45,12 @@ trait FilterTrait
     public static function by_family_filter()
     {
         $ops = [0 => 'no family'];
-        $families = Family::query()->where('status', 1)->get();
+        $families = FamilyPackage::newQuery('family')?->where('status', 1)->get();
+
+        if (!$families) {
+            return $ops;
+        }
+
         foreach ($families as $family) {
             $ops[$family->id] = $family->name;
         }

@@ -8,9 +8,9 @@ use App\Models\UserSetting;
 use App\Models\Ware;
 use App\Models\Follow;
 use App\Models\BlackList;
-use Utd\Family\Entities\FamilyUser;
 use App\Models\Report_user;
 use App\Models\AgencyJoinRequest;
+use App\Support\FamilyPackage;
 
 class UserObserver
 {
@@ -49,7 +49,9 @@ class UserObserver
         $user->ownerRoom()->delete();
         //        $user->carousels()->delete();
         //        Agency::where('owner_id',$user->id)->delete();
-        FamilyUser::where('user_id', $user->id)->delete();
+        FamilyPackage::call('family_user', function (string $class) use ($user) {
+            $class::query()->where('user_id', $user->id)->delete();
+        });
         Pack::where('user_id', $user->id)->delete();
         Report_user::where('user_id', $user->id)->delete();
         Follow::where('user_id', $user->id)->orWhere('followed_user_id', $user->id)->delete();
@@ -63,7 +65,9 @@ class UserObserver
         $user->ownerRoom()->delete();
         //        $user->carousels()->delete();
         //        Agency::where('owner_id',$user->id)->delete();
-        FamilyUser::where('user_id', $user->id)->delete();
+        FamilyPackage::call('family_user', function (string $class) use ($user) {
+            $class::query()->where('user_id', $user->id)->delete();
+        });
         Pack::where('user_id', $user->id)->delete();
         Report_user::where('user_id', $user->id)->delete();
         Follow::where('user_id', $user->id)->orWhere('followed_user_id', $user->id)->delete();

@@ -9,11 +9,10 @@ use App\Models\Ware;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use App\Models\TimeLog;
-use Utd\Family\Entities\FamilyUser;
-use Utd\Family\Entities\FamilyLevel;
 use App\Facades\UserHandling;
 use App\Models\Config;
 use App\Models\UserSetting;
+use App\Support\FamilyPackage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,36 +24,48 @@ class MyDataResource extends JsonResource
         $f = null;
 
         if ($family) {
-            $fu = FamilyUser::where('family_id', $family->id)->where('status', 1)->count();
+            $familyUserCount = FamilyPackage::call('family_user', function (string $class) use ($family) {
+                return $class::query()->where('family_id', $family->id)->where('status', 1)->count();
+            }, 0);
+
             $giftLogs = GiftLog::where(function ($q) {
                 $q->where('receiver_family_id', $this->id)->orWhere('sender_family_id', $this->id);
             })->sum('giftPrice');
 
-            $cur_level = FamilyLevel::where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
-            $next_level = FamilyLevel::where('exp', '>', $giftLogs)->orderBy('exp')->first();
+            $levelQuery = FamilyPackage::newQuery('family_level');
+            $cur_level = $levelQuery?->where('exp', '<=', $giftLogs)
+                ->orderByDesc('exp')
+                ->first();
+            $next_level = FamilyPackage::newQuery('family_level')?->where('exp', '>', $giftLogs)
+                ->orderBy('exp')
+                ->first();
 
             $min_exp = @$cur_level->exp ?: 0;
             $over = $giftLogs - $min_exp;
-            $diff = @$next_level->exp - @$cur_level->exp;
-            $lev = [
-                'level_exp' => (integer)$cur_level->exp ?: 0,
-                'level_name' => @$cur_level->name ?: '',
-                'level_img' => @$cur_level->img ?: '',
-                'family_exp' => (integer)$giftLogs,
-                'over_current_level_exp' => (integer)$over,
-                'next_exp' => (integer)$next_level->exp,
-                'next_name' => @$next_level->name,
-                'next_img' => @$next_level->img,
-                'per' => $diff == 0 ? 0 : (double)($over / $diff),
-                'rem' => (integer)($diff - $over)
-            ];
+            $diff = (@$next_level->exp ?? 0) - (@$cur_level->exp ?? 0);
+            $lev = null;
+
+            if ($cur_level) {
+                $lev = [
+                    'level_exp' => (int)($cur_level->exp ?? 0),
+                    'level_name' => $cur_level->name ?? '',
+                    'level_img' => $cur_level->img ?? '',
+                    'family_exp' => (int)$giftLogs,
+                    'over_current_level_exp' => (int)$over,
+                    'next_exp' => (int)($next_level->exp ?? 0),
+                    'next_name' => $next_level->name ?? null,
+                    'next_img' => $next_level->img ?? null,
+                    'per' => $diff == 0 ? 0 : (double)($over / $diff),
+                    'rem' => (int)($diff - $over)
+                ];
+            }
 
             $f = [
                 'owner_id' => $family->user_id,
                 'family_name' => $family->name,
                 'max_num' => $family->num,
                 'img' => $family->image,
-                'members_num' => $fu,
+                'members_num' => $familyUserCount,
                 'level' => $lev
             ];
         }

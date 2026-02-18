@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Models\Bd;
 use App\Models\User;
 use App\Models\Agency;
-use Utd\Family\Entities\Family;
+use App\Support\FamilyPackage;
 use App\Helpers\Common;
 use Illuminate\Bus\Queueable;
 use Utd\Agency\Entities\ShippingAgency;
@@ -194,7 +194,13 @@ class OfficialMessageJob implements ShouldQueue
                 }
             }
         } elseif ($feature && $feature === 'family') {
-            $families = Family::query()
+            $familiesQuery = FamilyPackage::newQuery('family');
+
+            if (!$familiesQuery) {
+                return;
+            }
+
+            $families = $familiesQuery
                 ->when($subFeature === 'country', function ($q) use ($featureIds) {
                     $q->whereHas('owner', fn($query) => $query->whereIn('country_id', $featureIds));
                 })

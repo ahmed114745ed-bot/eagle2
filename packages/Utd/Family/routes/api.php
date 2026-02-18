@@ -27,6 +27,7 @@ Route::prefix('api/families')->middleware($familiesApiMiddleware)->group(functio
     Route::post('exitFamily', [FamilyController::class, 'exitFamily']);
 });
 
+
 // Utd Custom Dashboard Routes
 Route::prefix('utd/families')->middleware($utdApiMiddleware)->group(function () {
     Route::get('/', [UtdFamilyController::class, 'index']);

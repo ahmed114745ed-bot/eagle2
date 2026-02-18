@@ -7,9 +7,8 @@ use App\Http\Resources\CountryResource;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\Country;
-use Utd\Family\Entities\Family;
-use Utd\Family\Entities\FamilyUser;
 use App\Models\Pack;
+use App\Support\FamilyPackage;
 use Utd\Room\Entities\Room;
 use App\Models\Ware;
 use Carbon\Carbon;
@@ -62,7 +61,7 @@ class UserResourceUserInfo extends JsonResource
         }
 
         $f = null;
-        $family = Family::query ()->where ('id',@$this->family_id)->first ();
+        $family = FamilyPackage::newQuery('family')?->where('id', @$this->family_id)->first();
         if ($family){
             $f = [
                 'owner_id'      => $family->user_id,

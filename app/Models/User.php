@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\Common;
 use App\Helpers\UserPackHelper;
 use App\Models\Config as ConfigModel;
+use App\Support\FamilyPackage;
 use App\Support\PackageHelper;
 use App\Traits\DynamicAchievementTrait;
 use App\Traits\DynamicRealsTrait;
@@ -40,8 +41,6 @@ use Modules\UsersWallet\Entities\UserWallet;
 use Modules\Vip\Entities\OVip;
 use Modules\Vip\Entities\UserVip;
 use Modules\Vip\Entities\Vip;
-use Utd\Family\Entities\Family;
-use Utd\Family\Entities\FamilyUser;
 use Utd\Moments\Entities\Moment;
 use Utd\Room\Entities\RequestBackgroundImage;
 use Utd\Room\Entities\Room;
@@ -692,7 +691,7 @@ class User extends Authenticatable
     // Dashboard Relations
     public function user_family()
     {
-        return $this->hasOne(Family::class, 'user_id');
+        return FamilyPackage::relation($this, 'hasOne', 'family', ['user_id']);
     }
 
     public function getIsFamilyAdminAttribute()
@@ -700,7 +699,10 @@ class User extends Authenticatable
         if (self::$withoutAppends) {
             return;
         }
-        $family_user = FamilyUser::query()->where('user_id', $this->id)->where('status', 1)->first();
+        $family_user = FamilyPackage::call('family_user', function (string $class) {
+            return $class::query()->where('user_id', $this->id)->where('status', 1)->first();
+        });
+
         if ($family_user) {
             if ($family_user->user_type === 1) {
                 return true;
@@ -717,7 +719,9 @@ class User extends Authenticatable
         if (self::$withoutAppends) {
             return;
         }
-        $family = Family::query()->where('user_id', $this->id)->exists();
+        $family = FamilyPackage::call('family', function (string $class) {
+            return $class::query()->where('user_id', $this->id)->exists();
+        }, false);
         if ($family) {
             return true;
         }
@@ -850,7 +854,7 @@ class User extends Authenticatable
 
     public function familyType()
     {
-        return $this->hasOne(FamilyUser::class, 'user_id', 'id');
+        return FamilyPackage::relation($this, 'hasOne', 'family_user', ['user_id', 'id']);
     }
 
     public function tags()
@@ -1110,7 +1114,7 @@ class User extends Authenticatable
 
     public function family()
     {
-        return $this->belongsTo(Family::class, 'family_id');
+        return FamilyPackage::relation($this, 'belongsTo', 'family', ['family_id']);
     }
 
 
@@ -1923,7 +1927,7 @@ class User extends Authenticatable
 
     public function hasFamily()
     {
-        return $this->belongsTo(Family::class, 'family_id');
+        return $this->family();
     }
     public function bdSalaries()
     {
