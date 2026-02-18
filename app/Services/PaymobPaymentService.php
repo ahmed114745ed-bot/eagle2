@@ -76,4 +76,47 @@ class PaymobPaymentService
 
         return $data;
     }
+
+    public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $expiresAt = null, $isLive = false)
+    {
+        $utdUrl = config("services.utd_paymob.utd_url");
+        // Use paymob-intention endpoint
+        $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
+
+        $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
+        $secure_key = config("services.utd_paymob.utd_paymob_secret");
+        $returnUrl = url(config("services.utd_paymob.utd_paymob_return_url"));
+        $orderId = 'ORDER-' . time();
+        $price = number_format($amount, 2, '.', '');
+        
+        $syn = $merchantCode . $orderId . "" . $returnUrl . $orderId . "1" . $price . $secure_key;
+        $signature = hash('sha256', $syn);
+
+        $data = [
+            'returnUrl' => $returnUrl,
+            'merchantCode' => $merchantCode,
+            'chargeItems' => [
+                [
+                    'itemId' => $orderId,
+                    'price' => (float) $amount,
+                ]
+            ],
+            'signature' => $signature,
+            'amount' => (float) $amount,
+            'name' => $name,
+            'order_id' => $orderId,
+            'description' => $description,
+            'email' => $email,
+            'phone' => $phone,
+            'expires_at' => $expiresAt,
+            'is_live' => $isLive,
+        ];
+
+        info('Paymob Payment Link Request', ['url' => $baseUrl, 'data' => $data]);
+
+        $response = Http::post($baseUrl, $data);
+
+        info('Paymob Payment Link Response', ['response' => $response->body()]);
+        return json_decode($response, true);
+    }
 }

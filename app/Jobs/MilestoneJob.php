@@ -47,8 +47,9 @@ class MilestoneJob implements ShouldQueue
      */
     public function handle(): void
     {
+        Log::info("Starting MilestoneJob for milestone ID: {$this->milestoneId}");
         $milestone = Milestone::with('rewards')->findOrFail($this->milestoneId);
-        
+
         $usersQuery = match ($milestone->slug) {
             'super-admin' => User::where('is_super_admin', 1),
             'bd' => User::where('is_bd', 1),
@@ -60,10 +61,34 @@ class MilestoneJob implements ShouldQueue
             default => User::query(),
         };
 
-        $totalUsers = $usersQuery->count();
 
         $processedCount = 0;
         $failedCount = 0;
+
+        if ($milestone->slug == 'charge-agency-owner') {
+
+            $milestone = Milestone::with('rewards')->where('slug', 'charge-agency-owner')->first();
+            User::whereHas('hasHostAgency')->chunk(100, function ($users) use ($milestone, &$processedCount, &$failedCount) {
+                foreach ($users as $user) {
+                    try {
+                        DB::transaction(function () use ($user, $milestone) {
+                            MilestoneHelper::removeReward($user, $milestone->slug);
+                        });
+
+                        $processedCount++;
+                        Log::debug("Processed milestone '{$milestone->slug}' for user {$user->id}");
+                    } catch (\Exception $e) {
+                        $failedCount++;
+                        Log::error("MilestoneJob failed for user {$user->id}", [
+                            'milestone_slug' => $milestone->slug,
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                    }
+                }
+            });
+        }
+
 
         $usersQuery->chunk(100, function ($users) use ($milestone, &$processedCount, &$failedCount) {
             foreach ($users as $user) {
@@ -72,7 +97,7 @@ class MilestoneJob implements ShouldQueue
                         MilestoneHelper::removeReward($user, $milestone->slug);
                         MilestoneHelper::grantMilestoneToUser($user, $milestone->slug);
                     });
-                    
+
                     $processedCount++;
                     Log::debug("Processed milestone '{$milestone->slug}' for user {$user->id}");
                 } catch (\Exception $e) {
