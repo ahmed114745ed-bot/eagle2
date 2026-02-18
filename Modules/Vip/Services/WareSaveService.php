@@ -47,15 +47,16 @@ class WareSaveService
     {
         $id = $form->model()->id;
 
-        $exists = Ware::where('level', $form->model()->level)
+        $query = Ware::where('level', $form->model()->level)
             ->where('type', $form->type)
-            ->where('get_type', 1)
-            ->when($id, function ($query) use ($id) {
-                $query->where('id', '!=', $id);
-            })
-            ->exists();
+            ->where('get_type', 1);
 
-        if ($exists) {
+        // Exclude current record when editing (use !== null instead of when() for proper null check)
+        if ($id !== null) {
+            $query->where('id', '!=', $id);
+        }
+
+        if ($query->exists()) {
             throw ValidationException::withMessages([
                 'type' => [__('This level and type combination already exists')],
             ]);
