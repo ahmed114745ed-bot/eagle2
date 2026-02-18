@@ -1861,7 +1861,7 @@ class User extends Authenticatable
 
     public function hasShippingAgencyV2()
     {
-        return $this->hasOne(Agency::class, 'app_owner_id');
+        return $this->hasOne(ShippingAgency::class, 'app_owner_id');
     }
 
     public function hasFamily()
