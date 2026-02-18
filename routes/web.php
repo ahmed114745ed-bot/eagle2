@@ -232,7 +232,7 @@ Route::get('/badge-seeders', function () {
 
     // Run multiple seeders one by one
     Artisan::call('db:seed', ['--class' => 'BadgeImageSeeder']);
-    
+
     return response()->json([
         'status' => 'success',
         'message' => '✅ All seeders executed successfully.'
@@ -241,7 +241,7 @@ Route::get('/badge-seeders', function () {
 
 Route::get('/config-badges-seeder', function () {
     Artisan::call('db:seed', ['--class' => 'ConfigBadgesSeeder']);
-    
+
     return response()->json([
         'status' => 'success',
         'message' => '✅ ConfigBadgesSeeder executed successfully.'
@@ -249,11 +249,11 @@ Route::get('/config-badges-seeder', function () {
 });
 
 Route::get('/boom-percentage-seeder', function () {
+
     Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
-    
     return response()->json([
         'status' => 'success',
-        'message' => '✅ BoomPercentageSeeder executed successfully.'
+        'message' => '✅ PercentageBoomSeeder executed successfully.'
     ]);
 });
 
@@ -644,7 +644,7 @@ Route::group(['prefix' => 'paypal',], function () { //'middleware' => 'throttle:
     //    Route::get('/transaction/{orderId}', [PayPalController::class, 'transaction'])->name('paypal.capture');
 });
 
- Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
+Route::get('/total-room-gift', [GiftLogController::class, 'totalRoomGift']);
 
 
 Route::get('/test-games', function () {
@@ -1536,7 +1536,7 @@ Route::get('/fix-total-room-gifts', function () {
                 $record->current_total = $correctTotal;
                 $record->save();
                 $updated++;
-                
+
                 $results[] = [
                     'action' => 'updated',
                     'room_id' => $roomId,
@@ -1556,7 +1556,7 @@ Route::get('/fix-total-room-gifts', function () {
                     'updated_at' => now(),
                 ]);
                 $created++;
-                
+
                 $results[] = [
                     'action' => 'created',
                     'room_id' => $roomId,
