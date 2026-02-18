@@ -5,7 +5,11 @@ use Utd\Family\Http\Controllers\Api\FamilyController;
 use Utd\Family\Http\Controllers\Api\FamilyLevelController;
 use Utd\Family\Http\Controllers\Utd\FamilyController as UtdFamilyController;
 
-Route::prefix('api/families')->group(function () {
+$familiesApiMiddleware = config('family.route_middlewares.families_api', ['api']);
+$utdApiMiddleware = config('family.route_middlewares.utd_api', $familiesApiMiddleware);
+$familyLevelsMiddleware = config('family.route_middlewares.family_levels_api', $familiesApiMiddleware);
+
+Route::prefix('api/families')->middleware($familiesApiMiddleware)->group(function () {
     Route::get('all', [FamilyController::class, 'index']);
     Route::get('show/{id}', [FamilyController::class, 'show']);
     Route::post('create', [FamilyController::class, 'store']);
@@ -24,7 +28,7 @@ Route::prefix('api/families')->group(function () {
 });
 
 // Utd Custom Dashboard Routes
-Route::prefix('utd/families')->group(function () {
+Route::prefix('utd/families')->middleware($utdApiMiddleware)->group(function () {
     Route::get('/', [UtdFamilyController::class, 'index']);
     Route::get('/all', [UtdFamilyController::class, 'all']);
     Route::post('/', [UtdFamilyController::class, 'store']);
@@ -34,7 +38,7 @@ Route::prefix('utd/families')->group(function () {
     Route::get('/{id}', [UtdFamilyController::class, 'show']);
 });
 
-Route::prefix('utd/family-levels')->group(function () {
+Route::prefix('utd/family-levels')->middleware($familyLevelsMiddleware)->group(function () {
     Route::get('/all', [FamilyLevelController::class, 'index']);
     Route::post('/show/{id}', [FamilyLevelController::class, 'show']);
     Route::post('/create', [FamilyLevelController::class, 'store']);

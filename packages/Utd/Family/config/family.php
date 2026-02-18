@@ -95,4 +95,33 @@ return [
             'user_account' => \Modules\SwitchAccount\Entities\UserAccount::class,
         ],
     ],
+    'route_middlewares' => [
+        'families_api' => [
+            'api',
+            'auth:sanctum',
+            'checkLatestToken',
+            'generalBan',
+            'userBan',
+            'update.last.seen',
+            'localization',
+        ],
+        'utd_api' => [
+            'api',
+            'auth:sanctum',
+            'checkLatestToken',
+            'generalBan',
+            'userBan',
+            'update.last.seen',
+            'localization',
+        ],
+        'family_levels_api' => [
+            'api',
+            'auth:sanctum',
+            'checkLatestToken',
+            'generalBan',
+            'userBan',
+            'update.last.seen',
+            'localization',
+        ],
+    ],
 ];
