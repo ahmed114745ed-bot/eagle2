@@ -5,6 +5,7 @@ namespace Utd\Family\Http\Resources\V2;
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Family\Http\Resources\ShortFamilyUserResource;
 
 class FamilyResource extends JsonResource
 {
