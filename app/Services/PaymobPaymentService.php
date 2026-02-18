@@ -80,8 +80,8 @@ class PaymobPaymentService
     public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $expiresAt = null, $isLive = false)
     {
         $utdUrl = config("services.utd_paymob.utd_url");
-        // Use paymob-payment-link endpoint
-        $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-payment-link', $utdUrl);
+        // Use paymob-intention endpoint
+        $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
 
         $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
         $secure_key = config("services.utd_paymob.utd_paymob_secret");
@@ -104,6 +104,7 @@ class PaymobPaymentService
             'signature' => $signature,
             'amount' => (float) $amount,
             'name' => $name,
+            'order_id' => $orderId,
             'description' => $description,
             'email' => $email,
             'phone' => $phone,
