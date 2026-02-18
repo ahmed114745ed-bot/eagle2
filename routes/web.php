@@ -249,7 +249,7 @@ Route::get('/config-badges-seeder', function () {
 });
 
 Route::get('/boom-percentage-seeder', function () {
-    Artisan::call('db:seed', ['--class' => 'BoomPercentageSeeder']);
+    Artisan::call('db:seed', ['--class' => 'PercentageBoomSeeder']);
     
     return response()->json([
         'status' => 'success',
