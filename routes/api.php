@@ -109,7 +109,7 @@ Route::prefix(config('app.api_prefix'))->group(function () {
     Route::post('fawry-callback', [PaymentMethodController::class, 'callback'])->middleware("verify.fawry.signature");
     Route::post('utd-fawry-callback', [PaymentMethodController::class, 'utdCallback'])->middleware("verify.utdFawry.signature");
     Route::get('/fawry/done', [PaymentMethodController::class, 'success']);
-    Route::post('utd-paymob-callback', [PaymentMethodController::class, 'utdPayMobCallback'])->middleware('verify.payMob.signature');
+    Route::post('utd-paymob-callback', [PaymentMethodController::class, 'utdPayMobCallback'])->middleware('verify.utdFawry.signature');
     Route::post('paypal-callback', [PayPalService::class, 'callback'])->name('paypal.callback')->middleware(['verify.paypal.webhook']);
     Route::get('paypal-return/{orderId}', [PayPalService::class, 'success'])->name('paypal.success');
     Route::get('paypal-cancel/{orderId}', [PayPalService::class, 'cancel'])->name('paypal.cancel');
