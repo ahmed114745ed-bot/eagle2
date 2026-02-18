@@ -15,10 +15,10 @@ class PercentageBoomSeeder extends Seeder
     public function run(): void
     {
 
-        $percentages = [0, 20, 40,  60, 80, 95, 100];
+        $percentages = [0, 20, 40, 60, 80, 95, 100];
 
         foreach ($percentages as $percentage) {
-            \Modules\RoomBoom\Entities\BoomPercentage::create([
+            \Modules\RoomBoom\Entities\BoomPercentage::firstOrCreate([
                 'percentage' => $percentage
             ]);
         }
