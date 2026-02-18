@@ -453,13 +453,17 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
-            $exists = Ware::where('level', $level)
+            
+            $query = Ware::where('level', $level)
                 ->where('type', $form->type)
-                ->where('get_type', 1)
-                ->when($id, fn($q) => $q->where('id', '!=', $id))
-                ->exists();
+                ->where('get_type', 1);
+            
+            // Exclude current record when editing (use !== null for proper null check)
+            if ($id !== null) {
+                $query->where('id', '!=', $id);
+            }
 
-            if ($exists) {
+            if ($query->exists()) {
                 return back()->with([
                     'error' => new MessageBag([
                         'title' => 'Error',
