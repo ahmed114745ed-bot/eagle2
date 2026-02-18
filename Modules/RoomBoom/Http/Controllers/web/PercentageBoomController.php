@@ -22,7 +22,7 @@ class PercentageBoomController extends MainController
     {
         $percentages = BoomPercentage::get();
         return parent::index($content
-            ->title(__('Room Boom settings'))
+            ->title(__('settings'))
             ->body(view('percentageBoom', compact(['percentages']))));
     }
 
