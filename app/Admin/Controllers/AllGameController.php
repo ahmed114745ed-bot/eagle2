@@ -178,7 +178,8 @@ class AllGameController extends MainController
                 0 => __('Joyplay'),
                 1 => __('OX'),
                 2 => __('Bytesun'),
-                3 => __('Zero Games'),
+                3 => __('Quantum Nexus'),
+                4 => __('Zero Games'),
             ]
         );
         $form->url('mini_url', __('Half Screen Link'));
@@ -188,9 +189,9 @@ class AllGameController extends MainController
         $form->switch('is_enable', __('enable'));
         $form->select('in_room', __('in_room'))->options(
             [
-                0 => __('Half Screen Link'),
-                1 => __('Full Screen Link'),
-                2 => __('HD Half Screen Link'),
+                0 => __('Half Screen'),
+                1 => __('Full Screen'),
+                2 => __('HD Half Screen'),
             ]
         )->default(0);
         $form->text('hight', __('hight'));
