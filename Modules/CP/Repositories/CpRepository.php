@@ -498,8 +498,8 @@ class CpRepository
     {
         return Cp::with([
             'cpRelation:id,title,type',
-            'toUser:id,name,dress_1,dress_2,dress_3',
-            'fromUser:id,name,dress_1,dress_2,dress_3',
+            'toUser:id,name,uuid,special_id,dress_1,dress_2,dress_3',
+            'fromUser:id,name,uuid,special_id,dress_1,dress_2,dress_3',
         ])
             ->whereHas("cpRelation", function ($q) {
                 $q->where('type', "!=", 'solution');

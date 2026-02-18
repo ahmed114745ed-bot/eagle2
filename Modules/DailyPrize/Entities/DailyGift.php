@@ -10,6 +10,7 @@ use Modules\Badge\Entities\Badge;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DailyGift extends Model
@@ -35,6 +36,11 @@ class DailyGift extends Model
     public function badge()
     {
         return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     public function getTarget5Attribute()
@@ -76,12 +82,7 @@ class DailyGift extends Model
                 $model->target = request('target5', $model->target);
             } elseif ($model->gift_type === 'achievement') {
 
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -100,15 +101,7 @@ class DailyGift extends Model
             } elseif ($model->gift_type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->gift_type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload(DIRECTORY_SEPARATOR . 'events', $file);
-                    $file = str_replace('\\', '/', $model->target);
-                    Storage::delete($file);
-                }
-                $model->target = $url ?? '';
-                //                $model->target = request('target4', $model->target);
-
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

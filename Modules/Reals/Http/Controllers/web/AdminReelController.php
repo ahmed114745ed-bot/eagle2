@@ -48,6 +48,19 @@ class AdminReelController extends MainController
                 ];
             });
 
+        $reelsScriptPath = public_path('modules/reals/js/reels-manager.js');
+        $reelsScriptUrl = asset('modules/reals/js/reels-manager.js');
+
+        if (is_file($reelsScriptPath)) {
+            $reelsScriptUrl .= '?v=' . filemtime($reelsScriptPath);
+        }
+
+        Admin::css('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
+        Admin::css('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+        Admin::js('https://cdn.tailwindcss.com');
+        Admin::js('https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js');
+        Admin::js($reelsScriptUrl);
+
         return $content
             ->body(view('reals::admin.reels.index', compact('reels', 'seed')));
     }

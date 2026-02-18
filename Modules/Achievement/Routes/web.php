@@ -11,13 +11,14 @@
 |
 */
 
-use Modules\Achievement\Http\Controllers\web\AchievementDedicateController;
+use Illuminate\Support\Facades\Route;
 use Modules\Achievement\Http\Controllers\web\AchievementsController;
 use Modules\Achievement\Http\Controllers\web\GiftAchievemntController;
+use Modules\Achievement\Http\Controllers\web\CustomAchievementController;
 use Modules\Achievement\Http\Controllers\web\AchievementsLevelsController;
+use Modules\Achievement\Http\Controllers\web\AchievementDedicateController;
 use Modules\Achievement\Http\Controllers\web\UserAchievementLevelController;
 use Modules\Achievement\Http\Controllers\web\AchievementLevelsModuleController;
-use Illuminate\Support\Facades\Route;
 
 Route::group(
     [
@@ -58,5 +59,7 @@ Route::group(
             Route::put('/{id}', [AchievementsLevelsController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [AchievementsLevelsController::class, 'destroy'])->where('id', '[0-9]+');
         });
+
+          Route::resource('custom-achievements', CustomAchievementController::class);
     }
 );

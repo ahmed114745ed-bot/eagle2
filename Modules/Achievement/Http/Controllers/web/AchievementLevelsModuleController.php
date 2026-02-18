@@ -74,7 +74,7 @@ class AchievementLevelsModuleController extends Controller
                 'admin_id' =>  $adminId,
             ];
 
-           UserAchievementLevel::create($attributes);
+            UserAchievementLevel::create($attributes);
         } elseif ($achievementLevel != null) {
             $res = $this->userAchievementService->assignAchievementLevelToUserByAdmin($userId, $achievementLevel);
             if (!$res) {
@@ -97,6 +97,8 @@ class AchievementLevelsModuleController extends Controller
 
         return redirect()->route(nameRoute('admin.achievement-dedicate.index'));
     }
+
+
 
     public function getAchievementLevels($achievementId)
     {

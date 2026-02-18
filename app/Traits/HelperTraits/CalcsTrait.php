@@ -970,7 +970,7 @@ trait CalcsTrait
             'color' =>  $color ?? '',
             'vip_gifts' => $vip_gifts ?? 0,
             'vip_upload_gif' => $vip_upload_gif ?? 0,
-            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip($user->id, 18, 'color') : null),
         ];
     }
 
@@ -1002,7 +1002,7 @@ trait CalcsTrait
             'expire'    => $vip->expire ?? 0,
             'ware_id' => $vipIcon?->id ?? 0,
             'color' => '',
-            'colored_name' => $hasColor ? common::wareUserVipV2($user, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVipV2($user, 18, 'color') : null),
         ];
     }
 
@@ -1170,7 +1170,7 @@ trait CalcsTrait
             'color' => $color,
             'vip_gifts' => $vip_gifts,
             'vip_upload_gif' => $vip_upload_gif,
-            'colored_name' => $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVip($user->id, 18, 'color') : null),
         ];
     }
 
@@ -1668,9 +1668,7 @@ trait CalcsTrait
 
         return [
             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
-            'colored_name' => $hasColor
-                ? Common::wareUserVip($user->id, 18, 'color') ?? ''
-                : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVip($user->id, 18, 'color') : null),
         ];
     }
 
@@ -1698,9 +1696,7 @@ trait CalcsTrait
 
         return [
             'vip_img'      => $vipIcon->show_img ?? $vip->img ?? $vip->image ?? '',
-            'colored_name' => $hasColor
-                ? (Common::wareUserVipV2($user, 18, 'color') ?? '')
-                : '',
+            'colored_name' => (fn($c) => is_string($c) ? $c : '')($hasColor ? Common::wareUserVipV2($user, 18, 'color') : null),
         ];
     }
 }

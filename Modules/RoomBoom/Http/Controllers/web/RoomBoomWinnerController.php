@@ -31,9 +31,11 @@ class RoomBoomWinnerController extends MainController
             'reward',
             'reward.gift',
             'reward.ware',
+            "reward.customAchievement",
+            'reward.customAchievement.images',
             'boom.roomBoomLevel',
             'boom.totalRoomGift.room',
-             'boom.totalRoomGift.room.owner.country',
+            'boom.totalRoomGift.room.owner.country',
             'user',
             'user.profile',
             'user.country',
@@ -95,7 +97,7 @@ class RoomBoomWinnerController extends MainController
                 case 'gift':
                     return $reward->gift?->name ?? 'Unknown Gift';
                 case 'achievement':
-                    return 'Achievement Badge';
+                    return $reward->customAchievement?->name ?? 'Unknown Achievement';
                 case 'coin':
                     return $reward->target . ' Coins';
                 default:
@@ -112,8 +114,7 @@ class RoomBoomWinnerController extends MainController
                 } elseif ($reward->target_type === 'gift') {
                     $path = $reward->gift?->show_img ?? $reward->gift?->img;
                 } elseif ($reward->target_type === 'achievement') {
-                    $value = getDriverUrl() . '/' . $reward->target;
-                    return "<img src='$value' width='80' height='80'>";
+                    $path = $reward->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ??  '';
                 } elseif ($reward->target_type === 'coin') {
                     $path = 'coin.png';
                 }

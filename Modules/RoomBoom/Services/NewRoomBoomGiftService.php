@@ -33,14 +33,12 @@ class NewRoomBoomGiftService
 
             if ($totalRoomGift) {
                 $currentTotal = $totalRoomGift->current_total;
-//                $newTotal = $currentTotal + $totalPrice;
+                $newTotal = $currentTotal + $totalPrice;
             } else {
-//                $newTotal = $currentTotal = $totalPrice;
+                $newTotal = $currentTotal = $totalPrice;
             }
 
             $this->oldLevels($totalPrice, $totalRoomGift->id, $userId, $currentTotal);
-
-            $newTotal = $currentTotal;
 
             $this->activateLevels($totalRoomGift, $newTotal);
 

@@ -26,7 +26,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null,private $totalNumWin,private $totalUserWin)
+    public function __construct(private int $userId, private int $roomId, private array $receiversIds, private int $giftId, private int $number, private int $price, private ?int $userCoin = null, private $totalNumWin = 0, private $totalUserWin = 0)
     {
         $this->roomTopUsersRepository = new RoomTopUsersRepository();
 
@@ -50,7 +50,7 @@ class UpdateUserDataWhenSendGift implements ShouldQueue
                        ])->first(); 
         $gift = Gift::query()->select([
                                           'id', 'name', 'type', 'price'
-                                      ])->where('type', 6)->where('id', $this->giftId)->where('enable', 1)->first();
+                                      ])->where('id', $this->giftId)->where('enable', 1)->first();
 
         $numberOfGift = $this->number * count($this->receiversIds);
         $totalPrice   = $gift->price * $numberOfGift;

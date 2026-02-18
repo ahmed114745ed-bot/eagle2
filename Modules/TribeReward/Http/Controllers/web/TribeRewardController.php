@@ -2,17 +2,18 @@
 
 namespace Modules\TribeReward\Http\Controllers\web;
 
-use App\Admin\Controllers\MainController;
+use Carbon\Carbon;
 use App\Models\Gift;
 use App\Models\Ware;
-use App\Selectables\Wares;
-use Carbon\Carbon;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use Modules\TribeReward\Entities\TribeReward;
+use App\Selectables\Wares;
 use Modules\Vip\Entities\OVip;
+use Encore\Admin\Layout\Content;
+use App\Selectables\CustomAchievements;
+use App\Admin\Controllers\MainController;
+use Modules\TribeReward\Entities\TribeReward;
 
 class TribeRewardController extends MainController
 {
@@ -52,7 +53,7 @@ class TribeRewardController extends MainController
         $grid = new Grid(new TribeReward());
 
         $tribe_top_id = request('tribe_top_id');
-        $grid->model()->where('tribe_top_id', $tribe_top_id);
+        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement','customAchievement.images'])->where('tribe_top_id', $tribe_top_id);
 
         $grid->column('id', __('ID'))->sortable();
         $grid->column('type', __('Type'));
@@ -62,19 +63,18 @@ class TribeRewardController extends MainController
             } elseif ($this->target_type == "vip") {
                 return @$this->vip->name;
             } elseif ($this->target_type == "achievement") {
-                $value = getDriverUrl() . '/' . @$this->target;
-                return "<img src='$value' width='80' height='80'>";
+                return $this->customAchievement?->name ?? '';
             }
         });
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->target_type == 'ware') {
-                $ware = Ware::find($this->target);
+                $ware = $this->ware;
                 $path = $ware->img2 ?? $ware?->show_img;
             } elseif ($this->target_type == 'vip') {
-                $vips = OVip::find($this->target);
+                $vips = $this->vip;
                 $path = $vips?->img;
             } elseif ($this->target_type == 'achievement') {
-                $path = $this?->target;
+                $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
             } else {
                 $path = 'coin.png';
             }
@@ -122,7 +122,7 @@ class TribeRewardController extends MainController
         $form->hidden('tribe_top_id')->default($tribe_top_id);
 
         $form->select('type', __('Type'))->options([
-//            'agency_reward' => __('Agency Reward'),
+            //            'agency_reward' => __('Agency Reward'),
             'share_rewards' => __('Share Rewards'),
         ])->default('share_rewards')->required()
             ->when('agency_reward', function (Form $form) {
@@ -148,9 +148,7 @@ class TribeRewardController extends MainController
                         })->rules('required');
                     })
                     ->when("achievement", function (Form $form) {
-                        $form->image("target4", __('image'))->name(function ($file) {
-                            return now()->timestamp . '.' . $file->guessExtension();
-                        })->disk('gcs');
+                        $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
                     });
             });
 

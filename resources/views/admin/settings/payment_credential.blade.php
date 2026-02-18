@@ -37,6 +37,9 @@
                                 @if ($coin->type == 'utd_fawry')
                                     @include('admin.settings.partial_payments.utd_fawry')
                                 @endif
+                                @if ($coin->type == 'utd_paymob')
+                                    @include('admin.settings.partial_payments.utd_paymob')
+                                @endif
                                 @if ($coin->type == 'strip')
                                     @include('admin.settings.partial_payments.stripe')
                                 @endif

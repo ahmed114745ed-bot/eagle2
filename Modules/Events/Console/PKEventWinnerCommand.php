@@ -125,8 +125,9 @@ class PKEventWinnerCommand extends Command
                     $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                     $attributes = [
                         'user_id'       => $user->id,
-                        'custom_image' => $reward->target,
+                        'custom_achievement_id' => $reward->target,
                         'end_at' => $dateTimestamp,
+                        'receive_type' => 'pk-event',
                     ];
                     UserAchievementLevel::create($attributes);
                     break;

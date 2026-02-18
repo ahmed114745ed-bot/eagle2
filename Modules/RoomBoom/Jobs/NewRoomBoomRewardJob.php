@@ -206,7 +206,8 @@ class NewRoomBoomRewardJob implements ShouldQueue
 
         $this->achievementInsertData[] = [
             'user_id' => $userId,
-            'custom_image' => $rewardTarget,
+           // 'custom_image' => $rewardTarget,
+            'custom_achievement_id' => $rewardTarget,
             'end_at' => $dateTimestamp,
             'created_at' => now(),
             'updated_at' => now()

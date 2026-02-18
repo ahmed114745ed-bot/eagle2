@@ -113,7 +113,14 @@ class RoomBoomLevelController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png')
             ->help(__('The special video for this level, displayed after completion. Each level has its own unique video.'));
-
+         $form->select('image_type', __('image_type'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+            ]
+        )->required();
         $form->saving(function (Form $form) {
             if (!$form->model()->exists) {
                 $count = RoomBoomLevel::count();

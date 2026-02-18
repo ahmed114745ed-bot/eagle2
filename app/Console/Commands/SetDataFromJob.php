@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\UpdateUserDataWhenSendGift;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 
 class SetDataFromJob extends Command
@@ -25,6 +26,7 @@ class SetDataFromJob extends Command
             $type = Redis::type($cleanKey)->getPayload();
 
             $value = null;
+
             if ($type == 'string') {
                 $value = Redis::get($cleanKey);
                 if ($value !== false || $value === 'b:0;') {
