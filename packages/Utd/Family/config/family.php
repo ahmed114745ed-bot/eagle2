@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'enabled' => env('FAMILY_ENABLED', true),
     /*
     |--------------------------------------------------------------------------
     | Family Package Configuration

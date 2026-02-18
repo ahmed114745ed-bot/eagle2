@@ -8,14 +8,14 @@ use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
 use App\Models\Agency;
-use Utd\Family\Entities\Family;
 use App\Models\Setting;
 use App\Models\OfficialMessage;
 use Illuminate\Support\Facades\DB;
-use Modules\Moment\Entities\Moment;
+use Utd\Moments\Entities\Moment;
 use App\Models\NotificationTemplate;
 use App\Models\OfficialMessageAdmin;
 use Modules\Public\Http\Services\UserCounterServices;
+use App\Support\FamilyPackage;
 
 class CustomNotificationNewNotUesdNow
 {
@@ -299,7 +299,7 @@ class CustomNotificationNewNotUesdNow
         (new UserCounterServices)->eventUser($receiver, 'official-messages');
     }
 
-    public function removeFamilyUser(Family $family, User $user)
+    public function removeFamilyUser($family, User $user)
     {
         $tokens_notification = $user?->notification_id;
         // $body_ar = __('api.remove_from_family', ['name' => $family->name],  'ar');
@@ -317,7 +317,7 @@ class CustomNotificationNewNotUesdNow
         (new UserCounterServices)->eventUser($user, 'official-messages');
     }
 
-    public function adminFamily(Family $family, User $user)
+    public function adminFamily($family, User $user)
     {
         $tokens_notification = $user?->notification_id;
         // $body_ar = __('api.admin_family', ['name' => $family->name], 'ar');
@@ -692,7 +692,16 @@ class CustomNotificationNewNotUesdNow
 
     public function familyLevelUpgrade(int $familyId)
     {
-        $family = Family::query()->with(['users' => fn($query) => $query->withoutAppends()->select(['users.id', 'notification_id', 'lan'])])->where('families.id', $familyId)->first();
+        $familyQuery = FamilyPackage::newQuery('family');
+
+        if (!$familyQuery) {
+            return 0;
+        }
+
+        $family = $familyQuery
+            ->with(['users' => fn($query) => $query->withoutAppends()->select(['users.id', 'notification_id', 'lan'])])
+            ->where('families.id', $familyId)
+            ->first();
         if (!$family) {
             return 0;
         }

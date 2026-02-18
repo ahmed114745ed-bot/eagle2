@@ -15,6 +15,12 @@ class FamilyServiceProvider extends ServiceProvider
             __DIR__ . '/../config/family.php', 'family'
         );
 
+        $this->registerNullBindings();
+
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         $this->registerAliases();
         $this->registerFamilyServices();
 
@@ -72,12 +78,9 @@ class FamilyServiceProvider extends ServiceProvider
     protected function registerFamilyServices(): void
     {
         $familyService = \Utd\Family\Services\FamilyService::class;
-        $nullFamilyService = \Utd\Family\Services\NullFamilyService::class;
         $contractInterface = config('family.contracts.family_service', \Utd\Family\Contracts\FamilyServiceContract::class);
 
         $this->app->singleton($familyService);
-        $this->app->singleton($nullFamilyService);
-        $this->app->alias($nullFamilyService, 'family.null_service');
 
         $this->app->singleton(\Utd\Family\Contracts\FamilyServiceContract::class, function ($app) use ($familyService) {
             return $app->make($familyService);
@@ -95,6 +98,10 @@ class FamilyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
         \Utd\Family\Entities\Family::observe(\Utd\Family\Observers\FamilyObserver::class);
         \Utd\Family\Entities\FamilyUser::observe(\Utd\Family\Observers\FamilyUserObserver::class);
 
@@ -117,5 +124,17 @@ class FamilyServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/family.php' => config_path('family.php'),
             ], 'family-config');
         }
+    }
+
+    protected function registerNullBindings(): void
+    {
+        $nullFamilyService = \Utd\Family\Services\NullFamilyService::class;
+        $this->app->singleton($nullFamilyService);
+        $this->app->alias($nullFamilyService, 'family.null_service');
+    }
+
+    protected function isEnabled(): bool
+    {
+        return (bool) config('family.enabled', true);
     }
 }

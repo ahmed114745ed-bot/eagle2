@@ -2,8 +2,8 @@
 
 namespace App\Selectables;
 
-use Utd\Family\Entities\Family;
 use App\Helpers\Common;
+use App\Support\FamilyPackage;
 use Encore\Admin\Grid\Filter;
 use Utd\Vip\Entities\OVip;
 use Encore\Admin\Grid\Selectable;
@@ -11,8 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class Families extends Selectable
 {
+    public $model;
 
-    public $model = Family::class;
+    public function __construct()
+    {
+        $familyModel = FamilyPackage::entity('family');
+
+        if (!$familyModel) {
+            abort(404, __('Family module is disabled.'));
+        }
+
+        $this->model = $familyModel;
+
+        parent::__construct();
+    }
 
     public function make()
     {

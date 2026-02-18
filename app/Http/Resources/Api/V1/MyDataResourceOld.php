@@ -5,8 +5,8 @@ namespace App\Http\Resources\Api\V1;
 use App\Models\Pack;
 use Utd\Room\Entities\Room;
 use App\Models\User;
-use Utd\Family\Entities\Family;
 use App\Helpers\Common;
+use App\Support\FamilyPackage;
 use App\Models\ImageColor;
 use App\Helpers\UserCommon;
 use App\Facades\UserHandling;
@@ -59,7 +59,7 @@ class MyDataResourceOld extends JsonResource
         }
 
         $f      = null;
-        $family = Family::query()->where('id', @$this->family_id)->first();
+        $family = FamilyPackage::newQuery('family')?->where('id', @$this->family_id)->first();
         if ($family) {
             $f = [
                 'owner_id'    => $family->user_id,

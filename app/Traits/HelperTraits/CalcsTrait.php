@@ -3,10 +3,9 @@
 namespace App\Traits\HelperTraits;
 
 use App\Helpers\Common;
-use Utd\Family\Entities\Family;
-use Utd\Family\Entities\FamilyLevel;
 use App\Models\GiftLog;
 use App\Models\OfficialMessage;
+use App\Support\FamilyPackage;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Support\PackageHelper;
 use Utd\Vip\Entities\OVip;
@@ -1423,32 +1422,51 @@ trait CalcsTrait
 
     public static function updateFamilyLevel($family_id)
     {
-        $family = Family::query()->find($family_id);
-        if ($family) {
-            $family->inc(['today_rank' => 1, 'week_rank' => 1, 'month_rank' => 1]);
-            $giftLogs = GiftLog::query()->where(function ($q) use ($family) {
-                $q->where('receiver_family_id', $family->id)->orWhere('sender_family_id', $family->id);
-            })->sum('giftPrice');
-            $level = FamilyLevel::query()->where('exp', '<=', $giftLogs)->orderByDesc('exp')->first();
-            if ($level) {
-                if ($level->id != $family->current_level_id) {
-                    DB::beginTransaction();
-                    try {
-                        OfficialMessage::query()->create(
-                            [
-                                'title' => 'family level upgraded',
-                                'user_id' => $family->user_id,
-                                'content' => 'congratulations your family level upgraded',
-                                'url' => ''
-                            ]
-                        );
-                        $family->update(['current_level_id' => $level->id]);
-                        DB::commit();
-                    } catch (\Exception $exception) {
-                        DB::rollBack();
-                    }
-                }
-            }
+        $familyQuery = FamilyPackage::newQuery('family');
+
+        if (!$familyQuery) {
+            return;
+        }
+
+        $family = $familyQuery->find($family_id);
+
+        if (!$family) {
+            return;
+        }
+
+        $family->inc(['today_rank' => 1, 'week_rank' => 1, 'month_rank' => 1]);
+
+        $giftLogs = GiftLog::query()->where(function ($q) use ($family) {
+            $q->where('receiver_family_id', $family->id)->orWhere('sender_family_id', $family->id);
+        })->sum('giftPrice');
+
+        $levelQuery = FamilyPackage::newQuery('family_level');
+
+        if (!$levelQuery) {
+            return;
+        }
+
+        $level = $levelQuery
+            ->where('exp', '<=', $giftLogs)
+            ->orderByDesc('exp')
+            ->first();
+
+        if (!$level || $level->id == $family->current_level_id) {
+            return;
+        }
+
+        DB::beginTransaction();
+        try {
+            OfficialMessage::query()->create([
+                'title' => 'family level upgraded',
+                'user_id' => $family->user_id,
+                'content' => 'congratulations your family level upgraded',
+                'url' => ''
+            ]);
+            $family->update(['current_level_id' => $level->id]);
+            DB::commit();
+        } catch (\Exception $exception) {
+            DB::rollBack();
         }
     }
 

@@ -8,9 +8,8 @@ use App\Http\Resources\CountryResource;
 use App\Models\Agency;
 use App\Models\AgencyJoinRequest;
 use App\Models\Country;
-use Utd\Family\Entities\Family;
-use Utd\Family\Entities\FamilyUser;
 use App\Models\Pack;
+use App\Support\FamilyPackage;
 use Utd\Room\Entities\Room;
 use App\Models\Ware;
 use Carbon\Carbon;
@@ -29,7 +28,7 @@ class GetUserDataResource extends JsonResource
     {
         $f = new \stdClass();
         $fn = '';
-        $family = Family::query ()->where ('id',@$this->family_id)->first ();
+        $family = FamilyPackage::newQuery('family')?->where('id', @$this->family_id)->first();
         if ($family){
             $f = [
                 'name'=>$family->name,
@@ -70,7 +69,9 @@ class GetUserDataResource extends JsonResource
             'is_family_admin'=> @$this->is_family_admin,
             'is_family_member'=> @$this->family_id?true:false,
             'family_id' => @$this->family_id,
-            'is_family_owner'=> @Family::query ()->where ('user_id',$this->id)->exists (),
+            'is_family_owner'=> FamilyPackage::call('family', function (string $class) {
+                return $class::query()->where('user_id', $this->id)->exists();
+            }, false),
             'family_name'=>@$fn,
             'family_data'=>@$f,
 //            'online_time'=>$this->online_time?date("Y-m-d H:i:s", $this->online_time):'',// mohammed
