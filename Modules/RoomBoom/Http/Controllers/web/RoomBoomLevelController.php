@@ -237,6 +237,8 @@ class RoomBoomLevelController extends MainController
 
         $roomBoomLevel->save();
 
+        settings()->set('boom_themes', time());
+
         admin_toastr(__('Saved successfully'), 'success');
 
         return redirect(admin_url('room_boom_levels'));
