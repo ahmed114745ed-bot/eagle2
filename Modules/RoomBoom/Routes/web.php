@@ -1,5 +1,6 @@
 <?php
 
+use Modules\RoomBoom\Http\Controllers\web\PercentageBoomController;
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomLevelController;
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomRewardController;
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomWinnerController;
@@ -18,9 +19,14 @@ Route::group(
     ],
     function () {
         Route::resource('room_boom_levels', RoomBoomLevelController::class);
+        Route::prefix('room_boom-theme')->group(function () {
+            Route::get('/{level_id}', [RoomBoomLevelController::class, 'editBackgroundImage']);
+            Route::put('/{level_id}', [RoomBoomLevelController::class, 'updateBackgroundImage']);
+        });
         Route::resource('super-boom-rules', SuperBoomRuleController::class);
         Route::get('room_boom_winners', [RoomBoomWinnerController::class, 'index']);
-
+        Route::get('/room-boom-settings', [PercentageBoomController::class, 'index']);
+        Route::post('/room-boom/save', [PercentageBoomController::class, 'save'])->name('room-boom.save');
         Route::prefix('room_boom_rewards/{room_boom_level_id}')->group(function () {
             Route::get('/', [RoomBoomRewardController::class, 'index'])->name('room_boom_rewards.index');
             Route::get('/create', [RoomBoomRewardController::class, 'create'])->name('room_boom_rewards.create');
