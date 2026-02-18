@@ -65,29 +65,29 @@ class MilestoneJob implements ShouldQueue
         $processedCount = 0;
         $failedCount = 0;
 
-        if ($milestone->slug == 'charge-agency-owner') {
+        // if ($milestone->slug == 'charge-agency-owner') {
 
-            $milestone = Milestone::with('rewards')->where('slug', 'charge-agency-owner')->first();
-            User::whereHas('hasHostAgency')->chunk(100, function ($users) use ($milestone, &$processedCount, &$failedCount) {
-                foreach ($users as $user) {
-                    try {
-                        DB::transaction(function () use ($user, $milestone) {
-                            MilestoneHelper::removeReward($user, $milestone->slug);
-                        });
+        //     $milestone = Milestone::with('rewards')->where('slug', 'charge-agency-owner')->first();
+        //     User::whereHas('hasHostAgency')->chunk(100, function ($users) use ($milestone, &$processedCount, &$failedCount) {
+        //         foreach ($users as $user) {
+        //             try {
+        //                 DB::transaction(function () use ($user, $milestone) {
+        //                     MilestoneHelper::removeReward($user, $milestone->slug);
+        //                 });
 
-                        $processedCount++;
-                        Log::debug("Processed milestone '{$milestone->slug}' for user {$user->id}");
-                    } catch (\Exception $e) {
-                        $failedCount++;
-                        Log::error("MilestoneJob failed for user {$user->id}", [
-                            'milestone_slug' => $milestone->slug,
-                            'error' => $e->getMessage(),
-                            'trace' => $e->getTraceAsString(),
-                        ]);
-                    }
-                }
-            });
-        }
+        //                 $processedCount++;
+        //                 Log::debug("Processed milestone '{$milestone->slug}' for user {$user->id}");
+        //             } catch (\Exception $e) {
+        //                 $failedCount++;
+        //                 Log::error("MilestoneJob failed for user {$user->id}", [
+        //                     'milestone_slug' => $milestone->slug,
+        //                     'error' => $e->getMessage(),
+        //                     'trace' => $e->getTraceAsString(),
+        //                 ]);
+        //             }
+        //         }
+        //     });
+        // }
 
 
         $usersQuery->chunk(100, function ($users) use ($milestone, &$processedCount, &$failedCount) {
