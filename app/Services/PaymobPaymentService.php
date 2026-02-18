@@ -104,7 +104,7 @@ class PaymobPaymentService
             'signature' => $signature,
             'amount' => (float) $amount,
             'name' => $name,
-            'merchant_order_id' => $orderId,
+            'order_id' => $orderId,
             'description' => $description,
             'email' => $email,
             'phone' => $phone,
