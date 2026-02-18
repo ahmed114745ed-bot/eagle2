@@ -134,12 +134,7 @@
                             <i class="bi bi-image me-2"></i>{{ __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)') }}
                         </option>
                     </select>
-                    <div class="mt-2 text-end">
-                        <span class="badge bg-light text-secondary rounded-pill px-3 py-2">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Current: <span class="fw-bold">{{ $percentage->image_type ?: 'Not set' }}</span>
-                        </span>
-                    </div>
+                   
                 </div>
 
             </div>
