@@ -248,6 +248,15 @@ Route::get('/config-badges-seeder', function () {
     ]);
 });
 
+Route::get('/boom-percentage-seeder', function () {
+    Artisan::call('db:seed', ['--class' => 'BoomPercentageSeeder']);
+    
+    return response()->json([
+        'status' => 'success',
+        'message' => '✅ BoomPercentageSeeder executed successfully.'
+    ]);
+});
+
 Route::get('/update-flag', function () {
 
     Artisan::call('db:seed', ['--class' => FlagSyrianSeeder::class]);
