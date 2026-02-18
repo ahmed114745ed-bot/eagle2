@@ -34,5 +34,6 @@ return [
     ],
     'loss_rotation' => [
         'cooldown_hours' => (int) env('FAIRLUCK_LOSS_ROTATION_HOURS', 6),
+        'priority_window' => (int) env('FAIRLUCK_LOSS_ROTATION_WINDOW', 3),
     ],
 ];

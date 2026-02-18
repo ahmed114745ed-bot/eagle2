@@ -79,9 +79,7 @@ class LossLedger
 
     public function isPriorityHolder(int $userId): bool
     {
-        $candidate = $this->currentPriorityHolder();
-
-        return $candidate !== null && $candidate->user_id === $userId;
+        return in_array($userId, $this->priorityWindowUserIds(), true);
     }
 
     public function currentPriorityHolder(): ?FairLuckLossLedger
@@ -92,6 +90,20 @@ class LossLedger
             ->orderBy('rotation_count')
             ->orderBy('updated_at')
             ->first();
+    }
+
+    private function priorityWindowUserIds(): array
+    {
+        $limit = $this->priorityWindow();
+
+        return $this->eligibleQuery()
+            ->orderBy('loss_score')
+            ->orderByDesc('loss_momentum')
+            ->orderBy('rotation_count')
+            ->orderBy('updated_at')
+            ->limit($limit)
+            ->pluck('user_id')
+            ->all();
     }
 
     public function markHighMultiplierAwarded(int $userId, int $payoutAmount): void
@@ -138,5 +150,10 @@ class LossLedger
     private function cooldownHours(): int
     {
         return max(1, (int) config('fairluck.loss_rotation.cooldown_hours', 6));
+    }
+
+    private function priorityWindow(): int
+    {
+        return max(1, (int) config('fairluck.loss_rotation.priority_window', 1));
     }
 }

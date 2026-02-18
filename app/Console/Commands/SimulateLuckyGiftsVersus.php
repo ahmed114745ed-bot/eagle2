@@ -321,9 +321,7 @@ class SimulateLuckyGiftsVersus extends Command
                                 </div>
                             </div>
                             <div class='mt-3'>
-                                <p class='mb-1 small text-muted'>صافي اللاعب (المكاسب − المدفوع): <strong>" . number_format($netFlow) . "</strong></p>
-                                <p class='mb-1 small text-muted'>تغير الرصيد (النهاية − البداية): <strong>" . number_format($balanceDelta) . "</strong></p>
-                                <p class='mb-0 small text-muted'>معادلة التحقق: {$playerEquation}</p>
+                                
                             </div>
                         </div>
                     </div>
@@ -353,44 +351,77 @@ class SimulateLuckyGiftsVersus extends Command
                 </tr>";
         }
 
+        $historyRows = '';
+        foreach ($history as $event) {
+            $outcomeBadge = $event['outcome'] === 'WIN'
+                ? "<span class='badge bg-success'>فوز</span>"
+                : "<span class='badge bg-danger'>خسارة</span>";
+            $multiplierDisplay = is_numeric($event['multiplier'])
+                ? number_format((float) $event['multiplier']) . 'x'
+                : '—';
+            $trendLabel = match ($event['trend']) {
+                'UP' => "<span class='text-success'>↑ UP</span>",
+                'DOWN' => "<span class='text-danger'>↓ DOWN</span>",
+                default => "<span class='text-muted'>FLAT</span>",
+            };
+            $historyRows .= "
+                <tr>
+                    <td>" . number_format($event['step']) . "</td>
+                    <td>" . number_format($event['round']) . "</td>
+                    <td>" . e($event['user']) . " ({$event['label']})</td>
+                    <td>{$outcomeBadge}</td>
+                    <td>{$multiplierDisplay}</td>
+                    <td>" . number_format($event['bet']) . "</td>
+                    <td class='text-success'>" . number_format($event['win']) . "</td>
+                    <td>" . number_format($event['house_cut']) . "</td>
+                    <td>" . number_format($event['balance_before']) . "</td>
+                    <td>" . number_format($event['balance_after']) . "</td>
+                    <td>{$trendLabel}</td>
+                    <td>" . e($event['mood']) . "</td>
+                </tr>";
+        }
+
+        if ($historyRows === '') {
+            $historyRows = "<tr><td colspan='12' class='text-center text-muted'>لا توجد طلبات مسجلة</td></tr>";
+        }
+
         $lastRound = $history ? $history[count($history) - 1]['round'] : 0;
         $totals['net'] = $totals['won'] - $totals['spent'];
         $globalRtp = $totals['spent'] > 0 ? ($totals['won'] / $totals['spent']) * 100 : 0;
         $scenarioEquation = number_format($totals['initial']) . ' + ' . number_format($totals['net']) . ' - ' . number_format($totals['house_cut']) . ' = ' . number_format($totals['final']);
         $playersCount = count($stats);
 
-        $scenarioOverview = "
-        <div class='alert alert-info shadow-sm mb-4'>
-            <p class='mb-1 fw-bold'>هدف السيناريو</p>
-            <p class='mb-3 mb-lg-4'>هذه المحاكاة تراقب طريقة توزيع Service 3 عندما يتنافس {$playersCount} لاعب/لاعبة على {$gift->name} بسعر رهان " . number_format($gift->price) . " عبر {$lastRound} دوراً، لقياس صافي كل لاعب مقابل مكسب التطبيق.</p>
-            <div class='row text-center g-3'>
-                <div class='col-6 col-lg-4'>
-                    <small>إجمالي الرصيد الابتدائي</small>
-                    <p class='h6 mb-0'>" . number_format($totals['initial']) . "</p>
-                </div>
-                <div class='col-6 col-lg-4'>
-                    <small>إجمالي الرهانات</small>
-                    <p class='h6 mb-0'>" . number_format($totals['available']) . "</p>
-                </div>
-                <div class='col-6 col-lg-4'>
-                    <small>إجمالي المكاسب</small>
-                    <p class='h6 mb-0 text-success'>" . number_format($totals['won']) . "</p>
-                </div>
-                
-                <div class='col-6 col-lg-4'>
-                    <small>صافي اللاعبين</small>
-                    <p class='h6 mb-0'>" . number_format($totals['net']) . "</p>
-                </div>
-                <div class='col-6 col-lg-4'>
-                    <small>خصم التطبيق</small>
-                    <p class='h6 mb-0 text-warning'>" . number_format($totals['house_cut']) . "</p>
-                </div>
-                <div class='col-6 col-lg-4'>
-                    <small>الرصيد النهائي المجمع</small>
-                    <p class='h6 mb-0'>" . number_format($totals['final']) . "</p>
+        $scenarioOverview = "";
+
+        $historyTableBlock = "
+        <div class='card shadow-sm mt-4'>
+            <div class='card-body'>
+                <h2 class='h4 mb-4'>سجل الطلبات حسب ترتيب اللعب</h2>
+                <p class='text-muted'>يعرض هذا الجدول كل محاولة بحسب الترتيب الفعلي للاعبين خلال المحاكاة.</p>
+                <div class='table-responsive'>
+                    <table class='table table-hover align-middle small'>
+                        <thead class='table-light'>
+                            <tr>
+                                <th>#</th>
+                                <th>الدور</th>
+                                <th>المستخدم</th>
+                                <th>النتيجة</th>
+                                <th>المضاعف</th>
+                                <th>قيمة الرهان</th>
+                                <th>قيمة الربح</th>
+                                <th>خصم التطبيق</th>
+                                <th>الرصيد قبل</th>
+                                <th>الرصيد بعد</th>
+                                <th>اتجاه التباين</th>
+                                <th>مزاج الخدمة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {$historyRows}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <p class='mb-0 small text-muted'>RTP الكلي: " . number_format($globalRtp, 2) . "% | معادلة التحقق الجماعية: {$scenarioEquation}</p>
         </div>";
 
         $html = "<!DOCTYPE html>
@@ -441,6 +472,7 @@ class SimulateLuckyGiftsVersus extends Command
                 </div>
             </div>
         </div>
+        {$historyTableBlock}
     </div>
 </body>
 </html>";

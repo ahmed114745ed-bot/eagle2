@@ -54,6 +54,7 @@ class FairLuckService3
             $isDrainLocked = (bool) \Illuminate\Support\Facades\Redis::get($drainLockKey);
 
             $globalVault = $this->getGlobalVaultBalance();
+            $poolBalance = $this->lossLedger->poolBalance();
             $betUnit = max(1, (int) round($betAmount));
             $globalVaultInt = (int) round($globalVault);
             $lossScoreBefore = $this->calculateLossScore($deviation, $contributionBank, $jackpotPity);
@@ -220,7 +221,9 @@ class FairLuckService3
                     $eligibilitySignal,
                     $globalVaultInt,
                     $isTopLossCandidate,
-                    $betUnit
+                    $betUnit,
+                    $poolBalance,
+                    $hasPaidForJackpot
                 );
                 
                 \Illuminate\Support\Facades\Redis::del($lossKey);
@@ -336,14 +339,27 @@ class FairLuckService3
         ?HighMultiplierSignal $highMultiplierSignal = null,
         int $globalVaultBalance = 0,
         bool $isTopLossCandidate = false,
-        int $betUnit = 0
+        int $betUnit = 0,
+        int $poolBalance = 0,
+        bool $hasPaidForJackpot = false
     ): int {
         $multipliers = [5, 10, 20, 50, 100, 250, 500, 1000];
         $weights = [];
-        $hasPaidForJackpot = $unlockContribution > 0 && $contributionBank >= $unlockContribution;
+        $hasPaidForJackpot = $hasPaidForJackpot || ($unlockContribution > 0 && $contributionBank >= $unlockContribution);
         $jackpotScaling = $unlockContribution > 0
             ? min(5.0, max(1.0, $contributionBank / $unlockContribution))
             : 1.0;
+
+        $highTierAvailability = $this->resolveHighTierAvailability(
+            $betUnit,
+            $globalVaultBalance,
+            $isTopLossCandidate,
+            $hasPaidForJackpot,
+            $deviation,
+            $pityCount
+        );
+
+        $poolWeightFactor = 1 + min(0.5, $poolBalance / max(1, $betUnit * 60000));
 
         $cautiousDistribution = $this->shouldUseCautiousDistribution(
             $deviation,
@@ -379,25 +395,43 @@ class FairLuckService3
             }
 
             if ($forceJackpot) {
-                if ($m >= 250 &&
-                    !$this->canDisburseHighMultiplier(
-                        $m,
-                        $betUnit,
-                        $globalVaultBalance,
-                        $isTopLossCandidate,
-                        $hasPaidForJackpot,
-                        $deviation,
-                        $pityCount
-                    )) {
+                if ($m < 250) {
+                    $weights[] = 0;
+                    continue;
+                }
+
+                if (!($highTierAvailability[$m] ?? false)) {
+                    $weights[] = 0;
+                    continue;
+                }
+
+                $eligibleJackpotTiers = array_values(array_filter([250, 500, 1000], fn ($tier) => $highTierAvailability[$tier] ?? false));
+                if (empty($eligibleJackpotTiers)) {
                     $weights[] = 0;
                     continue;
                 }
 
                 $weight = match ($m) {
-                    250 => $baseWeight * 250,
-                    500 => $baseWeight * 10,
+                    250 => $baseWeight * 140,
+                    500 => $baseWeight * 115,
+                    1000 => $baseWeight * 90,
                     default => 0,
                 };
+
+                $spreadBonus = 1 + (count($eligibleJackpotTiers) - 1) * 0.25;
+
+                if ($m === 250 && count($eligibleJackpotTiers) > 1) {
+                    $weight *= 0.65;
+                }
+
+                if ($m >= 500) {
+                    $weight *= $spreadBonus * $poolWeightFactor;
+                }
+
+                if ($m === 1000 && end($eligibleJackpotTiers) === 1000) {
+                    $weight *= 1.2;
+                }
+
                 $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
                 continue;
             }
@@ -410,23 +444,14 @@ class FairLuckService3
                 continue;
             }
 
-            if ($m >= 250 && !$hasPaidForJackpot) {
+            if ($m >= 250 && !$hasPaidForJackpot && !$isTopLossCandidate) {
                 $progress = $unlockContribution > 0 ? ($contributionBank / $unlockContribution) : 0;
                 if ($progress < 0.75) {
                     $weights[] = 0;
                     continue;
                 }
             }
-            if ($ratingApplies($m) &&
-                !$this->canDisburseHighMultiplier(
-                    $m,
-                    $betUnit,
-                    $globalVaultBalance,
-                    $isTopLossCandidate,
-                    $hasPaidForJackpot,
-                    $deviation,
-                    $pityCount
-                )) {
+            if ($ratingApplies($m) && $m >= 250 && !($highTierAvailability[$m] ?? false)) {
                 $weights[] = 0;
                 continue;
             }
@@ -440,13 +465,42 @@ class FairLuckService3
                 $jackpotScaling,
                 $pityCount,
                 $isDrainLocked,
-                $isBeginner
+                $isBeginner,
+                $isTopLossCandidate,
+                $highTierAvailability,
+                $poolWeightFactor
             );
 
             $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
         }
 
         return $this->weightedRandom($multipliers, $weights);
+    }
+
+    private function resolveHighTierAvailability(
+        int $betUnit,
+        int $globalVaultBalance,
+        bool $isTopLossCandidate,
+        bool $hasPaidForJackpot,
+        float $deviation,
+        int $pityCount
+    ): array {
+        $tiers = [250, 500, 1000];
+        $availability = [];
+
+        foreach ($tiers as $tier) {
+            $availability[$tier] = $this->canDisburseHighMultiplier(
+                $tier,
+                $betUnit,
+                $globalVaultBalance,
+                $isTopLossCandidate,
+                $hasPaidForJackpot,
+                $deviation,
+                $pityCount
+            );
+        }
+
+        return $availability;
     }
 
     private function shouldUseCautiousDistribution(
@@ -511,7 +565,10 @@ class FairLuckService3
         float $jackpotScaling,
         int $pityCount,
         bool $isDrainLocked,
-        bool $isBeginner
+        bool $isBeginner,
+        bool $isTopLossCandidate = false,
+        array $highTierAvailability = [],
+        float $poolWeight = 1.0
     ): float {
         if ($isDrainLocked && $multiplier >= 250) {
             return 0.0;
@@ -539,6 +596,31 @@ class FairLuckService3
 
         if ($isBeginner && $multiplier === 100) {
             $weight *= 1.5;
+        }
+
+        if ($isTopLossCandidate && $multiplier >= 250) {
+            $weight *= 1.35;
+            if ($multiplier >= 500 && $pityCount > 900) {
+                $weight *= 1.25;
+            }
+        }
+
+        if ($multiplier === 1000 && $pityCount > 1100) {
+            $weight *= 1.15;
+        }
+
+        $availableHighCount = count(array_filter([250, 500, 1000], fn ($tier) => $highTierAvailability[$tier] ?? false));
+
+        if ($availableHighCount > 1 && $multiplier === 250) {
+            $weight *= max(0.65, 1 - 0.15 * ($availableHighCount - 1));
+        }
+
+        if ($multiplier >= 500 && ($highTierAvailability[$multiplier] ?? false)) {
+            $weight *= (1 + min(0.6, $pityCount / 900)) * $poolWeight;
+        }
+
+        if ($multiplier === 1000 && ($highTierAvailability[1000] ?? false) && $pityCount > 950) {
+            $weight *= 1.2;
         }
 
         return $weight;
@@ -662,15 +744,7 @@ class FairLuckService3
             return true;
         }
 
-        if (!$hasPaidForJackpot) {
-            return false;
-        }
-
-        $priorityUnlocked = $isTopLossCandidate
-            || $pityCount >= 900
-            || $deviation <= -0.35;
-
-        if (!$priorityUnlocked) {
+        if (!$hasPaidForJackpot && !$isTopLossCandidate) {
             return false;
         }
 
