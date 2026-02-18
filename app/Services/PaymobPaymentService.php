@@ -92,6 +92,11 @@ class PaymobPaymentService
         $syn = $merchantCode . $orderId . "" . $returnUrl . $orderId . "1" . $price . $secure_key;
         $signature = hash('sha256', $syn);
 
+        // Split name into first_name and last_name
+        $nameParts = explode(' ', $name, 2);
+        $firstName = $nameParts[0] ?? 'Customer';
+        $lastName = $nameParts[1] ?? 'User';
+
         $data = [
             'returnUrl' => $returnUrl,
             'merchantCode' => $merchantCode,
@@ -102,14 +107,15 @@ class PaymobPaymentService
                 ]
             ],
             'signature' => $signature,
+            'special_reference' => $orderId,
             'amount' => (float) $amount,
-            'name' => $name,
-            'order_id' => $orderId,
             'description' => $description,
-            'email' => $email,
-            'phone' => $phone,
-            'expires_at' => $expiresAt,
-            'is_live' => $isLive,
+            'billing_data' => [
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $email,
+                'phone_number' => $phone,
+            ],
         ];
 
         info('Paymob Payment Link Request', ['url' => $baseUrl, 'data' => $data]);
