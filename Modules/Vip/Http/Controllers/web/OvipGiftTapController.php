@@ -455,14 +455,33 @@ class OvipGiftTapController extends MainController
             $level = $form->model()->level ?? request('level');
             $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
             
+            // DEBUG: Remove after fixing
+            \Log::info('OvipGiftTapController ensureUnique DEBUG', [
+                'id' => $id,
+                'level' => $level,
+                'type' => $type,
+                'form_type' => $form->type,
+                'model_type' => $form->model()->type,
+                'isEditing' => $form->isEditing(),
+                'request_type' => request('type'),
+                'route_ware_gift' => request()->route('ware_gift'),
+            ]);
+
             $query = Ware::where('level', $level)
                 ->where('type', $type)
                 ->where('get_type', 1);
-            
             // Exclude current record when editing (use !== null for proper null check)
             if ($id !== null) {
                 $query->where('id', '!=', $id);
             }
+
+            // DEBUG: Log the query
+            \Log::info('OvipGiftTapController QUERY DEBUG', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'exists' => $query->exists(),
+                'matching_ids' => (clone $query)->pluck('id')->toArray(),
+            ]);
 
             if ($query->exists()) {
                 return back()->with([

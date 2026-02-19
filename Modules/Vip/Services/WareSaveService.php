@@ -49,6 +49,18 @@ class WareSaveService
         $level = $form->model()->level;
         $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
 
+        // DEBUG: Remove after fixing
+        \Log::info('ensureUniqueCombination DEBUG', [
+            'id' => $id,
+            'level' => $level,
+            'type' => $type,
+            'form_type' => $form->type,
+            'model_type' => $form->model()->type,
+            'isEditing' => $form->isEditing(),
+            'request_type' => request('type'),
+            'route_ware_gift' => request()->route('ware_gift'),
+        ]);
+
         $query = Ware::where('level', $level)
             ->where('type', $type)
             ->where('get_type', 1);
@@ -57,6 +69,14 @@ class WareSaveService
         if ($id !== null) {
             $query->where('id', '!=', $id);
         }
+
+        // DEBUG: Log the query
+        \Log::info('ensureUniqueCombination QUERY', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings(),
+            'exists' => $query->exists(),
+            'matching_ids' => (clone $query)->pluck('id')->toArray(),
+        ]);
 
         if ($query->exists()) {
             throw ValidationException::withMessages([
