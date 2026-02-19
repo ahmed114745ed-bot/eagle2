@@ -395,19 +395,19 @@ class OvipGiftTapController extends MainController
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
             $exists = Ware::where('level', $level)
-                ->where('type', $form->type)
+                ->where('type', request('type'))
                 ->where('get_type', 1)
                 ->when($id, fn($q) => $q->where('id', '!=', $id))
                 ->exists();
 
-            // if ($exists) {
-            //     return back()->with([
-            //         'error' => new MessageBag([
-            //             'title' => 'Error',
-            //             'message' => __('This level and type combination already exists'),
-            //         ])
-            //     ]);
-            // }
+            if ($exists) {
+                return back()->with([
+                    'error' => new MessageBag([
+                        'title' => 'Error',
+                        'message' => __('This level and type combination already exists'),
+                    ])
+                ]);
+            }
 
             if (!in_array(request('type'), [18, 21])) {
                 $imageType1 = $form->input('image_type1');
