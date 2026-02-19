@@ -392,65 +392,6 @@ class OvipGiftTapController extends MainController
             }
 
 
-            // $hasShowImg = $form->show_img || $form->model()->show_img;
-            // $hasImg2 = $form->img2 || $form->model()->img2;
-            // $type = $form->model()->type ?? request('type');
-
-            // if (!$isType18or21 || ($isEditing && !in_array((int)$type, [18, 21]))) {
-            //     if (!$hasShowImg && !$hasImg2) {
-            //         return back()->with([
-            //             'error' => new MessageBag([
-            //                 'title' => 'Error',
-            //                 'message' => 'Please upload at least one image',
-            //             ])
-            //         ]);
-            //     }
-            // }
-
-            // $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'alpha', 'vap'];
-            // if ($form->show_img instanceof UploadedFile) {
-            //     // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
-            //     $ext = strtolower($form->show_img->guessExtension());
-
-            //     if (!in_array($ext, $allowed)) {
-            //         throw ValidationException::withMessages(['show_img' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
-            //     }
-
-            //     $form->image_type1 = $ext;
-            // }
-
-            // if ($form->img2 instanceof UploadedFile) {
-            //     // $allowed = ['svga', 'mp4','svg','alpha', 'vap', 'png'];
-            //     $ext = strtolower($form->img2->guessExtension());
-            //     $originalExt = strtolower($form->img2->getClientOriginalExtension());
-
-            //     if ($ext === 'zz' && $originalExt === 'svga') $ext = 'svga';
-            //     if ($ext === 'gif' && $originalExt === 'gif') $ext = 'png';
-
-            //     if ($ext === 'mp4') {
-            //         $videoPath = getDriverUrl() . '/' . upload($form->img2);
-            //         $wareId = $form->model()->id;
-
-            //         (new FfmpegService())->extractByDuration($videoPath, $wareId);
-
-            //         $imagePath = (config('app.env') !== 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
-            //         $response = Http::attach('image', Storage::disk('gcs')->get($imagePath), "{$wareId}.jpg")
-            //             ->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-            //         if ($response->successful()) {
-            //             $type = $response->json()['data']['video_type'] ?? null;
-            //             if ($type) $ext = strtolower($type);
-            //         }
-            //     }
-
-            //     if (!in_array($ext, $allowed)) {
-            //         throw ValidationException::withMessages(['img2' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
-            //     }
-
-            //     $form->input('detected_profile_frame_type', $ext);
-            //     $form->profile_frame_type = $ext;
-            // }
-
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
             $exists = Ware::where('level', $level)
@@ -459,14 +400,14 @@ class OvipGiftTapController extends MainController
                 ->when($id, fn($q) => $q->where('id', '!=', $id))
                 ->exists();
 
-            if ($exists) {
-                return back()->with([
-                    'error' => new MessageBag([
-                        'title' => 'Error',
-                        'message' => __('This level and type combination already exists'),
-                    ])
-                ]);
-            }
+            // if ($exists) {
+            //     return back()->with([
+            //         'error' => new MessageBag([
+            //             'title' => 'Error',
+            //             'message' => __('This level and type combination already exists'),
+            //         ])
+            //     ]);
+            // }
 
             if (!in_array(request('type'), [18, 21])) {
                 $imageType1 = $form->input('image_type1');
