@@ -451,20 +451,20 @@ class OvipGiftTapController extends MainController
             //     $form->profile_frame_type = $ext;
             // }
 
-            $id = $form->model()->id;
+            $id = $form->model()->id ?? request()->route('ware_gift');
             $level = $form->model()->level ?? request('level');
             $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
             
             // DEBUG: Remove after fixing
             \Log::info('OvipGiftTapController ensureUnique DEBUG', [
                 'id' => $id,
+                'model_id' => $form->model()->id,
+                'route_ware_gift' => request()->route('ware_gift'),
                 'level' => $level,
                 'type' => $type,
                 'form_type' => $form->type,
                 'model_type' => $form->model()->type,
                 'isEditing' => $form->isEditing(),
-                'request_type' => request('type'),
-                'route_ware_gift' => request()->route('ware_gift'),
             ]);
 
             $query = Ware::where('level', $level)
