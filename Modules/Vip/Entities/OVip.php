@@ -20,6 +20,7 @@ class OVip extends Model
         'exp',
         'expire',
         'img',
+        'background_img',
     ];
 
     protected $hidden = ['privileges'];
