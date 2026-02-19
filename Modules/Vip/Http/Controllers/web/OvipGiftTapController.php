@@ -451,7 +451,12 @@ class OvipGiftTapController extends MainController
             //     $form->profile_frame_type = $ext;
             // }
 
-            $id = $form->model()->id ?? request()->route('ware_gift');
+            // Get ID from multiple sources (model, route params)
+            $id = $form->model()->id 
+                ?? request()->route('ware_gift') 
+                ?? request()->route('id')
+                ?? request()->segment(3); // /admin/ware-gifts/{id}/edit
+            
             $level = $form->model()->level ?? request('level');
             $type = $form->type ?? $form->model()->type; // Use model type if form type is null (edit mode)
             
@@ -460,10 +465,10 @@ class OvipGiftTapController extends MainController
                 'id' => $id,
                 'model_id' => $form->model()->id,
                 'route_ware_gift' => request()->route('ware_gift'),
+                'route_id' => request()->route('id'),
+                'segment_3' => request()->segment(3),
                 'level' => $level,
                 'type' => $type,
-                'form_type' => $form->type,
-                'model_type' => $form->model()->type,
                 'isEditing' => $form->isEditing(),
             ]);
 
