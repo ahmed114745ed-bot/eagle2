@@ -488,14 +488,14 @@ class OvipGiftTapController extends MainController
                 'matching_ids' => (clone $query)->pluck('id')->toArray(),
             ]);
 
-            if ($query->exists()) {
-                return back()->with([
-                    'error' => new MessageBag([
-                        'title' => 'Error',
-                        'message' => __('This level and type combination already exists'),
-                    ])
-                ]);
-            }
+            // if ($query->exists()) {
+            //     return back()->with([
+            //         'error' => new MessageBag([
+            //             'title' => 'Error',
+            //             'message' => __('This level and type combination already exists'),
+            //         ])
+            //     ]);
+            // }
 
             if (!in_array($type, [18, 21])) {
                 $imageType1 = $form->input('image_type1');
