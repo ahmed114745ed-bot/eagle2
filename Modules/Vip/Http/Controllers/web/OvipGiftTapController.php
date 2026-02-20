@@ -266,18 +266,21 @@ class OvipGiftTapController extends MainController
     {
         $form = new Form(new Ware());
         $this->disableFormTools($form);
+        $isEditing = $form->isEditing();
+        if (!$isEditing) {
+            $form->hidden('level')->value(request('level'));
+            $form->hidden('type')->value(request('type'));
+            $form->hidden('is_active_for_vip')->value(1);
+            $form->hidden('get_type')->value(1);
+            $form->hidden('enable')->value(1);
+        }
 
-        $form->hidden('level')->value(request('level'));
-        $form->hidden('type')->value(request('type'));
-        $form->hidden('is_active_for_vip')->value(1);
-        $form->hidden('get_type')->value(1);
-        $form->hidden('enable')->value(1);
 
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
 
         $isType18or21 = in_array(request('type'), [18, 21]);
-        $isEditing = $form->isEditing();
+
 
         if (!$isType18or21 && ($isEditing && $ware && !in_array($ware->type, [18, 21]))) {
 
@@ -394,8 +397,9 @@ class OvipGiftTapController extends MainController
 
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
+            $type = $form->model()->type ?? request('type');
             $exists = Ware::where('level', $level)
-                ->where('type', request('type'))
+                ->where('type', $type)
                 ->where('get_type', 1)
                 ->when($id, fn($q) => $q->where('id', '!=', $id))
                 ->exists();
@@ -409,7 +413,7 @@ class OvipGiftTapController extends MainController
                 ]);
             }
 
-            if (!in_array(request('type'), [18, 21])) {
+            if (!in_array($type, [18, 21])) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
                 $final = $profileFrameType ?? $imageType1;
