@@ -822,12 +822,12 @@
                         <i class="fas fa-share"></i>
                     </div>
                     <div class="feature-name">
-                        {{ __('room boom') }}
+                        {{ __('Room Boom') }}
                     </div>
                     <div class="feature-status">
                         {{ $enableRoomBoom ? __('Enabled') : __('Disabled') }}
                     </div>
-                    <div class="feature-label">{{ __('room boom') }}</div>
+                    <div class="feature-label">{{ __('Room Boom') }}</div>
                 </div>
                 <div class="feature-body">
                     <form id="enableRoomBoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
