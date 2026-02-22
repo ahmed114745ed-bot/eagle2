@@ -261,17 +261,8 @@ class PaymobPaymentService
             ];
         }
         
-        // Check if responseData is directly a URL string
-        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
-            return [
-                'status' => 1,
-                'payment_url' => $responseData,
-                'message' => 'Payment link created successfully',
-                'data' => ['url' => $responseData]
-            ];
-        }
+    
         
-        // Check for payment URL in different possible fields (for object responses)
         $paymentUrl = null;
         if (is_array($responseData) || is_object($responseData)) {
             $responseArray = (array) $responseData;
