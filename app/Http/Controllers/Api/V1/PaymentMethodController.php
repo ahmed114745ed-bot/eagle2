@@ -117,6 +117,7 @@ class PaymentMethodController extends Controller
     {
         $webhookData = $request->all();
         info('UTD PayMob Callback received', $webhookData);
+        \Log::info('UTD PayMob Callback received', $webhookData);
 
         $obj = $webhookData['obj'] ?? [];
         $order = $obj['order'] ?? [];
