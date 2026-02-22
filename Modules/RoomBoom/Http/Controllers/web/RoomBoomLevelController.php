@@ -3,6 +3,7 @@
 namespace Modules\RoomBoom\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
@@ -74,6 +75,17 @@ class RoomBoomLevelController extends MainController
                 });
             }
         }
+
+
+        if (Admin::user()->can('edit-' . 'room-boom-levels') || Admin::user()->can('*')) {
+            $grid->column(__('Theme'))->display(function () {
+
+                $url1 = url('admin/room_boom-theme/' . $this->id);
+
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('Theme') . "</a>";
+                return $button1;
+            });
+        }
         if (method_exists($this, 'extendGrid')) {
             $this->extendGrid($grid);
         }
@@ -113,7 +125,7 @@ class RoomBoomLevelController extends MainController
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->default('1.png')
             ->help(__('The special video for this level, displayed after completion. Each level has its own unique video.'));
-         $form->select('image_type', __('image_type'))->options(
+        $form->select('image_type', __('image_type'))->options(
             [
                 'svga' => __('svga'),
                 'alpha' => __('alpha'),
@@ -135,4 +147,100 @@ class RoomBoomLevelController extends MainController
         return $form;
     }
 
+    public function editBackgroundImage($id, Content $content)
+    {
+        $roomBoomLevel = RoomBoomLevel::findOrFail($id);
+        return parent::edit($id, $content
+            ->title(trans('Edit Room Boom Level'))
+            ->body($this->backgroundImage($roomBoomLevel)->edit($id)));
+    }
+
+    protected function backgroundImage($model = null)
+    {
+        if ($model === null) {
+            $model = new RoomBoomLevel();
+        }
+
+        $form = new Form($model);
+
+        // ✅ IMPORTANT: SET FORM ACTION HERE
+        $form->setAction(admin_url('room_boom-theme/' . $model->id));
+
+        // Disable default tools (view, delete, etc.)
+        $this->disableFormTools($form);
+
+        // Background image upload
+        $form->image('background_image', trans('background image'))->name(function ($file) {
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
+            return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+        });
+        $form->select('image_type_background', __('image type background'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+                'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
+
+            ]
+        )->required();
+
+        $form->image('boom_image', trans('boom image'))->name(function ($file) {
+            $extension = $file->getClientOriginalExtension();
+            if (empty($extension)) {
+                $extension = $file->guessExtension();
+            }
+            return 'img_' . now()->timestamp . '_' . rand(100, 999) . '.' . $extension;
+        });
+        $form->select('image_type_boom', __('image type boom'))->options(
+            [
+                'svga' => __('svga'),
+                'alpha' => __('alpha'),
+                'mp4' => __('mp4'),
+                'vap' => __('vap'),
+                'png' => __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)'),
+
+            ]
+        )->required();
+        // After save
+        $form->saved(function (Form $form) {
+            admin_toastr(__('Background image updated successfully'), 'success');
+            return redirect(admin_url('room_boom_levels'));
+        });
+
+        return $form;
+    }
+
+
+    public function updateBackgroundImage($roomBoomLevel_id)
+    {
+        $roomBoomLevel = RoomBoomLevel::findOrFail($roomBoomLevel_id);
+
+        if (request()->hasFile('background_image')) {
+
+            $image = Common::upload('images', request()->file('background_image'));
+
+            $roomBoomLevel->background_image = $image;
+        }
+
+        if (request()->hasFile('boom_image')) {
+
+            $image = Common::upload('images', request()->file('boom_image'));
+
+            $roomBoomLevel->boom_image = $image;
+        }
+        $roomBoomLevel->image_type_background = request()->input('image_type_background');
+        $roomBoomLevel->image_type_boom = request()->input('image_type_boom');
+
+        $roomBoomLevel->save();
+
+        settings()->set('boom_themes', time());
+
+        admin_toastr(__('Saved successfully'), 'success');
+
+        return redirect(admin_url('room_boom_levels'));
+    }
 }

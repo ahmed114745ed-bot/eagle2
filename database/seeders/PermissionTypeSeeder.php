@@ -1092,6 +1092,14 @@ class PermissionTypeSeeder extends Seeder
                             PermissionType::ADMIN->value => ['browse'],
                         ],
                     ],
+                    [
+                        'key' => 'room-boom-settings',
+                        'except' => ['create', 'edit', 'delete', 'show'],
+                        'additional' => [],
+                        'types' => [
+                            PermissionType::ADMIN->value => ['browse'],
+                        ],
+                    ],
                 ],
             ],
             [
