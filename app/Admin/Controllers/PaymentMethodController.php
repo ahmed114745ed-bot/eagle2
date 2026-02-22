@@ -95,40 +95,26 @@ class PaymentMethodController extends AdminController
                 $paymentUrl = $fawryService->makePaymentLink($trxId, $request->amount, $exterData);
                 
                 if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => __('payment.fawry_error'),
-                        'data' => $paymentUrl
-                    ], 400);
+                      return response()->json($paymentUrl, 200);
+
                 }
                 
-                return response()->json([
-                    'success' => true,
-                    'message' => __('payment.fawry_success'),
-                    'payment_url' => $paymentUrl['payment_url'] ?? $paymentUrl,
-                    'data' => $paymentUrl
-                ], 200);
+                        return $paymentUrl;
+
                 
             } elseif ($request->link_type === 'paymob') {
                 $paymobService = new PaymobPaymentService();
                 $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
                 
                 if (isset($paymentUrl->status) && $paymentUrl->status == 0) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => __('payment.paymob_error'),
-                        'data' => $paymentUrl
-                    ], 400);
+                         return response()->json($paymentUrl, 200);
+
                 }
                 
-                return response()->json([
-                    'success' => true,
-                    'message' => __('payment.paymob_success'),
-                    'payment_url' => $paymentUrl->payment_url ?? $paymentUrl,
-                    'data' => $paymentUrl
-                ], 200);
-            }
-            
+                        return $paymentUrl;
+
+             }
+
         } catch (\Exception $e) {
             $trx->update(['status' => 'error']);
             
