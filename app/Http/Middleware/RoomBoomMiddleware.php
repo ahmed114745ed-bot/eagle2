@@ -23,9 +23,10 @@ class RoomBoomMiddleware
                 return Setting::where('key', $key)->value('value') ?? $default;
             });
         };
-        $roomBoom = $getSetting('room_boom') ?? 1;
-        $roomBoomEnable = $getSetting('enable_room_boom') ?? 1;
-        if (!$roomBoom && !$roomBoomEnable) abort(403, __('Not Found'));
+        $roomBoom = (bool) $getSetting('room_boom');
+        $roomBoomEnable = (bool) $getSetting('enable_room_boom');
+
+        if (!$roomBoom || !$roomBoomEnable) abort(403, __('Not Found'));
 
         return $next($request);
     }
