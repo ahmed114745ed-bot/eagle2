@@ -119,33 +119,52 @@ class PaymentMethodController extends Controller
         info('UTD PayMob Callback received', $webhookData);
         \Log::info('UTD PayMob Callback received', $webhookData);
 
+        // Handle new webhook format where data is directly in webhookData
+        $paymob = $webhookData['paymob'] ?? [];
         $obj = $webhookData['obj'] ?? [];
         $order = $obj['order'] ?? [];
 
-        $success = $obj['success'] ?? false;
-        $transactionId = $obj['id'] ?? null;
-        $amountCents = $obj['amount_cents'] ?? 0;
+        // Check success status from multiple possible locations
+        $success = $paymob['success'] ?? $obj['success'] ?? false;
+        $transactionId = $paymob['transaction_id'] ?? $obj['id'] ?? $webhookData['paymentRefrenceNumber'] ?? null;
+        $amountCents = $paymob['amount_cents'] ?? $obj['amount_cents'] ?? ($webhookData['paymentAmount'] * 100) ?? 0;
 
-        // Get merchant_order_id - could be in order or in items name
-        $merchantOrderId = $order['merchant_order_id'] ?? null;
-
-        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 872504210283505906")
+        $merchantOrderId = $webhookData['trx_code'] ?? null;
+        info('Initial merchantOrderId from trx_code', ['merchantOrderId' => $merchantOrderId]);
+        \Log::info('Initial merchantOrderId from trx_code', ['merchantOrderId' => $merchantOrderId]);
+        
+        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 987875126694946403 - ORDER-1771737867")
         if (!$merchantOrderId && !empty($order['items'])) {
+            info('merchantOrderId is null, checking items', ['items' => $order['items']]);
             $itemName = $order['items'][0]['name'] ?? '';
-            if (preg_match('/- (\w+)$/', $itemName, $matches)) {
+            info('Item name extracted', ['itemName' => $itemName]);
+            
+            if (preg_match('/Charge Coin - (\d+)/', $itemName, $matches)) {
                 $merchantOrderId = $matches[1];
+                info('Regex match successful', ['matches' => $matches, 'extracted_merchantOrderId' => $merchantOrderId]);
+            } else {
+                info('Regex match failed - no match found in item name');
             }
+        } else {
+            info('merchantOrderId status', [
+                'merchantOrderId_exists' => !empty($merchantOrderId),
+                'items_empty' => empty($order['items'] ?? [])
+            ]);
         }
 
         if (!$merchantOrderId) {
+           \Log::info('Missing merchant order ID', ['webhookData' => $webhookData]);
             return response()->json(['status' => 'error', 'message' => 'Missing merchant order ID'], 400);
         }
 
         // Find the coin log by trx
         $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
-        $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
+        // $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
 
-        if (!$coinLog && !$paymentMethod) {
+        if (!$coinLog 
+        // && !$paymentMethod
+         )
+         {
             return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
         }
 
@@ -156,11 +175,11 @@ class PaymentMethodController extends Controller
                 $coinLog->save();
             }
 
-            if ($paymentMethod) {
-                $paymentMethod->status = 'paid';
-                $paymentMethod->ref_code = $transactionId;
-                $paymentMethod->save();
-            }
+            // if ($paymentMethod) {
+            //     $paymentMethod->status = 'paid';
+            //     $paymentMethod->ref_code = $transactionId;
+            //     $paymentMethod->save();
+            // }
 
             return response()->json([
                 'status' => 'success',
@@ -170,10 +189,10 @@ class PaymentMethodController extends Controller
             ]);
         }
 
-        if ($paymentMethod) {
-            $paymentMethod->status = 'failed';
-            $paymentMethod->save();
-        }
+        // if ($paymentMethod) {
+        //     $paymentMethod->status = 'failed';
+        //     $paymentMethod->save();
+        // }
 
         return response()->json([
             'status' => 'failed',
