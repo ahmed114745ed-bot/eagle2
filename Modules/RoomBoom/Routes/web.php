@@ -6,16 +6,21 @@ use Modules\RoomBoom\Http\Controllers\web\RoomBoomRewardController;
 use Modules\RoomBoom\Http\Controllers\web\RoomBoomWinnerController;
 use Modules\RoomBoom\Http\Controllers\web\SuperBoomRuleController;
 
+
+
+
+
 Route::group(
     [
         'prefix'     => config('admin.route.prefix'),
+        'namespace'  => 'web',
         'middleware' => [
             'web',
             'admin',
             'adminIp',
             'multiLanguage',
         ],
-        'as'         => config('admin.route.prefix') . 'routes',
+        'as'         => config('admin.route.prefix') . '.',
     ],
     function () {
         Route::resource('room_boom_levels', RoomBoomLevelController::class);

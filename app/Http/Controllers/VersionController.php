@@ -115,7 +115,7 @@ class VersionController extends Controller
             'is_show_grid_view' => (bool) Common::getConf('show_room') ?? false,
 
             "room_boom" => [
-                "enabled" => true,
+                "enabled" => ($settings['enable_room_boom'] ?? 0) == 1 || ($settings['room_boom'] ?? 0) == 1,
                 "cache_assets" => $boomThemes,
             ],
 
@@ -225,7 +225,7 @@ class VersionController extends Controller
             return [];
         }
 
-        return $settings->whereIn('key', ['reel_status', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
+        return $settings->whereIn('key', ['reel_status', 'youtube_status', 'share_room_with_friends', 'live_status', 'host_agency', 'zego_feature', 'huawei_link', 'host_level_enabled', 'host_level_action', 'ios_link', 'android_link', 'room_cup', 'room_cup_setting', 'is_new_theme_enabled','room_boom','enable_room_boom', 'pk_live_action', 'moment_status'])->pluck('value', 'key')->toArray();
     }
 
 

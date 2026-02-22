@@ -814,6 +814,53 @@
                     </form>
                 </div>
             </div>
+
+
+             <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-share"></i>
+                    </div>
+                    <div class="feature-name">
+                        {{ __('room boom') }}
+                    </div>
+                    <div class="feature-status">
+                        {{ $enableRoomBoom ? __('Enabled') : __('Disabled') }}
+                    </div>
+                    <div class="feature-label">{{ __('room boom') }}</div>
+                </div>
+                <div class="feature-body">
+                    <form id="enableRoomBoomForm" class="new-form" action="{{ route('admin.app.settings.update') }}" method="POST"
+                          enctype="multipart/form-data">
+                        @csrf
+                        @php
+                            $errorMessage = $errors ? $errors->first('msg') : null;
+                        @endphp
+                        @if ($errorMessage)
+                            <div class="alert alert-danger text-center" style="margin-bottom: 20px;">{{ $errorMessage }}</div>
+                        @endif
+
+                        <div class="feature-toggle-container">
+                            <span class="toggle-label">{{ __('enable room boom feature') }}</span>
+                            <label class="switch">
+                                <input type="checkbox" id="enable_room_boom_toggle" {{ $enableRoomBoom ? 'checked' : '' }}
+                                onchange="document.getElementById('enable_room_boom_value').value = this.checked ? '1' : '0';
+                                    document.getElementById('enableRoomBoomForm').submit();">
+                                <span class="slider round"></span>
+                            </label>
+                            <input type="hidden" name="enable_room_boom" id="enable_room_boom_value"
+                                   value="{{ $enableRoomBoom ? '1' : '0' }}">
+                        </div>
+
+                        <div class="feature-description-container">
+                            <h4>{{ __('Feature Description') }}</h4>
+                            <div id="feature-description-content" class="external-content">
+                                <div class="loading">{{ __('Loading feature description...') }}</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
