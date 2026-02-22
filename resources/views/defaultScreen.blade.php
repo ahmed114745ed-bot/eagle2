@@ -11,8 +11,13 @@
 
 
                 <div class="mb-4 inp-div">
-                    <label for="type" class="form-label fw-bold d-block text-end">{{ __('default app screen') }}</label>
+                    <label for="type" class="form-label fw-bold d-block text-end">{{ __('Default App Screen') }}</label>
                     <select name="type" id="type" class="form-control text-end">
+                        @if(!$defaultScreen)
+                            <!-- Show placeholder if no default -->
+                            <option value="" selected>-- {{ __('Select Default App Screen') }} --</option>
+                        @endif
+
                         @foreach($enabledOptions as $value)
                             <option value="{{ $value }}" {{ $defaultScreen == $value ? 'selected' : '' }}>
                                 {{ __(ucwords(str_replace('_', ' ', $value))) }}
