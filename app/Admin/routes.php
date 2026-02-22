@@ -700,9 +700,6 @@ Route::group(
         Route::post('remaining-diamond-settings/save', [RemainingDiamondSettingController::class, 'save'])->name('remaining-diamond-settings.save');
         Route::prefix('ware-management')->group(function () {
             Route::get('/{type?}', [WareTabController::class, 'index']);
-            // Route::get('/edit', [WareTabController::class, 'edit'])->where('id', '[0-9]+');
-            // Route::put('/{id}', [WareTabController::class, 'update'])->where('id', '[0-9]+');
-            // Route::delete('/{id}', [WareTabController::class, 'destroy'])->where('id', '[0-9]+');
         });
         Route::resource('ware-management', WareTabController::class);
 
