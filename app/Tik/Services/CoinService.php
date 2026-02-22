@@ -114,7 +114,8 @@ class CoinService
                     name: $user->name ?? 'User',
                     description: 'Charge Coin - ' . $log->trx,
                     email: $user->email ?? null,
-                    phone: $user->phone ?? null
+                    phone: $user->phone ?? null,
+                    trx: $log->trx
                 );
                 if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
                     return Common::apiResponse(0, $paymentUrl['message'] ?? 'Payment failed', null, 400);

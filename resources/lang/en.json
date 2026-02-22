@@ -1739,7 +1739,27 @@
     "moment_viewer.randomOrder": "Random Order",
     "moment_viewer.refresh": "Refresh",
     "moment_viewer.loadMore": "Load More",
-    "share_room_message": "Hello, come and join me in this room, it's really fun"
+    "share_room_message": "Hello, come and join me in this room, it's really fun",
+    "payment.amount": "Amount",
+    "payment.type": "Type",
+    "payment.game_type": "Game Type",
+    "payment.link_type": "Link Type",
+    "payment.select_link_type": "Select Link Type",
+    "payment.fawry": "Fawry",
+    "payment.paymob": "PayMob",
+    "payment.save": "Save",
+    "payment.saving": "Saving...",
+    "payment.success": "Success",
+    "payment.error": "Error",
+    "payment.network_error": "Network error occurred, please try again",
+    "payment.open_payment_link": "Open Payment Link",
+    "payment.fawry_error": "Error occurred in Fawry processing",
+    "payment.fawry_success": "Fawry payment link created successfully",
+    "payment.paymob_not_implemented": "PayMob service is not available currently",
+    "payment.processing_error": "Payment processing error occurred",
+    "payment.invalid_link_type": "Invalid link type",
+    "payment.paymob_error": "Error occurred in PayMob processing",
+    "payment.paymob_success": "PayMob payment link created successfully"
 }
 
 

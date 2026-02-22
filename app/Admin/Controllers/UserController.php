@@ -1027,9 +1027,6 @@ class UserController extends MainController
     {
         $user = User::findOrFail($request->id);
         
-        // Debug: Log incoming request data
-        \Log::info('updateUsers request data:', $request->all());
-        
         $request->validate([
             'name' => ['nullable', 'string', 'max:255'],
             'uuid' => ['sometimes', Rule::unique('users', 'uuid')->ignore($user->id)],
@@ -1047,15 +1044,9 @@ class UserController extends MainController
         $user->email = $request->filled('email') ? $request->input('email') : null;
         $user->phone = $request->filled('phone') ? $request->input('phone') : null;
         $user->bio = $request->input('bio', $user->bio);
-        $user->country_id = $request->filled('country_id') ? $request->input('country_id') : null;
-        
-        // Debug: Log before save
-        \Log::info('User before save:', ['email' => $user->email, 'dirty' => $user->getDirty()]);
-        
+        $user->country_id = $request->filled('country_id') ? $request->input('country_id') : null;        
         $user->save();
         
-        // Debug: Log after save
-        \Log::info('User after save:', ['email' => $user->fresh()->email]);
 
         // Update or create profile
         $profile = $user->profile;
@@ -1074,7 +1065,7 @@ class UserController extends MainController
         
         $profile->save();
         
-        return Redirect::back()->with('success', __('User updated successfully'));
+        return Redirect::back();
     }
 
     // app/Admin/Controllers/UsersAppController.php

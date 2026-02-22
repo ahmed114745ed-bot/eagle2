@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 use App\Models\PaymentMethodHistory;
 use App\Services\FawryPaymentService;
+use App\Services\PaymobPaymentService;
 use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
@@ -69,24 +70,83 @@ class PaymentMethodController extends AdminController
 
     public function customStore(Request $request)
     {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'type' => 'required|string',
+            'link_type' => 'required|in:fawry,paymob'
+        ]);
+
         $trx = PaymentMethodHistory::create([
             "amount" => $request->amount,
             "type" => $request->type,
+            "link_type" => $request->link_type,
+            "payment_method" => $request->link_type,
         ]);
 
         $trxId = $trx->id;
+        $trx->utd_code = $trxId;
+        $trx->save();
+        
+        $exterData = ["type" => $request->type, 'paymentType' => "revenue"];
 
-        $fawryService = new FawryPaymentService();
-        $exterData = ["type"=>$request->type,'paymentType' => "revenue"];
+        try {
+            if ($request->link_type === 'fawry') {
+                $fawryService = new FawryPaymentService();
+                $paymentUrl = $fawryService->makePaymentLink($trxId, $request->amount, $exterData);
+                
+                if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
+                      return response()->json($paymentUrl, 200);
 
-        //  get url
-        $paymentUrl = $fawryService->makePayment($trxId, $request->amount,$exterData);
+                }
+                
+                return $paymentUrl;
 
-        if(isset($response['status']) && $paymentUrl['status']  == 0){
-            return $paymentUrl;
+                
+            } elseif ($request->link_type === 'paymob') {
+                $paymobService = new PaymobPaymentService();
+                $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
+                
+                // Check if payment creation failed
+                if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $paymentUrl['message'] ?? __('payment.paymob_error'),
+                        'data' => $paymentUrl
+                    ], 400);
+                }
+                
+                // Return success response with payment URL
+                $finalPaymentUrl = $paymentUrl['payment_url'] ?? $paymentUrl;
+                
+                // Handle case where paymentUrl is an array but payment_url is also an array/object
+                if (is_array($finalPaymentUrl) && isset($finalPaymentUrl['url'])) {
+                    $finalPaymentUrl = $finalPaymentUrl['url'];
+                } elseif (is_array($finalPaymentUrl)) {
+                    // If it's still an array, convert to string or get first valid URL
+                    $finalPaymentUrl = current($finalPaymentUrl);
+                }
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => __('payment.paymob_success'),
+                    'payment_url' => $finalPaymentUrl,
+                    'data' => $paymentUrl
+                ], 200);
+            }
+
+        } catch (\Exception $e) {
+            $trx->update(['status' => 'error']);
+            
+            return response()->json([
+                'success' => false,
+                'message' => __('payment.processing_error') . ': ' . $e->getMessage(),
+            ], 500);
         }
 
-        return response()->json($paymentUrl, 200);
+        return response()->json([
+            'success' => false,
+            'message' => __('payment.invalid_link_type'),
+        ], 400);
     }
 
 }
