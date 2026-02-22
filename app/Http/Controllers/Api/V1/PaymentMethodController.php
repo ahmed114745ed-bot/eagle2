@@ -159,9 +159,12 @@ class PaymentMethodController extends Controller
 
         // Find the coin log by trx
         $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
-        $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
+        // $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
 
-        if (!$coinLog && !$paymentMethod) {
+        if (!$coinLog 
+        // && !$paymentMethod
+         )
+         {
             return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
         }
 
@@ -172,11 +175,11 @@ class PaymentMethodController extends Controller
                 $coinLog->save();
             }
 
-            if ($paymentMethod) {
-                $paymentMethod->status = 'paid';
-                $paymentMethod->ref_code = $transactionId;
-                $paymentMethod->save();
-            }
+            // if ($paymentMethod) {
+            //     $paymentMethod->status = 'paid';
+            //     $paymentMethod->ref_code = $transactionId;
+            //     $paymentMethod->save();
+            // }
 
             return response()->json([
                 'status' => 'success',
@@ -186,10 +189,10 @@ class PaymentMethodController extends Controller
             ]);
         }
 
-        if ($paymentMethod) {
-            $paymentMethod->status = 'failed';
-            $paymentMethod->save();
-        }
+        // if ($paymentMethod) {
+        //     $paymentMethod->status = 'failed';
+        //     $paymentMethod->save();
+        // }
 
         return response()->json([
             'status' => 'failed',
