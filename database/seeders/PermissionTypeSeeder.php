@@ -1250,6 +1250,18 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                 ],
             ],
+            [
+                'name' => 'Default App Screen Settings',
+                'sort' => 48,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 48],
+                ],
+                'permissions' => [
+                    ['key' => 'default-screen-settings', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ],
         ];
 
 
