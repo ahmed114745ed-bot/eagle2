@@ -128,13 +128,25 @@ class PaymentMethodController extends Controller
 
         // Get merchant_order_id - could be in order or in items name
         $merchantOrderId = $order['merchant_order_id'] ?? null;
+        info('Initial merchantOrderId from order', ['merchantOrderId' => $merchantOrderId]);
 
         // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 987875126694946403 - ORDER-1771737867")
         if (!$merchantOrderId && !empty($order['items'])) {
+            info('merchantOrderId is null, checking items', ['items' => $order['items']]);
             $itemName = $order['items'][0]['name'] ?? '';
+            info('Item name extracted', ['itemName' => $itemName]);
+            
             if (preg_match('/Charge Coin - (\d+)/', $itemName, $matches)) {
                 $merchantOrderId = $matches[1];
+                info('Regex match successful', ['matches' => $matches, 'extracted_merchantOrderId' => $merchantOrderId]);
+            } else {
+                info('Regex match failed - no match found in item name');
             }
+        } else {
+            info('merchantOrderId already exists or items array is empty', [
+                'merchantOrderId_exists' => !empty($merchantOrderId),
+                'items_empty' => empty($order['items'])
+            ]);
         }
 
         if (!$merchantOrderId) {
