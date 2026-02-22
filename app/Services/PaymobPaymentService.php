@@ -161,21 +161,34 @@ class PaymobPaymentService
             ];
         }
         
-        // Check for payment URL in different possible fields
-        $paymentUrl = null;
-        if (isset($responseData['payment_url'])) {
-            $paymentUrl = $responseData['payment_url'];
-        } elseif (isset($responseData['redirectionUrl'])) {
-            $paymentUrl = $responseData['redirectionUrl'];
-        } elseif (isset($responseData['url'])) {
-            $paymentUrl = $responseData['url'];
-        } elseif (isset($responseData['checkout_url'])) {
-            $paymentUrl = $responseData['checkout_url'];
-        } elseif (isset($responseData['payment_link'])) {
-            $paymentUrl = $responseData['payment_link'];
+        // Check if responseData is directly a URL string
+        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
+            return [
+                'status' => 1,
+                'payment_url' => $responseData,
+                'message' => 'Payment link created successfully',
+                'data' => ['url' => $responseData]
+            ];
         }
         
-        if ($paymentUrl) {
+        // Check for payment URL in different possible fields (for object responses)
+        $paymentUrl = null;
+        if (is_array($responseData) || is_object($responseData)) {
+            $responseArray = (array) $responseData;
+            if (isset($responseArray['payment_url'])) {
+                $paymentUrl = $responseArray['payment_url'];
+            } elseif (isset($responseArray['redirectionUrl'])) {
+                $paymentUrl = $responseArray['redirectionUrl'];
+            } elseif (isset($responseArray['url'])) {
+                $paymentUrl = $responseArray['url'];
+            } elseif (isset($responseArray['checkout_url'])) {
+                $paymentUrl = $responseArray['checkout_url'];
+            } elseif (isset($responseArray['payment_link'])) {
+                $paymentUrl = $responseArray['payment_link'];
+            }
+        }
+        
+        if ($paymentUrl && filter_var($paymentUrl, FILTER_VALIDATE_URL)) {
             return [
                 'status' => 1,
                 'payment_url' => $paymentUrl,
@@ -308,21 +321,34 @@ class PaymobPaymentService
             ];
         }
         
-        // Check for payment URL in different possible fields
-        $paymentUrl = null;
-        if (isset($responseData['payment_url'])) {
-            $paymentUrl = $responseData['payment_url'];
-        } elseif (isset($responseData['redirectionUrl'])) {
-            $paymentUrl = $responseData['redirectionUrl'];
-        } elseif (isset($responseData['url'])) {
-            $paymentUrl = $responseData['url'];
-        } elseif (isset($responseData['checkout_url'])) {
-            $paymentUrl = $responseData['checkout_url'];
-        } elseif (isset($responseData['payment_link'])) {
-            $paymentUrl = $responseData['payment_link'];
+        // Check if responseData is directly a URL string
+        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
+            return [
+                'status' => 1,
+                'payment_url' => $responseData,
+                'message' => 'Payment link created successfully',
+                'data' => ['url' => $responseData]
+            ];
         }
         
-        if ($paymentUrl) {
+        // Check for payment URL in different possible fields (for object responses)
+        $paymentUrl = null;
+        if (is_array($responseData) || is_object($responseData)) {
+            $responseArray = (array) $responseData;
+            if (isset($responseArray['payment_url'])) {
+                $paymentUrl = $responseArray['payment_url'];
+            } elseif (isset($responseArray['redirectionUrl'])) {
+                $paymentUrl = $responseArray['redirectionUrl'];
+            } elseif (isset($responseArray['url'])) {
+                $paymentUrl = $responseArray['url'];
+            } elseif (isset($responseArray['checkout_url'])) {
+                $paymentUrl = $responseArray['checkout_url'];
+            } elseif (isset($responseArray['payment_link'])) {
+                $paymentUrl = $responseArray['payment_link'];
+            }
+        }
+        
+        if ($paymentUrl && filter_var($paymentUrl, FILTER_VALIDATE_URL)) {
             return [
                 'status' => 1,
                 'payment_url' => $paymentUrl,

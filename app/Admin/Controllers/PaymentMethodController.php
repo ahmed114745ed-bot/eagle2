@@ -116,10 +116,20 @@ class PaymentMethodController extends AdminController
                 }
                 
                 // Return success response with payment URL
+                $finalPaymentUrl = $paymentUrl['payment_url'] ?? $paymentUrl;
+                
+                // Handle case where paymentUrl is an array but payment_url is also an array/object
+                if (is_array($finalPaymentUrl) && isset($finalPaymentUrl['url'])) {
+                    $finalPaymentUrl = $finalPaymentUrl['url'];
+                } elseif (is_array($finalPaymentUrl)) {
+                    // If it's still an array, convert to string or get first valid URL
+                    $finalPaymentUrl = current($finalPaymentUrl);
+                }
+                
                 return response()->json([
                     'success' => true,
                     'message' => __('payment.paymob_success'),
-                    'payment_url' => $paymentUrl['payment_url'] ?? $paymentUrl,
+                    'payment_url' => $finalPaymentUrl,
                     'data' => $paymentUrl
                 ], 200);
             }
