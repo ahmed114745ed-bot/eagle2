@@ -1074,7 +1074,7 @@ class UserController extends MainController
         
         $profile->save();
         
-        return Redirect::back()->with('success', __('User updated successfully'));
+        return Redirect::back();
     }
 
     // app/Admin/Controllers/UsersAppController.php
