@@ -41,6 +41,7 @@ class PaymobPaymentService
         $response = Http::post($utdUrl, $data);
 
         info($response);
+        Log::info('Paymob Payment Response: ' . $response->body());
         return json_decode($response);
     }
 

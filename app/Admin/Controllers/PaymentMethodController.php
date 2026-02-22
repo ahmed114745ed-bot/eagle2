@@ -99,7 +99,7 @@ class PaymentMethodController extends AdminController
 
                 }
                 
-                        return $paymentUrl;
+                return $paymentUrl;
 
                 
             } elseif ($request->link_type === 'paymob') {
@@ -107,11 +107,11 @@ class PaymentMethodController extends AdminController
                 $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
                 
                 if (isset($paymentUrl->status) && $paymentUrl->status == 0) {
-                         return response()->json($paymentUrl, 200);
+                     return response()->json($paymentUrl, 200);
 
                 }
                 
-                        return $paymentUrl;
+                 return $paymentUrl;
 
              }
 
