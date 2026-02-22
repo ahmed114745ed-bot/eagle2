@@ -6,6 +6,7 @@ use App\Models\Gift;
 use App\Models\User;
 use App\Models\UserLuckProfile;
 use App\Services\FairLuck\FairLuckService3;
+use App\Services\FairLuck\FairLuckServiceAlshamla;
 use App\Services\FairLuck\LossLedger;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -14,14 +15,25 @@ class SimulateLuckyGiftsVersus extends Command
 {
     private const LABELS = ['A', 'B', 'C', 'D', 'E'];
 
-    protected $signature = 'simulate:lucky-gifts-versus {gift_id?} {--rounds=30} {--balance=30000} {--player-count=3} {--price=} {--userA=} {--userB=} {--userC=} {--userD=} {--userE=}';
-    protected $description = 'Simulate Service 3 among multiple users and generate an HTML timeline report';
+    protected $signature = 'simulate:lucky-gifts-versus {gift_id?} {--rounds=30} {--balance=30000} {--player-count=3} {--price=} {--userA=} {--userB=} {--userC=} {--userD=} {--userE=} {--service=service3}';
+    protected $description = 'Simulate FairLuck Service 3 or Alshamla among multiple users and generate an HTML timeline report';
 
-    public function handle(FairLuckService3 $fairLuckService, LossLedger $lossLedger)
+    public function handle(
+        FairLuckService3 $fairLuckService,
+        LossLedger $lossLedger,
+        FairLuckServiceAlshamla $alshamlaService
+    )
     { 
         $rounds = max(1, (int) $this->option('rounds'));
         $startingBalance = max(1, (int) $this->option('balance'));
         $playerCount = min(count(self::LABELS), max(2, (int) $this->option('player-count')));
+
+        $serviceOption = strtolower((string) $this->option('service'));
+        $serviceSelection = in_array($serviceOption, ['shamla', 'alshamla', 'الشامله'], true)
+            ? 'shamla'
+            : 'service3';
+        $activeService = $serviceSelection === 'shamla' ? $alshamlaService : $fairLuckService;
+        $this->info('Running simulation using: ' . ($serviceSelection === 'shamla' ? 'Alshamla Service' : 'Service 3'));
 
         
         $gift = $this->resolveGift($this->argument('gift_id'));
@@ -96,6 +108,7 @@ class SimulateLuckyGiftsVersus extends Command
                 $currentBalance -= $gift->price;
 
                 $result = $fairLuckService->processBet($player, $gift, $gift->price);
+                $result = $activeService->processBet($player, $gift, $gift->price);
 
                 $winAmount = $result->isWinner ? (int) round($result->multiplier * $gift->price) : 0;
                 $currentBalance += $winAmount;

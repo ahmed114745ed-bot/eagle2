@@ -325,7 +325,7 @@ class FairLuckService3
     /**
      * Smart weight-based selection to keep user in suspense.
      */
-    private function smartMultiplierSelect(
+    protected function smartMultiplierSelect(
         float $deviation,
         float $chaos,
         int $streak = 0,
@@ -343,7 +343,7 @@ class FairLuckService3
         int $poolBalance = 0,
         bool $hasPaidForJackpot = false
     ): int {
-        $multipliers = [5, 10, 20, 50, 100, 250, 500, 1000];
+        $multipliers = $this->getAvailableMultipliers();
         $weights = [];
         $hasPaidForJackpot = $hasPaidForJackpot || ($unlockContribution > 0 && $contributionBank >= $unlockContribution);
         $jackpotScaling = $unlockContribution > 0
@@ -474,10 +474,34 @@ class FairLuckService3
             $weights[] = $this->finalizeMultiplierWeight($weight, $m, $highMultiplierSignal);
         }
 
+        $weights = $this->tweakMultiplierWeights(
+            $multipliers,
+            $weights,
+            [
+                'force_jackpot' => $forceJackpot,
+                'force_mini_wins' => $forceMiniWins,
+                'is_drain_locked' => $isDrainLocked,
+                'streak' => $streak,
+                'deviation' => $deviation,
+                'pity' => $pityCount,
+                'chaos' => $chaos,
+            ]
+        );
+
         return $this->weightedRandom($multipliers, $weights);
     }
 
-    private function resolveHighTierAvailability(
+    protected function getAvailableMultipliers(): array
+    {
+        return [5, 10, 20, 50, 100, 250, 500, 1000];
+    }
+
+    protected function tweakMultiplierWeights(array $multipliers, array $weights, array $context): array
+    {
+        return $weights;
+    }
+
+    protected function resolveHighTierAvailability(
         int $betUnit,
         int $globalVaultBalance,
         bool $isTopLossCandidate,
@@ -503,7 +527,7 @@ class FairLuckService3
         return $availability;
     }
 
-    private function shouldUseCautiousDistribution(
+    protected function shouldUseCautiousDistribution(
         float $deviation,
         int $contributionBank,
         int $unlockContribution,
@@ -524,7 +548,7 @@ class FairLuckService3
         return false;
     }
 
-    private function cautiousDistributionWeight(int $multiplier, float $baseWeight, int $streak): float
+    protected function cautiousDistributionWeight(int $multiplier, float $baseWeight, int $streak): float
     {
         $streakPenalty = max(0.4, 1 - min(0.6, $streak * 0.04));
 
@@ -537,7 +561,7 @@ class FairLuckService3
         };
     }
 
-    private function neutralSmallWinWeight(
+    protected function neutralSmallWinWeight(
         int $multiplier,
         float $baseWeight,
         float $chaos,
@@ -556,7 +580,7 @@ class FairLuckService3
         };
     }
 
-    private function ratingSensitiveWeight(
+    protected function ratingSensitiveWeight(
         int $multiplier,
         float $baseWeight,
         float $deviation,
@@ -626,7 +650,7 @@ class FairLuckService3
         return $weight;
     }
 
-    private function finalizeMultiplierWeight(float $weight, int $multiplier, ?HighMultiplierSignal $highMultiplierSignal): int
+    protected function finalizeMultiplierWeight(float $weight, int $multiplier, ?HighMultiplierSignal $highMultiplierSignal): int
     {
         if ($weight <= 0) {
             return 0;
@@ -639,7 +663,7 @@ class FairLuckService3
         return (int) max(0, round($weight));
     }
 
-    private function getNaturalWeight(int $multiplier): int
+    protected function getNaturalWeight(int $multiplier): int
     {
         return match ($multiplier) {
             5 => 800, 10 => 350, 20 => 120, 50 => 30, 
@@ -648,7 +672,7 @@ class FairLuckService3
         };
     }
 
-    private function weightedRandom(array $values, array $weights): int
+    protected function weightedRandom(array $values, array $weights): int
     {
         $totalWeight = array_sum($weights);
         if ($totalWeight <= 0) return $values[0];
