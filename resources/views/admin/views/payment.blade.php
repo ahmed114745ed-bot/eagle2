@@ -32,8 +32,35 @@ function extracted() {
     const submitButton = document.getElementById('submitButton');
     const responseMessage = document.getElementById('responseMessage');
     
+    // Validate required fields before submission
+    const linkType = document.getElementById('link_type').value;
+    const amount = document.getElementById('amount').value;
+    
+    if (!linkType) {
+        responseMessage.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>{{ __("payment.error") }}!</strong> {{ __("payment.select_link_type") }}
+            </div>
+        `;
+        return false;
+    }
+    
+    if (!amount) {
+        responseMessage.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>{{ __("payment.error") }}!</strong> {{ __("payment.amount") }} {{ __("payment.required") }}
+            </div>
+        `;
+        return false;
+    }
+    
     // Get form data
     const formData = new FormData(form);
+    
+    // Explicitly add the link_type to ensure it's sent
+    formData.set('link_type', linkType);
+    formData.set('amount', amount);
+    formData.set('type', document.getElementById('type').value);
     
     // Disable submit button to prevent double submission
     submitButton.disabled = true;
@@ -52,7 +79,14 @@ function extracted() {
         }
     })
     .then(response => {
+        // Check if response is ok
         if (!response.ok) {
+            // If it's a validation error (422), return the response for further processing
+            if (response.status === 422) {
+                return response.json().then(data => {
+                    throw new Error(JSON.stringify(data));
+                });
+            }
             throw new Error('Network response was not ok');
         }
         return response.json();
@@ -77,9 +111,27 @@ function extracted() {
     })
     .catch(error => {
         console.error('Error:', error);
+        let errorMessage = '{{ __("payment.network_error") }}';
+        
+        try {
+            // Try to parse validation errors
+            const errorData = JSON.parse(error.message);
+            if (errorData.errors) {
+                const errors = Object.values(errorData.errors).flat();
+                errorMessage = errors.join('<br>');
+            } else if (errorData.message) {
+                errorMessage = errorData.message;
+            }
+        } catch (parseError) {
+            // If parsing fails, check for specific error messages
+            if (error.message && error.message.includes('link type')) {
+                errorMessage = '{{ __("payment.select_link_type") }}';
+            }
+        }
+        
         responseMessage.innerHTML = `
             <div class="alert alert-danger">
-                <strong>{{ __("payment.error") }}!</strong> {{ __("payment.network_error") }}
+                <strong>{{ __("payment.error") }}!</strong> ${errorMessage}
             </div>
         `;
     })
