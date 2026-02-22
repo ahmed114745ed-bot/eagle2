@@ -1,4 +1,11 @@
 function extracted() {
+    // Prevent multiple submissions
+    let submitButton = $('#submitButton');
+    if (submitButton.prop('disabled')) {
+        console.log('Form submission already in progress');
+        return false;
+    }
+
     // Collect CSRF token and amount value
     let token = $('input[name="_token"]').val();
     let amount = $('#amount').val();
@@ -6,7 +13,6 @@ function extracted() {
     let link_type = $('#link_type').val();
 
     // Disable submit button and show loading text
-    let submitButton = $('#submitButton');
     submitButton.attr('disabled', true).text('Loading...');
 
     // Send data using AJAX

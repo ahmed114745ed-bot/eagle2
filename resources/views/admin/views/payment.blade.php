@@ -1,4 +1,4 @@
-<form id="paymentForm" onsubmit="event.preventDefault(); return extracted()">
+<form id="paymentForm">
     @csrf
     <div class="form-group">
         <label for="amount">{{ __('payment.amount') }}</label>
