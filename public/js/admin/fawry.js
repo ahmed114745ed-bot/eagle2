@@ -72,7 +72,6 @@ $(document).ready(function() {
 
     $('#paymentForm').on('submit', function(e) {
         e.preventDefault();
-        e.preventDefault();
 
         return extracted();
 
