@@ -27,12 +27,33 @@ function extracted() {
             submitButton.attr('disabled', false).text('Save');
 
             // Handle the success response (e.g., open a payment URL)
-            var popup = window.open(response);
-
-            if (popup == null || typeof (popup) == 'undefined') {
-                alert('Please allow popups for this website');
+            console.log('Response received:', response);
+            
+            let paymentUrl = null;
+            
+            // Check for different response formats
+            if (typeof response === 'string') {
+                paymentUrl = response;
+            } else if (response && response.payment_url) {
+                paymentUrl = response.payment_url;
+            } else if (response && response.data && response.data.payment_url) {
+                paymentUrl = response.data.payment_url;
+            } else if (response && response.url) {
+                paymentUrl = response.url;
+            }
+            
+            console.log('Extracted payment URL:', paymentUrl);
+            
+            if (paymentUrl && typeof paymentUrl === 'string') {
+                var popup = window.open(paymentUrl);
+                if (popup == null || typeof (popup) == 'undefined') {
+                    alert('Please allow popups for this website');
+                } else {
+                    popup.focus();
+                }
             } else {
-                popup.focus();
+                console.error('Could not extract payment URL from response:', response);
+                $('#responseMessage').html('<div class="alert alert-danger">Error: Could not get payment URL</div>');
             }
         },
         error: function (xhr) {
