@@ -288,21 +288,9 @@ class PaymobPaymentService
             }
         }
         
-        if ($paymentUrl && filter_var($paymentUrl, FILTER_VALIDATE_URL)) {
-            return [
-                'status' => 1,
-                'payment_url' => $paymentUrl,
-                'message' => 'Payment link created successfully',
-                'data' => $responseData
-            ];
-        }
+       
         
-        // If no URL found, return the whole response for debugging
-        return [
-            'status' => 1,
-            'payment_url' => $responseData,
-            'message' => 'Payment processed but no URL found',
-            'data' => $responseData
-        ];
+       return $paymentUrl;
+
     }
 }
