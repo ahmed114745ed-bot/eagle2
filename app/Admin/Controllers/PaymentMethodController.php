@@ -10,6 +10,7 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class PaymentMethodController extends AdminController
@@ -106,6 +107,12 @@ class PaymentMethodController extends AdminController
                 $paymobService = new PaymobPaymentService();
                 $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
                 
+                // Add debug logging
+                Log::info('PaymentMethodController Paymob Response:', [
+                    'response_type' => gettype($paymentUrl),
+                    'response_data' => $paymentUrl
+                ]);
+                
                 // Check if payment creation failed
                 if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
                     return response()->json([
@@ -115,16 +122,32 @@ class PaymentMethodController extends AdminController
                     ], 400);
                 }
                 
-                // Return success response with payment URL
-                $finalPaymentUrl = $paymentUrl['payment_url'] ?? $paymentUrl;
+                // Extract the actual payment URL
+                $finalPaymentUrl = null;
                 
-                // Handle case where paymentUrl is an array but payment_url is also an array/object
-                if (is_array($finalPaymentUrl) && isset($finalPaymentUrl['url'])) {
-                    $finalPaymentUrl = $finalPaymentUrl['url'];
-                } elseif (is_array($finalPaymentUrl)) {
-                    // If it's still an array, convert to string or get first valid URL
-                    $finalPaymentUrl = current($finalPaymentUrl);
+                if (isset($paymentUrl['payment_url'])) {
+                    $finalPaymentUrl = $paymentUrl['payment_url'];
+                } elseif (is_string($paymentUrl)) {
+                    $finalPaymentUrl = $paymentUrl;
+                } elseif (is_array($paymentUrl)) {
+                    // Try to find URL in the array
+                    $finalPaymentUrl = $paymentUrl['url'] ?? $paymentUrl['payment_url'] ?? current($paymentUrl);
                 }
+                
+                // Ensure we have a valid URL string
+                if (!is_string($finalPaymentUrl) || !filter_var($finalPaymentUrl, FILTER_VALIDATE_URL)) {
+                    Log::error('PaymentMethodController: Invalid payment URL extracted', [
+                        'extracted_url' => $finalPaymentUrl,
+                        'original_response' => $paymentUrl
+                    ]);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid payment URL received',
+                        'data' => $paymentUrl
+                    ], 400);
+                }
+                
+                Log::info('PaymentMethodController: Final payment URL', ['url' => $finalPaymentUrl]);
                 
                 return response()->json([
                     'success' => true,
