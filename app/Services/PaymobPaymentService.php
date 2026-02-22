@@ -27,11 +27,6 @@ class PaymobPaymentService
 
     public function makePayment($trx, $amount, $exterData)
     {
-        PaymentMethodHistory::create([
-            "amount" => $amount,
-            "type" => 'game_type',
-            "utd_code" => $trx
-        ]);
 
         $data = $this->getBodyForPaymob($trx, $amount);
         $data['paymentSubType'] = $exterData['type'];
@@ -77,10 +72,15 @@ class PaymobPaymentService
         return $data;
     }
 
-    public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $expiresAt = null, $isLive = false)
+    public function createPaymentLink($amount, $name, $description = '', $email = null, $phone = null, $trx = null, $expiresAt = null, $isLive = false )
     {
+        PaymentMethodHistory::create([
+            "amount" => $amount,
+            "type" => 'game_type',
+            "utd_code" => $trx
+        ]);
+
         $utdUrl = config("services.utd_paymob.utd_url");
-        // Use paymob-intention endpoint
         $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
 
         $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
