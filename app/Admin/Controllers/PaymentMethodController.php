@@ -106,14 +106,23 @@ class PaymentMethodController extends AdminController
                 $paymobService = new PaymobPaymentService();
                 $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
                 
-                if (isset($paymentUrl->status) && $paymentUrl->status == 0) {
-                     return response()->json($paymentUrl, 200);
-
+                // Check if payment creation failed
+                if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $paymentUrl['message'] ?? __('payment.paymob_error'),
+                        'data' => $paymentUrl
+                    ], 400);
                 }
                 
-                 return $paymentUrl;
-
-             }
+                // Return success response with payment URL
+                return response()->json([
+                    'success' => true,
+                    'message' => __('payment.paymob_success'),
+                    'payment_url' => $paymentUrl['payment_url'] ?? $paymentUrl,
+                    'data' => $paymentUrl
+                ], 200);
+            }
 
         } catch (\Exception $e) {
             $trx->update(['status' => 'error']);

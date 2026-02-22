@@ -51,15 +51,19 @@ class PaymobPaymentService
 
         $utdUrl = config("services.utd_paymob.utd_url");
         
+        // Fix URL to use same endpoint as createPaymentLink (which works)
+        $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
+        
         Log::info('Paymob makePayment Request:', [
-            'url' => $utdUrl,
+            'original_url' => $utdUrl,
+            'corrected_url' => $baseUrl,
             'data' => $data,
             'trx' => $trx,
             'amount' => $amount
         ]);
         
         try {
-            $response = Http::timeout(30)->post($utdUrl, $data);
+            $response = Http::timeout(30)->post($baseUrl, $data);
             
             Log::info('Paymob makePayment Response:', [
                 'status' => $response->status(),
@@ -70,7 +74,7 @@ class PaymobPaymentService
         } catch (\Exception $e) {
             Log::error('Paymob makePayment Exception:', [
                 'error' => $e->getMessage(),
-                'url' => $utdUrl,
+                'url' => $baseUrl,
                 'data' => $data
             ]);
             return [
