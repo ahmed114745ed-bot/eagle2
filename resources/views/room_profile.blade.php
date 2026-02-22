@@ -395,37 +395,37 @@
                         <tr>
                             <td>{{ $gift->id }}</td>
                             <td>
-                                <a href="{{ admin_url('users/' . $gift->sender->id) }}" target="_blank"
+                                <a href="{{ admin_url('users/' . @$gift->sender->id) }}" target="_blank"
                                    class="d-flex align-items-center text-decoration-none">
                                     <img
-                                        src="{{ getImagePath($gift->sender->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                        src="{{ getImagePath(@$gift->sender->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                         width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div>
-                                        <strong style="font-size: 14px;">{{ $gift->sender->name }}</strong><br>
-                                        <small class="text-muted">UUID: {{ $gift->sender->uuid }}</small>
+                                        <strong style="font-size: 14px;">{{ @$gift->sender->name }}</strong><br>
+                                        <small class="text-muted">UUID: {{ @$gift->sender->uuid }}</small>
                                     </div>
                                 </a>
                             </td>
                             <td>
-                                <a href="{{ admin_url('users/' . $gift->receiver->id) }}" target="_blank"
+                                <a href="{{ admin_url('users/' . @$gift->receiver->id) }}" target="_blank"
                                    class="d-flex align-items-center text-decoration-none">
                                     <img
-                                        src="{{ getImagePath($gift->receiver->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
+                                        src="{{ getImagePath(@$gift->receiver->profile?->avatar) ?? asset('images/businessman-icon.jpg') }}"
                                         width="40" height="40"
                                         style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
                                     <div>
-                                        <strong style="font-size: 14px;">{{ $gift->receiver->name }}</strong><br>
-                                        <small class="text-muted">UUID: {{ $gift->receiver->uuid }}</small>
+                                        <strong style="font-size: 14px;">{{ @$gift->receiver->name }}</strong><br>
+                                        <small class="text-muted">UUID: {{ @$gift->receiver->uuid }}</small>
                                     </div>
                                 </a>
                             </td>
                             <td>
                                 <a href="#" class="d-flex align-items-center text-decoration-none">
-                                    <img src="{{ getImagePath($gift->gift->img ?? '') }}"
+                                    <img src="{{ getImagePath(@$gift->gift->img ?? '') }}"
                                          width="30" height="30"
                                          style="object-fit: cover; border-radius: 50%; margin-right: 10px;">
-                                    <span>{{ $gift->gift?->giftName ?? '' }}</span>
+                                    <span>{{ @$gift->gift?->giftName ?? '' }}</span>
                                 </a>
                             </td>
                             <td>{{ $gift->giftNum }}</td>
