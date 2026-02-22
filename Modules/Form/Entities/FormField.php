@@ -37,6 +37,14 @@ class FormField extends Model
     ];
 
     /**
+     * Get the section that owns this field
+     */
+    public function section()
+    {
+        return $this->belongsTo(FormSection::class, 'section_id');
+    }
+
+    /**
      * Get the custom widget for this field
      */
     public function widget()
