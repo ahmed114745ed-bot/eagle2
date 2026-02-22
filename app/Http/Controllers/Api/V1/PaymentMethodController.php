@@ -126,8 +126,7 @@ class PaymentMethodController extends Controller
         $transactionId = $obj['id'] ?? null;
         $amountCents = $obj['amount_cents'] ?? 0;
 
-        // Get merchant_order_id - could be in order or in items name
-        $merchantOrderId = $order['merchant_order_id'] ?? null;
+        $merchantOrderId = $webhookData['trx_code'] ?? null;
         info('Initial merchantOrderId from order', ['merchantOrderId' => $merchantOrderId]);
 
         // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 987875126694946403 - ORDER-1771737867")
