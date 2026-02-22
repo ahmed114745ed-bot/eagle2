@@ -107,13 +107,6 @@ class PaymentMethodController extends AdminController
                 $paymobService = new PaymobPaymentService();
                 $paymentUrl = $paymobService->makePayment($trxId, $request->amount, $exterData);
                 
-                // Add debug logging
-                Log::info('PaymentMethodController Paymob Response:', [
-                    'response_type' => gettype($paymentUrl),
-                    'response_data' => $paymentUrl
-                ]);
-                
-                // Check if payment creation failed
                 if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
                     return response()->json([
                         'success' => false,
@@ -122,7 +115,6 @@ class PaymentMethodController extends AdminController
                     ], 400);
                 }
                 
-                // Extract the actual payment URL
                 $finalPaymentUrl = null;
                 
                 if (isset($paymentUrl['payment_url'])) {
@@ -130,16 +122,11 @@ class PaymentMethodController extends AdminController
                 } elseif (is_string($paymentUrl)) {
                     $finalPaymentUrl = $paymentUrl;
                 } elseif (is_array($paymentUrl)) {
-                    // Try to find URL in the array
                     $finalPaymentUrl = $paymentUrl['url'] ?? $paymentUrl['payment_url'] ?? current($paymentUrl);
                 }
                 
-                // Ensure we have a valid URL string
                 if (!is_string($finalPaymentUrl) || !filter_var($finalPaymentUrl, FILTER_VALIDATE_URL)) {
-                    Log::error('PaymentMethodController: Invalid payment URL extracted', [
-                        'extracted_url' => $finalPaymentUrl,
-                        'original_response' => $paymentUrl
-                    ]);
+                
                     return response()->json([
                         'success' => false,
                         'message' => 'Invalid payment URL received',
@@ -147,7 +134,6 @@ class PaymentMethodController extends AdminController
                     ], 400);
                 }
                 
-                Log::info('PaymentMethodController: Final payment URL', ['url' => $finalPaymentUrl]);
                 
                 return response()->json([
                     'success' => true,
