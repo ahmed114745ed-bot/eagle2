@@ -129,10 +129,10 @@ class PaymentMethodController extends Controller
         // Get merchant_order_id - could be in order or in items name
         $merchantOrderId = $order['merchant_order_id'] ?? null;
 
-        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 872504210283505906")
+        // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 987875126694946403 - ORDER-1771737867")
         if (!$merchantOrderId && !empty($order['items'])) {
             $itemName = $order['items'][0]['name'] ?? '';
-            if (preg_match('/- (\w+)$/', $itemName, $matches)) {
+            if (preg_match('/Charge Coin - (\d+)/', $itemName, $matches)) {
                 $merchantOrderId = $matches[1];
             }
         }
