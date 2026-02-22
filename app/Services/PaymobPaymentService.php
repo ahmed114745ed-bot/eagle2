@@ -74,8 +74,50 @@ class PaymobPaymentService
 
         $utdUrl = config("services.utd_paymob.utd_url");
         
+        // Debug URL configuration
+        Log::info('Paymob URL Configuration:', [
+            'original_utd_url' => $utdUrl,
+            'utd_url_empty' => empty($utdUrl),
+            'utd_url_type' => gettype($utdUrl),
+            'all_paymob_config' => config("services.utd_paymob")
+        ]);
+        
+        // Ensure we have a valid URL - try alternative config keys if main one is empty
+        if (empty($utdUrl)) {
+            $utdUrl = config("services.utd_paymob.utd_paymob_url");
+            Log::info('Trying alternative URL config:', ['alternative_url' => $utdUrl]);
+        }
+        
+        if (empty($utdUrl)) {
+            Log::error('Paymob makePayment: utd_url configuration is empty');
+            return [
+                'status' => 0,
+                'message' => 'Payment gateway configuration error: Missing URL',
+                'data' => null
+            ];
+        }
+        
         // Fix URL to use same endpoint as createPaymentLink (which works)
         $baseUrl = preg_replace('/\/api\/.*$/', '/api/paymob-intention', $utdUrl);
+        
+        // If regex didn't work, construct URL manually
+        if ($baseUrl === $utdUrl && !str_contains($utdUrl, '/api/paymob-intention')) {
+            // Remove trailing slash and add the correct endpoint
+            $baseUrl = rtrim($utdUrl, '/') . '/api/paymob-intention';
+        }
+        
+        // Validate the final URL
+        if (empty($baseUrl) || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
+            Log::error('Paymob makePayment: Invalid URL generated', [
+                'original_url' => $utdUrl,
+                'generated_url' => $baseUrl
+            ]);
+            return [
+                'status' => 0,
+                'message' => 'Payment gateway configuration error: Invalid URL',
+                'data' => null
+            ];
+        }
         
         Log::info('Paymob makePayment Request:', [
             'original_url' => $utdUrl,
