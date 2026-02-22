@@ -250,7 +250,6 @@ class PaymobPaymentService
             ];
         }
 
-        // Get response data
         $responseData = $response->json();
         
         if (!$response->successful()) {
@@ -261,27 +260,10 @@ class PaymobPaymentService
             ];
         }
         
-    
-        
-        $paymentUrl = null;
-        if (is_array($responseData) || is_object($responseData)) {
-            $responseArray = (array) $responseData;
-            if (isset($responseArray['payment_url'])) {
-                $paymentUrl = $responseArray['payment_url'];
-            } elseif (isset($responseArray['redirectionUrl'])) {
-                $paymentUrl = $responseArray['redirectionUrl'];
-            } elseif (isset($responseArray['url'])) {
-                $paymentUrl = $responseArray['url'];
-            } elseif (isset($responseArray['checkout_url'])) {
-                $paymentUrl = $responseArray['checkout_url'];
-            } elseif (isset($responseArray['payment_link'])) {
-                $paymentUrl = $responseArray['payment_link'];
-            }
+        if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
+            return $responseData;     
         }
         
-       
-        
-       return $paymentUrl;
 
     }
 }
