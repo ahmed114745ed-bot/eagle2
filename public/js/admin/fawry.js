@@ -3,6 +3,7 @@ function extracted() {
     let token = $('input[name="_token"]').val();
     let amount = $('#amount').val();
     let type = $('#type').val();
+    let link_type = $('#link_type').val();
 
     // Disable submit button and show loading text
     let submitButton = $('#submitButton');
@@ -15,7 +16,8 @@ function extracted() {
         data: {
             _token: token,
             amount: amount,
-            type: type
+            type: type,
+            link_type: link_type
         },
         success: function (response) {
             if (response.status == 0) {
