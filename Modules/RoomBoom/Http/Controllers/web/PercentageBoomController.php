@@ -4,15 +4,12 @@ namespace Modules\RoomBoom\Http\Controllers\web;
 
 use App\Admin\Controllers\MainController;
 use App\Helpers\Common;
-use Carbon\Carbon;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
+use App\Models\Setting;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Show;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Box;
 use Illuminate\Http\Request;
 use Modules\RoomBoom\Entities\BoomPercentage;
-use Modules\RoomBoom\Entities\RoomBoomLevel;
 
 class PercentageBoomController extends MainController
 {
