@@ -16,11 +16,13 @@ use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use Illuminate\Support\MessageBag;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Modules\RankingReward\Entities\RankingType;
 use Modules\RankingReward\Entities\RankingRange;
 use Modules\RankingReward\Entities\RankingReward;
 use Modules\Reals\Http\Services\InterventionImage;
+use Modules\Achievement\Entities\CustomAchievement;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RankingTypeController extends MainController
@@ -191,7 +193,7 @@ class RankingTypeController extends MainController
     public function getRewards($id)
     {
         // Load the RankingRange and its rewards
-        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge'])->findOrFail($id);
+        $model = RankingRange::with(['rewards.ware', 'rewards.vip', 'rewards.badge','rewards.customAchievement','rewards.customAchievement.images'])->findOrFail($id);
         $members = $model->rewards->map(function ($reward) {
 
             $gift = '';
@@ -219,8 +221,8 @@ class RankingTypeController extends MainController
                     break;
 
                 case 'achievement':
-                    $gift = "<img src='" . getDriverUrl() . "/{$reward->target}' width='80'>";
-                    $path = $reward->target;
+                    $gift = optional($reward->customAchievement)->name;
+                    $path = optional($reward->customAchievement)->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                     break;
             }
 
@@ -339,8 +341,9 @@ class RankingTypeController extends MainController
                         $name = $reward->target . ' coins';
                         $url = getImagePath('coin.png');
                     } elseif ($reward->target_type == 'achievement') {
-                        $name = 'Achievement';
-                        $url = getImagePath($reward->target);
+                        $achievement = CustomAchievement::find($reward->target);
+                        $name = $achievement->name ?? $reward->target;
+                        $url = getImagePath($achievement->images?->firstWhere('language', app()->getLocale())?->image ?? '');
                     }
                     $showImage = handleShowImageWithTypes($reward->id, $url, -1, 60, 4, 'cover');
 
@@ -408,9 +411,8 @@ class RankingTypeController extends MainController
                 $form->number("target3", __("coins"));
             })
             ->when("achievement", function () use ($form) {
-                $form->image("target4", __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                })->disk('gcs');
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire_days', __('expire'))->default(1);
             });
 
@@ -507,7 +509,7 @@ class RankingTypeController extends MainController
                     $target = request('target3');
                     $fieldName = 'target3';
                 } elseif ($targetType === 'achievement') {
-                    $target = request()->hasFile('target4') ? request()->file('target4') : null;
+                    $target = request('target4');
                     $fieldName = 'target4';
                 }
 
@@ -565,12 +567,9 @@ class RankingTypeController extends MainController
             $action = request('action');
 
             if ($targetType) {
-                $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5');
+                $target = request('target1') ?? request('target2') ?? request('target3') ?? request('target5') ?? request('target4');
 
-                if ($targetType === 'achievement' && request()->hasFile('target4')) {
-                    $file = request()->file('target4');
-                    $target = $file->store('achievements', 'gcs');
-                }
+
 
                 if ($target) {
                     $reward = new RankingReward();
@@ -622,7 +621,7 @@ class RankingTypeController extends MainController
                             break;
 
                         case 'achievement':
-                            $path = getImagePath($reward->target);
+                            $path = getImagePath($reward->images?->firstWhere('language', app()->getLocale())?->image ?? '');
                             break;
                     }
 

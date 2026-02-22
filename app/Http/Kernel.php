@@ -37,7 +37,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\OctaneCacheClearing::class,
-        \App\Http\Middleware\ForcePusherRefresh::class, 
+        \App\Http\Middleware\ForcePusherRefresh::class,
     ];
 
     /**
@@ -110,6 +110,7 @@ class Kernel extends HttpKernel
         'clear.session' => \App\Http\Middleware\ClearSessionAfterRequest::class,
         'verify.fawry.signature' => \App\Http\Middleware\VerifyFawrySignature::class,
         'verify.utdFawry.signature' => \App\Http\Middleware\VerifyUtdFawrySignature::class,
+        'verify.payMob.signature' => \App\Http\Middleware\VerifyPayMobSignature::class,
         'verify.paypal.webhook' => \App\Http\Middleware\VerifyPayPalWebhook::class,
         'verify.codapay.webhook' => \App\Http\Middleware\VerifyCodapayWebhook::class,
         'production.error' => \App\Http\Middleware\StopInProduction::class,

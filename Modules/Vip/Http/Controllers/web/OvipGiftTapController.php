@@ -266,20 +266,25 @@ class OvipGiftTapController extends MainController
     {
         $form = new Form(new Ware());
         $this->disableFormTools($form);
+        $isEditing = $form->isEditing();
+        if (!$isEditing) {
+            $form->hidden('level')->value(request('level'));
+            $form->hidden('type')->value(request('type'));
+            $form->hidden('is_active_for_vip')->value(1);
+            $form->hidden('get_type')->value(1);
+            $form->hidden('enable')->value(1);
+        }
 
-        $form->hidden('level')->value(request('level'));
-        $form->hidden('type')->value(request('type'));
-        $form->hidden('is_active_for_vip')->value(1);
-        $form->hidden('get_type')->value(1);
-        $form->hidden('enable')->value(1);
 
         $id = request()->route('ware_gift');
         $ware = Ware::find($id);
 
         $isType18or21 = in_array(request('type'), [18, 21]);
-        $isEditing = $form->isEditing();
 
-        if (!$isType18or21 || ($isEditing && $ware && !in_array($ware->type, [18, 21]))) {
+
+        if (!$isType18or21 && ($isEditing && $ware && !in_array($ware->type, [18, 21]))) {
+
+            // dd($isType18or21, $isEditing, $ware?->type);
             $form->display('ID');
             $form->text('name', trans('name'));
             $form->text('name_en', trans('Name en'));
@@ -289,7 +294,7 @@ class OvipGiftTapController extends MainController
             $form->image('show_img', trans('img'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension())
                 ->default('1.png');
 
-            $form->file('img2', trans('svg'))->name(fn($file) => 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension());
+            $form->file('img2', trans('show'))->name(fn($file) => 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension());
 
             $form->keyValue('key_json', 'key_json');
             $form->text('key', trans('key'));
@@ -313,13 +318,37 @@ class OvipGiftTapController extends MainController
             }
         }
 
+
+
         if ($isType18or21 || ($isEditing && $ware && in_array($ware->type, [18, 21]))) {
-            $form->color('color', trans('color'));
+
+
+            $form->html('
+                    <div class="form-group">
+                        <label for="color">' . trans("color") . ':</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="color" id="color" name="color"
+                                value="' . ($ware->color ?? '#ccc') . '"
+                                style="width: 50px; height: 45px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer;">
+                            <input type="text" id="color_text" class="form-control"
+                                value="' . ($ware->color ?? '#ccc') . '"
+                                placeholder="ادخل لون" style="flex: 1;" readonly>
+                        </div>
+                    </div>
+
+                    <script>
+                        const colorInput = document.getElementById("color");
+                        const colorText = document.getElementById("color_text");
+                        colorInput.addEventListener("input", function() {
+                            colorText.value = this.value;
+                        });
+                    </script>
+                ');
         }
 
+
         $form->saving(function (Form $form) use ($isEditing, $isType18or21) {
-
-
+            if (request('color')) $form->model()->color = request('color');
             if (isset($form->key_json) && is_array($form->key_json)) {
                 // Normalize posted structure to ['keys' => [...], 'values' => [...]]
                 // Handle both formats: the KeyValue widget posts ['keys'=>[], 'values'=>[]]
@@ -366,69 +395,11 @@ class OvipGiftTapController extends MainController
             }
 
 
-            // $hasShowImg = $form->show_img || $form->model()->show_img;
-            // $hasImg2 = $form->img2 || $form->model()->img2;
-            // $type = $form->model()->type ?? request('type');
-
-            // if (!$isType18or21 || ($isEditing && !in_array((int)$type, [18, 21]))) {
-            //     if (!$hasShowImg && !$hasImg2) {
-            //         return back()->with([
-            //             'error' => new MessageBag([
-            //                 'title' => 'Error',
-            //                 'message' => 'Please upload at least one image',
-            //             ])
-            //         ]);
-            //     }
-            // }
-
-            // $allowed = ['svga', 'svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm', 'alpha', 'vap'];
-            // if ($form->show_img instanceof UploadedFile) {
-            //     // $allowed = ['svga','svg', 'mp4', 'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg', 'webp', 'mov', 'avi', 'wmv', 'flv', 'mkv', 'webm'];
-            //     $ext = strtolower($form->show_img->guessExtension());
-
-            //     if (!in_array($ext, $allowed)) {
-            //         throw ValidationException::withMessages(['show_img' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
-            //     }
-
-            //     $form->image_type1 = $ext;
-            // }
-
-            // if ($form->img2 instanceof UploadedFile) {
-            //     // $allowed = ['svga', 'mp4','svg','alpha', 'vap', 'png'];
-            //     $ext = strtolower($form->img2->guessExtension());
-            //     $originalExt = strtolower($form->img2->getClientOriginalExtension());
-
-            //     if ($ext === 'zz' && $originalExt === 'svga') $ext = 'svga';
-            //     if ($ext === 'gif' && $originalExt === 'gif') $ext = 'png';
-
-            //     if ($ext === 'mp4') {
-            //         $videoPath = getDriverUrl() . '/' . upload($form->img2);
-            //         $wareId = $form->model()->id;
-
-            //         (new FfmpegService())->extractByDuration($videoPath, $wareId);
-
-            //         $imagePath = (config('app.env') !== 'production' ? '' : 'test-') . "frames/{$wareId}.jpg";
-            //         $response = Http::attach('image', Storage::disk('gcs')->get($imagePath), "{$wareId}.jpg")
-            //             ->post('https://utd-test.utdsoftware.com/api/analyze-media');
-
-            //         if ($response->successful()) {
-            //             $type = $response->json()['data']['video_type'] ?? null;
-            //             if ($type) $ext = strtolower($type);
-            //         }
-            //     }
-
-            //     if (!in_array($ext, $allowed)) {
-            //         throw ValidationException::withMessages(['img2' => ['Invalid file type. Allowed: ' . implode(', ', $allowed)]]);
-            //     }
-
-            //     $form->input('detected_profile_frame_type', $ext);
-            //     $form->profile_frame_type = $ext;
-            // }
-
             $id = $form->model()->id;
             $level = $form->model()->level ?? request('level');
+            $type = $form->model()->type ?? request('type');
             $exists = Ware::where('level', $level)
-                ->where('type', $form->type)
+                ->where('type', $type)
                 ->where('get_type', 1)
                 ->when($id, fn($q) => $q->where('id', '!=', $id))
                 ->exists();
@@ -442,7 +413,7 @@ class OvipGiftTapController extends MainController
                 ]);
             }
 
-            if (!in_array(request('type'), [18, 21])) {
+            if (!in_array($type, [18, 21])) {
                 $imageType1 = $form->input('image_type1');
                 $profileFrameType = $form->input('profile_frame_type') ?? $form->input('detected_profile_frame_type');
                 $final = $profileFrameType ?? $imageType1;

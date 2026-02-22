@@ -23,8 +23,8 @@ class GiftRepository extends AbstractRepository
 
             return $user->myGifts()
                 ->withPivot('quantity')
+                ->orderByRaw('ISNULL(`sort`), `sort` ASC')
                 ->orderBy('use_count', 'desc')
-                ->orderByRaw('ISNULL(`sort`), `sort`')
                 ->orderBy('price')
                 ->get();
         }
@@ -35,8 +35,8 @@ class GiftRepository extends AbstractRepository
             $query->where('type', $type);
         }
 
-        return $query->orderBy('use_count', 'desc')
-            ->orderByRaw('ISNULL(`sort`), `sort`')
+        return $query->orderByRaw('ISNULL(`sort`), `sort` ASC')
+            ->orderBy('use_count', 'desc')
             ->orderBy('price')
             ->get();
     }
@@ -54,8 +54,8 @@ class GiftRepository extends AbstractRepository
         }
 
         return $query
+            ->orderByRaw('ISNULL(`sort`), `sort` ASC')
             ->orderBy('use_count', 'desc')
-            ->orderByRaw('ISNULL(`sort`), `sort`')
             ->orderBy('price')
             ->get();
     }
@@ -72,7 +72,10 @@ class GiftRepository extends AbstractRepository
 
     public function allGifts($page, $perPage)
     {
-        $gifts = $this->model->query()->where('type', '!=', 8)->orderBy("use_count", "desc");
+        $gifts = $this->model->query()
+            ->where('type', '!=', 8)
+            ->orderByRaw('ISNULL(`sort`), `sort` ASC')
+            ->orderBy('use_count', 'desc');
 
         return $gifts->orderBy('price')->paginate($perPage, ['*'], 'page', $page);
     }

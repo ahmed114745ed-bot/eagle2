@@ -104,20 +104,20 @@ class LevelController extends MainController
 
 
         if (!request()->filled('_export_')) {
-             $grid->column('level', __('Level'))->editable();
+            $grid->column('level', __('Level'))->editable();
             $grid->column('exp', __('Exp'))->display(function ($value) {
 
                 return number_format($value);
             })->editable();
             $grid->column('img', __('Image'))->image('', '30');
 
-            $grid->column('الاجرائات')->display(function () use ($relation_id) {
+            $grid->column(__('Procedures'))->display(function () use ($relation_id) {
                 $url1 = url('admin/cp-level-gifts/' . $this->id);
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>هداية</a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('gift') . "</a>";
                 return $button1;
             });
         } else {
-             $grid->column('level', __('Level'));
+            $grid->column('level', __('Level'));
             $grid->column('exp', __('Exp'))->display(function ($value) {
 
                 return number_format($value);
@@ -125,7 +125,6 @@ class LevelController extends MainController
         }
         $grid->actions(function ($actions) {
             $actions->disableView();
-
         });
         return $grid;
     }

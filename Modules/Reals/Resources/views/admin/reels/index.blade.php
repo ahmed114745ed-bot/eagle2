@@ -14,8 +14,6 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" as="style">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" media="print" onload="this.media='all'">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Reels Styles -->
@@ -23,43 +21,17 @@
         @include('reals::admin.reels.partials.styles')
 
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // إظهار navbar على الشاشات الصغيرة فقط
-            const nav = document.querySelector('.navbar');
-            const isMobile = window.innerWidth <= 768;
-            
-            if (nav) {
-                if (isMobile) {
-                    // إظهار navbar على الموبايل
-                    nav.classList.remove('navbar-hidden');
-                    nav.style.display = '';
-                } else {
-                    // إخفاء navbar على الديسكتوب
-                    if (!nav.classList.contains('navbar-hidden')) {
-                        nav.classList.add('navbar-hidden');
-                    }
-                }
-            }
-
-            const updateAppClassMargin = () => {
-                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+    @php
+        $reelsManagerFile = public_path('modules/reals/js/reels-manager.js');
+        $reelsManagerVersion = file_exists($reelsManagerFile) ? filemtime($reelsManagerFile) : time();
+    @endphp
+    <script data-exec-on-popstate src="{{ asset('modules/reals/js/reels-manager.js') }}?v={{ $reelsManagerVersion }}" data-reels-manager="true"></script>
+    <script data-exec-on-popstate>
+        (function () {
+            const updateNavbarLayout = () => {
+                const nav = document.querySelector('.navbar');
                 const isMobile = window.innerWidth <= 768;
-                
-                document.querySelectorAll('.app-class').forEach(el => {
-                    if (isMobile) {
-                        el.style.setProperty('margin-top', '50px', 'important');
-                    } else {
-                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
-                    }
-                });
-            };
 
-            updateAppClassMargin();
-            
-            // تحديث عند تغيير حجم الشاشة
-            window.addEventListener('resize', () => {
-                const isMobile = window.innerWidth <= 768;
                 if (nav) {
                     if (isMobile) {
                         nav.classList.remove('navbar-hidden');
@@ -68,9 +40,57 @@
                         nav.classList.add('navbar-hidden');
                     }
                 }
-                updateAppClassMargin();
-            }, { passive: true });
-        });
+
+                const hasHidden = nav && nav.classList.contains('navbar-hidden');
+                document.querySelectorAll('.app-class').forEach((el) => {
+                    if (window.innerWidth <= 768) {
+                        el.style.setProperty('margin-top', '50px', 'important');
+                    } else {
+                        el.style.setProperty('margin-top', hasHidden ? '0' : '7%', 'important');
+                    }
+                });
+            };
+
+            const initNavbarTweaks = () => {
+                updateNavbarLayout();
+
+                if (!window.__reelsNavbarResizeBound) {
+                    window.addEventListener('resize', updateNavbarLayout, { passive: true });
+                    window.__reelsNavbarResizeBound = true;
+                }
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initNavbarTweaks, { once: true });
+            } else {
+                initNavbarTweaks();
+            }
+
+            const ensureAdminGrid = () => {
+                if (window.$ && $.admin) {
+                    if (!$.admin.grid) {
+                        $.admin.grid = {
+                            selects: {},
+                            select(id) {
+                                this.selects[id] = id;
+                            },
+                            unselect(id) {
+                                delete this.selects[id];
+                            },
+                            selected() {
+                                return Object.keys(this.selects);
+                            },
+                        };
+                    }
+                }
+            };
+
+            ensureAdminGrid();
+            if (!window.__reelsEnsureAdminGridBound) {
+                document.addEventListener('pjax:complete', ensureAdminGrid);
+                window.__reelsEnsureAdminGridBound = true;
+            }
+        })();
     </script>
     <style>
                 .content-header,
@@ -219,6 +239,7 @@
             <div class="grid grid-cols-3 gap-2 p-2" x-show="reelsLoaded || filteredReels.length > 0">
                 <template x-for="reel in filteredReels" :key="reel.id">
                     <div @click="selectReel(reel.id); closeMobileSidebar()"
+                         :data-reel-id="reel.id"
                          :class="selectedReelId === reel.id ? 'ring-2 reel-ring shadow-lg' : ''"
                          class="cursor-pointer rounded-md overflow-hidden shadow hover:shadow-md transition relative group fade-in">
                         <div class="relative bg-gray-200 dark:bg-gray-700" style="padding-bottom: 177.78%; /* 16:9 ratio */">
@@ -438,6 +459,7 @@
                             <div class="flex items-center gap-3">
                                 <!-- Mute/Unmute Button -->
                                 <button @click.stop="toggleMute(reel.id)"
+                                        data-mute-btn="true"
                                         :style="isMuted(reel.id) ? 'background-color: #ef4444cc;' : 'background-color: rgba(255, 255, 255, 0.2);'"
                                         class="w-10 h-10 hover:bg-white/30 rounded-full backdrop-blur-md flex items-center justify-center text-white transition transform hover:scale-110 shadow-xl flex-shrink-0">
                                     <i :class="isMuted(reel.id) ? 'fa-volume-mute' : 'fa-volume-up'" class="fas text-lg"></i>
@@ -971,6 +993,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 sm:p-3">
             <template x-for="reel in filteredReels" :key="reel.id">
                 <div @click="selectReel(reel.id); closeMobileSidebar()"
+                     :data-reel-id="reel.id"
                      :class="selectedReelId === reel.id ? 'ring-2 sm:ring-4 ring-purple-500' : ''"
                      class="cursor-pointer rounded-lg overflow-hidden shadow-md hover:shadow-xl transition relative group">
                     <div class="relative aspect-[9/16] bg-gray-200 dark:bg-gray-700">
@@ -1022,10 +1045,68 @@
 </div>
 
 <!-- Reels Data -->
-<script>
+<script data-exec-on-popstate>
     window.initialReelsData = @json($reels);
     window.randomSeed = {{ $seed ?? 'null' }};
 </script>
+    <script data-exec-on-popstate>
+        (function () {
+            const initAlpineInsideContainer = () => {
+                if (!window.Alpine || !window.reelsManager) {
+                    return false;
+                }
 
-<!-- Reels Manager Script -->
-<script src="{{ asset('modules/reals/js/reels-manager.js') }}"></script>
+                const container = document.querySelector('#pjax-container') || document.body;
+                if (!container) {
+                    return false;
+                }
+
+                try {
+                    if (window.Alpine.destroyTree) {
+                        const oldRoot = container.querySelector('.reels-main-container[x-data]');
+                        if (oldRoot && oldRoot._x_dataStack) {
+                            window.Alpine.destroyTree(oldRoot);
+                        }
+                    }
+
+                    if (window.Alpine.initTree) {
+                        window.Alpine.initTree(container);
+                    } else if (window.Alpine.start) {
+                        window.Alpine.start();
+                    }
+
+                    container.querySelectorAll('[x-cloak]').forEach((el) => el.removeAttribute('x-cloak'));
+                } catch (error) {
+                    console.error('Alpine reinit error:', error);
+                    return false;
+                }
+
+                return true;
+            };
+
+            const scheduleInit = () => {
+                let attempts = 0;
+                const attempt = () => {
+                    if (initAlpineInsideContainer()) {
+                        return;
+                    }
+                    if (attempts++ < 40) {
+                        setTimeout(attempt, 50);
+                    }
+                };
+                attempt();
+            };
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', scheduleInit, { once: true });
+            } else {
+                scheduleInit();
+            }
+
+            ['pjax:complete', 'pjax:success', 'pjax:end'].forEach((eventName) => {
+                document.addEventListener(eventName, () => {
+                    setTimeout(scheduleInit, 0);
+                });
+            });
+        })();
+    </script>

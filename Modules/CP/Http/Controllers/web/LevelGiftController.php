@@ -2,23 +2,24 @@
 
 namespace Modules\CP\Http\Controllers\web;
 
-use App\Helpers\Common;
-use Modules\Vip\Entities\Vip;
-use Modules\Vip\Entities\OVip;
 use App\Models\Ware;
-use App\Selectables\OVips;
-use App\Selectables\Wares;
-use App\Selectables\WaresByType;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use App\Helpers\Common;
+use Encore\Admin\Admin;
+use App\Selectables\OVips;
+use App\Selectables\Wares;
 use Illuminate\Http\Request;
+use Modules\Vip\Entities\Vip;
+use Modules\Vip\Entities\OVip;
+use App\Selectables\WaresByType;
 use Encore\Admin\Layout\Content;
+use Modules\CP\Entities\CpLevel;
+use Illuminate\Http\UploadedFile;
+use Modules\CP\Entities\CpLevelGift;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Encore\Admin\Controllers\HasResourceActions;
-use Illuminate\Http\UploadedFile;
-use Modules\CP\Entities\CpLevel;
-use Modules\CP\Entities\CpLevelGift;
-use Encore\Admin\Admin;
 
 
 class LevelGiftController extends MainController
@@ -99,9 +100,8 @@ class LevelGiftController extends MainController
                 }
 
                 return  self::renderWareWithImage($this?->ware);
-
             } elseif ($this?->type == "vip") {
-//                return @$this?->vip?->name;
+                //                return @$this?->vip?->name;
                 if (request()->filled('_export_')) {
                     return 'vip';
                 }
@@ -112,16 +112,15 @@ class LevelGiftController extends MainController
             } elseif ($this?->type == "coins") {
                 return @$this?->item_id;
             } elseif ($this?->type == "achievement") {
-                if (request()->filled('_export_')) {
-                    return 'achievement';
-                }
-                $value = getDriverUrl() . '/' . @$this?->item_id;
-                return "<img src='$value' width='80' height='80'>";
+                $defaultImage = asset("images/image.png");
+                $path = getImagePath($this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '');
+                $url = $path ?: $defaultImage;
+                return handleShowImageWithTypes($this->id, $url, 50, 50);
             }
         });
 
         $grid->column('expire', __('expire'))->display(function ($value) {
-            if($this?->type !== "coins"){
+            if ($this?->type !== "coins") {
                 return  $value;
             }
             return  '';
@@ -138,21 +137,33 @@ class LevelGiftController extends MainController
         $grid->column('created_at', __('Created at'));
 
         $grid->tools(function (Grid\Tools $tools) use ($vip, $charge_event_id) {
+
             $url = url('admin/cp-levels/' . $vip->cp_relation_id);
+
+            $backText = __('Back to Levels');
+            $specialGiftText = __('Special gifts for');
+
             $customButtonHTML = <<<HTML
-                     <div style="display: contents; align-items: center;">
-                        <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
-                            <i class="fa fa-arrow-left"></i> الرجوع إلى levels
-                        </a>
-                        <label style="margin: 0;">هدايه الخاصه ب : {$vip->level} </label>
-                    </div>
-                HTML;
+        <div style="display: contents; align-items: center;">
+            <a href="{$url}" class="btn btn-sm btn-info" style="margin-right: 10px;">
+                <i class="fa fa-arrow-left"></i> {$backText}
+            </a>
+            <label style="margin: 0;">{$specialGiftText} : {$vip->level}</label>
+        </div>
+    HTML;
+
             $tools->append($customButtonHTML);
         });
 
         $grid->actions(function ($actions) {
             $actions->disableView();
         });
+
+        Admin::script("
+        if (window.innerWidth >= 1024) { // Example threshold for desktop screens
+            $('.table-responsive').removeClass('table-responsive');
+            }
+        ");
 
         return $grid;
     }
@@ -189,9 +200,9 @@ class LevelGiftController extends MainController
         return $form;
     }
 
-    protected function addVipFields($form ,$prefix = ''): void
+    protected function addVipFields($form, $prefix = ''): void
     {
-        $form->select($prefix.'item_id', __('VIP'))
+        $form->select($prefix . 'item_id', __('VIP'))
             ->options(OVip::pluck('name', 'id'))
             ->default(function ($form) {
                 return $form->model()->type === 'vip'
@@ -200,7 +211,7 @@ class LevelGiftController extends MainController
             });
     }
 
-    protected function addWareFields($form ,$prefix = '')
+    protected function addWareFields($form, $prefix = '')
     {
         $form->belongsTo('item_id', WaresByType::class, __('Ware'), function ($form) use ($prefix) {
             $form->setElementName($prefix . 'item_id')
@@ -219,24 +230,26 @@ class LevelGiftController extends MainController
 
             $this->addWareJs();
         });
-
     }
 
 
     protected function addCoinsFields($form)
     {
         $form->number("coins", __("coins"))
-            ->default(fn($form) => $form->model()->type === 'coins'
-                ? (int) $form->model()->item_id
-                : null
+            ->default(
+                fn($form) => $form->model()->type === 'coins'
+                    ? (int) $form->model()->item_id
+                    : null
             );
     }
 
     protected function addAchievementFields($form)
     {
-        $form->image("achievement", __('image'))
-            ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
-            ->disk('gcs');
+        // $form->image("achievement", __('image'))
+        //     ->name(fn($file) => now()->timestamp . '.' . $file->guessExtension())
+        //     ->disk('gcs');
+
+        $form->belongsTo('achievement', CustomAchievements::class, trans('Custom achievement'));
     }
     protected function addWareJs()
     {
@@ -300,13 +313,11 @@ class LevelGiftController extends MainController
         if ($form->ware_item_id) {
             $form->item_id = intval($form->ware_item_id);
             $form->model()->item_id =  intval($form->ware_item_id);
-
         }
 
         if ($form->vip_item_id) {
             $form->item_id = intval($form->vip_item_id);
             $form->model()->item_id =  intval($form->vip_item_id);
-
         }
         unset($form->type_ware);
         $form->ignore('type_ware');
@@ -320,14 +331,9 @@ class LevelGiftController extends MainController
         } elseif ($form->type == 'coins') {
             $form->item_id = $form->coins;
         } elseif ($form->type == 'achievement') {
-            if ($form->achievement instanceof UploadedFile) {
-                $url = Common::upload('cp', $form->achievement);
-            }
-            $form->item_id = $url ?? '';
+
+            $form->item_id = $form->achievement;
         }
-
-
-
     }
 
 
@@ -388,8 +394,4 @@ class LevelGiftController extends MainController
             e(@$ware?->name)
         );
     }
-
 }
-
-
-

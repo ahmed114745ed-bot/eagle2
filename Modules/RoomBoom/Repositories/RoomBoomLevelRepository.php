@@ -28,6 +28,6 @@ class RoomBoomLevelRepository
 
     public function getVideos(): \Illuminate\Support\Collection
     {
-        return RoomBoomLevel::select(['id', 'level', 'video'])->with(['roomBoomRewards','roomBooms'])->orderBy('level')->get();
+        return RoomBoomLevel::select(['id', 'level', 'video','image_type'])->with(['roomBoomRewards','roomBooms'])->orderBy('level')->get();
     }
 }

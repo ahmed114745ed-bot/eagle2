@@ -69,11 +69,11 @@ class PaymentGatewaysSeeder extends Seeder
 
         $fawry_id = PaymentCoin::updateOrCreate([
             'type' => 'fawry',
+            'package_type' => 'user',
         ], [
             'title' => 'fawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'Fawry payment method'
 
         ]);
@@ -120,11 +120,11 @@ class PaymentGatewaysSeeder extends Seeder
         //utd fawry
         $utd_fawry_id = PaymentCoin::updateOrCreate([
             'type' => 'utd_fawry',
+            'package_type' => 'user',
         ], [
             'title' => 'utdFawry',
             'photo' => 'images/fawry.jpeg',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'Utd Fawry payment method'
 
         ]);
@@ -168,14 +168,60 @@ class PaymentGatewaysSeeder extends Seeder
             ]);
         }
 
+        //utd paymob
+        $utd_paymob_id = PaymentCoin::updateOrCreate([
+            'type' => 'utd_paymob',
+            'package_type' => 'user',
+        ], [
+            'title' => 'utdPaymob',
+            'photo' => 'images/paymob.png',
+            'status' => 1,
+            'description' => 'Utd Paymob payment method'
+
+        ]);
+        $utd_paymob_fields = [
+            'new_1' => [
+                "name" => "utd_paymob_secret",
+                "type" => "input",
+                "value" => ""
+
+            ],
+            'new_2' => [
+                "name" => "utd_paymob_merchant_code",
+                "type" => "input",
+                "value" => ""
+
+            ],
+            'new_3' => [
+                "name" => "utd_paymob_url",
+                "type" => "input",
+                "value" => "https://utd-test.utdsoftware.com/api/paymob-initial"
+            ],
+            'new_4' => [
+                "name" => "utd_paymob_return_url",
+                "type" => "input",
+                "value" => 'https://eagle.utdsoftware.com/api/utd-paymob-callback'
+            ],
+        ];
+
+        foreach ($utd_paymob_fields as $key => $value) {
+            Setting::updateOrCreate([
+                'key' => $value['name'],
+                'item_id' => $utd_paymob_id->id,
+                'type' => 'payment'
+            ], [
+                'value' => $value['value'],'input_type' => $value['type']
+            ]);
+        }
+
         // sky pay
          $pay_sky_id = PaymentCoin::updateOrCreate([
              'type' => 'sky_pay',
+             'package_type' => 'user',
         ], [
              'title' => 'skyPay',
              'photo' => 'images/paysky.png',
              'status' => 1,
-             'package_type' => 'user',
             'description' => 'skyPay  payment method'
 
          ]);
@@ -223,11 +269,11 @@ class PaymentGatewaysSeeder extends Seeder
         //stripe
         $strip_id = PaymentCoin::updateOrCreate([
             'type' => 'strip',
+            'package_type' => 'user',
         ], [
             'title' => 'strip',
             'photo' => 'images/stripe.png',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'strip  payment method'
 
         ]);
@@ -280,11 +326,11 @@ class PaymentGatewaysSeeder extends Seeder
         //opay
         $opay_id = PaymentCoin::updateOrCreate([
             'type' => 'opay',
+            'package_type' => 'user',
         ], [
             'title' => 'opay',
             'photo' => 'images/opay.png',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'opay  payment method'
 
         ]);
@@ -342,11 +388,11 @@ class PaymentGatewaysSeeder extends Seeder
         //cashfree
         $cashfree_id = PaymentCoin::updateOrCreate([
             'type' => 'cash_free',
+            'package_type' => 'user',
         ], [
             'title' => 'cashfree',
             'photo' => 'images/cashfree.jpg',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'cashfree  payment method'
 
         ]);
@@ -394,11 +440,11 @@ class PaymentGatewaysSeeder extends Seeder
         //applepay
         $applepay_id = PaymentCoin::updateOrCreate([
             'type' => 'apple_pay',
+            'package_type' => 'user',
         ], [
             'title' => 'applepay',
             'photo' => 'images/applepay.png',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'applepay  payment method'
 
         ]);
@@ -543,11 +589,11 @@ class PaymentGatewaysSeeder extends Seeder
         //paypal
         $paypal_id = PaymentCoin::updateOrCreate([
             'type' => 'paypal',
+            'package_type' => 'user',
         ], [
             'title' => 'paypal',
             'photo' => 'images/paypal.png',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'paypal  payment method'
 
         ]);
@@ -655,11 +701,11 @@ class PaymentGatewaysSeeder extends Seeder
         //paytabs
         $paytabs_id = PaymentCoin::updateOrCreate([
             'type' => 'paytabs',
+            'package_type' => 'user',
         ], [
             'title' => 'paytabs',
             'photo' => 'images/paytabs.webp',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'paytabs  payment method'
 
         ]);
@@ -1076,11 +1122,11 @@ class PaymentGatewaysSeeder extends Seeder
         // Google Pay
         $google_pay_id = PaymentCoin::updateOrCreate([
             'type' => 'google_pay',
+            'package_type' => 'user',
         ], [
             'title' => 'google_pay',
             'photo' => 'images/googlepay.png',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'google pay  payment method'
 
         ]);
@@ -1117,11 +1163,11 @@ class PaymentGatewaysSeeder extends Seeder
         //codapay
         $codapay_id = PaymentCoin::updateOrCreate([
             'type' => 'codapay',
+            'package_type' => 'user',
         ], [
             'title' => 'codapay',
             'photo' => 'images/codapay.webp',
             'status' => 1,
-            'package_type' => 'user',
             'description' => 'codapay pay  payment method'
 
         ]);

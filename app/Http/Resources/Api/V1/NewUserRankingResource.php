@@ -13,7 +13,7 @@ class NewUserRankingResource extends JsonResource
     {
         $hasColor = Common::hasInPackV2($this->ranker->packs, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVipV2($this->user_id, 18, 'color') ?? '' : '';
+        $color_name = (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVipV2($this->user_id, 18, 'color') : null);
         $achievement_images = [];
         if ($this->ranker->medals) {
             foreach ($this->ranker->medals as $medal) {

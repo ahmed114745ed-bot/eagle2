@@ -85,8 +85,9 @@ class WeeklyStarWinner extends Command
                             $dateTimestamp = optional(Carbon::make($reward->expire))->format('Y-m-d H:i:s');
                             $attributes = [
                                 'user_id'       => $entry->sender_id,
-                                'custom_image' => $reward->target,
+                                'custom_achievement_id' => $reward->target,
                                 'end_at' => $dateTimestamp,
+                                'receive_type' => 'weekly-star',
                             ];
 
                             UserAchievementLevel::create($attributes);

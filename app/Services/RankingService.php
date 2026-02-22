@@ -491,7 +491,8 @@ class RankingService
 
             $hasColor = Common::hasInPack($user->id, 18, true);
 
-            $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
+            $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') : null;
+            $color_name = is_string($color_name) ? $color_name : '';
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
                     if ($medal->achievementLevel) {
@@ -572,7 +573,8 @@ class RankingService
 
             $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
-            $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+            $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') : null;
+            $color_name = is_string($color_name) ? $color_name : '';
             if ($user->medals) {
                 foreach ($user->medals as $medal) {
                     if ($medal->achievementLevel) {
@@ -672,8 +674,8 @@ class RankingService
 
         $data->each(function ($item) {
             $hasColor = Common::hasInPack($item->user_id, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') ?? '' : '';
-            $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
+            $color = $hasColor ? Common::wareUserVip($item->user_id, 18, 'color') : null;
+            $item->color_name = (is_string($color) && $color !== 'NULL') ? $color : '';
         });
 
         $achievement_images = [];
@@ -735,7 +737,8 @@ class RankingService
         $vip_level_img  = Common::ovip_center_rank_img($arr['user']['user_id']);
         $hasColor = Common::hasInPack($user->id, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') ?? '' : '';
+        $color_name = $hasColor ? common::wareUserVip($user->id, 18, 'color') : null;
+        $color_name = is_string($color_name) ? $color_name : '';
 
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {
@@ -776,8 +779,8 @@ class RankingService
     {
         $data->each(function ($item) use ($user) {
             $hasColor = Common::hasInPackV2($user->packs, 18, true) ?? '';
-            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') ?? '' : '';
-            $item->color_name = ($hasColor && $color && $color !== 'NULL') ? $color : '';
+            $color = $hasColor ? Common::wareUserVipV2($item->user_id, 18, 'color') : null;
+            $item->color_name = (is_string($color) && $color !== 'NULL') ? $color : '';
         });
 
         $achievement_images = [];
@@ -839,7 +842,8 @@ class RankingService
         $vip_level_img  = Common::ovip_center_rank_img_v2($arr['user']);
         $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') : null;
+        $color_name = is_string($color_name) ? $color_name : '';
 
         // $levels =Common::getSenderAndReceiverLevels($user->id);
         if (gettype($vip_level) != 'integer') {

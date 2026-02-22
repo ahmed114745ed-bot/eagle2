@@ -8,6 +8,7 @@ use App\Models\Ware;
 use App\Helpers\UserCommon;
 use Illuminate\Bus\Queueable;
 use App\Enums\UserCoinLogType;
+use Illuminate\Support\Carbon;
 use Modules\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
 use App\Facades\CustomNotification;
@@ -70,9 +71,13 @@ class RewardWinnerLevel implements ShouldQueue
                     if (!$ware) return;
                     UserCommon::addWareToUser($user, $ware, $rewad->expire, null, 'reward-winner-level');
                 } elseif ($rewad->type == "achievement") {
+                    $dateTimestamp = Carbon::parse($rewad->expire)->format("Y-m-d H:i:s");
+
                     $attributes = [
                         'user_id'       => $user->id,
-                        'custom_image' => $rewad->target,
+                        'custom_achievement_id' => $rewad->target,
+                        'end_at' => $dateTimestamp,
+                        'receive_type' => 'level',
                     ];
 
                     UserAchievementLevel::create($attributes);
@@ -93,7 +98,7 @@ class RewardWinnerLevel implements ShouldQueue
                 ];
                 WinnerLevelInterval::query()->create($data);
             }
-         //  \Log::info('Dispatch Room Level Notification Job", ', ['user_id' => $user->id, 'level' => $this->level, 'type' => $firstReward->levelInterval->type]);
+            //  \Log::info('Dispatch Room Level Notification Job", ', ['user_id' => $user->id, 'level' => $this->level, 'type' => $firstReward->levelInterval->type]);
             CustomNotification::RoomLevel($user->id, $this->level, $firstReward->rewardLevelInterval->type);
         }
     }

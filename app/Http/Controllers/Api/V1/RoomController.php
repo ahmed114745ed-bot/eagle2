@@ -2,48 +2,49 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Http\Resources\Api\V1\RoomAdminsResource;
-use Exception;
-use App\Models\Pk;
-use Carbon\Carbon;
-use App\Models\Room;
-use App\Models\User;
-use App\Helpers\Common;
-use App\Models\AllGame;
-use App\Models\LiveTime;
-use App\Models\KickRecord;
-use App\Models\EnteredRoom;
-use App\Models\RoomCategory;
-use Illuminate\Http\Request;
-use App\Services\RoomService;
-use Illuminate\Http\JsonResponse;
 use App\Classes\Room\RoomComments;
+use App\Helpers\Common;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Room\CommentRequest;
+use App\Http\Requests\EditRoomRequest;
+use App\Http\Resources\Api\V1\BoxUseResource;
+use App\Http\Resources\Api\V1\EnterRoomCollection;
+use App\Http\Resources\Api\V1\RoomAdminsResource;
+use App\Http\Resources\Api\V1\RoomResource;
+use App\Http\Resources\Api\V1\RoomVisitorsResource;
+use App\Http\Resources\Api\V1\UserResource;
+use App\Http\Resources\GiftRoomResource;
+use App\Http\Resources\RoomCountriesResource;
+use App\Http\Resources\RoomDetailsResource;
+use App\Http\Services\ProfileRelationsService;
 use App\Jobs\EnterRoomZigoRequest;
+use App\Models\AllGame;
+use App\Models\EnteredRoom;
+use App\Models\KickRecord;
+use App\Models\LiveTime;
+use App\Models\Pk;
+use App\Models\RequestBackgroundImage;
+use App\Models\Room;
+use App\Models\RoomCategory;
+use App\Models\RoomMicrophone;
+use App\Models\User;
+use App\Repositories\Room\RoomRepoInterface;
+use App\Services\RoomService;
+use App\Tik\Services\RoomRepoService;
+use App\Traits\MultiQueryPagination;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Traits\MultiQueryPagination;
-use Illuminate\Support\Facades\Auth;
-use App\Tik\Services\RoomRepoService;
-use Modules\LuckyBox\Entities\BoxUse;
-use App\Http\Requests\EditRoomRequest;
-use App\Models\RequestBackgroundImage;
-use Modules\CP\Entities\CpRoomHistory;
-use App\Http\Resources\GiftRoomResource;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\Api\V1\RoomResource;
-use App\Http\Resources\Api\V1\UserResource;
-use App\Http\Resources\RoomDetailsResource;
-use App\Repositories\Room\RoomRepoInterface;
-use App\Http\Resources\Api\V1\BoxUseResource;
-use App\Http\Resources\RoomCountriesResource;
-use App\Http\Services\ProfileRelationsService;
 use Illuminate\Validation\ValidationException;
-use App\Http\Requests\Api\V1\Room\CommentRequest;
-use App\Http\Resources\Api\V1\EnterRoomCollection;
-use App\Http\Resources\Api\V1\RoomVisitorsResource;
-use Modules\Charizma\Http\Services\UserCharismaService;
 use Modules\Achievement\Http\Services\UserAchievementService;
+use Modules\Charizma\Http\Services\UserCharismaService;
+use Modules\CP\Entities\CpRoomHistory;
+use Modules\LuckyBox\Entities\BoxUse;
 use Modules\RoomBoom\Entities\RoomBoom;
 use Modules\RoomBoom\Transformers\RoomBoomLevelResource;
 use Modules\RoomBoom\Transformers\RoomBoomResource;
@@ -371,12 +372,27 @@ class RoomController extends Controller
                 $room->save();
             }
             $this->updateMicrophone2($room->uid, $user->id);
+            $this->deleteOldRoomMic($user, $room);
             return Common::apiResponse(true, 'exited', ['visitor_ids_list' => $visitorIdsList]);
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
     }
+
+    public function deleteOldRoomMic($user, $room)
+    {
+        RoomMicrophone::where('user_id', $user->id)->delete();
+        CpRoomHistory::where("user_one_id", $user->id)
+            ->orWhere("user_two_id", $user->id)->delete();
+        $partner = $user->lovelyRelations()
+            ->with(['userOne', 'userTwo'])
+            ->first()?->partner;
+        $json = $this->cpMapJson([]);
+
+        if ($partner) Common::sendToZego('SendCustomCommand', @$partner->now_room_uid, $partner->id, $json);
+    }
+
 
     public function handleLeaveCp($user, $roomId)
     {

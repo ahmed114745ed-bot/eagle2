@@ -45,6 +45,9 @@ function reelsManager() {
             // تهيئة التخزين المؤقت
             this.initCache();
             
+            // إضافة event delegation للضغط على الفيديو والأزرار (للتعامل مع PJAX)
+            this.setupEventDelegation();
+            
             this.$nextTick(() => {
                 if (window.requestIdleCallback) {
                     requestIdleCallback(() => this.loadInitialData());
@@ -52,6 +55,64 @@ function reelsManager() {
                     setTimeout(() => this.loadInitialData(), 100);
                 }
             });
+        },
+        
+        // Event delegation للتعامل مع جميع الأحداث (PJAX support)
+        setupEventDelegation() {
+            const container = this.$el;
+            if (!container) {
+                // fallback إذا لم يكن الـ container متاحاً
+                setTimeout(() => this.setupEventDelegation(), 100);
+                return;
+            }
+            
+            // إزالة أي listener سابق
+            if (this._mainClickHandler) {
+                container.removeEventListener('click', this._mainClickHandler);
+            }
+            
+            this._mainClickHandler = (event) => {
+                const target = event.target;
+                
+                // 1. الضغط على الفيديو للتشغيل/الإيقاف
+                const video = target.closest('video');
+                if (video && video.id && video.id.startsWith('video-')) {
+                    event.stopPropagation();
+                    if (video.paused) {
+                        video.play().catch(err => {
+                            console.log('تعذر تشغيل الفيديو:', err);
+                        });
+                    } else {
+                        video.pause();
+                    }
+                    return;
+                }
+                
+                // 2. زر الميوت
+                const muteButton = target.closest('[data-mute-btn]') || 
+                    (target.closest('button') && target.closest('button').querySelector('.fa-volume-up, .fa-volume-mute'));
+                if (muteButton || (target.classList.contains('fa-volume-up') || target.classList.contains('fa-volume-mute'))) {
+                    event.stopPropagation();
+                    this.isGlobalMuted = !this.isGlobalMuted;
+                    const allVideos = document.querySelectorAll('video');
+                    allVideos.forEach(v => {
+                        v.muted = this.isGlobalMuted;
+                    });
+                    return;
+                }
+                
+                // 3. الضغط على thumbnail في الـ sidebar أو Mobile Overlay
+                const sidebarItem = target.closest('[data-reel-id]');
+                if (sidebarItem && !target.closest('.video-container')) {
+                    const reelId = sidebarItem.dataset?.reelId;
+                    if (reelId) {
+                        this.selectReel(parseInt(reelId));
+                        this.closeMobileSidebar();
+                    }
+                }
+            };
+            
+            container.addEventListener('click', this._mainClickHandler);
         },
         
         loadInitialData() {
@@ -95,6 +156,11 @@ function reelsManager() {
                 this.playFirstVideo();
                 this.setupInfiniteScroll();
                 this.setupSidebarScroll();
+                
+                // التحقق الدوري من حالة الفيديوهات (للتعامل مع PJAX)
+                this.checkExistingVideosReady();
+                setTimeout(() => this.checkExistingVideosReady(), 500);
+                setTimeout(() => this.checkExistingVideosReady(), 1000);
                 
                 // تحميل مسبق لأول فيديوهين فوراً
                 if (this.isMobile) {
@@ -523,6 +589,9 @@ function reelsManager() {
             this.selectedReelId = this.visibleReels[0]?.id;
             this.selectedReel = this.visibleReels[0] || null;
             
+            // التحقق من جميع الفيديوهات المحملة مسبقاً وتحديث حالتها
+            this.checkExistingVideosReady();
+            
             this.$nextTick(() => {
                 setTimeout(() => {
                     const firstVideo = document.getElementById('video-' + this.selectedReelId);
@@ -532,13 +601,25 @@ function reelsManager() {
                             console.log('⚡ تشغيل من الكاش');
                         }
                         
+                        // التحقق مرة أخرى وتحديث حالة الفيديو
                         if (firstVideo.readyState >= 2) {
+                            this.markVideoReady(this.selectedReelId);
                             firstVideo.play().catch(err => {
                                 console.log('تشغيل تلقائي معطل:', err);
                             });
                         }
                     }
                 }, 300); 
+            });
+        },
+        
+        // التحقق من الفيديوهات الموجودة مسبقاً (للتعامل مع PJAX navigation)
+        checkExistingVideosReady() {
+            this.visibleReels.forEach((reel) => {
+                const video = document.getElementById('video-' + reel.id);
+                if (video && video.readyState >= 2) {
+                    this.markVideoReady(reel.id);
+                }
             });
         },
         
@@ -571,8 +652,14 @@ function reelsManager() {
                 
                 if (newIndex >= 0 && newIndex < this.visibleReels.length) {
                     const newVideo = document.getElementById('video-' + this.visibleReels[newIndex]?.id);
-                    if (newVideo && newVideo.paused && newVideo.readyState >= 2) {
-                        newVideo.play().catch(() => {});
+                    if (newVideo) {
+                        // تحديث حالة الفيديو إذا كان جاهزاً
+                        if (newVideo.readyState >= 2) {
+                            this.markVideoReady(this.visibleReels[newIndex]?.id);
+                        }
+                        if (newVideo.paused && newVideo.readyState >= 2) {
+                            newVideo.play().catch(() => {});
+                        }
                     }
                 }
                 
@@ -820,18 +907,29 @@ function reelsManager() {
         async selectReel(reelId) {
             this.scrollingToSelection = true;
             this.pauseAllVideos();
-            this.selectedReelId = reelId;
-            this.selectedReel = this.visibleReels.find(r => r.id === reelId);
 
-            const targetIndex = this.visibleReels.findIndex(r => r.id === reelId);
-            if (targetIndex !== -1) {
-                this.currentVideoIndex = targetIndex;
-                this.loadedVideos = new Set([
-                    Math.max(0, targetIndex - 1),
-                    targetIndex,
-                    Math.min(this.visibleReels.length - 1, targetIndex + 1)
-                ]);
+            let targetIndex = this.visibleReels.findIndex(r => r.id === reelId);
+            if (targetIndex === -1) {
+                targetIndex = this.ensureReelVisible(reelId);
             }
+
+            const targetReel = this.allReels.find(r => r.id === reelId) ||
+                this.filteredReels.find(r => r.id === reelId);
+
+            if (targetIndex === -1 || !targetReel) {
+                this.scrollingToSelection = false;
+                return;
+            }
+
+            this.selectedReelId = reelId;
+            this.selectedReel = targetReel;
+
+            this.currentVideoIndex = targetIndex;
+            this.loadedVideos = new Set([
+                Math.max(0, targetIndex - 1),
+                targetIndex,
+                Math.min(this.visibleReels.length - 1, targetIndex + 1)
+            ]);
 
             const reelElement = document.querySelector(`[data-reel-id="${reelId}"]`);
             if (reelElement) {
@@ -843,12 +941,24 @@ function reelsManager() {
                 }
             }
 
-            // Play only the selected video after scroll settles
             this.$nextTick(() => {
                 this.playVideoById(reelId);
-                // Allow normal scroll autoplay again
                 this.scrollingToSelection = false;
             });
+        },
+
+        ensureReelVisible(reelId) {
+            const targetIndexAll = this.allReels.findIndex(r => r.id === reelId);
+            if (targetIndexAll === -1) {
+                return -1;
+            }
+
+            if (this.visibleReels.length < targetIndexAll + 1) {
+                const toAdd = this.allReels.slice(this.visibleReels.length, targetIndexAll + 1);
+                this.visibleReels = [...this.visibleReels, ...toAdd];
+            }
+
+            return this.visibleReels.findIndex(r => r.id === reelId);
         },
 
         playVideoById(reelId) {
@@ -859,11 +969,14 @@ function reelsManager() {
             if (video.readyState < 2) {
                 const onCanPlay = () => {
                     video.removeEventListener('canplay', onCanPlay);
+                    this.markVideoReady(reelId);
                     video.play().catch(() => {});
                 };
                 video.addEventListener('canplay', onCanPlay, { once: true });
                 video.load();
             } else {
+                // تحديث حالة الفيديو للتأكد من إظهاره
+                this.markVideoReady(reelId);
                 video.play().catch(() => {});
             }
         },
@@ -1162,4 +1275,8 @@ function reelsManager() {
             }
         }
     }
+}
+
+if (typeof window !== 'undefined') {
+    window.reelsManager = window.reelsManager || reelsManager;
 }
