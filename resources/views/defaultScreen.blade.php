@@ -13,8 +13,8 @@
                 <div class="mb-4 inp-div">
                     <label for="type" class="form-label fw-bold d-block text-end">{{ __('Default App Screen') }}</label>
                     <select name="type" id="type" class="form-control text-end">
-                        @if(!$defaultScreen)
-                            <!-- Show placeholder if no default -->
+                        @if(!array_key_exists($defaultScreen, $enabledOptions))
+                            <!-- Show placeholder if current default is disabled -->
                             <option value="" selected>-- {{ __('Select Default App Screen') }} --</option>
                         @endif
 
