@@ -1424,7 +1424,7 @@
                                                     <span>{{ $countryName }}</span>
                                                     @if($countryFlag)
                                                         <img src="{{ $countryFlag }}" alt="Flag" width="20" height="20"
-                                                            style="margin-top: 3px; filter: invert(1);">
+                                                            style="margin-top: 3px; ">
                                                     @endif
                                                 </div>
                                             </td>

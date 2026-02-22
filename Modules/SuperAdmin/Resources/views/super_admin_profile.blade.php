@@ -1102,7 +1102,7 @@
                                         $image = @$reward->vip->image ?? '';
                                     } elseif (request('type') == 'badge') {
                                         $name = @$reward->badge->name ?? '';
-                                        $image = @$reward->badge->image ?? '';
+                                        $image = @$reward->badge?->images?->firstWhere('language', app()->getLocale())?->image ?? '';
                                     }
                                 @endphp
 

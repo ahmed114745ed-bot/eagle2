@@ -26,8 +26,6 @@ class CpProfileService
 
     public function getCpProfiles($userId)
     {
-
-
         $statuses = [1, 4];
         $vipCount = $this->packRepository->countUserVipPacks($userId);
 

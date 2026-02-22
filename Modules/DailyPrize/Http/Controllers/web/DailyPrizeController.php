@@ -13,6 +13,7 @@ use Modules\Vip\Entities\OVip;
 use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
+use App\Selectables\CustomAchievements;
 use App\Admin\Controllers\MainController;
 use Modules\DailyPrize\Entities\DailyGift;
 use Encore\Admin\Controllers\AdminController;
@@ -82,7 +83,7 @@ class DailyPrizeController extends MainController
     {
         $type = request('type');
         $grid = new Grid(new DailyGift());
-        $grid->model()->where('type', $type)->orderBy('order');
+        $grid->model()->with(['ware', 'vip', 'badge', 'customAchievement.images','customAchievement'])->where('type', $type)->orderBy('order');
         // $grid->column('order', __('Order'))->editable();
         $grid->column('order', __('days'))
             ->display(function ($order) {
@@ -103,19 +104,19 @@ class DailyPrizeController extends MainController
             $grid->column('details', __('gift details'))->display(function () {
                 switch ($this->gift_type) {
                     case 'ware':
-                        $ware = \App\Models\Ware::find($this->target);
+                        $ware = $this->ware;
                         return $ware
                             ? __('name') . ': ' . $ware->name . ', ' . __('id') . ': ' . $ware->id
                             : __('Not Found');
 
                     case 'vip':
-                        $vip = \Modules\Vip\Entities\OVip::find($this->target);
+                        $vip = $this->vip;
                         return $vip
                             ? __('name') . ': ' . $vip->name . ', ' . __('id') . ': ' . $vip->id
                             : __('Not Found');
 
                     case 'achievement':
-                        return __('Achievement');
+                        return $this->customAchievement?->name ?? '';
 
                     default:
                         return $this->target;
@@ -126,13 +127,13 @@ class DailyPrizeController extends MainController
         //        if (!request()->filled('_export_')) {
         $grid->column('image', __('image'))->display(function ($path) {
             if ($this->gift_type == 'ware') {
-                $ware = Ware::find($this->target);
+                $ware = $this->ware;
                 $path = $ware->img2 ?? $ware?->show_img;
             } elseif ($this->gift_type == 'vip') {
-                $vips = OVip::find($this->target);
+                $vips = $this->vip;
                 $path = $vips?->img;
             } elseif ($this->gift_type == 'achievement') {
-                $path = $this->target;
+                $path = $this->customAchievement ? $this->customAchievement?->images?->firstWhere('language', app()->getLocale())?->image ?? '' : '';
             } else {
                 $path = 'coin.png';
             }
@@ -255,9 +256,8 @@ class DailyPrizeController extends MainController
                 $form->number('target3', __('coins'));
             })
             ->when('achievement', function () use ($form) {
-                $form->image('target4', __('image'))->name(function ($file) {
-                    return now()->timestamp . '.' . $file->guessExtension();
-                });
+                $form->belongsTo('target4', CustomAchievements::class, trans('Custom achievement'));
+
                 $form->number('expire', __('expire'));
             })
             ->rules('required');

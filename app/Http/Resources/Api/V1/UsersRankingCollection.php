@@ -100,7 +100,7 @@ class UsersRankingCollection extends ResourceCollection
         }
         $hasColor = Common::hasInPackV2($user->packs, 18, true);
 
-        $color_name = $hasColor ? common::wareUserVipV2($user->id, 18, 'color') ?? '' : '';
+        $color_name = (fn($c) => is_string($c) ? $c : '')($hasColor ? common::wareUserVipV2($user->id, 18, 'color') : null);
 
         return [
             'user_id'          => $user->id,

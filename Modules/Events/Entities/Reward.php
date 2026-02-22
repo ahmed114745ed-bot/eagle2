@@ -2,15 +2,16 @@
 
 namespace Modules\Events\Entities;
 
+use App\Models\Ware;
 use App\Helpers\Common;
 use Modules\Vip\Entities\OVip;
-use App\Models\Ware;
-use App\Traits\TimestampsWithTimezone;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Modules\Badge\Entities\Badge;
+use App\Traits\TimestampsWithTimezone;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Modules\Achievement\Entities\CustomAchievement;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Reward extends Model
 {
@@ -48,6 +49,11 @@ class Reward extends Model
     public function badge()
     {
         return $this->hasOne(Badge::class, 'id', 'target');
+    }
+
+    public function customAchievement()
+    {
+        return $this->hasOne(CustomAchievement::class, 'id', 'target');
     }
 
     public function getTarget1Attribute()
@@ -89,12 +95,7 @@ class Reward extends Model
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
 
-                $file = request('target4', $model->target);
-
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                }
-                $model->target = $url ?? '';
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);
@@ -113,14 +114,7 @@ class Reward extends Model
             } elseif ($model->type === 'badge') {
                 $model->target = request('target5', $model->target);
             } elseif ($model->type === 'achievement') {
-                $file = request('target4', $model->target);
-                if ($file instanceof UploadedFile) {
-                    $url = Common::upload('events', $file);
-                    Storage::delete($model->target);
-                }
-                $model->target = $url ?? '';
-                //                $model->target = request('target4', $model->target);
-
+                $model->target = request('target4', $model->target);
             }
             unset($model->target1);
             unset($model->target2);

@@ -209,8 +209,9 @@ function pu(val) {
                 $dateTimestamp = Carbon::parse($reward->expire)->format("Y-m-d H:i:s");
                 $attributes = [
                     'user_id'       => $user->id,
-                    'custom_image' => $reward->target,
+                    'custom_achievement_id' => $reward->target,
                     'end_at' => $dateTimestamp,
+                    'receive_type' => 'super_admin_dedicate',
                 ];
                 UserAchievementLevel::create($attributes);
                 break;

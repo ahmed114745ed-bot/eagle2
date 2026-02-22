@@ -57,6 +57,14 @@ return [
         "utd_fawry_url"        => env('FAWRY_URL','https://atfawry.fawrystaging.com/fawrypay-api/api/payments/init'),
     ],
 
+    'utd_paymob' => [
+        "utd_paymob_secret"          => env('UTD_PAYMOB_SECRET'),
+        "utd_paymob_merchant_code"   => env('UTD_PAYMOB_MERCHANT_CODE'),
+        "utd_url"                    => env('UTD_PAYMOB_URL', 'http://utd_backend.test/api/paymob-initial'),
+        "utd_paymob_return_url"      => env('UTD_PAYMOB_RETURN_URL', '/admin/payment-with-method'),
+        "utd_paymob_url"             => env('UTD_PAYMOB_URL'),
+    ],
+
     'zinipay' => [
         "api_key"          => env('ZINIPAY_API_KEY',"6ed92079-a485-4373-9453-505e20f6ef48"),
         "url"              => env('ZINIPAY_URL','https://api.zinipay.com/v1/payment/create'),
