@@ -117,9 +117,7 @@ class CoinService
                     phone: $user->phone ?? null,
                     trx: $log->trx
                 );
-                if (isset($paymentUrl['status']) && $paymentUrl['status'] == 0) {
-                    return Common::apiResponse(0, $paymentUrl['message'] ?? 'Payment failed', null, 400);
-                }
+              
                 return Common::apiResponse(1, 'ok', $paymentUrl, 200);
             } else if ($paymentMethod == 'opay') {
                 $opay = new OPayController();

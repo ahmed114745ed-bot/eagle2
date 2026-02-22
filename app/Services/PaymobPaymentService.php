@@ -235,28 +235,14 @@ class PaymobPaymentService
             ],
         ];
 
-        Log::info('Paymob createPaymentLink Request:', [
-            'url' => $baseUrl,
-            'data' => $data,
-            'amount' => $amount,
-            'trx' => $trx
-        ]);
+     
 
         try {
             $response = Http::timeout(30)->post($baseUrl, $data);
 
-            Log::info('Paymob createPaymentLink Response:', [
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'body' => $response->body(),
-                'json' => $response->json()
-            ]);
+        
         } catch (\Exception $e) {
-            Log::error('Paymob createPaymentLink Exception:', [
-                'error' => $e->getMessage(),
-                'url' => $baseUrl,
-                'data' => $data
-            ]);
+         
             return [
                 'status' => 0,
                 'message' => 'Connection error: ' . $e->getMessage(),
@@ -264,11 +250,9 @@ class PaymobPaymentService
             ];
         }
 
-        // Get response data
         $responseData = $response->json();
         
         if (!$response->successful()) {
-            Log::error('Paymob CreatePaymentLink Failed:', ['response' => $responseData]);
             return [
                 'status' => 0,
                 'message' => $responseData['message'] ?? 'Failed to create payment link',
@@ -276,49 +260,10 @@ class PaymobPaymentService
             ];
         }
         
-        // Check if responseData is directly a URL string
         if (is_string($responseData) && filter_var($responseData, FILTER_VALIDATE_URL)) {
-            return [
-                'status' => 1,
-                'payment_url' => $responseData,
-                'message' => 'Payment link created successfully',
-                'data' => ['url' => $responseData]
-            ];
+            return $responseData;     
         }
         
-        // Check for payment URL in different possible fields (for object responses)
-        $paymentUrl = null;
-        if (is_array($responseData) || is_object($responseData)) {
-            $responseArray = (array) $responseData;
-            if (isset($responseArray['payment_url'])) {
-                $paymentUrl = $responseArray['payment_url'];
-            } elseif (isset($responseArray['redirectionUrl'])) {
-                $paymentUrl = $responseArray['redirectionUrl'];
-            } elseif (isset($responseArray['url'])) {
-                $paymentUrl = $responseArray['url'];
-            } elseif (isset($responseArray['checkout_url'])) {
-                $paymentUrl = $responseArray['checkout_url'];
-            } elseif (isset($responseArray['payment_link'])) {
-                $paymentUrl = $responseArray['payment_link'];
-            }
-        }
-        
-        if ($paymentUrl && filter_var($paymentUrl, FILTER_VALIDATE_URL)) {
-            return [
-                'status' => 1,
-                'payment_url' => $paymentUrl,
-                'message' => 'Payment link created successfully',
-                'data' => $responseData
-            ];
-        }
-        
-        // If no URL found, return the whole response for debugging
-        Log::warning('Paymob CreatePaymentLink: No payment URL found in response', ['response' => $responseData]);
-        return [
-            'status' => 1,
-            'payment_url' => $responseData,
-            'message' => 'Payment processed but no URL found',
-            'data' => $responseData
-        ];
+
     }
 }

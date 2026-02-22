@@ -18,10 +18,10 @@ Route::group([
     'prefix' => 'boom_levels',
     'middleware' => ['auth:sanctum', 'checkLatestToken', 'generalBan', 'room.boom','localization', 'update.last.seen']
 ], function () {
-    Route::get('themes', [RoomBoomLevelController::class, 'roomThemes']);
     Route::get('get_videos', [RoomBoomLevelController::class, 'getVideos']);
     Route::get('{id}', [RoomBoomLevelController::class, 'index']);
 });
-
+    
+Route::get('room-boom/themes', [RoomBoomLevelController::class, 'roomThemes']);
 
 Route::get('super-boom-rules', [SuperBoomRuleController::class, 'index']);
