@@ -168,9 +168,29 @@ class PkEventController extends MainController
     public function store()
     {
         $data = request()->all();
-        $data['start_date'] = UserCommon::convertArabicNumbers(request()['start_date']);
+        
+        // Convert Arabic numbers in start_date
+        if (isset($data['start_date'])) {
+            $data['start_date'] = UserCommon::convertArabicNumbers($data['start_date']);
+        }
+        
         request()->merge($data);
+        
         return parent::store();
+    }
+
+    public function update($id)
+    {
+        $data = request()->all();
+        
+        // Convert Arabic numbers in start_date
+        if (isset($data['start_date'])) {
+            $data['start_date'] = UserCommon::convertArabicNumbers($data['start_date']);
+        }
+        
+        request()->merge($data);
+        
+        return parent::update($id);
     }
 
     /**
@@ -183,17 +203,17 @@ class PkEventController extends MainController
         $form = new Form(new PkEvent());
         $this->disableFormTools($form);
 
-        $form->display(__('admin.ID'));
-        $form = new Form(new PkEvent());
+        $form->display('id', __('admin.ID'));
+        
         $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
-
         $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        $form->date('start_date_local', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
+        
+        // Use start_date directly instead of start_date_local
+        $form->date('start_date', __('Start Date'))->default($minStartDate ?? date("Y-m-d"))
             ->rules(function ($form) {
-
                 $lastStartDate = \Modules\Events\Entities\PkEvent::max('start_date');
-
                 $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
+                
                 if ($minStartDate) {
                     if (!$id = $form->model()->id) {
                         return 'required|after:' . $minStartDate;
@@ -205,10 +225,13 @@ class PkEventController extends MainController
                 }
             });
 
-        // $form->belongsToMany('gifts', Gifts::class)
-        //     ->rules('required|array|size:3', [
-        //         'size' => __('choose only 3 gifts.'),
-        //     ]);
+        // Saving callback to convert Arabic numbers
+        $form->saving(function (Form $form) {
+            $startDate = request()->input('start_date');
+            if ($startDate) {
+                $form->start_date = UserCommon::convertArabicNumbers($startDate);
+            }
+        });
 
         return $form;
     }
