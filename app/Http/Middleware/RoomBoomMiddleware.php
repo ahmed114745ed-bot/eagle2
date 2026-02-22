@@ -27,5 +27,7 @@ class RoomBoomMiddleware
         $roomBoomEnable = (bool) $getSetting('enable_room_boom');
 
         if (!$roomBoom || !$roomBoomEnable) abort(403, __('Not Found'));
+
+        return $next($request);
     }
 }
