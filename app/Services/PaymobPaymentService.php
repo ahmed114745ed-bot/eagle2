@@ -39,12 +39,35 @@ class PaymobPaymentService
             'secret_length' => strlen($secret ?? '')
         ]);
         
-    
-        $data = $this->getBodyForPaymob($trx, $amount);
-        $data['paymentSubType'] = $exterData['type'];
-        $data['paymentType'] = $exterData['paymentType'];
-        $data['payment_method'] = $exterData['payment_method'] ?? 'card';
+        // Use same data structure as createPaymentLink instead of getBodyForPaymob
+        $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
+        $secret = config("services.utd_paymob.utd_paymob_secret");
+        $returnUrl = url(config("services.utd_paymob.utd_paymob_return_url"));
+        $orderId = 'ORDER-' . $trx . '-' . time();
+        $price = number_format($amount, 2, '.', '');
 
+        $syn = $merchantCode . $orderId . "" . $returnUrl . $orderId . "1" . $price . $secret;
+        $signature = hash('sha256', $syn);
+
+        $data = [
+            'returnUrl' => $returnUrl,
+            'merchantCode' => $merchantCode,
+            'chargeItems' => [
+                [
+                    'itemId' => $orderId,
+                    'price' => (float) $amount,
+                ]
+            ],
+            'signature' => $signature,
+            'special_reference' => $orderId,
+            'amount' => (float) $amount,
+            'description' => 'Payment via makePayment - ' . $trx,
+            'paymentSubType' => $exterData['type'] ?? 'game_type',
+            'paymentType' => $exterData['paymentType'] ?? 'revenue',
+            'payment_method' => $exterData['payment_method'] ?? 'card',
+        ];
+
+        // Add wallet phone if provided
         if (isset($exterData['wallet_phone'])) {
             $data['wallet_phone'] = $exterData['wallet_phone'];
         }
