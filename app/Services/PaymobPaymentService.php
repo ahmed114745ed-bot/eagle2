@@ -235,28 +235,14 @@ class PaymobPaymentService
             ],
         ];
 
-        Log::info('Paymob createPaymentLink Request:', [
-            'url' => $baseUrl,
-            'data' => $data,
-            'amount' => $amount,
-            'trx' => $trx
-        ]);
+     
 
         try {
             $response = Http::timeout(30)->post($baseUrl, $data);
 
-            Log::info('Paymob createPaymentLink Response:', [
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'body' => $response->body(),
-                'json' => $response->json()
-            ]);
+        
         } catch (\Exception $e) {
-            Log::error('Paymob createPaymentLink Exception:', [
-                'error' => $e->getMessage(),
-                'url' => $baseUrl,
-                'data' => $data
-            ]);
+         
             return [
                 'status' => 0,
                 'message' => 'Connection error: ' . $e->getMessage(),
@@ -268,7 +254,6 @@ class PaymobPaymentService
         $responseData = $response->json();
         
         if (!$response->successful()) {
-            Log::error('Paymob CreatePaymentLink Failed:', ['response' => $responseData]);
             return [
                 'status' => 0,
                 'message' => $responseData['message'] ?? 'Failed to create payment link',
@@ -313,7 +298,6 @@ class PaymobPaymentService
         }
         
         // If no URL found, return the whole response for debugging
-        Log::warning('Paymob CreatePaymentLink: No payment URL found in response', ['response' => $responseData]);
         return [
             'status' => 1,
             'payment_url' => $responseData,
