@@ -119,16 +119,20 @@ class PaymentMethodController extends Controller
         info('UTD PayMob Callback received', $webhookData);
         \Log::info('UTD PayMob Callback received', $webhookData);
 
+        // Handle new webhook format where data is directly in webhookData
+        $paymob = $webhookData['paymob'] ?? [];
         $obj = $webhookData['obj'] ?? [];
         $order = $obj['order'] ?? [];
 
-        $success = $obj['success'] ?? false;
-        $transactionId = $obj['id'] ?? null;
-        $amountCents = $obj['amount_cents'] ?? 0;
+        // Check success status from multiple possible locations
+        $success = $paymob['success'] ?? $obj['success'] ?? false;
+        $transactionId = $paymob['transaction_id'] ?? $obj['id'] ?? $webhookData['paymentRefrenceNumber'] ?? null;
+        $amountCents = $paymob['amount_cents'] ?? $obj['amount_cents'] ?? ($webhookData['paymentAmount'] * 100) ?? 0;
 
         $merchantOrderId = $webhookData['trx_code'] ?? null;
-        info('Initial merchantOrderId from order', ['merchantOrderId' => $merchantOrderId]);
-
+        info('Initial merchantOrderId from trx_code', ['merchantOrderId' => $merchantOrderId]);
+        \Log::info('Initial merchantOrderId from trx_code', ['merchantOrderId' => $merchantOrderId]);
+        
         // If merchant_order_id is null, extract code from item name (e.g., "Charge Coin - 987875126694946403 - ORDER-1771737867")
         if (!$merchantOrderId && !empty($order['items'])) {
             info('merchantOrderId is null, checking items', ['items' => $order['items']]);
@@ -142,13 +146,14 @@ class PaymentMethodController extends Controller
                 info('Regex match failed - no match found in item name');
             }
         } else {
-            info('merchantOrderId already exists or items array is empty', [
+            info('merchantOrderId status', [
                 'merchantOrderId_exists' => !empty($merchantOrderId),
-                'items_empty' => empty($order['items'])
+                'items_empty' => empty($order['items'] ?? [])
             ]);
         }
 
         if (!$merchantOrderId) {
+           \Log::info('Missing merchant order ID', ['webhookData' => $webhookData]);
             return response()->json(['status' => 'error', 'message' => 'Missing merchant order ID'], 400);
         }
 
