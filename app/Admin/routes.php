@@ -13,6 +13,7 @@ use App\Admin\Controllers\AgencyMangerUsers;
 use App\Admin\Controllers\AgencySettingsController;
 use App\Admin\Controllers\AllGameController;
 use App\Admin\Controllers\AllStatisticController;
+use App\Admin\Controllers\AppDefaultScreenSettingsController;
 use App\Admin\Controllers\AppearChargerAgencyController;
 use App\Admin\Controllers\AppFeatureController;
 use App\Admin\Controllers\AppSitiingCOnfigController;
@@ -577,8 +578,8 @@ Route::group(
         Route::resource('room-vips', RoomVipController::class);
         Route::resource('room-target', RoomTargetController::class);
 
-        // Route::resource('agencyMangLink', AgencyMangerLinkController::class);
-
+        Route::get('default-app-screen-settings', [AppDefaultScreenSettingsController::class, 'index']);
+        Route::post('default-app-screen', [AppDefaultScreenSettingsController::class, 'store']);
 
         Route::prefix('ag')->name('agency.')->namespace('AgencyControllers')->middleware('web-agency-feature')->group(function () {
             Route::get('/', 'HomeController@infoBox')->name('home');
@@ -639,13 +640,6 @@ Route::group(
         Route::get('admin-rewards', [SuperAdminRewardController::class, 'index']);
         Route::get('admin-rewards/{id}', [SuperAdminRewardController::class, 'getRewards']);
 
-        //    dd( Admin::menu(function ($menu) {
-        //         $menu->add('Custom Page', ['route' => 'admin.AppSitiingCOnfigController'])
-        //             ->icon('fa-file');
-        //     }));
-
-        // Route::get('/custom-page', [AppSitiingCOnfigController::class, 'index'])->name('admin.AppSitiingCOnfigController');
-
         Route::resource('admin-users', AdminUsersController::class);
         Route::resource('parent-users', ParentUsersController::class);
         Route::resource('invitation-code/settings', InvitationSettingsController::class);
@@ -656,7 +650,6 @@ Route::group(
         Route::resource('zego-feature', ZegoFeatureController::class);
         Route::get('chat-settings', [GroupChatController::class, 'chat_settings']);
         Route::get('admin-users/{id}/{agency}', 'AdminUsersController@show2');
-        //Route::get('percentage-target', [TargetPercentageController::class, 'index'])->name('percentage-target');
         Route::get('convert-is_gold', function () {
             $users = \App\Models\User::where("is_gold_id", 1)->get();
             foreach ($users as $user) {
