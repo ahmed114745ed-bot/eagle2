@@ -20,7 +20,7 @@ class PercentageBoomController extends MainController
         $percentages = BoomPercentage::get();
         return parent::index($content
             ->title(__('settings'))
-            ->body(view('percentageBoom', compact(['percentages']))));
+            ->body(view('percentageBoom', compact(['percentages',]))));
     }
 
 
@@ -58,7 +58,7 @@ class PercentageBoomController extends MainController
 
             $percentage->save();
         }
-        settings()->set('boom_themes', time());
+
         admin_toastr(__('Saved successfully'), 'success');
         return back();
     }
