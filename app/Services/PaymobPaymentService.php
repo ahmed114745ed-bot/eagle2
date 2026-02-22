@@ -27,7 +27,19 @@ class PaymobPaymentService
 
     public function makePayment($trx, $amount, $exterData)
     {
-
+        // Debug configuration
+        $utdUrl = config("services.utd_paymob.utd_url");
+        $merchantCode = config("services.utd_paymob.utd_paymob_merchant_code");
+        $secret = config("services.utd_paymob.utd_paymob_secret");
+        
+        Log::info('Paymob Configuration Check:', [
+            'utd_url' => $utdUrl,
+            'merchant_code' => $merchantCode,
+            'has_secret' => !empty($secret),
+            'secret_length' => strlen($secret ?? '')
+        ]);
+        
+    
         $data = $this->getBodyForPaymob($trx, $amount);
         $data['paymentSubType'] = $exterData['type'];
         $data['paymentType'] = $exterData['paymentType'];
@@ -38,11 +50,78 @@ class PaymobPaymentService
         }
 
         $utdUrl = config("services.utd_paymob.utd_url");
-        $response = Http::post($utdUrl, $data);
+        
+        Log::info('Paymob makePayment Request:', [
+            'url' => $utdUrl,
+            'data' => $data,
+            'trx' => $trx,
+            'amount' => $amount
+        ]);
+        
+        try {
+            $response = Http::timeout(30)->post($utdUrl, $data);
+            
+            Log::info('Paymob makePayment Response:', [
+                'status' => $response->status(),
+                'successful' => $response->successful(),
+                'body' => $response->body(),
+                'json' => $response->json()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Paymob makePayment Exception:', [
+                'error' => $e->getMessage(),
+                'url' => $utdUrl,
+                'data' => $data
+            ]);
+            return [
+                'status' => 0,
+                'message' => 'Connection error: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
 
-        info($response);
-        Log::info('Paymob Payment Response: ' . $response->body());
-        return json_decode($response);
+        // Get response data
+        $responseData = $response->json();
+        
+        if (!$response->successful()) {
+            Log::error('Paymob Payment Failed:', ['response' => $responseData]);
+            return [
+                'status' => 0,
+                'message' => $responseData['message'] ?? 'Payment request failed',
+                'data' => $responseData
+            ];
+        }
+        
+        // Check for payment URL in different possible fields
+        $paymentUrl = null;
+        if (isset($responseData['payment_url'])) {
+            $paymentUrl = $responseData['payment_url'];
+        } elseif (isset($responseData['redirectionUrl'])) {
+            $paymentUrl = $responseData['redirectionUrl'];
+        } elseif (isset($responseData['url'])) {
+            $paymentUrl = $responseData['url'];
+        } elseif (isset($responseData['checkout_url'])) {
+            $paymentUrl = $responseData['checkout_url'];
+        } elseif (isset($responseData['payment_link'])) {
+            $paymentUrl = $responseData['payment_link'];
+        }
+        
+        if ($paymentUrl) {
+            return [
+                'status' => 1,
+                'payment_url' => $paymentUrl,
+                'message' => 'Payment link created successfully',
+                'data' => $responseData
+            ];
+        }
+        
+        Log::warning('Paymob Payment: No payment URL found in response', ['response' => $responseData]);
+        return [
+            'status' => 1,
+            'payment_url' => $responseData,
+            'message' => 'Payment processed but no URL found',
+            'data' => $responseData
+        ];
     }
 
     public function getBodyForPaymob($trx, $amount)
@@ -119,8 +198,77 @@ class PaymobPaymentService
             ],
         ];
 
-        $response = Http::post($baseUrl, $data);
+        Log::info('Paymob createPaymentLink Request:', [
+            'url' => $baseUrl,
+            'data' => $data,
+            'amount' => $amount,
+            'trx' => $trx
+        ]);
 
-        return json_decode($response, true);
+        try {
+            $response = Http::timeout(30)->post($baseUrl, $data);
+
+            Log::info('Paymob createPaymentLink Response:', [
+                'status' => $response->status(),
+                'successful' => $response->successful(),
+                'body' => $response->body(),
+                'json' => $response->json()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Paymob createPaymentLink Exception:', [
+                'error' => $e->getMessage(),
+                'url' => $baseUrl,
+                'data' => $data
+            ]);
+            return [
+                'status' => 0,
+                'message' => 'Connection error: ' . $e->getMessage(),
+                'data' => null
+            ];
+        }
+
+        // Get response data
+        $responseData = $response->json();
+        
+        if (!$response->successful()) {
+            Log::error('Paymob CreatePaymentLink Failed:', ['response' => $responseData]);
+            return [
+                'status' => 0,
+                'message' => $responseData['message'] ?? 'Failed to create payment link',
+                'data' => $responseData
+            ];
+        }
+        
+        // Check for payment URL in different possible fields
+        $paymentUrl = null;
+        if (isset($responseData['payment_url'])) {
+            $paymentUrl = $responseData['payment_url'];
+        } elseif (isset($responseData['redirectionUrl'])) {
+            $paymentUrl = $responseData['redirectionUrl'];
+        } elseif (isset($responseData['url'])) {
+            $paymentUrl = $responseData['url'];
+        } elseif (isset($responseData['checkout_url'])) {
+            $paymentUrl = $responseData['checkout_url'];
+        } elseif (isset($responseData['payment_link'])) {
+            $paymentUrl = $responseData['payment_link'];
+        }
+        
+        if ($paymentUrl) {
+            return [
+                'status' => 1,
+                'payment_url' => $paymentUrl,
+                'message' => 'Payment link created successfully',
+                'data' => $responseData
+            ];
+        }
+        
+        // If no URL found, return the whole response for debugging
+        Log::warning('Paymob CreatePaymentLink: No payment URL found in response', ['response' => $responseData]);
+        return [
+            'status' => 1,
+            'payment_url' => $responseData,
+            'message' => 'Payment processed but no URL found',
+            'data' => $responseData
+        ];
     }
 }
