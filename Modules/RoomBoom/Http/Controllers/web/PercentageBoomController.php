@@ -58,7 +58,7 @@ class PercentageBoomController extends MainController
 
             $percentage->save();
         }
-
+        settings()->set('boom_themes', time());
         admin_toastr(__('Saved successfully'), 'success');
         return back();
     }
