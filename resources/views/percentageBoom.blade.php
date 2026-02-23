@@ -56,31 +56,18 @@
                 </div>
 
                 <!-- Type -->
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="type_{{ $percentage->id }}" class="form-label fw-medium text-secondary mb-2">
                         <i class="bi bi-tag me-1"></i>
                         {{ __('image_type') }}
                     </label>
-                    <select name="types[{{ $percentage->id }}]"
-                id="type_{{ $percentage->id }}"
-               
-                style="max-width: 135%; white-space: normal;">
+                    <select name="types[{{ $percentage->id }}]" id="type_{{ $percentage->id }}" class="form-select type-select">
                         <option value="" class="text-muted">{{ __('Select type') }}</option>
-                        <option value="svga" {{ $percentage->image_type == 'svga' ? 'selected' : '' }} class="py-2">
-                            <i class="bi bi-file-earmark me-2"></i>{{__('svga')}}
-                        </option>
-                        <option value="alpha" {{ $percentage->image_type == 'alpha' ? 'selected' : '' }}>
-                            <i class="bi bi-transparency me-2"></i>{{__('alpha')}}
-                        </option>
-                        <option value="mp4" {{ $percentage->image_type == 'mp4' ? 'selected' : '' }}>
-                            <i class="bi bi-film me-2"></i>{{__('mp4')}}
-                        </option>
-                        <option value="vap" {{ $percentage->image_type == 'vap' ? 'selected' : '' }}>
-                            <i class="bi bi-camera-reels me-2"></i>{{__('vap')}}
-                        </option>
-                        <option value="png" {{ $percentage->image_type == 'png' ? 'selected' : '' }}>
-                            <i class="bi bi-image me-2"></i>{{ __('image:(jpg, jpeg, png,gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)') }}
-                        </option>
+                        <option value="svga" {{ $percentage->image_type == 'svga' ? 'selected' : '' }}>{{ __('svga') }}</option>
+                        <option value="alpha" {{ $percentage->image_type == 'alpha' ? 'selected' : '' }}>{{ __('alpha') }}</option>
+                        <option value="mp4" {{ $percentage->image_type == 'mp4' ? 'selected' : '' }}>{{ __('mp4') }}</option>
+                        <option value="vap" {{ $percentage->image_type == 'vap' ? 'selected' : '' }}>{{ __('vap') }}</option>
+                        <option value="png" {{ $percentage->image_type == 'png' ? 'selected' : '' }} title="image:(jpg, jpeg, png, gif, bmp, tiff, svg, webp, mov, avi, wmv, flv, mkv, webm)">Image (png)</option>
                     </select>
                    
                 </div>
@@ -155,6 +142,7 @@
 
 
 .type-select {
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -205,7 +193,6 @@ select.form-select option:focus {
 
 /* Custom dropdown arrow */
 .form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
     background-size: 16px 12px;
 }
 
