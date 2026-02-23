@@ -45,14 +45,25 @@
                         <i class="bi bi-eye me-1"></i>
                         {{ __('Preview') }}
                     </label>
-                    <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient"
+                    {{-- <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient"
                          style="height:150px; background: linear-gradient(45deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%); background-size: 20px 20px;">
                         <img id="preview_{{ $percentage->id }}"
                              src="{{ $percentage->image ? getImagePath($percentage->image) : 'https://via.placeholder.com/150x150?text=No+Image' }}"
                              class="rounded-3 shadow-sm"
                              style="max-height: 140px; max-width: 100%; object-fit: contain;"
                              onerror="this.src='https://via.placeholder.com/150x150?text=Error'">
-                    </div>
+                    </div> --}}
+
+                        <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient"
+                            style="height:150px; background: linear-gradient(45deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%); background-size: 20px 20px;">
+                            
+                            {!! handleShowImageWithTypes(
+                                    $percentage->id, 
+                                    $percentage->image ? getImagePath($percentage->image) : null, 
+                                    140, 140
+                            ) !!}
+                            
+                        </div>
                 </div>
 
                 <!-- Type -->
