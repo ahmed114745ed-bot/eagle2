@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
-        Schema::table('user_days_tasks_progress', function (Blueprint $table) {
-            $table->boolean('is_collect')->default(false);
-        });
+        if (!Schema::hasColumn('user_days_tasks_progress', 'is_collect')) {
+            Schema::table('user_days_tasks_progress', function (Blueprint $table) {
+                $table->boolean('is_collect')->default(false);
+            });
+        }
 
-        Schema::table('user_day_progress', function (Blueprint $table) {
-            $table->boolean('get_rewards')->default(false);
-        });
+        if (!Schema::hasColumn('user_day_progress', 'get_rewards')) {
+            Schema::table('user_day_progress', function (Blueprint $table) {
+                $table->boolean('get_rewards')->default(false);
+            });
+        }
     }
 
     /**

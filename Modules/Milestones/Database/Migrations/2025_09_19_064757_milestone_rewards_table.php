@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-
+        if (Schema::hasTable('milestone_rewards')) {
+            return;
+        }
         Schema::create('milestone_rewards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('milestone_id')->constrained()->onDelete('cascade');

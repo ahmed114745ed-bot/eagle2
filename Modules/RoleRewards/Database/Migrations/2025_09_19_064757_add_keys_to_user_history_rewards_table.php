@@ -9,6 +9,16 @@ return new class extends Migration
 
     public function up(): void
     {
+        // Check if index already exists
+        $indexExists = DB::select("
+            SELECT INDEX_NAME FROM information_schema.STATISTICS 
+            WHERE TABLE_SCHEMA = DATABASE() 
+            AND TABLE_NAME = 'user_history_rewards' 
+            AND INDEX_NAME = 'uniq_user_rewards_v2'
+        ");
+        if (!empty($indexExists)) {
+            return;
+        }
         // أنشئ مفتاح جديد باسم مختلف
         DB::statement("
             ALTER TABLE user_history_rewards 

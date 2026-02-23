@@ -13,6 +13,9 @@ class CreateRoomBoomRewardsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('room_boom_rewards')) {
+            return;
+        }
         Schema::create('room_boom_rewards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('room_boom_level_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();

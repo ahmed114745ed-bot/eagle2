@@ -13,6 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('weekly_cp_winners')) {
+            return;
+        }
         Schema::create('weekly_cp_winners', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('weekly_cp_id');

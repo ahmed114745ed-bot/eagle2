@@ -54,6 +54,7 @@
         "utd/charizma": "*",
         "utd/chat": "*",
         "utd/cp": "*",
+        "utd/events": "dev-achievmentPackage",
         "utd/family": "*",
         "utd/gifts": "*",
         "utd/lucky-box": "*",
@@ -64,8 +65,7 @@
         "utd/room-boom": "*",
         "utd/room-cup": "*",
         "utd/task-stream": "*",
-        "utd/vip": "*",
-        "utd/events": "*"
+        "utd/vip": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

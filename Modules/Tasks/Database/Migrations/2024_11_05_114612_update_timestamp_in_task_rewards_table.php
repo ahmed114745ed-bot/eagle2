@@ -13,6 +13,9 @@ class UpdateTimestampInTaskRewardsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('task_rewards')) {
+            return;
+        }
         Schema::rename('tasks_rewards', 'task_rewards');
     }
 

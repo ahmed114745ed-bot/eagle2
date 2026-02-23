@@ -11,6 +11,9 @@ return new class extends Migration {
          */
         public function up(): void
         {
+            if (Schema::hasColumn('user_history_rewards', 'is_deleted')) {
+                return;
+            }
             Schema::table('user_history_rewards', function (Blueprint $table) {
                 $table->boolean('is_deleted')->default(false)->after('sub_type')->comment('Soft delete flag');
             });

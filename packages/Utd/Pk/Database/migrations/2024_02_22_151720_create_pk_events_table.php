@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('pk_events')) {
+            return;
+        }
         Schema::create('pk_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('admin_id')->nullable();

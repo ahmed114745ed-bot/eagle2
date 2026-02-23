@@ -13,6 +13,9 @@ class CreateAgencyRewardsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('agency_rewards')) {
+            return;
+        }
         Schema::create('agency_rewards', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('agency_id');

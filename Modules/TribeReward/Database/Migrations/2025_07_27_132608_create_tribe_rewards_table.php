@@ -13,6 +13,9 @@ class CreateTribeRewardsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('tribe_rewards')) {
+            return;
+        }
         Schema::create('tribe_rewards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tribe_top_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();

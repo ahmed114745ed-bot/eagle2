@@ -1,0 +1,22 @@
+{
+    "name": "utd/events",
+    "description": "Events package for weekly star, charge events, and event periods",
+    "type": "library",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Utd\\Events\\": "src/",
+            "Utd\\Events\\Database\\": "Database/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Utd\\Events\\EventsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {}
+}

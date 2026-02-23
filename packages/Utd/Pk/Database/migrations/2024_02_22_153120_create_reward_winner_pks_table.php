@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('reward_winner_pks')) {
+            return;
+        }
         Schema::create('reward_winner_pks', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('pk_winner_id');
