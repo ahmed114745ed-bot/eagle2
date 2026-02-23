@@ -157,7 +157,6 @@ class FormTemplateController extends Controller
     public function update(Request $request, FormTemplate $formTemplate)
     {
 
-    dd(123);
         $validated = $request->validate([
             'title' => 'required|array',
             'title.*' => 'required|string',
