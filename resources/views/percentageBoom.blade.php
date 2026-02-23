@@ -1,6 +1,6 @@
 
 
-
+<div class="card mb-4 border-0 ">
  <form action="{{ url('admin/room-boom/save') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
@@ -54,8 +54,7 @@
                              onerror="this.src='https://via.placeholder.com/150x150?text=Error'">
                     </div> --}}
 
-                        <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient"
-                            style="height:150px; background: linear-gradient(45deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%); background-size: 20px 20px;">
+                        <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient">
                             
                             {!! handleShowImageWithTypes(
                                     $percentage->id, 
@@ -67,14 +66,15 @@
                 </div>
 
                 <!-- Type -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="type_{{ $percentage->id }}" class="form-label fw-medium text-secondary mb-2">
                         <i class="bi bi-tag me-1"></i>
                         {{ __('image_type') }}
                     </label>
                     <select name="types[{{ $percentage->id }}]"
-                            id="type_{{ $percentage->id }}"
-                            class="form-select form-select-lg border-0 bg-light bg-opacity-50 rounded-4 shadow-sm">
+                id="type_{{ $percentage->id }}"
+               
+                style="max-width: 135%; white-space: normal;">
                         <option value="" class="text-muted">{{ __('Select type') }}</option>
                         <option value="svga" {{ $percentage->image_type == 'svga' ? 'selected' : '' }} class="py-2">
                             <i class="bi bi-file-earmark me-2"></i>{{__('svga')}}
@@ -107,9 +107,15 @@
             <i class="bi bi-arrow-right ms-2"></i>
         </button>
     </div>
+
+   
 </form>
+</div>
 
 <style>
+
+   
+
 .transition-all {
     transition: all 0.3s ease;
 }
@@ -144,6 +150,74 @@
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1) !important;
+}
+
+
+.type-select {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 2.5rem;
+}
+
+/* Dropdown menu styling */
+.type-select option {
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 10px 15px;
+    min-height: auto;
+    line-height: 1.4;
+}
+
+/* Better dropdown positioning */
+select.form-select option {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* For very long options, ensure they wrap */
+select.form-select option:last-child {
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 250px;
+}
+
+/* Alternative: Use a dropdown with fixed max-height and scrolling */
+select.form-select[size] {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Option groups styling */
+select.form-select optgroup {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    padding: 8px 10px;
+}
+
+/* Hover effect for options */
+select.form-select option:hover,
+select.form-select option:focus {
+    background-color: #e9ecef;
+}
+
+/* Custom dropdown arrow */
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-size: 16px 12px;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 768px) {
+    select.form-select option {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px;
+    }
+    
+    .type-select {
+        font-size: 16px;
+    }
 }
 </style>
 
