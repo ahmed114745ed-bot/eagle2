@@ -124,7 +124,7 @@
                     <span class="slider round"></span>
                 </label>
             </div>
-<br>
+     <br>
              <div class="switch-item">
                 <label for="changeCountryCheckbox" class="switch-label">{{__('accept change country')}}   </label>
                 <label class="switch">

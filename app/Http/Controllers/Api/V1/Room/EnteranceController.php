@@ -310,6 +310,9 @@ class EnteranceController extends Controller
         }
 
         $type  =  $room->type;
+        $audioRoom = Common::getSettingValue('audio_room') ?? 1;
+        if ($type == 'audio'  && !$audioRoom) return Common::apiResponse(false, 'Audio rooms are disabled', null, 400);
+
 
 
         $this->setDefaultBackground();
