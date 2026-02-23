@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -21,8 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('weekly_stars', function (Blueprint $table) {
-            $table->dropColumn('type');
-        });
+        DB::statement('ALTER TABLE weekly_stars MODIFY type INT NULL');
     }
 };

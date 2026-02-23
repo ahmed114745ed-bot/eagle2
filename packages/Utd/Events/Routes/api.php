@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Utd\Pk\Http\Controllers\PkEventController;
 use Utd\Events\Http\Controllers\WeeklyStarController;
 use Utd\Events\Http\Controllers\EventPeriodController;
 use Utd\Events\Http\Controllers\ChargeEventController;
+use Utd\Pk\Http\Controllers\Utd\PkEventController;
 
 /*
     |--------------------------------------------------------------------------

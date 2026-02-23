@@ -722,44 +722,6 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Events',
-                'sort' => 31,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 31],
-                ],
-                'permissions' => [
-                    ['key' => 'event-period', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'weekly-star', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'weekly_star_rewards', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'target-event', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'gift-target-event', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ...(PackageHelper::isInstalled('pk') ? [
-                        ['key' => 'pk-event', 'except' => [], 'additional' => [], 'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-                        ],],
-                        ['key' => 'pk-event-rewards', 'except' => [], 'additional' => [], 'types' => [
-                            PermissionType::ADMIN->value => $defaultMethods,
-                        ],],
-                    ] : []),
-                    ['key' => 'general-roles', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'event_report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['return-switch'], 'types' => [
-                        PermissionType::ADMIN->value => ['browse', 'return-switch'],
-                    ],],
-                ],
-            ],
-            [
                 'name' => 'Milestone',
                 'sort' => 32,
                 'types' => [
@@ -1296,6 +1258,47 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'vip-privilege', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('event')) {
+            $categories[] = [
+                'name' => 'Events',
+                'sort' => 31,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 31],
+                ],
+                'permissions' => [
+                    ['key' => 'event-period', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'weekly-star', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'weekly_star_rewards', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'target-event', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'gift-target-event', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ...(PackageHelper::isInstalled('pk') ? [
+                        ['key' => 'pk-event', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                        ['key' => 'pk-event-rewards', 'except' => [], 'additional' => [], 'types' => [
+                            PermissionType::ADMIN->value => $defaultMethods,
+                        ],],
+                    ] : []),
+                    ['key' => 'general-roles', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'event_report', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['return-switch'], 'types' => [
+                        PermissionType::ADMIN->value => ['browse', 'return-switch'],
                     ],],
                 ],
             ];

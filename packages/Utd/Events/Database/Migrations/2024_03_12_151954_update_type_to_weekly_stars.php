@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('weekly_stars', function (Blueprint $table) {
-            $table->dropColumn('type');
+            $table->string('type')->nullable()->default('weekly_star')->change();
         });
     }
 };

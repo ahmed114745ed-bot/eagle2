@@ -17,8 +17,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('weekly_stars', function (Blueprint $table) {
-            $table->dropColumn('type');
-        });
+        // Only drop if this migration actually added the column
+        // (column wouldn't exist from earlier migrations in a rollback scenario)
     }
 };

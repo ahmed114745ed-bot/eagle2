@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('general_roles', function (Blueprint $table) {
-            $table->text('desc_tr')->nullable();
-            $table->text('desc_hi')->nullable();
-        });
+        if (!Schema::hasColumn('general_roles', 'desc_tr')) {
+            Schema::table('general_roles', function (Blueprint $table) {
+                $table->text('desc_tr')->nullable();
+            });
+        }
+        if (!Schema::hasColumn('general_roles', 'desc_hi')) {
+            Schema::table('general_roles', function (Blueprint $table) {
+                $table->text('desc_hi')->nullable();
+            });
+        }
     }
 
     /**
@@ -22,8 +28,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('general_roles', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('general_roles', 'desc_tr')) {
+            Schema::table('general_roles', function (Blueprint $table) {
+                $table->dropColumn('desc_tr');
+            });
+        }
+        if (Schema::hasColumn('general_roles', 'desc_hi')) {
+            Schema::table('general_roles', function (Blueprint $table) {
+                $table->dropColumn('desc_hi');
+            });
+        }
     }
 };

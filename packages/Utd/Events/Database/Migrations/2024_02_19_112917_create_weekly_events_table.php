@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -29,6 +30,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Drop FK from CP package's weekly_cp_gifts if it exists
+        if (Schema::hasTable('weekly_cp_gifts')) {
+            Schema::table('weekly_cp_gifts', function (Blueprint $table) {
+                $table->dropForeign(['weekly_cp_id']);
+            });
+        }
         Schema::dropIfExists('weekly_stars');
     }
 };
