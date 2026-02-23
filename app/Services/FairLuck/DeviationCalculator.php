@@ -22,10 +22,9 @@ class DeviationCalculator
 
         $targetLossRate = (float) FairLuckSetting::getByKey('target_loss_rate', 0.01);
         
-        $actualLoss = -$totalProfit; // Profit is negative for loss
+        $actualLoss = -$totalProfit; 
         $targetLoss = $totalBets * $targetLossRate;
 
-        // Alignment with spec: Negative = lost more than target
         return ($targetLoss - $actualLoss) / $totalBets;
     }
 }
