@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VIP Package - Developer Installation Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: #1e293b;
+            line-height: 1.8;
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #8b5cf6;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #7c3aed;
+            margin-top: 40px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ddd6fe;
+        }
+        h3 {
+            color: #475569;
+            margin-top: 25px;
+        }
+        .step-box {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+            border-left: 4px solid #8b5cf6;
+            padding: 20px 25px;
+            margin: 20px 0;
+            border-radius: 0 12px 12px 0;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #6b21a8;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        code {
+            background: #f3e8ff;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Fira Code', Consolas, monospace;
+            font-size: 13px;
+            color: #7c3aed;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Fira Code', Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        .warning {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .info {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .success {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background: #8b5cf6;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #faf5ff;
+        }
+        .file-structure {
+            background: #0f172a;
+            color: #94a3b8;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Fira Code', Consolas, monospace;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        .file-structure .folder {
+            color: #a78bfa;
+        }
+        .file-structure .file {
+            color: #a5f3fc;
+        }
+        .toc {
+            background: #faf5ff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+        .toc h3 {
+            margin-top: 0;
+            color: #6b21a8;
+        }
+        .toc ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .toc li {
+            margin: 8px 0;
+        }
+        .toc a {
+            color: #7c3aed;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            color: #64748b;
+        }
+        @media print {
+            body { background: white; padding: 20px; }
+            .container { box-shadow: none; padding: 20px; }
+            pre { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>👑 VIP Package</h1>
+    <p class="subtitle">Developer Installation & Integration Guide</p>
+
+    <div class="toc">
+        <h3>📋 Table of Contents</h3>
+        <ul>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#requirements">Requirements</a></li>
+            <li><a href="#structure">Package Structure</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#contracts">Contracts & Integration</a></li>
+            <li><a href="#api">API Endpoints</a></li>
+            <li><a href="#admin">Admin Panel</a></li>
+            <li><a href="#removal">Removal</a></li>
+        </ul>
+    </div>
+
+    <h2 id="overview">Overview</h2>
+    <p>
+        The VIP package provides a comprehensive VIP membership system. 
+        Users can purchase or receive VIP subscriptions with various privileges,
+        including special badges, exclusive features, and customization options.
+    </p>
+
+    <h2 id="requirements">Requirements</h2>
+    <table>
+        <tr><th>Requirement</th><th>Version</th></tr>
+        <tr><td>PHP</td><td>>= 8.1</td></tr>
+        <tr><td>Laravel</td><td>10.x or 11.x</td></tr>
+        <tr><td>MySQL</td><td>>= 5.7</td></tr>
+        <tr><td>Laravel-Admin</td><td>Installed</td></tr>
+    </table>
+
+    <h2 id="structure">Package Structure</h2>
+    <div class="file-structure">
+<span class="folder">packages/Utd/Vip/</span>
+├── <span class="file">composer.json</span>
+├── <span class="file">CLIENT_INSTALLATION.html</span>
+├── <span class="file">INSTALLATION_GUIDE.html</span>
+├── <span class="folder">Database/</span>
+│   ├── <span class="folder">Migrations/</span>
+│   │   ├── <span class="file">2022_11_23_022450_create_vips_table.php</span>
+│   │   ├── <span class="file">2023_02_08_225348_create_o_vips_table.php</span>
+│   │   ├── <span class="file">2023_02_08_230210_create_vip_privileges_table.php</span>
+│   │   ├── <span class="file">2023_02_11_145841_create_users_vips_table.php</span>
+│   │   └── <span class="file">... (29 migrations total)</span>
+│   └── <span class="folder">Seeders/</span>
+│       ├── <span class="file">VipDatabaseSeeder.php</span>
+│       └── <span class="file">VipMenuSeeder.php</span>
+├── <span class="folder">Routes/</span>
+│   ├── <span class="file">api.php</span>
+│   ├── <span class="file">dashboard.php</span>
+│   ├── <span class="file">preview-routes.php</span>
+│   └── <span class="file">web.php</span>
+└── <span class="folder">src/</span>
+    ├── <span class="file">VipServiceProvider.php</span>
+    ├── <span class="file">RouteServiceProvider.php</span>
+    ├── <span class="folder">Entities/</span>
+    │   ├── <span class="file">OVip.php</span>
+    │   ├── <span class="file">UserVip.php</span>
+    │   ├── <span class="file">VipPrev.php</span>
+    │   └── <span class="file">VipPrivilege.php</span>
+    ├── <span class="folder">Helpers/</span>
+    │   └── <span class="file">VipCommon.php</span>
+    ├── <span class="folder">Http/</span>
+    │   └── <span class="folder">Controllers/</span>
+    │       ├── <span class="folder">Admin/</span>
+    │       │   ├── <span class="file">OVipController.php</span>
+    │       │   ├── <span class="file">VipPrivilegeController.php</span>
+    │       │   └── <span class="file">VipSettingsController.php</span>
+    │       ├── <span class="folder">Api/</span>
+    │       │   └── <span class="file">VipController.php</span>
+    │       └── <span class="folder">Web/</span>
+    │           └── <span class="file">WareVipController.php</span>
+    ├── <span class="folder">Repositories/</span>
+    │   ├── <span class="file">OvipRepository.php</span>
+    │   └── <span class="file">UserVipRepository.php</span>
+    └── <span class="folder">Services/</span>
+        └── <span class="file">VipAdminService.php</span>
+    </div>
+
+    <h2 id="installation">Installation</h2>
+
+    <div class="step-box">
+        <div class="step-title">Step 1: Copy Package</div>
+        <p>Copy the <code>Vip</code> folder to your packages directory:</p>
+        <pre><code>packages/Utd/Vip</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 2: Update composer.json</div>
+        <p>Add the repository and require the package:</p>
+        <pre><code>{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/Utd/Vip",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "require": {
+        "utd/vip": "*"
+    }
+}</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 3: Install via Composer</div>
+        <pre><code>composer update utd/vip</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 4: Run Migrations</div>
+        <pre><code>php artisan migrate</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 5: Run Seeders</div>
+        <pre><code>php artisan db:seed --class=PermissionTypeSeeder; php artisan db:seed --class="Utd\Vip\Database\Seeders\VipDatabaseSeeder"</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 6: Clear Cache</div>
+        <pre><code>php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="success">
+        <strong>✅ Installation Complete!</strong><br>
+        The package is now installed and ready to use.
+    </div>
+
+    <h2 id="contracts">Contracts & Integration</h2>
+    
+    <p>The VIP package exposes contracts for external integration. When the package is not installed, null implementations are automatically used.</p>
+
+    <h3>Available Contracts</h3>
+    <table>
+        <tr><th>Contract</th><th>Description</th></tr>
+        <tr><td><code>VipCommonContract</code></td><td>Main VIP helper with activation, deactivation methods</td></tr>
+        <tr><td><code>OvipRepositoryContract</code></td><td>Repository for OVip entities</td></tr>
+        <tr><td><code>UserVipRepositoryContract</code></td><td>Repository for UserVip entities</td></tr>
+    </table>
+
+    <h3>Usage Example</h3>
+    <pre><code>use App\Contracts\VipCommonContract;
+
+// Get VIP service (returns null implementation if package not installed)
+$vipService = app(VipCommonContract::class);
+
+// Create user VIP
+$vipService->createUserVip($userId, $vipId, $days);
+
+// Check if user has active VIP
+$hasVip = $vipService->userHasActiveVip($userId);</code></pre>
+
+    <div class="info">
+        <strong>📘 Note:</strong><br>
+        Use <code>PackageHelper::isInstalled('vip')</code> to check if the VIP package is installed before showing VIP-related UI elements.
+    </div>
+
+    <h2 id="api">API Endpoints</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        <tr><td>GET</td><td><code>/api/v3/vips</code></td><td>Get available VIP packages</td></tr>
+        <tr><td>GET</td><td><code>/api/v3/vips/{id}</code></td><td>Get VIP package details</td></tr>
+        <tr><td>GET</td><td><code>/api/v3/user/vip</code></td><td>Get current user's VIP status</td></tr>
+        <tr><td>POST</td><td><code>/api/v3/vips/purchase</code></td><td>Purchase VIP package</td></tr>
+        <tr><td>GET</td><td><code>/api/v3/vip-privileges</code></td><td>Get VIP privileges list</td></tr>
+    </table>
+
+    <h2 id="admin">Admin Panel Routes</h2>
+    <table>
+        <tr><th>Route</th><th>Description</th></tr>
+        <tr><td><code>/admin/ovip</code></td><td>Manage VIP packages (CRUD)</td></tr>
+        <tr><td><code>/admin/vip_privilege</code></td><td>Manage VIP privileges</td></tr>
+        <tr><td><code>/admin/vips_dedicate</code></td><td>Gift VIP to users</td></tr>
+    </table>
+
+    <h2 id="removal">Package Removal</h2>
+
+    <div class="warning">
+        <strong>⚠️ Warning:</strong> Removing this package will affect VIP functionality. Ensure fallback contracts are properly configured.
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 1: Remove Package</div>
+        <pre><code>composer remove utd/vip</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 2: Rollback Migrations (Optional)</div>
+        <pre><code>php artisan migrate:reset --path=packages/Utd/Vip/Database/Migrations</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 3: Remove Repository Entry</div>
+        <p>Remove the Vip repository entry from <code>composer.json</code>.</p>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 4: Delete Package Folder</div>
+        <pre><code>rm -rf packages/Utd/Vip</code></pre>
+    </div>
+
+    <div class="step-box">
+        <div class="step-title">Step 5: Clear Cache</div>
+        <pre><code>php artisan optimize:clear</code></pre>
+    </div>
+
+    <div class="info">
+        <strong>📘 Note:</strong><br>
+        After removal, the application will automatically use null implementations for VIP contracts, ensuring no errors occur.
+    </div>
+
+    <div class="footer">
+        <p><strong>VIP Package v1.0.0</strong></p>
+        <p>Documentation updated: February 2026</p>
+    </div>
+
+</div>
+
+</body>
+</html>

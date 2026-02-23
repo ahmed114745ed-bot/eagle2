@@ -316,14 +316,16 @@ class PermissionTypeSeeder extends Seeder
                             PermissionType::ADMIN->value => ['browse', 'gift-switch'],
                         ],
                     ],
-                    [
-                        'key' => 'gift-VIP',
-                        'except' => ['create', 'edit', 'delete', 'show'],
-                        'additional' => ['gift-switch'],
-                        'types' => [
-                            PermissionType::ADMIN->value => ['browse', 'gift-switch'],
+                    ...(PackageHelper::isInstalled('vip') ? [
+                        [
+                            'key' => 'gift-VIP',
+                            'except' => ['create', 'edit', 'delete', 'show'],
+                            'additional' => ['gift-switch'],
+                            'types' => [
+                                PermissionType::ADMIN->value => ['browse', 'gift-switch'],
+                            ],
                         ],
-                    ],
+                    ] : []),
                     [
                         'key' => 'gift-a-medal',
                         'except' => ['show'],
@@ -500,24 +502,6 @@ class PermissionTypeSeeder extends Seeder
                         PermissionType::ADMIN->value => ['delete', 'browse'],
                     ],],
                     ['key' => 'id-color', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                ],
-            ],
-            [
-                'name' => 'Vip',
-                'sort' => 15,
-                'types' => [
-                    PermissionType::ADMIN->value => ['sort' => 15],
-                ],
-                'permissions' => [
-                    ['key' => 'VIPs', 'except' => [], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'vip-gift', 'except' => ['show',], 'additional' => [], 'types' => [
-                        PermissionType::ADMIN->value => $defaultMethods,
-                    ],],
-                    ['key' => 'vip-privilege', 'except' => [], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                 ],
@@ -1291,6 +1275,27 @@ class PermissionTypeSeeder extends Seeder
                     ],],
                     ['key' => 'updates_group_chat', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse'],
+                    ],],
+                ],
+            ];
+        }
+
+        if (PackageHelper::isInstalled('vip')) {
+            $categories[] = [
+                'name' => 'Vip',
+                'sort' => 15,
+                'types' => [
+                    PermissionType::ADMIN->value => ['sort' => 15],
+                ],
+                'permissions' => [
+                    ['key' => 'VIPs', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'vip-gift', 'except' => ['show',], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
+                    ],],
+                    ['key' => 'vip-privilege', 'except' => [], 'additional' => [], 'types' => [
+                        PermissionType::ADMIN->value => $defaultMethods,
                     ],],
                 ],
             ];
