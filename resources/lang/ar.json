@@ -4995,6 +4995,7 @@
     "Default Screen Settings":"إعدادات الشاشة الافتراضية",
     "Browse default screen settings": "تصفح إعدادات الشاشة الافتراضية",
   "background": "الخلفية",
+  "Duration is too large. Maximum allowed date is 19-01-2038.":"المدة طويلة جدًا. الحد الأقصى المسموح به هو 19-01-2038.",
     "User Withdrawals": "مسحوبات المستخدمين",
     "User Withdrawal": "سحب المستخدم",
     "role_user": "المستخدم",
