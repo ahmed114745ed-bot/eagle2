@@ -19,6 +19,7 @@ use App\Models\CoinLog;
 use App\Models\ExchangeLog;
 use Modules\DailyPrize\Entities\DailyUserGift;
 use Utd\Events\Entities\WinnerReward;
+use App\Support\PackageHelper;
 
 class CoinReportController extends Controller
 {
@@ -124,16 +125,19 @@ class CoinReportController extends Controller
             'daily_prize'
         );
 
-        $result2 = $this->getCoinsData(
-            WinnerReward::class,
-            ['winner_id' => $user->id],
-            'events',
-            function ($query) {
-                $query->whereHas('reward', function ($q) {
-                    $q->where("type", "coins");
-                });
-            }
-        );
+        $result2 = [];
+        if (PackageHelper::isInstalled('event')) {
+            $result2 = $this->getCoinsData(
+                WinnerReward::class,
+                ['winner_id' => $user->id],
+                'events',
+                function ($query) {
+                    $query->whereHas('reward', function ($q) {
+                        $q->where("type", "coins");
+                    });
+                }
+            );
+        }
 
         $result = array_merge($result1, $result2);
         return Common::apiResponse(1, '', $result, 200);

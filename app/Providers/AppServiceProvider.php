@@ -50,6 +50,8 @@ use App\Services\Null\NullOvipRepository;
 use App\Services\Null\NullUserVipRepository;
 use App\Services\Null\NullVipRepository;
 use App\Services\Null\NullVipPrivilegeRepository;
+use App\Contracts\LoseWinnerRewardsContract;
+use App\Services\Null\NullLoseWinnerRewardsService;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -132,6 +134,11 @@ class AppServiceProvider extends ServiceProvider
         // VipPrivilegeRepository fallback
         if (!$this->app->bound(VipPrivilegeRepositoryContract::class)) {
             $this->app->bind(VipPrivilegeRepositoryContract::class, NullVipPrivilegeRepository::class);
+        }
+
+        // LoseWinnerRewards fallback
+        if (!$this->app->bound(LoseWinnerRewardsContract::class)) {
+            $this->app->bind(LoseWinnerRewardsContract::class, NullLoseWinnerRewardsService::class);
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

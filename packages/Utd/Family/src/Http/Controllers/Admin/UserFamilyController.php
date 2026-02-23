@@ -333,7 +333,8 @@ class UserFamilyController extends MainController
                 return $target;
             });
 
-            return new \family_admin('table')(
+            $tableClass = family_admin('table');
+            return new $tableClass(
                 [
                     'ID',
                     __('month') . '/' . __('year'),

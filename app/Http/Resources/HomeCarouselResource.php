@@ -4,7 +4,6 @@ namespace App\Http\Resources;
 
 use App\Helpers\Common;
 use Utd\Pk\Entities\Pk;
-use Utd\Events\Entities\GeneralRole;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class HomeCarouselResource extends JsonResource

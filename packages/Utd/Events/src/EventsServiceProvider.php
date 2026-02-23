@@ -5,8 +5,10 @@ namespace Utd\Events;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\LoseWinnerRewardsContract;
 use Utd\Events\Console\WeeklyStarUpdate;
 use Utd\Events\Console\WeeklyStarWinner;
+use Utd\Events\Services\LoseWinnerRewards;
 
 class EventsServiceProvider extends ServiceProvider
 {
@@ -109,6 +111,7 @@ class EventsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+        $this->app->bind(LoseWinnerRewardsContract::class, LoseWinnerRewards::class);
     }
 
     /**

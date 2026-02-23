@@ -1,10 +1,9 @@
 <?php
 
-namespace Utd\Events\Traits;
+namespace App\Traits;
 
-use App\Helpers\LogHelper;
-use Carbon\Carbon;
 use App\Helpers\Common;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
 trait EventModel

@@ -2,8 +2,8 @@
 
 namespace Utd\Events\Transformers;
 
-
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class WeeklyStarGift extends JsonResource
@@ -23,9 +23,11 @@ class WeeklyStarGift extends JsonResource
 
             case "vip":
                 $expire = $this->expire . ' days';
-                $type = $this->vip?->name;
-                $vipIcon = Ware::where('level', $this->vip?->level)->where('type', 10)->where('get_type', 1)->first();
-                $image = $this->vip?->img;
+                $type = $this->vip?->name ?? '';
+                $vipIcon = PackageHelper::isInstalled('vip') 
+                    ? Ware::where('level', $this->vip?->level)->where('type', 10)->where('get_type', 1)->first() 
+                    : null;
+                $image = $this->vip?->img ?? '';
                 break;
             case "badge":
                 $expire = $this->expire . ' days';

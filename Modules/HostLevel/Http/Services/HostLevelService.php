@@ -27,6 +27,9 @@ class HostLevelService
 
     public function roles()
     {
+        if (!PackageHelper::isInstalled('event')) {
+            return null;
+        }
         return GeneralRole::where('type', 'host_level')->first();
     }
 

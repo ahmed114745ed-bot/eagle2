@@ -178,6 +178,9 @@ class UsersDashboard extends Controller
 
     public function event_report( $id ,$type)
     {
+        if (!PackageHelper::isInstalled('event')) {
+            return AdminEventReportResource::collection(collect([]));
+        }
         $data = null;
         if($type === 'pk')
         {

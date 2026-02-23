@@ -12,13 +12,11 @@ class TopUserChargeResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
      */
-
-
     public function toArray($request)
     {
         return [
 
-          
+
                 'user_id'   => $this->id,
                 'uuid'      => $this->uuid ?? 0,
                 'name'      => $this->name ?? '',

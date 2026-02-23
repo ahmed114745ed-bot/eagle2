@@ -66,7 +66,7 @@ class EventPeriodController extends MainController
     protected function grid2()
     {
         $form = new Box();
-        $form->view('admin.grid.users.EventPeriodView');
+        $form->view('events::EventPeriodView');
 
         return $form;
     }

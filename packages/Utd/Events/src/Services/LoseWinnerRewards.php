@@ -2,15 +2,14 @@
 
 namespace Utd\Events\Services;
 
+use App\Contracts\LoseWinnerRewardsContract;
 use App\Models\Pack;
-use Utd\Vip\Entities\UserVip;
 use App\Models\Ware;
 use Carbon\Carbon;
 
-class LoseWinnerRewards
+class LoseWinnerRewards implements LoseWinnerRewardsContract
 {
-
-    public function removePacksVip( $reward,UserVip $vip, $user,$expire)
+    public function removePacksVip($reward, $vip, $user, $expire): void
     {
         $wares = Ware::query ()->where ('get_type',1)->where ('level',$vip->level)->get ();
         $targetIds = $wares->pluck('id');

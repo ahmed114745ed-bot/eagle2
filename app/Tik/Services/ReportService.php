@@ -2,20 +2,20 @@
 
 namespace App\Tik\Services;
 
-use App\Models\Pack;
-use Utd\Vip\Entities\UserVip;
-use Utd\Agency\Repositories\UserRepository;
-use Utd\Events\Entities\WinnerReward;
-use App\Http\Resources\UserReportResource;
-use Utd\Agency\Repositories\AgencyRepository;
-use App\Http\Resources\ReportEventResource;
-use Utd\Events\Entities\RewardWinnerPk;
-use App\Http\Resources\AgencyReportResource;
-use App\Tik\Repositories\AdminUsersRepository;
-use Utd\Events\Services\LoseWinnerRewards;
+use App\Contracts\LoseWinnerRewardsContract;
 use App\Http\Resources\AdminUserReportResource;
-use Utd\Achievements\Entities\UserAchievementLevel;
+use App\Http\Resources\AgencyReportResource;
+use App\Http\Resources\ReportEventResource;
+use App\Http\Resources\UserReportResource;
+use App\Models\Pack;
 use App\Support\PackageHelper;
+use App\Tik\Repositories\AdminUsersRepository;
+use Utd\Achievements\Entities\UserAchievementLevel;
+use Utd\Agency\Repositories\AgencyRepository;
+use Utd\Agency\Repositories\UserRepository;
+use Utd\Events\Entities\RewardWinnerPk;
+use Utd\Events\Entities\WinnerReward;
+use Utd\Vip\Entities\UserVip;
 
 class ReportService
 {
@@ -23,6 +23,7 @@ class ReportService
         private readonly AgencyRepository $agencyRepository,
         private readonly UserRepository $userRepository,
         private readonly AdminUsersRepository $adminUsersRepository,
+        private readonly LoseWinnerRewardsContract $loseWinnerRewards,
     ) {}
 
     public function report($request)
@@ -41,6 +42,9 @@ class ReportService
 
     public function eventReports($request)
     {
+        if (!PackageHelper::isInstalled('event')) {
+            return collect([]);
+        }
         $id = $request->id;
         if ($request->type == 'weekly_star' || $request->type == 'event_period') {
             $data = WinnerReward::where('type', $request->type)->when($request->type == 'weekly_star', fn($q) => $q->where('type', 'weekly_star')->orWhere('type', null))->with('winner', 'reward', 'reward.vip', 'reward.ware')->when(isset($id), function ($query) use ($id) {
@@ -57,6 +61,9 @@ class ReportService
 
     public function returnReward($request)
     {
+        if (!PackageHelper::isInstalled('event')) {
+            return false;
+        }
         $type = $request->input('type');
         $winner_reward_id = $request->input('reward_id');
         if ($type == "weekly") {
@@ -74,7 +81,7 @@ class ReportService
                 $userVip = PackageHelper::isInstalled('vip') ? UserVip::query()->where(["user_id" => $winner->id, "vip_id" => $winner_reward->reward->target])->latest()->first() : null;
                 $userVip->delete();
 
-                (new LoseWinnerRewards())->removePacksVip($winner_reward, $userVip, $winner, $winner_reward->reward->expire);
+                $this->loseWinnerRewards->removePacksVip($winner_reward, $userVip, $winner, $winner_reward->reward->expire);
             } elseif ($winner_reward->reward->type == 'ware') {
                 Pack::query()->where(['user_id' => $winner->id, "target_id" => $winner_reward->reward->target])->delete();
             } elseif ($winner_reward->reward->type == "achievement") {

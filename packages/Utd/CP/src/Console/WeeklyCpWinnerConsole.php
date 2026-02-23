@@ -7,6 +7,7 @@ use App\Models\GiftLog;
 use App\Models\Ware;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Support\PackageHelper;
 use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\CpWinnerReward;
 use Utd\CP\Entities\WeeklyCpWinner;
@@ -29,6 +30,10 @@ class WeeklyCpWinnerConsole extends Command
 
     public function handle()
     {
+        if (!PackageHelper::isInstalled('event')) {
+            return '';
+        }
+
         $weeklyCp = WeeklyStar::dayEnd()->where('type', 'weekly_cp')
             ->with('gifts', 'weeklyCpGifts')
             ->latest()

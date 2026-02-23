@@ -10,6 +10,7 @@ use Utd\Events\Entities\UserChargeEvent;
 use Utd\Events\Entities\WinnerReward;
 use Utd\Events\Entities\RewardWinnerPk;
 use Encore\Admin\Facades\Admin;
+use Utd\Events\Http\Actions\EventReportAction;
 
 class EventReportController extends MainController
 {
@@ -113,7 +114,7 @@ class EventReportController extends MainController
         if (Admin::user()->can('return-switch-' . $this->permission_name) || Admin::user()->can('*')) {
             $grid->column(__('return'))->display(function () {
                 $options = ['user' => __('user')];
-                return (new \Utd\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
+                return (new EventReportAction($this->id, 'weekly'))->render();
             });
         }
         return $grid;
@@ -184,7 +185,7 @@ class EventReportController extends MainController
 
             $grid->column(__('return'))->display(function () {
                 $options = ['user' => __('user')];
-                return (new \Utd\Events\Http\Actions\EventReportAction($this->id, 'pk'))->render();
+                return (new EventReportAction($this->id, 'pk'))->render();
             });
         }
         return $grid;
@@ -255,7 +256,7 @@ class EventReportController extends MainController
 
             $grid->column(__('return'))->display(function () {
                 $options = ['user' => __('user')];
-                return (new \Utd\Events\Http\Actions\EventReportAction($this->id, 'weekly'))->render();
+                return (new EventReportAction($this->id, 'weekly'))->render();
             });
         }
         return $grid;

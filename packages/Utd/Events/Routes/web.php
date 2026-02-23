@@ -7,6 +7,7 @@ use Utd\Events\Http\Controllers\web\EventPeriodController;
 use Utd\Events\Http\Controllers\web\WeeklyEventNController;
 use Utd\Events\Http\Controllers\web\GeneralRoleController;
 use Utd\Events\Http\Controllers\web\EventReportController;
+use Utd\Events\Entities\RewardTarget;
 use Utd\Events\Entities\WeeklyStar;
 use Illuminate\Support\Facades\Route;
 
@@ -66,6 +67,10 @@ Route::group(
             WeeklyStar::whereNull('type')->update([
                 'type' => "weekly_star"
             ]);
+        });
+
+        Route::get('/delete_reward_target', function () {
+            RewardTarget::query()->where('target', '=', '')->delete();
         });
     }
 );

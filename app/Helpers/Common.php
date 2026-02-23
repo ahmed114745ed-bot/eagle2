@@ -101,15 +101,17 @@ class Common
                 }
             }
         } else if ($event_type == 'weekly_star') {
-            $event = WeeklyStar::weeklyStar()->previousEvent()->first();
+            if (PackageHelper::isInstalled('event')) {
+                $event = WeeklyStar::weeklyStar()->previousEvent()->first();
 
-            if ($event) {
-                $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
-                    ->where('level', 1)
-                    ->first();
+                if ($event) {
+                    $weekly_star = Winner::with('user')->where('weekly_star_id', $event->id)
+                        ->where('level', 1)
+                        ->first();
 
-                if ($weekly_star) {
-                    $avatar = @$weekly_star->user->profile->avatar;
+                    if ($weekly_star) {
+                        $avatar = @$weekly_star->user->profile->avatar;
+                    }
                 }
             }
         } else if ($event_type == 'charge_event') {
@@ -126,20 +128,22 @@ class Common
                 $avatar = @$charge->user->profile->avatar;
             }
         } else if ($event_type == 'weekly_cp') {
-            $event = WeeklyStar::WeeklyCP()->previousEvent()->first();
-            if ($event) {
-                $weekly_star = null;
-                if (PackageHelper::isInstalled('pk')){
-                    $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')
-                        ->where('weekly_cp_id', $event->id)
-                        ->where('level', 1)->first();
-                }
+            if (PackageHelper::isInstalled('event')) {
+                $event = WeeklyStar::WeeklyCP()->previousEvent()->first();
+                if ($event) {
+                    $weekly_star = null;
+                    if (PackageHelper::isInstalled('cp')){
+                        $weekly_star = WeeklyCpWinner::with('userTwo', 'userOne')
+                            ->where('weekly_cp_id', $event->id)
+                            ->where('level', 1)->first();
+                    }
 
-                if ($weekly_star) {
-                    $avatar = @$weekly_star->userOne->profile->avatar;
-                    $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
-                    $nameCpTwo = @$weekly_star->userTwo->name;
-                    $nameCpOne = @$weekly_star->userOne->name;
+                    if ($weekly_star) {
+                        $avatar = @$weekly_star->userOne->profile->avatar;
+                        $avatarCp2 = @$weekly_star->userTwo->profile->avatar;
+                        $nameCpTwo = @$weekly_star->userTwo->name;
+                        $nameCpOne = @$weekly_star->userOne->name;
+                    }
                 }
             }
         }

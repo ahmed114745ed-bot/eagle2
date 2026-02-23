@@ -23,8 +23,9 @@ use Utd\Agency\Repositories\AgencySalaryRepository;
 use App\Http\Resources\Api\V1\GeneralUserResource;
 use App\Http\Resources\Api\V1\GeneralAgencyResource;
 use App\Contracts\UserAchievementContract;
+use Utd\Agency\Contracts\ChargeServiceInterface;
 
-class ChargeRepoService
+class ChargeRepoService implements ChargeServiceInterface
 {
     public function __construct(
         private readonly ChargeRepository $chargeRepository,
@@ -91,7 +92,7 @@ class ChargeRepoService
         }
     }
 
-    public function chargeTo(User $fromUser, User $toUser, $coins, $isRoomTarget, $usd)
+    public function chargeTo($fromUser, $toUser, $coins, $isRoomTarget, $usd)
     {
         $chargeType = 'user';
 
@@ -118,7 +119,7 @@ class ChargeRepoService
         }
     }
 
-    public function chargeToAgency(User $fromUser, ShippingAgency $toAgency, $coins, $isRoomTarget, $usd)
+    public function chargeToAgency($fromUser, $toAgency, $coins, $isRoomTarget, $usd)
     {
         // $chargeType = $isRoomTarget ? 'room_owner' : 'host';
         $chargeType = 'user';
@@ -142,7 +143,7 @@ class ChargeRepoService
         }
     }
 
-    public function sendMoney(User $sender, $receiverUuid, $count)
+    public function sendMoney($sender, $receiverUuid, $count)
     {
 
         $agency = $this->shippingAgencyRepository->findAgencyByOwnerId($sender->id, 1);
@@ -189,7 +190,7 @@ class ChargeRepoService
         return $charge->orderByDesc('created_at')->get();
     }
 
-    public function chargeDollarForOwner(User $sender, $receiverUuid, $count)
+    public function chargeDollarForOwner($sender, $receiverUuid, $count)
     {
         try {
 
@@ -232,7 +233,7 @@ class ChargeRepoService
         }
     }
 
-    public function chargeDollarForOwner_to_agency(User $sender, $receiverid, $count)
+    public function chargeDollarForOwner_to_agency($sender, $receiverid, $count)
     {
 
         try {
@@ -323,7 +324,7 @@ class ChargeRepoService
         $this->create($data);
     }
 
-    public function getCoinLogs($userId, ?string $searchKey = null)
+    public function getCoinLogs($userId, $searchKey = null)
     {
         return $this->coinLogRepository->getCoinsByUserId($userId, $searchKey);
     }
@@ -412,7 +413,7 @@ class ChargeRepoService
     }
 
 
-    public function chargeAgencyToAnother(User $auth, $request)
+    public function chargeAgencyToAnother($auth, $request)
     {
         DB::beginTransaction();
 

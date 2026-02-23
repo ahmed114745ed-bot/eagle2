@@ -92,23 +92,29 @@ class AchievementController extends Controller
         }
 
         if (isset($id) && ($id === 4)) {
-            $weeklyStar = WeeklyStar::currentEvent()
-                ->select('*')
-                ->with(['rewards' => function ($query) {
-                    $query->where('type', 'achievement');
-                }])
-                ->distinct()
-                ->get();
+            $weeklyStar = collect([]);
+            $chargeEvent = collect([]);
 
+            if (PackageHelper::isInstalled('event')) {
+                $weeklyStar = WeeklyStar::currentEvent()
+                    ->select('*')
+                    ->with(['rewards' => function ($query) {
+                        $query->where('type', 'achievement');
+                    }])
+                    ->distinct()
+                    ->get();
+
+                $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
+                    $query->where('type', 'achievement');
+                }])->get();
+            }
+
+            $pkEvent = null;
             if (PackageHelper::isInstalled('pk')) {
                 $pkEvent = PkEvent::currentEvent()->with(['rewards' => function ($query) {
                     $query->where('type', 'achievement');
                 }])->first();
             }
-
-            $chargeEvent = ChargeTargetEvent::query()->with(['rewards' => function ($query) {
-                $query->where('type', 'achievement');
-            }])->get();
 
             $append = [
                 'achievement_id' => 1,

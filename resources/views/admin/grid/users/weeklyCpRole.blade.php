@@ -78,7 +78,7 @@
 
 
                     <div class="box-body no-padding" style="margin: 10px">
-                        @if(\App\Support\PackageHelper::isInstalled('cp'))
+                        @if(\App\Support\PackageHelper::isInstalled('event'))
                         @php
                             $role = \Utd\Events\Entities\GeneralRole::where("type","weekly_cp")->first();
                         @endphp

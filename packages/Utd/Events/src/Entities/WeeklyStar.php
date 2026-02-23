@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\CpWeeklyStar;
-use Utd\Events\Traits\EventModel;
+use App\Traits\EventModel;
 use Utd\CP\Entities\WeeklyCpGift;
 use Utd\CP\Entities\WeeklyCpWinner;
 

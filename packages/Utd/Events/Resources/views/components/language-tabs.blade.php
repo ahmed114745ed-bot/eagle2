@@ -6,9 +6,7 @@
         ['code' => 'hi', 'name' => 'हिन्दी'],
     ];
     $roleType = isset($type) ? $type : 'weekly_star';
-    $role = \App\Support\PackageHelper::isInstalled('event')
-        ? \Utd\Events\Entities\GeneralRole::where("type", $roleType)->first()
-        : null;
+    $role = \Utd\Events\Entities\GeneralRole::where("type", $roleType)->first();
 @endphp
 
 <div class="box-body no-padding" style="margin: 10px">
@@ -43,6 +41,3 @@
 
      
 </div>
-
-
-

@@ -4,14 +4,14 @@ namespace Utd\Reals\Services;
 
 use App\Facades\CustomNotification;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Model;
 use Utd\Reals\Entities\Real;
+use Utd\Reals\Entities\RealUserLike;
 
 class RealLikesService extends BaseModelService
 {
-    public function __construct(Model $model)
+    public function __construct()
     {
-        parent::__construct($model);
+        parent::__construct(new RealUserLike());
     }
 
     public function add(Real $real, User $user)

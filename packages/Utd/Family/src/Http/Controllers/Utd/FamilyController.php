@@ -8,6 +8,7 @@ use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
 use Utd\Family\Http\Controllers\Controller;
 use Utd\Family\Services\FamilyService;
+use Utd\Family\Traits\DashBoardTrait;
 
 class FamilyController extends Controller
 {

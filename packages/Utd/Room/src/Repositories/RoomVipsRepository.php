@@ -28,12 +28,12 @@ class RoomVipsRepository extends AbstractRepository
             ->get();
     }
 
-    public function create(array $data)
+    public function create(array $data): mixed
     {
         return $this->model->create($data);
     }
 
-    public function update($id, array $data)
+    public function update(array $data, $id): mixed
     {
         $record = $this->model->find($id);
         if ($record) {
@@ -45,7 +45,7 @@ class RoomVipsRepository extends AbstractRepository
         return null;
     }
 
-    public function delete($id)
+    public function delete(int $id): bool
     {
         $record = $this->model->find($id);
         if ($record) {

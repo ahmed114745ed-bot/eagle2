@@ -9,10 +9,11 @@ use Utd\Achievements\Entities\Achievement;
 use Utd\Achievements\Entities\UserAchievement;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\Achievements\Enums\AchievementType;
+use Utd\Agency\Contracts\UserAchievementServiceInterface;
 
-class UserAchievementService implements UserAchievementContract
+class UserAchievementService implements UserAchievementContract, UserAchievementServiceInterface
 {
-    public function insertCharging(User $user, $totalCoins): void
+    public function insertCharging($user, $totalCoins): void
     {
         $timezone = getTimezone();
         $userId = $user->id;
@@ -184,5 +185,28 @@ class UserAchievementService implements UserAchievementContract
         });
 
         return $usersAchievements;
+    }
+
+    public function updateAchievement(int $userId, string $achievementType, $value)
+    {
+        // Implementation for updating achievement progress
+        return null;
+    }
+
+    public function getUserAchievements(int $userId)
+    {
+        return UserAchievement::query()
+            ->where('user_id', $userId)
+            ->with('achievement')
+            ->get();
+    }
+
+    public function hasCompletedAchievement(int $userId, int $achievementId): bool
+    {
+        return UserAchievement::query()
+            ->where('user_id', $userId)
+            ->where('achievement_id', $achievementId)
+            ->where('is_completed', true)
+            ->exists();
     }
 }

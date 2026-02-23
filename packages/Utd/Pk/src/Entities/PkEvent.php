@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Utd\Events\Traits\EventModel;
+use App\Traits\EventModel;
 
 class PkEvent extends Model
 {
