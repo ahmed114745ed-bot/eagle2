@@ -59,6 +59,14 @@ class SimulateLuckyGiftsVersus extends Command
             $this->ensureLuckProfile($player);
         }
 
+        $initialStorage = $lossLedger->poolBalance();
+        if ($initialStorage > 0) {
+            $clearedAmount = $lossLedger->resetPool();
+            $this->info("✅ تم تصفير محفظة التطبيق - الرصيد المُصفَّر: " . number_format($clearedAmount));
+        } else {
+            $this->info("✅ محفظة التطبيق فارغة بالفعل - البدء برصيد 0");
+        }
+
         $stats = [];
         foreach ($players as $label => $player) {
             $stats[$label] = [
@@ -537,6 +545,7 @@ class SimulateLuckyGiftsVersus extends Command
                     <td>" . number_format($event['round']) . "</td>
                     <td>" . e($event['user']) . " ({$event['label']})</td>
                     <td>{$outcomeBadge}</td>
+                    <td>{$multiplierDisplay}</td>
                     <td>" . number_format($event['bet']) . "</td>
                     <td class='text-success'>" . number_format($event['win']) . "</td>
                     <td>" . number_format($event['deviation_before'], 4) . "</td>
@@ -686,6 +695,10 @@ class SimulateLuckyGiftsVersus extends Command
                     <div class='col-12 col-lg-6'>
                         <h2 class='h4 mb-1'>مراقبة تخزين التطبيق والجاك بوت</h2>
                         <p class='text-muted mb-0'>توضح هذه الجدول أين يخزن التطبيق الخسائر الإضافية ومتى يقوم بالسحب، مع تتبع صافي وضع التطبيق بعد كل إرسال هدية.</p>
+                        <div class='alert alert-info small mt-2 mb-0'>
+                            <strong>ملاحظة مهمة:</strong> عمود \"حالة التخزين\" يُظهر صافي التغيير في الرصيد، وليس المنطق المباشر. 
+                            خدمة FairLuck لها منطق داخلي معقد قد يؤدي إلى \"صرف من الخزان\" حتى عند الخسارة بسبب عمليات متعددة متزامنة.
+                        </div>
                     </div>
                     <div class='col-12 col-lg-4 ms-lg-auto'>
                         <label for='playerFilter' class='form-label small text-muted mb-1'>فلترة حسب المستخدم (يؤثر على كل الجداول)</label>
@@ -702,6 +715,7 @@ class SimulateLuckyGiftsVersus extends Command
                                 <th>الدور</th>
                                 <th>المستخدم</th>
                                 <th>النتيجة</th>
+                                <th>المضاعف</th>
                                 <th>الرهان</th>
                                 <th>الربح</th>
                                 <th>انحراف قبل</th>
@@ -719,6 +733,70 @@ class SimulateLuckyGiftsVersus extends Command
                             {$storageRows}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </div>";
+
+        $multiplierExplanationBlock = "
+        <div class='card shadow-sm mt-4'>
+            <div class='card-body'>
+                <h2 class='h4 mb-4'>حساب الرصيد المتاح للمضاعفات</h2>
+                <div class='alert alert-info'>
+                    <h5 class='alert-heading'>كيف يتم حساب المضاعفات المتاحة؟</h5>
+                    <p class='mb-3'><strong>المعادلة الأساسية:</strong><br>
+                    الرصيد المتاح للمضاعفات = floor(رصيد المحفظة ÷ سعر الهدية)</p>";
+        
+        $maxBalance = $storageStats['max_balance']['amount'] ?? 0;
+        $multiplierExplanationBlock .= "
+                    <p class='mb-3'><strong>مع الرصيد الأعلى ({$maxBalance} كوين) والهدية بسعر ({$gift->price} كوين):</strong><br>
+                    أقصى مضاعف متاح = floor({$maxBalance} ÷ {$gift->price}) = <span class='fw-bold text-primary'>" . floor($maxBalance / $gift->price) . "x</span></p>
+                    
+                    <div class='row'>
+                        <div class='col-md-4'>
+                            <h6 class='text-success'>متاح (احتمالية 70%)</h6>
+                            <ul class='list-unstyled small'>";
+        
+        $maxAvailableMultiplier = floor($maxBalance / $gift->price);
+        $level1Multipliers = [5, 10, 20];
+        $level2Multipliers = [50, 100];
+        $level3Multipliers = [250, 500, 1000];
+        
+        foreach ($level1Multipliers as $mult) {
+            $status = $mult <= $maxAvailableMultiplier ? '✅' : '❌';
+            $requiredBalance = $mult * $gift->price;
+            $multiplierExplanationBlock .= "<li>{$status} {$mult}x (يحتاج " . number_format($requiredBalance) . " كوين)</li>";
+        }
+        
+        $multiplierExplanationBlock .= "</ul>
+                        </div>
+                        <div class='col-md-4'>
+                            <h6 class='text-warning'>متوسط (احتمالية 20%)</h6>
+                            <ul class='list-unstyled small'>";
+        
+        foreach ($level2Multipliers as $mult) {
+            $status = $mult <= $maxAvailableMultiplier ? '✅' : '❌';
+            $requiredBalance = $mult * $gift->price;
+            $multiplierExplanationBlock .= "<li>{$status} {$mult}x (يحتاج " . number_format($requiredBalance) . " كوين)</li>";
+        }
+        
+        $multiplierExplanationBlock .= "</ul>
+                        </div>
+                        <div class='col-md-4'>
+                            <h6 class='text-danger'>كبير (احتمالية 10%)</h6>
+                            <ul class='list-unstyled small'>";
+        
+        foreach ($level3Multipliers as $mult) {
+            $status = $mult <= $maxAvailableMultiplier ? '✅' : '❌';
+            $requiredBalance = $mult * $gift->price;
+            $multiplierExplanationBlock .= "<li>{$status} {$mult}x (يحتاج " . number_format($requiredBalance) . " كوين)</li>";
+        }
+        
+        $multiplierExplanationBlock .= "</ul>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <p class='mb-0'><strong>لزيادة فرص المضاعفات الكبيرة:</strong> يجب تجميع المزيد من الخسائر في محفظة التطبيق من خلال زيادة عدد الأدوار أو زيادة الرصيد الابتدائي للاعبين.</p>
                 </div>
             </div>
         </div>";
@@ -851,11 +929,10 @@ class SimulateLuckyGiftsVersus extends Command
                     </table>
                 </div>
             </div>
-        </div>
-        {$historyTableBlock}
+        </div> 
         {$storageTableBlock}
-        {$storageMilestonesBlock}
         {$storageStatsBlock}
+        {$multiplierExplanationBlock}
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -885,3 +962,10 @@ class SimulateLuckyGiftsVersus extends Command
         return $path;
     }
 }
+
+
+
+
+
+
+

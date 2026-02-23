@@ -156,4 +156,18 @@ class LossLedger
     {
         return max(1, (int) config('fairluck.loss_rotation.priority_window', 1));
     }
+
+    /**
+     */
+    public function resetPool(): int
+    {
+        return DB::transaction(function () {
+            $pool = $this->poolRowForUpdate();
+            $oldBalance = $pool->balance;
+            $pool->balance = 0;
+            $pool->save();
+            
+            return (int) $oldBalance;
+        });
+    }
 }
