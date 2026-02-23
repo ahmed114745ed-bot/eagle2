@@ -100,13 +100,32 @@
     </div>
     @endforeach
 
-    <div class="d-flex justify-content-end mt-4">
+    {{-- <div class="d-flex justify-content-end mt-4">
         <button type="submit" class="btn btn-primary btn-lg rounded-5 px-5 py-3 shadow-lg hover-scale transition-all">
             <i class="bi bi-check-circle me-2"></i>
             {{ __('Save') }}
             <i class="bi bi-arrow-right ms-2"></i>
         </button>
-    </div>
+    </div> --}}
+
+        <div class="box-footer">
+
+            <input type="hidden" name="_token" value="za1Uk8aVRuzBBWojNUrfhSq7FaKjMHAzFi4xwh0y" autocomplete="off">
+
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-2">
+            </div>
+
+            <div class="col-md-8">
+
+                <div class="btn-group pull-right">
+                    <button type="submit" class="btn btn-primary"> <i class="bi bi-check-circle me-2"></i>
+                    {{ __('Save') }}
+                    <i class="bi bi-arrow-right ms-2"></i></button>
+                  </div>
+             </div>
+        </div>
 
    
 </form>
