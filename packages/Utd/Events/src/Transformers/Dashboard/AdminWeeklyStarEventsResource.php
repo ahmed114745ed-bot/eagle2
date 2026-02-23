@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Dashboard\Events;
+namespace Utd\Events\Transformers\Dashboard;
 
 use Utd\Vip\Entities\OVip;
 use App\Models\Ware;

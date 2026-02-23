@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\Events\Http\Controllers\Utd;
 
 use Exception;
 use App\Helpers\Common;

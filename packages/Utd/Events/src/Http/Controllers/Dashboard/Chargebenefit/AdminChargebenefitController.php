@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\Chargebenefit;
+namespace Utd\Events\Http\Controllers\Dashboard\Chargebenefit;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

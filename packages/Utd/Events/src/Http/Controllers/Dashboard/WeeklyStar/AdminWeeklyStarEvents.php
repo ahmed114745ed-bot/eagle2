@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\WeeklyStar;
+namespace Utd\Events\Http\Controllers\Dashboard\WeeklyStar;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Room\AdminGiftsResource;

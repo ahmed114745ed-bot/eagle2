@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Utd\Events\Transformers;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TargetEventResource extends JsonResource
+class WeeklyRewardResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -41,7 +41,8 @@ class TargetEventResource extends JsonResource
             'id_target' => $this->target ?? '',
             'image' => $path ?? '',
             'expire' => $this->expire ?? 0,
-            'charge_event_id' => $this->charge_event_id,
+            'weekly_star_id' => $this->weekly_star_id,
+            'level' => $this->level,
 
 
         ];

@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\utd;
+namespace Utd\Events\Http\Controllers\Utd;
 
 use Exception;
-use App\Models\Gift;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use Utd\Events\Entities\Reward;
 use App\Http\Controllers\Controller;
-use Utd\Events\Entities\WeeklyStar;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Resources\WeeklyEventResource;
+use Utd\Events\Entities\RewardTarget;
+use Utd\Events\Transformers\TargetEventResource;
+use Utd\Events\Entities\ChargeTargetEvent;
 
-class WeeklyEventController extends Controller
+class TargetEventController extends Controller
 {
 
     public function index(Request $request)
@@ -20,34 +19,23 @@ class WeeklyEventController extends Controller
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = WeeklyStar::where('type', $request->type)->with('gifts')->when(isset($id), function ($query) use ($id) {
+        $data = ChargeTargetEvent::when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
-        })->paginate($perPage, ['*'], 'page', $page);
+        })->select('id', 'value')->paginate($perPage, ['*'], 'page', $page);
         return Common::apiResponse(true, 'done', $data);
     }
 
     public function store(Request $request)
     {
-        $request->merge(['gifts' => explode(',', $request->gifts)]);
         $validator = Validator::make($request->all(), [
-            'start_date' => 'required|date|date_format:Y-m-d',
-            'type' => 'required|string',
-            'gifts' => 'required|array|size:3',
-
+            'value' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
         try {
-            $lastStartDate = WeeklyStar::max('start_date');
-            $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addWeek()->toDateString() : null;
-            if ($minStartDate == $request->start_date) {
-                return Common::apiResponse(0, __('date must be after ' . $minStartDate),);
-            }
-
-            $weeklyEvent = WeeklyStar::create($request->all());
-            $weeklyEvent->gifts()->sync($request->gifts);
+            ChargeTargetEvent::create($request->all());
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -55,25 +43,10 @@ class WeeklyEventController extends Controller
         }
     }
 
-    public function defaultDate(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'type' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-        $lastStartDate = WeeklyStar::where("type", $request->type)->max('start_date');
-
-        $minStartDate = $lastStartDate ? \Carbon\Carbon::parse($lastStartDate)->addDay(8)->toDateString() : null;
-        return Common::apiResponse(true, 'done', $minStartDate);
-    }
-
     public function show($id)
     {
         try {
-            $data = WeeklyStar::with('gifts')->findOrFail($id);
+            $data =  ChargeTargetEvent::select('id', 'value')->findOrFail($id);
             return Common::apiResponse(true, ' successfully',  $data);
         } catch (Exception $exception) {
 
@@ -83,26 +56,17 @@ class WeeklyEventController extends Controller
 
     public function update($id, Request $request)
     {
-        $request->merge(['gifts' => explode(',', $request->gifts)]);
         $validator = Validator::make($request->all(), [
-            'start_date' => 'required|date|date_format:Y-m-d',
-            'type' => 'required|string',
-            'gifts' => 'required|array|size:3',
-
+            'value' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
             return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
         }
 
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
-
         try {
-            $data = WeeklyStar::findOrFail($id);
+            $data =  ChargeTargetEvent::findOrFail($id);
             $data->update($request->all());
-            $data->gifts()->sync($request->gifts);
             return Common::apiResponse(true, 'updated successfully');
         } catch (Exception $exception) {
 
@@ -113,9 +77,8 @@ class WeeklyEventController extends Controller
     public function destroy($id)
     {
         try {
-            $data = WeeklyStar::findOrFail($id);
+            $data =  ChargeTargetEvent::findOrFail($id);
             $data->delete();
-
             return Common::apiResponse(true, 'deleted successfully',  $data);
         } catch (Exception $exception) {
 
@@ -123,30 +86,21 @@ class WeeklyEventController extends Controller
         }
     }
 
-    public function allGifts(Request $request)
+    public function allGifts($targetId, Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'level' => 'required|integer|in:1,2,3',
-            'weekly_star_id' => 'required|integer|exists:weekly_stars,id',
-        ]);
-
-        if ($validator->fails()) {
-            return Common::apiResponse(0, __('api_responses.validation_error'), $validator->errors());
-        }
         $id = $request->id;
         $perPage = $request->per_page;
         $page = $request->page;
-        $data = Reward::where('weekly_star_id', $request->weekly_star_id)->where('level', $request->level)->when(isset($id), function ($query) use ($id) {
+        $data = RewardTarget::where('charge_event_id', $targetId)->when(isset($id), function ($query) use ($id) {
             $query->where('id', $id);
         })->with('ware', 'vip')->paginate($perPage, ['*'], 'page', $page);
-        return Common::apiResponse(true, 'done', WeeklyEventResource::collection($data));
+        return Common::apiResponse(true, 'done', TargetEventResource::collection($data));
     }
 
     public function storeGift(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'weekly_star_id' => 'required|integer|exists:weekly_stars,id',
-            'level' => 'required|numeric|in:1,2,3',
+            'charge_event_id' => 'required|integer|exists:reward_charges,id',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -163,12 +117,11 @@ class WeeklyEventController extends Controller
             }
 
             $data = [
-                'weekly_star_id' => $request->weekly_star_id,
-                'level' => $request->level,
+                'charge_event_id' => $request->charge_event_id,
                 'type' => $request->type,
                 'expire'  => $request->expire,
             ];
-            Reward::create($data);
+            RewardTarget::create($data);
             return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
@@ -179,8 +132,7 @@ class WeeklyEventController extends Controller
     public function updateGift($id, Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'weekly_star_id' => 'required|integer|exists:weekly_stars,id',
-            'level' => 'required|numeric|in:1,2,3',
+            'charge_event_id' => 'required|integer|exists:reward_charges,id',
             'type' => 'required',
             'target1' => 'nullable',
             'target2' => 'nullable',
@@ -197,12 +149,11 @@ class WeeklyEventController extends Controller
             }
 
             $data = [
-                'weekly_star_id' => $request->weekly_star_id,
-                'pk_type' => $request->pk_type,
-                'level' => $request->level,
+                'charge_event_id' => $request->charge_event_id,
                 'type' => $request->type,
+                'expire'  => $request->expire,
             ];
-            $reward =  Reward::findOrFail($id);
+            $reward =  RewardTarget::findOrFail($id);
             if ($request->type == 'ware') {
                 $reward->target = $request->target1;
             } elseif ($request->type == 'vip') {
@@ -214,7 +165,7 @@ class WeeklyEventController extends Controller
                 $reward->target = Common::upload('images', $file);
             }
             $reward->update($data);
-            return Common::apiResponse(true, 'updated successfully');
+            return Common::apiResponse(true, 'created successfully');
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -224,7 +175,7 @@ class WeeklyEventController extends Controller
     public function destroyGift($id)
     {
         try {
-            $data =  Reward::findOrFail($id);
+            $data =  RewardTarget::findOrFail($id);
             $data->delete();
             return Common::apiResponse(true, 'deleted successfully',  $data);
         } catch (Exception $exception) {
@@ -236,22 +187,11 @@ class WeeklyEventController extends Controller
     public function showGift($id)
     {
         try {
-            $data =  Reward::with('ware', 'vip')->findOrFail($id);
-            return Common::apiResponse(true, 'done', new WeeklyEventResource($data));
+            $data =  RewardTarget::with('ware', 'vip')->findOrFail($id);
+            return Common::apiResponse(true, 'done', new TargetEventResource($data));
         } catch (Exception $exception) {
 
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
         }
-    }
-
-    public function gifts(Request $request)
-    {
-        $id = $request->id;
-        $perPage = $request->per_page;
-        $page = $request->page;
-        $data = Gift::when(isset($id), function ($query) use ($id) {
-            $query->where('id', $id);
-        })->orderBy('sort')->orderBy('type')->where('enable', 1)->paginate($perPage, ['*'], 'page', $page);
-        return Common::apiResponse(true, 'done', $data);
     }
 }

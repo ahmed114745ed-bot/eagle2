@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\WeeklyStar;
+namespace Utd\Events\Http\Controllers\Dashboard\WeeklyStar;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
-use App\Http\Resources\Dashboard\Events\AdminWeeklyStarEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 use Utd\Events\Entities\Reward;
+use Utd\Events\Transformers\Dashboard\AdminWeeklyStarEventsResource;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
 
 class AdminWeeklyStarEventsRewords extends Controller
 {
@@ -21,9 +21,9 @@ class AdminWeeklyStarEventsRewords extends Controller
         $level3 = Reward::where('weekly_star_id', $id)->where('level', 3)->get();
 
         return [
-            'level1' => AdminPKEventRewords::collection($level1),
-            'level2' => AdminPKEventRewords::collection($level2),
-            'level3' => AdminPKEventRewords::collection($level3),
+            'level1' => AdminPKEventRewardsResource::collection($level1),
+            'level2' => AdminPKEventRewardsResource::collection($level2),
+            'level3' => AdminPKEventRewardsResource::collection($level3),
         ];
     }
 

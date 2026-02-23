@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Dashboard\Events;
+namespace Utd\Events\Transformers\Dashboard;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
 
 class AdminEventReportResource extends JsonResource
 {
@@ -36,7 +37,7 @@ class AdminEventReportResource extends JsonResource
         return [
             'id' => $this->id,
             'user' =>$this->get_user($this->pk_winner_id),
-            'reword' => new AdminPKEventRewords($this->reward)
+            'reword' => new AdminPKEventRewardsResource($this->reward)
         ];
     }
 }

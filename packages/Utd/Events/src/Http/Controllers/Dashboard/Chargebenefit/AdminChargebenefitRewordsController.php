@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\Chargebenefit;
+namespace Utd\Events\Http\Controllers\Dashboard\Chargebenefit;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Events\AdminChargebenefitResource;
-use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
-use App\Http\Resources\Dashboard\Events\AdminPKEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
 use Utd\Events\Entities\RewardTarget;
+use Utd\Events\Transformers\Dashboard\AdminChargebenefitResource;
+use Utd\Pk\Http\Resources\AdminPKEventRewardsResource;
 
 class AdminChargebenefitRewordsController extends Controller
 {
@@ -17,7 +16,7 @@ class AdminChargebenefitRewordsController extends Controller
     {
         $id = $request->input('id');
         $level1 = RewardTarget::where('charge_event_id', $id)->get();
-        return  AdminPKEventRewords::collection($level1);
+        return  AdminPKEventRewardsResource::collection($level1);
     }
 
     public function store(Request $request)

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events;
+namespace Utd\Events\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Dashboard\Events\AdminEventReportResource;
 use App\Models\Pack;
 use Utd\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
@@ -14,6 +13,7 @@ use Utd\Events\Entities\UserChargeEvent;
 use Utd\Events\Entities\WinnerReward;
 use Utd\Events\Http\Actions\EventReportAction;
 use Utd\Events\Services\LoseWinnerRewards;
+use Utd\Events\Transformers\Dashboard\AdminEventReportResource;
 use App\Support\PackageHelper;
 
 class AdminGeneralRolesController extends Controller

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dashboard\Events\PeriodEvent;
+namespace Utd\Events\Http\Controllers\Dashboard\PeriodEvent;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\Room\AdminGiftsResource;
