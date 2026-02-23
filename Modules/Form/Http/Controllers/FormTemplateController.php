@@ -197,7 +197,7 @@ class FormTemplateController extends Controller
             'form_type' => $request->form_type,
             'description' => $request->description,
         ]);
-
+dd($request->sections, $formTemplate->sections()->with('fields')->get());
         // Delete old sections and fields (cascade will handle fields)
         $formTemplate->sections()->delete();
 
