@@ -386,6 +386,15 @@ class HomeCarouselController extends MainController
             default => now()->addHours($duration),
         };
 
+        $maxTimestamp = Carbon::create(2038, 1, 19, 3, 14, 7);
+
+        if ($endAt->greaterThan($maxTimestamp)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('Duration is too large. Maximum allowed date is 19-01-2038.')
+            ], 422);
+        }
+
         $display = HomeCarouselDisplay::firstOrNew([
             'home_carousel_id' => $data['home_carousel_id'],
             'display_type' => $data['display_type'],
@@ -483,13 +492,13 @@ class HomeCarouselController extends MainController
         ])->when('1', function (Form $form) {
 
             $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+                ->rules('required|integer|min:1|max:5000');
         })->when('2', function (Form $form) {
             $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+                ->rules('required|integer|min:1|max:5000');
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
-                ->rules('required|regex:/^\d+$/');
+                ->rules('required|integer|min:1|max:5000');
         })->when('4', function (Form $form) {
             $form->hidden('input', trans('input'))->default(0);
         });

@@ -49,6 +49,7 @@
 "done successfully ✅": "Başarıyla tamamlandı ✅",
 "Default App Screen Settings": "Varsayılan Uygulama Ekranı Ayarları",
 "Default Screen Settings": "Varsayılan Ekran Ayarları",
+"Duration is too large. Maximum allowed date is 19-01-2038.": "Süre çok uzun. İzin verilen maksimum tarih 19-01-2038'dir.",
   "Browse default screen settings": "Varsayılan Ekran Ayarlarını Görüntüle",
   "enable audio room feature": "Ses Odası Özelliğini Etkinleştir",
   "Default App Screen": "Varsayılan Uygulama Ekranı",

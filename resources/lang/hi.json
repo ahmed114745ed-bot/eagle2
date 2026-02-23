@@ -24,6 +24,7 @@
     "enable room boom feature": "रूम बूम फीचर सक्षम करें",
     "percentage": "प्रतिशत",
     "Audio Room": "ऑडियो रूम",
+    "Duration is too large. Maximum allowed date is 19-01-2038.": "अवधि बहुत लंबी है। अधिकतम अनुमत तिथि 19-01-2038 है।",
   "enable audio room feature": "ऑडियो रूम फीचर सक्षम करें",
   "Default App Screen": "डिफ़ॉल्ट ऐप स्क्रीन",
   "Select Default App Screen": "डिफ़ॉल्ट ऐप स्क्रीन चुनें",

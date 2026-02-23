@@ -39,6 +39,7 @@
 "Audio Room": "Ruang Audio",
 "done successfully ✅": "Berhasil ✅",
 "Default Screen Settings": "Pengaturan Layar Default",
+"Duration is too large. Maximum allowed date is 19-01-2038.": "Durasi terlalu lama. Tanggal maksimum yang diizinkan adalah 19-01-2038.",
   "Browse default screen settings": "Jelajahi Pengaturan Layar Default",
 "Default App Screen Settings": "Pengaturan Layar Aplikasi Default",
   "enable audio room feature": "Aktifkan Fitur Ruang Audio",
