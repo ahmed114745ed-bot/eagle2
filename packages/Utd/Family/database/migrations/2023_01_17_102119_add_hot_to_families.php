@@ -14,7 +14,7 @@ class AddHotToFamilies extends Migration
     public function up()
     {
         Schema::table('families', function (Blueprint $table) {
-            $table->unsignedBigInteger ('hot')->nullable ()->default (0);
+            $table->unsignedBigInteger('hot')->nullable()->default(0);
         });
     }
 
@@ -30,4 +30,3 @@ class AddHotToFamilies extends Migration
         });
     }
 }
-

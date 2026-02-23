@@ -2,19 +2,18 @@
 
 namespace Utd\Family\Services;
 
+use App\Contracts\FamilyContract;
 use Carbon\CarbonInterface;
+use Exception;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Family\Contracts\FamilyServiceContract;
 use Utd\Family\Http\Resources\V2\FamilyResource;
 use Utd\Family\Repositories\FamilyRankRepository;
 use Utd\Family\Repositories\FamilyRepository;
 use Utd\Family\Repositories\FamilyUserRepository;
-use Utd\Family\Services\RoomRepositoryContract;
-use App\Contracts\FamilyContract;
 
 class FamilyService implements FamilyContract, FamilyServiceContract
 {
-
     public function __construct(
         private readonly FamilyRepository $familyRepository,
         private readonly FamilyUserRepository $familyUserRepository,
@@ -23,10 +22,10 @@ class FamilyService implements FamilyContract, FamilyServiceContract
         private readonly RoomRepositoryContract $roomRepository
     ) {}
 
-
     public function getWithSearch($search = null): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->familyRepository->getWithSearch($search);
+
         return FamilyResource::collection($data);
     }
 
@@ -38,24 +37,27 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     public function create($user, $request, $price)
     {
         $family = $this->familyRepository->findByUserId($user->id);
-        if ($family) throw new \Exception('already have family');
+        if ($family) {
+            throw new Exception('already have family');
+        }
 
         $img = null;
-        if ($request->hasFile('image'))  $img = family_helper('common')::upload('families', $request->file('image'));
-
+        if ($request->hasFile('image')) {
+            $img = family_helper('common')::upload('families', $request->file('image'));
+        }
 
         // DB::beginTransaction();
         $familyData = [
             'name' => $request->name,
             'introduce' => $request->introduce,
-            'notice' =>  $request->notice,
+            'notice' => $request->notice,
             'user_id' => $user->id,
             'num' => 20,
-            'image' =>  $img ?: '',
+            'image' => $img ?: '',
             'is_success' => 1,
             'country_id' => $user->country_id,
         ];
-        $family =  $this->familyRepository->create($familyData);
+        $family = $this->familyRepository->create($familyData);
 
         $familyUserData = [
             'user_id' => $user->id,
@@ -66,7 +68,7 @@ class FamilyService implements FamilyContract, FamilyServiceContract
         $this->familyUserRepository->create($familyUserData);
 
         $logAmount = -abs($price);
-        $amountBefore =  $user->di;
+        $amountBefore = $user->di;
         family_helper('user_coin_log')::logByType(
             $user->id,
             $logAmount,
@@ -89,18 +91,18 @@ class FamilyService implements FamilyContract, FamilyServiceContract
 
         switch ($time) {
             case 'today':
-                $query = ['day' => now()->day, 'month' => now()->month, 'year' => now()->year,];
+                $query = ['day' => now()->day, 'month' => now()->month, 'year' => now()->year];
                 break;
             case 'month':
-                $query = ['month' => now()->month, 'year' => now()->year,];
+                $query = ['month' => now()->month, 'year' => now()->year];
                 break;
             case 'week':
                 $query = ['created_at' => [today()->startOfWeek(), today()->endOfWeek()]];
                 break;
             default:
-                throw new \Exception('time not define');
+                throw new Exception('time not define');
         }
-        if ($time == 'today' || $time == 'month') {
+        if ($time === 'today' || $time === 'month') {
             $rank = $this->familyRankRepository->ranking(condition: $query, paginate: 10);
         } else {
             $rank = $this->familyRankRepository->ranking(whereBetween: $query, paginate: 10);
@@ -111,8 +113,8 @@ class FamilyService implements FamilyContract, FamilyServiceContract
 
     public function userRank()
     {
-        $todayCondition = ['day' => now()->day, 'month' => now()->month, 'year' => now()->year,];
-        $monthCondition = ['month' => now()->month, 'year' => now()->year,];
+        $todayCondition = ['day' => now()->day, 'month' => now()->month, 'year' => now()->year];
+        $monthCondition = ['month' => now()->month, 'year' => now()->year];
         $weeklyCondition = ['created_at' => [today()->startOfWeek(CarbonInterface::SATURDAY), today()->endOfWeek(CarbonInterface::FRIDAY)]];
 
         $today = $this->familyRankRepository->ranking(condition: $todayCondition);
@@ -126,8 +128,12 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     {
         $family = $this->familyRepository->findById($familyId);
         $is_admin = $this->familyUserRepository->checkIsAdmin($familyId, $userId);
-        if (($userId != $family->user_id) && !$is_admin) throw new \Exception('not allowed');
-        if (!$family) throw new \Exception('not found');
+        if (($userId !== $family->user_id) && ! $is_admin) {
+            throw new Exception('not allowed');
+        }
+        if (! $family) {
+            throw new Exception('not found');
+        }
         if ($request->name) {
             $family->name = $request->name;
         }
@@ -141,6 +147,7 @@ class FamilyService implements FamilyContract, FamilyServiceContract
             $family->image = family_helper('common')::upload('families', $request->file('image'));
         }
         $family->save();
+
         return $family;
     }
 
@@ -149,24 +156,32 @@ class FamilyService implements FamilyContract, FamilyServiceContract
 
         $family = $this->familyRepository->findById($familyId);
 
-
         $familyUser = $this->familyRepository->findByUserId($user->id);
 
-        if ($familyUser)  throw new \Exception(__('already have one'));
-        if (!$family)   throw new \Exception(__('family not found'));
+        if ($familyUser) {
+            throw new Exception(__('already have one'));
+        }
+        if (! $family) {
+            throw new Exception(__('family not found'));
+        }
 
-        if ($family->id == $user->family_id) throw new \Exception(__('already joined'));
+        if ($family->id === $user->family_id) {
+            throw new Exception(__('already joined'));
+        }
 
-        if ($family->members_num >= $family->num) throw new \Exception(__('family is full members'));
+        if ($family->members_num >= $family->num) {
+            throw new Exception(__('family is full members'));
+        }
         $UserFamilyMember = $this->familyUserRepository->checkFamilyMember($user->id, $familyId);
         if ($UserFamilyMember) {
             $user->family_id = $family->id;
             $user->save();
-            throw new \Exception(__('already joined'));
+            throw new Exception(__('already joined'));
         }
         $userSentRequest = $this->familyUserRepository->checkSendJoinRequest($user->id, $familyId);
-        if ($userSentRequest)  throw new \Exception(__('you_alredy_have_sent'));
-
+        if ($userSentRequest) {
+            throw new Exception(__('you_alredy_have_sent'));
+        }
 
         $data = [
             'user_id' => $user->id,
@@ -175,32 +190,43 @@ class FamilyService implements FamilyContract, FamilyServiceContract
             'status' => 0,
         ];
         $this->familyUserRepository->create($data);
+
         return $family;
     }
 
     public function delete($user, $familyId)
     {
         $family = $this->familyRepository->findById($familyId);
-        if (!$family) throw new \Exception('not found');
-        if ($user->id != $family->user_id) return family_helper('common')::apiResponse(0, 'not allowed', null, 403);
+        if (! $family) {
+            throw new Exception('not found');
+        }
+        if ($user->id !== $family->user_id) {
+            return family_helper('common')::apiResponse(0, 'not allowed', null, 403);
+        }
         $this->familyUserRepository->delete($familyId);
         $this->userRepository->updateFamilyId($user, null);
         $this->userRepository->updateUsersFamily($familyId, null);
         $family->delete();
+
         return true;
     }
 
     public function removeUserFromFamily($userId, $familyId, $authId)
     {
-        $family =   $this->familyRepository->findById($familyId);
+        $family = $this->familyRepository->findById($familyId);
         $isAdmin = $this->familyUserRepository->checkIsAdmin($familyId, $userId);
 
+        if ($authId === $userId) {
+            throw new Exception('try to remove your self');
+        }
+        $user = $this->userRepository->findById($userId);
+        if (! $family || ! $user) {
+            throw new Exception('not found');
+        }
 
-        if ($authId == $userId) throw new \Exception('try to remove your self');
-        $user =  $this->userRepository->findById($userId);
-        if (!$family || !$user) throw new \Exception('not found');
-
-        if (!$isAdmin && ($family->user_id !=  $authId)) throw new \Exception('not allowed');
+        if (! $isAdmin && ($family->user_id !== $authId)) {
+            throw new Exception('not allowed');
+        }
         $this->userRepository->update(['family_id' => null], $user->id);
         $this->familyUserRepository->deleteUserFromFamily($userId, $family->id);
 
@@ -210,14 +236,16 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     public function requestList($userId)
     {
         $family = $this->familyRepository->findByUserId($userId);
-        if (!$family) {
+        if (! $family) {
             $userFamily = $this->familyUserRepository->admin($userId);
 
             if ($userFamily) {
                 $family = $this->familyRepository->findById($userFamily->family_id);
             }
         }
-        if (!$family) throw new \Exception('not found');
+        if (! $family) {
+            throw new Exception('not found');
+        }
 
         return $this->familyUserRepository->requestUsersList($userId, $family->id);
     }
@@ -226,57 +254,82 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     {
         $requestUser = $this->familyUserRepository->findById($request->req_id);
 
-        if (!$requestUser) throw new \Exception('not found');
+        if (! $requestUser) {
+            throw new Exception('not found');
+        }
         $user = $this->userRepository->findById($requestUser->user_id);
-        if ($request->status == 1) {
+        if ($request->status === 1) {
             $other = $this->familyUserRepository->findByUserId($requestUser->user_id);
-            if (!$user) throw new \Exception('user not found');
-            if ($other && $user->family_id != null)  throw new \Exception('user already joined to other family');
+            if (! $user) {
+                throw new Exception('user not found');
+            }
+            if ($other && $user->family_id !== null) {
+                throw new Exception('user already joined to other family');
+            }
 
             $familyUser = $this->familyRepository->findByUserId($requestUser->user_id);
-            if ($familyUser)  throw new \Exception(__('already have one'));
+            if ($familyUser) {
+                throw new Exception(__('already have one'));
+            }
 
             $family = $this->familyRepository->findById($requestUser->family_id);
-            if (!$family) throw new \Exception(__('not found'));
-            if ($request->status == 1 && $family->members_num >= $family->num) throw new \Exception(__('family is full members'));
+            if (! $family) {
+                throw new Exception(__('not found'));
+            }
+            if ($request->status === 1 && $family->members_num >= $family->num) {
+                throw new Exception(__('family is full members'));
+            }
             $admin = $this->familyUserRepository->checkIsAdmin($family->id, $auth->id);
-            if ($family->user_id != $auth->id  && !$admin) throw new \Exception(__('you do not have permeation to take action'));
+            if ($family->user_id !== $auth->id && ! $admin) {
+                throw new Exception(__('you do not have permeation to take action'));
+            }
 
             $this->familyUserRepository->update(['status' => $request->status], $requestUser->id);
 
             $this->userRepository->update(['family_id' => $family->id], $user->id);
             $this->familyUserRepository->deleteOldRequest($requestUser->user_id, $requestUser->id);
 
-            if ($user && ($request->status == 1))  family_facade('custom_notification')::acceptUserFamily($family, $user);
-        } elseif ($request->status == 2) {
+            if ($user && ($request->status === 1)) {
+                family_facade('custom_notification')::acceptUserFamily($family, $user);
+            }
+        } elseif ($request->status === 2) {
             $this->familyUserRepository->deleteRefusedRequest($requestUser->id);
         }
 
         return $user;
     }
 
-
     public function familyUserType($request)
     {
         $family = $this->familyRepository->findById($request->family_id);
-        if (!$family) throw new \Exception(__('not found'));
-        if ($request->type == 1 && $family->admins_num >= $family->num_admins) throw new \Exception('full admins');
-        if ($request->type == 0 && $family->members_num >= $family->num) throw new \Exception('full members');
+        if (! $family) {
+            throw new Exception(__('not found'));
+        }
+        if ($request->type === 1 && $family->admins_num >= $family->num_admins) {
+            throw new Exception('full admins');
+        }
+        if ($request->type === 0 && $family->members_num >= $family->num) {
+            throw new Exception('full members');
+        }
         $familyUser = $this->familyUserRepository->getFamilyUser($request->user_id, $request->family_id);
 
-        if (!$familyUser) throw new \Exception('not found');
+        if (! $familyUser) {
+            throw new Exception('not found');
+        }
         $familyUser->user_type = $request->type;
         $familyUser->save();
         $user = $this->userRepository->findById($request->user_id);
+
         return [$family, $user];
     }
 
-
     public function memberList($familyId)
     {
-        $family =  $this->familyRepository->findById($familyId);
+        $family = $this->familyRepository->findById($familyId);
 
-        if (!$family) throw new \Exception('not found');
+        if (! $family) {
+            throw new Exception('not found');
+        }
         $owner = $this->userRepository->findById($family->user_id);
 
         $adminIds = $this->familyUserRepository->adminIds($family->id);
@@ -285,6 +338,7 @@ class FamilyService implements FamilyContract, FamilyServiceContract
         $admins = $this->userRepository->getUsers($adminIds);
 
         $members = $this->userRepository->getUsersWithPaginate($memberIds, 20);
+
         return [$owner, $admins, $members];
     }
 
@@ -292,11 +346,14 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     {
         $family = $this->familyRepository->findById($familyId);
 
-        if (!$family) throw new \Exception('not found');
+        if (! $family) {
+            throw new Exception('not found');
+        }
         $memberIds = $this->familyUserRepository->familyMemberIds($family->id);
 
         // $rooms = $this->roomRepository->getRooms($memberIds);
         $rooms = $this->roomRepository->all(request(), $memberIds);
+
         return $rooms;
     }
 
@@ -309,14 +366,15 @@ class FamilyService implements FamilyContract, FamilyServiceContract
     public function searchUsersInFamily($key, $page)
     {
         $perPage = 10;
+
         return $this->familyRepository->searchUserFamily($key, $page, $perPage);
     }
 
     public function kickFamily($userId)
     {
         $user = $this->userRepository->findById($userId);
-        if (!$user) {
-            throw new \Exception('user not found');
+        if (! $user) {
+            throw new Exception('user not found');
         }
         $user->family_id = null;
         $user->is_family_admin = 0;

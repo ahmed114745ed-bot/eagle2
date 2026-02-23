@@ -2,50 +2,51 @@
 
 namespace Utd\Family\Http\Controllers\Api;
 
-use Utd\Family\Http\Controllers\Controller;
-
-use Utd\Family\Entities\FamilyLevel;
-use Utd\Family\Services\FamilyLevelService;
-use Illuminate\Http\Request;
 use Exception;
+use Illuminate\Http\Request;
+use Utd\Family\Entities\FamilyLevel;
+use Utd\Family\Http\Controllers\Controller;
+use Utd\Family\Services\FamilyLevelService;
 
 class FamilyLevelController extends Controller
 {
     public function __construct(private FamilyLevelService $FamilyLevelService) {}
+
     public function index(Request $request)
     {
 
         // $FamilyLevel = $this->FamilyLevelService->index();
-        $perPage = request('per_page')?? 10;
+        $perPage = request('per_page') ?? 10;
         $FamilyLevel = FamilyLevel::paginate($perPage);
+
         return response()->json([
             'status' => 'success',
             'message' => 'FamilyLevels returned successfully',
-            'data' => $FamilyLevel
+            'data' => $FamilyLevel,
         ]);
     }
-    public function show( $id,Request $request)
+
+    public function show($id, Request $request)
     {
         $FamilyLevel = FamilyLevel::find($id);
 
         return response()->json([
             'status' => 'success',
             'message' => 'FamilyLevel returned successfully',
-            'data' => $FamilyLevel
+            'data' => $FamilyLevel,
         ]);
     }
-
 
     public function store(Request $request)
     {
         try {
-            $FamilyLevel =   $this->FamilyLevelService->create( $request);
-        }catch (\Exception $e) {
+            $FamilyLevel = $this->FamilyLevelService->create($request);
+        } catch (Exception $e) {
 
             return response()->json([
                 'message' => 'failed',
                 'status' => 'failed',
-                'data' => null
+                'data' => null,
             ]);
 
         }
@@ -53,26 +54,23 @@ class FamilyLevelController extends Controller
         return response()->json([
             'message' => 'FamilyLevel created successfully',
             'status' => 'success',
-            'data' => $FamilyLevel
+            'data' => $FamilyLevel,
         ]);
     }
 
-
-
-
-    public function update($id ,Request $request)
+    public function update($id, Request $request)
     {
 
         try {
-            $family = $this->FamilyLevelService->update( $request, $id);
+            $family = $this->FamilyLevelService->update($request, $id);
         } catch (Exception $e) {
 
             return response()->json([
                 'message' => 'failed',
                 'status' => 'failed',
-                'data' => null
+                'data' => null,
             ]);
-         }
+        }
 
         return response()->json([
             'message' => 'FamilyLevel updated successfully',
@@ -80,10 +78,8 @@ class FamilyLevelController extends Controller
         ]);
     }
 
-
     public function destroy($id)
     {
-
 
         FamilyLevel::findOrFail($id)->delete();
 
@@ -92,5 +88,4 @@ class FamilyLevelController extends Controller
             'message' => 'FamilyLevel deleted successfully',
         ]);
     }
-
 }

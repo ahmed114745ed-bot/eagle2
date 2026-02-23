@@ -27,7 +27,7 @@ class AdminPKEventRewardsResource extends JsonResource
 
         }
         if ($type === 'vip') {
-            if (!PackageHelper::isInstalled('vip')) {
+            if (! PackageHelper::isInstalled('vip')) {
                 return '';
             }
             $item = OVip::find($id);

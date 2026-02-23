@@ -14,8 +14,8 @@ class AddFieldsToFamilyLevels extends Migration
     public function up()
     {
         Schema::table('family_levels', function (Blueprint $table) {
-            $table->unsignedInteger ('members')->nullable ()->default (0);
-            $table->unsignedInteger ('admins')->nullable ()->default (0);
+            $table->unsignedInteger('members')->nullable()->default(0);
+            $table->unsignedInteger('admins')->nullable()->default(0);
         });
     }
 

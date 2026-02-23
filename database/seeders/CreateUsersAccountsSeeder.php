@@ -4,10 +4,10 @@ namespace Database\Seeders;
 
 
 
+use App\Contracts\VipCommonContract;
 use App\Models\User;
 use App\Support\PackageHelper;
 use Illuminate\Database\Seeder;
-use Utd\Vip\Helpers\VipCommon;
 use Illuminate\Support\Facades\Hash;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\UserVip;
@@ -42,10 +42,10 @@ class CreateUsersAccountsSeeder extends Seeder
 
             if (PackageHelper::isInstalled('vip') && $vips->isNotEmpty()) {
                 $vip = $vips->random();
-                VipCommon::createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, 'buy-vip');
+                app(VipCommonContract::class)->createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, 'buy-vip');
                 $userVip = UserVip::where('user_id', $user->id)->first();
 
-                VipCommon::handleVipActivation($userVip);
+                app(VipCommonContract::class)->handleVipActivation($userVip);
             }
         }
     }

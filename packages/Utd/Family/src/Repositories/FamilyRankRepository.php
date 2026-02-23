@@ -2,18 +2,12 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Repositories\AbstractRepository;
-
 use Utd\Family\Entities\FamilyRank;
-
-
-
 
 class FamilyRankRepository extends AbstractRepository
 {
-
     /**
-     * @param Model $model
+     * @param  Model  $model
      */
     public function __construct()
     {
@@ -31,7 +25,7 @@ class FamilyRankRepository extends AbstractRepository
             $builder->whereBetween($key, $value);
         }
         if ($paginate) {
-            $data =  $builder->orderByDesc("coins")->paginate($paginate);
+            $data = $builder->orderByDesc('coins')->paginate($paginate);
         } else {
             $data = $builder
                 ->take($limit)

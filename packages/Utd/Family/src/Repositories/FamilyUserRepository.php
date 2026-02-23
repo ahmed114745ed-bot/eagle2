@@ -2,23 +2,17 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Repositories\AbstractRepository;
-
 use Utd\Family\Entities\FamilyUser;
-
-
 
 class FamilyUserRepository extends AbstractRepository
 {
-
     /**
-     * @param Model $model
+     * @param  Model  $model
      */
     public function __construct()
     {
         parent::__construct(new FamilyUser());
     }
-
 
     // public function create($data)
     // {
@@ -57,17 +51,21 @@ class FamilyUserRepository extends AbstractRepository
     public function delete($familyId)
     {
         $this->model->where('family_id', $familyId)->delete();
+
         return true;
     }
+
     public function deleteByUserId($userId)
     {
         $this->model->where('user_id', $userId)->delete();
+
         return true;
     }
 
     public function deleteUserFromFamily($userId, $familyId)
     {
         $this->model->where('family_id', $familyId)->where('user_id', $userId)->delete();
+
         return true;
     }
 
@@ -92,12 +90,14 @@ class FamilyUserRepository extends AbstractRepository
     public function deleteOldRequest($userId, $acceptRequestId)
     {
         $this->model->where('user_id', $userId)->where('status', 0)->where('id', '!=', $acceptRequestId)->delete();
+
         return true;
     }
 
     public function deleteRefusedRequest($refusedRequestId)
     {
         $this->model->where('id', $refusedRequestId)->delete();
+
         return true;
     }
 
@@ -105,7 +105,6 @@ class FamilyUserRepository extends AbstractRepository
     {
         return $this->model->where('family_id', $familyId)->where('user_id', '!=', $userId)->get();
     }
-
 
     public function getFamilyUser($userId, $familyId)
     {
@@ -126,7 +125,6 @@ class FamilyUserRepository extends AbstractRepository
     {
         return $this->model->query()->where('family_id', $familyId)->where('status', 1)->pluck('user_id')->toArray();
     }
-
 
     public function exitUser($userId)
     {

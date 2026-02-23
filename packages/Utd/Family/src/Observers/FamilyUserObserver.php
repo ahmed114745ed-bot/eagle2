@@ -14,7 +14,7 @@ class FamilyUserObserver
      */
     public function created(FamilyUser $familyUser)
     {
-        if ($familyUser->status == 1) {
+        if ($familyUser->status === 1) {
             $userModel = family_model_or_fail('user');
             $userModel::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
         }
@@ -27,7 +27,7 @@ class FamilyUserObserver
      */
     public function updated(FamilyUser $familyUser)
     {
-        if ($familyUser->status == 1) {
+        if ($familyUser->status === 1) {
             $userModel = family_model_or_fail('user');
             $userModel::query()->where('id', $familyUser->user_id)->update(['family_id' => $familyUser->family_id]);
         }

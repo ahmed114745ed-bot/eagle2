@@ -2,21 +2,21 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
-use Utd\Family\Http\Controllers\Controller;
-
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Utd\Family\Entities\FamilyLevel;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class FamilyLevelController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'families-level';
+
     public $hiddenColumns = [];
+
     public function __construct()
     {
         $appFeatureService = family_service('app_feature');
@@ -45,13 +45,13 @@ class FamilyLevelController extends MainController
             ->title(trans('family levels'))
             ->body($this->form()));
     }
+
     public function show($id, Content $content)
     {
         return parent::show($id, $content
             ->title(trans('family levels'))
             ->body($this->detail($id)));
     }
-
 
     /**
      * Make a grid builder.
@@ -65,11 +65,11 @@ class FamilyLevelController extends MainController
         $grid->id(__('ID'));
         $grid->column('name', __('level'))->display(function ($name) {
             $path = @$this->img;
-            $defaultImage = asset("images/level.jpg");
+            $defaultImage = asset('images/level.jpg');
             $url = getImagePath($path) ?? $defaultImage;
 
             // Check if the image exists
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
             $image = handleShowImageWithTypes($this->id, $url, 40, 40);
@@ -86,23 +86,23 @@ class FamilyLevelController extends MainController
         $grid->column('admins', __('admins'));
 
         $grid->tools(function (Grid\Tools $tools) {
-            $tools->append('<a href="' . url('/admin/family-level') . '" target="_blank" class="btn btn-sm btn-success">
-                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
+            $tools->append('<a href="'.url('/admin/family-level').'" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>'.__('admin.exportExcel').'</a>');
         });
-
 
         $grid->actions(function ($actions) {
             $actions->disableView();
         });
         $grid->disableExport();
         $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -117,6 +117,7 @@ class FamilyLevelController extends MainController
         //        $show->created_at(trans('admin.created_at'));
         //        $show->updated_at(trans('admin.updated_at'));
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -129,7 +130,6 @@ class FamilyLevelController extends MainController
     {
         $form = new Form(new FamilyLevel);
         $this->disableFormTools($form);
-
 
         $form->display(__('ID'));
         $form->text('name', __('Name ar'));

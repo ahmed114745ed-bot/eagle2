@@ -22,6 +22,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
         $this->mapWebRoutes();
+        $this->mapPreviewRoutes();
     }
 
     /**
@@ -30,7 +31,17 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapWebRoutes(): void
     {
         Route::middleware('web')
-            ->group(__DIR__ . '/../Routes/web.php');
+            ->group(__DIR__.'/../Routes/web.php');
+    }
+
+    /**
+     * Define the "preview" routes for the application.
+     */
+    protected function mapPreviewRoutes(): void
+    {
+        Route::middleware(['throttle'])
+            ->prefix('preview')
+            ->group(__DIR__.'/../Routes/preview-routes.php');
     }
 
     /**
@@ -40,6 +51,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware('api')
-            ->group(__DIR__ . '/../Routes/api.php');
+            ->group(__DIR__.'/../Routes/api.php');
     }
 }

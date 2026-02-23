@@ -39,8 +39,14 @@ use App\Services\Gifts\LuckyGiftService;
 use App\Services\RedisService;
 use App\Contracts\UserCharismaServiceContract;
 use App\Contracts\TaskStreamServiceContract;
+use App\Contracts\VipCommonContract;
+use App\Contracts\OvipRepositoryContract;
+use App\Contracts\UserVipRepositoryContract;
 use App\Services\Null\NullUserCharismaService;
 use App\Services\Null\NullTaskStreamService;
+use App\Services\Null\NullVipCommonService;
+use App\Services\Null\NullOvipRepository;
+use App\Services\Null\NullUserVipRepository;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -99,6 +105,21 @@ class AppServiceProvider extends ServiceProvider
         // TaskStream service fallback
         if (!$this->app->bound(TaskStreamServiceContract::class)) {
             $this->app->bind(TaskStreamServiceContract::class, NullTaskStreamService::class);
+        }
+
+        // VipCommon service fallback
+        if (!$this->app->bound(VipCommonContract::class)) {
+            $this->app->bind(VipCommonContract::class, NullVipCommonService::class);
+        }
+
+        // OvipRepository fallback
+        if (!$this->app->bound(OvipRepositoryContract::class)) {
+            $this->app->bind(OvipRepositoryContract::class, NullOvipRepository::class);
+        }
+
+        // UserVipRepository fallback
+        if (!$this->app->bound(UserVipRepositoryContract::class)) {
+            $this->app->bind(UserVipRepositoryContract::class, NullUserVipRepository::class);
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

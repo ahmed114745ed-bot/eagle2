@@ -3,6 +3,7 @@
 namespace Utd\CP\Services;
 
 use App\Contracts\CpServiceContract;
+use App\Contracts\VipCommonContract;
 use App\Enums\UserCoinLogType;
 use App\Facades\CustomNotification;
 use App\Helpers\Common;
@@ -14,14 +15,13 @@ use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
-use Utd\Vip\Entities\OVip;
-use Utd\Vip\Helpers\VipCommon;
 use Throwable;
 use Utd\Achievements\Entities\UserAchievementLevel;
 use Utd\CP\Entities\Cp as EntitiesCp;
 use Utd\CP\Entities\CpLevel;
 use Utd\CP\Entities\CpLevelGift;
 use Utd\CP\Entities\CpLevelTakeGift;
+use Utd\Vip\Entities\OVip;
 
 class CpService implements CpServiceContract
 {
@@ -253,10 +253,10 @@ class CpService implements CpServiceContract
         $vip = PackageHelper::isInstalled('vip') ? OVip::find($vipId) : null;
         if ($vip) {
             if ($rewardGender === $userOneGender || $rewardGender === 'all') {
-                VipCommon::createUserVip($vip, $userOne, $expire, 0, '', 1, 0, 0, 'cp-gifts');
+                app(VipCommonContract::class)->createUserVip($vip, $userOne, $expire, 0, '', 1, 0, 0, 'cp-gifts');
             }
             if ($rewardGender === $userTwoGender || $rewardGender === 'all') {
-                VipCommon::createUserVip($vip, $userTwo, $expire, 0, '', 1, 0, 0, 'cp-gifts');
+                app(VipCommonContract::class)->createUserVip($vip, $userTwo, $expire, 0, '', 1, 0, 0, 'cp-gifts');
             }
         }
     }

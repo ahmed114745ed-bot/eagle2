@@ -21,7 +21,7 @@ class RoomVipController extends MainController
 
     public function index(Content $content)
     {
-        if (!PackageHelper::isInstalled('vip')) {
+        if (! PackageHelper::isInstalled('vip')) {
             return $content->title(trans('room-vips'))->body('VIP package is not installed');
         }
 
@@ -38,7 +38,7 @@ class RoomVipController extends MainController
      */
     public function show($id, Content $content)
     {
-        if (!PackageHelper::isInstalled('vip')) {
+        if (! PackageHelper::isInstalled('vip')) {
             return $content->title(trans('room-vips'))->body('VIP package is not installed');
         }
 
@@ -55,7 +55,7 @@ class RoomVipController extends MainController
      */
     public function edit($id, Content $content)
     {
-        if (!PackageHelper::isInstalled('vip')) {
+        if (! PackageHelper::isInstalled('vip')) {
             return $content->title(trans('room-vips'))->body('VIP package is not installed');
         }
 
@@ -66,7 +66,7 @@ class RoomVipController extends MainController
 
     public function create(Content $content)
     {
-        if (!PackageHelper::isInstalled('vip')) {
+        if (! PackageHelper::isInstalled('vip')) {
             return $content->title(trans('room-vips'))->body('VIP package is not installed');
         }
 

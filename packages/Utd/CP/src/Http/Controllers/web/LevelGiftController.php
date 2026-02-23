@@ -14,11 +14,11 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Utd\Vip\Entities\OVip;
-use Utd\Vip\Entities\Vip;
 use Utd\Achievements\Entities\Achievement;
 use Utd\CP\Entities\CpLevel;
 use Utd\CP\Entities\CpLevelGift;
+use Utd\Vip\Entities\OVip;
+use Utd\Vip\Entities\Vip;
 
 class LevelGiftController extends MainController
 {

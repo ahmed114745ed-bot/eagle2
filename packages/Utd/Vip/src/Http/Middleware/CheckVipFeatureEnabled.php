@@ -2,14 +2,15 @@
 
 namespace Utd\Vip\Http\Middleware;
 
-use Closure;
 use App\Services\AppFeatureService;
+use Closure;
 
 class CheckVipFeatureEnabled
 {
     public function handle($request, Closure $next)
     {
-        (new AppFeatureService)->validateStatusEnable("vips");
+        (new AppFeatureService)->validateStatusEnable('vips');
+
         return $next($request);
     }
 }

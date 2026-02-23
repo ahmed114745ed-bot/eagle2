@@ -13,13 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
-use Utd\Vip\Entities\Vip;
 use Utd\Chat\Entities\ChatMessage;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Traits\RoomBoxes;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\TaskStream\Entities\TaskStreamRoom;
+use Utd\Vip\Entities\Vip;
 
 /**
  * @method static withoutAppends()

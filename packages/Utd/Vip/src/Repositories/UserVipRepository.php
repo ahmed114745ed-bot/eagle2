@@ -2,16 +2,18 @@
 
 namespace Utd\Vip\Repositories;
 
+use App\Contracts\UserVipRepositoryContract;
 use App\Models\Pack;
 use App\Tik\Repositories\AbstractRepository;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Utd\Vip\Entities\UserVip;
 
 /**
  * @property UserVip $model
  */
-class UserVipRepository extends AbstractRepository
+class UserVipRepository extends AbstractRepository implements UserVipRepositoryContract
 {
     /**
      * @param  Model  $model
@@ -85,9 +87,9 @@ class UserVipRepository extends AbstractRepository
         $pack = $this->findByIdWithPack($pack_id, $user_id);
 
         if (! $pack) {
-            throw new \Exception(__('pack_not_found'));
+            throw new Exception(__('pack_not_found'));
         }
-        if ($pack->is_used != $isUsed) {
+        if ($pack->is_used !== $isUsed) {
             $pack->is_used = $isUsed;
             $pack->save();
         }

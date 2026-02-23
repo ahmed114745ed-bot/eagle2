@@ -3,9 +3,9 @@
 namespace Utd\CP\Entities;
 
 use App\Models\Ware;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\PackageHelper;
 use Utd\Vip\Entities\OVip;
 
 class CpLevelGift extends Model

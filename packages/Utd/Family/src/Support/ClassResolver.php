@@ -4,7 +4,7 @@ namespace Utd\Family\Support;
 
 /**
  * ClassResolver
- * 
+ *
  * Helper class to resolve external classes from config for Family package
  */
 class ClassResolver
@@ -15,6 +15,7 @@ class ClassResolver
     public static function model(string $key): ?string
     {
         $class = config("family.models.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -24,6 +25,7 @@ class ClassResolver
     public static function helper(string $key): ?string
     {
         $class = config("family.helpers.{$key}");
+
         return $class && (class_exists($class) || trait_exists($class)) ? $class : null;
     }
 
@@ -33,6 +35,7 @@ class ClassResolver
     public static function service(string $key): ?string
     {
         $class = config("family.services.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -42,6 +45,7 @@ class ClassResolver
     public static function getService(string $key)
     {
         $class = config("family.services.{$key}");
+
         return $class && class_exists($class) ? app($class) : null;
     }
 
@@ -51,6 +55,7 @@ class ClassResolver
     public static function controller(string $key): ?string
     {
         $class = config("family.controllers.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -60,6 +65,7 @@ class ClassResolver
     public static function admin(string $key): ?string
     {
         $class = config("family.admin.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -69,6 +75,7 @@ class ClassResolver
     public static function resource(string $key): ?string
     {
         $class = config("family.resources.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -78,6 +85,7 @@ class ClassResolver
     public static function facade(string $key): ?string
     {
         $class = config("family.facades.{$key}");
+
         return $class && (class_exists($class) || interface_exists($class)) ? $class : null;
     }
 
@@ -87,6 +95,7 @@ class ClassResolver
     public static function contract(string $key): ?string
     {
         $class = config("family.contracts.{$key}");
+
         return $class && (interface_exists($class) || class_exists($class)) ? $class : null;
     }
 
@@ -96,6 +105,7 @@ class ClassResolver
     public static function trait(string $key): ?string
     {
         $class = config("family.traits.{$key}");
+
         return $class && trait_exists($class) ? $class : null;
     }
 
@@ -105,6 +115,7 @@ class ClassResolver
     public static function enum(string $key): ?string
     {
         $class = config("family.enums.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -114,6 +125,7 @@ class ClassResolver
     public static function repository(string $key): ?string
     {
         $class = config("family.repositories.{$key}");
+
         return $class && class_exists($class) ? $class : null;
     }
 
@@ -140,7 +152,7 @@ class ClassResolver
     {
         $moduleConfig = config("family.modules.{$module}", []);
 
-        if (!($moduleConfig['enabled'] ?? false)) {
+        if (! ($moduleConfig['enabled'] ?? false)) {
             return null;
         }
 
@@ -149,6 +161,7 @@ class ClassResolver
         }
 
         $class = $moduleConfig[$key] ?? null;
+
         return $class && class_exists($class) ? $class : null;
     }
 }

@@ -2,17 +2,20 @@
 
 namespace Utd\Vip\Helpers;
 
+use App\Contracts\VipCommonContract;
 use App\Helpers\Common;
 use App\Models\Pack;
 use App\Models\User;
 use App\Models\Ware;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
+use Throwable;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Entities\UserVip;
 
-class VipCommon
+class VipCommon implements VipCommonContract
 {
-    public static function createUserVip(OVip $vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1): bool
+    public function createUserVip($vip, User $user, int $expire = 0, $dashUserId = 0, $typeSend = '', $qty = 1, $senderId = 0, $total = 0, $receiveType = 'not-sending', $isUsed = null, $sendNotification = 1): bool
     {
         try {
             DB::transaction(function () use ($vip, $user, $expire, $dashUserId, $typeSend, $senderId, $qty, $total, $receiveType, $isUsed) {
@@ -55,48 +58,23 @@ class VipCommon
             }
 
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }
 
-    public static function handleVipActivation(UserVip $userVip): void
+    public function handleVipActivation($userVip): void
     {
         $userVip->loadMissing(['user', 'OVip.privilegs']);
 
         match ($userVip->using) {
-            0 => self::handleInitialActivation($userVip),
-            1 => self::handleReactivation($userVip),
-            default => throw new \InvalidArgumentException('Invalid is_using value'),
+            0 => $this->handleInitialActivation($userVip),
+            1 => $this->handleReactivation($userVip),
+            default => throw new InvalidArgumentException('Invalid is_using value'),
         };
     }
 
-    protected static function handleInitialActivation(UserVip $userVip): void
-    {
-        $user = $userVip->user;
-        $vip = $userVip->OVip;
-
-        self::updateVipUsage($userVip);
-        self::deactivateOtherUserVips($user, $userVip);
-        self::deactivateOldUserPacks($userVip, $vip, $user);
-        self::activateVipWares($vip);
-        self::assignWaresToUser($vip, $userVip, $user);
-        self::updateUserCurrentVip($user);
-    }
-
-    protected static function handleReactivation(UserVip $userVip): void
-    {
-        $user = $userVip->user;
-        $vip = $userVip->OVip;
-
-        self::updateVipUsage($userVip);
-        self::deactivateOtherUserVips($user, $userVip);
-        self::deactivateOldUserPacks($userVip, $vip, $user);
-        self::assignWaresToUser($vip, $userVip, $user);
-        self::updateUserCurrentVip($user);
-    }
-
-    public static function deactivateVip(UserVip $vip): void
+    public function deactivateVip($vip): void
     {
         if ($vip) {
             $vip->update(['is_used' => 0]);
@@ -104,7 +82,74 @@ class VipCommon
         }
     }
 
-    private static function updateVipUsage(UserVip $userVip): void
+    public function unUsePack($type, $user)
+    {
+        Pack::where('type', $type)
+            ->where('user_id', $user->id)
+            ->where('get_type', '!=', 1)
+            ->update(['is_used' => 0]);
+    }
+
+    public function userDress($ware, $user, $isUsed)
+    {
+        $dressFieldMap = [
+            4 => 'dress_1',
+            5 => 'dress_2',
+            6 => 'dress_3',
+        ];
+
+        if (isset($dressFieldMap[$ware->type])) {
+            $field = $dressFieldMap[$ware->type];
+            $user->$field = $isUsed ? $ware->id : null;
+            $user->save();
+        }
+    }
+
+    public function removeVipFromUser($user, $id, $receive_type)
+    {
+        $vip = UserVip::where('receive_type', $receive_type)
+            ->where('user_id', $user->id)
+            ->where('vip_id', $id)
+            ->first();
+        if (! $vip) {
+            return;
+        }
+
+        $vipReceiveType = $receive_type.'-'.$vip->level;
+        Pack::where('vip_user_id', $vip->id)
+            ->where('receive_type', $vipReceiveType)
+            ->where('user_id', $user->id)
+            ->delete();
+
+        $vip->delete();
+    }
+
+    protected function handleInitialActivation(UserVip $userVip): void
+    {
+        $user = $userVip->user;
+        $vip = $userVip->OVip;
+
+        $this->updateVipUsage($userVip);
+        $this->deactivateOtherUserVips($user, $userVip);
+        $this->deactivateOldUserPacks($userVip, $vip, $user);
+        $this->activateVipWares($vip);
+        $this->assignWaresToUser($vip, $userVip, $user);
+        $this->updateUserCurrentVip($user);
+    }
+
+    protected function handleReactivation(UserVip $userVip): void
+    {
+        $user = $userVip->user;
+        $vip = $userVip->OVip;
+
+        $this->updateVipUsage($userVip);
+        $this->deactivateOtherUserVips($user, $userVip);
+        $this->deactivateOldUserPacks($userVip, $vip, $user);
+        $this->assignWaresToUser($vip, $userVip, $user);
+        $this->updateUserCurrentVip($user);
+    }
+
+    private function updateVipUsage(UserVip $userVip): void
     {
         $userVip->num_used++;
         $update = [
@@ -113,14 +158,14 @@ class VipCommon
             'using' => 1,
         ];
 
-        if ($userVip->using == 0 && $userVip->days > 0) {
+        if ($userVip->using === 0 && $userVip->days > 0) {
             $update['expire'] = now()->addDays($userVip->days * $userVip->qty)->timestamp;
         }
 
         $userVip->update($update);
     }
 
-    private static function deactivateOtherUserVips(User $user, UserVip $current): void
+    private function deactivateOtherUserVips(User $user, UserVip $current): void
     {
         $vip = UserVip::where('user_id', $user->id)
             ->where('id', '!=', $current->id)
@@ -131,11 +176,11 @@ class VipCommon
             })->first();
 
         if ($vip) {
-            self::deactivateVip($vip);
+            $this->deactivateVip($vip);
         }
     }
 
-    private static function deactivateOldUserPacks(UserVip $userVip, OVip $vip, User $user): void
+    private function deactivateOldUserPacks(UserVip $userVip, OVip $vip, User $user): void
     {
         if (! $userVip->is_used) {
             return;
@@ -150,7 +195,7 @@ class VipCommon
             ->update(['is_used' => 0]);
     }
 
-    private static function activateVipWares(OVip $vip): void
+    private function activateVipWares(OVip $vip): void
     {
         foreach ($vip->privilegs->pluck('type')->toArray() as $type) {
             $ware = Ware::where('get_type', 1)
@@ -167,7 +212,7 @@ class VipCommon
         }
     }
 
-    private static function assignWaresToUser(OVip $vip, UserVip $userVip, User $user): void
+    private function assignWaresToUser(OVip $vip, UserVip $userVip, User $user): void
     {
         $types = $vip->privilegs->pluck('type')->toArray();
 
@@ -184,11 +229,11 @@ class VipCommon
             ->get();
 
         foreach ($wares as $ware) {
-            self::assignWareToUser($ware, $user, $userVip, $expireTimestamp);
+            $this->assignWareToUser($ware, $user, $userVip, $expireTimestamp);
         }
     }
 
-    private static function updateUserCurrentVip(User $user): void
+    private function updateUserCurrentVip(User $user): void
     {
         $activeVip = UserVip::where('user_id', $user->id)
             ->where('is_used', 1)
@@ -204,7 +249,7 @@ class VipCommon
         }
     }
 
-    private static function assignWareToUser($ware, $user, $userVip, $expireTimestamp)
+    private function assignWareToUser($ware, $user, $userVip, $expireTimestamp)
     {
         Pack::query()
             ->where('user_id', $user->id)
@@ -241,50 +286,8 @@ class VipCommon
         }
 
         if (in_array($ware->type, [4, 5, 6])) {
-            self::userDress($ware, $user, $userVip->is_used);
-            self::unUsePack([$ware->type], $user);
+            $this->userDress($ware, $user, $userVip->is_used);
+            $this->unUsePack([$ware->type], $user);
         }
-    }
-
-    public static function unUsePack($type, $user)
-    {
-        Pack::where('type', $type)
-            ->where('user_id', $user->id)
-            ->where('get_type', '!=', 1)
-            ->update(['is_used' => 0]);
-    }
-
-    public static function userDress($ware, $user, $isUsed)
-    {
-        $dressFieldMap = [
-            4 => 'dress_1',
-            5 => 'dress_2',
-            6 => 'dress_3',
-        ];
-
-        if (isset($dressFieldMap[$ware->type])) {
-            $field = $dressFieldMap[$ware->type];
-            $user->$field = $isUsed ? $ware->id : null;
-            $user->save();
-        }
-    }
-
-    public static function removeVipFromUser($user, $id, $receive_type)
-    {
-        $vip = UserVip::where('receive_type', $receive_type)
-            ->where('user_id', $user->id)
-            ->where('vip_id', $id)
-            ->first();
-        if (! $vip) {
-            return;
-        }
-
-        $vipReceiveType = $receive_type.'-'.$vip->level;
-        Pack::where('vip_user_id', $vip->id)
-            ->where('receive_type', $vipReceiveType)
-            ->where('user_id', $user->id)
-            ->delete();
-
-        $vip->delete();
     }
 }

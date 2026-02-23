@@ -28,7 +28,7 @@ class InstallFamilyCommand extends Command
         $this->info('📝 نشر ملف الإعدادات...');
         $this->call('vendor:publish', [
             '--provider' => 'Utd\Family\FamilyServiceProvider',
-            '--tag' => 'config'
+            '--tag' => 'config',
         ]);
 
         // 2. تشغيل التهجيرات
@@ -41,18 +41,20 @@ class InstallFamilyCommand extends Command
 
         $this->newLine();
         $this->info('✅ تم تثبيت حزمة Family بنجاح!');
-        
+
         return Command::SUCCESS;
     }
 
     protected function updateComposer()
     {
         $path = base_path('composer.json');
-        if (!File::exists($path)) return;
+        if (! File::exists($path)) {
+            return;
+        }
 
         $composer = json_decode(File::get($path), true);
-        
-        if (!isset($composer['require']['utd/family'])) {
+
+        if (! isset($composer['require']['utd/family'])) {
             $composer['require']['utd/family'] = '*';
             File::put($path, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             $this->warn('⚠️  تمت إضافة الحزمة لـ composer.json. يرجى تنفيذ composer update');

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateFamiliesTable extends Migration
 {
@@ -15,12 +15,12 @@ class CreateFamiliesTable extends Migration
     {
         Schema::create('families', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedTinyInteger('is_success')->nullable ()->default (1);
-            $table->string('image')->nullable ()->comment('avatar');
+            $table->unsignedTinyInteger('is_success')->nullable()->default(1);
+            $table->string('image')->nullable()->comment('avatar');
             $table->string('name');
             $table->string('introduce')->nullable();
             $table->string('notice')->comment('announcement')->nullable();
-            $table->unsignedInteger('num')->comment('number of people')->nullable()->default (20);
+            $table->unsignedInteger('num')->comment('number of people')->nullable()->default(20);
             $table->unsignedInteger('user_id')->index()->comment('owner');
             $table->unsignedTinyInteger('speakswitch')->comment('Whether members are banned')->nullable();
             $table->unsignedTinyInteger('status')->default('1')->nullable();

@@ -3,17 +3,18 @@
 namespace Utd\Vip\Http\Controllers\Web;
 
 use App\Admin\Controllers\MainController;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Widgets\Table;
 use Utd\Vip\Actions\VipDedicateAction;
 use Utd\Vip\Entities\OVip;
-use Encore\Admin\Grid;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Widgets\Table;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class DedicateVipController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'gift-VIP';
 
     public function index(Content $content)
@@ -26,8 +27,7 @@ class DedicateVipController extends MainController
     /**
      * Show interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function show($id, Content $content)
@@ -40,8 +40,7 @@ class DedicateVipController extends MainController
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -58,24 +57,24 @@ class DedicateVipController extends MainController
             ->body($this->form());
     }
 
-
     protected function grid()
     {
         $grid = new Grid(new OVip);
         $grid->model()
             ->with([
-                'waresOvip:id,level,name,show_img,img2'
+                'waresOvip:id,level,name,show_img,img2',
             ])->orderByDesc('created_at');
         $grid->id('ID');
         $grid->column('name', __('name'));
         $grid->column('price', __('price'));
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
-            $defaultImage = asset("images/image.png");
+            $defaultImage = asset('images/image.png');
             $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 
@@ -83,7 +82,7 @@ class DedicateVipController extends MainController
 
             $wares = $this->waresOvip->map(function ($ware) {
                 $showaImage = $ware->show_img
-                    ? '<img src="' . getImagePath($ware->show_img) . '" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
+                    ? '<img src="'.getImagePath($ware->show_img).'" style="max-width:50px;max-height:50px;" />' // تأكد من تعديل المسار حسب مكان تخزين الصور
                     : 'No Image';
                 $imgPath = getImagePath($ware->img2);
 
@@ -91,7 +90,7 @@ class DedicateVipController extends MainController
                     ? handleShowImageWithTypes($ware->id, $imgPath, 50, 50) // تأكد من تعديل المسار حسب مكان تخزين الصور
                     : 'No Image';
 
-                return    [
+                return [
                     'id' => $ware->id,
                     'name' => $ware->name,
                     'show_img' => $showaImage,
@@ -111,7 +110,7 @@ class DedicateVipController extends MainController
         });
         $grid->column('level', __('level'));
         $grid->column('expire', __('expire'));
-        if (Admin::user()->can('gift-switch-' . $this->permission_name) || Admin::user()->can('*')) {
+        if (Admin::user()->can('gift-switch-'.$this->permission_name) || Admin::user()->can('*')) {
             $grid->column('return', __('dedicate'))->display(function () {
                 return (new VipDedicateAction($this->id))->render();
             });
@@ -134,6 +133,7 @@ class DedicateVipController extends MainController
 
             $(window).resize(removeTableResponsive);
         ");
+
         return $grid;
     }
 }

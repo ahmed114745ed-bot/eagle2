@@ -6,7 +6,7 @@ use App\Models\Ware;
 use Encore\Admin\Form;
 use Utd\Vip\Entities\VipPrivilege;
 
-class VipService
+class VipAdminService
 {
     public function handleSaving(Form $form): void
     {

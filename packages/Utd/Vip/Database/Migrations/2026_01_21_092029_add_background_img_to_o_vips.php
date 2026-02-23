@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('o_vips', function (Blueprint $table) {
-           $table->string('background_img')->nullable()->after('img');
+            $table->string('background_img')->nullable()->after('img');
         });
     }
 

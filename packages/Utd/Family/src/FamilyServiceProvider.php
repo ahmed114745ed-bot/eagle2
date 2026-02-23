@@ -12,42 +12,75 @@ class FamilyServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/family.php', 'family'
+            __DIR__.'/../config/family.php', 'family'
         );
 
         $this->registerNullBindings();
 
-        if (!$this->isEnabled()) {
+        if (! $this->isEnabled()) {
             return;
         }
 
         $this->registerAliases();
         $this->registerFamilyServices();
 
-        $this->app->singleton(\Utd\Family\Repositories\FamilyRepository::class);
-        $this->app->singleton(\Utd\Family\Repositories\FamilyUserRepository::class);
-        $this->app->singleton(\Utd\Family\Repositories\FamilyRankRepository::class);
-        $this->app->singleton(\Utd\Family\Repositories\FamilyLevelRepository::class);
-        $this->app->singleton(\Utd\Family\Services\FamilyLevelService::class);
+        $this->app->singleton(Repositories\FamilyRepository::class);
+        $this->app->singleton(Repositories\FamilyUserRepository::class);
+        $this->app->singleton(Repositories\FamilyRankRepository::class);
+        $this->app->singleton(Repositories\FamilyLevelRepository::class);
+        $this->app->singleton(Services\FamilyLevelService::class);
+    }
+
+    /**
+     * Bootstrap services
+     */
+    public function boot(): void
+    {
+        if (! $this->isEnabled()) {
+            return;
+        }
+
+        Entities\Family::observe(Observers\FamilyObserver::class);
+        Entities\FamilyUser::observe(Observers\FamilyUserObserver::class);
+
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        if (file_exists(__DIR__.'/../routes/admin.php')) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
+        }
+
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'family');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Console\InstallFamilyCommand::class,
+                Console\UninstallFamilyCommand::class,
+            ]);
+
+            $this->publishes([
+                __DIR__.'/../config/family.php' => config_path('family.php'),
+            ], 'family-config');
+        }
     }
 
     protected function registerAliases(): void
     {
-        if (!class_exists('Utd\\Family\\Http\\Controllers\\Controller')) {
+        if (! class_exists('Utd\\Family\\Http\\Controllers\\Controller')) {
             $baseController = config('family.controllers.base');
             if ($baseController && class_exists($baseController)) {
                 class_alias($baseController, 'Utd\\Family\\Http\\Controllers\\Controller');
             }
         }
 
-        if (!class_exists('Utd\\Family\\Http\\Controllers\\Admin\\MainController')) {
+        if (! class_exists('Utd\\Family\\Http\\Controllers\\Admin\\MainController')) {
             $mainController = config('family.controllers.admin_main');
             if ($mainController && class_exists($mainController)) {
                 class_alias($mainController, 'Utd\\Family\\Http\\Controllers\\Admin\\MainController');
             }
         }
 
-        if (!class_exists('Utd\\Family\\Repositories\\AbstractRepository')) {
+        if (! class_exists('Utd\\Family\\Repositories\\AbstractRepository')) {
             $abstractRepository = config('family.repositories.abstract');
             if ($abstractRepository && class_exists($abstractRepository)) {
                 class_alias($abstractRepository, 'Utd\\Family\\Repositories\\AbstractRepository');
@@ -67,7 +100,7 @@ class FamilyServiceProvider extends ServiceProvider
             });
         }
 
-        if (!trait_exists('Utd\\Family\\Traits\\DashBoardTrait', false)) {
+        if (! trait_exists('Utd\\Family\\Traits\\DashBoardTrait', false)) {
             $dashboardTrait = config('family.traits.dashboard');
             if ($dashboardTrait && trait_exists($dashboardTrait)) {
                 class_alias($dashboardTrait, 'Utd\\Family\\Traits\\DashBoardTrait');
@@ -77,12 +110,12 @@ class FamilyServiceProvider extends ServiceProvider
 
     protected function registerFamilyServices(): void
     {
-        $familyService = \Utd\Family\Services\FamilyService::class;
-        $contractInterface = config('family.contracts.family_service', \Utd\Family\Contracts\FamilyServiceContract::class);
+        $familyService = Services\FamilyService::class;
+        $contractInterface = config('family.contracts.family_service', Contracts\FamilyServiceContract::class);
 
         $this->app->singleton($familyService);
 
-        $this->app->singleton(\Utd\Family\Contracts\FamilyServiceContract::class, function ($app) use ($familyService) {
+        $this->app->singleton(Contracts\FamilyServiceContract::class, function ($app) use ($familyService) {
             return $app->make($familyService);
         });
 
@@ -93,42 +126,9 @@ class FamilyServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Bootstrap services
-     */
-    public function boot(): void
-    {
-        if (!$this->isEnabled()) {
-            return;
-        }
-
-        \Utd\Family\Entities\Family::observe(\Utd\Family\Observers\FamilyObserver::class);
-        \Utd\Family\Entities\FamilyUser::observe(\Utd\Family\Observers\FamilyUserObserver::class);
-
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
-        if (file_exists(__DIR__ . '/../routes/admin.php')) {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/admin.php');
-        }
-
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'family');
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                \Utd\Family\Console\InstallFamilyCommand::class,
-                \Utd\Family\Console\UninstallFamilyCommand::class,
-            ]);
-
-            $this->publishes([
-                __DIR__ . '/../config/family.php' => config_path('family.php'),
-            ], 'family-config');
-        }
-    }
-
     protected function registerNullBindings(): void
     {
-        $nullFamilyService = \Utd\Family\Services\NullFamilyService::class;
+        $nullFamilyService = Services\NullFamilyService::class;
         $this->app->singleton($nullFamilyService);
         $this->app->alias($nullFamilyService, 'family.null_service');
     }

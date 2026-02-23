@@ -1,7 +1,9 @@
 <?php
 
 namespace Utd\Vip\Http\Resources;
+
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
 
 class VipResource extends JsonResource
 {
@@ -10,8 +12,8 @@ class VipResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  \Illuminate\Http\Request  $request
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray($request)
     {
@@ -23,5 +25,4 @@ class VipResource extends JsonResource
 
         ];
     }
-
 }

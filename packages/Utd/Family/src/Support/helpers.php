@@ -2,138 +2,138 @@
 
 use Utd\Family\Support\ClassResolver;
 
-if (!function_exists('family_model')) {
+if (! function_exists('family_model')) {
     function family_model(string $key)
     {
         return ClassResolver::model($key);
     }
 }
 
-if (!function_exists('family_helper')) {
+if (! function_exists('family_helper')) {
     function family_helper(string $key)
     {
         return ClassResolver::helper($key);
     }
 }
 
-if (!function_exists('family_service')) {
+if (! function_exists('family_service')) {
     function family_service(string $key)
     {
         return ClassResolver::getService($key);
     }
 }
 
-if (!function_exists('family_facade')) {
+if (! function_exists('family_facade')) {
     function family_facade(string $key)
     {
         return ClassResolver::facade($key);
     }
 }
 
-if (!function_exists('family_resource')) {
+if (! function_exists('family_resource')) {
     function family_resource(string $key)
     {
         return ClassResolver::resource($key);
     }
 }
 
-if (!function_exists('family_enum')) {
+if (! function_exists('family_enum')) {
     function family_enum(string $key)
     {
         return ClassResolver::enum($key);
     }
 }
 
-if (!function_exists('family_trait')) {
+if (! function_exists('family_trait')) {
     function family_trait(string $key)
     {
         return ClassResolver::trait($key);
     }
 }
 
-if (!function_exists('family_contract')) {
+if (! function_exists('family_contract')) {
     function family_contract(string $key)
     {
         return ClassResolver::contract($key);
     }
 }
 
-if (!function_exists('family_controller')) {
+if (! function_exists('family_controller')) {
     function family_controller(string $key)
     {
         return ClassResolver::controller($key);
     }
 }
 
-if (!function_exists('family_repository')) {
+if (! function_exists('family_repository')) {
     function family_repository(string $key)
     {
         return ClassResolver::repository($key);
     }
 }
 
-if (!function_exists('family_admin')) {
+if (! function_exists('family_admin')) {
     function family_admin(string $key)
     {
         return ClassResolver::admin($key);
     }
 }
 
-if (!function_exists('family_module')) {
+if (! function_exists('family_module')) {
     function family_module(string $module, ?string $key = null)
     {
         return ClassResolver::module($module, $key);
     }
 }
 
-if (!function_exists('family_model_or_fail')) {
+if (! function_exists('family_model_or_fail')) {
     function family_model_or_fail(string $key): string
     {
         $class = family_model($key);
-        if (!$class) {
-            throw new \RuntimeException("family.models.{$key} is not configured or unavailable.");
+        if (! $class) {
+            throw new RuntimeException("family.models.{$key} is not configured or unavailable.");
         }
 
         return $class;
     }
 }
 
-if (!function_exists('family_admin_or_fail')) {
+if (! function_exists('family_admin_or_fail')) {
     function family_admin_or_fail(string $key): string
     {
         $class = family_admin($key);
-        if (!$class) {
-            throw new \RuntimeException("family.admin.{$key} is not configured or unavailable.");
+        if (! $class) {
+            throw new RuntimeException("family.admin.{$key} is not configured or unavailable.");
         }
 
         return $class;
     }
 }
 
-if (!function_exists('family_resource_or_fail')) {
+if (! function_exists('family_resource_or_fail')) {
     function family_resource_or_fail(string $key): string
     {
         $class = family_resource($key);
-        if (!$class) {
-            throw new \RuntimeException("family.resources.{$key} is not configured or unavailable.");
+        if (! $class) {
+            throw new RuntimeException("family.resources.{$key} is not configured or unavailable.");
         }
 
         return $class;
     }
 }
 
-if (!function_exists('family_contract_or_fail')) {
+if (! function_exists('family_contract_or_fail')) {
     function family_contract_or_fail(string $key): string
     {
         $class = family_contract($key);
-        if (!$class) {
-            throw new \RuntimeException("family.contracts.{$key} is not configured or unavailable.");
+        if (! $class) {
+            throw new RuntimeException("family.contracts.{$key} is not configured or unavailable.");
         }
 
         return $class;
     }
 }
 
-if (!interface_exists(\App\Contracts\FamilyContract::class) && interface_exists(\Utd\Family\Contracts\FamilyServiceContract::class)) {
-    class_alias(\Utd\Family\Contracts\FamilyServiceContract::class, \App\Contracts\FamilyContract::class);
+if (! interface_exists(App\Contracts\FamilyContract::class) && interface_exists(Utd\Family\Contracts\FamilyServiceContract::class)) {
+    class_alias(Utd\Family\Contracts\FamilyServiceContract::class, App\Contracts\FamilyContract::class);
 }

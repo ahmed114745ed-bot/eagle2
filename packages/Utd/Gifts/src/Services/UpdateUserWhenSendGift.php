@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Public\Http\Services\UpgradeLevelServices;
 use Modules\Public\Http\Services\UpgradeReceiverLevelServices;
-use Utd\Vip\Entities\Vip;
 use Throwable;
 use Utd\Gifts\Entities\UserGift;
+use Utd\Vip\Entities\Vip;
 
 class UpdateUserWhenSendGift
 {
@@ -128,7 +128,7 @@ class UpdateUserWhenSendGift
 
     public function getLevel(int $type, int $totalCoins)
     {
-        if (!PackageHelper::isInstalled('vip')) {
+        if (! PackageHelper::isInstalled('vip')) {
             return null;
         }
 

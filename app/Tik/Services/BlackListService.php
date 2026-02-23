@@ -2,23 +2,13 @@
 
 namespace App\Tik\Services;
 
-use App\Models\Pack;
-use Utd\Vip\Entities\UserVip;
 use App\Tik\Repositories\BlackLisRepository;
-use Modules\Events\Entities\WinnerReward;
-use App\Http\Resources\UserReportResource;
-use App\Http\Resources\ReportEventResource;
-use Modules\Events\Entities\RewardWinnerPk;
-use App\Http\Resources\AgencyReportResource;
-use Modules\Events\Services\LoseWinnerRewards;
-use App\Http\Resources\AdminUserReportResource;
-use Utd\Achievements\Entities\UserAchievementLevel;
 
 class BlackListService
 {
     public function __construct(
         private readonly BlackLisRepository $Repository,
-   
+
     ) {}
 
 
@@ -32,7 +22,7 @@ class BlackListService
     // public function blocked_search($user_id,$key){
     //     return $this->Repository->blocked_search($user_id,$key);
     // }
-    
+
     public function store(array  $data){
         return $this->Repository->store($data);
     }
@@ -44,5 +34,5 @@ class BlackListService
     public function delete($id){
         return $this->Repository->delete($id);
     }
-    
+
 }

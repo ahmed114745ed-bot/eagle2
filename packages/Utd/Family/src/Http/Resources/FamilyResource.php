@@ -2,8 +2,10 @@
 
 namespace Utd\Family\Http\Resources;
 
-use Utd\Family\Entities\FamilyUser;
 use Illuminate\Http\Resources\Json\JsonResource;
+use JsonSerializable;
+use stdClass;
+use Utd\Family\Entities\FamilyUser;
 
 class FamilyResource extends JsonResource
 {
@@ -11,7 +13,7 @@ class FamilyResource extends JsonResource
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @return array|\Illuminate\Contracts\Support\Arrayable|JsonSerializable
      */
     public function toArray($request)
     {
@@ -20,10 +22,10 @@ class FamilyResource extends JsonResource
         $user = $userModel::find($this->user_id);
         if ($user) {
             $owner = [
-                'id'        => $user->id,
+                'id' => $user->id,
                 'is_family_admin' => @$user->is_family_admin,
-                'family_id' => strval($user->family_id),
-                'name'  => $user->name,
+                'family_id' => (string) ($user->family_id),
+                'name' => $user->name,
                 'profile' => [
                     'image' => $user->profile->avatar,
                 ],
@@ -33,21 +35,21 @@ class FamilyResource extends JsonResource
                     'flag' => @$user->country->flag,
                 ],
                 'family_status' => 2,
-                'type_user'            => intval(@$user->type_user) ?: 0, // both
-                'manger_type'          => $mangerTypeResource ? new $mangerTypeResource(@$user->mangerType) : null,
-                'uuid'                 => @$user->uuid, // both
-                'id_image'             => @$user->specialId?->ware?->show_img ?? '',
-                'special_id'          =>  @$user->specialId?->ware?->id ?? 0,
+                'type_user' => (int) (@$user->type_user) ?: 0, // both
+                'manger_type' => $mangerTypeResource ? new $mangerTypeResource(@$user->mangerType) : null,
+                'uuid' => @$user->uuid, // both
+                'id_image' => @$user->specialId?->ware?->show_img ?? '',
+                'special_id' => @$user->specialId?->ware?->id ?? 0,
             ];
         } else {
-            $owner = new \stdClass();
+            $owner = new stdClass();
         }
 
-        $mems = FamilyUser::query()->with("user")->where('family_id', @$this->id)->where('status', 1)->where("user_type",'!=',2)->get();
+        $mems = FamilyUser::query()->with('user')->where('family_id', @$this->id)->where('status', 1)->where('user_type', '!=', 2)->get();
         $requested = FamilyUser::where('user_id', $request->user()->id)
-        ->where('family_id', $this->id)
-        ->where('status', 0)
-        ->exists();
+            ->where('family_id', $this->id)
+            ->where('status', 0)
+            ->exists();
 
         return [
 
@@ -59,7 +61,7 @@ class FamilyResource extends JsonResource
             'max_num_of_admins' => @$this->num_admins ?: 0,
             'owner' => $owner,
             'am_i_member' => FamilyUser::query()->where('user_id', $request->user()->id)->where('family_id', $this->id)->where('status', 1)->exists(),
-            'am_i_owner' => (@$this->user_id == $request->user()->id) ? true : false,
+            'am_i_owner' => (@$this->user_id === $request->user()->id) ? true : false,
             'am_i_admin' => $request->user()->is_family_admin ? true : false,
             'members' => ShortFamilyUserResource::collection($mems),
             'num_of_requests' => FamilyUser::query()->where('family_id', $this->id)->where('status', 0)->count(),

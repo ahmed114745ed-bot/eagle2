@@ -17,7 +17,7 @@ class FamilyCountryUpdateSeeder extends Seeder
         $families = Family::with('owner')->get();
 
         foreach ($families as $family) {
-            $family->country_id =   @$family->owner?->country_id ?? null;
+            $family->country_id = @$family->owner?->country_id ?? null;
             $family->save();
         }
     }

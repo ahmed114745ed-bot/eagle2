@@ -38,7 +38,7 @@ use App\Models\UserEarnInvitation;
 use Illuminate\Support\Facades\DB;
 use App\Models\AgencyMangerPullingOut;
 use App\Traits\HelperTraits\ZegoTrait;
-use Utd\Vip\Helpers\VipCommon;
+use App\Contracts\VipCommonContract;
 use Twilio\Rest\Client as TwilioClint;
 
 use App\Http\Resources\CountryResource;
@@ -330,7 +330,7 @@ class UserCommon
 
 
         if (!$user_vip_check) {
-            VipCommon::createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, $receiveType);
+            app(VipCommonContract::class)->createUserVip($vip, $user, $vip->expire, null, '', 1, 0, 0, $receiveType);
         }
     }
 
@@ -401,7 +401,7 @@ class UserCommon
 
     {
         DB::beginTransaction();
-        VipCommon::createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification);
+        app(VipCommonContract::class)->createUserVip($vip, $user, $expire, null, '', 1, 0, 0, $receiveType, $isUsed, $sendNotification);
         DB::commit();
         // Common::sendOfficialMessage($user->id, __('تهانينا'), __('لقد حصلت على مستوى VIP جديد كهدية'));
         // $tokens_notfacion[] = DB::table('users')->where('id', $user->id)->value('notification_id');
@@ -412,7 +412,7 @@ class UserCommon
 
     public static function removeVipFromUser(User $user, $id, $receiveType)
     {
-        VipCommon::removeVipFromUser($user, $id, $receiveType);
+        app(VipCommonContract::class)->removeVipFromUser($user, $id, $receiveType);
     }
 
     public static function removeEventsWareFromUser(User $user, $id, $receiveType)

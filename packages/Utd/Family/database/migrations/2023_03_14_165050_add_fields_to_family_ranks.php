@@ -14,9 +14,9 @@ class AddFieldsToFamilyRanks extends Migration
     public function up()
     {
         Schema::table('families', function (Blueprint $table) {
-            $table->unsignedBigInteger ('today_rank')->nullable ()->default (0);
-            $table->unsignedBigInteger ('week_rank')->nullable ()->default (0);
-            $table->unsignedBigInteger ('month_rank')->nullable ()->default (0);
+            $table->unsignedBigInteger('today_rank')->nullable()->default(0);
+            $table->unsignedBigInteger('week_rank')->nullable()->default(0);
+            $table->unsignedBigInteger('month_rank')->nullable()->default(0);
         });
     }
 

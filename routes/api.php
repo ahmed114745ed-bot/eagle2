@@ -64,9 +64,6 @@ use Utd\Achievements\Http\Controllers\AchievementController;
 use Modules\AreaManager\Http\Controllers\AreaManagerController;
 use Modules\Public\Http\Controllers\web\UpgradeLevelController;
 use Modules\UsersWallet\Http\Controllers\Api\ExchangeController;
-use Modules\SuperAdmin\Http\Controllers\Admin\SuperAdminController;
-use App\Http\Controllers\MallController as ControllersMallController;
-
 
 Route::get('/health', [HealthCheckController::class, 'status']);
 Route::get('/badges', [BadgeController::class, 'index']);
@@ -279,14 +276,14 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             });
 
 
-     
+
 
 
             Route::post('charge_history', [ChargeController::class, 'chargeHistory']);
             Route::post('user-charge-coins', [ChargeController::class, 'userChargeCoins']);
             Route::post('user-charge-coinsII', [ChargeController::class, 'userChargeCoinsII']);
 
-           
+
 
 
             // group-chat routes moved to packages/Utd/Chat/Routes/api.php
@@ -391,17 +388,6 @@ Route::prefix(config('app.api_prefix'))->group(function () {
             // end ranking
 
             // start vips
-            // Route::prefix('vips')->middleware(['appFeatureEnable:vips'])->group(function () {
-            //     Route::get('/list', [VipController::class, 'vipList']);
-            //     Route::get('/user/list', [VipController::class, 'vipUserList']);
-            //     Route::post('/buyVip', [VipController::class, 'buyVip']);
-            //     Route::post('/buy-vip-percentage', [ControllersMallController::class, 'buyVip']);
-            //     Route::post('/use', [VipController::class, 'vip_use']);
-            //     Route::post('/use-pack', [VipController::class, 'pack_use']);
-            //     Route::post('/send-to-user', [VipController::class, 'vip_send']);
-            // });
-            // Route::get('levels/badges', [VipController::class, 'badges']);
-            // Route::get('levels', [VipController::class, 'index']);
             Route::get('profile-frame-wares', [\App\Http\Controllers\Api\V1\WareController::class, 'profile_frame_wares']);
             // end vips
 

@@ -162,7 +162,7 @@ class MilestoneRewardController
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));
             })
             ->when("vip", function (Form $form) {
-                if (class_exists(OVips::class)) {
+                if (PackageHelper::isInstalled('vip')) {
                     $form->belongsTo('rewardable_id2', OVips::class, trans('vip'));
                 }
                 $form->number('expire', __('Expire'))->default(1)->help(__('admin.lifetime_help'));

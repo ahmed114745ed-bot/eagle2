@@ -14,7 +14,7 @@ class AddCurrentLevelToFamilies extends Migration
     public function up()
     {
         Schema::table('families', function (Blueprint $table) {
-            $table->integer ('current_level_id')->default (0);
+            $table->integer('current_level_id')->default(0);
         });
     }
 

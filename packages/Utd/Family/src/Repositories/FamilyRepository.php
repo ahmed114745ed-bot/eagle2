@@ -2,26 +2,28 @@
 
 namespace Utd\Family\Repositories;
 
-use Utd\Family\Repositories\AbstractRepository;
-
-use Utd\Family\Entities\Family;
 use Illuminate\Database\Eloquent\Model;
+use Utd\Family\Entities\Family;
 
 class FamilyRepository extends AbstractRepository
 {
-
     public function __construct()
     {
         $model = new Family;
         parent::__construct($model);
 
-        if (!$this->model instanceof Family) return;
+        if (! $this->model instanceof Family) {
+            return;
+        }
     }
 
     public function getWithSearch($search = null)
     {
         $conditions = [['status', 1]];
-        if (!is_null($search))   $conditions[] =  ['name', 'like', "%$search%"];
+        if (! is_null($search)) {
+            $conditions[] = ['name', 'like', "%$search%"];
+        }
+
         return $this->getPaginate(
             conditions: $conditions,
             with: ['members' => fn ($q) => $q->limit(10)],
@@ -50,7 +52,7 @@ class FamilyRepository extends AbstractRepository
 
     public function findByUserId($userId)
     {
-      return  $this->model->query()->where('user_id', $userId)->first();
+        return $this->model->query()->where('user_id', $userId)->first();
     }
 
     public function searchUserFamily($key, $page, $perPage)
@@ -59,9 +61,9 @@ class FamilyRepository extends AbstractRepository
 
         return $userModel::whereHas('family')
             ->where(function ($query) use ($key) {
-                $query->where('name', 'like', '%' . $key . '%')
-                    ->orWhere('id', 'like', '%' . $key . '%')
-                    ->orWhere('user_id', 'like', '%' . $key . '%');
+                $query->where('name', 'like', '%'.$key.'%')
+                    ->orWhere('id', 'like', '%'.$key.'%')
+                    ->orWhere('user_id', 'like', '%'.$key.'%');
             })
             ->select('id', 'name', 'user_id', 'avatar')
             ->paginate($perPage, ['*'], 'page', $page);
@@ -70,6 +72,7 @@ class FamilyRepository extends AbstractRepository
     public function delete($family)
     {
         $family->delete();
+
         return true;
     }
 }

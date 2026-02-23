@@ -255,7 +255,7 @@ class DailyPrizeController extends MainController
                 $form->number('expire', __('expire'));
             })
             ->when('vip', function () use ($form) {
-                if (class_exists(OVips::class)) {
+                if (PackageHelper::isInstalled('vip')) {
                     $form->belongsTo('target2', OVips::class, trans('vips'));
                 }
                 $form->number('expire', __('expire'));

@@ -9,7 +9,7 @@ use App\Tik\Repositories\PackRepository;
 use App\Contracts\RoomRepositoryContract;
 use Utd\Agency\Repositories\UserRepository;
 use App\Tik\Repositories\WareRepository;
-use Utd\Vip\Repositories\UserVipRepository;
+use App\Contracts\UserVipRepositoryContract;
 use phpDocumentor\Reflection\Types\Mixed_;
 
 
@@ -19,7 +19,7 @@ class PackService
         private readonly PackRepository $packRepository,
         private readonly WareRepository $wareRepository,
         private readonly RoomRepositoryContract $roomRepository,
-        private readonly UserVipRepository $userVipRepository,
+        private readonly UserVipRepositoryContract $userVipRepository,
         private readonly UserRepository $userRepository,
     ) {}
 

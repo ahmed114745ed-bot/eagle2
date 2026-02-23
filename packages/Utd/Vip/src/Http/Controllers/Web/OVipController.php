@@ -2,38 +2,33 @@
 
 namespace Utd\Vip\Http\Controllers\Web;
 
-use App\Models\Ware;
+use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\Config;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-use App\Helpers\Common;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
+use Illuminate\Validation\Rule;
 use Utd\Vip\Entities\OVip;
 use Utd\Vip\Selectables\Privileges;
-use Encore\Admin\Facades\Admin;
-use Illuminate\Validation\Rule;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
-use Utd\Vip\Services\VipService;
-use Utd\Vip\Entities\VipPrivilege;
-use Illuminate\Support\Facades\Session;
-use App\Admin\Controllers\MainController;
-use Encore\Admin\Controllers\HasResourceActions;
-
+use Utd\Vip\Services\VipAdminService;
 
 class OVipController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'VIPs';
+
     public $permission_setting = 'ovip-settings';
 
-
     public $hiddenColumns = [];
+
     public function __construct()
     {
         $this->middleware(\Utd\Vip\Http\Middleware\CheckVipFeatureEnabled::class);
@@ -41,12 +36,13 @@ class OVipController extends MainController
 
     public function vipSettings(Content $content)
     {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-' . $this->permission_setting);
+        if (! Admin::user()->can('*')) {
+            Permission::check('browse-'.$this->permission_setting);
         }
 
         $config = Config::pluck('value', 'name')->toArray();
         $config['enable_vip_auto'] = true;
+
         return $content->view('vip_settings', compact('config'));
     }
 
@@ -62,14 +58,14 @@ class OVipController extends MainController
     public function show($id, Content $content)
     {
         $oVip = OVip::findOrFail($id);
+
         return parent::show($id, $content->title(__('OVip'))->view('ovip_profile', compact('oVip')));
     }
 
     /**
      * Edit interface.
      *
-     * @param mixed $id
-     * @param Content $content
+     * @param  mixed  $id
      * @return Content
      */
     public function edit($id, Content $content)
@@ -82,6 +78,7 @@ class OVipController extends MainController
     public function editBackgroundImage($id, Content $content)
     {
         $oVip = OVip::findOrFail($id);
+
         return parent::edit($id, $content
             ->title(trans('vip'))
             ->body($this->backgroundImage($oVip)->edit($id)));
@@ -116,9 +113,6 @@ class OVipController extends MainController
      *
      * @return Grid
      */
-
-
-
     protected function grid()
     {
 
@@ -129,18 +123,20 @@ class OVipController extends MainController
         $grid->column('name', __('name'));
         $grid->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
-            $defaultImage = asset("images/image.png");
+            $defaultImage = asset('images/image.png');
             $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
         $grid->column('price', __('price'))->display(function ($coin) {
             $icon = asset('images/coin.jpg');
+
             return "
                 <div style='display: flex; align-items: center; gap: 5px;'>
-                    <span>" . number_format($coin) . "</span>
+                    <span>".number_format($coin)."</span>
                     <img src='{$icon}' alt='Coin' width='20' height='20'>
 
                 </div>
@@ -148,23 +144,25 @@ class OVipController extends MainController
         });
         $grid->column('expire', __('expire'));
 
-        if (Admin::user()->can('browse-' . 'vip-gift') || Admin::user()->can('*')) {
+        if (Admin::user()->can('browse-'.'vip-gift') || Admin::user()->can('*')) {
             $grid->column(__('file'))->display(function () {
                 $privilegeTypes = optional($this->privilegs)->pluck('en_name', 'type')->sortKeys();
                 $type = $privilegeTypes?->keys()->first();
-                $url1 = url('admin/ovip-gift/' . $this->id . '?type=' . $type);
+                $url1 = url('admin/ovip-gift/'.$this->id.'?type='.$type);
 
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('setting') . "</a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('setting').'</a>';
+
                 return $button1;
             });
         }
 
-        if (Admin::user()->can('edit-' . 'vip-gift') || Admin::user()->can('*')) {
+        if (Admin::user()->can('edit-'.'vip-gift') || Admin::user()->can('*')) {
             $grid->column(__('Theme'))->display(function () {
 
-                $url1 = url('admin/ovip-theme/' . $this->id);
+                $url1 = url('admin/ovip-theme/'.$this->id);
 
-                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>" . __('Theme') . "</a>";
+                $button1 = "<a href='{$url1}' class='btn btn-sm btn-info'>".__('Theme').'</a>';
+
                 return $button1;
             });
         }
@@ -182,17 +180,16 @@ class OVipController extends MainController
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
     {
         $show = new Show(OVip::findOrFail($id));
         $this->extendShow($show);
+
         return $show;
     }
-
-
 
     /**
      * Make a form builder.
@@ -224,10 +221,10 @@ class OVipController extends MainController
             });
 
         $form->text('name', __('name'));
-        $form->image('image2', trans('img'))->name(fn($file) => now()->timestamp . rand(0, 999) . '.' . $file->guessExtension());
+        $form->image('image2', trans('img'))->name(fn ($file) => now()->timestamp.rand(0, 999).'.'.$file->guessExtension());
 
         $form->file('img', trans('svga'))->name(function ($file) {
-            return 'svga_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+            return 'svga_'.Str::random(6).'.'.$file->getClientOriginalExtension();
         });
 
         $form->currency('price', __('price'))->symbol('🪙')->rules('required|numeric|gt:0');
@@ -240,13 +237,11 @@ class OVipController extends MainController
         $form->belongsToMany('privilegs', Privileges::class, __('privileges'))->rules('required|array|min:1');
 
         $form->saving(function (Form $form) {
-            app(VipService::class)->handleSaving($form);
+            app(VipAdminService::class)->handleSaving($form);
         });
 
         return $form;
     }
-
-
 
     protected function backgroundImage($model = null)
     {
@@ -257,7 +252,7 @@ class OVipController extends MainController
         $form = new Form($model);
 
         // ✅ IMPORTANT: SET FORM ACTION HERE
-        $form->setAction(admin_url('ovip-theme/' . $model->id));
+        $form->setAction(admin_url('ovip-theme/'.$model->id));
 
         // Disable default tools (view, delete, etc.)
         $this->disableFormTools($form);
@@ -269,6 +264,7 @@ class OVipController extends MainController
         // After save
         $form->saved(function (Form $form) {
             admin_toastr(__('Background image updated successfully'), 'success');
+
             return redirect(admin_url('ovip'));
         });
 

@@ -11,6 +11,7 @@ use App\Tik\Repositories\WareRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 use Utd\Agency\Repositories\UserRepository;
 use Utd\Vip\Helpers\VipCommon;
 use Utd\Vip\Repositories\OvipRepository;
@@ -69,7 +70,7 @@ class VipService
         $total = $vip->price * $qty;
         $user = $request->user();
 
-        if ($request->type == 1) {
+        if ($request->type === 1) {
             if (! $request->to_user) {
                 throw new Exception(__('api_responses.missing_params'));
             }
@@ -78,7 +79,7 @@ class VipService
                 throw new Exception(__('api.phone'));
             }
 
-            if ($targetUser->id == $user->id) {
+            if ($targetUser->id === $user->id) {
                 throw new Exception(__('api_responses.notSend'));
             }
             if ($user->di < $total) {
@@ -149,7 +150,7 @@ class VipService
         $userVip = $this->userVipRepository->findById($request->vip_id);
 
         if (
-            ! $userVip || $userVip->user_id != $from->id ||
+            ! $userVip || $userVip->user_id !== $from->id ||
             $userVip->is_used || $userVip->num_used >= 1 || $userVip->using
         ) {
             throw new Exception(__('api_responses.vip_already_used'));
@@ -159,7 +160,7 @@ class VipService
         if (! $toUser) {
             throw new Exception(__('api_responses.notFound'));
         }
-        if ($toUser->id == $from->id) {
+        if ($toUser->id === $from->id) {
             throw new Exception(__('api_responses.notSend'));
         }
 
@@ -235,10 +236,10 @@ class VipService
         $qty = $request->qty ?: 1;
         $total = $vip->price * $qty;
         $expire = $vip->expire;
-        $ex = $expire == 0 ? 0 : now()->addDays($expire * $qty)->timestamp;
+        $ex = $expire === 0 ? 0 : now()->addDays($expire * $qty)->timestamp;
 
         return $this->wrap(function () use ($request, $vip, $qty, $total, $expire, $ex) {
-            [$user_id, $from, $type, $sender_id, $user] = $request->type == 1
+            [$user_id, $from, $type, $sender_id, $user] = $request->type === 1
                 ? $this->authUserSend($request, $total)
                 : $this->authUser($request, $total);
 
@@ -251,7 +252,7 @@ class VipService
                 $userVip = $this->userVipRepository->findByUserLevel($user_id, $vip->level, $vip->id);
 
                 if ($userVip) {
-                    $newExpire = $userVip->expire == 0 ? 0 : $userVip->expire + ($expire * $qty * 86400);
+                    $newExpire = $userVip->expire === 0 ? 0 : $userVip->expire + ($expire * $qty * 86400);
                     $updateData = [
                         'expire' => $newExpire,
                         'qty' => $userVip->qty + $qty,
@@ -271,7 +272,7 @@ class VipService
                 CustomNotification::vips($user, $remainingDays, $vip->img);
 
                 return Common::apiResponse(true, 'done', null, 201);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 DB::rollBack();
                 throw $e;
             }
@@ -291,7 +292,7 @@ class VipService
             $expire = $vip->expire;
             $ex = $expire === 0 ? 0 : now()->addDays($expire * $qty)->timestamp;
 
-            [$user_id, $from, $type, $sender_id, $user] = $request->type == 1
+            [$user_id, $from, $type, $sender_id, $user] = $request->type === 1
                 ? $this->authUserSend($request, $total)
                 : $this->authUser($request, $total);
 

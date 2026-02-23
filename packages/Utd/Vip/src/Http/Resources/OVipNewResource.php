@@ -2,13 +2,11 @@
 
 namespace Utd\Vip\Http\Resources;
 
-use Utd\Vip\Entities\UserVip;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class OVipNewResource extends JsonResource
 {
-
     public function toArray($request)
     {
         $oVip = $this->OVip;
@@ -28,11 +26,11 @@ class OVipNewResource extends JsonResource
         }
 
         return [
-            "target_id" => $this->id,
-            "is_buyed" => true,
-            "is_used" => $this->is_used == 1,
-            "using" => $this->using == 1,
-            'expire' => $this->expire != 0 ? ($this->expire == null ? 0 : date("Y-m-d H:i:s", $this->expire)) : 0,
+            'target_id' => $this->id,
+            'is_buyed' => true,
+            'is_used' => $this->is_used === 1,
+            'using' => $this->using === 1,
+            'expire' => $this->expire !== 0 ? ($this->expire === null ? 0 : date('Y-m-d H:i:s', $this->expire)) : 0,
             'remaining_time' => $this->expire && $diff
                     ? sprintf('%dd %dh %dm', $diff->days, $diff->h, $diff->i)
                     : sprintf('%dd', $this->days),
@@ -53,10 +51,11 @@ class OVipNewResource extends JsonResource
                         $priv->item = $wares->where('type', $priv->type)->first();
                         $priv->level = $oVip?->level;
                         $priv->active = in_array($priv->id, $activePrivilegeIds);
+
                         return $priv;
                     })->sortByDesc('active')
                 ),
-            ]
+            ],
         ];
     }
 }

@@ -103,7 +103,6 @@ use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\WareTabController;
-use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\WithdrawController;
 use App\Admin\Controllers\ZegoFeatureController;
 use App\Http\Controllers\AddTargetToJsonController;
@@ -431,7 +430,7 @@ Route::group(
         ])->name('agency-manger-export');
         Route::get('/dev', 'HomeController@devindex')->name('dev-home');
         //        Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency.home');
-        Route::resource('wares-vips', WareVipController::class);
+        // wares-vips moved to packages/Utd/Vip/Routes/web.php
         // servers
         Route::resource('server-country', ServerCountryController::class);
         // room-gift-targets moved to packages/Utd/Room/Routes/web.php

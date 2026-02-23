@@ -2,24 +2,25 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
-use Utd\Family\Http\Controllers\Controller;
-
 use Carbon\Carbon;
-use Utd\Family\Entities\Family;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Utd\Family\Entities\FamilyUser;
+use Encore\Admin\Layout\Content;
+use Maatwebsite\Excel\Facades\Excel;
 use Utd\Family\Admin\Extensions\FamilyExporter;
 use Utd\Family\Admin\Extensions\FamilyLevelExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Encore\Admin\Layout\Content;
-use Encore\Admin\Controllers\HasResourceActions;
+use Utd\Family\Entities\Family;
+use Utd\Family\Entities\FamilyUser;
 
 class FamilyController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'families';
+
     public $hiddenColumns = [];
+
     protected string $userModel;
 
     public function __construct()
@@ -45,7 +46,7 @@ class FamilyController extends MainController
         $date = request('date');
         $id = request('id');
         $uuid = request('uuid');
-   
+
         return Excel::download(
             new FamilyExporter($date, $id, $uuid),
             'families.csv'
@@ -73,123 +74,10 @@ class FamilyController extends MainController
             ->body($this->form()));
     }
 
-    // public function show($id, Content $content)
-    // {
-    //     return parent::show($id, $content
-    //         ->title(trans('families'))
-    //         ->body($this->detail($id)));
-    // }
-
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
-    protected function grid()
-    {
-        $grid = new Grid(new Family);
-        $countryID =session('filter_country_id');
-
-        $grid->filter(function (Grid\Filter $filter) {
-            $filter->expand();
-            $filter->disableIdFilter();
-            $filter->equal('id', __('ID'));
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    $query->whereHas('owner', function ($subQuery) {
-                        $subQuery->where('uuid', 'like', "%{$this->input}%");
-                    });
-                }, __('UUID'), 'uuid')->placeholder(__('search for host by UUID'));
-            });
-
-            $filter->column(1 / 2, function ($filter) {
-                $filter->where(function ($query) {
-                    if ($date = request('date')) {
-                        $dateEn = Carbon::parse(convertArabicToEnglishNumbers($date))->endOfDay();
-                        $query->whereDate('created_at',  $dateEn);
-                    }
-                }, __('created_at'), 'date')->date();
-            });
-        });
-        $grid->model()
-            ->select(['id', 'name', 'image', 'user_id', 'num', 'total_diamond', 'created_at'])
-            ->when($countryID, fn($q) => $q->whereHas('owner', fn($q) => $q->where('country_id', $countryID)))
-            ->withCount([
-                'allMembers as members_count_cached',
-                'admins as admins_count_cached'
-            ])
-            ->with([
-                'owner:id,name,uuid',
-                'owner.profile:id,user_id,avatar',
-            ])
-            ->orderByDesc('id');
-
-        $grid->id(__('ID'));
-        $grid->column('image', __('family'))->display(function ($image) {
-            $name = e($this->name);
-            $defaultImage = asset("images/family.jpg");
-            $url = $image ? getImagePath($image) : $defaultImage;
-            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                {$imgTag}<strong>{$name}</strong>
-            </div>";
-        });
-
-        $grid->column('owner.name', trans('owner'))->display(function ($name) {
-            $owner = $this->owner;
-            if (!$owner) return '-';
-            
-            $uid = $owner->uuid;
-            $avatar = $owner->profile?->avatar;
-            $defaultImage = asset('images/businessman-icon.jpg');
-            $url = $avatar ? getImagePath($avatar) : $defaultImage;
-            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
-            $showUrl = url("admin/users/{$owner->id}");
-            $escapedName = e($name);
-
-            return "<div style='display: flex; align-items: center; gap: 10px;'>
-                {$imgTag}
-                <div>
-                    <a href='{$showUrl}' style='text-decoration: underline;'>{$escapedName}</a>
-                    <br><span style='font-size: smaller;'>UUID: {$uid}</span>
-                </div>
-            </div>";
-        });
-
-        $grid->column('num', __('number of people'))->display(function ($value) {
-            // Original accessor returns count - 1 to exclude owner
-            $count = max(0, ($this->members_count_cached ?? 0) - 1);
-            return $count . '/' . $value;
-        });
-        $grid->column('num_admins', __('number of admins'))->display(function ($value) {
-            return $this->admins_count_cached . '/' . $value;
-        });
-        $grid->column('max_level', __('level'));
-        $grid->column('max_exp', __('exp'));
-        $grid->column('created_at', __('created_at'));
-
-        $grid->tools(function (Grid\Tools $tools) {
-            $uuid = request('uuid') ?? (request('owner')['uuid'] ?? null);
-            $query = http_build_query([
-
-                'date' => request('date') ? convertArabicToEnglishNumbers(request('date')) : '',
-                'id' => request('id'),
-                'uuid' => $uuid,
-            ]);
-
-            $tools->append('<a href="' . url('/admin/families-excel') . '?' . $query . '" target="_blank" class="btn btn-sm btn-success">
-                <i class="fa fa-download"></i>' . __('admin.exportExcel') . '</a>');
-        });
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        return $grid;
-    }
-
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     // protected function detail($id)
@@ -220,14 +108,131 @@ class FamilyController extends MainController
         $type = request('type');
         $family = Family::with(['owner:id,name,uuid', 'owner.profile:id,user_id,avatar'])
             ->findOrFail($id);
-        
+
         $familyMembers = $family->allMembers()
             ->with(['user:id,name,uuid', 'user.profile:id,user_id,avatar'])
-            ->when($type !== null, fn($q) => $q->where('user_type', $type))
+            ->when($type !== null, fn ($q) => $q->where('user_type', $type))
             ->paginate(10, ['*'], 'member_page');
-            
+
         return parent::show($id, $content->title(__('family profile'))
             ->view('family_profile', compact('family', 'familyMembers')));
+    }
+
+    // public function show($id, Content $content)
+    // {
+    //     return parent::show($id, $content
+    //         ->title(trans('families'))
+    //         ->body($this->detail($id)));
+    // }
+
+    /**
+     * Make a grid builder.
+     *
+     * @return Grid
+     */
+    protected function grid()
+    {
+        $grid = new Grid(new Family);
+        $countryID = session('filter_country_id');
+
+        $grid->filter(function (Grid\Filter $filter) {
+            $filter->expand();
+            $filter->disableIdFilter();
+            $filter->equal('id', __('ID'));
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    $query->whereHas('owner', function ($subQuery) {
+                        $subQuery->where('uuid', 'like', "%{$this->input}%");
+                    });
+                }, __('UUID'), 'uuid')->placeholder(__('search for host by UUID'));
+            });
+
+            $filter->column(1 / 2, function ($filter) {
+                $filter->where(function ($query) {
+                    if ($date = request('date')) {
+                        $dateEn = Carbon::parse(convertArabicToEnglishNumbers($date))->endOfDay();
+                        $query->whereDate('created_at', $dateEn);
+                    }
+                }, __('created_at'), 'date')->date();
+            });
+        });
+        $grid->model()
+            ->select(['id', 'name', 'image', 'user_id', 'num', 'total_diamond', 'created_at'])
+            ->when($countryID, fn ($q) => $q->whereHas('owner', fn ($q) => $q->where('country_id', $countryID)))
+            ->withCount([
+                'allMembers as members_count_cached',
+                'admins as admins_count_cached',
+            ])
+            ->with([
+                'owner:id,name,uuid',
+                'owner.profile:id,user_id,avatar',
+            ])
+            ->orderByDesc('id');
+
+        $grid->id(__('ID'));
+        $grid->column('image', __('family'))->display(function ($image) {
+            $name = e($this->name);
+            $defaultImage = asset('images/family.jpg');
+            $url = $image ? getImagePath($image) : $defaultImage;
+            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
+
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                {$imgTag}<strong>{$name}</strong>
+            </div>";
+        });
+
+        $grid->column('owner.name', trans('owner'))->display(function ($name) {
+            $owner = $this->owner;
+            if (! $owner) {
+                return '-';
+            }
+
+            $uid = $owner->uuid;
+            $avatar = $owner->profile?->avatar;
+            $defaultImage = asset('images/businessman-icon.jpg');
+            $url = $avatar ? getImagePath($avatar) : $defaultImage;
+            $imgTag = handleShowImageWithTypes($this->id, $url, 40, 40);
+            $showUrl = url("admin/users/{$owner->id}");
+            $escapedName = e($name);
+
+            return "<div style='display: flex; align-items: center; gap: 10px;'>
+                {$imgTag}
+                <div>
+                    <a href='{$showUrl}' style='text-decoration: underline;'>{$escapedName}</a>
+                    <br><span style='font-size: smaller;'>UUID: {$uid}</span>
+                </div>
+            </div>";
+        });
+
+        $grid->column('num', __('number of people'))->display(function ($value) {
+            // Original accessor returns count - 1 to exclude owner
+            $count = max(0, ($this->members_count_cached ?? 0) - 1);
+
+            return $count.'/'.$value;
+        });
+        $grid->column('num_admins', __('number of admins'))->display(function ($value) {
+            return $this->admins_count_cached.'/'.$value;
+        });
+        $grid->column('max_level', __('level'));
+        $grid->column('max_exp', __('exp'));
+        $grid->column('created_at', __('created_at'));
+
+        $grid->tools(function (Grid\Tools $tools) {
+            $uuid = request('uuid') ?? (request('owner')['uuid'] ?? null);
+            $query = http_build_query([
+
+                'date' => request('date') ? convertArabicToEnglishNumbers(request('date')) : '',
+                'id' => request('id'),
+                'uuid' => $uuid,
+            ]);
+
+            $tools->append('<a href="'.url('/admin/families-excel').'?'.$query.'" target="_blank" class="btn btn-sm btn-success">
+                <i class="fa fa-download"></i>'.__('admin.exportExcel').'</a>');
+        });
+        $this->extendGrid($grid);
+        $grid->disableExport();
+
+        return $grid;
     }
 
     /**
@@ -250,8 +255,9 @@ class FamilyController extends MainController
         $form->select('user_id', __('user id'))->options(function ($value) use ($userModel) {
             $ops2 = [];
             foreach ($userModel::where('id', $value)->get() as $user) {
-                $ops2[$user->id] = $user->uuid . '_' . $user->name;
+                $ops2[$user->id] = $user->uuid.'_'.$user->name;
             }
+
             return $ops2;
         })->ajax('/api/search/users4', 'id', 'name')->rules('required');
         $form->hidden('is_success', 'is_success')->default(1)->rules('required');
@@ -259,7 +265,7 @@ class FamilyController extends MainController
         $form->saving(function (Form $form) use ($userModel) {
             $oldOwnerFamily = $form->model()->user_id;
             $newOwnerFamily = request()->user_id;
-            if ($form->model()->exists && ($oldOwnerFamily != $newOwnerFamily)) {
+            if ($form->model()->exists && ($oldOwnerFamily !== $newOwnerFamily)) {
                 $userModel::where('id', $form->model()->user_id)->update(['family_id' => 0]);
                 FamilyUser::where([
                     'user_id' => $form->model()->user_id,
@@ -276,7 +282,7 @@ class FamilyController extends MainController
                 'user_type' => 2,
                 'status' => 1,
             ])->exists();
-            if (!$checkFamilyUser) {
+            if (! $checkFamilyUser) {
                 $userModel::where('id', $form->model()->user_id)->update(['family_id' => $form->model()->id]);
                 FamilyUser::create([
                     'user_id' => $form->model()->user_id,

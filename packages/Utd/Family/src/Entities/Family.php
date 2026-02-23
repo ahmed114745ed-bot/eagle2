@@ -2,12 +2,13 @@
 
 namespace Utd\Family\Entities;
 
-use function request;
+use Cache;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Utd\Family\Traits\ResourceTrait;
 use Utd\Family\Traits\TimestampsWithTimezone;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use function request;
 
 class Family extends Model
 {
@@ -38,7 +39,7 @@ class Family extends Model
 
     public function getMembersNumAttribute()
     {
-        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */->count();
+        $fu = FamilyUser::query()->where('family_id', $this->id)->where('status', 1)/* ->where ('user_type',0) */ ->count();
 
         return $fu;
     }
@@ -115,13 +116,12 @@ class Family extends Model
             // Cache all levels once (usually < 20 records)
             static $allLevels = null;
             if ($allLevels === null) {
-                $allLevels = \Cache::remember('family_levels_all', 300, fn() => 
-                    FamilyLevel::orderByDesc('exp')->get()
+                $allLevels = Cache::remember('family_levels_all', 300, fn () => FamilyLevel::orderByDesc('exp')->get()
                 );
             }
-            
+
             $giftLogs = $this->total_diamond ?? 0;
-            $this->cachedLevelMax = $allLevels->first(fn($level) => $level->exp <= $giftLogs);
+            $this->cachedLevelMax = $allLevels->first(fn ($level) => $level->exp <= $giftLogs);
         }
 
         return $this->cachedLevelMax;
@@ -138,30 +138,33 @@ class Family extends Model
     public function getLevelMaxMembersNumAttribute()
     {
         $level = $this->getLevelMax();
+
         return $level?->members;
     }
 
     public function getMaxExpAttribute()
     {
         $level = $this->getLevelMax();
+
         return $level?->exp ?? 0;
     }
 
     public function getMaxLevelAttribute()
     {
         $level = $this->getLevelMax();
-        if (!$level) return '';
-        
-        return app()->getLocale() === 'ar' 
-            ? ($level->name ?? $level->name_en) 
+        if (! $level) {
+            return '';
+        }
+
+        return app()->getLocale() === 'ar'
+            ? ($level->name ?? $level->name_en)
             : ($level->name_en ?? $level->name);
     }
-
-
 
     public function getLevelMaxAdminsNumAttribute()
     {
         $level = $this->getLevelMax();
+
         return $level?->admins;
 
         return null;

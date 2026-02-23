@@ -14,9 +14,9 @@ use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Modules\Badge\Entities\Badge;
 use Modules\Events\Entities\WeeklyStar;
-use Utd\Vip\Entities\OVip;
 use Utd\Achievements\Entities\Achievement;
 use Utd\CP\Entities\WeeklyCpGift;
+use Utd\Vip\Entities\OVip;
 
 class WeeklyCpGiftController extends MainController
 {

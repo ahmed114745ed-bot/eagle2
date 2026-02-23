@@ -2,9 +2,9 @@
 
 namespace Utd\Vip\Selectables;
 
-use Utd\Vip\Entities\VipPrivilege;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
+use Utd\Vip\Entities\VipPrivilege;
 
 class Privileges extends Selectable
 {

@@ -2,24 +2,21 @@
 
 namespace Utd\Family\Http\Controllers\Admin;
 
-use Utd\Family\Http\Controllers\Controller;
-
-use Utd\Family\Entities\FamilyUser;
-use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-    
+use Utd\Family\Entities\FamilyUser;
+
 class FamilyUserController extends MainController
 {
     use HasResourceActions;
+
     public $permission_name = 'family-user';
+
     public $hiddenColumns = [
 
     ];
-
 
     /**
      * Make a grid builder.
@@ -41,14 +38,15 @@ class FamilyUserController extends MainController
         $grid->closeswitch('closeswitch');
         $grid->created_at(trans('admin.created_at'));
         $grid->updated_at(trans('admin.updated_at'));
-        $this->extendGrid ($grid);
+        $this->extendGrid($grid);
+
         return $grid;
     }
 
     /**
      * Make a show builder.
      *
-     * @param mixed $id
+     * @param  mixed  $id
      * @return Show
      */
     protected function detail($id)
@@ -66,7 +64,8 @@ class FamilyUserController extends MainController
         $show->closeswitch('closeswitch');
         $show->created_at(trans('admin.created_at'));
         $show->updated_at(trans('admin.updated_at'));
-        $this->extendShow ($show);
+        $this->extendShow($show);
+
         return $show;
     }
 

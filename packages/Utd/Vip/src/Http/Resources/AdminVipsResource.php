@@ -15,13 +15,13 @@ class AdminVipsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'        => $this->id,
-            'sort'      => $this->sort,
-            'name'      => $this->name,
-            'level'     => $this->level,
-            'img'       => $this->img,
-            'price'     => $this->price,
-            'expire'    => $this->expire,
+            'id' => $this->id,
+            'sort' => $this->sort,
+            'name' => $this->name,
+            'level' => $this->level,
+            'img' => $this->img,
+            'price' => $this->price,
+            'expire' => $this->expire,
             'privilegs' => $this->privilegs->pluck('id')->toArray(),
         ];
     }

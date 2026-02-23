@@ -67,6 +67,11 @@ class VipRepository extends AbstractRepository
         });
     }
 
+    public function getLevelsByType(int $type)
+    {
+        return $this->model->where('type', $type)->orderBy('level')->get();
+    }
+
     private function mapChunk($vips)
     {
         return $vips->chunk(10)->map(function ($chunk) {
@@ -76,10 +81,5 @@ class VipRepository extends AbstractRepository
                 'badge' => $chunk->last()->img,
             ];
         })->toArray();
-    }
-
-    public function getLevelsByType(int $type)
-    {
-        return $this->model->where('type', $type)->orderBy('level')->get();
     }
 }

@@ -204,7 +204,7 @@ class RoleRewardsController extends MainController
             ->when("ware", function (Form $form) {
                 $form->belongsTo('rewardable_id1', Wares::class, trans('wares'));
             })->when("vip", function () use ($form) {
-                if (class_exists(OVips::class)) {
+                if (PackageHelper::isInstalled('vip')) {
                     $form->belongsTo('rewardable_id2', OVips::class, trans('vips'));
                 }
             })->when("achievement", function (Form $form) {

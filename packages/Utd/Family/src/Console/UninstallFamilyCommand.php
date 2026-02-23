@@ -29,6 +29,7 @@ class UninstallFamilyCommand extends Command
         if (! $this->option('force')) {
             if (! $this->confirm('هل أنت متأكد من رغبتك في إلغاء تثبيت حزمة Family؟')) {
                 $this->info('تم إلغاء العملية.');
+
                 return Command::SUCCESS;
             }
         }
@@ -49,8 +50,6 @@ class UninstallFamilyCommand extends Command
 
         return Command::SUCCESS;
     }
-
-   
 
     protected function removeFromComposer()
     {
@@ -125,6 +124,7 @@ class UninstallFamilyCommand extends Command
         $path = config_path('app.php');
         if (! File::exists($path)) {
             $this->warn('⚠️ ملف config/app.php غير موجود، تخطي إزالة مزود الخدمة.');
+
             return;
         }
 
@@ -170,6 +170,7 @@ class UninstallFamilyCommand extends Command
 
         if (! is_resource($process)) {
             $this->warn('⚠️ تعذر تشغيل composer dump-autoload تلقائياً. نفذه يدوياً.');
+
             return;
         }
 
@@ -201,5 +202,4 @@ class UninstallFamilyCommand extends Command
         $this->callSilent('view:clear');
         $this->line('   ✅ تم مسح الكاش.');
     }
-
 }

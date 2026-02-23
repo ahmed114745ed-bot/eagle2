@@ -2,17 +2,23 @@
 
 namespace Utd\Family\Admin\Extensions;
 
-use Utd\Family\Entities\Family;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
-
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Utd\Family\Entities\Family;
 
 class FamilyExporter implements FromCollection, WithHeadings
 {
+    public $date;
+
+    public $id;
+
+    public $uuid;
+
     protected $fileName = 'families.csv';
+
     protected $headings = [
-        "id",
-        "name",
+        'id',
+        'name',
         'owner',
         'num',
         'num_admins',
@@ -20,12 +26,8 @@ class FamilyExporter implements FromCollection, WithHeadings
         'exp',
         'created_at',
     ];
-    public $date;
-    public $id;
-    public $uuid;
 
-
-    public function __construct($date = null, $id = null,  $uuid = null)
+    public function __construct($date = null, $id = null, $uuid = null)
     {
 
         $this->id = $id;
@@ -34,19 +36,18 @@ class FamilyExporter implements FromCollection, WithHeadings
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function collection()
     {
         $id = $this->id;
-        $date =  $this->date;
+        $date = $this->date;
         $uuid = $this->uuid;
 
-
         $families = Family::query()->with('owner')
-            ->when($id, fn($q) => $q->where('id', $id))
-            ->when($uuid, fn($q) => $q->whereHas('owner', fn($sub) => $sub->searchByUuid($uuid)))
-            ->when($date, fn($q) => $q->whereDate('created_at', $date))
+            ->when($id, fn ($q) => $q->where('id', $id))
+            ->when($uuid, fn ($q) => $q->whereHas('owner', fn ($sub) => $sub->searchByUuid($uuid)))
+            ->when($date, fn ($q) => $q->whereDate('created_at', $date))
             ->get();
         $arr = [];
 
@@ -56,25 +57,22 @@ class FamilyExporter implements FromCollection, WithHeadings
                 'id' => $family->id,
                 'name' => $family->name ?? '',
                 'owner' => $family->owner->name ?? '',
-                'num' => $family->members_count . '/' . ($family->num_admins ?? 0),
-                'num_admins' => $family->admins_num . '/' . ($family->num_admins ?? 0),
+                'num' => $family->members_count.'/'.($family->num_admins ?? 0),
+                'num_admins' => $family->admins_num.'/'.($family->num_admins ?? 0),
                 'max_level' => $family->max_level ?? '',
                 'max_exp' => $family->max_exp,
                 'created_at' => $family->created_at,
 
-
             ];
         }
-
 
         return collect($arr);
     }
 
-
     public function headings(): array
     {
         $headings = [
-            __("id", [], 'ar'),
+            __('id', [], 'ar'),
             __('name', [], 'ar'),
             __('owner', [], 'ar'),
             __('number of people', [], 'ar'),

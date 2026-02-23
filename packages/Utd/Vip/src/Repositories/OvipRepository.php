@@ -2,6 +2,7 @@
 
 namespace Utd\Vip\Repositories;
 
+use App\Contracts\OvipRepositoryContract;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Support\Collection;
 use Utd\Vip\Entities\OVip;
@@ -9,7 +10,7 @@ use Utd\Vip\Entities\OVip;
 /**
  * @template TModel of \Illuminate\Database\Eloquent\Model
  */
-class OvipRepository extends AbstractRepository
+class OvipRepository extends AbstractRepository implements OvipRepositoryContract
 {
     public function __construct()
     {

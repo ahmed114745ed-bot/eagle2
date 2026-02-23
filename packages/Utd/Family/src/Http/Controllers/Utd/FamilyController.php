@@ -2,11 +2,11 @@
 
 namespace Utd\Family\Http\Controllers\Utd;
 
-use Utd\Family\Http\Controllers\Controller;
-
+use Exception;
+use Illuminate\Http\Request;
 use Utd\Family\Entities\Family;
 use Utd\Family\Entities\FamilyUser;
-use Illuminate\Http\Request;
+use Utd\Family\Http\Controllers\Controller;
 use Utd\Family\Services\FamilyService;
 
 class FamilyController extends Controller
@@ -14,6 +14,7 @@ class FamilyController extends Controller
     use DashBoardTrait;
 
     protected $familyService;
+
     protected string $userModel;
 
     public function __construct(FamilyService $familyService)
@@ -28,20 +29,18 @@ class FamilyController extends Controller
         $perPage = request('per_page') ?? 10;
         $families = Family::paginate($perPage);
 
-
         return family_helper('common')::apiResponse(true, '', $families, 200);
     }
 
     public function all()
     {
 
-        $families = Family::all()->map(function($family){
+        $families = Family::all()->map(function ($family) {
             return [
                 'id' => $family->id,
                 'name' => $family->name,
             ];
         });
-
 
         return family_helper('common')::apiResponse(true, '', $families, 200);
     }
@@ -55,7 +54,7 @@ class FamilyController extends Controller
             $image = family_helper('common')::upload('images', $request->image);
         }
 
-        $family  = Family::create([
+        $family = Family::create([
             'name' => $request->name,
             'introduce' => $request->introduce,
             'notice' => $request->notice,
@@ -71,28 +70,27 @@ class FamilyController extends Controller
 
         // Create FamilyUser entry
         FamilyUser::create([
-            'user_id'   => $family->user_id,
+            'user_id' => $family->user_id,
             'family_id' => $family->id,
             'user_type' => 2,
-            'status'    => 1,
+            'status' => 1,
         ]);
 
-        return family_helper('common')::apiResponse(true, '',  [], 200);
+        return family_helper('common')::apiResponse(true, '', [], 200);
     }
 
     public function update(Request $request, $id)
     {
 
-
         if ($request->has('image')) {
             $image = family_helper('common')::upload('images', $request->image);
             Family::findOrFail($id)->update([
-                'image' => $image
+                'image' => $image,
             ]);
         }
-        $family =  Family::findOrFail($id);
+        $family = Family::findOrFail($id);
 
-        if ($family->user_id != $request->user_id) {
+        if ($family->user_id !== $request->user_id) {
             $userModel = $this->userModel;
             $userModel::where('id', $request->user_id)->update(['family_id' => null]);
             FamilyUser::where([
@@ -116,7 +114,7 @@ class FamilyController extends Controller
             'notice' => $request->notice,
             'is_success' => $request->is_success,
             'user_id' => $request->user_id,
-            'num' => $request->num
+            'num' => $request->num,
         ]);
 
         return family_helper('common')::apiResponse(1, 'Family updated successfully');
@@ -140,7 +138,7 @@ class FamilyController extends Controller
     public function delete_all(Request $request)
     {
         $request->validate([
-            'ids' => 'required'
+            'ids' => 'required',
         ]);
 
         $ids = explode(',', $request->ids);
@@ -154,8 +152,9 @@ class FamilyController extends Controller
     {
         try {
             $this->familyService->kickFamily($id);
+
             return family_helper('common')::apiResponse(true, 'removed');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
 
             return family_helper('common')::apiResponse(0, $exception->getMessage(), null, 400);
         }

@@ -14,7 +14,7 @@ trait DashBoardTrait
 
         return $file->storeAs(
             $folder,
-            $name . '.' . $file->getClientOriginalExtension(),
+            $name.'.'.$file->getClientOriginalExtension(),
             $this->getStorageDisk()
         );
     }
@@ -45,14 +45,14 @@ trait DashBoardTrait
     public function ware_types($type)
     {
         $types = [
-            1  => 'Gemstone',
-            3  => 'Card Scroll',
-            4  => 'Avatar Frame',
-            5  => 'Bubble Frame',
-            6  => 'Entering Special Effects',
-            7  => 'Microphone Aperture',
-            8  => 'Badge',
-            9  => 'NoKick',
+            1 => 'Gemstone',
+            3 => 'Card Scroll',
+            4 => 'Avatar Frame',
+            5 => 'Bubble Frame',
+            6 => 'Entering Special Effects',
+            7 => 'Microphone Aperture',
+            8 => 'Badge',
+            9 => 'NoKick',
             10 => 'Icon',
             11 => 'intro animation',
             12 => 'wapel',
@@ -82,14 +82,14 @@ trait DashBoardTrait
     public function vip_previlage_type($type)
     {
         $types = [
-            1  => 'Gemstone',
-            3  => 'Card Scroll',
-            4  => 'Avatar Frame',
-            5  => 'Bubble Frame',
-            6  => 'Entering Special Effects',
-            7  => 'Microphone Aperture',
-            8  => 'Badge',
-            9  => 'NoKick',
+            1 => 'Gemstone',
+            3 => 'Card Scroll',
+            4 => 'Avatar Frame',
+            5 => 'Bubble Frame',
+            6 => 'Entering Special Effects',
+            7 => 'Microphone Aperture',
+            8 => 'Badge',
+            9 => 'NoKick',
             10 => 'Icon',
             11 => 'intro animation',
             12 => 'wapel',
@@ -135,7 +135,7 @@ trait DashBoardTrait
 
         return $file->storeAs(
             $folder,
-            $name . '.' . $file->getClientOriginalExtension(),
+            $name.'.'.$file->getClientOriginalExtension(),
             $this->getStorageDisk()
         );
     }

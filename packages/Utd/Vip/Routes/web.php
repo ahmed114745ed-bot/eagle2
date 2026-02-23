@@ -17,7 +17,6 @@ use Utd\Vip\Http\Controllers\Web\VipPrivilegeController;
 |
 */
 
-
 Route::group(
     [
         'prefix' => config('admin.route.prefix'),
@@ -27,7 +26,7 @@ Route::group(
             'adminIp',
             'multiLanguage',
         ],
-        'as' => config('admin.route.prefix') . '.',
+        'as' => config('admin.route.prefix').'.',
     ],
     function () {
 
@@ -38,7 +37,7 @@ Route::group(
 
         Route::prefix('ovip-theme')->group(function () {
             Route::get('/{ovip_id}', [OVipController::class, 'editBackgroundImage']);
-             Route::put('{ovip_id}', [OVipController::class, 'updateBackgroundImage']);
+            Route::put('{ovip_id}', [OVipController::class, 'updateBackgroundImage']);
 
         });
 

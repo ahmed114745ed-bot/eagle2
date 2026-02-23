@@ -15,7 +15,7 @@ class FamilyObserver
     public function deleted(Family $family)
     {
         $userClass = family_model('user');
-        if (!$userClass) {
+        if (! $userClass) {
             return;
         }
 

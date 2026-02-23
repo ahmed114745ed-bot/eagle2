@@ -1,28 +1,26 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Vip\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
 use App\Models\Ware;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use Illuminate\Support\Str;
-use Utd\Vip\Entities\VipPrivilege;
-use Encore\Admin\Controllers\AdminController;
-use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Facades\Admin;
+use Encore\Admin\Show;
+use Utd\Vip\Entities\VipPrivilege;
 
 class WareVipController extends MainController
 {
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
     use HasResourceActions;
+
     public $permission_name = 'wares-vips';
+
+    protected $title = 'wares-vips';
+
     public function index(Content $content)
     {
         return parent::index($content
@@ -30,30 +28,16 @@ class WareVipController extends MainController
             ->body($this->grid()));
     }
 
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function show($id, Content $content)
     {
-        return parent::show($id,$content
+        return parent::show($id, $content
             ->title(trans('wares-vips'))
             ->body($this->detail($id)));
     }
 
-    /**
-     * Edit interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function edit($id, Content $content)
     {
-        return parent::edit($id,$content
+        return parent::edit($id, $content
             ->title(trans('wares-vips'))
             ->body($this->form()->edit($id)));
     }
@@ -65,12 +49,6 @@ class WareVipController extends MainController
             ->body($this->form()));
     }
 
-
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
     protected function grid()
     {
         $grid = new Grid(new Ware());
@@ -83,7 +61,6 @@ class WareVipController extends MainController
             });
 
             $filter->column(1 / 2, function ($filter) {
-
                 $filter->equal('type', __('type'))->select(
                     VipPrivilege::pluck('name', 'type')->toArray()
                 );
@@ -94,13 +71,8 @@ class WareVipController extends MainController
         $grid->column('get_type', __('get_type'))->select(
             [
                 1 => trans('vip level automatic acquisition'),
-                //               2=>trans ('activity'),
-                //               3=>trans ('treasure box'),
                 4 => trans('purchase'),
-                //               5=>trans ('background modification'),
                 6 => trans('limited time purchase'),
-                //               7=>trans ('treasure box point exchange'),
-                //               8=>trans ('cp level unlock'),
             ]
         );
         $grid->column('type', __('type'))->select(
@@ -126,35 +98,27 @@ class WareVipController extends MainController
                 20 => trans('hide last active'),
                 21 => trans('sound effect'),
                 22 => trans('upload GIF image'),
-                28 => trans('profile frame')
-
-
+                28 => trans('profile frame'),
             ]
         );
         $grid->column('name', __('name'))->editable();
         $grid->title(__('title'));
         $grid->column('price', __('price'))->currency();
-        //        $grid->score('score');
         $grid->level(__('level'));
         $grid->column('show_img', __('show_img'))->image('', 30);
         $grid->column('color', __('color'));
         $grid->expire(__('expire'));
         if (Admin::user()->can('edit_ware_price') || Admin::user()->can('*')) {
-        $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
+            $grid->column('enable', __('enable'))->switch(Common::getSwitchStates());
         }
         $grid->column('is_active_for_vip', __('active_for_vip'))->switch(Common::getSwitchStates());
         $grid->sort(__('sort'), __('sort'));
         $this->extendGrid($grid);
         $grid->disableExport();
+
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
     protected function detail($id)
     {
         $show = new Show(Ware::findOrFail($id));
@@ -185,11 +149,6 @@ class WareVipController extends MainController
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
     protected function form()
     {
         $form = new Form(new Ware());
@@ -198,32 +157,21 @@ class WareVipController extends MainController
         $form->select('get_type', trans('get_type'))->options(
             [
                 1 => trans('vip level automatic acquisition'),
-                //               2=>trans ('activity'),
-                //               3=>trans ('treasure box'),
-                //  4=>trans ('purchase'),
-                //               5=>trans ('background modification'),
-                //   6=>trans ('limited time purchase'),
-                //               7=>trans ('treasure box point exchange'),
-                //               8=>trans ('cp level unlock'),
             ]
         )->default(1);
         $form->select('type', trans('type'))->options(function ($value) {
             $privileges = [];
             foreach (VipPrivilege::get() as $pri) {
-                $privileges[$pri->type] =  $pri->name;
+                $privileges[$pri->type] = $pri->name;
             }
+
             return $privileges;
         })->rules('required');
-        //        ->rules (function ($form){
-        //            if (!$id = $form->model()->id) {
-        //                return 'required';
-        //            }
-        //        });
         $form->text('name', trans('name'));
         $form->text('name_en', trans('Name en'));
         $form->text('title', trans('title'));
         $form->text('title_en', trans('Title en'));
-        if (!$form->isEditing()) {
+        if (! $form->isEditing()) {
             if (Admin::user()->can('add_ware_price') || Admin::user()->can('*')) {
                 $form->currency('price', __('price'))->symbol('💰');
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
@@ -235,42 +183,40 @@ class WareVipController extends MainController
                 $form->switch('enable', trans('enable'))->states(Common::getSwitchStates());
             }
         }
-        //        $form->number('score', trans('score'));
         $form->number('level', trans('level'))->rules(
             'required|numeric|min:1',
             [
-                'min'   => 'levels can not be 0',
+                'min' => 'levels can not be 0',
             ]
         );
         $form->text('key', trans('key'));
         $form->image('show_img', trans('img'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         })->default('1.png');
         $form->switch('half_image_profile', trans('half image'))->states(Common::getSwitchStates());
-        //        $form->image('img1', trans('img'));
         $form->file('img2', trans('svg'))->name(function ($file) {
+            $wareId = request()->route('wares-vips');
+            $wareId = $wareId ?? Ware::max('id') + 1;
 
-            $wareId = request()->route('wares-vips'); // Retrieve the current Ware ID (if editing)
-            $wareId = $wareId ?? Ware::max('id') + 1; // Predict next ID if creating
-
-            // Determine the file prefix based on type and environment
-            $type = request()->input('type'); // Get the selected type
+            $type = request()->input('type');
             $prefix = '';
 
             if (app()->environment('local')) {
                 $prefix = 't-';
             }
 
-            if ($type == 4) { // For "Avatar Frame"
-                return $prefix . 'w-f' . $wareId . '.' . $file->guessExtension();
-            } elseif ($type == 5) { // For "Bubble Frame"
-                return $prefix . 'w-b' . $wareId . '.' . $file->guessExtension();
-            } elseif ($type == 10) { // For "Bubble Frame"
-                return $prefix . 'w-vb' . $wareId . '.' . $file->guessExtension();
-            } else {
-                // Default fallback naming (optional)
-                return $prefix . 'w-default' . $wareId . '.' . $file->guessExtension();
+            if ($type === 4) {
+                return $prefix.'w-f'.$wareId.'.'.$file->guessExtension();
             }
+            if ($type === 5) {
+                return $prefix.'w-b'.$wareId.'.'.$file->guessExtension();
+            }
+            if ($type === 10) {
+                return $prefix.'w-vb'.$wareId.'.'.$file->guessExtension();
+            }
+
+            return $prefix.'w-default'.$wareId.'.'.$file->guessExtension();
+
         });
         $form->select('image_type', __('image_type'))->options(
             [
@@ -281,18 +227,16 @@ class WareVipController extends MainController
                 'image' => __('image'),
             ]
         )->rules(function ($form) {
-            // Add a conditional validation rule for 'image_type'
-            if ($form->model()->img2) {  // Check if img2 is uploaded
+            if ($form->model()->img2) {
                 return 'required';
             }
-            return 'nullable';  // If no image uploaded, 'image_type' is not required
+
+            return 'nullable';
         });
-        //        $form->file('img3', trans('video'));
         $form->color('color', trans('color'));
         $form->number('expire', trans('expire(in days)'))->placeholder(trans('0 if permanent'));
 
         $form->switch('is_active_for_vip', __('active_for_vip'))->states(Common::getSwitchStates());
-        //        $form->number('sort', 'sort');
         $form->number('num', __('num'));
 
         return $form;

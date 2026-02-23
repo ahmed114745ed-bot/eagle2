@@ -2,9 +2,9 @@
 
 namespace Utd\Vip\Selectables;
 
-use Utd\Vip\Entities\OVip;
 use Encore\Admin\Grid\Filter;
 use Encore\Admin\Grid\Selectable;
+use Utd\Vip\Entities\OVip;
 
 class OVips extends Selectable
 {
@@ -18,6 +18,7 @@ class OVips extends Selectable
         $this->column('img', __('img'))->display(function ($path) {
             /** @var OVip $this */
             $url = getImagePath($path);
+
             return handleShowImageWithTypes($this->id, $url, 50, 50);
         });
 

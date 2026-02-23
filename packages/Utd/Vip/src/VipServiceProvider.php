@@ -2,8 +2,15 @@
 
 namespace Utd\Vip;
 
+use App\Contracts\OvipRepositoryContract;
+use App\Contracts\UserVipRepositoryContract;
+use App\Contracts\VipCommonContract;
+use Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Utd\Vip\Helpers\VipCommon;
+use Utd\Vip\Repositories\OvipRepository;
+use Utd\Vip\Repositories\UserVipRepository;
 
 class VipServiceProvider extends ServiceProvider
 {
@@ -15,12 +22,12 @@ class VipServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->registerTranslations();
-        $this->loadMigrationsFrom(__DIR__ . '/../Database/Migrations');
-        $this->loadRoutesFrom(__DIR__ . '/../Routes/utd.php');
+        $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+        $this->loadRoutesFrom(__DIR__.'/../Routes/utd.php');
 
         Route::prefix('api/dashboard')
             ->middleware(['api'])
-            ->group(__DIR__ . '/../Routes/dashboard.php');
+            ->group(__DIR__.'/../Routes/dashboard.php');
     }
 
     /**
@@ -29,6 +36,18 @@ class VipServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->register(RouteServiceProvider::class);
+
+        $this->app->singleton(VipCommonContract::class, VipCommon::class);
+        $this->app->singleton(OvipRepositoryContract::class, OvipRepository::class);
+        $this->app->singleton(UserVipRepositoryContract::class, UserVipRepository::class);
+    }
+
+    /**
+     * Get the services provided by the provider.
+     */
+    public function provides(): array
+    {
+        return [];
     }
 
     /**
@@ -37,10 +56,10 @@ class VipServiceProvider extends ServiceProvider
     protected function registerConfig(): void
     {
         $this->publishes([
-            __DIR__ . '/../Config/config.php' => config_path('vip.php'),
+            __DIR__.'/../Config/config.php' => config_path('vip.php'),
         ], 'config');
 
-        $this->mergeConfigFrom(__DIR__ . '/../Config/config.php', 'vip');
+        $this->mergeConfigFrom(__DIR__.'/../Config/config.php', 'vip');
     }
 
     /**
@@ -49,7 +68,7 @@ class VipServiceProvider extends ServiceProvider
     protected function registerViews(): void
     {
         $viewPath = resource_path('views/modules/vip');
-        $sourcePath = __DIR__ . '/../Resources/views';
+        $sourcePath = __DIR__.'/../Resources/views';
 
         $this->publishes([
             $sourcePath => $viewPath,
@@ -68,24 +87,16 @@ class VipServiceProvider extends ServiceProvider
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, 'vip');
         } else {
-            $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'vip');
+            $this->loadTranslationsFrom(__DIR__.'/../Resources/lang', 'vip');
         }
-    }
-
-    /**
-     * Get the services provided by the provider.
-     */
-    public function provides(): array
-    {
-        return [];
     }
 
     private function getPublishableViewPaths(): array
     {
         $paths = [];
-        foreach (\Config::get('view.paths') as $path) {
-            if (is_dir($path . '/modules/vip')) {
-                $paths[] = $path . '/modules/vip';
+        foreach (Config::get('view.paths') as $path) {
+            if (is_dir($path.'/modules/vip')) {
+                $paths[] = $path.'/modules/vip';
             }
         }
 

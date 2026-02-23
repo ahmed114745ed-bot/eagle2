@@ -48,7 +48,6 @@ use App\Admin\Controllers\TestPusherController;
 use App\Admin\Controllers\TrashedUserAccountController;
 use App\Admin\Controllers\UserLevelController;
 use App\Admin\Controllers\UserOnlineHistoryController;
-use App\Admin\Controllers\WareVipController;
 use App\Admin\Controllers\WithdrawController;
 use Utd\Room\Entities\Background;
 use Utd\Room\Entities\Room;
@@ -208,7 +207,7 @@ Route::group([
     Route::get('/agency-export-report', [ExportController::class, 'usersAgencyTargets'])->name('agency-export-report');
     Route::get('/dev', 'HomeController@devindex')->name('dev-home');
     Route::get('/agency_home', 'HomeController@agencyInfoBox')->name('agency2.home');
-    Route::resource('wares-vips', WareVipController::class);
+    // wares-vips moved to packages/Utd/Vip/Routes/web.php
     // servers
     Route::resource('server-country', ServerCountryController::class);
     Route::resource('room-gift-targets', RoomGiftTargetController::class);

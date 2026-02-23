@@ -96,6 +96,13 @@ class OVip extends Model
         }
     }
 
+    public function wareIcon10()
+    {
+        return $this->hasOne(Ware::class, 'level', 'level')
+            ->where('type', 10)
+            ->where('get_type', 1);
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -104,12 +111,5 @@ class OVip extends Model
             $oVip->privilegs()->detach();
             $oVip->wares()->forceDelete();
         });
-    }
-
-    public function wareIcon10()
-    {
-        return $this->hasOne(Ware::class, 'level', 'level')
-            ->where('type', 10)
-            ->where('get_type', 1);
     }
 }

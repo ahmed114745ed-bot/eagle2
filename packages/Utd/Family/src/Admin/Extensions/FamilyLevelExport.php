@@ -2,27 +2,24 @@
 
 namespace Utd\Family\Admin\Extensions;
 
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Utd\Family\Entities\FamilyLevel;
 
-use Maatwebsite\Excel\Concerns\WithHeadings;
-
-use Maatwebsite\Excel\Concerns\FromCollection;
-
-
-class FamilyLevelExport  implements FromCollection, WithHeadings
+class FamilyLevelExport implements FromCollection, WithHeadings
 {
-
     protected $fileName = 'family_levels_list.csv';
+
     protected $headings = [
-        "id",
-        "name",
+        'id',
+        'name',
         'members',
-        "admins",
+        'admins',
         'exp',
     ];
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function collection()
     {
@@ -30,7 +27,6 @@ class FamilyLevelExport  implements FromCollection, WithHeadings
         $arr = [];
 
         foreach ($familyLevels as $familyLevel) {
-
 
             $arr[] = [
                 'id' => $familyLevel->id,
@@ -44,11 +40,10 @@ class FamilyLevelExport  implements FromCollection, WithHeadings
         return collect($arr);
     }
 
-
     public function headings(): array
     {
         return [
-            __("id", [], 'ar'),
+            __('id', [], 'ar'),
             __('name', [], 'ar'),
             __('exp', [], 'ar'),
             __('members', [], 'ar'),

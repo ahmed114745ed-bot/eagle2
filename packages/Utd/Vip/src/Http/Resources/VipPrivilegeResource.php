@@ -1,8 +1,10 @@
 <?php
 
 namespace Utd\Vip\Http\Resources;
+
 use App\Http\Resources\WareResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use stdClass;
 
 class VipPrivilegeResource extends JsonResource
 {
@@ -10,15 +12,16 @@ class VipPrivilegeResource extends JsonResource
     {
 
         $ware = $this->item;
+
         return [
             'id' => $this->id,
-            'name' => app()->getLocale() == 'en' ? $this->en_name  : $this->name,
+            'name' => app()->getLocale() === 'en' ? $this->en_name : $this->name,
             'active' => $this->active,
             'type' => $this->type,
-            "title"=> $this->title,
-            "img1"=> $this->img1,
-            "img2"=> $this->img2,
-            'item' => $ware ? new WareResource($ware) : new \stdClass(),
+            'title' => $this->title,
+            'img1' => $this->img1,
+            'img2' => $this->img2,
+            'item' => $ware ? new WareResource($ware) : new stdClass(),
         ];
     }
 }

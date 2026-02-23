@@ -17,9 +17,9 @@ use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
 use Modules\Badge\Entities\Badge;
-use Utd\Vip\Entities\OVip;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkReward;
+use Utd\Vip\Entities\OVip;
 
 class PkEventController extends MainController
 {

@@ -3,25 +3,25 @@
 namespace Utd\Vip\Http\Controllers\Web;
 
 use App\Admin\Controllers\MainController;
+use App\Services\AppFeatureService;
+use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Utd\Vip\Entities\VipPrivilege;
-use Encore\Admin\Layout\Content;
-use App\Services\AppFeatureService;
-use App\Http\Controllers\Controller;
-use Encore\Admin\Controllers\HasResourceActions;
 
 class VipPrivilegeController extends MainController
 {
     use HasResourceActions;
 
     public $permission_name = 'vip-privilege';
+
     public $hiddenColumns = [];
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("vips");
+        (new AppFeatureService)->validateStatusEnable('vips');
     }
 
     public function index(Content $content)
@@ -76,6 +76,7 @@ class VipPrivilegeController extends MainController
         });
 
         $this->extendGrid($grid);
+
         return $grid;
     }
 
@@ -83,6 +84,7 @@ class VipPrivilegeController extends MainController
     {
         $show = new Show(VipPrivilege::findOrFail($id));
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -121,5 +123,4 @@ class VipPrivilegeController extends MainController
 
         return $form;
     }
-
 }
