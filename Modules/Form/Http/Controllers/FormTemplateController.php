@@ -352,6 +352,7 @@ class FormTemplateController extends Controller
             'form_type' => $request->form_type,
             'description' => $request->description,
         ]);
+         $formTemplate->sections()->delete();
 
         // Process sections
         foreach ($request->sections as $sectionData) {
