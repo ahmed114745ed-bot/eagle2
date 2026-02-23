@@ -41,11 +41,15 @@ use App\Contracts\TaskStreamServiceContract;
 use App\Contracts\VipCommonContract;
 use App\Contracts\OvipRepositoryContract;
 use App\Contracts\UserVipRepositoryContract;
+use App\Contracts\VipRepositoryContract;
+use App\Contracts\VipPrivilegeRepositoryContract;
 use App\Services\Null\NullUserCharismaService;
 use App\Services\Null\NullTaskStreamService;
 use App\Services\Null\NullVipCommonService;
 use App\Services\Null\NullOvipRepository;
 use App\Services\Null\NullUserVipRepository;
+use App\Services\Null\NullVipRepository;
+use App\Services\Null\NullVipPrivilegeRepository;
 use App\Support\PackageHelper;
 use Carbon\Carbon;
 use Encore\Admin\Facades\Admin;
@@ -118,6 +122,16 @@ class AppServiceProvider extends ServiceProvider
         // UserVipRepository fallback
         if (!$this->app->bound(UserVipRepositoryContract::class)) {
             $this->app->bind(UserVipRepositoryContract::class, NullUserVipRepository::class);
+        }
+
+        // VipRepository fallback
+        if (!$this->app->bound(VipRepositoryContract::class)) {
+            $this->app->bind(VipRepositoryContract::class, NullVipRepository::class);
+        }
+
+        // VipPrivilegeRepository fallback
+        if (!$this->app->bound(VipPrivilegeRepositoryContract::class)) {
+            $this->app->bind(VipPrivilegeRepositoryContract::class, NullVipPrivilegeRepository::class);
         }
 
         // Register custom event dispatcher for Octane broadcaster refresh

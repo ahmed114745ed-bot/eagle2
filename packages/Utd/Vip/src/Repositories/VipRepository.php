@@ -2,11 +2,12 @@
 
 namespace Utd\Vip\Repositories;
 
+use App\Contracts\VipRepositoryContract;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Support\Facades\Cache;
 use Utd\Vip\Entities\Vip;
 
-class VipRepository extends AbstractRepository
+class VipRepository extends AbstractRepository implements VipRepositoryContract
 {
     public function __construct()
     {

@@ -38,7 +38,7 @@ use Utd\Agency\Repositories\AgencyRepository;
 use App\Tik\Repositories\TargetRepository;
 use App\Http\Resources\Api\V1\RoomResource;
 use App\Contracts\FamilyContract;
-use Utd\Vip\Repositories\VipRepository;
+use App\Contracts\VipRepositoryContract;
 use App\Tik\Repositories\UserSalaryRepository;
 use App\Tik\Repositories\UserTargetRepository;
 use App\Contracts\RoomVisitorRepositoryContract;
@@ -61,7 +61,7 @@ use App\Contracts\GiftLogRepositoryContract;
 class UserService
 {
     public function __construct(
-        private readonly VipRepository $vipRepository,
+        private readonly VipRepositoryContract $vipRepository,
         private readonly ProfileVisitorRepository $ProfileVisitorRepository,
         private readonly UserSettingRepository $userSettingRepository,
         private readonly ?GiftLogRepositoryContract $giftLogRepository,

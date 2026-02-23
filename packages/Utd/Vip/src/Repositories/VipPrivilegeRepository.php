@@ -2,11 +2,12 @@
 
 namespace Utd\Vip\Repositories;
 
+use App\Contracts\VipPrivilegeRepositoryContract;
 use App\Tik\Repositories\AbstractRepository;
 use Illuminate\Support\Collection;
 use Utd\Vip\Entities\VipPrivilege;
 
-class VipPrivilegeRepository extends AbstractRepository
+class VipPrivilegeRepository extends AbstractRepository implements VipPrivilegeRepositoryContract
 {
     public function __construct()
     {

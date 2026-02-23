@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Tik\Services;
+namespace Utd\Vip\Services;
 
 use App\Helpers\Common;
-use  Utd\Vip\Repositories\OvipRepository;
-use  Utd\Vip\Repositories\VipPrivilegeRepository;
 use App\Tik\Repositories\WareRepository;
-
+use Utd\Vip\Repositories\OvipRepository;
+use Utd\Vip\Repositories\VipPrivilegeRepository;
 
 class OvipService
 {
@@ -36,7 +35,7 @@ class OvipService
             'expire' => $request->expire,
             'exp' => $request->exp
         ];
-        $ovip =  $this->ovipRepository->create($dataOvip);
+        $ovip = $this->ovipRepository->create($dataOvip);
 
         $ovip->privilegs()->sync($privileges);
 
@@ -56,6 +55,7 @@ class OvipService
     {
         return $this->ovipRepository->findById($id);
     }
+
     public function showWithAllPrivileges($id)
     {
         $vipPrivileges = $this->vipPrivilegeRepository->all();
@@ -77,7 +77,7 @@ class OvipService
             'exp' => $request->exp
         ];
         if ($request->hasFile('image')) {
-            $dataOvip['img']= Common::upload('images', $request->file('image'));
+            $dataOvip['img'] = Common::upload('images', $request->file('image'));
         }
         $privileges = json_decode($request->privileges);
         $this->ovipRepository->update($dataOvip, $request->o_vip_id);

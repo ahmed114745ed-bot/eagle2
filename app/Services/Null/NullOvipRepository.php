@@ -36,4 +36,14 @@ class NullOvipRepository implements OvipRepositoryContract
     {
         return null;
     }
+
+    public function create(array $data): mixed
+    {
+        return null;
+    }
+
+    public function update(array $data, $id): mixed
+    {
+        return false;
+    }
 }

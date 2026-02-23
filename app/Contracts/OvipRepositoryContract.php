@@ -35,4 +35,14 @@ interface OvipRepositoryContract
      * Find VIP by ID
      */
     public function findVipById($vipId);
+
+    /**
+     * Create a new Ovip
+     */
+    public function create(array $data): mixed;
+
+    /**
+     * Update an Ovip
+     */
+    public function update(array $data, $id): mixed;
 }

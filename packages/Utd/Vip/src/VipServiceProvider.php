@@ -5,7 +5,9 @@ namespace Utd\Vip;
 use App\Contracts\OvipRepositoryContract;
 use App\Contracts\UserVipRepositoryContract;
 use App\Contracts\VipCommonContract;
-use Config;
+use App\Contracts\VipPrivilegeRepositoryContract;
+use App\Contracts\VipRepositoryContract;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Utd\Vip\Entities\Vip;
@@ -13,6 +15,8 @@ use Utd\Vip\Helpers\VipCommon;
 use Utd\Vip\Observers\VipObserver;
 use Utd\Vip\Repositories\OvipRepository;
 use Utd\Vip\Repositories\UserVipRepository;
+use Utd\Vip\Repositories\VipPrivilegeRepository;
+use Utd\Vip\Repositories\VipRepository;
 
 class VipServiceProvider extends ServiceProvider
 {
@@ -45,6 +49,8 @@ class VipServiceProvider extends ServiceProvider
         $this->app->singleton(VipCommonContract::class, VipCommon::class);
         $this->app->singleton(OvipRepositoryContract::class, OvipRepository::class);
         $this->app->singleton(UserVipRepositoryContract::class, UserVipRepository::class);
+        $this->app->singleton(VipRepositoryContract::class, VipRepository::class);
+        $this->app->singleton(VipPrivilegeRepositoryContract::class, VipPrivilegeRepository::class);
     }
 
     /**

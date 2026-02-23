@@ -18,7 +18,6 @@ use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\GiftLogController;
 use App\Http\Controllers\Api\V1\MangerTypeController;
 use App\Http\Controllers\Api\V1\OfferController;
-use App\Http\Controllers\Api\V1\OvipController;
 use App\Http\Controllers\Api\V1\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionController;
 use Utd\Pk\Http\Controllers\Api\PkController;
@@ -466,23 +465,11 @@ Route::middleware([])->group(function () {
         Route::post('/update', [TargetController::class, 'update']);
         Route::post('/show', [TargetController::class, 'show']);
     });
-    //ovip
-    Route::prefix('ovips')->group(function () {
-        Route::get('/all', [OvipController::class, 'index']);
-        Route::post('/create', [OvipController::class, 'store']);
-        Route::post('/update', [OvipController::class, 'update']);
-        Route::post('/show', [OvipController::class, 'show']);
-        Route::post('/ware-vip', [VipController::class, 'createWareVip']);
-        Route::post('/show-privilege', [OvipController::class, 'showWithAllPrivileges']);
-        Route::get('/ware-vips', [VipController::class, 'getWareVip']);
-        Route::post('/delete-ware', [VipController::class, 'deleteWare']);
-    });
     Route::post('/update-room-cup', [SettingController::class, 'updateRoomCup']);
     Route::post('/update-room-boom', [SettingController::class, 'updateRoomBoom']);
     Route::post('/update-remaining-diamonds', [SettingController::class, 'updateRemainingDiamonds']);
     Route::post('/update-host-level', [SettingController::class, 'updateHostLevel']);
     Route::post('/update-pk-live', [SettingController::class, 'updatePkLive']);
-    Route::get('all-vip-privileges', [OvipController::class, 'allVIP']);
 
     // agency statistic
     Route::get('agency-statistic', [AgencyStatisticController::class, 'statistic']);
