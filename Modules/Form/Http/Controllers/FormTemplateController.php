@@ -189,7 +189,7 @@ class FormTemplateController extends Controller
         $duplicatesInDb = array_intersect($allFieldNames, $existingNames);
 
         if (!empty($duplicatesInDb)) {
-            dd(1222333, $duplicatesInDb);
+
             $duplicateList = implode(', ', $duplicatesInDb);
             return back()->withErrors(['duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"])->withInput();
         }
