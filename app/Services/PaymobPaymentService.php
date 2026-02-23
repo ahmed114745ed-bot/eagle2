@@ -193,6 +193,7 @@ class PaymobPaymentService
     {
         PaymentMethodHistory::create([
             "amount" => $amount,
+            "payment_method" => 'paymob',
             "type" => 'game_type',
             "utd_code" => $trx
         ]);
