@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vip_privileges', function (Blueprint $table) {
-            $table->string('en_title')->nullable();
+            if (! Schema::hasColumn('vip_privileges', 'en_title')) {
+                $table->string('en_title')->nullable();
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vip_privileges', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('vip_privileges', 'en_title')) {
+                $table->dropColumn('en_title');
+            }
         });
     }
 };

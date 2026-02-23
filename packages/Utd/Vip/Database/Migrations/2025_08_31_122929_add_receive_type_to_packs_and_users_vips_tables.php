@@ -12,22 +12,30 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('packs', function (Blueprint $table) {
-            $table->string('receive_type')->nullable();
+            if (! Schema::hasColumn('packs', 'receive_type')) {
+                $table->string('receive_type')->nullable();
+            }
         });
 
         Schema::table('users_vips', function (Blueprint $table) {
-            $table->string('receive_type')->nullable();
+            if (! Schema::hasColumn('users_vips', 'receive_type')) {
+                $table->string('receive_type')->nullable();
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('packs', function (Blueprint $table) {
-            $table->dropColumn('receive_type');
+            if (Schema::hasColumn('packs', 'receive_type')) {
+                $table->dropColumn('receive_type');
+            }
         });
 
         Schema::table('users_vips', function (Blueprint $table) {
-            $table->dropColumn('receive_type');
+            if (Schema::hasColumn('users_vips', 'receive_type')) {
+                $table->dropColumn('receive_type');
+            }
         });
     }
 };

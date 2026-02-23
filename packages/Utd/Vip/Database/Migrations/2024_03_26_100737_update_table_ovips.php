@@ -12,17 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('o_vips', function (Blueprint $table) {
-            $table->string('image2')->nullable();
+            if (! Schema::hasColumn('o_vips', 'sort')) {
+                $table->integer('sort')->after('id')->default(0);
+            }
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('o_vips', function (Blueprint $table) {
-           $table->dropColumn('image2');
+            if (Schema::hasColumn('o_vips', 'sort')) {
+                $table->dropColumn('sort');
+            }
         });
     }
 };
