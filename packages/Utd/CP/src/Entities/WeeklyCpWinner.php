@@ -3,6 +3,7 @@
 namespace Utd\CP\Entities;
 
 use App\Models\User;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Events\Entities\WeeklyStar;
@@ -25,6 +26,7 @@ class WeeklyCpWinner extends Model
 
     public function weeklyCp()
     {
-        return $this->belongsTo(WeeklyStar::class, 'weekly_cp_id');
+        return PackageHelper::checkRelation($this, 'event', 'belongsTo') ??
+            $this->belongsTo(WeeklyStar::class, 'weekly_cp_id');
     }
 }

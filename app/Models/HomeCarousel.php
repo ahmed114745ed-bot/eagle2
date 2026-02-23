@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use App\Support\PackageHelper;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Events\Entities\GeneralRole;
@@ -39,7 +40,8 @@ class HomeCarousel extends Model
 
     public function generalRole()
     {
-        return $this->hasOne(GeneralRole::class, 'type', 'event_type');
+        return PackageHelper::checkRelation($this, 'event', 'hasOne') ??
+            $this->hasOne(GeneralRole::class, 'type', 'event_type');
     }
 
     public function countries()

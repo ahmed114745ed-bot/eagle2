@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Chat\Entities\ChatMessage;
+use Utd\Events\Entities\WeeklyStar;
 use Utd\Family\Entities\Family;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
@@ -35,6 +36,7 @@ class PackageHelper
         'chat' => ChatMessage::class,
         'vip' => OVip::class,
         'family' => Family::class,
+        'event' => WeeklyStar::class,
     ];
 
     /**
