@@ -52,7 +52,9 @@
         "utd/achievements": "dev-achievmentPackage",
         "utd/agency": "*",
         "utd/charizma": "*",
+        "utd/chat": "*",
         "utd/cp": "*",
+        "utd/family": "*",
         "utd/gifts": "*",
         "utd/lucky-box": "*",
         "utd/moments": "*",
@@ -61,9 +63,7 @@
         "utd/room": "*",
         "utd/room-boom": "*",
         "utd/room-cup": "*",
-        "utd/task-stream": "*",
-        "utd/chat": "*",
-        "utd/family": "*"
+        "utd/task-stream": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",
@@ -80,7 +80,6 @@
             "Utd\\CP\\Database\\Seeders\\": "vendor/utd/cp/Database/Seeders/",
             "Utd\\LuckyBox\\Database\\Seeders\\": "vendor/utd/lucky-box/Database/Seeders/",
             "Utd\\Family\\": "packages/Utd/Family/src/"
-
         },
         "files": [
             "app/helpers.php",
@@ -174,7 +173,8 @@
             "url": "packages/Utd/RoomCup"
         },
         {
-            "type": "path", "url": "./packages/Utd/Gifts"
+            "type": "path",
+            "url": "./packages/Utd/Gifts"
         },
         {
             "type": "path",
@@ -214,12 +214,14 @@
         },
         {
             "type": "path",
-            "url": "packages/Utd/Vip"
-        }
-        ,   {
-            "type": "path",
             "url": "packages/Utd/Family",
-            "options": {"symlink": true}
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "packages/Utd/Vip"
         }
     ]
 }
