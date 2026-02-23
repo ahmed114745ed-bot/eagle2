@@ -45,23 +45,13 @@
                         <i class="bi bi-eye me-1"></i>
                         {{ __('Preview') }}
                     </label>
-                    {{-- <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient"
-                         style="height:150px; background: linear-gradient(45deg, #f8f9fa 25%, #ffffff 25%, #ffffff 50%, #f8f9fa 50%, #f8f9fa 75%, #ffffff 75%, #ffffff 100%); background-size: 20px 20px;">
-                        <img id="preview_{{ $percentage->id }}"
-                             src="{{ $percentage->image ? getImagePath($percentage->image) : 'https://via.placeholder.com/150x150?text=No+Image' }}"
-                             class="rounded-3 shadow-sm"
-                             style="max-height: 140px; max-width: 100%; object-fit: contain;"
-                             onerror="this.src='https://via.placeholder.com/150x150?text=Error'">
-                    </div> --}}
 
-                        <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient">
-                            
+                        <div class="border rounded-4 d-flex align-items-center justify-content-center bg-light bg-gradient preview-wrapper" style="height:150px;">
                             {!! handleShowImageWithTypes(
-                                    $percentage->id, 
-                                    $percentage->image ? getImagePath($percentage->image) : null, 
+                                    $percentage->id,
+                                    $percentage->image ? getImagePath($percentage->image) : null,
                                     140, 140
                             ) !!}
-                            
                         </div>
                 </div>
 
@@ -100,13 +90,6 @@
     </div>
     @endforeach
 
-    {{-- <div class="d-flex justify-content-end mt-4">
-        <button type="submit" class="btn btn-primary btn-lg rounded-5 px-5 py-3 shadow-lg hover-scale transition-all">
-            <i class="bi bi-check-circle me-2"></i>
-            {{ __('Save') }}
-            <i class="bi bi-arrow-right ms-2"></i>
-        </button>
-    </div> --}}
 
         <div class="box-footer">
 
@@ -116,16 +99,15 @@
             </div>
             <div class="col-md-2">
             </div>
+                <div class="col-md-8">
 
-            <div class="col-md-8">
-
-                <div class="btn-group pull-right">
-                    <button type="submit" class="btn btn-primary"> <i class="bi bi-check-circle me-2"></i>
-                    {{ __('Save') }}
-                    <i class="bi bi-arrow-right ms-2"></i></button>
-                  </div>
-             </div>
-        </div>
+                    <div class="btn-group pull-right">
+                        <button type="submit" class="btn btn-primary"> <i class="bi bi-check-circle me-2"></i>
+                        {{ __('Save') }}
+                        <i class="bi bi-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+            </div>
 
    
 </form>
@@ -237,6 +219,18 @@ select.form-select option:focus {
     .type-select {
         font-size: 16px;
     }
+}
+
+/* Preview wrapper centering and size constraints */
+.preview-wrapper img,
+.preview-wrapper video,
+.preview-wrapper svg,
+.preview-wrapper svga {
+    max-height: 140px;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 </style>
 
