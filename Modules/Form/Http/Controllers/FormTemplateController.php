@@ -340,6 +340,7 @@ class FormTemplateController extends Controller
 
         if (!empty($duplicatesInDb)) {
             $duplicateList = implode(', ', $duplicatesInDb);
+            dd($duplicatesInDb, $existingNames);
             return back()->withErrors([
                 'duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"
             ])->withInput();
