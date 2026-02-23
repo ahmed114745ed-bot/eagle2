@@ -335,11 +335,11 @@ class FormTemplateController extends Controller
             ->pluck('field_name')
             ->toArray();
 
-        $duplicatesInDb = array_intersect($allFieldNames, $existingNames);
+        // Remove names that are already part of this template
+        $duplicatesInDb = array_diff($allFieldNames, $existingNames);
 
         if (!empty($duplicatesInDb)) {
             $duplicateList = implode(', ', $duplicatesInDb);
-            dd($duplicatesInDb, $existingNames, $allFieldNames);
             return back()->withErrors([
                 'duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"
             ])->withInput();
