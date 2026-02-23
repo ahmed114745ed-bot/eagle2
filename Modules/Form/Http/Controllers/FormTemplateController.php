@@ -193,13 +193,14 @@ class FormTemplateController extends Controller
             $duplicateList = implode(', ', $duplicatesInDb);
             return back()->withErrors(['duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"])->withInput();
         }
+        dd($request->sections, $formTemplate->sections()->with('fields')->get());
         // Update form template basic info
         $formTemplate->update([
             'title' => $request->title,
             'form_type' => $request->form_type,
             'description' => $request->description,
         ]);
-dd($request->sections, $formTemplate->sections()->with('fields')->get());
+
         // Delete old sections and fields (cascade will handle fields)
         $formTemplate->sections()->delete();
 
