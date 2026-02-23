@@ -179,18 +179,7 @@ class FormTemplateController extends Controller
             }
         }
 
-        $existingNames = FormField::whereHas('section', function ($q) use ($formTemplate) {
-            $q->where('form_template_id', $formTemplate->id);
-        })
-            ->pluck('field_name')
-            ->toArray();
-
-        $duplicatesInDb = array_intersect($allFieldNames, $existingNames);
-
-        if (!empty($duplicatesInDb)) {
-            $duplicateList = implode(', ', $duplicatesInDb);
-            return back()->withErrors(['duplicate_field' => "الأسماء التالية موجودة مسبقاً في هذا النموذج: $duplicateList"])->withInput();
-        }
+       // dd($request->sections, $formTemplate->sections()->with('fields')->get());
         // Update form template basic info
         $formTemplate->update([
             'title' => $request->title,
