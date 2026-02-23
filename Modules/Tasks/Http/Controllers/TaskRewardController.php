@@ -9,7 +9,7 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
-use Modules\Events\Entities\Reward;
+use Utd\Events\Entities\Reward;
 use Modules\Tasks\Entities\Day;
 use Encore\Admin\Form\Request;
 use Utd\CP\Entities\CpLevelGift;

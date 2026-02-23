@@ -8,12 +8,12 @@ use App\Models\Pack;
 use Utd\Vip\Entities\UserVip;
 use Illuminate\Http\Request;
 use Utd\Achievements\Entities\UserAchievementLevel;
-use Modules\Events\Entities\GeneralRole;
-use Modules\Events\Entities\RewardWinnerPk;
-use Modules\Events\Entities\UserChargeEvent;
-use Modules\Events\Entities\WinnerReward;
-use Modules\Events\Http\Actions\EventReportAction;
-use Modules\Events\Services\LoseWinnerRewards;
+use Utd\Events\Entities\GeneralRole;
+use Utd\Events\Entities\RewardWinnerPk;
+use Utd\Events\Entities\UserChargeEvent;
+use Utd\Events\Entities\WinnerReward;
+use Utd\Events\Http\Actions\EventReportAction;
+use Utd\Events\Services\LoseWinnerRewards;
 use App\Support\PackageHelper;
 
 class AdminGeneralRolesController extends Controller

@@ -7,7 +7,7 @@ use App\Models\GiftLog;
 use App\Models\Ware;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\CpWinnerReward;
 use Utd\CP\Entities\WeeklyCpWinner;
 use Utd\CP\Services\CpService;

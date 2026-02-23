@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Dashboard\Events\Chargebenefit;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\ChargeTargetEvent;
+use Utd\Events\Entities\ChargeTargetEvent;
 
 class AdminChargebenefitController extends Controller
 {

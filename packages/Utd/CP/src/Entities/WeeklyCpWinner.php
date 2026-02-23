@@ -5,7 +5,7 @@ namespace Utd\CP\Entities;
 use App\Models\User;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStar;
 
 class WeeklyCpWinner extends Model
 {

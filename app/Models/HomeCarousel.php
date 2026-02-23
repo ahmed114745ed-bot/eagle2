@@ -5,7 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Events\Entities\GeneralRole;
+use Utd\Events\Entities\GeneralRole;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Utd\Room\Entities\Room;
 

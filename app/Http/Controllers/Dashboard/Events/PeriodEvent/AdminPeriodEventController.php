@@ -7,8 +7,8 @@ use App\Http\Resources\Dashboard\Room\AdminGiftsResource;
 use App\Models\Gift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\Events\Entities\WeeklyStarGift;
+use Utd\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStarGift;
 
 class AdminPeriodEventController extends Controller
 {

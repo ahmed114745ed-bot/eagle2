@@ -13,7 +13,7 @@ use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
 use Encore\Admin\Show;
 use Encore\Admin\Widgets\Box;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStar;
 
 class WeeklyCpController extends MainController
 {

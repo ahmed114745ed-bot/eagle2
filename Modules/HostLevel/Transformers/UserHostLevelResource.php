@@ -3,7 +3,7 @@
 namespace Modules\HostLevel\Transformers;
 
 
-use Modules\Events\Transformers\WeeklyStarGift;
+use Utd\Events\Transformers\WeeklyStarGift;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserHostLevelResource extends JsonResource

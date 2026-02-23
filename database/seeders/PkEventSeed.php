@@ -6,10 +6,10 @@ use App\Models\User;
 use App\Models\Config;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\Winner;
+use Utd\Events\Entities\Winner;
 use Utd\Pk\Entities\PkEvent;
 use Utd\Pk\Entities\PkWinner;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStar;
 
 class PkEventSeed extends Seeder
 {

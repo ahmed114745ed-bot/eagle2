@@ -8,8 +8,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\Events\Entities\WeeklyStarGift;
+use Utd\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStarGift;
 
 class WeeklyStarSeeder extends Seeder
 {

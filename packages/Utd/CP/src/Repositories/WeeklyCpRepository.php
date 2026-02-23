@@ -4,8 +4,8 @@ namespace Utd\CP\Repositories;
 
 use App\Models\GiftLog;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\GeneralRole;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\GeneralRole;
+use Utd\Events\Entities\WeeklyStar;
 use Utd\CP\Entities\Cp;
 
 class WeeklyCpRepository

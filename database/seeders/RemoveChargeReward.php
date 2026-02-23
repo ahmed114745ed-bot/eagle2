@@ -11,9 +11,9 @@ use Utd\Vip\Entities\UserVip;
 use Utd\Room\Entities\RoomGame;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\RewardTarget;
-use Modules\Events\Entities\UserChargeEvent;
-use Modules\Events\Entities\ChargeTargetEvent;
+use Utd\Events\Entities\RewardTarget;
+use Utd\Events\Entities\UserChargeEvent;
+use Utd\Events\Entities\ChargeTargetEvent;
 use Utd\Achievements\Entities\UserAchievementLevel;
 
 

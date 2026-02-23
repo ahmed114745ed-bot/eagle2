@@ -7,7 +7,7 @@ use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
 use App\Http\Resources\Dashboard\Events\AdminWeeklyStarEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\Reward;
+use Utd\Events\Entities\Reward;
 
 class AdminWeeklyStarEventsRewords extends Controller
 {

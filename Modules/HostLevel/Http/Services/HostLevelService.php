@@ -11,7 +11,7 @@ use App\Enums\UserCoinLogType;
 use Utd\Vip\Entities\OVip;
 use App\Helpers\UserCoinLogHelper;
 use App\Support\PackageHelper;
-use Modules\Events\Entities\GeneralRole;
+use Utd\Events\Entities\GeneralRole;
 use Modules\HostLevel\Entities\HostLevel;
 use Modules\HostLevel\Entities\HostLevelWinner;
 use Utd\Achievements\Entities\UserAchievementLevel;

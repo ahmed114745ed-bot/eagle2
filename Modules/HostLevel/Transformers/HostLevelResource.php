@@ -6,7 +6,7 @@ namespace Modules\HostLevel\Transformers;
 use App\Helpers\Common;
 use App\Models\GiftLog;
 use Modules\HostLevel\Entities\HostLevel;
-use Modules\Events\Transformers\WeeklyStarGift;
+use Utd\Events\Transformers\WeeklyStarGift;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class HostLevelResource extends JsonResource

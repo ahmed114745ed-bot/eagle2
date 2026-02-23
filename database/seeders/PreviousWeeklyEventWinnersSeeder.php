@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Models\Config;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Modules\Events\Entities\WeeklyStar;
-use Modules\Events\Entities\Winner;
+use Utd\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\Winner;
 
 class PreviousWeeklyEventWinnersSeeder extends Seeder
 {
