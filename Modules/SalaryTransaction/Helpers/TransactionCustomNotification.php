@@ -6,8 +6,6 @@ use Utd\Vip\Entities\Vip;
 use App\Models\Gift;
 use App\Models\User;
 use App\Models\Ware;
-use App\Models\Agency;
-use App\Models\Family;
 use App\Helpers\Common;
 use App\Models\Setting;
 use App\Models\OfficialMessage;

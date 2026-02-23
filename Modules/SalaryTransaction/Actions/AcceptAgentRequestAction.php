@@ -5,7 +5,6 @@ namespace Modules\SalaryTransaction\Actions;
 use App\Helpers\Common;
 use App\Models\AgencySallary;
 use App\Models\Charge;
-use App\Models\FamilyUser;
 use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;

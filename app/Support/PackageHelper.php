@@ -5,6 +5,7 @@ namespace App\Support;
 use Illuminate\Database\Eloquent\Model;
 use Utd\Achievements\Entities\Achievement;
 use Utd\Chat\Entities\ChatMessage;
+use Utd\Family\Entities\Family;
 use Utd\TaskStream\Entities\TaskStream;
 use Utd\Charizma\Entities\ExtraDataInRoom;
 use Utd\CP\Entities\Cp;
@@ -33,6 +34,7 @@ class PackageHelper
         'luckyBox' => Box::class,
         'chat' => ChatMessage::class,
         'vip' => OVip::class,
+        'family' => Family::class,
     ];
 
     /**

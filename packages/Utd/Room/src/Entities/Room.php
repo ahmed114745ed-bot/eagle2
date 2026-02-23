@@ -3,7 +3,6 @@
 namespace Utd\Room\Entities;
 
 use App\Models\AllGame;
-use App\Models\Family;
 use App\Models\GiftLog;
 use App\Models\User;
 use App\Support\PackageHelper;
@@ -14,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\DB;
 use Utd\Chat\Entities\ChatMessage;
+use Utd\Family\Entities\Family;
 use Utd\LuckyBox\Entities\BoxUse;
 use Utd\Pk\Entities\Pk;
 use Utd\Room\Traits\RoomBoxes;
@@ -233,7 +233,8 @@ class Room extends Model
 
     public function family()
     {
-        return $this->belongsTo(Family::class, 'uid', 'user_id');
+        return PackageHelper::checkRelation($this, 'family', 'belongsTo') ??
+            $this->belongsTo(Family::class, 'uid', 'user_id');
     }
 
     public function lastPk()

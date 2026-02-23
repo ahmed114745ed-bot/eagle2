@@ -3,7 +3,6 @@
 namespace Modules\SalaryTransaction\Actions;
 
 use App\Helpers\Common;
-use App\Models\FamilyUser;
 use Utd\Vip\Entities\OVip;
 use App\Models\Pack;
 use App\Models\User;
