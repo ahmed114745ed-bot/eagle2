@@ -63,8 +63,7 @@
         "utd/room-cup": "*",
         "utd/task-stream": "*",
         "utd/chat": "*",
-        "utd/family": "*",
-        "utd/vip": "*"
+        "utd/family": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15.4",

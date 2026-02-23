@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Observers;
+namespace Utd\Vip\Observers;
 
 use Utd\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Cache;

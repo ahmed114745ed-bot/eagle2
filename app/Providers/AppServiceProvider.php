@@ -28,7 +28,6 @@ use App\Observers\GiftObserver;
 use App\Observers\SettingObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserSallaryObserver;
-use App\Observers\VipObserver;
 use App\Observers\WareObserver;
 use App\Repositories\Community\SearchRepository;
 use App\Repositories\Community\SearchRepositoryInterface;
@@ -58,7 +57,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Utd\Vip\Entities\Vip;
 use Utd\Pk\Entities\Pk;
 use Utd\Pk\Observers\PKObserver;
 
@@ -389,7 +387,6 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        Vip::observe(VipObserver::class);
         Setting::observe(SettingObserver::class);
         \App\Models\Config::observe(ConfigObserver::class);
     }

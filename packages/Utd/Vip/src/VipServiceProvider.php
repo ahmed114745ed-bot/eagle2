@@ -8,7 +8,9 @@ use App\Contracts\VipCommonContract;
 use Config;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Utd\Vip\Entities\Vip;
 use Utd\Vip\Helpers\VipCommon;
+use Utd\Vip\Observers\VipObserver;
 use Utd\Vip\Repositories\OvipRepository;
 use Utd\Vip\Repositories\UserVipRepository;
 
@@ -23,6 +25,9 @@ class VipServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->registerTranslations();
         $this->loadMigrationsFrom(__DIR__.'/../Database/Migrations');
+
+        // Register observer
+        Vip::observe(VipObserver::class);
         $this->loadRoutesFrom(__DIR__.'/../Routes/utd.php');
 
         Route::prefix('api/dashboard')
