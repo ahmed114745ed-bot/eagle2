@@ -7,7 +7,7 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Enums\TypeGeneralRole;
 use App\Http\Controllers\Controller;
-use Modules\Events\Entities\GeneralRole;
+use Utd\Events\Entities\GeneralRole;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 

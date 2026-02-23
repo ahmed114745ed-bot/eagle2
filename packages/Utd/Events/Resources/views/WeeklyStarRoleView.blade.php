@@ -79,7 +79,7 @@
 
                     <div class="box-body no-padding" style="margin: 10px">
                         @php
-                            $role = \Modules\Events\Entities\GeneralRole::where("type","weekly_star")->first();
+                            $role = \Utd\Events\Entities\GeneralRole::where("type","weekly_star")->first();
                         @endphp
                         @if($role != null)
                             <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">

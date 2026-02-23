@@ -7,9 +7,9 @@ use App\Helpers\Common;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use Modules\Events\Entities\RewardTarget;
+use Utd\Events\Entities\RewardTarget;
 use App\Http\Resources\TargetEventResource;
-use Modules\Events\Entities\ChargeTargetEvent;
+use Utd\Events\Entities\ChargeTargetEvent;
 
 class TargetEventController extends Controller
 {

@@ -8,7 +8,7 @@ use App\Http\Resources\Dashboard\Events\AdminPKEventRewords;
 use App\Http\Resources\Dashboard\Events\AdminPKEventsResource;
 use App\Traits\Dashboard\DashBoardTrait;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\RewardTarget;
+use Utd\Events\Entities\RewardTarget;
 
 class AdminChargebenefitRewordsController extends Controller
 {

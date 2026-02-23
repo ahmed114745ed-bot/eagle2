@@ -80,7 +80,7 @@
                     <div class="box-body no-padding" style="margin: 10px">
                         @if(\App\Support\PackageHelper::isInstalled('cp'))
                         @php
-                            $role = \Modules\Events\Entities\GeneralRole::where("type","weekly_cp")->first();
+                            $role = \Utd\Events\Entities\GeneralRole::where("type","weekly_cp")->first();
                         @endphp
                         @if($role != null)
                             <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">

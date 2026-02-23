@@ -79,7 +79,7 @@
 
                     <div class="box-body no-padding" style="margin: 10px">
                         @php
-                            $role = \Modules\Events\Entities\GeneralRole::where("type","event_period")->first();
+                            $role = \Utd\Events\Entities\GeneralRole::where("type","event_period")->first();
                         @endphp
                         @if($role != null)
                             <a href="{{url('admin/general-rols/'.@$role->id.'/edit')}}">

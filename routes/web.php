@@ -470,7 +470,7 @@ Route::get('/admin/bd-logout', [AuthController::class, 'customBdLogout'])->name(
 //Route::get('/add-user-coin', [UsersChargeController::class, 'chargeUser']);
 
 Route::get('/delete_reward_target', function () {
-    \Modules\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
+    \Utd\Events\Entities\RewardTarget::query()->where('target', '=', '')->delete();
 });
 
 Route::get('/test-fcm/{userid}', function ($userId) {

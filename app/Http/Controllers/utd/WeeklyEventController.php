@@ -6,9 +6,9 @@ use Exception;
 use App\Models\Gift;
 use App\Helpers\Common;
 use Illuminate\Http\Request;
-use Modules\Events\Entities\Reward;
+use Utd\Events\Entities\Reward;
 use App\Http\Controllers\Controller;
-use Modules\Events\Entities\WeeklyStar;
+use Utd\Events\Entities\WeeklyStar;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\WeeklyEventResource;
 

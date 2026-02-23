@@ -6,7 +6,7 @@
         ['code' => 'hi', 'name' => 'हिन्दी'],
     ];
     $roleType = isset($type) ? $type : 'weekly_star';
-    $role = \Modules\Events\Entities\GeneralRole::where("type", $roleType)->first();
+    $role = \Utd\Events\Entities\GeneralRole::where("type", $roleType)->first();
 @endphp
 
 <div class="box-body no-padding" style="margin: 10px">

@@ -18,7 +18,7 @@ use App\Models\Charge;
 use App\Models\CoinLog;
 use App\Models\ExchangeLog;
 use Modules\DailyPrize\Entities\DailyUserGift;
-use Modules\Events\Entities\WinnerReward;
+use Utd\Events\Entities\WinnerReward;
 
 class CoinReportController extends Controller
 {
