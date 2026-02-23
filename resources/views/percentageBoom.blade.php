@@ -102,7 +102,10 @@
 
 <style>
 
-   
+   element.style {
+    height: 140px !important;
+    text-align: left;
+}
 
 .transition-all {
     transition: all 0.3s ease;
