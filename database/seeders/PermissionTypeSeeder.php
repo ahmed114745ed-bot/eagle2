@@ -160,7 +160,7 @@ class PermissionTypeSeeder extends Seeder
                         'additional' => ['charge-switch'],
                         'types' => [
                             PermissionType::ADMIN->value => ['browse', 'create', 'edit', 'delete', 'charge-switch', 'show'],
-                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show'],
+                            PermissionType::AREA_MANAGER->value => ['browse', 'create', 'show', 'delete'],
 
                         ],
                     ],
@@ -621,7 +621,7 @@ class PermissionTypeSeeder extends Seeder
                     ['key' => 'agencies-join-requests', 'except' => ['create'], 'additional' => [], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'edit', 'delete', 'show'],
                     ],],
-                    
+
                     ['key' => 'request-agencies', 'except' => ['create', 'edit', 'delete', 'show'], 'additional' => ['accept-agency', 'refuse-agency'], 'types' => [
                         PermissionType::ADMIN->value => ['browse', 'accept-agency', 'refuse-agency'],
                     ],],
@@ -1238,7 +1238,7 @@ class PermissionTypeSeeder extends Seeder
                 ],
             ],
 
-             [
+            [
                 'name' => 'addons',
                 'sort' => 47,
                 'types' => [
