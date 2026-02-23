@@ -32,6 +32,7 @@ class VipService
         private readonly UserVipRepository $userVipRepository,
         private readonly PackRepository $packRepository,
         private readonly WareRepository $wareRepository,
+        private readonly VipCommon $vipCommon,
     ) {}
 
     public function vipIndex($type)
@@ -109,7 +110,7 @@ class VipService
         $this->userRepository->decrementUserCoins($from, $total);
         $this->packRepository->deleteExpirePack();
 
-        VipCommon::createUserVip($vip, $user, $vip->expire, null, '', $qty, $sender_id, $total, 'buy-vip');
+        $this->vipCommon->createUserVip($vip, $user, $vip->expire, null, '', $qty, $sender_id, $total, 'buy-vip');
 
         $countWares = $this->wareRepository->countWareByLevel($vip->level);
 
@@ -127,9 +128,9 @@ class VipService
         $isUsed = (bool) $request->type;
 
         if ($isUsed) {
-            VipCommon::handleVipActivation($userVip);
+            $this->vipCommon->handleVipActivation($userVip);
         } else {
-            VipCommon::deactivateVip($userVip);
+            $this->vipCommon->deactivateVip($userVip);
         }
 
         return ['target_id' => $userVip->id];
@@ -261,10 +262,10 @@ class VipService
                     ];
                     $this->userVipRepository->update($updateData, $userVip->id);
                 } else {
-                    VipCommon::createUserVip($vip, $user, ($expire * $qty), null, '', $qty, $sender_id, $total, 'buy-with-active');
+                    $this->vipCommon->createUserVip($vip, $user, ($expire * $qty), null, '', $qty, $sender_id, $total, 'buy-with-active');
                 }
 
-                VipCommon::handleVipActivation($userVip);
+                $this->vipCommon->handleVipActivation($userVip);
 
                 DB::commit();
 
@@ -302,7 +303,7 @@ class VipService
                 $from->decrement('di', $total);
                 $this->packRepository->deleteExpirePack();
 
-                VipCommon::createUserVip($vip, $user, ($expire * $qty), null, '', $qty, $sender_id, $total, 'buy-vips-per');
+                $this->vipCommon->createUserVip($vip, $user, ($expire * $qty), null, '', $qty, $sender_id, $total, 'buy-vips-per');
 
                 DB::commit();
 

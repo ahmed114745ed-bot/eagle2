@@ -52,7 +52,7 @@ class VipDedicateAction extends Action
 
             DB::beginTransaction();
 
-            VipCommon::createUserVip($vip, $user, $request->days, Admin::user()->id, '', 1, 0, 0, 'admin-dedicate');
+            app(VipCommon::class)->createUserVip($vip, $user, $request->days, Admin::user()->id, '', 1, 0, 0, 'admin-dedicate');
 
             DB::commit();
 

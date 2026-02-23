@@ -61,7 +61,7 @@ class DedicateVipController extends Controller
             ];
             $userVip = UserVip::query()->where($uniqueAttributes)->first();
             if (!$userVip) {
-                VipCommon::createUserVip($vip, $user, $request->days ?? 1, $request->dash_user_id, '', 1, 0, 0, 'dash-dedicate');
+                app(VipCommon::class)->createUserVip($vip, $user, $request->days ?? 1, $request->dash_user_id, '', 1, 0, 0, 'dash-dedicate');
             } else {
                 $userVip->qty++;
                 if ($userVip->expire > now()->timestamp) {
