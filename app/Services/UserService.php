@@ -1323,8 +1323,8 @@ class UserService
     {
         return $this->userRepository->findOrFail($userId, [
             'family',
-            'receiverLevel:id,img,level,exp',
-            'senderLevel:id,img,level',
+            'receiverLevel',
+            'senderLevel',
             'medals.achievementLevel.achievement'
         ]);
     }

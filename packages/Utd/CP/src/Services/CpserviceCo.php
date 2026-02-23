@@ -316,8 +316,8 @@ class CpserviceCo
             'profile:id,user_id,avatar',
             'cpsAsOne.cpRelation',
             'cpsAsTwo.cpRelation',
-            'receiverLevel:id,img',
-            'senderLevel:id,img',
+            'receiverLevel',
+            'senderLevel',
             'packs' => fn ($q) => $q->whereIn('type', [25])->where('is_used', true)->with('ware:id,value'),
         ]);
 

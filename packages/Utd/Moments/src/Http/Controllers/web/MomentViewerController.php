@@ -162,9 +162,9 @@ class MomentViewerController extends MainController
                         ->where('is_used', 1)
                         ->with(['ware:id,img1,img2,show_img,color,value']),
                     'UserVip' => fn ($q) => $q->with('OVip:id,img'),
-                    'receiverLevel:id,img,level',
-                    'senderLevel:id,img,level',
-                    'chargeLevel:id,img,level',
+                    'receiverLevel',
+                    'senderLevel',
+                    'chargeLevel',
                     'profile:id,user_id,avatar',
                     'room:id,uid,room_pass',
                     'shippingAgency:id,app_owner_id,name,img',

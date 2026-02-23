@@ -492,8 +492,8 @@ class UserController extends MainController
         $with = [
             'profile:id,user_id,avatar',
             'country:id,name,flag,language,e_name,phone_code,iso,iso_numeric,currency_numeric',
-            'senderLevel:id,level,type,img',
-            'receiverLevel:id,level,type,img',
+            'senderLevel',
+            'receiverLevel',
         ];
 
         // Only load packs when viewing packs tab

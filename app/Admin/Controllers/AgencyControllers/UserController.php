@@ -482,8 +482,8 @@ class UserController extends MainController
                 'profile:id,user_id,avatar',
                 'agency:id,name,img',
                 'userSetting',
-                'senderLevel:id,level,img',
-                'receiverLevel:id,level,img',
+                'senderLevel',
+                'receiverLevel',
                 'country',
                 'packs' => fn($q) => $q->where('is_used', true)
                     ->whereIn('type', [25])

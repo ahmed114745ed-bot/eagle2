@@ -25,8 +25,8 @@ class UserGameRanking extends Model
             ->with([
                 'mangerType:id,name_ar,name_en,img',
                 'UserVip:id,user_id,expire,level,is_used',
-                'senderLevel:id,level,type,img',
-                'receiverLevel:id,level,type,img',
+                'senderLevel',
+                'receiverLevel',
                 'country:id,name,iso,flag',
                 'profile:user_id,avatar,birthday',
             ]);

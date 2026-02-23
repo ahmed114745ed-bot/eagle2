@@ -555,9 +555,9 @@ class UserRepository extends Repository
             //                ->where('is_used', 1)
             //                ->with(['ware']),
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
-            'receiverLevel:id,img,level,exp',
-            'senderLevel:id,img,level',
-            'chargeLevel:id,img,level',
+            'receiverLevel',
+            'senderLevel',
+            'chargeLevel',
             'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
@@ -586,9 +586,9 @@ class UserRepository extends Repository
         return User::with([
             'packs',
             'UserVip' => fn($q) => $q->with('OVip:id,img'),
-            'receiverLevel:id,img,level',
-            'senderLevel:id,img,level',
-            'chargeLevel:id,img,level',
+            'receiverLevel',
+            'senderLevel',
+            'chargeLevel',
             'agency' => fn($q) => $q->with(['owner' => fn($q) => $q->select(['id'])->with('profile:id,user_id,avatar')]),
             'profile',
             'ownerRoom' => fn($q) => $q->with('owner.country:id,language'),
@@ -895,9 +895,9 @@ class UserRepository extends Repository
                 'UserVip' => fn($q) => $q->with('OVip:id,img'),
                 'UserVip.Ovip.wares',
                 'nowRoomOwner.packs' => fn($q) => $q->where('is_used', 1)->with('ware'),
-                'receiverLevel:id,img',
-                'senderLevel:id,img',
-                'chargeLevel:id,img,level',
+                'receiverLevel',
+                'senderLevel',
+                'chargeLevel',
                 'agency.owner',
             ])
             ->withCount(['profileVisits as profile_visitors'])
