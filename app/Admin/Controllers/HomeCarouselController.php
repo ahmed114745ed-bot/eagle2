@@ -466,11 +466,9 @@ class HomeCarouselController extends MainController
             4 => __('lifetime')
         ])->when('1', function (Form $form) {
 
-            $form->text('input', trans('input'))
-                ->rules('required|integer|min:1|max:99');
+            $form->text('input', trans('input'));
         })->when('2', function (Form $form) {
-            $form->text('input', trans('input'))
-                ->rules('required|integer|min:1|max:99');
+            $form->text('input', trans('input'));
         })->when('3', function (Form $form) {
             $form->text('input', trans('input'))
                 ->rules('required|integer|min:1|max:99');
