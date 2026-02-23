@@ -50,7 +50,7 @@
                             {!! handleShowImageWithTypes(
                                     $percentage->id,
                                     $percentage->image ? getImagePath($percentage->image) : null,
-                                    140, 140
+                                    400, 140
                             ) !!}
                         </div>
                 </div>
@@ -101,11 +101,6 @@
 </div>
 
 <style>
-
-   element.style {
-    height: 140px !important;
-    text-align: left;
-}
 
 .transition-all {
     transition: all 0.3s ease;
