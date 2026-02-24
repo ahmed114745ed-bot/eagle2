@@ -100,17 +100,21 @@ class AdminUserController extends EncorUsersController
 
         $grid->column('created_at', trans('admin.created_at'))->sortable();
         $grid->column('updated_at', trans('admin.updated_at'))->sortable();
-        
-        // إضافة عمود حذف مخصص بدلاً من استخدام actions
-        $grid->column('delete_action', 'Actions')->display(function () {
-            $id = $this->id;
-            return "<button onclick='customSuperAdminDelete({$id})' class='btn btn-sm btn-danger'>
-                        <i class='fa fa-trash'></i> Delete
-                    </button>";
-        });
 
-        // تعطيل جميع الـ actions الافتراضية تماماً
-        $grid->disableActions();
+        // الآن أضع الـ actions مع الاحتفاظ بالعرض والتعديل وإضافة حذف مخصص
+        $grid->actions(function (\Encore\Admin\Grid\Displayers\Actions $actions) {
+                \Log::info('Custom Grid actions callback called with full control');
+                
+                $actions->disableDelete(); // تعطيل الحذف الافتراضي فقط
+                
+                // إضافة زر حذف مخصص
+                $id = $actions->getKey();
+                $actions->append("<a href='javascript:void(0);' onclick='customSuperAdminDelete({$id})' class='text-danger'>
+                                    <i class='fa fa-trash'></i> Delete
+                                  </a>");
+                
+                \Log::info('Custom delete action added successfully');
+        });
 
         $grid->tools(function ($tools) {
                 $logoutUrl = route('superadmin.superadmin.logout');
