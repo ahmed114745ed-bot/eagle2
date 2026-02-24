@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير سريع - نظام FairLuck</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .summary { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 15px; 
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .summary-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .summary-card:hover { transform: translateY(-3px); }
+        .summary-card h3 { color: #666; font-size: 0.9em; margin-bottom: 8px; }
+        .summary-card .value { font-size: 1.8em; font-weight: bold; color: #667eea; }
+        .win { color: #28a745 !important; }
+        .loss { color: #dc3545 !important; }
+        .content { padding: 30px; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        th, td { padding: 12px; text-align: center; }
+        th { background: #667eea; color: white; font-weight: 600; }
+        tr:nth-child(even) { background: #f8f9fa; }
+        tr:hover { background: #e3f2fd; }
+        .section { margin-bottom: 30px; }
+        .section h2 { color: #333; margin-bottom: 15px; border-bottom: 3px solid #667eea; padding-bottom: 8px; }
+        .wallet-change { padding: 20px; background: #f8f9fa; border-radius: 12px; margin: 20px 0; }
+        .positive { color: #28a745; font-weight: bold; }
+        .negative { color: #dc3545; font-weight: bold; }
+        .zero { color: #6c757d; }
+        .footer { background: #f1f3f4; padding: 20px; text-align: center; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ تقرير سريع - نظام FairLuck</h1>
+            <p>تحليل سريع للأداء والنتائج</p>
+            <p>2026-02-23 08:50:32</p>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-card">
+                <h3>المحاولات</h3>
+                <div class="value">8</div>
+            </div>
+            <div class="summary-card">
+                <h3>المكاسب</h3>
+                <div class="value win">1</div>
+            </div>
+            <div class="summary-card">
+                <h3>نسبة الفوز</h3>
+                <div class="value">12.5%</div>
+            </div>
+            <div class="summary-card">
+                <h3>صافي الربح</h3>
+                <div class="value loss">-600</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>📋 بيانات التشغيل</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div><strong>المستخدم:</strong> سابر (ID: 3)</div>
+                    <div><strong>الهدية:</strong> 777 (ID: 383)</div>
+                    <div><strong>مبلغ الرهان:</strong> 200</div>
+                    <div><strong>الانحراف الأولي:</strong> 7.2197</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🎲 النتائج التفصيلية</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>النتيجة</th>
+                            <th>المضاعف</th>
+                            <th>الربح/الخسارة</th>
+                            <th>معامل الانحراف</th>
+                            <th>مزاج النظام</th>
+                        </tr>
+                    </thead>
+                    <tbody><tr>
+                        <td>1</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>6.8895</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>2</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>6.5834</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>3</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>6.2988</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>4</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>6.0335</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>5</td>
+                        <td><span class='win'>🏆 فوز</span></td>
+                        <td>5x</td>
+                        <td><span class='positive'>800</span></td>
+                        <td>6.0377</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>6</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>5.7975</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>7</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>5.5721</td>
+                        <td>😤 استرداد</td>
+                      </tr><tr>
+                        <td>8</td>
+                        <td><span class='loss'>💔 خسارة</span></td>
+                        <td>-</td>
+                        <td><span class='negative'>-200</span></td>
+                        <td>5.3602</td>
+                        <td>😤 استرداد</td>
+                      </tr></tbody>
+                </table>
+            </div>
+            
+            <div class="section">
+                <h2>💰 تغييرات المحافظ</h2>
+                <div class="wallet-change">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>المحفظة</th>
+                                <th>الرصيد الأولي</th>
+                                <th>الرصيد النهائي</th>
+                                <th>التغيير</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr>
+                        <td>المحفظة الرئيسية</td>
+                        <td>227,208</td>
+                        <td>227,996</td>
+                        <td><span class='positive'>+788</span></td>
+                      </tr><tr>
+                        <td>محفظة الجاكبوت</td>
+                        <td>500,540</td>
+                        <td>500,680</td>
+                        <td><span class='positive'>+140</span></td>
+                      </tr><tr>
+                        <td>المحفظة المتوسطة</td>
+                        <td>115,660</td>
+                        <td>115,870</td>
+                        <td><span class='positive'>+210</span></td>
+                      </tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🎯 نظام FairLuck الذكي - النسخة 3</p>
+            <p>تقرير تم توليده في: 2026-02-23 08:50:32</p>
+        </div>
+    </div>
+</body>
+</html>

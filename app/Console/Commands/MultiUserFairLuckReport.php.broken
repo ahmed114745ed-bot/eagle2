@@ -1,0 +1,572 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\FairLuckWallet;
+use App\Models\User;
+use App\Models\Gift;
+use App\Services\FairLuck\FairLuckService3;
+use App\Services\FairLuck\DeviationCalculator;
+use App\Services\FairLuck\ProfileManager;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+
+class MultiUserFairLuckReport extends Command
+{
+    protected $signature = 'fairluck:multi-user-report 
+                            {gift_id=383 : معرف الهدية} 
+                            {bet_amount=100 : مبلغ الرهان}
+                            {--users=3 : عدد المستخدمين}
+                            {--initial_balance=10000 : الرصيد الابتدائي}';
+
+    protected $description = 'توليد تقرير HTML شامل لمتعدد المستخدمين حتى انتهاء الرصيد';
+
+    private array $users = [];
+    private array $allRounds = [];
+    private array $userStats = [];
+    private array $walletHistory = [];
+    private int $totalRounds = 0;
+
+    public function handle()
+    {
+        $giftId = $this->argument('gift_id');
+        $betAmount = (float) $this->argument('bet_amount');
+        $userCount = (int) $this->option('users');
+        $initialBalance = (float) $this->option('initial_balance');
+
+        $this->info("🎯 بدء محاكاة متعددة المستخدمين...");
+        
+        $gift = Gift::find($giftId);
+        if (!$gift) {
+            $this->error('❌ الهدية غير موجودة');
+            return;
+        }
+
+        // إنشاء المستخدمين
+        $this->createTestUsers($userCount, $initialBalance);
+        
+        // تشغيل المحاكاة
+        $this->runMultiUserSimulation($gift, $betAmount);
+        
+        // توليد التقرير
+        $this->generateMultiUserHtmlReport($gift, $betAmount, $initialBalance);
+        
+        $this->info("✅ تم توليد التقرير متعدد المستخدمين!");
+        $this->displaySummary();
+    }
+
+    private function createTestUsers($userCount, $initialBalance)
+    {
+        $this->info("👥 إنشاء {$userCount} مستخدمين للاختبار...");
+        
+        for ($i = 1; $i <= $userCount; $i++) {
+            $letter = chr(64 + $i); // A, B, C, etc.
+            $username = "MultiUser_{$letter}_" . time() . rand(1000, 9999);
+            
+            $user = User::create([
+                'name' => $username,
+                'email' => strtolower($letter) . '_test_' . time() . '@test.local',
+                'password' => bcrypt('password'),
+                'di' => $initialBalance,
+                'email_verified_at' => now()
+            ]);
+            
+            $this->users[] = [
+                'user' => $user,
+                'letter' => $letter,
+                'initial_balance' => $initialBalance,
+                'attempts' => 0,
+                'wins' => 0,
+                'total_bet' => 0,
+                'total_win' => 0,
+                'final_balance' => $initialBalance,
+                'finished_round' => 0,
+                'max_multiplier' => 0,
+                'high_multipliers' => 0 // >=250
+            ];
+            
+            $this->line("  ✓ تم إنشاء المستخدم {$letter}: {$username}");
+        }
+    }
+
+    private function runMultiUserSimulation($gift, $betAmount)
+    {
+        $fairLuckService = app(FairLuckService3::class);
+        $round = 1;
+        $activeUsers = count($this->users);
+        
+        $this->info("🎲 بدء المحاكاة مع {$activeUsers} مستخدمين...");
+        
+        // حفظ الحالة الأولية للمحافظ
+        $this->walletHistory[0] = FairLuckWallet::getAllBalances();
+        
+        while ($activeUsers > 0) {
+            // عرض مختصر للدور
+            if ($round % 100 == 0 || $round <= 10) {
+                $this->line("الدور #{$round} - مستخدمين نشطين: {$activeUsers}");
+            }
+            
+            // توقف مبكر إذا لم ينته أي مستخدم بعد 5000 دور
+            if ($round > 5000) {
+                $finishedUsers = 0;
+                foreach ($this->users as $userData) {
+                    if ($userData['finished_round'] > 0) {
+                        $finishedUsers++;
+                    }
+                }
+                
+                if ($finishedUsers == 0) {
+                    $this->warn("⚠️ إيقاف مبكر: لم ينته أي مستخدم بعد 5000 دور");
+                    foreach ($this->users as &$userData) {
+                        if ($userData['finished_round'] == 0) {
+                            $userData['finished_round'] = $round;
+                        }
+                    }
+                    break;
+                }
+            }
+            
+            foreach ($this->users as $index => &$userData) {
+                if ($userData['user']->di < $betAmount) {
+                    continue; // المستخدم نفد رصيده
+                }
+                
+                try {
+                    // الحالة قبل الرهان
+                    $walletsBefore = FairLuckWallet::getAllBalances();
+                    $profileManager = app(ProfileManager::class);
+                    $profileBefore = $profileManager->getProfile($userData['user']->id);
+                    
+                    $calculator = new DeviationCalculator();
+                    $deviationBefore = $calculator->calculate(
+                        $profileBefore->total_bets,
+                        $profileBefore->total_profit,
+                        $profileBefore->medium_wallet_wins ?? 0,
+                        $profileBefore->jackpot_wallet_wins ?? 0
+                    );
+                    
+                    // تنفيذ الرهان
+                    $result = $fairLuckService->processBet($userData['user'], $gift, $betAmount);
+                    
+                    // تحديث بيانات المستخدم
+                    $userData['user']->refresh();
+                    $userData['attempts']++;
+                    $userData['total_bet'] += $betAmount;
+                    
+                    if ($result->isWinner) {
+                        $userData['wins']++;
+                        $userData['total_win'] += $result->profitAmount;
+                        if ($result->multiplier > $userData['max_multiplier']) {
+                            $userData['max_multiplier'] = $result->multiplier;
+                        }
+                        if ($result->multiplier >= 250) {
+                            $userData['high_multipliers']++;
+                        }
+                    }
+                    
+                    $userData['final_balance'] = $userData['user']->di;
+                    
+                    // الحالة بعد الرهان  
+                    $walletsAfter = FairLuckWallet::getAllBalances();
+                    $profileAfter = $profileManager->getProfile($userData['user']->id);
+                    
+                    // حفظ تفاصيل الدور
+                    $this->allRounds[] = [
+                        'global_round' => $round,
+                        'user_round' => $userData['attempts'],
+                        'user' => $userData['user'],
+                        'user_letter' => $userData['letter'],
+                        'result' => $result,
+                        'deviation_before' => $deviationBefore,
+                        'deviation_after' => $result->newDeviation,
+                        'wallets_before' => $walletsBefore,
+                        'wallets_after' => $walletsAfter,
+                        'wallet_changes' => [
+                            'global_vault' => $walletsAfter['global_vault'] - $walletsBefore['global_vault'],
+                            'jackpot_wallet' => $walletsAfter['jackpot_wallet'] - $walletsBefore['jackpot_wallet'],
+                            'medium_wallet' => $walletsAfter['medium_wallet'] - $walletsBefore['medium_wallet']
+                        ],
+                        'bet_amount' => $betAmount,
+                        'user_balance' => $userData['user']->di,
+                        'profile_before' => $profileBefore,
+                        'profile_after' => $profileAfter
+                    ];
+                    
+                    // إذا نفد رصيد المستخدم، سجل الدور النهائي
+                    if ($userData['user']->di < $betAmount && $userData['finished_round'] == 0) {
+                        $userData['finished_round'] = $round;
+                    }
+                    
+                } catch (\Exception $e) {
+                    $this->error("❌ خطأ للمستخدم {$userData['letter']}: " . $e->getMessage());
+                }
+            }
+            
+            // حفظ حالة المحافظ بعد كل دور
+            $this->walletHistory[$round] = FairLuckWallet::getAllBalances();
+            
+            // حساب المستخدمين النشطين
+            $activeUsers = 0;
+            foreach ($this->users as &$userData) {
+                $userData['user']->refresh(); // تحديث البيانات
+                if ($userData['user']->di >= $betAmount) {
+                    $activeUsers++;
+                } elseif ($userData['finished_round'] == 0) {
+                    // تسجيل انتهاء المستخدم
+                    $userData['finished_round'] = $round;
+                    $this->line("💸 انتهى رصيد المستخدم {$userData['letter']} في الدور {$round}");
+            
+            $round++;
+            
+            // عرض تقدم كل 1000 دور
+            if ($round % 1000 == 0) {
+                $this->line("📊 الدور {$round} - المستخدمين النشطين: {$activeUsers}");
+                // عرض الأرصدة الحالية
+                foreach ($this->users as $userData) {
+                    $this->line("  • {$userData['letter']}: " . number_format($userData['user']->di));
+                }
+            }
+            
+            // حد أمان لتجنب التشغيل اللانهائي
+            if ($round > 10000) {
+                $this->warn("⚠️ تم إيقاف المحاكاة بعد 10000 دور للأمان");
+                
+                // وضع علامة انتهاء للمستخدمين المتبقيين
+                foreach ($this->users as &$userData) {
+                    if ($userData['user']->di >= $betAmount && $userData['finished_round'] == 0) {
+                        $userData['finished_round'] = $round;
+                    }
+                }
+                break;
+            }
+        }
+        
+        $this->totalRounds = $round - 1;
+        
+        // تحديث الإحصائيات النهائية
+        foreach ($this->users as &$userData) {
+            if ($userData['finished_round'] == 0) {
+                $userData['finished_round'] = $this->totalRounds;
+            }
+        }
+    }
+
+    private function generateMultiUserHtmlReport($gift, $betAmount, $initialBalance)
+    {
+        $timestamp = date('Y_m_d_H_i_s');
+        $filename = "multi_user_fairluck_report_{$timestamp}.html";
+        $publicFilename = "multi_user_fairluck_report.html";
+        
+        // حساب الإحصائيات العامة
+        $totalAttempts = array_sum(array_column($this->users, 'attempts'));
+        $totalWins = array_sum(array_column($this->users, 'wins'));
+        $totalBets = array_sum(array_column($this->users, 'total_bet'));
+        $totalWinnings = array_sum(array_column($this->users, 'total_win'));
+        $overallRTP = $totalBets > 0 ? ($totalWinnings / $totalBets) * 100 : 0;
+        
+        $html = $this->buildHtmlReport($gift, $betAmount, $initialBalance, $totalAttempts, $totalWins, $totalBets, $totalWinnings, $overallRTP);
+        
+        // حفظ الملف
+        $fullPath = storage_path("app/public/reports/{$filename}");
+        $directory = dirname($fullPath);
+        if (!file_exists($directory)) {
+            mkdir($directory, 0755, true);
+        }
+        
+        file_put_contents($fullPath, $html);
+        
+        // نسخ إلى public
+        $publicPath = public_path($publicFilename);
+        copy($fullPath, $publicPath);
+        
+        $this->line("📄 مسار الملف: {$fullPath}");
+        $this->line("🌐 متاح في: {$publicPath}");
+    }
+
+    private function buildHtmlReport($gift, $betAmount, $initialBalance, $totalAttempts, $totalWins, $totalBets, $totalWinnings, $overallRTP)
+    {
+        $html = "<!DOCTYPE html>
+<html lang='ar' dir='rtl'>
+<head>
+    <meta charset='UTF-8'>
+    <title>تقرير FairLuck متعدد المستخدمين</title>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>
+    <style>
+        body { background:#f8f9fb; font-family:'Segoe UI', serif; }
+        h1, h2 { font-weight:700; }
+        .table thead th { white-space:nowrap; }
+        .user-card { transition: transform 0.3s; }
+        .user-card:hover { transform: translateY(-5px); }
+        .winner-row { background-color: #d4edda !important; }
+        .loser-row { background-color: #f8d7da !important; }
+        .filter-buttons { margin-bottom: 20px; }
+        .stats-summary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    </style>
+</head>
+<body>
+    <div class='container py-5'>
+        <div class='stats-summary p-4 rounded mb-5'>
+            <h1 class='text-center mb-4'>تقرير FairLuck متعدد المستخدمين - النسخة الذكية 3</h1>
+            <p class='text-center mb-4'>الهدية: {$gift->name} | مبلغ الرهان: " . number_format($betAmount) . " | الرصيد الابتدائي: " . number_format($initialBalance) . " | إجمالي الأدوار: {$this->totalRounds}</p>
+            
+            <div class='row text-center g-3'>
+                <div class='col-md-3'>
+                    <div class='bg-white bg-opacity-10 p-3 rounded'>
+                        <h4>" . count($this->users) . "</h4>
+                        <small>عدد المستخدمين</small>
+                    </div>
+                </div>
+                <div class='col-md-3'>
+                    <div class='bg-white bg-opacity-10 p-3 rounded'>
+                        <h4>" . number_format($totalAttempts) . "</h4>
+                        <small>إجمالي المحاولات</small>
+                    </div>
+                </div>
+                <div class='col-md-3'>
+                    <div class='bg-white bg-opacity-10 p-3 rounded'>
+                        <h4>" . number_format($totalWins) . "</h4>
+                        <small>إجمالي المكاسب</small>
+                    </div>
+                </div>
+                <div class='col-md-3'>
+                    <div class='bg-white bg-opacity-10 p-3 rounded'>
+                        <h4>" . number_format($overallRTP, 2) . "%</h4>
+                        <small>RTP الإجمالي</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class='row'>";
+        
+        // بطاقات المستخدمين
+        foreach ($this->users as $userData) {
+            $rtp = $userData['total_bet'] > 0 ? ($userData['total_win'] / $userData['total_bet']) * 100 : 0;
+            $netResult = $userData['total_win'] - $userData['total_bet'];
+            $netClass = $netResult >= 0 ? 'text-success' : 'text-danger';
+            
+            $html .= "<div class='col-md-4 mb-4'>
+                <div class='card shadow-sm h-100 user-card'>
+                    <div class='card-body'>
+                        <h4 class='card-title'>المستخدم {$userData['user']->name} ({$userData['letter']})</h4>
+                        <p class='mb-1 text-secondary'>الرصيد الابتدائي: " . number_format($initialBalance) . "</p>
+                        <div class='row text-center g-3'>
+                            <div class='col-6 col-lg-4'>
+                                <small>المحاولات</small>
+                                <p class='h5 mb-0'>{$userData['attempts']}</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>مرات الفوز</small>
+                                <p class='h5 mb-0'>{$userData['wins']}</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>الدور النهائي</small>
+                                <p class='h5 mb-0'>{$userData['finished_round']}</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>إجمالي الرهانات</small>
+                                <p class='h5 mb-0'>" . number_format($userData['total_bet']) . "</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>إجمالي المكاسب</small>
+                                <p class='h5 text-success mb-0'>" . number_format($userData['total_win']) . "</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>الرصيد النهائي</small>
+                                <p class='h5 mb-0'>" . number_format($userData['final_balance']) . "</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>RTP</small>
+                                <p class='h5 mb-0'>" . number_format($rtp, 2) . "%</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>مضاعفات ≥250</small>
+                                <p class='h5 mb-0'>{$userData['high_multipliers']}</p>
+                            </div>
+                            <div class='col-6 col-lg-4'>
+                                <small>أعلى مضاعف</small>
+                                <p class='h5 mb-0'>{$userData['max_multiplier']}x</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>";
+        }
+        
+        $html .= "</div>
+        
+        <!-- ملخص المستخدمين -->
+        <div class='card shadow-sm mb-4'>
+            <div class='card-body'>
+                <h2 class='h4 mb-4'>ملخص المستخدمين</h2>
+                <div class='table-responsive'>
+                    <table class='table table-striped align-middle'>
+                        <thead class='table-dark'>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>المحاولات</th>
+                                <th>مرات الفوز</th>
+                                <th>مضاعفات ≥250</th>
+                                <th>إجمالي المكاسب</th>
+                                <th>إجمالي المدفوع</th>
+                                <th>صافي اللاعب</th>
+                                <th>الرصيد النهائي</th>
+                                <th>الدور النهائي</th>
+                                <th>RTP</th>
+                                <th>أعلى مضاعف</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+        
+        foreach ($this->users as $userData) {
+            $rtp = $userData['total_bet'] > 0 ? ($userData['total_win'] / $userData['total_bet']) * 100 : 0;
+            $netResult = $userData['total_win'] - $userData['total_bet'];
+            $netClass = $netResult >= 0 ? 'text-success' : 'text-danger';
+            
+            $html .= "<tr>
+                        <td>{$userData['user']->name} ({$userData['letter']})</td>
+                        <td>{$userData['attempts']}</td>
+                        <td>{$userData['wins']}</td>
+                        <td>{$userData['high_multipliers']}</td>
+                        <td>" . number_format($userData['total_win']) . "</td>
+                        <td>" . number_format($userData['total_bet']) . "</td>
+                        <td class='{$netClass}'>" . number_format($netResult) . "</td>
+                        <td>" . number_format($userData['final_balance']) . "</td>
+                        <td>{$userData['finished_round']}</td>
+                        <td>" . number_format($rtp, 2) . "%</td>
+                        <td>{$userData['max_multiplier']}x</td>
+                      </tr>";
+        }
+        
+        $html .= "</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- التفاصيل الكاملة -->
+        <div class='card shadow-sm'>
+            <div class='card-body'>
+                <h2 class='h4 mb-4'>التفاصيل الكاملة للأدوار</h2>
+                
+                <div class='filter-buttons mb-3'>
+                    <button class='btn btn-outline-primary btn-sm me-2' onclick='filterRows(\"all\")'>الكل</button>";
+        
+        foreach ($this->users as $userData) {
+            $html .= "<button class='btn btn-outline-secondary btn-sm me-1' onclick='filterRows(\"{$userData['letter']}\")'>{$userData['letter']}</button>";
+        }
+        
+        $html .= "<button class='btn btn-outline-success btn-sm me-1' onclick='filterRows(\"winners\")'>الفائزين فقط</button>
+                    <button class='btn btn-outline-danger btn-sm' onclick='filterRows(\"losers\")'>الخاسرين فقط</button>
+                </div>
+                
+                <div class='table-responsive'>
+                    <table class='table table-sm table-striped align-middle'>
+                        <thead class='table-dark'>
+                            <tr>
+                                <th>الدور العام</th>
+                                <th>دور المستخدم</th>
+                                <th>المستخدم</th>
+                                <th>النتيجة</th>
+                                <th>المضاعف</th>
+                                <th>الرهان</th>
+                                <th>الربح/الخسارة</th>
+                                <th>انحراف قبل</th>
+                                <th>انحراف بعد</th>
+                                <th>المزاج</th>
+                                <th>المحفظة الرئيسية</th>
+                                <th>محفظة الجاكبوت</th>
+                                <th>المحفظة المتوسطة</th>
+                                <th>رصيد المستخدم</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+        
+        foreach ($this->allRounds as $round) {
+            $isWinner = $round['result']->isWinner;
+            $rowClass = $isWinner ? 'winner-row' : 'loser-row';
+            $resultBadge = $isWinner ? "<span class='badge bg-success'>فوز</span>" : "<span class='badge bg-danger'>خسارة</span>";
+            $multiplier = $isWinner ? $round['result']->multiplier . 'x' : '-';
+            $profit = $isWinner ? number_format($round['result']->profitAmount) : '-' . number_format($round['bet_amount']);
+            $profitClass = $isWinner ? 'text-success' : 'text-danger';
+            
+            $mood = match($round['result']->mood) {
+                'Generous' => '😊 سخي',
+                'Recovery' => '😤 استرداد', 
+                'Stable' => '😐 مستقر',
+                default => '🤔 غير محدد'
+            };
+            
+            $html .= "<tr class='{$rowClass}' data-filterable-row='true' data-player='{$round['user_letter']}' data-result='" . ($isWinner ? 'winner' : 'loser') . "'>
+                        <td>{$round['global_round']}</td>
+                        <td>{$round['user_round']}</td>
+                        <td>{$round['user']->name} ({$round['user_letter']})</td>
+                        <td>{$resultBadge}</td>
+                        <td>{$multiplier}</td>
+                        <td>" . number_format($round['bet_amount']) . "</td>
+                        <td class='{$profitClass}'>{$profit}</td>
+                        <td>" . number_format($round['deviation_before'], 4) . "</td>
+                        <td>" . number_format($round['deviation_after'], 4) . "</td>
+                        <td>{$mood}</td>
+                        <td>" . number_format($round['wallet_changes']['global_vault']) . "</td>
+                        <td>" . number_format($round['wallet_changes']['jackpot_wallet']) . "</td>
+                        <td>" . number_format($round['wallet_changes']['medium_wallet']) . "</td>
+                        <td>" . number_format($round['user_balance']) . "</td>
+                      </tr>";
+        }
+        
+        $html .= "</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js'></script>
+    <script>
+        function filterRows(filter) {
+            const rows = document.querySelectorAll('[data-filterable-row]');
+            
+            rows.forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (filter === 'winners') {
+                    row.style.display = row.getAttribute('data-result') === 'winner' ? '' : 'none';
+                } else if (filter === 'losers') {
+                    row.style.display = row.getAttribute('data-result') === 'loser' ? '' : 'none';
+                } else {
+                    row.style.display = row.getAttribute('data-player') === filter ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>";
+        
+        return $html;
+    }
+
+    private function displaySummary()
+    {
+        $summaryData = [];
+        foreach ($this->users as $userData) {
+            $rtp = $userData['total_bet'] > 0 ? ($userData['total_win'] / $userData['total_bet']) * 100 : 0;
+            $summaryData[] = [
+                $userData['letter'],
+                number_format($userData['attempts']),
+                number_format($userData['wins']),
+                number_format($rtp, 1) . '%',
+                number_format($userData['final_balance']),
+                $userData['finished_round']
+            ];
+        }
+        
+        $this->table(
+            ['مستخدم', 'محاولات', 'مكاسب', 'RTP', 'رصيد نهائي', 'دور نهائي'],
+            $summaryData
+        );
+        
+        $this->line("📊 إجمالي الأدوار: {$this->totalRounds}");
+        $this->line("📊 إجمالي المحاولات: " . array_sum(array_column($this->users, 'attempts')));
+    }
+}
