@@ -63,7 +63,7 @@ class RoomController extends MainController
 
     public function show($id, Content $content)
     {
-        $room = Room::with(['owner.profile', 'roomLevel','roomCategory', 'microphones.user.profile'])
+        $room = Room::with(['owner.profile', 'roomLevel', 'roomCategory', 'microphones.user.profile'])
             ->withCount('roomVisitors')
             ->findOrFail($id);
 
@@ -608,9 +608,55 @@ class RoomController extends MainController
 
         $grid->id(__('ID'));
 
+        // $grid->column('room_name', __('room'))->display(function ($name) {
+        //     $path = @$this->room_cover;
+        //     $id = @$this->id;
+        //     $defaultImage = asset("images/room.jpg");
+        //     $url = getImagePath($path) ?? $defaultImage;
+
+        //     if (!isImageExists($url)) {
+        //         $url = $defaultImage;
+        //     }
+
+        //     if (strlen($name) > 50) {
+        //         $name = substr($name, 0, 50) . ' ...';
+        //     }
+        //          //dd( $this->roomLevel);
+        //     $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
+        //     $levelImageHtml = '';
+
+        //     if ($levelimage) {
+        //         $levelImageHtml = "
+        //             <div style='margin-top:4px;'>
+        //                 <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
+        //             </div>
+        //         ";
+        //     }
+        //     return "
+        //             <div style='display: flex; align-items: center; gap: 10px;'>
+        //                 <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+        //                 <div>
+        //                     <span style='cursor: pointer;'>$name</span><br>
+        //                     <span style='cursor: pointer;'>ID: $id</span>
+        //                      {$levelImageHtml}
+        //                 </div>
+        //             </div>
+        //         ";
+        // });
+
         $grid->column('room_name', __('room'))->display(function ($name) {
-            $path = @$this->room_cover;
-            $id = @$this->id;
+
+            $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
+
+            if (mb_strlen($name) > 50) {
+                $name = mb_substr($name, 0, 50) . ' ...';
+            }
+
+            $name = e($name);
+
+            $path = $this->room_cover;
+            $id = $this->id;
+
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
 
@@ -618,30 +664,15 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
-            }
-                 //dd( $this->roomLevel);
-            $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
-            $levelImageHtml = '';
-
-            if ($levelimage) {
-                $levelImageHtml = "
-                    <div style='margin-top:4px;'>
-                        <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
-                    </div>
-                ";
-            }
             return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                        <div>
-                            <span style='cursor: pointer;'>$name</span><br>
-                            <span style='cursor: pointer;'>ID: $id</span>
-                             {$levelImageHtml}
-                        </div>
-                    </div>
-                ";
+        <div style='display:flex;align-items:center;gap:10px;'>
+            <img src='{$url}' style='width:50px;height:50px;border-radius:6px;'>
+            <div>
+                <span>{$name}</span><br>
+                <span>ID: {$id}</span>
+            </div>
+        </div>
+    ";
         });
 
         $grid->column('owner_id', __('room owner'))->display(function ($name) {
