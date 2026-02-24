@@ -85,42 +85,38 @@ class DeleteSubSuperAdminAction extends RowAction
         
         return <<<SCRIPT
         console.log('SuperAdmin Delete Script Loaded');
-        alert('SuperAdmin Delete Script Loaded!'); // تأكيد أن الـ script يتم تحميله
         
-        function superAdminDelete(id) {
-            console.log('superAdminDelete called with id:', id);
-            alert('superAdminDelete called with id: ' + id);
-            
-            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-                console.log('Delete confirmed, sending AJAX request');
-                alert('Delete confirmed, sending AJAX to: /superadmin/auth-users/' + id);
+        if (typeof superAdminDelete === 'undefined') {
+            function superAdminDelete(id) {
+                console.log('superAdminDelete called with id:', id);
                 
-                $.ajax({
-                    method: 'DELETE',
-                    url: '/superadmin/auth-users/' + id,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        console.log('AJAX beforeSend');
-                        alert('AJAX request starting...');
-                    },
-                    success: function(response) {
-                        console.log('Delete response:', response);
-                        alert('Delete success response: ' + JSON.stringify(response));
-                        if (response.success) {
-                            toastr.success('تم الحذف بنجاح');
-                            location.reload();
-                        } else {
-                            toastr.error(response.message || 'حدث خطأ');
+                if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                    console.log('Delete confirmed, sending AJAX to: /superadmin/auth-users/' + id);
+                    
+                    $.ajax({
+                        method: 'DELETE',
+                        url: '/superadmin/auth-users/' + id,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            console.log('AJAX request starting...');
+                        },
+                        success: function(response) {
+                            console.log('Delete response:', response);
+                            if (response.success) {
+                                toastr.success('تم الحذف بنجاح');
+                                location.reload();
+                            } else {
+                                toastr.error(response.message || 'حدث خطأ');
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Delete error:', xhr);
+                            toastr.error('حدث خطأ أثناء الحذف');
                         }
-                    },
-                    error: function(xhr) {
-                        console.error('Delete error:', xhr);
-                        alert('Delete error: ' + xhr.status + ' ' + xhr.statusText);
-                        toastr.error('حدث خطأ أثناء الحذف');
-                    }
-                });
+                    });
+                }
             }
         }
         SCRIPT;
