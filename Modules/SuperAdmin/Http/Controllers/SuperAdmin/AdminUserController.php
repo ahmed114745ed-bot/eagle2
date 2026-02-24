@@ -11,6 +11,7 @@ use Encore\Admin\Layout\Content;
 use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 
+use Modules\SuperAdmin\Actions\SuperAdmin\DeleteSubSuperAdminAction;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
 
@@ -41,9 +42,8 @@ class AdminUserController extends EncorUsersController
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
-                $actions->disableDelete();              
-                $deleteUrl = request()->getSchemeAndHttpHost() . "/superadmin/auth-users/" . $actions->getKey();
-                $actions->append('<a href="javascript:void(0);" onclick="customDelete(' . $actions->getKey() . ')" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></a>');
+                $actions->disableDelete(); // تعطيل الحذف الافتراضي
+                $actions->add(new DeleteSubSuperAdminAction()); // إضافة action مخصص
         });
 
         $grid->tools(function ($tools) {
@@ -71,30 +71,26 @@ class AdminUserController extends EncorUsersController
                         });
                     }
                     
-                    function customDelete(id) {
-                        if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-                            fetch('/superadmin/auth-users/' + id, {
-                                method: 'DELETE',
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                                    'Content-Type': 'application/json',
-                                },
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.error) {
-                                    toastr.error(data.message || data.error);
-                                } else {
-                                    toastr.success('تم الحذف بنجاح');
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => {
-                                toastr.error('حدث خطأ أثناء الحذف');
-                                console.error('Error:', error);
-                            });
-                        }
-                    }
+                    // تعديل action الحذف ليشير للسوبر أدمن
+                    $(document).ready(function() {
+                        // البحث عن جميع forms التي تحتوي على _handle_action_
+                        $('form[action*="_handle_action_"]').each(function() {
+                            var currentAction = $(this).attr('action');
+                            if (currentAction.includes('/admin/')) {
+                                var newAction = currentAction.replace('/admin/', '/superadmin/');
+                                $(this).attr('action', newAction);
+                            }
+                        });
+                        
+                        // مراقبة إضافة forms جديدة
+                        $(document).on('submit', 'form[action*="_handle_action_"]', function(e) {
+                            var currentAction = $(this).attr('action');
+                            if (currentAction.includes('/admin/')) {
+                                var newAction = currentAction.replace('/admin/', '/superadmin/');
+                                $(this).attr('action', newAction);
+                            }
+                        });
+                    });
                 </script>
                 HTML;
 
