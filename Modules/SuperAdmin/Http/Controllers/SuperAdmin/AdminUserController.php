@@ -98,25 +98,27 @@ class AdminUserController extends EncorUsersController
             ";
         });
 
-        $grid->column('created_at', trans('admin.created_at'))->sortable();
-        $grid->column('updated_at', trans('admin.updated_at'))->sortable();
+        // إضافة عمود مخصص للأفعال يحتوي على جميع الأزرار
+        $grid->column('custom_actions', 'الإجراءات')->display(function () {
+            $id = $this->id;
+            $viewUrl = url("superadmin/auth-users/{$id}");
+            $editUrl = url("superadmin/auth-users/{$id}/edit");
+            
+            return "
+            <div class='btn-group'>
+                <button type='button' class='btn btn-sm btn-default dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                    <i class='fa fa-cog'></i>&nbsp;&nbsp;<span class='caret'></span>
+                </button>
+                <ul class='dropdown-menu dropdown-menu-right'>
+                    <li><a href='{$viewUrl}'><i class='fa fa-eye'></i>&nbsp;&nbsp;عرض</a></li>
+                    <li><a href='{$editUrl}'><i class='fa fa-edit'></i>&nbsp;&nbsp;تعديل</a></li>
+                    <li><a href='javascript:void(0);' onclick='customSuperAdminDelete({$id})' style='color: red;'><i class='fa fa-trash'></i>&nbsp;&nbsp;حذف</a></li>
+                </ul>
+            </div>";
+        })->sortable(false);
 
-        // الآن أضع الـ actions مع الاحتفاظ بالعرض والتعديل وإضافة حذف مخصص
-        $grid->actions(function (\Encore\Admin\Grid\Displayers\Actions $actions) {
-                \Log::info('Custom Grid actions callback called');
-                
-                $actions->disableDelete(); // تعطيل الحذف الافتراضي فقط
-                \Log::info('Default delete disabled');
-                
-                // إضافة زر حذف مخصص كـ Action
-                $actions->add(new CustomDeleteAction());
-                \Log::info('Custom delete action added via Action class');
-                
-                // ولنجرب أيضا append مع تنسيق جديد
-                $id = $actions->getKey();
-                $actions->append('<a href="javascript:void(0);" onclick="customSuperAdminDelete(' . $id . ')" style="color: red; display: block; padding: 5px;"><i class="fa fa-trash"></i>&nbsp;&nbsp;حذف TEST</a>');
-                \Log::info('Test delete action appended', ['id' => $id]);
-        });
+        // تعطيل الأفعال الافتراضية تماماً
+        $grid->disableActions();
 
         $grid->tools(function ($tools) {
                 $logoutUrl = route('superadmin.superadmin.logout');
