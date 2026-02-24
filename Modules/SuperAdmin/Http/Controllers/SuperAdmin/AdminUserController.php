@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\RoleRewards\Actions\DeleteUser;
 
 use Modules\SuperAdmin\Actions\SuperAdmin\DeleteSubSuperAdminAction;
+use Modules\SuperAdmin\Actions\SuperAdmin\CustomDeleteAction;
 use Modules\RoleRewards\Helpers\UserRoleRewardHelper;
 use App\Admin\Controllers\MainController;
 
@@ -106,13 +107,11 @@ class AdminUserController extends EncorUsersController
                 
                 $actions->disableDelete(); // تعطيل الحذف الافتراضي فقط
                 
-                // إضافة زر حذف مخصص
+                // إضافة زر حذف مخصص بتنسيق مناسب لـ Laravel Admin
                 $id = $actions->getKey();
-                $actions->append("<a href='javascript:void(0);' onclick='customSuperAdminDelete({$id})' class='text-danger'>
-                                    <i class='fa fa-trash'></i> Delete
-                                  </a>");
+                $actions->append('<li><a href="javascript:void(0);" onclick="customSuperAdminDelete(' . $id . ')" class="text-danger"><i class="fa fa-trash"></i>&nbsp;&nbsp;Delete</a></li>');
                 
-                \Log::info('Custom delete action added successfully');
+                \Log::info('Custom delete action added successfully', ['id' => $id]);
         });
 
         $grid->tools(function ($tools) {
