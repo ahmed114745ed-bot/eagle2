@@ -44,7 +44,6 @@ class AdminUserController extends EncorUsersController
             'request_path' => request()->path()
         ]);
 
-        // استنساخ منطق parent لكن مع تحكم كامل في الـ actions
         $permission_name = $this->permission_name;
 
         $grid = new \Encore\Admin\Grid(new \App\Models\Admin());
@@ -150,15 +149,31 @@ class AdminUserController extends EncorUsersController
                             if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
                                 console.log('Delete confirmed, sending AJAX to: /superadmin/auth-users/' + id);
                                 
+                                // الحصول على CSRF token بطريقة آمنة
+                                var csrfToken = '';
+                                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                                if (csrfMeta) {
+                                    csrfToken = csrfMeta.getAttribute('content');
+                                } else if (window.Laravel && window.Laravel.csrfToken) {
+                                    csrfToken = window.Laravel.csrfToken;
+                                } else if ($('meta[name="csrf-token"]').length) {
+                                    csrfToken = $('meta[name="csrf-token"]').attr('content');
+                                }
+                                
+                                console.log('CSRF Token:', csrfToken);
+                                
                                 fetch('/superadmin/auth-users/' + id, {
                                     method: 'DELETE',
                                     headers: {
-                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                        'X-CSRF-TOKEN': csrfToken,
                                         'Content-Type': 'application/json',
                                         'X-Requested-With': 'XMLHttpRequest'
                                     }
                                 })
-                                .then(response => response.json())
+                                .then(response => {
+                                    console.log('Response status:', response.status);
+                                    return response.json();
+                                })
                                 .then(data => {
                                     console.log('Delete response:', data);
                                     if (data.success) {
