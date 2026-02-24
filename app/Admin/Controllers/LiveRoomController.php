@@ -524,12 +524,12 @@ class LiveRoomController extends MainController
                         ->orWhere('uuid', 'like', "%$input%"));
                 }, __('User'))->placeholder(__('Search by name or numId'));
 
-                
+
                     $locale = app()->getLocale(); // 'ar', 'en', etc.
                     $column = $locale === 'ar' ? 'name' : 'e_name';
 
                     $countries =\App\Models\Country::query()->pluck($column, 'id');
-                
+
 
                 $filter->where(function ($query) {
                     if ($this->input) {
@@ -596,14 +596,20 @@ class LiveRoomController extends MainController
             if (strlen($name) > 50) {
                 $name = substr($name, 0, 50) . ' ...';
             }
+
+            $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+            $encodedName = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+            $roomUrl = url("admin/rooms/{$id}");
             return "
-                <div style='display: flex; align-items: center; gap: 10px;'>
-                    <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                    <div>
-                        <span style='cursor: pointer;'>$name</span><br>
-                        <span style='cursor: pointer;'>ID: $id</span>
+                <a href='$roomUrl' style='text-decoration: none; color: inherit;'>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                        <div>
+                            <span style='cursor: pointer;'>$encodedName</span><br>
+                            <span style='cursor: pointer;'>ID: $id</span>
+                        </div>
                     </div>
-                </div>
             ";
         });
 

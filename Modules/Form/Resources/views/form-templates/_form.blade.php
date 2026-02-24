@@ -58,11 +58,11 @@
                 @foreach($locales as $key =>$locale)
                     <div class="relative">
                         <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
-                        <input type="text" name="title[{{ $locale }}]" {{ $loop->first ? 'required' : '' }}
+                           <input type="text" name="title[{{ $locale }}]" {{ $loop->first ? 'required' : '' }}
                                @if($locale === 'ar') dir="rtl" @endif
                                class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                                placeholder="{{ __('Form Title') }}"
-                               value="{{ old('title.'.$key, $template->getTranslation('title', $key)) }}">
+                               value="{{ old('title.'.$key, is_array($template->getTranslation('title', $key)) ? json_encode($template->getTranslation('title', $key)) : $template->getTranslation('title', $key)) }}">
                     </div>
                 @endforeach
             </div>
@@ -83,7 +83,7 @@
                     <div class="absolute top-0 right-0 bg-blue-100 text-blue-800 text-lg px-2 py-1 rounded">{{ strtoupper($locale) }}</div>
                     <textarea name="description[{{ $locale }}]" rows="3" @if($locale === 'ar') dir="rtl" @endif
                               class="w-full px-4 py-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                              placeholder="{{ __('Form description') }}">{{ old('description.'.$key, $template->getTranslation('description', $key)) }}</textarea>
+                              placeholder="{{ __('Form description') }}">{{ old('description.'.$key, is_array($template->getTranslation('description', $key)) ? json_encode($template->getTranslation('description', $key)) : $template->getTranslation('description', $key)) }}</textarea>
                 </div>
             @endforeach
         </div>
@@ -113,7 +113,7 @@
              style="margin: 0px 13px;"
             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg">
         <i class="fas fa-save {{ app()->getLocale() == 'ar' ? 'ml-2' : 'mr-2' }}"></i>
-        {{ $buttonText ?? __('Create Template') }}
+        {{ is_array($buttonText ?? null) ? json_encode($buttonText) : ($buttonText ?? __('Create Template')) }}
     </button>
 </div>
 
@@ -216,7 +216,7 @@ function addSection(data = null) {
                     <span class="section-drag-handle cursor-move px-2">
                         <i class="fas fa-grip-vertical text-gray-500"></i>
                     </span>
-                    <h3 class="text-lg font-bold text-blue-800">${'{{ __('Section') }}'} #${sectionCount}</h3>
+                    <h3 class="text-lg font-bold text-blue-800">${@json(__('Section'))} #${sectionCount}</h3>
                 </div>
                 <div class="flex items-center space-x-2">
                     <button type="button" onclick="toggleSection(this)" class="text-gray-600 hover:text-gray-800" style="margin: 0px 11px;">
@@ -228,7 +228,7 @@ function addSection(data = null) {
 
             <div class="section-content">
                 <div class="mb-4">
-                    <h4 class="text-md font-semibold mb-3">${'{{ __('Section Title') }}'} *</h4>
+                    <h4 class="text-md font-semibold mb-3">${@json(__('Section Title'))} *</h4>
                     <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-4">
                         ${titlesHtml}
                     </div>
@@ -239,7 +239,7 @@ function addSection(data = null) {
                 <div class="mb-4">
                     <button type="button" onclick="addField(${sectionCount})"
                             class="bg-blue-600 text-white px-4 py-4 rounded-lg hover:bg-blue-700">
-                        <i class="fas fa-plus"></i> ${'{{ __('Add Field') }}'}
+                        <i class="fas fa-plus"></i> ${@json(__('Add Field'))}
                     </button>
 
                 </div>
@@ -330,7 +330,7 @@ function addField(sectionId, data = null) {
                     <span class="field-drag-handle cursor-move px-2">
                         <i class="fas fa-grip-vertical text-gray-400"></i>
                     </span>
-                    <h4 class="font-semibold text-gray-700">${'{{ __('Field') }}'} #${fieldId}</h4>
+                    <h4 class="font-semibold text-gray-700">${@json(__('Field'))} #${fieldId}</h4>
                 </div>
                 <div class="flex items-center space-x-2">
                     <button type="button" onclick="toggleSection(this)" class="text-gray-600 hover:text-gray-800" style="margin: 0px 11px;">
@@ -342,7 +342,7 @@ function addField(sectionId, data = null) {
 
             <div class="section-content">
                 <div class="mb-4">
-                    <h5 class="text-lg font-semibold mb-2">${'{{ __('Field Label') }}'} *</h5>
+                    <h5 class="text-lg font-semibold mb-2">${@json(__('Field Label'))} *</h5>
                     <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-3">
                         ${labelHtml}
                     </div>
@@ -350,27 +350,27 @@ function addField(sectionId, data = null) {
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                     <div class="field-name-container">
-                        <label class="block text-lg font-semibold mb-1">${'{{ __('Field Name') }}'} *</label>
+                        <label class="block text-lg font-semibold mb-1">${@json(__('Field Name'))} *</label>
                         <input type="text" ${canDeleteSection ? 'readonly' : ''} name="sections[${sectionId}][fields][${fieldId}][name]" required
                             class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg field-name-input"
                             placeholder="full_name" value="${data ? escapeHtml(data.field_name || '') : ''}">
                     </div>
                     <div>
-                        <label class="block text-lg font-semibold mb-1">${'{{ __('Field Type') }}'} *</label>
+                        <label class="block text-lg font-semibold mb-1">${@json(__('Field Type'))} *</label>
                         <select ${canDeleteSection ? 'disabled' : ''} name="sections[${sectionId}][fields][${fieldId}][type]" required
                                 class="w-full px-5 py-4 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-lg field-type-select"
                                 onchange="handleFieldTypeChange(${sectionId}, ${fieldId}, this)">
-                            <option value="text" ${data && data.field_type === 'text' ? 'selected' : ''}>${'{{ __('Text') }}'}</option>
-                            <option value="email" ${data && data.field_type === 'email' ? 'selected' : ''}>${'{{ __('Email') }}'}</option>
-                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${'{{ __('integer') }}'}</option>
-                            <option value="tel" ${data && data.field_type === 'tel' ? 'selected' : ''}>${'{{ __('Phone') }}'}</option>
-                            <option value="date" ${data && data.field_type === 'date' ? 'selected' : ''}>${'{{ __('Date') }}'}</option>
-                            <option value="textarea" ${data && data.field_type === 'textarea' ? 'selected' : ''}>${'{{ __('Textarea') }}'}</option>
-                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${'{{ __('file') }}'}</option>
-                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${'{{ __('select') }}'}</option>
-                            <option value="checkbox" ${data && data.field_type === 'checkbox' ? 'selected' : ''}>${'{{ __('Checkbox') }}'}</option>
-                            <option value="radio" ${data && data.field_type === 'radio' ? 'selected' : ''}>${'{{ __('Radio') }}'}</option>
-                            <option value="custom" ${data && data.field_type === 'custom' ? 'selected' : ''}>${'{{ __('Custom Widget') }}'}</option>
+                            <option value="text" ${data && data.field_type === 'text' ? 'selected' : ''}>${@json(__('Text'))}</option>
+                            <option value="email" ${data && data.field_type === 'email' ? 'selected' : ''}>${@json(__('Email'))}</option>
+                            <option value="number" ${data && data.field_type === 'number' ? 'selected' : ''}>${@json(__('integer'))}</option>
+                            <option value="tel" ${data && data.field_type === 'tel' ? 'selected' : ''}>${@json(__('Phone'))}</option>
+                            <option value="date" ${data && data.field_type === 'date' ? 'selected' : ''}>${@json(__('Date'))}</option>
+                            <option value="textarea" ${data && data.field_type === 'textarea' ? 'selected' : ''}>${@json(__('Textarea'))}</option>
+                            <option value="file" ${data && data.field_type === 'file' ? 'selected' : ''}>${@json(__('file'))}</option>
+                            <option value="select" ${data && data.field_type === 'select' ? 'selected' : ''}>${@json(__('select'))}</option>
+                            <option value="checkbox" ${data && data.field_type === 'checkbox' ? 'selected' : ''}>${@json(__('Checkbox'))}</option>
+                            <option value="radio" ${data && data.field_type === 'radio' ? 'selected' : ''}>${@json(__('Radio'))}</option>
+                            <option value="custom" ${data && data.field_type === 'custom' ? 'selected' : ''}>${@json(__('Custom Widget'))}</option>
                         </select>
                     </div>
                 </div>
@@ -378,20 +378,20 @@ function addField(sectionId, data = null) {
                 <!-- Custom Widget Selector -->
                 <div class="widget-selector-container mb-4" style="display: ${data && data.field_type === 'custom' ? 'block' : 'none'};">
                     <label class="block text-lg font-semibold mb-1">
-                        <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>${'{{ __('Select Custom Widget') }}'} *
+                        <i class="fas fa-puzzle-piece text-purple-600 mr-1"></i>${@json(__('Select Custom Widget'))} *
                     </label>
                     <select name="sections[${sectionId}][fields][${fieldId}][widget_id]"
                             class="w-full px-5 py-4 border-2 border-purple-300 rounded focus:border-purple-500 focus:outline-none text-lg bg-purple-50 widget-select">
-                        <option value="">-- ${'{{ __('Choose a widget') }}'} --</option>
+                        <option value="">-- ${@json(__('Choose a widget'))} --</option>
                         ${widgetOptionsHtml}
                     </select>
                     <p class="text-gray-500 mt-1">
-                        <i class="fas fa-info-circle"></i> ${'{{ __('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)') }}'}
+                        <i class="fas fa-info-circle"></i> ${@json(__('Custom widgets provide specialized UI (BD Selector, User Picker, etc.)'))}
                     </p>
                 </div>
 
                 <div class="mb-4 placeholder-container" style="display: ${data && data.field_type === 'custom' ? 'none' : 'block'};">
-                    <h5 class="text-lg font-semibold mb-2">${'{{ __('Placeholder Text') }}'}</h5>
+                    <h5 class="text-lg font-semibold mb-2">${@json(__('Placeholder Text'))}</h5>
                     <div class="grid grid-cols-1 md:grid-cols-${Math.min(4, locales.length)} gap-3">
                         ${placeholderHtml}
                     </div>
@@ -401,12 +401,12 @@ function addField(sectionId, data = null) {
                 <div class="mb-4 options-container" style="display: ${data && ['select', 'checkbox', 'radio'].includes(data.field_type) ? 'block' : 'none'};">
                     <h5 class="text-lg font-semibold mb-2">
                         <i class="fas fa-list-ul text-blue-600 mr-1"></i>
-                        ${'{{ __('Select Options Configuration') }}'}
+                        ${@json(__('Select Options Configuration'))}
                     </h5>
                     
                     <!-- Options Type Selector -->
                     <div class="mb-3 p-3 rounded-lg">
-                        <label class="block text-lg font-semibold mb-2">${'{{ __('Options Type') }}'}</label>
+                        <label class="block text-lg font-semibold mb-2">${@json(__('Options Type'))}</label>
                         <div class="flex gap-4">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" name="sections[${sectionId}][fields][${fieldId}][options_type]" 
@@ -415,7 +415,7 @@ function addField(sectionId, data = null) {
                                        onchange="toggleOptionsType(${sectionId}, ${fieldId}, 'custom')">
                                 <span class="text-lg">
                                     <i class="fas fa-edit text-blue-600"></i>
-                                    ${'{{ __('Custom Options') }}'}
+                                    ${@json(__('Custom Options'))}
                                 </span>
                             </label>
                             <label class="flex items-center cursor-pointer">
@@ -425,7 +425,7 @@ function addField(sectionId, data = null) {
                                        onchange="toggleOptionsType(${sectionId}, ${fieldId}, 'predefined')">
                                 <span class="text-lg">
                                     <i class="fas fa-database text-green-600"></i>
-                                    ${'{{ __('Pre-defined Data') }}'}
+                                    ${@json(__('Pre-defined Data'))}
                                 </span>
                             </label>
                         </div>
@@ -436,7 +436,7 @@ function addField(sectionId, data = null) {
                         <div class="mb-3">
                             <button type="button" onclick="addCustomOption(${sectionId}, ${fieldId})"
                                     class="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600">
-                                <i class="fas fa-plus mr-1"></i> ${'{{ __('Add Option') }}'}
+                                <i class="fas fa-plus mr-1"></i> ${@json(__('Add Option'))}
                             </button>
                         </div>
                         <div id="custom-options-${sectionId}-${fieldId}" class="space-y-3">
@@ -448,23 +448,23 @@ function addField(sectionId, data = null) {
                     <div class="predefined-options-selector" style="display: ${data && data.data_source ? 'block' : 'none'};">
                         <select name="sections[${sectionId}][fields][${fieldId}][data_source]"
                                 class="w-full px-5 py-4 border-2 border-green-300 rounded focus:border-green-500 focus:outline-none text-lg bg-green-50">
-                            <option value="">-- ${'{{ __('Select Data Source') }}'} --</option>
+                            <option value="">-- ${@json(__('Select Data Source'))} --</option>
                             <option value="countries" ${data && data.data_source === 'countries' ? 'selected' : ''}}>
-                                <i class="fas fa-globe"></i> ${'{{ __('Countries') }}'}
+                                <i class="fas fa-globe"></i> ${@json(__('Countries'))}
                             </option>
                             <option value="cities" ${data && data.data_source === 'cities' ? 'selected' : ''}}>
-                                <i class="fas fa-city"></i> ${'{{ __('Cities') }}'}
+                                <i class="fas fa-city"></i> ${@json(__('Cities'))}
                             </option>
                             <option value="languages" ${data && data.data_source === 'languages' ? 'selected' : ''}">
-                                <i class="fas fa-language"></i> ${'{{ __('Languages') }}'}
+                                <i class="fas fa-language"></i> ${@json(__('Languages'))}
                             </option>
                             <option value="currencies" ${data && data.data_source === 'currencies' ? 'selected' : ''}}>
-                                <i class="fas fa-dollar-sign"></i> ${'{{ __('Currencies') }}'}
+                                <i class="fas fa-dollar-sign"></i> ${@json(__('Currencies'))}
                             </option>
                         </select>
                         <p class="text-lg text-gray-500 mt-1">
                             <i class="fas fa-info-circle"></i> 
-                            ${'{{ __('Options will be loaded dynamically from server') }}'}
+                            ${@json(__('Options will be loaded dynamically from server'))}
                         </p>
                     </div>
                 </div>
@@ -474,11 +474,11 @@ function addField(sectionId, data = null) {
                 <div class="flex items-center space-x-4">
                     <label class="flex items-center text-lg">
                         <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][required]" value="1" ${data && data.is_required ? 'checked' : ''} class="mr-2 checkbox">
-                        ${'{{ __('Required') }}'}
+                        ${@json(__('Required'))}
                     </label>
                     <label class="flex items-center text-lg">
                         <input type="checkbox" name="sections[${sectionId}][fields][${fieldId}][enabled]" value="1" ${data && data.is_enabled ? 'checked' : ''} class="mr-2 checkbox">
-                        ${'{{ __('Enabled') }}'}
+                        ${@json(__('Enabled'))}
                     </label>
                 </div>
 
@@ -537,7 +537,7 @@ function addCustomOption(sectionId, fieldId, data = null) {
                        name="sections[${sectionId}][fields][${fieldId}][options][${optionId}][label][${locale}]" 
                        ${locale === locales[0] ? 'required' : ''} ${dir}
                        class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:outline-none"
-                       placeholder="${'{{ __('Option Label') }}'}" 
+                       placeholder="${@json(__('Option Label'))}" 
                        value="${escapeHtml(val)}">
             </div>`;
     }).join('');
@@ -545,7 +545,7 @@ function addCustomOption(sectionId, fieldId, data = null) {
     const optionHtml = `
         <div class="option-item border-2 border-gray-200 p-3 rounded bg-gray-50" data-option="${optionId}">
             <div class="flex justify-between items-start mb-2">
-                <span class="font-medium text-gray-700">${'{{ __('Option') }}'} #${optionId}</span>
+                <span class="font-medium text-gray-700">${@json(__('Option'))} #${optionId}</span>
                 <button type="button" onclick="removeCustomOption(${sectionId}, ${fieldId}, ${optionId})"
                         class="text-red-600 hover:text-red-800">
                     <i class="fas fa-times"></i>
@@ -555,7 +555,7 @@ function addCustomOption(sectionId, fieldId, data = null) {
                 ${optionLabelsHtml}
             </div>
             <div>
-                <label class="block text-sm font-medium mb-1">${'{{ __('Value') }}'} *</label>
+                <label class="block text-sm font-medium mb-1">${@json(__('Value'))} *</label>
                 <input type="text" 
                        name="sections[${sectionId}][fields][${fieldId}][options][${optionId}][value]" 
                        required

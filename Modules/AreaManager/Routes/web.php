@@ -112,6 +112,7 @@ Route::group(
         Route::get('sub-area-manager-users/profile/{id}', [AdminUserController::class, 'showProfile']);
 
         Route::resource('superadmin-users', SuperAdminController::class);
+         Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
         Route::get('superadmin-users-profile/{id}', [SuperAdminController::class, 'profile']);
         Route::get('users/profile/{id}', [UserController::class, 'show'])->name('user.profile');
         Route::resource('/bd-salaries', BdSalariesController::class);

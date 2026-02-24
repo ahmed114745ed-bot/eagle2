@@ -61,13 +61,14 @@ Route::group(
         });
 
         Route::resource('superadmin-users', SuperAdminController::class);
+        Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
         Route::resource('restore-super-admins', RestoreSuperAdminController::class);
         Route::resource('superadmin-users-settings', SuperAdminSelectController::class);
 
         Route::post('superadmin-users/make-default', [SuperAdminSelectController::class, 'makeDefault'])->name('make-superadmin-default');
         Route::get('superadmin-users/select', [SuperAdminSelectController::class, 'index'])->name('superadmin-users.select');
 
-       
+
 
 
         Route::post('/set-preview-superadmin', function () {
@@ -86,7 +87,8 @@ Route::group(
         Route::group(['prefix' => 'superadmin-charges-report'], function () {
             Route::get('/{id}', [SuperAdminChargeReportController::class, 'index']);
         });
-    });
+    }
+);
 
 
 /*
@@ -123,7 +125,6 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\WalletController;
 
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
 });
 
 
@@ -206,7 +207,9 @@ Route::group(
             ]
         ]);
 
+
         Route::get('superadmin-profile/{id}', [SuperAdminController::class, 'profile']);
+        Route::post('delete-sub-admin/{id}', [SuperAdminController::class, 'deleteSubSuperAdmin']);
 
         Route::resource('rooms', RoomController::class);
         Route::get('home-carousel/history', [SuperadminBannerHistory::class, 'index'])->name('home-carousel.history');
@@ -283,4 +286,3 @@ Route::group(
         Route::get('/superadmin-logout', [AuthController::class, 'customSuperadminLogout'])->name('superadmin.logout');
     }
 );
-

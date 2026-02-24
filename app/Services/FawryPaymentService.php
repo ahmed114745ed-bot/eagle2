@@ -30,10 +30,6 @@ class FawryPaymentService
 
     public function makePayment($trx,$amount,$exterData)
     {
-//        $response =  $this->utdFawryInitial($trx,$amount,$exterData);
-//        if(isset($response['status']) && $response['status'] == 0){
-//            return $response;
-//        }
         PaymentMethodHistory::create([
             "amount" => $amount,
             "type" => 'game_type',
@@ -48,6 +44,16 @@ class FawryPaymentService
         return json_decode($response);
     }
 
+        public function makePaymentLink($trx,$amount,$exterData)
+    {
+        $data = $this->getBodyForFawry($trx,$amount);
+        $data['paymentSubType'] = $exterData['type'];
+        $data['paymentType'] = $exterData['paymentType'];
+        $utdUrl = config("services.utd_fawry.utd_url");
+        $response = Http::post($utdUrl, $data);
+        info($response);
+        return json_decode($response);
+    }
     public function utdFawryInitial($trx,$amount,$exterData)
     {
        $data =  $this->getBodyForFawry($trx,$amount);

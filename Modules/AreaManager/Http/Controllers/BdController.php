@@ -2,24 +2,25 @@
 
 namespace Modules\AreaManager\Http\Controllers;
 
-use App\Models\Bd;
-use App\Models\User;
-use Encore\Admin\Form;
-use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Helpers\Common;
-use App\Models\Country;
-use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Box;
-use Illuminate\Support\Carbon;
-use Encore\Admin\Facades\Admin;
-use Encore\Admin\Layout\Content;
-use Illuminate\Support\Facades\DB;
-use App\Models\BdAgencyHostSallary;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Hash;
 use App\Admin\Actions\DeleteBdAction;
 use App\Admin\Controllers\MainController;
+use App\Helpers\Common;
+use App\Models\Bd;
+use App\Models\BdAgencyHostSallary;
+use App\Models\Country;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
+use Encore\Admin\Form;
+use Encore\Admin\Grid;
+use Encore\Admin\Layout\Content;
+use Encore\Admin\Layout\Row;
+use Encore\Admin\Show;
+use Encore\Admin\Widgets\Box;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdmin;
 
 class BdController extends MainController
@@ -316,10 +317,12 @@ class BdController extends MainController
                     if ($OldUserAppId) {
                         $OldUserAppId->is_bd = 0;
                         $OldUserAppId->save();
+                         MilestoneHelper::removeReward($OldUserAppId, 'bd');
                     }
                     $newUserAppId = User::find($newAppId);
                     $newUserAppId->is_bd = 1;
                     $newUserAppId->save();
+                    MilestoneHelper::grantMilestoneToUser($newUserAppId, 'bd');
                     $form->app_id = $newAppId;
                 }
             } else {
@@ -344,6 +347,7 @@ class BdController extends MainController
             if (isset($userApp)) {
                 $userApp->is_bd = 1;
                 $userApp->save();
+                MilestoneHelper::grantMilestoneToUser($userApp, 'bd');
             }
 
             $role = DB::table('admin_roles')->where('slug', 'bd')->first();

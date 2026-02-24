@@ -11,6 +11,7 @@ class VerifyUtdFawrySignature
 
     public function handle(Request $request, Closure $next): Response
     {
+        info('webhook');
         $responseData           = $request->all();
         $secureKey              = config("services.utd_fawry.utd_fawry_secret");
         $fawryRefNumber         = $responseData['fawryRefNumber'];

@@ -110,6 +110,89 @@ class PaymentMethodController extends Controller
         return response()->json(['status' => 'error', 'message' => 'Payment status is invalid or failed.'], 400);
     }
 
+    /**
+     * Handle PayMob callback forwarded from UTD
+     */
+    public function utdPayMobCallback(Request $request): JsonResponse
+    {
+        $webhookData = $request->all();
+
+        $paymob = $webhookData['paymob'] ?? [];
+        $obj = $webhookData['obj'] ?? [];
+        $order = $obj['order'] ?? [];
+
+        $success = $paymob['success'] ?? $obj['success'] ?? false;
+        $transactionId = $paymob['transaction_id'] ?? $obj['id'] ?? $webhookData['paymentRefrenceNumber'] ?? null;
+        $amountCents = $paymob['amount_cents'] ?? $obj['amount_cents'] ?? ($webhookData['paymentAmount'] * 100) ?? 0;
+
+        $merchantOrderId = $webhookData['trx_code'] ?? null;
+        
+        if (!$merchantOrderId && !empty($order['items'])) {
+            info('merchantOrderId is null, checking items', ['items' => $order['items']]);
+            $itemName = $order['items'][0]['name'] ?? '';
+            info('Item name extracted', ['itemName' => $itemName]);
+            
+            if (preg_match('/Charge Coin - (\d+)/', $itemName, $matches)) {
+                $merchantOrderId = $matches[1];
+                info('Regex match successful', ['matches' => $matches, 'extracted_merchantOrderId' => $merchantOrderId]);
+            } else {
+                info('Regex match failed - no match found in item name');
+            }
+        } else {
+            info('merchantOrderId status', [
+                'merchantOrderId_exists' => !empty($merchantOrderId),
+                'items_empty' => empty($order['items'] ?? [])
+            ]);
+        }
+
+        if (!$merchantOrderId) {
+            return response()->json(['status' => 'error', 'message' => 'Missing merchant order ID'], 400);
+        }
+
+        $coinLog = CoinLog::where('trx', $merchantOrderId)->first();
+        $paymentMethod = PaymentMethodHistory::where('utd_code', $merchantOrderId)->first();
+           \Log::info('Looking up records', [
+            'merchantOrderId' => $merchantOrderId,
+            'coinLog_found' => (bool) $coinLog,
+            'paymentMethod_found' => (bool) $paymentMethod,
+        ]);
+        if (!$coinLog && !$paymentMethod) {
+            return response()->json(['status' => 'error', 'message' => 'Payment not found'], 404);
+        }
+
+        if ($success) {
+            if ($coinLog) {
+                $this->webhookPayment($coinLog->id);
+                $coinLog->pid = $transactionId;
+                $coinLog->save();
+            }
+
+            if ($paymentMethod) {
+                $paymentMethod->status = 'paid';
+                $paymentMethod->ref_code = $transactionId;
+                $paymentMethod->save();
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Payment successful',
+                'transaction_id' => $transactionId,
+                'amount' => $amountCents / 100,
+            ]);
+        }
+
+        if ($paymentMethod) {
+            $paymentMethod->status = 'failed';
+            $paymentMethod->save();
+        }
+
+        return response()->json([
+            'status' => 'failed',
+            'message' => 'Payment failed',
+            'transaction_id' => $transactionId,
+        ], 400);
+    }
+
     public function success(Request $request): JsonResponse
     {
         try {
