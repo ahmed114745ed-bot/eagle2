@@ -3,17 +3,15 @@
 namespace Utd\Vip\Http\Controllers\Dashboard;
 
 use App\Facades\CustomNotification;
-use App\Helpers\Common;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Utd\Vip\Http\Resources\AdminVipsResource;
 use Utd\Vip\Entities\OVip;
 use App\Models\User;
 use Utd\Vip\Entities\UserVip;
-use App\Models\vip_prev;
+use Utd\Vip\Entities\VipPrev;
 use Utd\Vip\Entities\VipPrivilege;
 use App\Traits\Dashboard\DashBoardTrait;
-use Carbon\Carbon;
-use DB;
 use Illuminate\Http\Request;
 use Utd\Vip\Helpers\VipCommon;
 
@@ -90,7 +88,7 @@ class AdminVipsController extends Controller
         ];
         $userVip = UserVip::query()->where($uniqueAttributes)->first();
         if (!$userVip) {
-   
+
             app(VipCommon::class)->createUserVip($vip ,$user ,$request->days , auth()->id() ,'',1,0,0,'admin-vip');
 
         }
@@ -144,7 +142,7 @@ class AdminVipsController extends Controller
                 $item = VipPrivilege::find($request->pivilege_id[$i]);
                 if($item)
                 {
-                    vip_prev::insert([
+                    VipPrev::insert([
                         'o_vip_privilege_id'  => $request->pivilege_id[$i],
                         'o_vip_id'            => $OVip_last->id ,
                     ]);
@@ -182,7 +180,7 @@ class AdminVipsController extends Controller
         $OVip->price     = $request->price ;
         $OVip->expire    = $request->expire ;
         $OVip->save();
-        vip_prev::where('o_vip_id',$OVip->id)->delete();
+        VipPrev::where('o_vip_id',$OVip->id)->delete();
         if($request->pivilege_id)
         {
             for($i=0 ; $i < count($request->pivilege_id); $i++)
@@ -190,7 +188,7 @@ class AdminVipsController extends Controller
                 $item = VipPrivilege::find($request->pivilege_id[$i]);
                 if($item)
                 {
-                    vip_prev::insert([
+                    VipPrev::insert([
                         'o_vip_privilege_id'  => $request->pivilege_id[$i],
                         'o_vip_id'            => $OVip->id ,
                     ]);
@@ -207,7 +205,7 @@ class AdminVipsController extends Controller
         {
             $this->delete_img($OVip->img);
         }
-        vip_prev::where('o_vip_id',$OVip)->delete();
+        VipPrev::where('o_vip_id',$OVip)->delete();
         $OVip->delete();
         return 200;
     }

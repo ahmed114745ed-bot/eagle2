@@ -2,8 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Support\PackageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Utd\Vip\Http\Resources\UserVipUtdResource;
 
 class UserPackVipResource extends JsonResource
 {
@@ -16,7 +18,9 @@ class UserPackVipResource extends JsonResource
     {
         return [
             'packs' => UserPackUtdResource::collection($this->packsUser),
-            'vip' => UserVipUtdResource::collection($this->userHaveVip),
+            'vip' => PackageHelper::isInstalled('vip')
+                ? UserVipUtdResource::collection($this->userHaveVip)
+                : [],
         ];
     }
 }

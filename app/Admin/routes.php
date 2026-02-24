@@ -99,7 +99,6 @@ use App\Admin\Controllers\UserSettingController;
 use App\Admin\Controllers\UsersJoinedAgencyController;
 use App\Admin\Controllers\UserWalletController;
 use App\Admin\Controllers\V2\SalariesController;
-use App\Admin\Controllers\VipController;
 use App\Admin\Controllers\WalletTransactionController;
 use App\Admin\Controllers\WareController;
 use App\Admin\Controllers\WareTabController;
@@ -285,14 +284,7 @@ Route::group(
         Route::post('send-request-invite-code', 'UserController@request_invite_code');
         Route::resource('user-statistics', 'UserStatisticsController');
         Route::resource('profiles', 'ProfileController');
-        Route::resource('vips', 'VipController');
-        Route::get('vips-sender', [VipController::class, 'senderIndex']);
-        Route::get('vips-receiver', [VipController::class, 'receiverIndex']);
-        if (\App\Support\PackageHelper::isInstalled('cp')) {
-            Route::get('vips-cp', [VipController::class, 'cpIndex']);
-        }
-        Route::get('vips-room', [VipController::class, 'roomIndex']);
-        Route::get('vips-charge', [VipController::class, 'chargeIndex']);
+        // VIP level routes moved to packages/Utd/Vip/Routes/web.php
         // Room routes moved to packages/Utd/Room/Routes/web.php
         Route::resource('all-games', AllGameController::class);
         Route::resource('game-settings', GameSettingsController::class);
@@ -336,7 +328,6 @@ Route::group(
         });
         Route::resource('emoji-categories', EmojiCategoryController::class);
         Route::resource('home_carousels', 'HomeCarouselController');
-        Route::resource('vip_prev', 'VipAuthController');
 
 
 

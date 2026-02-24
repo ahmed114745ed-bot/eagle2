@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Vip\Entities;
 
 use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Model;

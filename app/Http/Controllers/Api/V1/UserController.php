@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Support\PackageHelper;
 use Auth;
 use Exception;
 use App\Models\Ban;
@@ -39,7 +40,6 @@ use App\helper\InvitationEarningHelper;
 use App\Http\Resources\MyDataUtdResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\AppSettingResource;
-use App\Http\Resources\UserVipUtdResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Http\Resources\UserPackUtdResource;
 use App\Http\Resources\UserPackVipResource;
@@ -64,6 +64,7 @@ use Modules\SwitchAccount\Entities\UserDevicesHistory;
 use App\Http\Resources\Api\V1\UserLevelHistoryResource;
 use App\Contracts\UserAchievementContract;
 use Utd\Achievements\Transformers\UserAchievementLevelsResource;
+use Utd\Vip\Http\Resources\UserVipUtdResource;
 
 class UserController extends Controller
 {
@@ -448,7 +449,7 @@ class UserController extends Controller
 //         $key = $request->q;
 //         $page = $request->get('page', 1);
 //         $users = $this->userService->searchUsersInFamily($key, $page);
-// 
+//
 //         return response()->json($users);
 //     }
 
@@ -1180,9 +1181,9 @@ class UserController extends Controller
 //             $this->userService->kickFamily($id);
 //             return Common::apiResponse(true, 'removed');
 //         } catch (Exception $exception) {
-// 
+//
 //             return Common::apiResponse(0, $exception->getMessage(), null, 400);
-    
+
 
     public function changeAgency(Request $request)
     {
@@ -1414,6 +1415,9 @@ class UserController extends Controller
     public function userVip($id)
     {
         try {
+            if (!PackageHelper::isInstalled('vip')) {
+                return Common::apiResponse(true, 'done', []);
+            }
             $data = $this->userService->userPacksAndVip($id);
             return Common::apiResponse(true, 'done', UserVipUtdResource::collection($data->userHaveVip));
         } catch (Exception $exception) {

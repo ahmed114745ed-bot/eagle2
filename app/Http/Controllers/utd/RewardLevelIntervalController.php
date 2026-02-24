@@ -10,8 +10,8 @@ use App\Enums\IntervalLevel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Modules\Public\Entities\RewardLevelInterval;
-use App\Http\Resources\Api\V1\IntervalOVipResource;
 use App\Http\Resources\Api\V1\IntervalWareResource;
+use Utd\Vip\Http\Resources\IntervalOVipResource;
 
 class RewardLevelIntervalController extends Controller
 {
@@ -58,8 +58,8 @@ class RewardLevelIntervalController extends Controller
 
         if ($request->hasFile('target4')) {
             $target = Common::upload('images', $request->file('target4'));
-        } 
-        
+        }
+
         RewardLevelInterval::where('level_interval_id', $reward_level_interval)->findOrFail($id)->update([
             'type' => $request->type,
            // 'target' => $target,
@@ -95,7 +95,10 @@ class RewardLevelIntervalController extends Controller
 
     public function vipInterval()
     {
-        $vips = PackageHelper::isInstalled('vip') ? OVip::query()->get() : collect();
+        if (!PackageHelper::isInstalled('vip')) {
+            return Common::apiResponse(1, 'success', [], 200);
+        }
+        $vips = OVip::query()->get();
 
         return Common::apiResponse(1, 'success', IntervalOVipResource::collection($vips), 200);
     }

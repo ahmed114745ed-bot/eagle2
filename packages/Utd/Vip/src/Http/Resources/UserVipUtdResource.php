@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Utd\Vip\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -22,7 +22,6 @@ class UserVipUtdResource extends JsonResource
             'qty' => $this?->qty ?? 0,
             'total_price' => $this->total,
             'image' => $this->OVip->img ?? '',
-
         ];
     }
 }

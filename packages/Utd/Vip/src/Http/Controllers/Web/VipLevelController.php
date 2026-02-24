@@ -1,29 +1,22 @@
 <?php
 
-namespace App\Admin\Controllers;
+namespace Utd\Vip\Http\Controllers\Web;
 
+use App\Admin\Controllers\MainController;
+use App\Services\AppFeatureService;
 use App\Support\PackageHelper;
-use Utd\Vip\Entities\Vip;
+use Encore\Admin\Auth\Permission;
+use Encore\Admin\Controllers\HasResourceActions;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use Encore\Admin\Auth\Permission;
-use App\Admin\Fields\Image;
+use Encore\Admin\Show;
+use Utd\Vip\Entities\Vip;
 
-use App\Services\AppFeatureService;
-use App\Admin\Controllers\MainController;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Str;
-
-class VipController extends MainController
+class VipLevelController extends MainController
 {
-    /**
-     * Title for current resource.
-     *
-     * @var string
-     */
+    use HasResourceActions;
 
     public $permission_name = 'level';
     public $hiddenColumns = [];
@@ -57,7 +50,6 @@ class VipController extends MainController
             ->body($this->grid()));
     }
 
-
     public function senderIndex(Content $content)
     {
         if (!Admin::user()->can('*')) {
@@ -67,6 +59,7 @@ class VipController extends MainController
             ->title(trans('charge level'))
             ->body($this->senderGrid()));
     }
+
     protected function senderGrid()
     {
         $grid = new Grid(new Vip());
@@ -79,10 +72,7 @@ class VipController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->display(function ($path) {
-            /** @var Ware $this */
             $defaultImage = asset("images/image.png");
             $url = getImagePath($path) ?? $defaultImage;
             if (!isImageExists($url)) {
@@ -103,6 +93,7 @@ class VipController extends MainController
             ->title(trans('charge level'))
             ->body($this->receiverGrid());
     }
+
     protected function receiverGrid()
     {
         $grid = new Grid(new Vip());
@@ -115,8 +106,6 @@ class VipController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -124,6 +113,7 @@ class VipController extends MainController
 
         return $grid;
     }
+
     public function cpIndex(Content $content)
     {
         if (!PackageHelper::isInstalled('cp')) {
@@ -146,8 +136,6 @@ class VipController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -155,7 +143,6 @@ class VipController extends MainController
 
         return $grid;
     }
-
 
     public function roomIndex(Content $content)
     {
@@ -176,8 +163,6 @@ class VipController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -205,8 +190,6 @@ class VipController extends MainController
             $value = $value->getOriginal();
             return number_format($value);
         })->editable();
-        //        $grid->column('di', __('Diamonds'));
-        //        $grid->column('co', __('Coins'));
         $grid->column('img', __('Image'))->image('', '30');
         $this->extendGrid($grid);
         $grid->disableExport();
@@ -215,13 +198,6 @@ class VipController extends MainController
         return $grid;
     }
 
-    /**
-     * Show interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function show($id, Content $content)
     {
         return parent::show($id, $content
@@ -229,13 +205,6 @@ class VipController extends MainController
             ->body($this->detail($id)));
     }
 
-    /**
-     * Edit interface.
-     *
-     * @param mixed $id
-     * @param Content $content
-     * @return Content
-     */
     public function edit($id, Content $content)
     {
         return parent::edit($id, $content
@@ -250,20 +219,12 @@ class VipController extends MainController
             ->body($this->form()));
     }
 
-
-    /**
-     * Make a grid builder.
-     *
-     * @return Grid
-     */
     protected function grid()
     {
         $grid = new Grid(new Vip());
 
-        // Sort by type desc then exp asc
         $grid->model()->orderByDesc('type')->orderBy('exp');
 
-        // Filter model by selected tab
         $grid->model()->when(request('tab', 'Appsender'), function ($query, $tab) {
             switch ($tab) {
                 case 'Appsender':
@@ -284,7 +245,6 @@ class VipController extends MainController
             }
         });
 
-        // Tabs at top rendered from the Blade view
         $grid->header(function () {
             $tabs = [
                 'Appsender' => __('AppSender'),
@@ -296,25 +256,13 @@ class VipController extends MainController
                 $tabs['Appcp'] = __('AppCP');
             }
 
-            if (PackageHelper::isInstalled('room')){
+            if (PackageHelper::isInstalled('room')) {
                 $tabs['Approom'] = __('AppRoom');
             }
-            // Render the Blade view with tabs data
             return view('admin.tabs', compact('tabs'));
         });
 
-        // Other grid settings
         $grid->quickSearch();
-
-        /* $grid->column('id', __('Id'));
-
-        $grid->column('type', __('Type'))->select([
-            1 => __('broadcaster'),
-            2 => __('honor'),
-            3 => __('cp'),
-            4 => __('room'),
-            5 => __('charge'),
-        ]); */
 
         $grid->column('level', __('Level'))->editable();
 
@@ -342,10 +290,8 @@ class VipController extends MainController
             }
         });
 
-        // Any custom grid extensions
         $this->extendGrid($grid);
 
-        // No export button
         $grid->disableExport();
         $currentTab = request('tab', 'Appsender');
         $grid->disableCreateButton();
@@ -356,12 +302,6 @@ class VipController extends MainController
         return $grid;
     }
 
-    /**
-     * Make a show builder.
-     *
-     * @param mixed $id
-     * @return Show
-     */
     protected function detail($id)
     {
         $show = new Show(Vip::findOrFail($id));
@@ -370,35 +310,26 @@ class VipController extends MainController
         $show->field('type', __('Type'))->number();
         $show->field('level', __('Level'))->number();
         $show->field('exp', __('Exp'))->number();
-        //        $show->field('di', __('Diamonds'))->number ();
-        //        $show->field('co', __('Coins'))->number ();
         $show->field('img', __('Image'))->image();
-        //        $show->field('created_at', __('Created at'));
-        //        $show->field('updated_at', __('Updated at'));
         $this->extendShow($show);
         return $show;
     }
 
-    /**
-     * Make a form builder.
-     *
-     * @return Form
-     */
     protected function form()
     {
         $form = new Form(new Vip());
         $this->disableFormTools($form);
 
         $tabToTypeMap = [
-            'Appsender' => 2,   // honor
-            'Appreceived' => 1, // broadcaster
-            'Appcp' => 3,       // cp
-            'Approom' => 4,     // room
-            'Appcharge' => 5,   // charge
+            'Appsender' => 2,
+            'Appreceived' => 1,
+            'Appcp' => 3,
+            'Approom' => 4,
+            'Appcharge' => 5,
         ];
 
         $currentTab = request('tab', 'Appsender');
-        $currentType = $tabToTypeMap[$currentTab] ?? 2; // Default to 2 if tab not found
+        $currentType = $tabToTypeMap[$currentTab] ?? 2;
 
         if ($form->isCreating()) {
             $form->hidden('type')->default($currentType);
@@ -409,22 +340,17 @@ class VipController extends MainController
             $form->select('type', __('Type'))->options($this->getVipTypeOptions());
         }
 
-        //        $form->textarea('name_ar', __('name_ar'));
-        //        $form->textarea('name_en', __('name_en'));
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
-        //        $form->number('di', __('Diamonds'));
-        //        $form->number('co', __('Coins'));
         $form->file('img', __('Image'))->name(function ($file) {
             return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
         })->removable()->rules('required');
 
-
         $form->footer(function ($footer) {
-            $footer->disableReset();        // Disables the "Reset" button
-            $footer->disableViewCheck();    // Disables the "View" checkbox
-            $footer->disableEditingCheck(); // Disables the "Continue editing" checkbox
-            $footer->disableCreatingCheck(); // Disables the "Continue creating" checkbox
+            $footer->disableReset();
+            $footer->disableViewCheck();
+            $footer->disableEditingCheck();
+            $footer->disableCreatingCheck();
         });
 
         return $form;

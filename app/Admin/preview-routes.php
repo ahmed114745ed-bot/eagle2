@@ -176,7 +176,6 @@ Route::group([
     Route::resource('official_msgs', 'OfficialMessageController');
     Route::resource('emojis', 'EmojiController');
     Route::resource('home_carousels', 'HomeCarouselController');
-    Route::resource('vip_prev', 'VipAuthController');
     Route::resource('agencies', 'AgencyController');
     Route::resource('families', 'FamilyController');
     Route::resource('targets', 'TargetController');

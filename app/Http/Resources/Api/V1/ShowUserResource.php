@@ -5,12 +5,13 @@ namespace App\Http\Resources\Api\V1;
 use App\Models\User;
 use App\Helpers\Common;
 use App\Facades\UserHandling;
+use App\Support\PackageHelper;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Contracts\UserAchievementContract;
+use Utd\Vip\Http\Resources\VipUserResource;
 
 class ShowUserResource extends JsonResource
 {
-
     /**
      * Transform the resource into an array.
      *
@@ -23,7 +24,7 @@ class ShowUserResource extends JsonResource
             'id' => $this->id,
             'coins' => number_format($this->di),
             'uuid' => $this->uuid,
-            'original_uuid' =>  $this->original_uuid,
+            'original_uuid' => $this->original_uuid,
             'name' => $this->name ?? '',
             'nickname' => $this->nickname ?? '',
             'charge_status' => $this->charge_status,
@@ -46,14 +47,14 @@ class ShowUserResource extends JsonResource
             'status' => @$this->status,
             'type_user' => $this->type_user,
             'manger_type_id' => $this->manger_type_id ?? 0,
-            'Level' =>  Common::level_center($this->resource)['sender_level'],
-            'worth' =>  Common::level_center($this->resource)['receiver_level'],
-            'diamonds' =>  $this->coins,
-            'balance' =>  $this->salary,
+            'Level' => Common::level_center($this->resource)['sender_level'],
+            'worth' => Common::level_center($this->resource)['receiver_level'],
+            'diamonds' => $this->coins,
+            'balance' => $this->salary,
             'pack' => PackUserResource::collection($this->packs),
-            'vip' => VipUserResource::collection($this->haveVip)
-
-
+            'vip' => PackageHelper::isInstalled('vip')
+                ? VipUserResource::collection($this->haveVip)
+                : [],
         ];
     }
 }

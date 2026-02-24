@@ -27,7 +27,6 @@ use App\Http\Controllers\Api\V1\TargetController;
 use App\Http\Controllers\Api\V1\TrashedUserController;
 use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\UtdUserController;
-use App\Http\Controllers\Api\V1\VipController;
 use App\Http\Controllers\Api\V1\WareController;
 use App\Http\Controllers\Api\V2\Report_userController;
 use App\Http\Controllers\utd\AdminCheckController;

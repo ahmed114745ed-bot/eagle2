@@ -2,10 +2,10 @@
 
 namespace Modules\TribeReward\Transformers;
 
-use App\Models\OVip;
 use App\Models\Ware;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Support\PackageHelper;
+use Utd\Vip\Entities\OVip;
 
 class AgencyRewardResource extends JsonResource
 {

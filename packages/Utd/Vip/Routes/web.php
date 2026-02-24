@@ -1,9 +1,12 @@
 <?php
 
+use App\Support\PackageHelper;
 use Illuminate\Support\Facades\Route;
 use Utd\Vip\Http\Controllers\Web\DedicateVipController;
 use Utd\Vip\Http\Controllers\Web\OVipController;
 use Utd\Vip\Http\Controllers\Web\OvipGiftTapController;
+use Utd\Vip\Http\Controllers\Web\VipAuthController;
+use Utd\Vip\Http\Controllers\Web\VipLevelController;
 use Utd\Vip\Http\Controllers\Web\VipPrivilegeController;
 
 /*
@@ -30,6 +33,16 @@ Route::group(
     ],
     function () {
 
+        Route::resource('vips', VipLevelController::class);
+        Route::get('vips-sender', [VipLevelController::class, 'senderIndex']);
+        Route::get('vips-receiver', [VipLevelController::class, 'receiverIndex']);
+        if (PackageHelper::isInstalled('cp')) {
+            Route::get('vips-cp', [VipLevelController::class, 'cpIndex']);
+        }
+        Route::get('vips-room', [VipLevelController::class, 'roomIndex']);
+        Route::get('vips-charge', [VipLevelController::class, 'chargeIndex']);
+
+        Route::resource('vip_prev', VipAuthController::class);
         Route::resource('vip_privilege', VipPrivilegeController::class);
         Route::resource('ovip', OVipController::class);
         Route::get('ovip-gift/{ovip_id}/{type?}', [OvipGiftTapController::class, 'index']);

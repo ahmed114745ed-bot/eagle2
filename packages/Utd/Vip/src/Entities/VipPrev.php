@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace Utd\Vip\Entities;
 
-use App\Traits\TimestampsWithTimezone;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class vip_prev extends Model
+class VipPrev extends Model
 {
-    use HasFactory, TimestampsWithTimezone;
+    use HasFactory;
 
     protected $table = 'vip_prev';
+
+    public $timestamps = false;
 
     protected $fillable = [
         'o_vip_id',
