@@ -3,19 +3,20 @@
 namespace Modules\Form\Http\Controllers;
 
 
-use App\Models\Bd;
-use App\Models\User;
+use App\Admin\Controllers\MainController;
+use App\Admin\Services\UserService;
 use App\Models\Agency;
+use App\Models\Bd;
+use App\Models\ShippingAgency;
+use App\Models\User;
+use Encore\Admin\Facades\Admin;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
-use Encore\Admin\Show;
-use App\Models\ShippingAgency;
-use Encore\Admin\Facades\Admin;
 use Encore\Admin\Layout\Content;
-use App\Admin\Services\UserService;
-use App\Admin\Controllers\MainController;
+use Encore\Admin\Show;
 use Modules\Form\Entities\FormRequest;
 use Modules\Form\Services\FormRenderService;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class FormRequestController extends MainController
 {
@@ -422,7 +423,7 @@ class FormRequestController extends MainController
         $request->update(['status' => 'approved']);
         $owner->type_user = 2;
         $owner->save();
-
+        MilestoneHelper::grantMilestoneToUser($owner, 'host-agency-owner');
         // return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
         return response()->json([
             'success' => true,
@@ -460,7 +461,7 @@ class FormRequestController extends MainController
             'country_id' => $phoneUser->country_id,
             'password' => $data['password'] ?? 123456789,
         ]);
-
+        MilestoneHelper::grantMilestoneToUser($phoneUser, 'bd');
         $request->update(['status' => 'approved']);
 
         //  return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
@@ -505,6 +506,8 @@ class FormRequestController extends MainController
             'bd_id' => $request->bd_id,
             'country_id' => $owner->country_id,
         ]);
+
+        MilestoneHelper::grantMilestoneToUser($owner, 'charge-agency-owner');
         $request->update(['status' => 'approved']);
         return response()->json(['success' => true, 'message' => __('تمت الموافقة بنجاح')]);
     }

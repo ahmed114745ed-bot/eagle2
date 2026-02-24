@@ -3,18 +3,17 @@
 namespace App\Admin\Actions;
 
 
-use App\Models\User;
-use App\Models\Ware;
-use App\Models\Agency;
-use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Facades\CustomNotification;
+use App\Models\Agency;
+use App\Models\User;
 use App\Notifications\AcceptAgency;
 use Encore\Admin\Actions\RowAction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Validation\ValidationException;
 use Modules\AgencyApp\Entities\AdditionalInfo;
+use Modules\Milestones\Helpers\MilestoneHelper;
 
 class AcceptAgencyAction extends RowAction
 {
@@ -49,6 +48,7 @@ class AcceptAgencyAction extends RowAction
         if ($agency->additionalInfo->gmail) {
             Notification::route('mail',  $agency->additionalInfo->gmail)->notify(new AcceptAgency());
         }
+         MilestoneHelper::grantMilestoneToUser($user, 'host-agency-owner');
       //  Common::createUserAdmin($appOwnerId);
         CustomNotification::acceptRequestAgency($user);
         return $this->response()->success('success')->refresh();
