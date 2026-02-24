@@ -207,7 +207,8 @@ class RoomController extends MainController
                 'pks'           => $pks,
                 'boxes'         => $boxes,
                 'roomTypes'     => $roomTypes,
-                'roomModes'     => $roomModes
+                'roomModes'     => $roomModes,
+                'errors'        => session('errors') ?: new \Illuminate\Support\MessageBag()
             ])));
     }
     /**
