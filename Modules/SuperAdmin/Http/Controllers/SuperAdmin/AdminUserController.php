@@ -41,7 +41,9 @@ class AdminUserController extends EncorUsersController
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
-                // $actions->disableDelete();
+                $actions->disableDelete();              
+                $deleteUrl = request()->getSchemeAndHttpHost() . "/superadmin/auth-users/" . $actions->getKey();
+                $actions->append('<a href="javascript:void(0);" onclick="customDelete(' . $actions->getKey() . ')" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></a>');
         });
 
         $grid->tools(function ($tools) {
@@ -59,7 +61,7 @@ class AdminUserController extends EncorUsersController
                     </button>
 
                 </div>
-                     <script>
+                <script>
                     function copyAreaManagerUrl() {
                         const url = '{$areaManagerUrl}';
                         navigator.clipboard.writeText(url).then(() => {
@@ -67,6 +69,31 @@ class AdminUserController extends EncorUsersController
                         }).catch(() => {
                             alert('تعذر نسخ الرابط');
                         });
+                    }
+                    
+                    function customDelete(id) {
+                        if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                            fetch('/superadmin/auth-users/' + id, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                    'Content-Type': 'application/json',
+                                },
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    toastr.error(data.message || data.error);
+                                } else {
+                                    toastr.success('تم الحذف بنجاح');
+                                    location.reload();
+                                }
+                            })
+                            .catch(error => {
+                                toastr.error('حدث خطأ أثناء الحذف');
+                                console.error('Error:', error);
+                            });
+                        }
                     }
                 </script>
                 HTML;
@@ -96,7 +123,7 @@ class AdminUserController extends EncorUsersController
             $user = $this->model->find($id);
             if ($user){
                 if ($user->isRole('admin') || $user->isRole('developer')){
-                    return response ()->json (['error'=>'','message'=>__('admin cant be deleted')]);
+                    return response ()->json (['error' => true, 'message' => __('admin cant be deleted')]);
                 }
             }
 
@@ -108,10 +135,13 @@ class AdminUserController extends EncorUsersController
 
             Agency::query ()->where ('owner_id',$id)->delete ();
 
-            return parent ::destroy ($id);
+            // حذف المستخدم
+            $user->delete();
+            
+            return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
             
         } catch (\Exception $e) {
-            return response()->json(['error' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
+            return response()->json(['error' => true, 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
     }
 
