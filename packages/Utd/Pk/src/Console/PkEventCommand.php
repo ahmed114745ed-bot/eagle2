@@ -15,7 +15,7 @@ class PkEventCommand extends Command
 
     public function handle()
     {
-        $pkEvent = PkEvent::endToday()->first();
+        $pkEvent = PkEvent::dayEnd()->first();
 
         if (! $pkEvent) {
             return '';

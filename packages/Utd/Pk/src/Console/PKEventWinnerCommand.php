@@ -37,7 +37,7 @@ class PKEventWinnerCommand extends Command
 
     protected function getCurrentPkEvent()
     {
-        return PkEvent::endToday()->with('rewards')
+        return PkEvent::dayEnd()->with('rewards')
             ->first();
     }
 

@@ -25,7 +25,7 @@ class WeeklyStarWinner extends Command
 
     public function handle()
     {
-        $weeklyEvent = WeeklyStar::endToday()->where('type', 'weekly_star')
+        $weeklyEvent = WeeklyStar::dayEnd()->where('type', 'weekly_star')
             ->with('gifts', 'rewards')
             ->latest()
             ->first();

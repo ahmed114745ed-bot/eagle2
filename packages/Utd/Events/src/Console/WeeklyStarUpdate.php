@@ -18,7 +18,7 @@ class WeeklyStarUpdate extends Command
     public function handle()
     {
         $weeklyEvent = WeeklyStar::weeklyStar()
-             ->endToday()
+             ->dayEnd()
             ->with('gifts')
             ->latest()
             ->first();
