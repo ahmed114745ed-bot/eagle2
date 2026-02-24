@@ -632,12 +632,10 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
-            info("$name");
+            $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+            $encodedName = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
-            }
-                 //dd( $this->roomLevel);
+            //dd( $this->roomLevel);
             $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
             $levelImageHtml = '';
 
@@ -652,7 +650,7 @@ class RoomController extends MainController
                     <div style='display: flex; align-items: center; gap: 10px;'>
                         <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                         <div>
-                            <span style='cursor: pointer;'>$name</span><br>
+                            <span style='cursor: pointer;'>$encodedName</span><br>
                             <span style='cursor: pointer;'>ID: $id</span>
                              {$levelImageHtml}
                         </div>
