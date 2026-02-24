@@ -38,10 +38,16 @@ class AdminUserController extends EncorUsersController
 
     public function grid ()
     {
+        \Log::info('AdminUserController grid method called', [
+            'controller_class' => get_class($this),
+            'request_url' => request()->url(),
+            'request_path' => request()->path()
+        ]);
 
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
+                \Log::info('Grid actions callback called');
                 $actions->disableDelete(); 
                 $actions->add(new DeleteSubSuperAdminAction()); 
         });
@@ -115,10 +121,20 @@ class AdminUserController extends EncorUsersController
 
     public function destroy ( $id )
     {
+        \Log::info('AdminUserController destroy method called', [
+            'id' => $id,
+            'controller_class' => get_class($this),
+            'request_url' => request()->url(),
+            'request_method' => request()->method(),
+            'request_path' => request()->path(),
+            'current_route' => request()->route()->getName()
+        ]);
+        
         try {
             $user = $this->model->find($id);
             if ($user){
                 if ($user->isRole('admin') || $user->isRole('developer')){
+                    \Log::warning('Attempted to delete admin/developer user', ['user_id' => $id]);
                     return response ()->json (['error' => true, 'message' => __('admin cant be deleted')]);
                 }
             }
@@ -127,6 +143,11 @@ class AdminUserController extends EncorUsersController
             if ($OldUserAppId) {
                 $OldUserAppId->is_sub_super_admin = 0;
                 $OldUserAppId->save();
+                
+                \Log::info('Updated user is_sub_super_admin in destroy method', [
+                    'user_id' => $OldUserAppId->id,
+                    'app_id' => $user->app_id
+                ]);
             }
 
             Agency::query ()->where ('owner_id',$id)->delete ();
@@ -134,9 +155,16 @@ class AdminUserController extends EncorUsersController
             // حذف المستخدم
             $user->delete();
             
+            \Log::info('User deleted successfully in destroy method', ['user_id' => $id]);
+            
             return response()->json(['success' => true, 'message' => 'تم الحذف بنجاح']);
             
         } catch (\Exception $e) {
+            \Log::error('Error in AdminUserController destroy method', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json(['error' => true, 'message' => 'حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
         }
     }
