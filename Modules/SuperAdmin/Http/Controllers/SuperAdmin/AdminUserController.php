@@ -100,16 +100,17 @@ class AdminUserController extends EncorUsersController
 
         $grid->column('created_at', trans('admin.created_at'))->sortable();
         $grid->column('updated_at', trans('admin.updated_at'))->sortable();
-
-        // الآن أضع الـ actions بالطريقة الصحيحة
-        $grid->actions(function (\Encore\Admin\Grid\Displayers\Actions $actions) {
-                \Log::info('Custom Grid actions callback called with full control');
-                
-                $actions->disableDelete(); // تعطيل الحذف الافتراضي
-                $actions->add(new DeleteSubSuperAdminAction()); // إضافة action مخصص
-                
-                \Log::info('DeleteSubSuperAdminAction added successfully');
+        
+        // إضافة عمود حذف مخصص بدلاً من استخدام actions
+        $grid->column('delete_action', 'Actions')->display(function () {
+            $id = $this->id;
+            return "<button onclick='customSuperAdminDelete({$id})' class='btn btn-sm btn-danger'>
+                        <i class='fa fa-trash'></i> Delete
+                    </button>";
         });
+
+        // تعطيل جميع الـ actions الافتراضية تماماً
+        $grid->disableActions();
 
         $grid->tools(function ($tools) {
                 $logoutUrl = route('superadmin.superadmin.logout');
@@ -127,35 +128,49 @@ class AdminUserController extends EncorUsersController
 
                 </div>
                 <script>
-                    function copyAreaManagerUrl() {
-                        const url = '{$areaManagerUrl}';
-                        navigator.clipboard.writeText(url).then(() => {
-                            toastr.success('تم نسخ الرابط بنجاح');
-                        }).catch(() => {
-                            alert('تعذر نسخ الرابط');
-                        });
+                    if (typeof copyAreaManagerUrl === 'undefined') {
+                        function copyAreaManagerUrl() {
+                            const url = '{$areaManagerUrl}';
+                            navigator.clipboard.writeText(url).then(() => {
+                                toastr.success('تم نسخ الرابط بنجاح');
+                            }).catch(() => {
+                                alert('تعذر نسخ الرابط');
+                            });
+                        }
                     }
                     
-                    // تعديل action الحذف ليشير للسوبر أدمن
-                    $(document).ready(function() {
-                        // البحث عن جميع forms التي تحتوي على _handle_action_
-                        $('form[action*="_handle_action_"]').each(function() {
-                            var currentAction = $(this).attr('action');
-                            if (currentAction.includes('/admin/')) {
-                                var newAction = currentAction.replace('/admin/', '/superadmin/');
-                                $(this).attr('action', newAction);
+                    if (typeof customSuperAdminDelete === 'undefined') {
+                        function customSuperAdminDelete(id) {
+                            console.log('customSuperAdminDelete called with id:', id);
+                            
+                            if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                                console.log('Delete confirmed, sending AJAX to: /superadmin/auth-users/' + id);
+                                
+                                fetch('/superadmin/auth-users/' + id, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                        'Content-Type': 'application/json',
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Delete response:', data);
+                                    if (data.success) {
+                                        toastr.success('تم الحذف بنجاح');
+                                        location.reload();
+                                    } else {
+                                        toastr.error(data.message || 'حدث خطأ');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Delete error:', error);
+                                    toastr.error('حدث خطأ أثناء الحذف');
+                                });
                             }
-                        });
-                        
-                        // مراقبة إضافة forms جديدة
-                        $(document).on('submit', 'form[action*="_handle_action_"]', function(e) {
-                            var currentAction = $(this).attr('action');
-                            if (currentAction.includes('/admin/')) {
-                                var newAction = currentAction.replace('/admin/', '/superadmin/');
-                                $(this).attr('action', newAction);
-                            }
-                        });
-                    });
+                        }
+                    }
                 </script>
                 HTML;
 
