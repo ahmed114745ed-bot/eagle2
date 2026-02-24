@@ -13,6 +13,9 @@ class CreateHostLevelRewardsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('host_level_rewards')) {
+            return;
+        }
         Schema::create('host_level_rewards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('host_level_id')->nullable()->constrained('host_levels')->nullOnDelete();

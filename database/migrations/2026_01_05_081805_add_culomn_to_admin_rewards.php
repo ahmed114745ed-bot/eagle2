@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('admin_rewards', 'package_id')) {
+            return;
+        }
         Schema::table('admin_rewards', function (Blueprint $table) {
             $table->unsignedBigInteger('package_id')->nullable();
         });

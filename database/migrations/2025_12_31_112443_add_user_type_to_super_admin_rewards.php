@@ -11,6 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Check if already renamed
+        if (Schema::hasTable('admin_rewards')) {
+            // Add columns to admin_rewards if needed
+            if (!Schema::hasColumn('admin_rewards', 'created_by')) {
+                Schema::table('admin_rewards', function (Blueprint $table) {
+                    $table->unsignedBigInteger('created_by')->nullable();
+                });
+            }
+            if (!Schema::hasColumn('admin_rewards', 'user_type')) {
+                Schema::table('admin_rewards', function (Blueprint $table) {
+                    $table->string('user_type')->default('super_admin');
+                });
+            }
+            return;
+        }
+
         // 1️⃣ Modify table FIRST
         Schema::table('super_admin_rewards', function (Blueprint $table) {
             $table->unsignedBigInteger('created_by')->nullable();

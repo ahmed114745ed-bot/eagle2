@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('room_cup_rewards', 'target_id')) {
+            return;
+        }
         Schema::table('room_cup_rewards', function (Blueprint $table) {
             $table->unsignedBigInteger('target_id')->nullable()
                   ->comment('ID of the target ');

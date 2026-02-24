@@ -13,6 +13,9 @@ class CreateHostLevelWinnersTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('host_level_winners')) {
+            return;
+        }
         Schema::create('host_level_winners', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
