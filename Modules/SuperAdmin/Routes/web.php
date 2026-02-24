@@ -104,6 +104,7 @@ use Modules\SuperAdmin\Http\Controllers\SuperAdmin\AuthController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\BdSalariesController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\ChargeController;
+use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HandleController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeCarouselController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\HomeController;
 use Modules\SuperAdmin\Http\Controllers\SuperAdmin\LiveRoomController;
@@ -169,7 +170,7 @@ Route::group(
         'as' => 'superadmin.',
     ],
     function () {
-        Route::post('_handle_action_', '\Encore\Admin\Controllers\HandleController@handleAction')->name('handle-action');
+        Route::post('_handle_action_', [HandleController::class, 'handleAction'])->name('handle-action');
         
         Route::get('setting', [AuthController::class, 'getSetting']);
         Route::get('auth/setting', [AuthController::class, 'getSetting']);
