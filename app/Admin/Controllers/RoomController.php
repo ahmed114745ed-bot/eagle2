@@ -347,6 +347,7 @@ class RoomController extends MainController
                 'rooms.level',
                 'rooms.level_id',
                 'rooms.created_at',
+                'rooms.hour_hot',
                 \DB::raw("
         CASE rooms.room_status
             WHEN 1 THEN 100
@@ -611,42 +612,47 @@ class RoomController extends MainController
         $grid->id(__('ID'));
 
         $grid->column('room_name', __('room'))->display(function ($name) {
-            $path = @$this->room_cover;
-            $id = @$this->id;
-            $defaultImage = asset("images/room.jpg");
-            $url = getImagePath($path) ?? $defaultImage;
+            try {
+                $path = @$this->room_cover;
+                $id = @$this->id;
+                $defaultImage = asset("images/room.jpg");
+                $url = getImagePath($path) ?? $defaultImage;
 
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
+                if (!isImageExists($url)) {
+                    $url = $defaultImage;
+                }
 
-            if (strlen($name) > 50) {
-                $name = substr($name, 0, 50) . ' ...';
-            }
-                 //dd( $this->roomLevel);
-            $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
-            $levelImageHtml = '';
+                if (strlen($name ?? '') > 50) {
+                    $name = substr($name, 0, 50) . ' ...';
+                }
+                $name = $name ?? '';
+                $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
+                $levelImageHtml = '';
 
-            if ($levelimage) {
-                $levelImageHtml = "
-                    <div style='margin-top:4px;'>
-                        <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
-                    </div>
-                ";
-            }
-            return "
-                    <div style='display: flex; align-items: center; gap: 10px;'>
-                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-                        <div>
-                            <span style='cursor: pointer;'>$name</span><br>
-                            <span style='cursor: pointer;'>ID: $id</span>
-                             {$levelImageHtml}
+                if ($levelimage) {
+                    $levelImageHtml = "
+                        <div style='margin-top:4px;'>
+                            <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
                         </div>
-                    </div>
-                ";
+                    ";
+                }
+                return "
+                        <div style='display: flex; align-items: center; gap: 10px;'>
+                            <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+                            <div>
+                                <span style='cursor: pointer;'>$name</span><br>
+                                <span style='cursor: pointer;'>ID: $id</span>
+                                 {$levelImageHtml}
+                            </div>
+                        </div>
+                    ";
+            } catch (\Exception $e) {
+                \Log::error('Error displaying room: ' . $e->getMessage() . ' Room ID: ' . ($this->id ?? 'unknown'));
+                return '<span class="text-danger">Error loading room</span>';
+            }
         });
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        $grid->column('uid', __('room owner'))->display(function ($uid) {
             $user = $this->owner;
             if (! $user) {
                 return __('No User');
@@ -661,17 +667,16 @@ class RoomController extends MainController
         });
 
 
-        $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
+        $grid->column('room_visitors_count', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
 
 
         $grid->column(__('microphone'))->display(function () {
-
-            $microphones = $this->microphones->sortBy('position');
-
-
-            if ($microphones->isEmpty()) {
-                return '';
-            }
+            try {
+                $microphones = $this->microphones;
+                if (!$microphones || $microphones->isEmpty()) {
+                    return '';
+                }
+                $microphones = $microphones->sortBy('position');
 
             $html = '<div class="image-container">';
 
@@ -742,6 +747,10 @@ class RoomController extends MainController
             }
 
             return $html;
+            } catch (\Exception $e) {
+                \Log::error('Error displaying microphones: ' . $e->getMessage());
+                return '';
+            }
         });
 
 
