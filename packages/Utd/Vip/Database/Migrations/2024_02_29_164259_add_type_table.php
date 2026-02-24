@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users_vips', function (Blueprint $table) {
-            $table->char("type_send",100)->nullable();
+            $table->char('type_send', 100)->nullable();
         });
     }
 

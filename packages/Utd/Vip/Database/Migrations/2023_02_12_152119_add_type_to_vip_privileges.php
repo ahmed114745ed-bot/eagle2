@@ -14,7 +14,7 @@ class AddTypeToVipPrivileges extends Migration
     public function up()
     {
         Schema::table('vip_privileges', function (Blueprint $table) {
-            $table->unsignedTinyInteger ('type')->nullable ()->default (0);
+            $table->unsignedTinyInteger('type')->nullable()->default(0);
         });
     }
 

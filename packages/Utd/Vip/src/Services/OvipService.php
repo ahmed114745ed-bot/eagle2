@@ -33,7 +33,7 @@ class OvipService
             'img' => $image ?? '',
             'price' => $request->price,
             'expire' => $request->expire,
-            'exp' => $request->exp
+            'exp' => $request->exp,
         ];
         $ovip = $this->ovipRepository->create($dataOvip);
 
@@ -48,6 +48,7 @@ class OvipService
                 }
             }
         }
+
         return true;
     }
 
@@ -64,6 +65,7 @@ class OvipService
             'all_privileges' => $vipPrivileges,
             'o_vips' => $ovip,
         ];
+
         return $data;
     }
 
@@ -74,7 +76,7 @@ class OvipService
             'level' => $request->level,
             'price' => $request->price,
             'expire' => $request->expire,
-            'exp' => $request->exp
+            'exp' => $request->exp,
         ];
         if ($request->hasFile('image')) {
             $dataOvip['img'] = Common::upload('images', $request->file('image'));
@@ -93,6 +95,7 @@ class OvipService
                 }
             }
         }
+
         return true;
     }
 

@@ -9,9 +9,9 @@ class VipPrev extends Model
 {
     use HasFactory;
 
-    protected $table = 'vip_prev';
-
     public $timestamps = false;
+
+    protected $table = 'vip_prev';
 
     protected $fillable = [
         'o_vip_id',

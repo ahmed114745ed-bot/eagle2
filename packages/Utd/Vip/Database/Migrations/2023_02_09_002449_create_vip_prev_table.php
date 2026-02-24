@@ -14,8 +14,8 @@ class CreateVipPrevTable extends Migration
     public function up()
     {
         Schema::create('vip_prev', function (Blueprint $table) {
-            $table->unsignedBigInteger ('o_vip_id');
-            $table->unsignedBigInteger ('o_vip_privilege_id');
+            $table->unsignedBigInteger('o_vip_id');
+            $table->unsignedBigInteger('o_vip_privilege_id');
         });
     }
 

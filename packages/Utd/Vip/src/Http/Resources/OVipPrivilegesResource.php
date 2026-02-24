@@ -23,6 +23,7 @@ class OVipPrivilegesResource extends JsonResource
                 $request->vipPrivileges->map(function ($p) use ($activePrivilegeIds) {
                     $priv = clone $p;
                     $priv->active = in_array($priv->id, $activePrivilegeIds);
+
                     return $priv;
                 })->sortByDesc('active')
             ),

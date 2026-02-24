@@ -2,10 +2,10 @@
 
 namespace Utd\Vip\Http\Controllers\Api;
 
-use Exception;
 use App\Helpers\Common;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Utd\Vip\Http\Resources\OVipPrivilegesResource;
 use Utd\Vip\Services\OvipService;
@@ -17,6 +17,7 @@ class OvipController extends Controller
     public function index()
     {
         $data = $this->ovipService->index();
+
         return Common::apiResponse(1, '', $data);
     }
 
@@ -36,6 +37,7 @@ class OvipController extends Controller
         }
         try {
             $this->ovipService->create($request);
+
             return Common::apiResponse(1, 'created successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -51,6 +53,7 @@ class OvipController extends Controller
             return Common::apiResponse(0, implode(',', $validator->errors()->all()), null, 422);
         }
         $data = $this->ovipService->show($request->ovip_id);
+
         return Common::apiResponse(1, '', $data);
     }
 
@@ -58,6 +61,7 @@ class OvipController extends Controller
     {
         $data = $this->ovipService->showWithAllPrivileges($request->ovip_id);
         request()->vipPrivileges = $data['all_privileges'];
+
         return Common::apiResponse(1, '', new OVipPrivilegesResource($data['o_vips']));
     }
 
@@ -65,7 +69,7 @@ class OvipController extends Controller
     {
         $id = $request->o_vip_id;
         $validator = Validator::make($request->all(), [
-            'level' => 'required|unique:o_vips,level,' . $id,
+            'level' => 'required|unique:o_vips,level,'.$id,
             'o_vip_id' => 'required|integer|exists:o_vips,id',
             'price' => 'required|numeric',
             'exp' => 'required|numeric',
@@ -80,6 +84,7 @@ class OvipController extends Controller
 
         try {
             $this->ovipService->update($request);
+
             return Common::apiResponse(1, 'updated successfully');
         } catch (Exception $exception) {
             return Common::apiResponse(0, $exception->getMessage(), null, 400);
@@ -89,6 +94,7 @@ class OvipController extends Controller
     public function allVIP(Request $request)
     {
         $data = $this->ovipService->allVIP($request->search);
+
         return Common::apiResponse(1, '', $data);
     }
 }

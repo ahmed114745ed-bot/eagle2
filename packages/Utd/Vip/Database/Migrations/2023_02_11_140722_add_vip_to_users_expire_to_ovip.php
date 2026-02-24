@@ -13,12 +13,12 @@ class AddVipToUsersExpireToOvip extends Migration
      */
     public function up()
     {
-        if (!Schema::hasColumn('users', 'vip')) {
+        if (! Schema::hasColumn('users', 'vip')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->integer('vip')->nullable()->default(0);
             });
         }
-        if (!Schema::hasColumn('o_vips', 'expire')) {
+        if (! Schema::hasColumn('o_vips', 'expire')) {
             Schema::table('o_vips', function (Blueprint $table) {
                 $table->integer('expire')->nullable()->default(0);
             });

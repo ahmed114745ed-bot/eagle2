@@ -15,12 +15,12 @@ class CreateVipsTable extends Migration
     {
         Schema::create('vips', function (Blueprint $table) {
             $table->id();
-            $table->integer ('type')->default (0)->comment ('1 نجمة شارب 2 ذهبي حاد 3 كبار الشخصيات');
-            $table->integer ('level')->default (0)->comment ('المستوى');
-            $table->bigInteger ('exp')->default (0)->comment ('خبرة');
-            $table->bigInteger ('di')->default (0)->comment ('ماسات');
-            $table->bigInteger ('co')->default (0)->comment ('عملات');
-            $table->string ('img')->nullable ();
+            $table->integer('type')->default(0)->comment('1 نجمة شارب 2 ذهبي حاد 3 كبار الشخصيات');
+            $table->integer('level')->default(0)->comment('المستوى');
+            $table->bigInteger('exp')->default(0)->comment('خبرة');
+            $table->bigInteger('di')->default(0)->comment('ماسات');
+            $table->bigInteger('co')->default(0)->comment('عملات');
+            $table->string('img')->nullable();
             $table->timestamps();
         });
     }

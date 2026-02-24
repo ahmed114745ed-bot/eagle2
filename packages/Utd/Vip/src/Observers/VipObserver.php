@@ -2,8 +2,8 @@
 
 namespace Utd\Vip\Observers;
 
-use Utd\Vip\Entities\Vip;
 use Illuminate\Support\Facades\Cache;
+use Utd\Vip\Entities\Vip;
 
 class VipObserver
 {

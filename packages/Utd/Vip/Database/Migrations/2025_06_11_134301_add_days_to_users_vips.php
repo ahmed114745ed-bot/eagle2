@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users_vips', function (Blueprint $table) {
-           $table->integer('days')->nullable();
+            $table->integer('days')->nullable();
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users_vips', function (Blueprint $table) {
-           $table->dropColumn('days');
+            $table->dropColumn('days');
         });
     }
 };

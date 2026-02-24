@@ -10,7 +10,7 @@ class PrivilegeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => app()->getLocale() == 'en' ? ($this->en_name ?? $this->name) : $this->name,
+            'name' => app()->getLocale() === 'en' ? ($this->en_name ?? $this->name) : $this->name,
             'active' => $this->active,
             'type' => $this->type,
             'title' => $this->title,

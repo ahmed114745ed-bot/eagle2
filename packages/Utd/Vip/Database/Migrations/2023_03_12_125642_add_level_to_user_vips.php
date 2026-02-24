@@ -14,7 +14,7 @@ class AddLevelToUserVips extends Migration
     public function up()
     {
         Schema::table('users_vips', function (Blueprint $table) {
-            $table->unsignedInteger ('level')->nullable ()->default (0);
+            $table->unsignedInteger('level')->nullable()->default(0);
         });
     }
 

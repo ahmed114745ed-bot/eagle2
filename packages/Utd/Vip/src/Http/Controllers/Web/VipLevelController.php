@@ -19,28 +19,12 @@ class VipLevelController extends MainController
     use HasResourceActions;
 
     public $permission_name = 'level';
+
     public $hiddenColumns = [];
 
     public function __construct()
     {
-        (new AppFeatureService)->validateStatusEnable("vips");
-    }
-
-    protected function getVipTypeOptions(): array
-    {
-        $options = [
-            1 => __('broadcaster'),
-            2 => __('honor'),
-            4 => __('room'),
-            5 => __('charge'),
-        ];
-
-        if (PackageHelper::isInstalled('cp')) {
-            $options[3] = __('cp');
-        }
-
-        ksort($options);
-        return $options;
+        (new AppFeatureService)->validateStatusEnable('vips');
     }
 
     public function index(Content $content)
@@ -52,39 +36,13 @@ class VipLevelController extends MainController
 
     public function senderIndex(Content $content)
     {
-        if (!Admin::user()->can('*')) {
-            Permission::check('browse-' . $this->permission_name);
+        if (! Admin::user()->can('*')) {
+            Permission::check('browse-'.$this->permission_name);
         }
+
         return parent::index($content
             ->title(trans('charge level'))
             ->body($this->senderGrid()));
-    }
-
-    protected function senderGrid()
-    {
-        $grid = new Grid(new Vip());
-        $grid->model()->where('type', 2)->orderByDesc('type')->orderBy('exp');
-        $grid->quickSearch();
-        $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->display(function ($path) {
-            $defaultImage = asset("images/image.png");
-            $url = getImagePath($path) ?? $defaultImage;
-            if (!isImageExists($url)) {
-                $url = $defaultImage;
-            }
-            return handleShowImageWithTypes($this->id, $url, 50, 50);
-        });
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        $grid->setResource('vips');
-
-        return $grid;
     }
 
     public function receiverIndex(Content $content)
@@ -94,54 +52,15 @@ class VipLevelController extends MainController
             ->body($this->receiverGrid());
     }
 
-    protected function receiverGrid()
-    {
-        $grid = new Grid(new Vip());
-        $grid->model()->where('type', 1)->orderByDesc('type')->orderBy('exp');
-        $grid->quickSearch();
-        $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->image('', '30');
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        $grid->setResource('vips');
-
-        return $grid;
-    }
-
     public function cpIndex(Content $content)
     {
-        if (!PackageHelper::isInstalled('cp')) {
+        if (! PackageHelper::isInstalled('cp')) {
             abort(404);
         }
+
         return $content
             ->title(trans('charge level'))
             ->body($this->cpGrid());
-    }
-
-    protected function cpGrid()
-    {
-        $grid = new Grid(new Vip());
-        $grid->model()->where('type', 3)->orderByDesc('type')->orderBy('exp');
-        $grid->quickSearch();
-        $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->image('', '30');
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        $grid->setResource('vips');
-
-        return $grid;
     }
 
     public function roomIndex(Content $content)
@@ -151,51 +70,11 @@ class VipLevelController extends MainController
             ->body($this->roomGrid());
     }
 
-    protected function roomGrid()
-    {
-        $grid = new Grid(new Vip());
-        $grid->model()->where('type', 4)->orderByDesc('type')->orderBy('exp');
-        $grid->quickSearch();
-        $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->image('', '30');
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        $grid->setResource('vips');
-
-        return $grid;
-    }
-
     public function chargeIndex(Content $content)
     {
         return $content
             ->title(trans('charge level'))
             ->body($this->chargeGrid());
-    }
-
-    protected function chargeGrid()
-    {
-        $grid = new Grid(new Vip());
-        $grid->model()->where('type', 5)->orderByDesc('type')->orderBy('exp');
-        $grid->quickSearch();
-        $grid->column('id', __('Id'));
-        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
-        $grid->column('level', __('Level'))->editable();
-        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
-            $value = $value->getOriginal();
-            return number_format($value);
-        })->editable();
-        $grid->column('img', __('Image'))->image('', '30');
-        $this->extendGrid($grid);
-        $grid->disableExport();
-        $grid->setResource('vips');
-
-        return $grid;
     }
 
     public function show($id, Content $content)
@@ -217,6 +96,137 @@ class VipLevelController extends MainController
         return parent::create($content
             ->title(trans('charge level'))
             ->body($this->form()));
+    }
+
+    protected function getVipTypeOptions(): array
+    {
+        $options = [
+            1 => __('broadcaster'),
+            2 => __('honor'),
+            4 => __('room'),
+            5 => __('charge'),
+        ];
+
+        if (PackageHelper::isInstalled('cp')) {
+            $options[3] = __('cp');
+        }
+
+        ksort($options);
+
+        return $options;
+    }
+
+    protected function senderGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 2)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+
+            return number_format($value);
+        })->editable();
+        $grid->column('img', __('Image'))->display(function ($path) {
+            $defaultImage = asset('images/image.png');
+            $url = getImagePath($path) ?? $defaultImage;
+            if (! isImageExists($url)) {
+                $url = $defaultImage;
+            }
+
+            return handleShowImageWithTypes($this->id, $url, 50, 50);
+        });
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    protected function receiverGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 1)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+
+            return number_format($value);
+        })->editable();
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    protected function cpGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 3)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+
+            return number_format($value);
+        })->editable();
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    protected function roomGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 4)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+
+            return number_format($value);
+        })->editable();
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
+    }
+
+    protected function chargeGrid()
+    {
+        $grid = new Grid(new Vip());
+        $grid->model()->where('type', 5)->orderByDesc('type')->orderBy('exp');
+        $grid->quickSearch();
+        $grid->column('id', __('Id'));
+        $grid->column('type', __('Type'))->select($this->getVipTypeOptions());
+        $grid->column('level', __('Level'))->editable();
+        $grid->column('exp', __('Exp'))->display(function ($column, Grid\Column $value) {
+            $value = $value->getOriginal();
+
+            return number_format($value);
+        })->editable();
+        $grid->column('img', __('Image'))->image('', '30');
+        $this->extendGrid($grid);
+        $grid->disableExport();
+        $grid->setResource('vips');
+
+        return $grid;
     }
 
     protected function grid()
@@ -259,6 +269,7 @@ class VipLevelController extends MainController
             if (PackageHelper::isInstalled('room')) {
                 $tabs['Approom'] = __('AppRoom');
             }
+
             return view('admin.tabs', compact('tabs'));
         });
 
@@ -271,23 +282,24 @@ class VipLevelController extends MainController
         })->editable();
 
         $grid->column('img', __('Image'))->display(function ($img) {
-            $defaultImage = asset("images/image.png");
+            $defaultImage = asset('images/image.png');
             $url = getImagePath($img) ?? $defaultImage;
-            if (!isImageExists($url)) {
+            if (! isImageExists($url)) {
                 $url = $defaultImage;
             }
 
-            $ext = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+            $ext = mb_strtolower(pathinfo($url, PATHINFO_EXTENSION));
 
-            $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',];
+            $imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
 
             $inner = handleShowImageWithTypes($this->id, $url, 50, 50);
 
             if (in_array($ext, $imageTypes)) {
                 return "<a href='{$url}' target='_blank'><img src='{$url}' style='width:50px'/></a>";
-            } else {
-                return $inner;
             }
+
+            return $inner;
+
         });
 
         $this->extendGrid($grid);
@@ -296,9 +308,10 @@ class VipLevelController extends MainController
         $currentTab = request('tab', 'Appsender');
         $grid->disableCreateButton();
         $grid->tools(function (Grid\Tools $tools) use ($currentTab) {
-            $tools->append('<a href="' . admin_url('vips/create?tab=' . $currentTab) . '" class="btn btn-sm btn-success">
-            <i class="fa fa-plus"></i>&nbsp;' . trans('admin.new') . '</a>');
+            $tools->append('<a href="'.admin_url('vips/create?tab='.$currentTab).'" class="btn btn-sm btn-success">
+            <i class="fa fa-plus"></i>&nbsp;'.trans('admin.new').'</a>');
         });
+
         return $grid;
     }
 
@@ -312,6 +325,7 @@ class VipLevelController extends MainController
         $show->field('exp', __('Exp'))->number();
         $show->field('img', __('Image'))->image();
         $this->extendShow($show);
+
         return $show;
     }
 
@@ -343,7 +357,7 @@ class VipLevelController extends MainController
         $form->number('level', __('Level'))->required();
         $form->number('exp', __('Exp'))->help(__('sender: 1 coin = 1 exp -- receiver: 1 coin = 1 exp'));
         $form->file('img', __('Image'))->name(function ($file) {
-            return now()->timestamp . rand(0, 999) . '.' . $file->guessExtension();
+            return now()->timestamp.rand(0, 999).'.'.$file->guessExtension();
         })->removable()->rules('required');
 
         $form->footer(function ($footer) {

@@ -14,13 +14,13 @@ class ModifyVipTable extends Migration
     public function up()
     {
         Schema::table('vips', function (Blueprint $table) {
-            $table->dropColumn (['exp','di','co']);
+            $table->dropColumn(['exp', 'di', 'co']);
         });
 
         Schema::table('vips', function (Blueprint $table) {
-            $table->bigInteger ('exp')->nullable ()->default (0)->comment ('خبرة');
-            $table->bigInteger ('di')->nullable ()->default (0)->comment ('ماسات');
-            $table->bigInteger ('co')->nullable ()->default (0)->comment ('عملات');
+            $table->bigInteger('exp')->nullable()->default(0)->comment('خبرة');
+            $table->bigInteger('di')->nullable()->default(0)->comment('ماسات');
+            $table->bigInteger('co')->nullable()->default(0)->comment('عملات');
         });
     }
 

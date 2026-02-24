@@ -52,13 +52,13 @@ class UserVip extends Model
         })->where('is_used', 1);
     }
 
-    protected static function booted()
-    {
-        static::created(function ($userVip) {});
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($userVip) {});
     }
 }
