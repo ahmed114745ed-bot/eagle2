@@ -715,9 +715,9 @@ class RoomController extends MainController
 
                 $name = e($user->name);
                 $id   = e($user->id);
-               $url = url("users/{$id}");
+                $userUrl = admin_url('users/' . $user->id);
                 $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$url}'">
+                <div class="image-wrapper" onclick="window.location.href='{$userUrl}'">
                     <img src="{$url}" title="{$name}"
                     style="width: 40px; height: 40px; border-radius: 50%;
                             object-fit: cover; border: 2px solid white;
