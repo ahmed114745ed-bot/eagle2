@@ -32,6 +32,7 @@ use Modules\Milestones\Helpers\MilestoneHelper;
 use Modules\SuperAdmin\Entities\SuperAdminReward;
 use App\Admin\Actions\FrozenWalletSuperAdminAction;
 use Modules\SuperAdmin\Actions\Admin\DeleteSuperAdminsAction;
+use Modules\SuperAdmin\Entities\SubAdmin;
 
 class SuperAdminController extends MainController
 {
@@ -773,33 +774,7 @@ class SuperAdminController extends MainController
         return $show;
     }
 
-    //    public function sync($days = 0)
-    //    {
-    //        $days = request()->query('days', 0);
-    //        $bds = DB::table('admin_users')
-    //            ->where('type', 'bd')
-    //            ->where('app_id', '!=', 0)
-    //            ->get();
-    //
-    //        $updated = 0;
-    //
-    //        foreach ($bds as $bd) {
-    //            $query = DB::table('agencies')
-    //                ->where('bd_id', $bd->app_id);
-    //
-    //            if ($days > 0) {
-    //                $query->where('created_at', '<=', now()->subDays($days));
-    //            }
-    //
-    //            $affected = $query->update(['bd_id' => $bd->id]);
-    //            $updated += $affected;
-    //        }
-    //
-    //        return response()->json([
-    //            'status' => 'success',
-    //            'message' => $updated
-    //        ]);
-    //    }
+
 
 
     public function searchBySuperAdmin(Request $request)
@@ -813,5 +788,26 @@ class SuperAdminController extends MainController
                     ->orWhere('id', 'like', '%' . $key . '%');
             })
             ->paginate($perPage, ['*'], 'page', $page);
+    }
+
+
+
+
+    public function deleteSubSuperAdmin($id)
+    {
+        $oldUser = DB::table('admin_users')->where('id', $id)->first();
+        $OldUserAppId = User::find($oldUser->app_id);
+        if ($OldUserAppId) {
+            $OldUserAppId->is_sub_super_admin = 0;
+            $OldUserAppId->save();
+        }
+
+        // Delete the SubAdmin record
+        DB::table('admin_users')->where('id', $oldUser->id)->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => __('done')
+        ]);
     }
 }
