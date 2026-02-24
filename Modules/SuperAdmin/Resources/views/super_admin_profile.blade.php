@@ -837,6 +837,7 @@
         <a href="?tab=agencies" class="tab-btn {{ $activeTab === 'agencies' ? 'active' : '' }}">{{ __('agencies') }}</a>
         <a href="?tab=rewards" class="tab-btn {{ $activeTab === 'rewards' ? 'active' : '' }}">{{ __('rewards') }}</a>
         <a href="?tab=bds" class="tab-btn {{ $activeTab === 'bds' ? 'active' : '' }}">{{ __('bds') }}</a>
+        <a href="?tab=sub_super_admin" class="tab-btn {{ $activeTab === 'sub_super_admin' ? 'active' : '' }}">{{ __('super admins') }}</a>
 
 
     </div>
@@ -928,7 +929,121 @@
         </div>
     @endif
 
-    @if($activeTab === 'bds')
+    @if($activeTab === 'sub_super_admin')
+        <div class="tab-content active" id="sub-super-admin-tab">
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ __('Super Admins') }}</h3>
+                    <span class="badge count-badge">{{ optional($subSuperAdmins)->total() ?? 0 }}</span>
+                </div>
+                @if($subSuperAdmins && $subSuperAdmins->count())
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('user') }}</th>
+
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($subSuperAdmins as $index => $subSuperAdmin)
+                                <tr>
+                                    <td>{{ $index + 1 + (($subSuperAdmins->currentPage() - 1) * $subSuperAdmins->perPage()) }}</td>
+
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+
+                                            <!-- Avatar -->
+                                            <div class="user-avatar">
+                                                <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}">
+                                                    <img
+                                                        src="{{ $subSuperAdmin->avatar ? getImagePath($subSuperAdmin->avatar) : $defaultImage }}"
+                                                        alt="{{ $subSuperAdmin->username ?? '' }}"
+                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                </a>
+                                            </div>
+
+                                            <!-- Name + ID -->
+                                            <div class="user-info" style="line-height: 1.2;">
+                                                <strong>
+                                                    <a href="{{ url($prefix.'/auth-users/' .$subSuperAdmin->id) }}"
+                                                       style="display: block;">
+                                                        {{ $subSuperAdmin->username ?? '' }}
+                                                    </a>
+                                                </strong>
+
+                                                <small style="color: #555;">
+                                                    ID: {{ $subSuperAdmin->id }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+
+                                            <!-- Avatar -->
+                                            <div class="user-avatar">
+                                                <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}">
+                                                    <img
+                                                        src="{{ $subSuperAdmin->appUser?->profile?->avatar ? getImagePath($subSuperAdmin->appUser->profile->avatar) : $defaultImage }}"
+                                                        alt="{{ $subSuperAdmin->appUser?->name ?? '' }}"
+                                                        style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">
+                                                </a>
+                                            </div>
+
+                                            <!-- Name + ID -->
+                                            <div class="user-info" style="line-height: 1.2;">
+                                                <strong style="display: flex; align-items: center; gap: 6px;">
+                                                    <a href="{{ url($prefix.'/users/' . ($subSuperAdmin->appUser?->id ?? 0)) }}"
+                                                       style="display: flex; align-items: center; gap: 6px;">
+
+                                                        {{-- Country Flag --}}
+                                                        @if(@$subSuperAdmin->appUser->country->flag)
+                                                            <img src="{{ getImagePath($subSuperAdmin->appUser->country->flag) }}"
+                                                                 alt="flag"
+                                                                 style="width: 20px; height: 14px; object-fit: cover; border-radius: 2px;">
+                                                        @endif
+
+                                                        {{-- User Name --}}
+                                                        {{ $subSuperAdmin->appUser?->name ?? '' }}
+                                                    </a>
+                                                </strong>
+
+                                                <small style="color: #555;">
+                                                    ID: {{ $subSuperAdmin->appUser?->uuid ?? 'N/A' }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper">
+                        {{ $subSuperAdmins->appends(['tab' => 'sub-super-admin',
+                        'sub_super_admin_page' => $subSuperAdmins?->currentPage(),])->links('vendor.pagination.default') }}
+                    </div>
+                @else
+                    <div class="empty-table">
+                        <i class="fas fa-users-slash"></i>
+                        <p>{{ __('No super admins found') }}</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+
+
+     @if($activeTab === 'bds')
         <div class="tab-content active" id="bds-tab">
             <div class="card">
                 <div class="card-header">
