@@ -567,83 +567,246 @@ class RoomController extends MainController
 
 
 
+    // protected function defineGridColumns($grid)
+    // {
+    //     $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
+
+    //     // Preload users for this page only
+    //     $grid->model()->with('microphones')->collection(function ($collection) {
+    //         // collect all microphone user IDs from the current page rows
+    //         $allIds = $collection->flatMap(function ($row) {
+    //             return array_filter(explode(',', (string) $row->microphone));
+    //         })->unique()->values()->all();
+
+    //         // fetch all needed users once
+    //         $users = collect();
+    //         if (!empty($allIds)) {
+    //             $users = User::select(['id', 'name'])
+    //                 //->with('profile:id,user_id,avatar')
+    //                 ->whereIn('id', $allIds)
+    //                 ->get()
+    //                 ->keyBy('id');
+    //         }
+
+    //         // attach a ready-to-use collection on each row
+    //         $collection->each(function ($row) use ($users) {
+    //             $ids = array_filter(explode(',', (string) $row->microphone));
+    //             $row->microphone_users = collect($ids)
+    //                 ->map(fn($id) => $users->get($id))
+    //                 ->filter()
+    //                 ->values();
+    //         });
+
+    //         return $collection; // IMPORTANT: return the collection
+    //     });
+
+    //     $grid->column('pin', __('Pin Status'))->display(function ($pin) {
+    //         return $pin == 1
+    //             ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
+    //             : '<span class="text-muted"> </span>';
+    //     });
+
+    //     $grid->id(__('ID'));
+
+    //     // $grid->column('room_name', __('room'))->display(function ($name) {
+    //     //     $path = @$this->room_cover;
+    //     //     $id = @$this->id;
+    //     //     $defaultImage = asset("images/room.jpg");
+    //     //     $url = getImagePath($path) ?? $defaultImage;
+
+    //     //     if (!isImageExists($url)) {
+    //     //         $url = $defaultImage;
+    //     //     }
+
+    //     //     if (strlen($name) > 50) {
+    //     //         $name = substr($name, 0, 50) . ' ...';
+    //     //     }
+    //     //          //dd( $this->roomLevel);
+    //     //     $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
+    //     //     $levelImageHtml = '';
+
+    //     //     if ($levelimage) {
+    //     //         $levelImageHtml = "
+    //     //             <div style='margin-top:4px;'>
+    //     //                 <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
+    //     //             </div>
+    //     //         ";
+    //     //     }
+    //     //     return "
+    //     //             <div style='display: flex; align-items: center; gap: 10px;'>
+    //     //                 <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
+    //     //                 <div>
+    //     //                     <span style='cursor: pointer;'>$name</span><br>
+    //     //                     <span style='cursor: pointer;'>ID: $id</span>
+    //     //                      {$levelImageHtml}
+    //     //                 </div>
+    //     //             </div>
+    //     //         ";
+    //     // });
+
+    //     $grid->column('room_name', __('room'))->display(function ($name) {
+
+    //         $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
+
+    //         if (mb_strlen($name) > 50) {
+    //             $name = mb_substr($name, 0, 50) . ' ...';
+    //         }
+
+    //         $name = e($name);
+
+    //         $path = $this->room_cover;
+    //         $id = $this->id;
+
+    //         $defaultImage = asset("images/room.jpg");
+    //         $url = getImagePath($path) ?? $defaultImage;
+
+    //         if (!isImageExists($url)) {
+    //             $url = $defaultImage;
+    //         }
+
+    //             return "
+    //                 <div style='display:flex;align-items:center;gap:10px;'>
+    //                     <img src='{$url}' style='width:50px;height:50px;border-radius:6px;'>
+    //                     <div>
+    //                         <span>{$name}</span><br>
+    //                         <span>ID: {$id}</span>
+    //                     </div>
+    //                 </div>
+    //            ";
+    //     });
+
+    //     $grid->column('owner_id', __('room owner'))->display(function ($name) {
+    //         $user = $this->owner;
+    //         if (! $user) {
+    //             return __('No User');
+    //         }
+
+    //         return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+    //     });
+
+    //     $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
+    //         $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
+    //         return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
+    //     });
+
+
+    //     $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
+
+
+    //     $grid->column(__('microphone'))->display(function () {
+
+    //         $microphones = $this->microphones->sortBy('position');
+
+
+    //         if ($microphones->isEmpty()) {
+    //             return '';
+    //         }
+
+    //         $html = '<div class="image-container">';
+
+    //         foreach ($microphones as $mic) {
+    //             $user = $mic->user;
+
+    //             if (!$user) continue;
+
+    //             $url = $user->profile?->avatar
+    //                 ? getImagePath($user->profile->avatar)
+    //                 : asset("images/businessman-icon.jpg");
+
+    //             $name = e($user->name);
+    //             $id   = e($user->id);
+
+    //             $html .= <<<HTML
+    //             <div class="image-wrapper" onclick="window.location.href='{$id}'">
+    //                 <img src="{$url}" title="{$name}"
+    //                 style="width: 40px; height: 40px; border-radius: 50%;
+    //                         object-fit: cover; border: 2px solid white;
+    //                         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    //                         transition: transform 0.3s ease;"/>
+    //             </div>
+    //          HTML;
+    //         }
+
+    //         $html .= '</div>';
+
+    //         // Add the same CSS block only once
+    //         static $appended = false;
+    //         if (!$appended) {
+    //             $html .= '
+    //           <style>
+
+
+
+    //             .image-container {
+    //                 display: flex;
+    //                 justify-content: start;
+    //                 align-items: center;
+    //                 gap: -10px; /* Overlap the images slightly */
+    //                 padding: 8px 0;
+    //                 overflow-y: overlay;
+    //                 width: 218px;
+    //                 padding-right: 16px;
+    //             }
+    //             .image-wrapper {
+    //                 display: inline-block;
+    //                 position: relative;
+    //                 margin-right: -12px;
+    //             }
+    //             .image-wrapper img {
+    //                 width: 40px;
+    //                 height: 40px;
+    //                 border-radius: 50%;
+    //                 object-fit: cover;
+    //                 border: 2px solid #fff;
+    //                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    //                 transition: transform 0.3s ease, box-shadow 0.3s ease;
+    //                 cursor: pointer;
+    //             }
+    //             .image-wrapper img:hover {
+    //                 transform: scale(1.2);
+    //                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    //             }
+    //             </style>';
+    //             $appended = true;
+    //         }
+
+    //         return $html;
+    //     });
+
+
+
+
+
+    //     Admin::style('
+    //     .dropdown-backdrop {
+    //         position: absolute !important;
+
+    //     }
+    //     html.ltr .dropdown-menu {
+
+    //         right: 38px !important;
+    //     }
+
+    // ');
+    // }
+
     protected function defineGridColumns($grid)
     {
         $maxRoomAdmin = Common::getConfig('max_room_admin') ?? 4;
 
-        // Preload users for this page only
-        $grid->model()->with('microphones')->collection(function (Collection $collection) {
-            // collect all microphone user IDs from the current page rows
-            $allIds = $collection->flatMap(function ($row) {
-                return array_filter(explode(',', (string) $row->microphone));
-            })->unique()->values()->all();
-
-            // fetch all needed users once
-            $users = collect();
-            if (!empty($allIds)) {
-                $users = User::select(['id', 'name'])
-                    //->with('profile:id,user_id,avatar')
-                    ->whereIn('id', $allIds)
-                    ->get()
-                    ->keyBy('id');
-            }
-
-            // attach a ready-to-use collection on each row
-            $collection->each(function ($row) use ($users) {
-                $ids = array_filter(explode(',', (string) $row->microphone));
-                $row->microphone_users = collect($ids)
-                    ->map(fn($id) => $users->get($id))
-                    ->filter()
-                    ->values();
-            });
-
-            return $collection; // IMPORTANT: return the collection
-        });
-
         $grid->column('pin', __('Pin Status'))->display(function ($pin) {
             return $pin == 1
-                ? '<span class="text-success"> <i class="fa fa-thumb-tack"></i></span>'
-                : '<span class="text-muted"> </span>';
+                ? '<span class="text-success"><i class="fa fa-thumb-tack"></i></span>'
+                : '';
         });
 
         $grid->id(__('ID'));
 
-        // $grid->column('room_name', __('room'))->display(function ($name) {
-        //     $path = @$this->room_cover;
-        //     $id = @$this->id;
-        //     $defaultImage = asset("images/room.jpg");
-        //     $url = getImagePath($path) ?? $defaultImage;
-
-        //     if (!isImageExists($url)) {
-        //         $url = $defaultImage;
-        //     }
-
-        //     if (strlen($name) > 50) {
-        //         $name = substr($name, 0, 50) . ' ...';
-        //     }
-        //          //dd( $this->roomLevel);
-        //     $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
-        //     $levelImageHtml = '';
-
-        //     if ($levelimage) {
-        //         $levelImageHtml = "
-        //             <div style='margin-top:4px;'>
-        //                 <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
-        //             </div>
-        //         ";
-        //     }
-        //     return "
-        //             <div style='display: flex; align-items: center; gap: 10px;'>
-        //                 <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
-        //                 <div>
-        //                     <span style='cursor: pointer;'>$name</span><br>
-        //                     <span style='cursor: pointer;'>ID: $id</span>
-        //                      {$levelImageHtml}
-        //                 </div>
-        //             </div>
-        //         ";
-        // });
-
+        /*
+    |--------------------------------------------------------------------------
+    | Room Name Column
+    |--------------------------------------------------------------------------
+    */
         $grid->column('room_name', __('room'))->display(function ($name) {
 
             $name = mb_convert_encoding($name, 'UTF-8', 'UTF-8');
@@ -655,7 +818,7 @@ class RoomController extends MainController
             $name = e($name);
 
             $path = $this->room_cover;
-            $id = $this->id;
+            $id   = $this->id;
 
             $defaultImage = asset("images/room.jpg");
             $url = getImagePath($path) ?? $defaultImage;
@@ -665,38 +828,58 @@ class RoomController extends MainController
             }
 
             return "
-        <div style='display:flex;align-items:center;gap:10px;'>
-            <img src='{$url}' style='width:50px;height:50px;border-radius:6px;'>
-            <div>
-                <span>{$name}</span><br>
-                <span>ID: {$id}</span>
+            <div style='display:flex;align-items:center;gap:10px;'>
+                <img src='{$url}' style='width:50px;height:50px;border-radius:6px;object-fit:cover;'>
+                <div>
+                    <span>{$name}</span><br>
+                    <span>ID: {$id}</span>
+                </div>
             </div>
-        </div>
-    ";
+        ";
         });
 
-        $grid->column('owner_id', __('room owner'))->display(function ($name) {
+        /*
+    |--------------------------------------------------------------------------
+    | Owner Column
+    |--------------------------------------------------------------------------
+    */
+        $grid->column('owner_id', __('room owner'))->display(function () {
             $user = $this->owner;
-            if (! $user) {
-                return __('No User');
+
+            if (!$user) {
+                return e(__('No User'));
             }
 
-            return app(UserService::class)->adminUserAvatar($user, withoutLevels: true);
+            return app(UserService::class)
+                ->adminUserAvatar($user, withoutLevels: true);
         });
 
+        /*
+    |--------------------------------------------------------------------------
+    | Max Admin Column
+    |--------------------------------------------------------------------------
+    */
         $grid->column('max_admin', __('Max Admin'))->display(function ($maxAdmin) use ($maxRoomAdmin) {
             $adminsCount = is_array($this->admins) ? count($this->admins) : 0;
             return $adminsCount . '/' . ($maxAdmin ?? $maxRoomAdmin);
         });
 
+        /*
+    |--------------------------------------------------------------------------
+    | Visitors Count
+    |--------------------------------------------------------------------------
+    */
+        $grid->column('room_visitors_count', __('Number of users'))
+            ->display(fn() => $this->room_visitors_count ?? 0);
 
-        $grid->column('id', __('Number of users'))->display(fn() => $this->room_visitors_count ?? 0);
-
-
+        /*
+    |--------------------------------------------------------------------------
+    | Microphones Column
+    |--------------------------------------------------------------------------
+    */
         $grid->column(__('microphone'))->display(function () {
 
             $microphones = $this->microphones->sortBy('position');
-
 
             if ($microphones->isEmpty()) {
                 return '';
@@ -705,8 +888,8 @@ class RoomController extends MainController
             $html = '<div class="image-container">';
 
             foreach ($microphones as $mic) {
-                $user = $mic->user;
 
+                $user = $mic->user;
                 if (!$user) continue;
 
                 $url = $user->profile?->avatar
@@ -716,77 +899,48 @@ class RoomController extends MainController
                 $name = e($user->name);
                 $id   = e($user->id);
 
-                $html .= <<<HTML
-                <div class="image-wrapper" onclick="window.location.href='{$id}'">
-                    <img src="{$url}" title="{$name}"
-                    style="width: 40px; height: 40px; border-radius: 50%;
-                            object-fit: cover; border: 2px solid white;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-                            transition: transform 0.3s ease;"/>
+                $html .= "
+                <div class='image-wrapper'>
+                    <img src='{$url}' title='{$name}'
+                         style='width:40px;height:40px;border-radius:50%;
+                                object-fit:cover;border:2px solid #fff;
+                                box-shadow:0 2px 6px rgba(0,0,0,0.1);'>
                 </div>
-             HTML;
+            ";
             }
 
             $html .= '</div>';
 
-            // Add the same CSS block only once
-            static $appended = false;
-            if (!$appended) {
-                $html .= '
-              <style>
-
-
-
-                .image-container {
-                    display: flex;
-                    justify-content: start;
-                    align-items: center;
-                    gap: -10px; /* Overlap the images slightly */
-                    padding: 8px 0;
-                    overflow-y: overlay;
-                    width: 218px;
-                    padding-right: 16px;
-                }
-                .image-wrapper {
-                    display: inline-block;
-                    position: relative;
-                    margin-right: -12px;
-                }
-                .image-wrapper img {
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 2px solid #fff;
-                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    cursor: pointer;
-                }
-                .image-wrapper img:hover {
-                    transform: scale(1.2);
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                }
-                </style>';
-                $appended = true;
-            }
-
             return $html;
         });
 
-
-
-
-
+        /*
+    |--------------------------------------------------------------------------
+    | Styles
+    |--------------------------------------------------------------------------
+    */
         Admin::style('
+        .image-container {
+            display:flex;
+            align-items:center;
+            gap:-10px;
+            padding:8px 0;
+            width:218px;
+            padding-right:16px;
+        }
+        .image-wrapper {
+            margin-right:-12px;
+        }
+        .image-wrapper img:hover {
+            transform:scale(1.2);
+            transition:0.3s;
+        }
         .dropdown-backdrop {
-            position: absolute !important;
-
+            position:absolute !important;
         }
         html.ltr .dropdown-menu {
-
-            right: 38px !important;
+            right:38px !important;
         }
-
     ');
     }
 
