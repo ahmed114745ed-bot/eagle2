@@ -664,12 +664,33 @@ class RoomController extends MainController
                 $url = $defaultImage;
             }
 
-                return "
-                    <div style='display:flex;align-items:center;gap:10px;'>
-                        <img src='{$url}' style='width:50px;height:50px;border-radius:6px;'>
+            if (strlen($name) > 50) {
+                $name = substr($name, 0, 50) . ' ...';
+            }
+
+            $cleanName = preg_replace('/[\x00-\x1F\x7F]/u', '', $name);
+            $encodedName = htmlspecialchars($cleanName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+            $levelimage = @$this->roomLevel?->img ? getImagePath(@$this->roomLevel->img ?? '') : null;
+            $levelImageHtml = '';
+
+            if ($levelimage) {
+                $levelImageHtml = "
+                    <div style='margin-top:4px;'>
+                        <img src='{$levelimage}' style='width:32px;height:30px;margin-right:2px;'>
+                    </div>
+                ";
+            }
+
+            $roomUrl = url("admin/rooms/{$id}");
+            return "
+                <a href='$roomUrl' style='text-decoration: none; color: inherit;'>
+                    <div style='display: flex; align-items: center; gap: 10px;'>
+                        <img src='$url' alt='Room Image' style='width: 50px; height: 50px; object-fit: cover; border-radius: 6px;'>
                         <div>
-                            <span>{$name}</span><br>
-                            <span>ID: {$id}</span>
+                            <span style='cursor: pointer;'>$encodedName</span><br>
+                            <span style='cursor: pointer;'>ID: $id</span>
+                             {$levelImageHtml}
                         </div>
                     </div>
                ";
