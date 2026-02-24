@@ -42,8 +42,8 @@ class AdminUserController extends EncorUsersController
         $grid =  parent::grid();
 
         $grid->actions(function ( $actions) {
-                $actions->disableDelete(); // تعطيل الحذف الافتراضي
-                $actions->add(new DeleteSubSuperAdminAction()); // إضافة action مخصص
+                $actions->disableDelete(); 
+                $actions->add(new DeleteSubSuperAdminAction()); 
         });
 
         $grid->tools(function ($tools) {
